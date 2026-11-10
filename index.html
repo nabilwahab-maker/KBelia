@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        try {
+          var _origFetch = typeof window !== 'undefined' && window.fetch ? window.fetch.bind(window) : null;
+          var _currentFetch = _origFetch;
+
+          if (typeof Window !== 'undefined' && Window.prototype) {
+            try {
+              Object.defineProperty(Window.prototype, 'fetch', {
+                configurable: true,
+                enumerable: true,
+                get: function() {
+                  return _currentFetch || _origFetch;
+                },
+                set: function(fn) {
+                  _currentFetch = fn;
+                  try {
+                    window.fetch = fn;
+                  } catch (_) {}
+                }
+              });
+            } catch (_) {}
+          }
+
+          try {
+            Object.defineProperty(window, 'fetch', {
+              configurable: true,
+              enumerable: true,
+              get: function() {
+                return _currentFetch || _origFetch;
+              },
+              set: function(fn) {
+                _currentFetch = fn;
+              }
+            });
+          } catch (_) {
+            try {
+              window.fetch = _currentFetch;
+            } catch (_) {}
+          }
+        } catch (_) {}
+
+        var isExtensionError = function(msg, source, err) {
+          try {
+            var full = [
+              msg,
+              source,
+              err && err.message,
+              err && err.stack
+            ].join(' ');
+            return full.indexOf('chrome-extension://') !== -1 ||
+                   full.indexOf('moz-extension://') !== -1 ||
+                   full.indexOf('Cannot set property fetch') !== -1 ||
+                   full.indexOf('which has only a getter') !== -1 ||
+                   full.indexOf('eppiocemhmnlbhjplcgkofciiegomcon') !== -1;
+          } catch (_) {
+            return false;
+          }
+        };
+
+        if (typeof window !== 'undefined') {
+          var prevOnError = window.onerror;
+          window.onerror = function(msg, source, lineno, colno, err) {
+            if (isExtensionError(msg, source, err)) {
+              return true;
+            }
+            if (prevOnError) {
+              return prevOnError.apply(this, arguments);
+            }
+          };
+
+          window.addEventListener('error', function(event) {
+            if (
+              event &&
+              isExtensionError(event.message, event.filename, event.error)
+            ) {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              return true;
+            }
+          }, true);
+
+          window.addEventListener('unhandledrejection', function(event) {
+            if (
+              event &&
+              isExtensionError('', '', event.reason)
+            ) {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              return true;
+            }
+          }, true);
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KBELIA - Portal Pembangunan & Keusahawanan Belia Kelantan</title>
+    <meta name="description" content="KBELIA - Portal rasmi pembangunan inovasi, kapsul niaga, geran dan direktori usahawan belia Kelantan." />
+    <meta property="og:title" content="KBELIA - Portal Belia Kelantan" />
+    <meta property="og:description" content="Portal rasmi pembangunan inovasi, kapsul niaga, geran dan direktori usahawan belia Kelantan." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

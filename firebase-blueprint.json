@@ -1,0 +1,161 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Maklumat profil belia usahawan atau pengguna berdaftar",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "fullName": { "type": "string", "maxLength": 120 },
+        "email": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "district": { "type": "string", "maxLength": 50 },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "avatarUrl": { "type": "string", "maxLength": 500 },
+        "icNumber": { "type": "string", "maxLength": 20 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "fullName", "email"]
+    },
+    "BusinessListing": {
+      "title": "BusinessListing",
+      "description": "Perniagaan atau jenama yang didaftarkan oleh belia Kelantan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "ownerId": { "type": "string", "maxLength": 128 },
+        "ownerName": { "type": "string", "maxLength": 120 },
+        "ownerEmail": { "type": "string", "maxLength": 120 },
+        "ownerPhone": { "type": "string", "maxLength": 30 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "tagline": { "type": "string", "maxLength": 200 },
+        "category": { "type": "string", "maxLength": 50 },
+        "district": { "type": "string", "maxLength": 50 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "ssmNumber": { "type": "string", "maxLength": 50 },
+        "whatsapp": { "type": "string", "maxLength": 30 },
+        "instagram": { "type": "string", "maxLength": 100 },
+        "tiktok": { "type": "string", "maxLength": 100 },
+        "logoUrl": { "type": "string", "maxLength": 500 },
+        "bannerUrl": { "type": "string", "maxLength": 500 },
+        "isApproved": { "type": "boolean" },
+        "isFeatured": { "type": "boolean" },
+        "capsuleSlotId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "ownerId", "businessName", "category", "district"]
+    },
+    "CapsuleSlot": {
+      "title": "CapsuleSlot",
+      "description": "Kapsul niaga / kiosk mini fizikal untuk disewa usahawan belia",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 30 },
+        "name": { "type": "string", "maxLength": 100 },
+        "hubLocation": { "type": "string", "maxLength": 120 },
+        "district": { "type": "string", "maxLength": 50 },
+        "size": { "type": "string", "maxLength": 50 },
+        "monthlyRate": { "type": "number" },
+        "dailyRate": { "type": "number" },
+        "status": { "type": "string", "enum": ["available", "occupied", "maintenance", "reserved"] },
+        "amenities": { "type": "array" },
+        "currentTenantBusinessName": { "type": "string", "maxLength": 150 },
+        "currentTenantId": { "type": "string", "maxLength": 128 },
+        "imageUrl": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "code", "name", "hubLocation", "district", "monthlyRate", "status"]
+    },
+    "CapsuleBooking": {
+      "title": "CapsuleBooking",
+      "description": "Permohonan dan tempahan sewaan slot kapsul niaga oleh belia",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "slotId": { "type": "string", "maxLength": 128 },
+        "slotCode": { "type": "string", "maxLength": 50 },
+        "applicantId": { "type": "string", "maxLength": 128 },
+        "applicantName": { "type": "string", "maxLength": 120 },
+        "applicantEmail": { "type": "string", "maxLength": 120 },
+        "applicantPhone": { "type": "string", "maxLength": 30 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "businessCategory": { "type": "string", "maxLength": 50 },
+        "durationMonths": { "type": "number" },
+        "startDate": { "type": "string", "maxLength": 30 },
+        "pitchNotes": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "adminNotes": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "slotId", "applicantId", "applicantName", "businessName", "status"]
+    },
+    "ProductItem": {
+      "title": "ProductItem",
+      "description": "Produk atau servis yang disenaraikan di bawah sesebuah perniagaan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "businessId": { "type": "string", "maxLength": 128 },
+        "ownerId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 150 },
+        "price": { "type": "number" },
+        "description": { "type": "string", "maxLength": 1000 },
+        "category": { "type": "string", "maxLength": 50 },
+        "imageUrl": { "type": "string", "maxLength": 500 },
+        "inStock": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "businessId", "name", "price"]
+    },
+    "YouthProgram": {
+      "title": "YouthProgram",
+      "description": "Program geran, latihan keusahawanan, bengkel dan pameran untuk belia",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "category": { "type": "string", "maxLength": 50 },
+        "date": { "type": "string", "maxLength": 100 },
+        "location": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "organizer": { "type": "string", "maxLength": 120 },
+        "grantAmount": { "type": "string", "maxLength": 100 },
+        "registrationLink": { "type": "string", "maxLength": 500 },
+        "isFeatured": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "title", "category", "description"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Profil pengguna dan belia usahawan"
+    },
+    "/businesses/{businessId}": {
+      "schema": { "$ref": "#/entities/BusinessListing" },
+      "description": "Penyenaraian perniagaan belia Kelantan"
+    },
+    "/capsule_slots/{slotId}": {
+      "schema": { "$ref": "#/entities/CapsuleSlot" },
+      "description": "Slot kiosk kapsul niaga fizikal"
+    },
+    "/capsule_bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/CapsuleBooking" },
+      "description": "Rekod permohonan dan tempahan slot kapsul"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/ProductItem" },
+      "description": "Katalog produk usahawan belia"
+    },
+    "/programs/{programId}": {
+      "schema": { "$ref": "#/entities/YouthProgram" },
+      "description": "Hebahan program, geran dan latihan belia"
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Senarai ID admin berdaftar"
+    }
+  }
+}
