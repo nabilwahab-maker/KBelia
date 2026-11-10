@@ -23,7 +23,8 @@ import {
   Clock,
   Database,
   Sliders,
-  FileText
+  FileText,
+  Video
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
 import { useAuth } from '../context/AuthContext';
@@ -767,18 +768,19 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
         {/* =================================================================== */}
         {/* ROLE B: MENTOR SISTEM (EKSLUSIF HAB BIMBINGAN & PERAKUAN GERAN)     */}
+        {/* 4 KATEGORI UTAMA SELARI GAYA PORTAL BELIA UMK DENGAN BUTANG LENGKAP */}
         {/* =================================================================== */}
         {isMentor && (
           <div className="space-y-4">
             
-            {/* KATEGORI: PUSAT BIMBINGAN MENTOR */}
+            {/* KATEGORI 1: BIMBINGAN & SESI */}
             <div className="space-y-1">
               <div className="text-[11px] font-black tracking-wider text-purple-700 dark:text-purple-400 uppercase px-2 pt-1 pb-1">
-                {isMs ? 'PUSAT BIMBINGAN MENTOR' : 'MENTOR COACHING HUB'}
+                {isMs ? 'BIMBINGAN & SESI' : 'COACHING & SESSIONS'}
               </div>
 
               {/* BUTANG UTAMA DENGAN SUB-MENU AKORDION */}
-              {matchesSearch('hab bimbingan mentor papan pemuka sesi klinik perakuan geran belia log jurnal minit tindakan profil waktu kelapangan') && (
+              {matchesSearch('papan pemuka mentor sesi bimbingan perakuan geran belia log jurnal minit tindakan profil waktu kelapangan') && (
                 <div className="space-y-1">
                   <button
                     type="button"
@@ -809,7 +811,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   {/* SUB-MENU AKORDION MENTOR (4 MODUL EKSKLUSIF) */}
                   {isMentorDashboardAccordionOpen && (
                     <div className="ml-3 pl-2.5 border-l-2 border-purple-300 dark:border-purple-600/70 space-y-1 pt-0.5 pb-1 animate-in fade-in slide-in-from-top-1 duration-200">
-                      {/* Sub 1: Sesi Bimbingan & Klinik */}
+                      {/* Sub 1: Sesi Bimbingan (NO KLINIK) */}
                       <button
                         type="button"
                         onClick={() => {
@@ -823,7 +825,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Calendar className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'mentor' && mentorSubTab === 'sessions' ? 'text-white' : 'text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400'}`} />
-                        <span className="truncate">{isMs ? 'Sesi Bimbingan & Klinik' : 'Mentoring Sessions'}</span>
+                        <span className="truncate">{isMs ? 'Sesi Bimbingan' : 'Mentoring Sessions'}</span>
                       </button>
 
                       {/* Sub 2: Perakuan Rasmi Geran Belia */}
@@ -879,6 +881,222 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* BUTANG PINTAS LANGSUNG KATEGORI 1 */}
+              {matchesSearch('permohonan bimbingan mentee usahawan baru menunggu semakan') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('sessions');
+                    setTimeout(() => {
+                      document.getElementById('mentor-applications-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl text-slate-600 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:text-purple-700 dark:hover:text-purple-300 transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Users className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                    <span className="truncate">{isMs ? 'Permohonan Bimbingan' : 'Mentorship Applications'}</span>
+                  </div>
+                  <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              )}
+
+              {matchesSearch('jadual bimbingan temujanji kalendar sesi aktif') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('sessions');
+                    setTimeout(() => {
+                      document.getElementById('mentor-schedule-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl text-slate-600 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:text-purple-700 dark:hover:text-purple-300 transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Calendar className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span className="truncate">{isMs ? 'Jadual' : 'Schedule'}</span>
+                  </div>
+                  <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              )}
+
+              {matchesSearch('pelan tindakan tugasan mentee kpi usahawan nota bimbingan') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('sessions');
+                    setTimeout(() => {
+                      document.getElementById('mentor-action-plans-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl text-slate-600 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:text-purple-700 dark:hover:text-purple-300 transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span className="truncate">{isMs ? 'Pelan Tindakan' : 'Action Plan'}</span>
+                  </div>
+                  <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              )}
+            </div>
+
+            {/* KATEGORI 2: PERAKUAN & GERAN */}
+            <div className="space-y-1">
+              <div className="text-[11px] font-black tracking-wider text-amber-600 dark:text-amber-400 uppercase px-2 pt-1 pb-1">
+                {isMs ? 'PERAKUAN & GERAN' : 'ENDORSEMENTS & GRANTS'}
+              </div>
+
+              {matchesSearch('surat perakuan rasmi geran sokongan dana benih umk') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('endorsements');
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
+                    activeTab === 'mentor' && mentorSubTab === 'endorsements'
+                      ? 'bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-300/80 dark:border-amber-500/40 shadow-2xs font-bold'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Award className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span className="truncate">{isMs ? 'Surat Perakuan Rasmi' : 'Official Endorsements'}</span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              )}
+
+              {matchesSearch('kriteria dana benih geran pemangkin rm3000 rm5000 tekun mara') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('endorsements');
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl text-slate-600 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-700 dark:hover:text-amber-300 transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span className="truncate">{isMs ? 'Kriteria Dana & Geran' : 'Grant Criteria'}</span>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 px-1.5 py-0.5 rounded">RM3K-RM10K</span>
+                </button>
+              )}
+            </div>
+
+            {/* KATEGORI 3: LOG & MINIT TINDAKAN */}
+            <div className="space-y-1">
+              <div className="text-[11px] font-black tracking-wider text-emerald-600 dark:text-emerald-400 uppercase px-2 pt-1 pb-1">
+                {isMs ? 'LOG & MINIT TINDAKAN' : 'ACTION LOG & MINUTES'}
+              </div>
+
+              {matchesSearch('log jurnal tindakan minit bimbingan sesi usahawan') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('logbook');
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
+                    activeTab === 'mentor' && mentorSubTab === 'logbook'
+                      ? 'bg-emerald-500/15 text-emerald-900 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-500/40 shadow-2xs font-bold'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <FileCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span className="truncate">{isMs ? 'Log Jurnal Bimbingan' : 'Action Logbook'}</span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              )}
+
+              {matchesSearch('semakan kpi kemajuan tugasan usahawan garis masa') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('logbook');
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-700 dark:hover:text-emerald-300 transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span className="truncate">{isMs ? 'Semakan Tugasan Mentee' : 'Mentee Task Review'}</span>
+                  </div>
+                  <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              )}
+            </div>
+
+            {/* KATEGORI 4: PROFIL & BANTUAN */}
+            <div className="space-y-1">
+              <div className="text-[11px] font-black tracking-wider text-slate-500 dark:text-slate-400 uppercase px-2 pt-1 pb-1">
+                {isMs ? 'PROFIL & BANTUAN' : 'PROFILE & SUPPORT'}
+              </div>
+
+              {matchesSearch('profil kelapangan jadual mentor umk waktu') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('profile');
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
+                    activeTab === 'mentor' && mentorSubTab === 'profile'
+                      ? 'bg-purple-500/15 text-purple-950 dark:text-purple-300 border border-purple-300/80 dark:border-purple-500/40 shadow-2xs font-bold'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Settings className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                    <span className="truncate">{isMs ? 'Profil & Kelapangan' : 'Profile & Availability'}</span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              )}
+
+              {matchesSearch('bilik temu duga maya google meet bilik kaunseling') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('sessions');
+                    setTimeout(() => {
+                      document.getElementById('mentor-schedule-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Video className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                    <span className="truncate">{isMs ? 'Bilik Temujanji Maya' : 'Virtual Meet Room'}</span>
+                  </div>
+                  <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              )}
+
+              {matchesSearch('panduan bimbingan usahawan umk ceed insken etika') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('mentor');
+                    if (onSelectMentorSubTab) onSelectMentorSubTab('profile');
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <GraduationCap className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span className="truncate">{isMs ? 'Panduan UMK CEED' : 'UMK CEED Guidelines'}</span>
+                  </div>
+                  <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
               )}
             </div>
 
@@ -1113,7 +1331,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 </button>
               )}
 
-              {matchesSearch('klinik bimbingan mentor konsultasi bengkel clinic') && (
+              {matchesSearch('sesi bimbingan mentor konsultasi bengkel mentoring') && (
                 <button
                   type="button"
                   onClick={() => setActiveTab('events')}

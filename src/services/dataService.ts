@@ -57,6 +57,25 @@ export function markIdAsDeleted(id: string) {
   }
 }
 
+// Auto-upgrade local storage cache to reflect new photographic assets
+export function upgradeLocalImageCache() {
+  try {
+    if (typeof window === 'undefined') return;
+    const version = localStorage.getItem('kbelia_images_v3');
+    if (!version) {
+      localStorage.setItem('kbelia_images_v3', 'true');
+      localStorage.removeItem(CACHE_KEYS.BUSINESSES);
+      localStorage.removeItem(CACHE_KEYS.SLOTS);
+      localStorage.removeItem(CACHE_KEYS.PRODUCTS);
+      localStorage.removeItem(CACHE_KEYS.PROGRAMS);
+      localStorage.removeItem('kbelia_mentor_profiles');
+    }
+  } catch (e) {
+    console.warn('Cache upgrade notice:', e);
+  }
+}
+upgradeLocalImageCache();
+
 // --- SEED INITIAL DATA IF EMPTY ---
 export async function seedInitialData() {
   try {

@@ -78,7 +78,7 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     recommendedAmount: 'RM3,000',
     grantProgramTitle: 'Dana Benih Usahawan Belia Kelantan (RM3,000)',
     justification: 'Usahawan menunjukkan komitmen tinggi dengan rekod jualan tunai konsisten melebihi RM4,200 sebulan. Penggunaan mesin retort pembungkusan akan melipatgandakan jangka hayat sambal dan sedia dipasarkan di Kapsul Niaga KB Sentral.',
-    businessReadinessRemark: 'Telah menghadiri 3 sesi klinik bimbingan penuh dan mematuhi piawaian pembungkusan label produk UMK CEED.',
+    businessReadinessRemark: 'Telah menghadiri 3 sesi bimbingan penuh dan mematuhi piawaian pembungkusan label produk UMK CEED.',
     issuedAt: '2026-03-28',
     status: 'active'
   },
@@ -426,7 +426,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       recommendedAmount: newEndorsementGrantType,
       grantProgramTitle: programTitle,
       justification: newEndorsementJustification,
-      businessReadinessRemark: newEndorsementReadiness || 'Telah dinilai secara profesional dalam klinik bimbingan mentor UMK.',
+      businessReadinessRemark: newEndorsementReadiness || 'Telah dinilai secara profesional dalam sesi bimbingan mentor UMK.',
       issuedAt: new Date().toISOString().split('T')[0],
       status: 'active'
     };
@@ -515,7 +515,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               Pusat Pengurusan Mentor Bertauliah
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 dark:text-[#8A99AD] leading-relaxed">
-              Bahagian ini dikhaskan untuk <strong>Mentor Bertauliah (UMK, INSKEN & SME Corp)</strong> sahaja bagi menguruskan sesi bimbingan klinik, mengeluarkan <strong>Surat Perakuan Rasmi Geran Belia</strong>, dan mencatat log jurnal tindakan. Modul ini diasingkan sepenuhnya daripada fungsi usahawan mahupun pentadbir sistem demi memelihara integriti bimbingan.
+              Bahagian ini dikhaskan untuk <strong>Mentor Bertauliah (UMK, INSKEN & SME Corp)</strong> sahaja bagi menguruskan sesi bimbingan, mengeluarkan <strong>Surat Perakuan Rasmi Geran Belia</strong>, dan mencatat log jurnal tindakan. Modul ini diasingkan sepenuhnya daripada fungsi usahawan mahupun pentadbir sistem demi memelihara integriti bimbingan.
             </p>
           </div>
 
@@ -625,7 +625,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Sesi Klinik Disahkan
+              Sesi Bimbingan Disahkan
             </span>
             <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 flex items-center justify-center">
               <Calendar className="w-4 h-4" />
@@ -677,299 +677,514 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
       </div>
 
+      {/* 4. SUB-TAB NAVIGATION BAR (SESI BIMBINGAN, PERAKUAN GERAN, LOG JURNAL, PROFIL) */}
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => handleSubTabChange('sessions')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+            currentSubTab === 'sessions'
+              ? 'bg-purple-600 text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span>Sesi Bimbingan</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSubTabChange('endorsements')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+            currentSubTab === 'endorsements'
+              ? 'bg-amber-600 text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Award className="w-4 h-4" />
+          <span>Perakuan Geran</span>
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-white/20 dark:bg-black/20">
+            {totalEndorsementsCount}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSubTabChange('logbook')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+            currentSubTab === 'logbook'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <FileText className="w-4 h-4" />
+          <span>Log & Minit Tindakan</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSubTabChange('profile')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+            currentSubTab === 'profile'
+              ? 'bg-slate-800 text-white shadow-xs dark:bg-slate-700'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <GraduationCap className="w-4 h-4" />
+          <span>Profil & Kelapangan</span>
+        </button>
+      </div>
+
       {/* ===================================================================== */}
-      {/* TAB 1: SESI BIMBINGAN & KLINIK MENTEE                                  */}
+      {/* TAB 1: SESI BIMBINGAN (LAYOUT KEBAWAH PENUH & MESRA BACAAN MESEJ)     */}
       {/* ===================================================================== */}
       {currentSubTab === 'sessions' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
+        <div className="flex flex-col space-y-8 animate-in fade-in duration-200">
           
-          {/* Kolum 1: Senarai Permohonan Temu Janji Mentee */}
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+          {/* =================================================================== */}
+          {/* SEKSYEN 1: PERMOHONAN BIMBINGAN (FULL-WIDTH STACKED CARD)           */}
+          {/* =================================================================== */}
+          <section id="mentor-applications-section" className="bg-white dark:bg-[#1E293B] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 gap-3">
+              <div>
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                    Permohonan Bimbingan Mentee
+                  <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center">
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                    Permohonan Bimbingan
                   </h3>
                 </div>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Senarai permohonan bimbingan usahawan belia dengan mesej cabaran, perincian bisnes dan tindakan bimbingan segera.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                   {filteredRegistrations.length} Usahawan
                 </span>
               </div>
+            </div>
 
-              {/* Quick Search */}
-              <div className="relative mb-3">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            {/* Quick Search & Filter Controls Bar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Cari usahawan, bisnes atau topik..."
-                  className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  placeholder="Cari nama usahawan, jenama perniagaan atau topik bimbingan..."
+                  className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                 />
               </div>
 
               {/* Status Tabs Filter */}
-              <div className="flex items-center gap-1 pb-2 mb-3 border-b border-slate-100 dark:border-slate-800 overflow-x-auto">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                 {(['all', 'pending', 'confirmed', 'completed'] as const).map(tab => (
                   <button
                     key={tab}
                     type="button"
                     onClick={() => setStatusFilter(tab)}
-                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all whitespace-nowrap cursor-pointer ${
                       statusFilter === tab
-                        ? 'bg-purple-600 text-white shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        ? 'bg-purple-600 text-white shadow-xs font-bold'
+                        : 'text-slate-600 dark:text-slate-400 bg-slate-100/70 dark:bg-slate-800/60 hover:bg-slate-200/80 dark:hover:bg-slate-700/80'
                     }`}
                   >
-                    {tab === 'all' ? 'Semua' : tab === 'pending' ? `Menunggu (${pendingCount})` : tab === 'confirmed' ? `Disahkan (${confirmedCount})` : `Selesai (${completedCount})`}
+                    {tab === 'all' ? `Semua (${mentorRegistrations.length})` : tab === 'pending' ? `Menunggu (${pendingCount})` : tab === 'confirmed' ? `Disahkan (${confirmedCount})` : `Selesai (${completedCount})`}
                   </button>
                 ))}
               </div>
-
-              {/* Mentee List Container */}
-              <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
-                {filteredRegistrations.length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                    <GraduationCap className="w-8 h-8 text-slate-400 mx-auto mb-1 opacity-50" />
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Tiada rekod padanan.</p>
-                  </div>
-                ) : (
-                  filteredRegistrations.map(mentee => {
-                    const isPending = mentee.status === 'pending';
-                    const isConfirmed = mentee.status === 'confirmed';
-                    const isCompleted = mentee.status === 'completed';
-
-                    return (
-                      <div
-                        key={mentee.id}
-                        className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-all space-y-2"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                              {mentee.entrepreneurName}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                              {mentee.businessName} &middot; <span className="font-semibold text-purple-600 dark:text-purple-400">{mentee.topic}</span>
-                            </p>
-                          </div>
-                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
-                            isCompleted
-                              ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300'
-                              : isConfirmed
-                              ? 'bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300'
-                              : isPending
-                              ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300'
-                              : 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300'
-                          }`}>
-                            {isCompleted ? 'Selesai' : isConfirmed ? 'Disahkan' : isPending ? 'Menunggu' : 'Batal'}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60 dark:border-slate-700/60 text-[10px]">
-                          {(() => {
-                            const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
-                            const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
-                            return (
-                              <a
-                                href={cleanPhone ? `https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}` : '#'}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-emerald-700 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1"
-                              >
-                                <Phone className="w-3 h-3" />
-                                <span>WhatsApp Usahawan</span>
-                              </a>
-                            );
-                          })()}
-
-                          <div className="flex items-center gap-1">
-                            {isPending && (
-                              <button
-                                type="button"
-                                onClick={() => handleStatusChange(mentee, 'confirmed')}
-                                className="px-2 py-0.5 rounded text-[10px] font-bold text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                              >
-                                Sahkan
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => handleOpenNotesModal(mentee)}
-                              className="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 hover:bg-purple-200 cursor-pointer"
-                            >
-                              Nota Tindakan
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-3 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span>Bimbingan usahawan berdaftar UMK</span>
-              <span className="font-mono text-purple-600 dark:text-purple-400 font-bold">KBELIA 2026</span>
-            </div>
-          </div>
-
-          {/* Kolum 2: Jadual Klinik Bimbingan & Temu Janji Aktif */}
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                    Jadual Klinik Terdekat
-                  </h3>
+            {/* Mentee Applications Full-Width Stacked Cards */}
+            <div className="space-y-4 pt-1">
+              {filteredRegistrations.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30">
+                  <GraduationCap className="w-10 h-10 text-slate-400 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Tiada rekod padanan permohonan bimbingan.</p>
+                  <p className="text-xs text-slate-400 mt-1">Cuba tukar kata kunci carian atau pilih tab status lain di atas.</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsNewSlotModalOpen(true)}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Slot Baharu</span>
-                </button>
-              </div>
+              ) : (
+                filteredRegistrations.map(mentee => {
+                  const isPending = mentee.status === 'pending';
+                  const isConfirmed = mentee.status === 'confirmed';
+                  const isCompleted = mentee.status === 'completed';
 
-              {/* Upcoming Confirmed Sessions */}
-              <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
-                {mentorRegistrations.filter(m => m.status === 'confirmed').length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                    <Clock className="w-8 h-8 text-slate-400 mx-auto mb-1 opacity-50" />
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Tiada sesi klinik aktif ditetapkan.</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">Sahkan permohonan menunggu di Kolum 1 untuk menjadualkan temu janji.</p>
-                  </div>
-                ) : (
-                  mentorRegistrations.filter(m => m.status === 'confirmed').map((mentee) => (
+                  const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
+                  const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
+
+                  return (
                     <div
                       key={mentee.id}
-                      className="p-3.5 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 space-y-2"
+                      className="p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/40 hover:border-purple-300 dark:hover:border-purple-800/70 transition-all space-y-4 shadow-2xs"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>{mentee.preferredDate || 'Akan Ditetapkan'} &middot; {mentee.preferredTime || '10:00 AM'}</span>
-                        </span>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300">
-                          Disahkan
-                        </span>
+                      {/* Top Row: Mentee Info & Status Badge */}
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                              {mentee.entrepreneurName}
+                            </h4>
+                            <span className="text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-0.5 rounded-md border border-purple-200 dark:border-purple-800/60">
+                              {mentee.businessName}
+                            </span>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                            <span className="flex items-center gap-1 font-medium text-slate-700 dark:text-slate-300">
+                              <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                              <span>{mentee.district || 'Kelantan'}</span>
+                            </span>
+                            <span>&middot;</span>
+                            <span>Kategori: <strong className="text-slate-700 dark:text-slate-300 font-semibold">{mentee.businessCategory || 'Perniagaan Belia'}</strong></span>
+                            <span>&middot;</span>
+                            <span>Fokus Bimbingan: <strong className="text-purple-600 dark:text-purple-400 font-semibold">{mentee.topic}</strong></span>
+                            {mentee.preferredDate && (
+                              <>
+                                <span>&middot;</span>
+                                <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium">
+                                  <Clock className="w-3 h-3" />
+                                  <span>Cadangan: {mentee.preferredDate} ({mentee.preferredTime || '10:00 AM'})</span>
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Status Label */}
+                        <div className="shrink-0 self-start">
+                          <span className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-lg ${
+                            isCompleted
+                              ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                              : isConfirmed
+                              ? 'bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                              : isPending
+                              ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                              : 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                          }`}>
+                            {isCompleted ? 'Selesai Dibimbing' : isConfirmed ? 'Sesi Disahkan' : isPending ? 'Menunggu Tindakan' : 'Dibatalkan'}
+                          </span>
+                        </div>
                       </div>
 
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                          {mentee.entrepreneurName} ({mentee.businessName})
-                        </h4>
-                        <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
-                          Topik: <span className="font-semibold">{mentee.topic}</span>
+                      {/* Prominent Mentee Message & Challenges Box (Generous space & large readable font) */}
+                      <div className="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/60 space-y-2">
+                        <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                          <MessageSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                          <span>Mesej Permohonan & Cabaran Dihadapi Usahawan:</span>
+                        </div>
+                        <p className="text-sm sm:text-base leading-relaxed text-slate-800 dark:text-slate-100 font-normal whitespace-pre-line">
+                          {mentee.challenges ? (
+                            `"${mentee.challenges}"`
+                          ) : (
+                            <span className="italic text-slate-500 dark:text-slate-400">
+                              "Usahawan memohon sesi bimbingan khusus bagi strategi pemasaran, pengurusan kos operasi, dan persediaan dokumentasi permohonan geran belia UMK."
+                            </span>
+                          )}
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-blue-100 dark:border-blue-900/40">
-                        {mentee.meetingLink ? (
+                      {/* Existing Mentor Action Plan Preview if any */}
+                      {mentee.mentorActionPlan && (
+                        <div className="p-3.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 space-y-1">
+                          <div className="flex items-center justify-between text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                            <span className="flex items-center gap-1.5">
+                              <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                              <span>Pelan Tindakan Mentor Tersimpan:</span>
+                            </span>
+                            <span className="text-[11px] font-normal text-emerald-700 dark:text-emerald-400">Telah dihantar</span>
+                          </div>
+                          <p className="text-xs text-slate-700 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                            {mentee.mentorActionPlan}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Action Buttons Row */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        {/* Left: Contact */}
+                        <div className="flex items-center gap-2">
                           <a
-                            href={mentee.meetingLink}
+                            href={cleanPhone ? `https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20saya%20mentor%20anda%20dari%20KBelia%20UMK.` : '#'}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-[11px] text-blue-600 dark:text-blue-400 font-bold hover:underline"
+                            className="px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-950/60 hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
                           >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            <span>Sertai Google Meet</span>
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>WhatsApp Usahawan</span>
                           </a>
-                        ) : (
-                          <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            <span>Bilik Kaunseling UMK</span>
-                          </span>
-                        )}
+                        </div>
 
-                        <button
-                          type="button"
-                          onClick={() => handleStatusChange(mentee, 'completed')}
-                          className="px-2.5 py-1 rounded text-[10px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-1"
-                        >
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>Selesai Sesi</span>
-                        </button>
+                        {/* Right: Actions */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          {isPending && (
+                            <button
+                              type="button"
+                              onClick={() => handleStatusChange(mentee, 'confirmed')}
+                              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                            >
+                              <Calendar className="w-3.5 h-3.5" />
+                              <span>Sahkan Sesi Bimbingan</span>
+                            </button>
+                          )}
+
+                          {isConfirmed && (
+                            <button
+                              type="button"
+                              onClick={() => handleStatusChange(mentee, 'completed')}
+                              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Tandakan Selesai Sesi</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleOpenNotesModal(mentee)}
+                            className="px-3.5 py-2 rounded-xl text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-100/80 dark:bg-purple-950/60 hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>{mentee.mentorActionPlan ? 'Kemaskini Pelan Tindakan' : '+ Sediakan Pelan Tindakan'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNewEndorsementMenteeName(mentee.entrepreneurName);
+                              setNewEndorsementBusinessName(mentee.businessName);
+                              setNewEndorsementDistrict(mentee.district);
+                              setIsNewEndorsementModalOpen(true);
+                            }}
+                            className="px-3.5 py-2 rounded-xl text-xs font-bold text-amber-800 dark:text-amber-300 bg-amber-100/80 dark:bg-amber-950/60 hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Award className="w-3.5 h-3.5" />
+                            <span>Perakuan Geran</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
+                  );
+                })
+              )}
             </div>
+          </section>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-3 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span>Penyeliaan Temuduga Maya & Bersemuka</span>
-              <span className="text-blue-600 dark:text-blue-400 font-bold">UMK CEED</span>
-            </div>
-          </div>
-
-          {/* Kolum 3: Pelan Tindakan Ringkas Mentee */}
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+          {/* =================================================================== */}
+          {/* SEKSYEN 2: JADUAL (FULL-WIDTH STACKED CARD)                         */}
+          {/* =================================================================== */}
+          <section id="mentor-schedule-section" className="bg-white dark:bg-[#1E293B] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 gap-3">
+              <div>
                 <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                    Pelan Tindakan Mentee
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                    Jadual
                   </h3>
                 </div>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                  {mentorRegistrations.filter(m => m.mentorActionPlan).length} Disediakan
-                </span>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Takwim sesi temujanji aktif bersemuka di bilik bimbingan UMK serta sesi Google Meet maya.
+                </p>
               </div>
 
-              {/* Action Plans Feed */}
-              <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
-                {mentorRegistrations.filter(m => m.mentorActionPlan).length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-                    <MessageSquare className="w-8 h-8 text-slate-400 mx-auto opacity-50" />
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Belum ada nota pelan tindakan.</p>
-                    <p className="text-[11px] text-slate-400">Tekan "Nota Tindakan" pada senarai mentee untuk menghantar panduan perniagaan.</p>
-                  </div>
-                ) : (
-                  mentorRegistrations.filter(m => m.mentorActionPlan).map((mentee) => (
+              <button
+                type="button"
+                onClick={() => setIsNewSlotModalOpen(true)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Slot Baharu</span>
+              </button>
+            </div>
+
+            {/* Confirmed Sessions List */}
+            <div className="space-y-4">
+              {mentorRegistrations.filter(m => m.status === 'confirmed').length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30">
+                  <Clock className="w-10 h-10 text-slate-400 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Tiada sesi bimbingan aktif ditetapkan dalam jadual.</p>
+                  <p className="text-xs text-slate-400 mt-1">Sahkan permohonan bimbingan di bahagian atas untuk menjadualkan tarikh dan slot.</p>
+                </div>
+              ) : (
+                mentorRegistrations.filter(m => m.status === 'confirmed').map((mentee) => {
+                  const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
+                  const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
+
+                  return (
                     <div
                       key={mentee.id}
-                      className="p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/30 dark:bg-emerald-950/20 space-y-2"
+                      className="p-5 sm:p-6 rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/30 dark:bg-blue-950/20 space-y-4"
                     >
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                          {mentee.entrepreneurName}
-                        </h4>
-                        <button
-                          type="button"
-                          onClick={() => handleOpenNotesModal(mentee)}
-                          className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer"
-                        >
-                          Kemaskini
-                        </button>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs font-bold text-blue-800 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/60 px-3 py-1 rounded-lg uppercase tracking-wider flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                            <span>{mentee.preferredDate || 'Akan Ditetapkan'} &middot; {mentee.preferredTime || '10:00 AM'}</span>
+                          </span>
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            Sesi Disahkan
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {mentee.meetingLink ? (
+                            <a
+                              href={mentee.meetingLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-xs"
+                            >
+                              <Video className="w-3.5 h-3.5" />
+                              <span>Sertai Google Meet</span>
+                              <ExternalLink className="w-3 h-3 ml-0.5" />
+                            </a>
+                          ) : (
+                            <span className="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-1 bg-white/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 font-medium">
+                              <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                              <span>Bilik Bimbingan UMK CEED</span>
+                            </span>
+                          )}
+                        </div>
                       </div>
 
-                      <p className="text-[11px] text-slate-600 dark:text-slate-300 whitespace-pre-line bg-white/70 dark:bg-slate-900/50 p-2.5 rounded-lg border border-emerald-100 dark:border-emerald-900/40 leading-relaxed font-sans">
-                        {mentee.mentorActionPlan}
-                      </p>
+                      <div className="space-y-1">
+                        <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                          {mentee.entrepreneurName} &middot; <span className="text-blue-600 dark:text-blue-400">{mentee.businessName}</span>
+                        </h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-300">
+                          Topik Perbincangan: <strong className="text-slate-900 dark:text-white font-semibold">{mentee.topic}</strong> &middot; Daerah: {mentee.district || 'Kelantan'}
+                        </p>
+                        {mentee.challenges && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 pt-1 line-clamp-1 italic">
+                            Nota usahawan: "{mentee.challenges}"
+                          </p>
+                        )}
+                      </div>
 
-                      <div className="flex items-center justify-between text-[10px] text-slate-400">
-                        <span>Topik: {mentee.topic}</span>
-                        <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Tersimpan</span>
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-blue-100 dark:border-blue-900/40">
+                        {cleanPhone ? (
+                          <a
+                            href={`https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20peringatan%20sesi%20bimbingan%20kita%20pada%20${encodeURIComponent(mentee.preferredDate || 'tarikh dijadualkan')}.`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-emerald-700 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>Hantar Peringatan WhatsApp</span>
+                          </a>
+                        ) : <span />}
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenNotesModal(mentee)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950 hover:bg-purple-200 transition-colors cursor-pointer"
+                          >
+                            Nota / Pelan Tindakan
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleStatusChange(mentee, 'completed')}
+                            className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Selesai Sesi</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  ))
-                )}
+                  );
+                })
+              )}
+            </div>
+          </section>
+
+          {/* =================================================================== */}
+          {/* SEKSYEN 3: PELAN TINDAKAN (FULL-WIDTH STACKED CARD)                 */}
+          {/* =================================================================== */}
+          <section id="mentor-action-plans-section" className="bg-white dark:bg-[#1E293B] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                    Pelan Tindakan
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Garis panduan bimbingan, sasaran KPI jualan dan langkah penambahbaikan berstruktur untuk usahawan belia.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  {mentorRegistrations.filter(m => m.mentorActionPlan).length} Pelan Disediakan
+                </span>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-3 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span>Pemantauan Prestasi Usahawan</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">Patuh KPI</span>
+            {/* Action Plans Feed in Full Width */}
+            <div className="space-y-4">
+              {mentorRegistrations.filter(m => m.mentorActionPlan).length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30 space-y-2">
+                  <MessageSquare className="w-10 h-10 text-slate-400 mx-auto opacity-50" />
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Belum ada nota pelan tindakan.</p>
+                  <p className="text-xs text-slate-400">Tekan "+ Sediakan Pelan Tindakan" pada senarai permohonan bimbingan di atas untuk menetapkan hala tuju bisnes usahawan.</p>
+                </div>
+              ) : (
+                mentorRegistrations.filter(m => m.mentorActionPlan).map((mentee) => (
+                  <div
+                    key={mentee.id}
+                    className="p-5 sm:p-6 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/30 dark:bg-emerald-950/20 space-y-3"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                          {mentee.entrepreneurName} &middot; <span className="text-emerald-700 dark:text-emerald-400">{mentee.businessName}</span>
+                        </h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Topik: <span className="font-semibold text-slate-700 dark:text-slate-300">{mentee.topic}</span> &middot; Daerah: {mentee.district || 'Kelantan'}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleOpenNotesModal(mentee)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/50 hover:bg-emerald-200 dark:hover:bg-emerald-900/80 transition-colors cursor-pointer self-start sm:self-auto"
+                      >
+                        Kemaskini Pelan Tindakan
+                      </button>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-white/90 dark:bg-slate-900/70 border border-emerald-200/80 dark:border-emerald-900/50 space-y-1.5">
+                      <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 block">
+                        Garis Panduan & Sasaran Tindakan Mentor:
+                      </span>
+                      <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed font-sans">
+                        {mentee.mentorActionPlan}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+                      <span>Penyeliaan berterusan di bawah inisiatif keusahawanan UMK CEED</span>
+                      <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Tersimpan & Sah</span>
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-          </div>
+          </section>
 
         </div>
       )}
@@ -1457,7 +1672,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   type="text"
                   value={newEndorsementReadiness}
                   onChange={(e) => setNewEndorsementReadiness(e.target.value)}
-                  placeholder="Cth: Telah lulus 3 sesi klinik mentor & mematuhi piawaian pembungkusan UMK"
+                  placeholder="Cth: Telah lulus 3 sesi bimbingan mentor & mematuhi piawaian pembungkusan UMK"
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
@@ -1730,7 +1945,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   rows={3}
                   value={newLogMinutes}
                   onChange={(e) => setNewLogMinutes(e.target.value)}
-                  placeholder="Catatkan nasihat mentor, isu aliran tunai atau penemuan klinik..."
+                  placeholder="Catatkan nasihat mentor, isu aliran tunai atau penemuan bimbingan..."
                   className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-sans leading-relaxed"
                 />
               </div>

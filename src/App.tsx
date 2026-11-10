@@ -152,6 +152,12 @@ function MainApp() {
   // Mentor Portal & Mentorship State
   const [mentors, setMentors] = useState<MentorProfile[]>(() => {
     try {
+      const version = localStorage.getItem('kbelia_mentor_v3');
+      if (!version) {
+        localStorage.setItem('kbelia_mentor_v3', 'true');
+        localStorage.setItem('kbelia_mentor_profiles', JSON.stringify(INITIAL_MENTOR_PROFILES));
+        return INITIAL_MENTOR_PROFILES;
+      }
       const saved = localStorage.getItem('kbelia_mentor_profiles');
       return saved ? JSON.parse(saved) : INITIAL_MENTOR_PROFILES;
     } catch {
@@ -213,9 +219,14 @@ function MainApp() {
         snapshot.forEach((doc) => {
           if (!deleted.includes(doc.id)) {
             const data = doc.data();
+            const seedSlot = INITIAL_CAPSULE_SLOTS.find(s => s.id === doc.id);
+            const imageUrl = (seedSlot?.imageUrl?.startsWith('/public/assets/generated') || !data.imageUrl || data.imageUrl.includes('kiosk_modular_kbelia')) 
+              ? (seedSlot?.imageUrl || data.imageUrl) 
+              : data.imageUrl;
             loadedSlots.push({
               id: doc.id,
               ...data,
+              imageUrl,
               amenities: Array.isArray(data.amenities) ? data.amenities : ['Palam Elektrik', 'WiFi 500Mbps', 'Rak Display']
             } as CapsuleSlot);
           }
@@ -246,7 +257,20 @@ function MainApp() {
         const loadedBiz: BusinessListing[] = [];
         snapshot.forEach((doc) => {
           if (!deleted.includes(doc.id)) {
-            loadedBiz.push({ id: doc.id, ...doc.data() } as BusinessListing);
+            const data = doc.data();
+            const seedBiz = INITIAL_BUSINESSES.find(b => b.id === doc.id);
+            const bannerUrl = (seedBiz?.bannerUrl?.startsWith('/public/assets/generated') || !data.bannerUrl || data.bannerUrl.includes('banner_kelantan_landmark') || data.bannerUrl.includes('kiosk_modular'))
+              ? (seedBiz?.bannerUrl || data.bannerUrl)
+              : data.bannerUrl;
+            const logoUrl = (seedBiz?.logoUrl?.startsWith('/public/assets/generated') || !data.logoUrl || data.logoUrl.includes('avatar_youth_') || data.logoUrl.includes('product_kelantan_delights') || data.logoUrl.includes('banner_kelantan'))
+              ? (seedBiz?.logoUrl || data.logoUrl)
+              : data.logoUrl;
+            loadedBiz.push({ 
+              id: doc.id, 
+              ...data,
+              bannerUrl,
+              logoUrl
+            } as BusinessListing);
           }
         });
         const existingBizIds = new Set(loadedBiz.map(b => b.id));
@@ -275,7 +299,16 @@ function MainApp() {
         const loadedProd: ProductItem[] = [];
         snapshot.forEach((doc) => {
           if (!deleted.includes(doc.id)) {
-            loadedProd.push({ id: doc.id, ...doc.data() } as ProductItem);
+            const data = doc.data();
+            const seedProd = INITIAL_PRODUCTS.find(p => p.id === doc.id);
+            const imageUrl = (seedProd?.imageUrl?.startsWith('/public/assets/generated') || !data.imageUrl || data.imageUrl.includes('product_kelantan_delights') || data.imageUrl.includes('kiosk_modular') || data.imageUrl.includes('avatar_') || data.imageUrl.includes('banner_kelantan'))
+              ? (seedProd?.imageUrl || data.imageUrl)
+              : data.imageUrl;
+            loadedProd.push({ 
+              id: doc.id, 
+              ...data,
+              imageUrl
+            } as ProductItem);
           }
         });
         const existingProdIds = new Set(loadedProd.map(p => p.id));

@@ -1261,7 +1261,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <h3 className="text-xl font-bold text-white">Pemantauan Mentor & Usahawan Negeri Kelantan</h3>
               <p className="text-xs text-purple-200 max-w-2xl leading-relaxed">
-                Pemantauan sesi temujanji klinik bimbingan usahawan belia bersama mentor UMK dan jurulatih industri.
+                Pemantauan sesi temujanji bimbingan usahawan belia bersama mentor UMK dan jurulatih industri.
               </p>
             </div>
 

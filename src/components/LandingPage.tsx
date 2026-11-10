@@ -92,7 +92,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       badge: 'Slot Sedia Diduduki',
       badgeColor: 'bg-emerald-500 text-white',
       location: 'Hab UMK Bachok & KB Sentral',
-      imageUrl: '/src/assets/images/kiosk_modular_kbelia_1793924253417.jpg',
+      imageUrl: '/public/assets/generated/kiosk_modular_kbelia.jpg',
       stat: '10 Kapsul Tersedia',
       ctaText: 'Log Masuk & Mohon Sewa',
       onAction: () => setActiveTab('login')
@@ -105,7 +105,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       badge: 'Usahawan Pilihan Belia',
       badgeColor: 'bg-amber-500 text-slate-950',
       location: 'Zon Seni & Warisan Kota Bharu',
-      imageUrl: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+      imageUrl: '/public/assets/generated/batik_canting_kelantan.jpg',
       stat: 'Penilaian 4.8 ★ (38 Ulasan)',
       ctaText: 'Log Masuk & Lihat Direktori',
       onAction: () => setActiveTab('login')
@@ -118,7 +118,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       badge: 'F&B Pilihan Ramai',
       badgeColor: 'bg-red-600 text-white',
       location: 'Hab Kapsul Niaga Bachok',
-      imageUrl: '/src/assets/images/product_kelantan_delights_1793924253401.jpg',
+      imageUrl: '/public/assets/generated/kopi_nissem_melaka.jpg',
       stat: '42+ Ulasan Pelanggan',
       ctaText: 'Log Masuk & Teroka Produk',
       onAction: () => setActiveTab('login')
@@ -131,7 +131,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       badge: 'Penerima Dana Benih',
       badgeColor: 'bg-blue-600 text-white',
       location: 'Pusat Transformasi Belia KB',
-      imageUrl: '/src/assets/images/avatar_youth_male_1793924250192.jpg',
+      imageUrl: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1200&q=80',
       stat: 'Pembiayaan Diluluskan',
       ctaText: 'Log Masuk & Maklumat Skim',
       onAction: () => setActiveTab('login')
@@ -144,7 +144,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       badge: 'Liputan Seluruh Negeri',
       badgeColor: 'bg-purple-600 text-white',
       location: '10 Jajahan Kelantan',
-      imageUrl: '/src/assets/images/banner_kelantan_landmark_1793924253242.jpg',
+      imageUrl: '/public/assets/generated/wau_bulan_kelantan.jpg',
       stat: '10 Jajahan Berhubung',
       ctaText: 'Log Masuk & Semak Lokasi',
       onAction: () => setActiveTab('login')
@@ -168,19 +168,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     setCurrentSlide(prev => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
-  // Continuous auto-moving horizontal photo strip cards (Maintained as original)
+  // Continuous auto-moving horizontal photo strip cards (All distinct & aligned)
   const movingPhotoCards = [
     {
-      img: '/src/assets/images/kiosk_modular_kbelia_1793924253417.jpg',
+      img: '/public/assets/generated/kopi_nissem_melaka.jpg',
       title: "Kapsul F&B A1",
       subtitle: "D'Kelate Artisan Coffee",
       tag: 'RM15/hari',
       tagColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
       location: 'Bachok',
-      type: 'Kiosk Sedia Ada'
+      type: 'Kiosk F&B'
     },
     {
-      img: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+      img: '/public/assets/generated/batik_canting_kelantan.jpg',
       title: 'Batik Belia Kontemporari',
       subtitle: 'Fesyen & Kraf Moden',
       tag: 'Rating 4.8 ★',
@@ -189,7 +189,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       type: 'Kraf & Fesyen'
     },
     {
-      img: '/src/assets/images/kiosk_modular_kbelia_1793924253417.jpg',
+      img: '/public/assets/generated/kiosk_modular_kbelia.jpg',
       title: 'Kapsul Niaga KB Sentral B1',
       subtitle: 'Ruang Komersil Smart Pod',
       tag: 'RM20/hari',
@@ -198,7 +198,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       type: 'Kiosk Komersil'
     },
     {
-      img: '/src/assets/images/avatar_youth_male_1793924250192.jpg',
+      img: '/public/assets/generated/usahawan_belia_lelaki.jpg',
       title: 'Studio Multimedia KB',
       subtitle: 'Fotografi & TikTok Ads',
       tag: 'Dana Benih',
@@ -207,17 +207,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       type: 'Servis Digital'
     },
     {
-      img: '/src/assets/images/banner_kelantan_landmark_1793924253242.jpg',
-      title: 'Kapsul Fesyen A2',
-      subtitle: 'Boutique Pod Modular',
-      tag: 'RM12/hari',
+      img: '/public/assets/generated/keropok_lekor_kelantan.jpg',
+      title: 'Keropok Crispy Chepa',
+      subtitle: 'Kudapan Lekor Vakum',
+      tag: 'RM15/pek',
       tagColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-      location: 'Bachok',
-      type: 'Kiosk Butik'
+      location: 'Pengkalan Chepa',
+      type: 'Makanan Tradisi'
     },
     {
-      img: '/src/assets/images/product_kelantan_delights_1793924253401.jpg',
-      title: 'Akok Tart & Kopi Nissem',
+      img: '/public/assets/generated/akok_kelantan_tradisi.jpg',
+      title: 'Akok Tart & Pastri Bakar',
       subtitle: 'Pastri & Minuman Warisan',
       tag: 'F&B Pilihan',
       tagColor: 'bg-rose-100 text-rose-900 border-rose-300',
@@ -225,18 +225,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       type: 'Inkubasi F&B'
     },
     {
-      img: '/src/assets/images/kiosk_modular_kbelia_1793924253417.jpg',
+      img: '/public/assets/generated/madu_kelulut_rimba.jpg',
       title: 'Kapsul Agrotek C1',
-      subtitle: 'Hub Komuniti Keusahawanan',
+      subtitle: 'Madu Kelulut Rimba Jeli',
       tag: 'RM14/hari',
       tagColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
       location: 'Jeli',
       type: 'Produk Agro'
     },
     {
-      img: '/src/assets/images/banner_kelantan_landmark_1793924253242.jpg',
+      img: '/public/assets/generated/wau_bulan_kelantan.jpg',
       title: 'Kapsul Warisan & Kraf D1',
-      subtitle: 'Hub Pelancongan Sri Tujoh',
+      subtitle: 'Galeri Wau Bulan Sri Tujoh',
       tag: 'RM12/hari',
       tagColor: 'bg-purple-100 text-purple-900 border-purple-300',
       location: 'Tumpat',

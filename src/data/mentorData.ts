@@ -11,7 +11,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
       'Strategi E-Dagang & Penjenamaan',
       'Pengembangan Perniagaan Belia'
     ],
-    avatarUrl: '/src/assets/images/avatar_mentor_umk_1793924250411.jpg',
+    avatarUrl: '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg',
     email: 'wanazhar@umk.edu.my',
     phone: '60199887711',
     bio: 'Berpengalaman lebih 15 tahun membimbing usahawan belia dan pelajar IPT di Pantai Timur mencapai jualan 6 angka melalui saluran digital.',
@@ -29,7 +29,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
       'Kawalan Kualiti Produk & Rantaian Bekalan',
       'Keusahawanan Wanita & Kraf Warisan'
     ],
-    avatarUrl: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+    avatarUrl: '/public/assets/generated/usahawan_belia_wanita.jpg',
     email: 'sitiaminah.coach@insken.gov.my',
     phone: '60129876543',
     bio: 'Pemenang Anugerah Usahawanita Inovatif Kelantan dan panel bimbingan INSKEN yang telah mengeksport produk kraf ke 8 negara.',
@@ -47,7 +47,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
       'Permohonan Pembiayaan TEKUN, MARA & PUNB',
       'Pengurusan Cukai & Aliran Tunai'
     ],
-    avatarUrl: '/src/assets/images/avatar_mentor_umk_1793924250411.jpg',
+    avatarUrl: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
     email: 'khairul.audit@smeadvisor.my',
     phone: '60139123456',
     bio: 'Pakar perakaunan bertauliah membantu usahawan mikro menyediakan buku tunai piawai dan kertas kerja pembiayaan perniagaan sehingga RM50,000.',
@@ -65,7 +65,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
       'Teknologi Pemprosesan & Jangka Hayat Produk',
       'Inovasi Makanan & Minuman (F&B) Kiosk'
     ],
-    avatarUrl: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+    avatarUrl: '/public/assets/generated/avatar_youth_female_1793924250745.jpg',
     email: 'norazila.fiat@umk.edu.my',
     phone: '60145556677',
     bio: 'Mengetuai makmal inovasi halal UMK Jeli dengan kepakaran membimbing usahawan F&B melepasi audit MeSTI dan pensijilan Halal rasmi.',
