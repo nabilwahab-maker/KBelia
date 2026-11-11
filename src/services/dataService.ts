@@ -264,7 +264,7 @@ export async function saveCapsuleSlot(slot: Partial<CapsuleSlot> & { code: strin
       amenities: slot.amenities || ['Palam Elektrik', 'WiFi 500Mbps', 'Rak Display'],
       currentTenantBusinessName: slot.currentTenantBusinessName || '',
       currentTenantId: slot.currentTenantId || '',
-      imageUrl: slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia_1793924253417.jpg',
+      imageUrl: slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia.jpg',
       createdAt: slot.createdAt || new Date().toISOString()
     };
     await setDoc(doc(db, path, id), fullSlot, { merge: true });

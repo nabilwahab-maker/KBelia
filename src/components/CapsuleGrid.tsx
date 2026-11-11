@@ -240,7 +240,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                 {/* 1. Gambar Kad Berkadar Tetap (H-48) di Atas - Bersih Tanpa Teks Bertindih */}
                 <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
                   <img
-                    src={slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia_1793924253417.jpg'}
+                    src={slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia.jpg'}
                     alt={slot.name}
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                   />
@@ -288,45 +288,45 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
                       {/* Prominent Pricing Block */}
                       <div className="text-right shrink-0">
-                        <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-900 mb-1">
+                        <span className="text-[11px] font-semibold text-blue-800 dark:text-blue-400 block mb-0.5">
                           Subsidi 50%
                         </span>
                         <div>
-                          <span className="text-base font-black text-red-700 dark:text-amber-400 tabular-nums">RM{slot.monthlyRate}</span>
-                          <span className="text-[11px] text-slate-500 dark:text-[#8A99AD]">/bln</span>
+                          <span className="text-lg font-bold text-blue-900 dark:text-blue-400 tabular-nums">RM{slot.monthlyRate}</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">/bln</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Specifications Bar (Size & Jajahan) */}
-                    <div className="py-2 px-3 bg-slate-50 dark:bg-[#1A222C] rounded-xl border border-slate-200/80 dark:border-[#2E3A47] flex items-center justify-between text-xs">
-                      <span className="text-slate-500 dark:text-[#8A99AD]">
+                    <div className="py-2 px-3 bg-slate-50 dark:bg-[#1A222C] rounded-lg border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+                      <span className="text-slate-500 dark:text-slate-400">
                         Saiz: <strong className="text-slate-800 dark:text-white font-semibold">{slot.size}</strong>
                       </span>
-                      <span className="text-slate-500 dark:text-[#8A99AD]">
+                      <span className="text-slate-500 dark:text-slate-400">
                         Jajahan: <strong className="text-slate-800 dark:text-white font-semibold">{slot.district}</strong>
                       </span>
                     </div>
 
                     {/* Current Tenant Info if Occupied */}
                     {slot.currentTenantBusinessName && (
-                      <div className="p-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl flex items-center gap-2">
-                        <Store className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <div className="p-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-800 rounded-lg flex items-center gap-2">
+                        <Store className="w-4 h-4 text-slate-600 dark:text-slate-400 shrink-0" />
                         <div className="min-w-0 flex-1">
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-medium">Dioperasi oleh:</span>
-                          <span className="text-xs font-bold text-slate-800 dark:text-white truncate block">{slot.currentTenantBusinessName}</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-normal">Dioperasi oleh:</span>
+                          <span className="text-xs font-semibold text-slate-800 dark:text-white truncate block">{slot.currentTenantBusinessName}</span>
                         </div>
                       </div>
                     )}
 
                     {/* Amenities list */}
                     <div className="space-y-1.5">
-                      <span className="text-[11px] font-bold text-slate-500 dark:text-[#8A99AD]">Kemudahan Termasuk:</span>
+                      <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">Kemudahan Termasuk:</span>
                       <div className="flex flex-wrap gap-1.5">
                         {(slot.amenities || []).map((amenity, idx) => (
                           <span
                             key={idx}
-                            className="text-[10px] font-medium bg-slate-100 dark:bg-[#1A222C] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#2E3A47] px-2 py-0.5 rounded-md"
+                            className="text-[10px] font-medium bg-slate-100 dark:bg-[#1A222C] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 px-2 py-0.5 rounded-md"
                           >
                             {amenity}
                           </span>
@@ -335,8 +335,8 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                     </div>
                   </div>
 
-                  {/* UX RULE: Clear CTAs & Primary CTA stands out */}
-                  <div className="pt-3 border-t border-slate-100 dark:border-[#2E3A47]">
+                  {/* Primary CTA Button in UMK Blue */}
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
                     {!isAvailable ? (
                       <button
                         type="button"
@@ -348,25 +348,25 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                             onSelectSlot(slot);
                           }
                         }}
-                        className="interactive-press w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-2xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/60 group/btn"
+                        className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
                       >
-                        <Store className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <Store className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400 shrink-0" />
                         <span>Lihat Butiran Kapsul & Penyewa</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform duration-200 text-emerald-600 dark:text-emerald-400" />
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                       </button>
                     ) : isReadOnly ? (
-                      <div className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-center bg-slate-100 dark:bg-[#1A222C] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#2E3A47] flex items-center justify-center gap-2">
-                        <Eye className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                      <div className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold text-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2">
+                        <Eye className="w-3.5 h-3.5 text-blue-700 dark:text-blue-400" />
                         <span>Status: Kekosongan Tersedia (Dipantau)</span>
                       </div>
                     ) : (
                       <button
                         type="button"
                         onClick={() => onSelectSlot(slot)}
-                        className="interactive-press interactive-lift w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-xs bg-red-700 hover:bg-red-800 active:bg-red-900 text-white shadow-red-700/20 group/btn"
+                        className="w-full py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-blue-800 hover:bg-blue-900 active:bg-blue-950 text-white shadow-sm"
                       >
                         <span>Mohon Kapsul Ini (RM{slot.monthlyRate}/bln)</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform duration-200" />
+                        <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>

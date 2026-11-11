@@ -134,17 +134,15 @@ export const B2BMarketSection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Banner */}
-      <div className="bg-gradient-to-r from-red-800 via-red-900 to-amber-900 rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-blue-900 rounded-2xl p-6 sm:p-8 text-white shadow-sm relative overflow-hidden">
         <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-amber-300 text-xs font-bold mb-3 border border-white/10">
-            <Megaphone className="w-3.5 h-3.5" />
-            <span>{isEn ? 'Youth Ads & Commercial Opportunities' : 'Ruang Iklan & Peluang Niaga Belia'}</span>
+          <div className="text-xs font-bold uppercase tracking-wider text-blue-200 mb-2">
+            {isEn ? 'Youth Ads & Commercial Opportunities' : 'Ruang Iklan & Peluang Niaga Belia'}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
             {isEn ? 'Youth Commercial Ads & Business Opportunities' : 'Pemandangan Belia & Siarkan Iklan Niaga'}
           </h1>
-          <p className="text-xs sm:text-sm text-red-100/90 mt-2 leading-relaxed">
+          <p className="text-xs sm:text-sm text-blue-100 mt-2 leading-relaxed">
             {isEn
               ? 'A dedicated platform for youth entrepreneurs to advertise commercial offers, find local business supplies, and explore trade partnerships across 10 Kelantan districts.'
               : 'Platform khas untuk usahawan belia menyiarkan iklan perniagaan, tawaran produk, mencari bekalan tempatan dan memupuk kerjasama niaga di seluruh 10 jajahan Kelantan.'}
@@ -153,7 +151,7 @@ export const B2BMarketSection: React.FC = () => {
       </div>
 
       {/* Control Bar */}
-      <div className="bg-white dark:bg-[#24303F] rounded-2xl p-4 border border-slate-200 dark:border-[#2E3A47] shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="relative w-full md:w-72">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
@@ -161,19 +159,19 @@ export const B2BMarketSection: React.FC = () => {
             placeholder={isEn ? 'Search supplies, ingredients, packaging...' : 'Cari bekalan, ramuan, pembungkusan...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-red-700"
+            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-700"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           {/* Type Toggle */}
-          <div className="flex rounded-xl bg-slate-100 dark:bg-[#1A222C] p-1 border border-slate-200 dark:border-[#2E3A47]">
+          <div className="flex rounded-lg bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
             <button
               type="button"
               onClick={() => setFilterType('all')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'all'
-                  ? 'bg-white dark:bg-[#24303F] text-slate-900 dark:text-white shadow-xs'
+                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
                   : 'text-slate-500 dark:text-slate-400'
               }`}
             >
@@ -182,9 +180,9 @@ export const B2BMarketSection: React.FC = () => {
             <button
               type="button"
               onClick={() => setFilterType('demand')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'demand'
-                  ? 'bg-amber-500 text-white shadow-xs'
+                  ? 'bg-blue-800 text-white shadow-xs'
                   : 'text-slate-500 dark:text-slate-400'
               }`}
             >
@@ -193,9 +191,9 @@ export const B2BMarketSection: React.FC = () => {
             <button
               type="button"
               onClick={() => setFilterType('supply')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'supply'
-                  ? 'bg-emerald-600 text-white shadow-xs'
+                  ? 'bg-blue-700 text-white shadow-xs'
                   : 'text-slate-500 dark:text-slate-400'
               }`}
             >
@@ -207,7 +205,7 @@ export const B2BMarketSection: React.FC = () => {
           <select
             value={filterDistrict}
             onChange={(e) => setFilterDistrict(e.target.value)}
-            className="px-3 py-2 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-slate-800 dark:text-slate-200 font-semibold focus:outline-none"
+            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium focus:outline-none"
           >
             <option value="all">{isEn ? 'All Districts' : 'Semua Jajahan'}</option>
             <option value="Kota Bharu">Kota Bharu</option>
@@ -226,9 +224,9 @@ export const B2BMarketSection: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsPostingModalOpen(true)}
-            className="interactive-press interactive-lift px-4 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ml-auto"
+            className="px-4 py-2 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer ml-auto active:scale-98"
           >
-            <Megaphone className="w-3.5 h-3.5 text-amber-300" />
+            <Megaphone className="w-3.5 h-3.5 text-blue-200" />
             <span>{isEn ? 'Post Advertisement' : 'Siarkan Iklan'}</span>
           </button>
         </div>
@@ -239,31 +237,31 @@ export const B2BMarketSection: React.FC = () => {
         {filteredListings.map((item) => (
           <div
             key={item.id}
-            className="interactive-card bg-white dark:bg-[#24303F] rounded-3xl p-5 border border-slate-200 dark:border-[#2E3A47] hover:border-amber-400/40 dark:hover:border-amber-400/40 shadow-xs flex flex-col justify-between group cursor-pointer"
+            className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 hover:border-blue-500 shadow-xs flex flex-col justify-between group transition-colors"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <span
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${
+                  className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${
                     item.type === 'supply'
-                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-900/40'
-                      : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-900/40'
+                      ? 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-900/40'
+                      : 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
                   }`}
                 >
                   {item.type === 'supply' ? (isEn ? 'Supplying / Wholesale' : 'Membekal (Tawaran)') : (isEn ? 'Seeking Supply' : 'Mencari Bekalan')}
                 </span>
-                <span className="text-[10px] text-slate-400 font-semibold">
+                <span className="text-[11px] text-slate-400 font-mono tabular-nums">
                   {item.date}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white leading-snug group-hover:text-red-700 dark:group-hover:text-amber-400 transition-colors duration-200">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                   {item.title}
                 </h3>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
-                  <span className="font-bold text-slate-700 dark:text-slate-300">{item.authorBusiness}</span>
-                  <span>•</span>
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">{item.authorBusiness}</span>
+                  <span>·</span>
                   <span>{item.authorName}</span>
                 </div>
               </div>
@@ -273,18 +271,18 @@ export const B2BMarketSection: React.FC = () => {
               </p>
 
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 pt-1">
-                <MapPin className="w-3.5 h-3.5 text-red-600 dark:text-amber-400 shrink-0" />
+                <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
                 <span>{item.district}</span>
               </div>
             </div>
 
             {/* Direct WhatsApp Call to Action */}
-            <div className="pt-4 mt-4 border-t border-slate-100 dark:border-[#2E3A47]">
+            <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
               <a
                 href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20B2B%20anda%20di%20Portal%20KBELIA:%20${encodeURIComponent(item.title)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="interactive-press interactive-lift w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-2"
+                className="w-full py-2 px-3 bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 active:scale-98"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>

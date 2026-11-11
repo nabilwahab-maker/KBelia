@@ -140,7 +140,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
           <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-[#2C384D] bg-slate-100 dark:bg-[#161D2B]">
             <div className="h-48 sm:h-56 w-full relative">
               <img
-                src={slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia_1793924253417.jpg'}
+                src={slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia.jpg'}
                 alt={slot.name}
                 className="w-full h-full object-cover"
               />

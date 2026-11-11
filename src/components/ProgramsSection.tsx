@@ -112,17 +112,17 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           <div
             key={prog.id}
             id={`program-card-${prog.id}`}
-            className="interactive-card bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-[#2E3A47] hover:border-amber-400/40 dark:hover:border-amber-400/40 overflow-hidden shadow-xs flex flex-col justify-between group cursor-pointer"
+            className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 overflow-hidden shadow-xs flex flex-col justify-between group transition-colors"
           >
             <div className="p-6 space-y-4">
               
               {/* Category & Featured Badge */}
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 bg-slate-100 dark:bg-[#1A222C] text-slate-800 dark:text-slate-300 border border-slate-200 dark:border-[#2E3A47] rounded text-[11px] font-bold">
+                <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-semibold">
                   {prog.category}
                 </span>
                 {prog.isFeatured && (
-                  <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50 rounded text-[10px] font-bold">
+                  <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50 rounded text-[10px] font-bold">
                     {language === 'en' ? 'Featured' : 'Utama'}
                   </span>
                 )}
@@ -130,29 +130,29 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
 
               {/* Title & Description */}
               <div>
-                <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-snug group-hover:text-red-700 dark:group-hover:text-amber-400 transition-colors duration-200">
+                <h3 className="font-bold text-slate-900 dark:text-white text-base leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                   {prog.title}
                 </h3>
-                <p className="text-xs text-slate-600 dark:text-[#8A99AD] mt-2 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                   {prog.description}
                 </p>
               </div>
 
               {/* Grant amount callout if present */}
               {prog.grantAmount && (
-                <div className="p-3 bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl text-xs flex items-center gap-2 group-hover:scale-[1.02] transition-transform duration-200">
-                  <DollarSign className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                <div className="p-3 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/50 rounded-lg text-xs flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-blue-700 dark:text-blue-400 shrink-0" />
                   <div>
-                    <span className="text-[10px] text-amber-800 dark:text-amber-400 font-medium block">
+                    <span className="text-[10px] text-blue-800 dark:text-blue-300 font-medium block">
                       {language === 'en' ? 'Aid Value / Grant Amount:' : 'Nilai Bantuan / Hadiah:'}
                     </span>
-                    <span className="font-extrabold text-amber-950 dark:text-amber-200">{prog.grantAmount}</span>
+                    <span className="font-extrabold text-blue-950 dark:text-blue-200 tabular-nums">{prog.grantAmount}</span>
                   </div>
                 </div>
               )}
 
               {/* Date & Location Details */}
-              <div className="space-y-1.5 pt-1 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-[#2E3A47]">
+              <div className="space-y-1.5 pt-1 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" />
                   <span>{prog.date}</span>
@@ -171,10 +171,10 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             </div>
 
             {/* Footer Action */}
-            <div className="p-4 bg-slate-50 dark:bg-[#1C2434] border-t border-slate-100 dark:border-[#2E3A47]">
+            <div className="p-4 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800">
             {isReadOnly ? (
-              <div className="w-full py-2.5 px-4 bg-slate-100 dark:bg-[#1C2434] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold flex items-center justify-center gap-2">
-                <Eye className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <div className="w-full py-2 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium flex items-center justify-center gap-2">
+                <Eye className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 <span>{language === 'en' ? 'Status: State Initiative (Monitored)' : 'Status: Inisiatif Negeri (Dipantau)'}</span>
               </div>
             ) : (
@@ -191,10 +191,10 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                     );
                   }
                 }}
-                className="interactive-press interactive-lift w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-red-700 dark:hover:bg-red-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                className="w-full py-2.5 px-4 bg-blue-800 hover:bg-blue-900 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer active:scale-98"
               >
                 <span>{language === 'en' ? 'Register / Apply Program' : 'Daftar / Mohon Program'}</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
             </div>

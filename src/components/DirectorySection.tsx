@@ -212,17 +212,18 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent"></div>
 
-                    {/* Category pill */}
-                    <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded text-[10px] font-bold bg-slate-900/90 text-white">
+                    {/* Category kicker */}
+                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-900/80 backdrop-blur-xs text-white">
                       {biz.category}
-                    </span>
+                    </div>
 
-                    {/* Featured / SSM Badge */}
+                    {/* Verified SSM mark */}
                     <div className="absolute top-3 right-3 flex items-center gap-1">
-                      {biz.isFeatured && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-400 text-slate-950">
-                          {t('featured_badge')}
-                        </span>
+                      {biz.ssmNumber && (
+                        <div className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white/90 text-slate-900 shadow-xs flex items-center gap-1">
+                          <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                          <span>SSM Sah</span>
+                        </div>
                       )}
                     </div>
 
@@ -230,30 +231,23 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                     <img
                       src={biz.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                       alt={biz.businessName}
-                      className="absolute -bottom-3 left-4 w-14 h-14 rounded-xl border-2 border-white dark:border-[#24303F] shadow-md object-cover bg-white dark:bg-[#1A222C] group-hover:scale-110 transition-transform duration-300"
+                      className="absolute -bottom-3 left-4 w-12 h-12 rounded-lg border-2 border-white dark:border-[#24303F] shadow-sm object-cover bg-white dark:bg-[#1A222C]"
                     />
                   </div>
 
                   {/* Content Info */}
-                  <div className="pt-5 p-5 space-y-3">
+                  <div className="pt-4 p-5 space-y-2.5">
                     <div>
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-extrabold text-slate-900 dark:text-white text-base group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-200">
-                          {biz.businessName}
-                        </h3>
-                        {biz.ssmNumber && (
-                          <span title={t('ssm_registered')} className="text-emerald-600 dark:text-emerald-400">
-                            <ShieldCheck className="w-4 h-4" />
-                          </span>
-                        )}
-                      </div>
+                      <h3 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-blue-800 dark:group-hover:text-blue-400 transition-colors">
+                        {biz.businessName}
+                      </h3>
                       
-                      <p className="text-xs text-red-700 dark:text-red-400 font-semibold line-clamp-1 mt-0.5">
+                      <p className="text-xs text-blue-800 dark:text-blue-400 font-medium line-clamp-1 mt-0.5">
                         {biz.tagline}
                       </p>
                     </div>
 
-                    <p className="text-xs text-slate-600 dark:text-[#8A99AD] line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
                       {biz.description}
                     </p>
 
@@ -262,8 +256,8 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                         <MapPin className="w-3.5 h-3.5 text-slate-400" />
                         <span>{biz.district}, Kelantan</span>
                       </div>
-                      <div className="flex items-center gap-1 text-amber-500 font-bold text-[11px]">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
+                      <div className="flex items-center gap-1 text-slate-700 dark:text-slate-200 font-semibold text-xs tabular-nums">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
                         <span>{biz.rating || 5.0}</span>
                       </div>
                     </div>
@@ -271,13 +265,13 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="p-4 bg-slate-50/80 dark:bg-[#1C2434] border-t border-slate-100 dark:border-[#2E3A47] flex items-center gap-2">
+                <div className="p-4 bg-slate-50 dark:bg-[#1C2434] border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
                   <button
                     onClick={() => onSelectBusiness(biz)}
-                    className="interactive-press flex-1 py-2 px-3 bg-white dark:bg-[#24303F] hover:bg-slate-100 dark:hover:bg-[#2E3A47] text-slate-800 dark:text-white border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 shadow-2xs cursor-pointer"
+                    className="flex-1 py-2 px-3 bg-blue-800 hover:bg-blue-900 active:bg-blue-950 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                   >
-                    <span>{language === 'en' ? 'Catalogue & Profile' : 'Katalog & Profil'}</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
+                    <span>{language === 'en' ? 'View Profile & Catalog' : 'Katalog & Profil'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </button>
 
                   <a

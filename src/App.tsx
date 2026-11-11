@@ -493,7 +493,7 @@ function MainApp() {
   // 0. STANDALONE LANDING PAGE (Welcoming homepage on initial link load)
   if (activeTab === 'landing') {
     return (
-      <div className="min-h-screen bg-[#F4F1EA] dark:bg-[#0B1329] bg-songket-pattern text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B132B] text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
         <TopProgressBar />
         <LandingPage
           setActiveTab={setActiveTab}
@@ -540,7 +540,7 @@ function MainApp() {
   // 1. STANDALONE LOGIN PAGE (Separated from dashboard)
   if (activeTab === 'login') {
     return (
-      <div className="min-h-screen bg-[#F4F1EA] dark:bg-[#0B1329] bg-songket-pattern text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B132B] text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
         <LoginPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -569,7 +569,7 @@ function MainApp() {
   // 1b. STANDALONE REGISTER PAGE (Dedicated Laman Pendaftaran Usahawan Belia)
   if (activeTab === 'register') {
     return (
-      <div className="min-h-screen bg-[#F4F1EA] dark:bg-[#0B1329] bg-songket-pattern text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B132B] text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
         <RegisterPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -596,7 +596,7 @@ function MainApp() {
   }
 
   return (
-    <div className="h-screen bg-[#F4F1EA] dark:bg-[#0B1329] bg-songket-pattern flex flex-col text-slate-900 dark:text-[#E2E8F0] font-sans antialiased transition-colors duration-200 overflow-hidden">
+    <div className="h-screen bg-[#F8FAFC] dark:bg-[#0B132B] flex flex-col text-slate-900 dark:text-[#E2E8F0] font-sans antialiased transition-colors duration-200 overflow-hidden">
       <TopProgressBar />
       {/* 1. TOP HEADER BAR */}
       <UMKHeader
@@ -640,7 +640,7 @@ function MainApp() {
         />
 
         {/* Center/Right Dynamic Body - Fully stretched for full-screen mode */}
-        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-3 sm:p-6 lg:p-8 xl:p-10 w-full max-w-none min-w-0 scroll-smooth bg-[#F4F1EA] dark:bg-[#0B1329] bg-songket-pattern">
+        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-3 sm:p-6 lg:p-8 xl:p-10 w-full max-w-none min-w-0 scroll-smooth bg-[#F8FAFC] dark:bg-[#0B132B]">
           
           {/* Universal Dashboard Banner Header following reference layout */}
           <DashboardBannerHeader

@@ -161,45 +161,31 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
         {/* Left Column: Exactly Aligned with Sidebar below (w-64 or w-18) */}
         <div className={`${isSidebarCollapsed ? 'w-18 px-2 justify-center gap-1' : 'w-64 px-4 justify-between'} shrink-0 h-full border-r border-slate-200 dark:border-[#2E3A47] flex items-center transition-all duration-200 bg-white dark:bg-[#1C2434]`}>
           
-          {/* KBELIA Brand Logo Button */}
+          {/* KBELIA Brand Wordmark */}
           <button
             id="kbelia-logo-btn"
             onClick={() => setShowLogoutConfirm(true)}
-            className={`flex items-center gap-2.5 hover:opacity-90 transition-opacity text-left shrink-0 cursor-pointer ${isSidebarCollapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-2.5 hover:opacity-95 transition-opacity text-left shrink-0 cursor-pointer ${isSidebarCollapsed ? 'justify-center' : ''}`}
             title="KBELIA - Tekan logo untuk log keluar"
           >
-            <div className="w-8 h-8 sm:w-9 sm:h-9 relative flex items-center justify-center rounded-xl bg-gradient-to-tr from-red-700 via-red-800 to-amber-600 text-white shadow-xs shrink-0">
-              <div className="flex items-center justify-center font-black tracking-tighter text-sm">
-                <span className="text-amber-300">K</span>
-                <span className="text-white">B</span>
-              </div>
+            <div className="w-8 h-8 rounded-lg bg-blue-900 text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-xs shrink-0">
+              <span className="font-extrabold text-white">KB</span>
             </div>
 
             {!isSidebarCollapsed && (
               <div className="leading-tight">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-base sm:text-lg font-black tracking-tight text-red-950 dark:text-white">
+                <div className="flex items-center gap-2">
+                  <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
                     KBELIA
                   </span>
-                  <span className={`px-1.5 py-0.2 text-[9px] font-extrabold rounded uppercase border ${
-                    isAdmin 
-                      ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-800' 
-                      : userProfile?.role === 'mentor' 
-                        ? 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-950/80 dark:text-purple-300 dark:border-purple-800' 
-                        : 'bg-red-100 text-red-900 border-red-200 dark:bg-red-950/80 dark:text-red-300 dark:border-red-900'
-                  }`}>
-                    {isAdmin ? t('nav_role_admin') : userProfile?.role === 'mentor' ? t('nav_role_mentor') : t('nav_role_merchant')}
+                  <span className="text-xs text-slate-300 dark:text-slate-600 font-normal">·</span>
+                  <span className="text-xs font-semibold text-blue-800 dark:text-blue-400">
+                    UMK CEED
                   </span>
                 </div>
-                <div className="text-[10px] font-bold">
-                  {isAdmin ? (
-                    <span className="text-amber-700 dark:text-amber-400">{t('nav_admin_badge')}</span>
-                  ) : userProfile?.role === 'mentor' ? (
-                    <span className="text-purple-700 dark:text-purple-400">{t('nav_mentor_badge')}</span>
-                  ) : (
-                    <span className="text-emerald-700 dark:text-emerald-400">{t('nav_youth_badge')}</span>
-                  )}
-                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">
+                  {isAdmin ? 'Panel Pentadbir' : userProfile?.role === 'mentor' ? 'Portal Mentor Pakar' : 'Portal Usahawan Belia'}
+                </p>
               </div>
             )}
           </button>

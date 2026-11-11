@@ -243,7 +243,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [slotMonthlyRate, setSlotMonthlyRate] = useState('150');
   const [slotStatus, setSlotStatus] = useState<SlotStatus>('available');
   const [slotAmenities, setSlotAmenities] = useState('Palam Elektrik 13A, WiFi 500Mbps, Rak Paparan Bertingkat');
-  const [slotImageUrl, setSlotImageUrl] = useState('/public/assets/generated/kiosk_modular_kbelia_1793924253417.jpg');
+  const [slotImageUrl, setSlotImageUrl] = useState('/public/assets/generated/kiosk_modular_kbelia.jpg');
 
   // Program form state
   const [showProgramForm, setShowProgramForm] = useState(false);
