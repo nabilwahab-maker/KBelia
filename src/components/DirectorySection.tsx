@@ -206,7 +206,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                 <div>
                   <div className="relative h-36 bg-slate-100 dark:bg-slate-800 overflow-hidden">
                     <img
-                      src={biz.bannerUrl || '/src/assets/images/banner_kelantan_landmark_1793924253242.jpg'}
+                      src={biz.bannerUrl || '/public/assets/generated/banner_kelantan_landmark_1793924253242.jpg'}
                       alt={biz.businessName}
                       className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                     />
@@ -228,7 +228,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
 
                     {/* Logo avatar floating */}
                     <img
-                      src={biz.logoUrl || '/src/assets/images/product_kelantan_delights_1793924253401.jpg'}
+                      src={biz.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                       alt={biz.businessName}
                       className="absolute -bottom-3 left-4 w-14 h-14 rounded-xl border-2 border-white dark:border-[#24303F] shadow-md object-cover bg-white dark:bg-[#1A222C] group-hover:scale-110 transition-transform duration-300"
                     />

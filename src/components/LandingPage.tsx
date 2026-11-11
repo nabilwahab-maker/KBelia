@@ -1115,7 +1115,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <div>
                     <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-slate-800">
                       <img 
-                        src={slot.imageUrl || '/src/assets/images/kiosk_modular_kbelia_1793924253417.jpg'} 
+                        src={slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia_1793924253417.jpg'} 
                         alt={slot.name} 
                         className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500" 
                       />

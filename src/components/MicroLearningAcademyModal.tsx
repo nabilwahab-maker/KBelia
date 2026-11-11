@@ -69,20 +69,6 @@ const COURSES: CourseModule[] = [
     ],
     isCompleted: false,
     badge: 'Lencana Pemasar Digital Belia'
-  },
-  {
-    id: '4',
-    title: 'Asas Permohonan Pensijilan Halal JAKIM / JHEIK',
-    category: 'Pematuhan',
-    duration: '8 Minit',
-    description: 'Langkah mudah melengkapkan dokumen Halal untuk meluaskan pasaran produk warisan Kelantan ke peringkat antarabangsa.',
-    keyPoints: [
-      'Semak semua ramuan makanan mempunyai sijil Halal yang diiktiraf JAKIM.',
-      'Lantik sekurang-kurangnya seorang penyelia Muslim bagi pemantauan operasi.',
-      'Simpan fail rekod pembekal bahan mentah dengan kemas.'
-    ],
-    isCompleted: false,
-    badge: 'Lencana Pematuhan Halal'
   }
 ];
 

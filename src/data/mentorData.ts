@@ -16,7 +16,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     phone: '60199887711',
     bio: 'Berpengalaman lebih 15 tahun membimbing usahawan belia dan pelajar IPT di Pantai Timur mencapai jualan 6 angka melalui saluran digital.',
     availableDays: 'Setiap Isnin & Rabu (10:00 AM - 1:00 PM)',
-    activeMenteesCount: 4,
+    activeMenteesCount: 3,
     pin: '1234'
   },
   {
@@ -34,7 +34,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     phone: '60129876543',
     bio: 'Pemenang Anugerah Usahawanita Inovatif Kelantan dan panel bimbingan INSKEN yang telah mengeksport produk kraf ke 8 negara.',
     availableDays: 'Setiap Selasa & Khamis (2:30 PM - 5:00 PM)',
-    activeMenteesCount: 3,
+    activeMenteesCount: 2,
     pin: '1234'
   },
   {
@@ -54,24 +54,6 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     availableDays: 'Setiap Rabu & Sabtu (11:00 AM - 3:00 PM)',
     activeMenteesCount: 2,
     pin: '1234'
-  },
-  {
-    id: 'mentor-4',
-    name: 'Ts. Dr. Norazila Binti Mat Deris',
-    title: 'Penyelidik Kanan Keselamatan Makanan & Bioteknologi',
-    agency: 'Fakulti Industri Asas Tani UMK Kampus Jeli',
-    expertise: [
-      'Pensijilan Halal JAKIM & MeSTI KKM',
-      'Teknologi Pemprosesan & Jangka Hayat Produk',
-      'Inovasi Makanan & Minuman (F&B) Kiosk'
-    ],
-    avatarUrl: '/public/assets/generated/avatar_youth_female_1793924250745.jpg',
-    email: 'norazila.fiat@umk.edu.my',
-    phone: '60145556677',
-    bio: 'Mengetuai makmal inovasi halal UMK Jeli dengan kepakaran membimbing usahawan F&B melepasi audit MeSTI dan pensijilan Halal rasmi.',
-    availableDays: 'Setiap Jumaat (9:00 AM - 12:00 PM)',
-    activeMenteesCount: 3,
-    pin: '1234'
   }
 ];
 
@@ -83,8 +65,8 @@ export const INITIAL_MENTORSHIP_REGISTRATIONS: MentorshipRegistration[] = [
     entrepreneurName: 'Ahmad Nabil Bin Yusoff',
     entrepreneurPhone: '601123456789',
     entrepreneurEmail: 'nabil.kopi@gmail.com',
-    businessName: 'Kopi Tok Bali & Pastri Pantai',
-    district: 'Pasir Puteh',
+    businessName: "D'Kelate Artisan Coffee & Pastry",
+    district: 'Bachok',
     businessCategory: 'Makanan & Minuman (F&B)',
     topic: 'Strategi Pemasaran TikTok Shop & Video Viral Menu Tempatan',
     challenges: 'Kiosk kami baru mula beroperasi. Perlukan bimbingan bagaimana merakam video TikTok menarik bagi menarik pelancong dan pelajar UMK datang ke kiosk.',
@@ -104,7 +86,7 @@ export const INITIAL_MENTORSHIP_REGISTRATIONS: MentorshipRegistration[] = [
     entrepreneurName: 'Wan Nur Insyirah',
     entrepreneurPhone: '60139988112',
     entrepreneurEmail: 'insyirah.art@gmail.com',
-    businessName: 'Batik Seri Cik Siti Studio',
+    businessName: 'Batik Belia Kontemporari',
     district: 'Kota Bharu',
     businessCategory: 'Fesyen, Batik & Kraf Kelantan',
     topic: 'Penjenamaan Premium & Jualan Live TikTok',
@@ -129,99 +111,14 @@ export const INITIAL_MENTORSHIP_REGISTRATIONS: MentorshipRegistration[] = [
     district: 'Bachok',
     businessCategory: 'Fesyen, Batik & Kraf Kelantan',
     topic: 'Penembusan Pasaran Cenderamata Korporat & Eksport',
-    challenges: 'Produk anyaman kami berkualiti tinggi tetapi sukar tembusi pasaran hotel mewah dan cenderamata agensi kerajaan.',
-    preferredDate: '29 Mac 2026 (Ahad)',
+    challenges: 'Produk anyaman kami diminati tetapi belum mempunyai pembungkusan piawai untuk pasaran antarabangsa.',
+    preferredDate: '25 Mac 2026 (Rabu)',
     preferredTime: '2:30 PM - 3:30 PM',
-    mode: 'Bersemuka di Kampus',
-    status: 'pending',
-    notes: 'Usahawan meminta panduan menyediakan profil cenderamata rasmi.',
-    mentorActionPlan: '',
-    meetingLink: '',
-    createdAt: '2026-03-23T11:00:00Z'
-  },
-  {
-    id: 'mentee-reg-4',
-    mentorId: 'mentor-3',
-    mentorName: 'En. Khairul Hafiz Bin Razali, CA',
-    entrepreneurName: 'Mohd Firdaus Bin Zakaria',
-    entrepreneurPhone: '60143322119',
-    entrepreneurEmail: 'firdaus.auto@gmail.com',
-    businessName: 'Daus Tech & Aksesori Kiosk',
-    district: 'Kota Bharu',
-    businessCategory: 'Teknologi & Servis Digital',
-    topic: 'Penyediaan Penyata Aliran Tunai & Pembiayaan TEKUN RM20,000',
-    challenges: 'Mahu memohon pembiayaan TEKUN Nasional untuk membesarkan stok aksesori tetapi belum mempunyai rekod kewangan yang teratur.',
-    preferredDate: '2 April 2026 (Khamis)',
-    preferredTime: '11:00 AM - 12:00 PM',
-    mode: 'Bersemuka di Kampus',
-    status: 'confirmed',
-    notes: 'Sesi dijadualkan di Pejabat Audit Kota Bharu.',
-    mentorActionPlan: '1. Asingkan lejar jualan harian kiosk selama 30 hari.\n2. Sediakan salinan penyata bank syarikat 3 bulan terkini.\n3. Isi borang senarai aset TEKUN.',
-    meetingLink: '',
-    createdAt: '2026-03-21T16:40:00Z'
-  },
-  {
-    id: 'mentee-reg-5',
-    mentorId: 'mentor-4',
-    mentorName: 'Ts. Dr. Norazila Binti Mat Deris',
-    entrepreneurName: 'Nik Farisya Binti Nik Omar',
-    entrepreneurPhone: '60195544332',
-    entrepreneurEmail: 'farisya.sambal@gmail.com',
-    businessName: 'Sambal Garing Ikan Masin Tumpat',
-    district: 'Tumpat',
-    businessCategory: 'Makanan & Minuman (F&B)',
-    topic: 'Permohonan Pensijilan MeSTI & Pelabelan Nutrisi',
-    challenges: 'Mahu masukkan sambal garing ke rangkaian stesen minyak dan pasar raya tempatan tetapi perlukan pensijilan MeSTI KKM.',
-    preferredDate: '3 April 2026 (Jumaat)',
-    preferredTime: '10:00 AM - 11:00 AM',
     mode: 'Google Meet Maya',
     status: 'completed',
-    notes: 'Sesi bimbingan fasa 1 telah selesai. Usahawan kini dalam peringkat ujian makmal jangka hayat.',
-    mentorActionPlan: '1. Hantar sampel ke Makmal UMK Jeli untuk ujian mikrobiologi.\n2. Kemas kini reka bentuk label dengan format fakta nutrisi standard KKM.\n3. Hadiri bengkel GMP UMK bulan depan.',
-    meetingLink: 'https://meet.google.com/nor-zila-umk',
-    createdAt: '2026-03-15T10:00:00Z'
-  }
-];
-
-export const INITIAL_GRANT_ENDORSEMENTS = [
-  {
-    id: 'endorse-001',
-    endorsementCode: 'PERAKUAN-UMK-2026-0814',
-    mentorId: 'mentor-1',
-    mentorName: 'Prof. Madya Dr. Wan Azhar',
-    mentorAgency: 'Universiti Malaysia Kelantan (UMK)',
-    mentorDesignation: 'Pengarah Institut Keusahawanan UMK',
-    menteeId: 'mentee-reg-2',
-    menteeName: 'Wan Nur Insyirah',
-    menteePhone: '60139988112',
-    businessName: 'Batik Seri Cik Siti Studio',
-    businessCategory: 'Fesyen, Batik & Kraf Kelantan',
-    district: 'Kota Bharu' as const,
-    recommendedAmount: 'RM5,000' as const,
-    grantProgramTitle: 'Dana Skala Usahawan Belia Digital (RM5,000)',
-    justification: 'Usahawan telah melengkapkan 3 modul bimbingan digital, menunjukkan rekod pesanan konsisten melalui TikTok Live, dan mempunyai inovasi motif batik moden yang sedia untuk pasaran luar Kelantan.',
-    businessReadinessRemark: 'Disiplin rekod jualan memuaskan, prototaip produk berkualiti tinggi dan mempunyai akaun perniagaan rasmi berdaftar SSM.',
-    issuedAt: '2026-03-23T16:00:00Z',
-    status: 'active' as const
-  },
-  {
-    id: 'endorse-002',
-    endorsementCode: 'PERAKUAN-UMK-2026-0925',
-    mentorId: 'mentor-4',
-    mentorName: 'Ts. Dr. Norazila Binti Mat Deris',
-    mentorAgency: 'Fakulti Industri Asas Tani UMK Kampus Jeli',
-    mentorDesignation: 'Penyelidik Kanan Keselamatan Makanan',
-    menteeId: 'mentee-reg-5',
-    menteeName: 'Nik Farisya Binti Nik Omar',
-    menteePhone: '60195544332',
-    businessName: 'Sambal Garing Ikan Masin Tumpat',
-    businessCategory: 'Makanan & Minuman (F&B)',
-    district: 'Tumpat' as const,
-    recommendedAmount: 'RM3,000' as const,
-    grantProgramTitle: 'Dana Benih Usahawan Belia Kelantan (RM3,000)',
-    justification: 'Produk sambal telah lulus ujian awal kestabilan makanan di Makmal UMK Jeli dan memerlukan dana geran bagi membiayai yuran pensijilan MeSTI KKM serta pembungkusan retort.',
-    businessReadinessRemark: 'Kapasiti pemprosesan bersih memenuhi piawaian GMP, potensi pasaran runcit Pantai Timur sangat tinggi.',
-    issuedAt: '2026-03-20T11:30:00Z',
-    status: 'active' as const
+    notes: 'Sesi bimbingan pembungkusan produk kraftangan dan pengiraan kos telah selesai.',
+    mentorActionPlan: '1. Sediakan kad cerita warisan ("craft artisan story card") di dalam setiap kotak.\n2. Hubungi MATRADE untuk geran eksport MDG.\n3. Tetapkan MOQ 50 unit bagi tempahan korporat.',
+    meetingLink: 'https://meet.google.com/kbe-insken-2026',
+    createdAt: '2026-03-20T10:00:00Z'
   }
 ];

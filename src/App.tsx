@@ -149,12 +149,12 @@ function MainApp() {
   const [isB2BModalOpen, setIsB2BModalOpen] = useState(false);
   const [isEventsModalOpen, setIsEventsModalOpen] = useState(false);
 
-  // Mentor Portal & Mentorship State
+  // Mentor Portal & Mentorship State (v4 - streamlined to 3 mentors & 3 registrations)
   const [mentors, setMentors] = useState<MentorProfile[]>(() => {
     try {
-      const version = localStorage.getItem('kbelia_mentor_v3');
+      const version = localStorage.getItem('kbelia_mentor_v4');
       if (!version) {
-        localStorage.setItem('kbelia_mentor_v3', 'true');
+        localStorage.setItem('kbelia_mentor_v4', 'true');
         localStorage.setItem('kbelia_mentor_profiles', JSON.stringify(INITIAL_MENTOR_PROFILES));
         return INITIAL_MENTOR_PROFILES;
       }
@@ -167,6 +167,11 @@ function MainApp() {
 
   const [mentorshipRegistrations, setMentorshipRegistrations] = useState<MentorshipRegistration[]>(() => {
     try {
+      const version = localStorage.getItem('kbelia_mentor_v4');
+      if (!version) {
+        localStorage.setItem('kbelia_mentorship_registrations', JSON.stringify(INITIAL_MENTORSHIP_REGISTRATIONS));
+        return INITIAL_MENTORSHIP_REGISTRATIONS;
+      }
       const saved = localStorage.getItem('kbelia_mentorship_registrations');
       return saved ? JSON.parse(saved) : INITIAL_MENTORSHIP_REGISTRATIONS;
     } catch {
@@ -217,6 +222,10 @@ function MainApp() {
       if (!snapshot.empty) {
         const loadedSlots: CapsuleSlot[] = [];
         snapshot.forEach((doc) => {
+          // Exclude pruned demo slots
+          if (doc.id.startsWith('cap-') && !INITIAL_CAPSULE_SLOTS.some(s => s.id === doc.id)) {
+            return;
+          }
           if (!deleted.includes(doc.id)) {
             const data = doc.data();
             const seedSlot = INITIAL_CAPSULE_SLOTS.find(s => s.id === doc.id);
@@ -248,7 +257,7 @@ function MainApp() {
     return () => unsubSlots();
   }, [refreshTrigger]);
 
-  // 2. Real-time Businesses Listener (Merges with INITIAL_BUSINESSES to ensure all 30 demo stores appear)
+  // 2. Real-time Businesses Listener (Merges with INITIAL_BUSINESSES to ensure active 3 demo stores appear)
   useEffect(() => {
     const deletedIds = getDeletedIds();
     const unsubBiz = onSnapshot(collection(db, 'businesses'), (snapshot) => {
@@ -256,6 +265,10 @@ function MainApp() {
       if (!snapshot.empty) {
         const loadedBiz: BusinessListing[] = [];
         snapshot.forEach((doc) => {
+          // Exclude pruned demo businesses
+          if (doc.id.startsWith('biz-') && !INITIAL_BUSINESSES.some(b => b.id === doc.id)) {
+            return;
+          }
           if (!deleted.includes(doc.id)) {
             const data = doc.data();
             const seedBiz = INITIAL_BUSINESSES.find(b => b.id === doc.id);
@@ -290,7 +303,7 @@ function MainApp() {
     return () => unsubBiz();
   }, [refreshTrigger]);
 
-  // 3. Real-time Products Listener (Merges with INITIAL_PRODUCTS to ensure 40 demo products appear)
+  // 3. Real-time Products Listener (Merges with INITIAL_PRODUCTS to ensure active 3 demo products appear)
   useEffect(() => {
     const deletedIds = getDeletedIds();
     const unsubProd = onSnapshot(collection(db, 'products'), (snapshot) => {
@@ -298,6 +311,10 @@ function MainApp() {
       if (!snapshot.empty) {
         const loadedProd: ProductItem[] = [];
         snapshot.forEach((doc) => {
+          // Exclude pruned demo products
+          if (doc.id.startsWith('prod-') && !INITIAL_PRODUCTS.some(p => p.id === doc.id)) {
+            return;
+          }
           if (!deleted.includes(doc.id)) {
             const data = doc.data();
             const seedProd = INITIAL_PRODUCTS.find(p => p.id === doc.id);
@@ -336,11 +353,20 @@ function MainApp() {
       if (!snapshot.empty) {
         const loadedProg: YouthProgram[] = [];
         snapshot.forEach((doc) => {
+          // Exclude pruned demo programs
+          if (doc.id.startsWith('prog-') && !INITIAL_PROGRAMS.some(p => p.id === doc.id)) {
+            return;
+          }
           if (!deleted.includes(doc.id)) {
             loadedProg.push({ id: doc.id, ...doc.data() } as YouthProgram);
           }
         });
-        setPrograms(loadedProg);
+        const existingProgIds = new Set(loadedProg.map(p => p.id));
+        const mergedProg = [
+          ...loadedProg,
+          ...INITIAL_PROGRAMS.filter(p => !existingProgIds.has(p.id) && !deleted.includes(p.id))
+        ];
+        setPrograms(mergedProg);
       } else {
         setPrograms(INITIAL_PROGRAMS.filter(p => !deleted.includes(p.id)));
       }

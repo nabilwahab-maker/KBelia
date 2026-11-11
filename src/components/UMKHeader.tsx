@@ -148,10 +148,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
   const displayName = userProfile?.fullName || user?.displayName || (isAdmin ? 'Pentadbir Sistem' : 'Usahawan Belia');
   const avatarSrc = userProfile?.avatarUrl || user?.photoURL || (isAdmin 
-    ? '/src/assets/images/avatar_admin_kelantan_1793924251898.jpg' 
+    ? '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg' 
     : userProfile?.role === 'mentor' 
-      ? '/src/assets/images/avatar_mentor_umk_1793924250411.jpg' 
-      : '/src/assets/images/avatar_youth_male_1793924250192.jpg');
+      ? '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg' 
+      : '/public/assets/generated/avatar_youth_male_1793924250192.jpg');
 
   return (
     <header className="bg-white dark:bg-[#1C2434] border-b border-slate-200 dark:border-[#2E3A47] sticky top-0 z-40 transition-colors duration-200 shadow-2xs w-full shrink-0">

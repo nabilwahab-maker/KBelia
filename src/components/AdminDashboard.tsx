@@ -243,7 +243,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [slotMonthlyRate, setSlotMonthlyRate] = useState('150');
   const [slotStatus, setSlotStatus] = useState<SlotStatus>('available');
   const [slotAmenities, setSlotAmenities] = useState('Palam Elektrik 13A, WiFi 500Mbps, Rak Paparan Bertingkat');
-  const [slotImageUrl, setSlotImageUrl] = useState('/src/assets/images/kiosk_modular_kbelia_1793924253417.jpg');
+  const [slotImageUrl, setSlotImageUrl] = useState('/public/assets/generated/kiosk_modular_kbelia_1793924253417.jpg');
 
   // Program form state
   const [showProgramForm, setShowProgramForm] = useState(false);
@@ -765,7 +765,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <img
-                            src={biz.logoUrl || '/src/assets/images/product_kelantan_delights_1793924253401.jpg'}
+                            src={biz.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                             alt=""
                             className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-[#2E3A47] bg-white dark:bg-[#1A222C]"
                           />
@@ -1293,7 +1293,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <div className="space-y-2.5">
                       <div className="flex items-center gap-3">
                         <img 
-                          src={m.avatarUrl || '/src/assets/images/avatar_mentor_umk_1793924250411.jpg'} 
+                          src={m.avatarUrl || '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg'} 
                           alt={m.name}
                           className="w-11 h-11 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0" 
                         />

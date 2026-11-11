@@ -120,10 +120,10 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
     : 'KBELIA-2026-0382';
 
   const avatarSrc = userProfile?.avatarUrl || user?.photoURL || (userProfile?.role === 'admin'
-    ? '/src/assets/images/avatar_admin_kelantan_1793924251898.jpg'
+    ? '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg'
     : userProfile?.role === 'mentor'
-      ? '/src/assets/images/avatar_mentor_umk_1793924250411.jpg'
-      : '/src/assets/images/avatar_youth_male_1793924250192.jpg');
+      ? '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg'
+      : '/public/assets/generated/avatar_youth_male_1793924250192.jpg');
 
   const handleSaveChanges = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();

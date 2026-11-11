@@ -83,21 +83,6 @@ const SAMPLE_EVENTS: YouthEvent[] = [
     fee: 'Percuma (Atas Jemputan)',
     description: 'Sesi perbentangan 5-minit pitch di hadapan panel dana benih MARA, TEKUN, dan angel investor untuk pembiayaan sehingga RM50,000.',
     whatsappContact: '60133445566'
-  },
-  {
-    id: 'evt-4',
-    title: 'Pasar Lambak Kraftangan & Batik Mahasiswa',
-    category: 'expo',
-    date: '20 - 21 Jun 2026',
-    time: '4.00 PTG - 11.00 MLM',
-    district: 'Tumpat',
-    location: 'Perkarangan Pantai Sri Tujuh, Tumpat',
-    organizer: 'Kelab Usahawan Muda Tumpat',
-    boothsAvailable: 12,
-    totalBooths: 25,
-    fee: 'RM20 / Hari',
-    description: 'Pameran santai jualan produk tekstil batik, aksesori buatan tangan, dan kopi hipster sempena cuti persekolahan.',
-    whatsappContact: '60178899001'
   }
 ];
 

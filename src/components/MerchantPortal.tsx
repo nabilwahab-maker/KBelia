@@ -151,8 +151,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const [whatsapp, setWhatsapp] = useState(myBusiness?.whatsapp || userProfile?.phone || '');
   const [instagram, setInstagram] = useState(myBusiness?.instagram || '');
   const [tiktok, setTiktok] = useState(myBusiness?.tiktok || '');
-  const [logoUrl, setLogoUrl] = useState(myBusiness?.logoUrl || '/src/assets/images/avatar_youth_male_1793924250192.jpg');
-  const [bannerUrl, setBannerUrl] = useState(myBusiness?.bannerUrl || '/src/assets/images/banner_kelantan_landmark_1793924253242.jpg');
+  const [logoUrl, setLogoUrl] = useState(myBusiness?.logoUrl || '/public/assets/generated/avatar_youth_male_1793924250192.jpg');
+  const [bannerUrl, setBannerUrl] = useState(myBusiness?.bannerUrl || '/public/assets/generated/banner_kelantan_landmark_1793924253242.jpg');
 
   // Settings Tab State
   const [settingsFullName, setSettingsFullName] = useState(userProfile?.fullName || user?.displayName || '');
@@ -217,7 +217,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const [prodPrice, setProdPrice] = useState('');
   const [prodDesc, setProdDesc] = useState('');
   const [prodCategory, setProdCategory] = useState('Menu Utama');
-  const [prodImageUrl, setProdImageUrl] = useState('/src/assets/images/product_kelantan_delights_1793924253401.jpg');
+  const [prodImageUrl, setProdImageUrl] = useState('/public/assets/generated/product_kelantan_delights_1793924253401.jpg');
 
   // Booking action states
   const [selectedReceiptBooking, setSelectedReceiptBooking] = useState<CapsuleBooking | null>(null);

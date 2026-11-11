@@ -163,7 +163,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   const [slotSize, setSlotSize] = useState('10ft x 10ft Smart Pod');
   const [slotMonthlyRate, setSlotMonthlyRate] = useState('150');
   const [slotAmenities, setSlotAmenities] = useState('Palam Elektrik 13A, WiFi 500Mbps, Rak Paparan Bertingkat');
-  const [slotImageUrl, setSlotImageUrl] = useState('/src/assets/images/kiosk_modular_kbelia_1793924253417.jpg');
+  const [slotImageUrl, setSlotImageUrl] = useState('/public/assets/generated/kiosk_modular_kbelia_1793924253417.jpg');
   const [savingSlot, setSavingSlot] = useState(false);
 
   // State for Add Program Modal

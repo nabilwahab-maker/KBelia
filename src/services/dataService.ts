@@ -57,18 +57,20 @@ export function markIdAsDeleted(id: string) {
   }
 }
 
-// Auto-upgrade local storage cache to reflect new photographic assets
+// Auto-upgrade local storage cache to reflect new photographic assets and streamlined 3 items per section
 export function upgradeLocalImageCache() {
   try {
     if (typeof window === 'undefined') return;
-    const version = localStorage.getItem('kbelia_images_v3');
+    const version = localStorage.getItem('kbelia_streamline_v4');
     if (!version) {
-      localStorage.setItem('kbelia_images_v3', 'true');
+      localStorage.setItem('kbelia_streamline_v4', 'true');
       localStorage.removeItem(CACHE_KEYS.BUSINESSES);
       localStorage.removeItem(CACHE_KEYS.SLOTS);
       localStorage.removeItem(CACHE_KEYS.PRODUCTS);
       localStorage.removeItem(CACHE_KEYS.PROGRAMS);
       localStorage.removeItem('kbelia_mentor_profiles');
+      localStorage.removeItem('kbelia_mentorship_registrations');
+      localStorage.removeItem(CACHE_KEYS.DELETED_IDS);
     }
   } catch (e) {
     console.warn('Cache upgrade notice:', e);
@@ -182,8 +184,8 @@ export async function saveBusinessListing(business: Partial<BusinessListing> & {
       whatsapp: business.whatsapp || '',
       instagram: business.instagram || '',
       tiktok: business.tiktok || '',
-      logoUrl: business.logoUrl || '/src/assets/images/product_kelantan_delights_1793924253401.jpg',
-      bannerUrl: business.bannerUrl || '/src/assets/images/banner_kelantan_landmark_1793924253242.jpg',
+      logoUrl: business.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg',
+      bannerUrl: business.bannerUrl || '/public/assets/generated/banner_kelantan_landmark_1793924253242.jpg',
       isApproved: business.isApproved ?? true,
       isFeatured: business.isFeatured ?? false,
       capsuleSlotId: business.capsuleSlotId || '',
@@ -222,7 +224,7 @@ export async function saveProduct(product: Partial<ProductItem> & { businessId: 
       price: product.price || 0,
       description: product.description || '',
       category: product.category || 'Umum',
-      imageUrl: product.imageUrl || '/src/assets/images/product_kelantan_delights_1793924253401.jpg',
+      imageUrl: product.imageUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg',
       inStock: product.inStock ?? true,
       createdAt: product.createdAt || new Date().toISOString()
     };
@@ -262,7 +264,7 @@ export async function saveCapsuleSlot(slot: Partial<CapsuleSlot> & { code: strin
       amenities: slot.amenities || ['Palam Elektrik', 'WiFi 500Mbps', 'Rak Display'],
       currentTenantBusinessName: slot.currentTenantBusinessName || '',
       currentTenantId: slot.currentTenantId || '',
-      imageUrl: slot.imageUrl || '/src/assets/images/kiosk_modular_kbelia_1793924253417.jpg',
+      imageUrl: slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia_1793924253417.jpg',
       createdAt: slot.createdAt || new Date().toISOString()
     };
     await setDoc(doc(db, path, id), fullSlot, { merge: true });

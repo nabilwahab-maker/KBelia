@@ -60,9 +60,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const ADMIN_EMAIL = 'nabilwahab03020302@gmail.com';
 
 const checkIsAdminEmail = (email?: string | null): boolean => {
-  if (!email || !ADMIN_EMAIL) return false;
+  if (!email) return false;
   const cleanEmail = email.trim().toLowerCase();
-  return cleanEmail === ADMIN_EMAIL.trim().toLowerCase() || cleanEmail.includes('admin@kbelia') || cleanEmail.includes('urusetia@kbelia');
+  return cleanEmail === ADMIN_EMAIL.trim().toLowerCase() || 
+         cleanEmail === 's24b0382@siswa.umk.edu.my' || 
+         cleanEmail.includes('admin@kbelia') || 
+         cleanEmail.includes('urusetia@kbelia');
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -406,7 +409,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           uid: userId,
           displayName: 'Nabil Wahab (Pentadbir KBELIA)',
           email: cleanEmail.includes('@') ? cleanEmail : 'admin@kbelia.gov.my',
-          photoURL: '/src/assets/images/avatar_admin_kelantan_1793924251898.jpg',
+          photoURL: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
           isDemo: true
         };
 
@@ -618,7 +621,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: 'admin-nabil-01',
         displayName: 'Nabil Wahab (Pentadbir NiagaBelia)',
         email: ADMIN_EMAIL,
-        photoURL: '/src/assets/images/avatar_admin_kelantan_1793924251898.jpg',
+        photoURL: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
         isDemo: true,
       };
       profile = {
@@ -628,7 +631,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: 'admin',
         phone: '+60199001122',
         district: 'Kota Bharu',
-        avatarUrl: '/src/assets/images/avatar_admin_kelantan_1793924251898.jpg',
+        avatarUrl: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
         createdAt: new Date().toISOString(),
         ...customData
       };
@@ -637,7 +640,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: 'admin-urusetia-02',
         displayName: 'Urusetia KBELIA Negeri Kelantan',
         email: 'urusetia@kbelia.kelantan.gov.my',
-        photoURL: '/src/assets/images/avatar_admin_kelantan_1793924251898.jpg',
+        photoURL: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
         isDemo: true,
       };
       profile = {
@@ -647,7 +650,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: 'admin',
         phone: '+6097481000',
         district: 'Kota Bharu',
-        avatarUrl: '/src/assets/images/avatar_admin_kelantan_1793924251898.jpg',
+        avatarUrl: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
         createdAt: new Date().toISOString(),
         ...customData
       };
@@ -656,7 +659,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: 'demo-tenant-1',
         displayName: 'Ahmad Faizul (D\'Kelate Coffee)',
         email: 'faizul.artisan@gmail.com',
-        photoURL: '/src/assets/images/avatar_youth_male_1793924250192.jpg',
+        photoURL: '/public/assets/generated/avatar_youth_male_1793924250192.jpg',
         isDemo: true,
       };
       profile = {
@@ -666,7 +669,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: 'user',
         phone: '+601123456789',
         district: 'Bachok',
-        avatarUrl: '/src/assets/images/avatar_youth_male_1793924250192.jpg',
+        avatarUrl: '/public/assets/generated/avatar_youth_male_1793924250192.jpg',
         createdAt: new Date().toISOString(),
         ...customData
       };
@@ -675,7 +678,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: 'demo-tenant-3',
         displayName: 'Nur Syafiqah (Batik Belia)',
         email: 'syafiqah.batik@gmail.com',
-        photoURL: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+        photoURL: '/public/assets/generated/avatar_youth_female_1793924250745.jpg',
         isDemo: true,
       };
       profile = {
@@ -685,7 +688,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: 'user',
         phone: '+60198765432',
         district: 'Kota Bharu',
-        avatarUrl: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+        avatarUrl: '/public/assets/generated/avatar_youth_female_1793924250745.jpg',
         createdAt: new Date().toISOString(),
         ...customData
       };
@@ -694,7 +697,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: 'demo-tenant-2',
         displayName: 'Muhammad Harith (Studio Belia)',
         email: 'harith.multimedia@gmail.com',
-        photoURL: '/src/assets/images/avatar_youth_male_1793924250192.jpg',
+        photoURL: '/public/assets/generated/avatar_youth_male_1793924250192.jpg',
         isDemo: true,
       };
       profile = {
@@ -704,7 +707,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: 'user',
         phone: '+60139988776',
         district: 'Kota Bharu',
-        avatarUrl: '/src/assets/images/avatar_youth_male_1793924250192.jpg',
+        avatarUrl: '/public/assets/generated/avatar_youth_male_1793924250192.jpg',
         createdAt: new Date().toISOString(),
         ...customData
       };
@@ -713,7 +716,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: 'user-mentor-1',
         displayName: 'Prof. Madya Dr. Wan Azhar',
         email: 'wanazhar@umk.edu.my',
-        photoURL: '/src/assets/images/avatar_mentor_umk_1793924250411.jpg',
+        photoURL: '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg',
         isDemo: true,
       };
       profile = {
@@ -724,7 +727,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         mentorId: 'mentor-1',
         phone: '60199887711',
         district: 'Kota Bharu',
-        avatarUrl: '/src/assets/images/avatar_mentor_umk_1793924250411.jpg',
+        avatarUrl: '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg',
         createdAt: new Date().toISOString(),
         ...customData
       };
@@ -733,7 +736,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: 'user-mentor-2',
         displayName: 'Puan Siti Aminah Binti Yusof',
         email: 'sitiaminah.coach@insken.gov.my',
-        photoURL: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+        photoURL: '/public/assets/generated/avatar_youth_female_1793924250745.jpg',
         isDemo: true,
       };
       profile = {
@@ -744,7 +747,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         mentorId: 'mentor-2',
         phone: '60129876543',
         district: 'Kota Bharu',
-        avatarUrl: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+        avatarUrl: '/public/assets/generated/avatar_youth_female_1793924250745.jpg',
         createdAt: new Date().toISOString(),
         ...customData
       };
@@ -753,7 +756,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: 'user-mentor-3',
         displayName: 'En. Khairul Hafiz Bin Razali, CA',
         email: 'khairul.audit@smeadvisor.my',
-        photoURL: '/src/assets/images/avatar_mentor_umk_1793924250411.jpg',
+        photoURL: '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg',
         isDemo: true,
       };
       profile = {
@@ -764,7 +767,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         mentorId: 'mentor-3',
         phone: '60139123456',
         district: 'Kota Bharu',
-        avatarUrl: '/src/assets/images/avatar_mentor_umk_1793924250411.jpg',
+        avatarUrl: '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg',
         createdAt: new Date().toISOString(),
         ...customData
       };
@@ -773,7 +776,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: 'user-mentor-4',
         displayName: 'Ts. Dr. Norazila Binti Mat Deris',
         email: 'norazila.fiat@umk.edu.my',
-        photoURL: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+        photoURL: '/public/assets/generated/avatar_youth_female_1793924250745.jpg',
         isDemo: true,
       };
       profile = {
@@ -784,7 +787,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         mentorId: 'mentor-4',
         phone: '60145556677',
         district: 'Jeli',
-        avatarUrl: '/src/assets/images/avatar_youth_female_1793924250745.jpg',
+        avatarUrl: '/public/assets/generated/avatar_youth_female_1793924250745.jpg',
         createdAt: new Date().toISOString(),
         ...customData
       };

@@ -54,17 +54,6 @@ const INITIAL_B2B_LISTINGS: B2BListing[] = [
     description: 'Pek zip lock mesra rak kiosk. Tahan 6 bulan, pensijilan Halal JAKIM, minimum pesanan borong serendah 20 pek.',
     whatsapp: '60123456783',
     date: '2 hari lepas'
-  },
-  {
-    id: 'b2b-4',
-    authorName: 'Ahmad Faizul',
-    authorBusiness: 'Keropok Lekor Crispy Kota Bharu',
-    district: 'Kota Bharu',
-    type: 'demand',
-    title: 'Mencari Pembekal Kotak Pembungkusan & Biodegradable Cup',
-    description: 'Perlu 1,000 unit kotak kustom bertemakan kraftangan Kelantan untuk produk kudapan belia.',
-    whatsapp: '60199123456',
-    date: '3 hari lepas'
   }
 ];
 

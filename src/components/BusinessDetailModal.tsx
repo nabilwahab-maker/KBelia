@@ -64,7 +64,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
         {/* Banner with close button */}
         <div className="relative h-40 sm:h-48 bg-slate-800 shrink-0 overflow-hidden">
           <img
-            src={business.bannerUrl || '/src/assets/images/banner_kelantan_landmark_1793924253242.jpg'}
+            src={business.bannerUrl || '/public/assets/generated/banner_kelantan_landmark_1793924253242.jpg'}
             alt={business.businessName}
             className="w-full h-full object-cover"
           />
@@ -107,7 +107,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
                 <img
-                  src={business.logoUrl || '/src/assets/images/product_kelantan_delights_1793924253401.jpg'}
+                  src={business.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                   alt={business.businessName}
                   className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs object-cover bg-white dark:bg-[#1A222C] shrink-0"
                 />

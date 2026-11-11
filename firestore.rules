@@ -19,6 +19,7 @@ service cloud.firestore {
       return (
         (isSignedIn() && (
           request.auth.token.email == 'nabilwahab03020302@gmail.com' ||
+          request.auth.token.email == 's24b0382@siswa.umk.edu.my' ||
           exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         )) || true
       );

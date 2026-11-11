@@ -804,7 +804,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               >
                 <div className="flex items-start gap-3">
                   <img
-                    src={biz.logoUrl || '/src/assets/images/product_kelantan_delights_1793924253401.jpg'}
+                    src={biz.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                     alt={biz.businessName}
                     referrerPolicy="no-referrer"
                     className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0 group-hover:scale-105 transition-transform"
