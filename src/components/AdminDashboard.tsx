@@ -59,6 +59,7 @@ import { ImageDropzone } from './ImageDropzone';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import confetti from 'canvas-confetti';
+import { showToast } from './ToastNotification';
 
 interface AdminDashboardProps {
   slots: CapsuleSlot[];
@@ -544,20 +545,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="text-[11px] text-slate-400 dark:text-slate-500">Dana & latihan keusahawanan aktif</div>
         </div>
       </div>
-
-      {/* Alert Notifications */}
-      {message && (
-        <div className={`mb-6 p-4 rounded-xl text-xs font-medium flex items-center justify-between ${
-          message.type === 'success' 
-            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800' 
-            : 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
-        }`}>
-          <span>{message.text}</span>
-          <button onClick={() => setMessage(null)} className="interactive-press text-xs font-bold opacity-60 hover:opacity-100 cursor-pointer">×</button>
-        </div>
-      )}
-
-
 
       {/* TAB 0: ADVANCED 1-CLICK APPROVAL QUEUE & AUDIT EXPORTS */}
       {adminTab === 'queue' && (

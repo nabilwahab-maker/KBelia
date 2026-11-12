@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
 
 export interface ToastMessage {
@@ -26,7 +26,11 @@ export const showToast = (
     id: `toast-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
     duration: toastObj.duration ?? 4000
   };
-  listeners.forEach(fn => fn(newToast));
+  
+  // Defer listener execution to prevent React "Cannot update a component while rendering a different component"
+  setTimeout(() => {
+    listeners.forEach(fn => fn(newToast));
+  }, 0);
 };
 
 export const ToastContainer: React.FC = () => {
@@ -43,7 +47,9 @@ export const ToastContainer: React.FC = () => {
   }, []);
 
   const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 0);
   };
 
   if (toasts.length === 0) return null;
@@ -59,25 +65,35 @@ export const ToastContainer: React.FC = () => {
 
 const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: () => void }> = ({ toast, onDismiss }) => {
   const [progress, setProgress] = useState(100);
+  const onDismissRef = useRef(onDismiss);
+
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  }, [onDismiss]);
 
   useEffect(() => {
     const duration = toast.duration || 4000;
-    const interval = 20;
-    const step = (interval / duration) * 100;
+    const startTime = Date.now();
+    const interval = 25;
 
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          onDismiss();
-          return 0;
-        }
-        return prev - step;
-      });
+    const dismissTimer = setTimeout(() => {
+      onDismissRef.current();
+    }, duration);
+
+    const progressTimer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
+      setProgress(remaining);
+      if (remaining <= 0) {
+        clearInterval(progressTimer);
+      }
     }, interval);
 
-    return () => clearInterval(timer);
-  }, [toast, onDismiss]);
+    return () => {
+      clearTimeout(dismissTimer);
+      clearInterval(progressTimer);
+    };
+  }, [toast.id, toast.duration]);
 
   const getTheme = () => {
     switch (toast.type) {
