@@ -118,8 +118,8 @@ function MainApp() {
   // Admin Sub-Navigation State (Queue, Bookings, Businesses, Slots, Programs, Mentors, Sync, Settings)
   const [adminSubTab, setAdminSubTab] = useState<AdminSubTab>('queue');
 
-  // Mentor Sub-Navigation State (Sessions, Endorsements, Logbook, Profile)
-  const [mentorSubTab, setMentorSubTab] = useState<MentorSubTab>('sessions');
+  // Mentor Sub-Navigation State (Overview, Sessions, Endorsements, Logbook, Profile)
+  const [mentorSubTab, setMentorSubTab] = useState<MentorSubTab>('overview');
 
   // Modals state
   const [selectedSlotForBooking, setSelectedSlotForBooking] = useState<CapsuleSlot | null>(null);

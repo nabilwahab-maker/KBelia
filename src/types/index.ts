@@ -313,7 +313,8 @@ export type AdminSubTab =
   | 'settings';   // Tetapan Operasi
 
 export type MentorSubTab = 
-  | 'sessions'       // Sesi & Klinik Mentee
+  | 'overview'       // Ringkasan Dashboard Eksekutif Mentor
+  | 'sessions'       // Sesi Bimbingan Mentee
   | 'endorsements'   // Perakuan Rasmi Geran Belia
   | 'logbook'        // Log Jurnal Minit & Pelan Tindakan
   | 'profile';       // Profil & Waktu Bimbingan

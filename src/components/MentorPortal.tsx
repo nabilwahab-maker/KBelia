@@ -7,6 +7,7 @@ import {
   Calendar, 
   Video, 
   MapPin, 
+  LayoutDashboard, 
   MessageSquare, 
   Search, 
   Filter, 
@@ -179,7 +180,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   onBackToHome,
   onOpenMentorshipClinic,
   onOpenAdminDashboard,
-  activeSubTab = 'sessions',
+  activeSubTab = 'overview',
   onSelectSubTab
 }) => {
   const { userProfile, isAdmin, openLoginModal, logout } = useAuth();
@@ -677,8 +678,21 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
       </div>
 
-      {/* 4. SUB-TAB NAVIGATION BAR (SESI BIMBINGAN, PERAKUAN GERAN, LOG JURNAL, PROFIL) */}
+      {/* 4. SUB-TAB NAVIGATION BAR (RINGKASAN, SESI BIMBINGAN, PERAKUAN GERAN, LOG JURNAL, PROFIL) */}
       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => handleSubTabChange('overview')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+            currentSubTab === 'overview'
+              ? 'bg-purple-600 text-white shadow-xs'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <LayoutDashboard className="w-4 h-4" />
+          <span>Ringkasan</span>
+        </button>
+
         <button
           type="button"
           onClick={() => handleSubTabChange('sessions')}
@@ -734,6 +748,386 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           <span>Profil & Kelapangan</span>
         </button>
       </div>
+
+      {/* ===================================================================== */}
+      {/* TAB 0: RINGKASAN EKSEKUTIF (EXECUTIVE COMMAND CENTER)                */}
+      {/* ===================================================================== */}
+      {currentSubTab === 'overview' && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          
+          {/* A. Status Ringkas & Tarikh Operasi */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white dark:bg-[#1E293B] px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 flex items-center justify-center font-bold">
+                <LayoutDashboard className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Pusat Kawalan & Pemantauan Usahawan Belia
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {currentMentor.agency} &middot; Kelantan
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs font-mono tabular-nums text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700/60">
+              <Clock className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              <span>Hari Ini &middot; 12 November 2026</span>
+            </div>
+          </div>
+
+          {/* B. 4 Bento KPI Metric Counters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Metric 1 */}
+            <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Usahawan Dipantau</span>
+                <Users className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="text-2xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
+                {totalMentees}
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                {mentorRegistrations.filter(r => r.status === 'confirmed').length} sesi aktif disahkan
+              </p>
+            </div>
+
+            {/* Metric 2 */}
+            <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Tindakan Perlu</span>
+                <Clock className="w-4 h-4 text-amber-500" />
+              </div>
+              <div className="text-2xl font-black text-amber-600 dark:text-amber-400 tabular-nums tracking-tight">
+                {pendingCount}
+              </div>
+              <p className="text-[11px] text-amber-700 dark:text-amber-400 mt-1 font-semibold">
+                {pendingCount > 0 ? 'Permohonan bimbingan menunggu' : 'Semua permohonan selesai'}
+              </p>
+            </div>
+
+            {/* Metric 3 */}
+            <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Perakuan Geran</span>
+                <Award className="w-4 h-4 text-amber-500" />
+              </div>
+              <div className="text-2xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
+                {totalEndorsementsCount}
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Surat rasmi ditandatangani
+              </p>
+            </div>
+
+            {/* Metric 4 */}
+            <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Log & KPI Mentee</span>
+                <FileText className="w-4 h-4 text-emerald-500" />
+              </div>
+              <div className="text-2xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">
+                {totalLogbookCount}
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Minit & tindakan disemak
+              </p>
+            </div>
+          </div>
+
+          {/* C. 2-Column Command Hub: Temujanji Terdekat & Status Geran */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Lajur 1: Temujanji Terdekat & Tindakan Segera */}
+            <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                      Temujanji Terdekat & Tindakan
+                    </h3>
+                  </div>
+                  <span className="text-[11px] font-mono text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded">
+                    {mentorRegistrations.slice(0, 3).length} Sesi Terkini
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {mentorRegistrations.slice(0, 3).map((reg) => (
+                    <div 
+                      key={reg.id}
+                      className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3"
+                    >
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                            {reg.entrepreneurName}
+                          </span>
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
+                            reg.status === 'confirmed'
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                              : reg.status === 'completed'
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                          }`}>
+                            {reg.status === 'confirmed' ? 'Disahkan' : reg.status === 'completed' ? 'Selesai' : 'Menunggu'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                          {reg.businessName} &middot; <span className="font-medium text-slate-700 dark:text-slate-300">{reg.district}</span>
+                        </p>
+                        <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 pt-0.5">
+                          <Clock className="w-3 h-3 text-slate-400" />
+                          <span>{reg.preferredDate || 'Akan ditetapkan'} &middot; {reg.preferredTime || '10:00 AM'}</span>
+                          <span>&middot;</span>
+                          <span>{reg.mode === 'online' ? 'Google Meet Maya' : 'Bersemuka Kampus'}</span>
+                        </div>
+                      </div>
+
+                      <div className="shrink-0">
+                        {reg.status === 'pending' ? (
+                          <button
+                            type="button"
+                            onClick={() => handleStatusChange(reg, 'confirmed')}
+                            className="px-3 py-1.5 rounded-lg bg-purple-700 hover:bg-purple-800 text-white text-[11px] font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+                          >
+                            Sahkan Sesi
+                          </button>
+                        ) : reg.meetingLink ? (
+                          <a
+                            href={reg.meetingLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-all inline-flex items-center gap-1.5 shadow-2xs whitespace-nowrap"
+                          >
+                            <Video className="w-3 h-3" />
+                            <span>Bilik Maya</span>
+                          </a>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleSubTabChange('sessions')}
+                            className="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-semibold transition-all cursor-pointer whitespace-nowrap"
+                          >
+                            Butiran
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {mentorRegistrations.length === 0 && (
+                    <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                      Tiada temujanji aktif buat masa ini.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 mt-4 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Semak jadual lengkap & pengurusan mentee
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleSubTabChange('sessions')}
+                  className="text-xs font-bold text-purple-700 dark:text-purple-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Buka Sesi Bimbingan</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Lajur 2: Status Perakuan Geran & Dana Benih */}
+            <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-amber-500" />
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                      Status Perakuan Geran Usahawan
+                    </h3>
+                  </div>
+                  <span className="text-[11px] font-mono text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded">
+                    {endorsements.length} Diluluskan
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {endorsements.slice(0, 3).map((end) => (
+                    <div 
+                      key={end.id}
+                      className="p-3.5 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-900/40 flex items-center justify-between gap-3"
+                    >
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                            {end.menteeName}
+                          </span>
+                          <span className="text-[10px] font-mono font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded">
+                            {end.recommendedAmount}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate">
+                          {end.businessName} &middot; <span className="text-slate-500 dark:text-slate-400">{end.district}</span>
+                        </p>
+                        <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400 pt-0.5">
+                          Kod: {end.endorsementCode} &middot; Tarikh: {end.issuedAt}
+                        </p>
+                      </div>
+
+                      <div className="shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedEndorsementForView(end);
+                            handleSubTabChange('endorsements');
+                          }}
+                          className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+                        >
+                          Lihat Surat
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {endorsements.length === 0 && (
+                    <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                      Belum ada surat perakuan geran dikeluarkan.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 mt-4 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setIsNewEndorsementModalOpen(true)}
+                  className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Keluarkan Perakuan Baharu</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleSubTabChange('endorsements')}
+                  className="text-xs font-bold text-amber-700 dark:text-amber-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Senarai Lengkap</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          {/* D. Jadual Data Padat Usahawan Mentee (High-Density Executive Table) */}
+          <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                  Direktori Ringkas Usahawan Mentee
+                </h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Senarai usahawan belia di bawah pemantauan {currentMentor.name}
+                </p>
+              </div>
+
+              <div className="relative w-full sm:w-64">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari usahawan, jajahan..."
+                  className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    <th className="py-3 px-4">Usahawan & Perniagaan</th>
+                    <th className="py-3 px-4">Jajahan</th>
+                    <th className="py-3 px-4">Kategori</th>
+                    <th className="py-3 px-4">Status Sesi</th>
+                    <th className="py-3 px-4">Status Geran</th>
+                    <th className="py-3 px-4 text-right">Tindakan</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                  {filteredRegistrations.map((mentee) => {
+                    const hasEndorsement = endorsements.some(e => e.menteeName.toLowerCase() === mentee.entrepreneurName.toLowerCase());
+                    return (
+                      <tr 
+                        key={mentee.id}
+                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                      >
+                        <td className="py-3 px-4">
+                          <div className="font-bold text-slate-900 dark:text-white">{mentee.entrepreneurName}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">{mentee.businessName}</div>
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-medium">
+                          {mentee.district}
+                        </td>
+                        <td className="py-3 px-4 text-slate-500 dark:text-slate-400">
+                          {mentee.topic}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${
+                            mentee.status === 'confirmed'
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                              : mentee.status === 'completed'
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                          }`}>
+                            {mentee.status === 'confirmed' ? 'Disahkan' : mentee.status === 'completed' ? 'Selesai' : 'Menunggu'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          {hasEndorsement ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                              <Award className="w-3.5 h-3.5" />
+                              <span>Diperaku</span>
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-slate-400">
+                              Belum
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleSubTabChange('sessions')}
+                            className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-semibold transition-all cursor-pointer whitespace-nowrap"
+                          >
+                            Buka Sesi
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {filteredRegistrations.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                        Tiada rekod usahawan mentee dijumpai.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      )}
 
       {/* ===================================================================== */}
       {/* TAB 1: SESI BIMBINGAN (LAYOUT KEBAWAH PENUH & MESRA BACAAN MESEJ)     */}

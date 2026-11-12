@@ -25,7 +25,6 @@ import {
   Users,
   FileText,
   UserCheck,
-  Send,
   Video,
   Mail,
   Phone,
@@ -77,8 +76,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [legalModalType, setLegalModalType] = useState<'privacy' | 'terms' | null>(null);
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterSuccess, setNewsletterSuccess] = useState(false);
 
   const availableSlotsCount = slots.filter(s => s.status === 'available').length;
 
@@ -203,14 +200,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   ];
 
   const activeSlideData = heroSlides[currentSlide];
-
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newsletterEmail || !newsletterEmail.includes('@')) return;
-    setNewsletterSuccess(true);
-    setNewsletterEmail('');
-    setTimeout(() => setNewsletterSuccess(false), 5000);
-  };
 
   return (
     <div id="kbelia-landing-root" className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white transition-colors duration-200">
@@ -346,25 +335,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 ? 'Sewa kios pintar modular, pameran produk tempatan di Direktori Negeri, dan mohon geran pembiayaan keusahawanan dalam satu gerbang rasmi.'
                 : 'Rent smart modular kiosks across 10 districts, showcase local products in the state digital directory, and access entrepreneur grants in one official portal.'}
             </p>
-
-            {/* Assertive Hero Call-to-Actions (Rule 10 & 11) */}
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setActiveTab('academic')}
-                className="px-6 py-3 rounded-lg bg-blue-800 hover:bg-blue-900 text-white font-bold text-sm shadow-sm transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
-              >
-                <span>{isBM ? 'Mohon Kapsul Niaga' : 'Apply for Capsule Kiosk'}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('hepa')}
-                className="px-6 py-3 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 font-bold text-sm shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
-              >
-                <span>{isBM ? 'Teroka Direktori Usahawan' : 'Explore Business Directory'}</span>
-              </button>
-            </div>
           </div>
 
           {/* ========================================================================= */}
@@ -1100,10 +1070,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         RM{slot.dailyRate} <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">/ hari</span>
                       </div>
                     </div>
-
-                    <span className="text-xs font-bold text-white bg-blue-800 hover:bg-blue-900 px-3 py-1.5 rounded-lg transition-colors">
-                      {isBM ? 'Mohon Sekarang' : 'Apply Now'}
-                    </span>
                   </div>
 
                 </div>
@@ -1285,45 +1251,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* 11. COMPREHENSIVE INSTITUTIONAL FOOTER (CHECKLIST ITEM 11) */}
       {/* ========================================================================= */}
       <footer className="bg-slate-100 dark:bg-[#0A1124] text-slate-600 dark:text-slate-300 text-xs border-t border-slate-200 dark:border-[#1E3158]">
-        
-        {/* Newsletter Subscription Row */}
-        <div className="border-b border-slate-200 dark:border-[#1E3158] py-10 bg-slate-50 dark:bg-[#080E1F]">
-          <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="space-y-1 text-center md:text-left">
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center justify-center md:justify-start gap-2">
-                <Mail className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Langgan Buletin & Info Peluang Usahawan</span>
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400">
-                Terima kemas kini terkini pembukaan slot kiosk, tawaran geran benih, dan bengkel keusahawanan terus ke peti masuk anda.
-              </p>
-            </div>
-
-            <form onSubmit={handleNewsletterSubmit} className="flex items-center w-full max-w-md gap-2">
-              <input
-                type="email"
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                placeholder="Emel anda"
-                className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-[#1E2638] border border-slate-300 dark:border-[#2C384D] text-slate-900 dark:text-white placeholder:text-slate-400 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                required
-              />
-              <button
-                type="submit"
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Langgan</span>
-              </button>
-            </form>
-          </div>
-
-          {newsletterSuccess && (
-            <div className="max-w-md mx-auto mt-3 p-2 text-center text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 rounded-lg">
-              Terima kasih! Anda kini telah melanggan buletin rasmi KBelia Kelantan.
-            </div>
-          )}
-        </div>
 
         {/* 4-Column Footer Content */}
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
