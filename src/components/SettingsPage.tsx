@@ -548,7 +548,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
   };
 
   return (
-    <div id="kbelia-settings-module" className="max-w-5xl mx-auto space-y-6">
+    <div id="kbelia-settings-module" className="w-full space-y-6">
       
       {/* 1. Header Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-red-950 p-6 sm:p-7 rounded-2xl text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-700">

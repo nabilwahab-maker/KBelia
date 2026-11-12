@@ -640,7 +640,7 @@ function MainApp() {
         />
 
         {/* Center/Right Dynamic Body - Fully stretched for full-screen mode */}
-        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-3 sm:p-6 lg:p-8 xl:p-10 w-full max-w-none min-w-0 scroll-smooth bg-[#F8FAFC] dark:bg-[#0B132B]">
+        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3.5 lg:p-4 w-full max-w-none min-w-0 scroll-smooth bg-[#F8FAFC] dark:bg-[#0B132B]">
           
           {/* Universal Dashboard Banner Header following reference layout */}
           <DashboardBannerHeader
@@ -656,7 +656,7 @@ function MainApp() {
             <>
               {/* 1. ADMIN DASHBOARD VIEW */}
               {isAdmin && (
-                <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+                <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
                   <AdminDashboard
                     slots={slots}
                     businesses={businesses}
@@ -675,7 +675,7 @@ function MainApp() {
 
               {/* 2. MENTOR DASHBOARD VIEW */}
               {isMentor && (
-                <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+                <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
                   <MentorPortal
                     mentors={mentors}
                     registrations={mentorshipRegistrations}
@@ -693,7 +693,7 @@ function MainApp() {
 
               {/* 3. YOUTH ENTREPRENEUR DASHBOARD VIEW */}
               {isYouth && (
-                <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+                <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
                   <MerchantPortal
                     myBusiness={myBusiness}
                     myProducts={myProducts}
@@ -722,7 +722,7 @@ function MainApp() {
 
           {/* KAPSUL NIAGA VIEW */}
           {activeTab === 'academic' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
               <div className="mb-6 pb-4 border-b border-slate-200 dark:border-[#2E3A47]">
                 <div className="flex items-center gap-2 text-red-700 dark:text-red-400 text-xs font-bold uppercase tracking-wider mb-1">
                   <Building2 className="w-4 h-4" />
@@ -753,7 +753,7 @@ function MainApp() {
 
           {/* DIREKTORI USAHAWAN KELANTAN */}
           {activeTab === 'hepa' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
               <div className="mb-6 pb-4 border-b border-slate-200 dark:border-[#2E3A47]">
                 <div className="flex items-center gap-2 text-red-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
                   <Store className="w-4 h-4" />
@@ -777,7 +777,7 @@ function MainApp() {
 
           {/* GERAN & DANA BELIA */}
           {activeTab === 'ceed' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
               <div className="mb-6 pb-4 border-b border-slate-200 dark:border-[#2E3A47]">
                 <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
                   <Award className="w-4 h-4" />
@@ -802,21 +802,21 @@ function MainApp() {
 
           {/* JADUAL ACARA & KARNIVAL BELIA */}
           {activeTab === 'events' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
               <EventsSection />
             </div>
           )}
 
           {/* RUANG IKLAN & PELUANG NIAGA BELIA */}
           {activeTab === 'b2b' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
               <B2BMarketSection />
             </div>
           )}
 
           {/* KALKULATOR KELAYAKAN GERAN & PEMBIAYAAN */}
           {activeTab === 'calculator' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
               <GrantCalculatorSection 
                 onOpenGrantModal={handleOpenGrantModal}
                 onOpenMentorship={() => setIsMentorshipModalOpen(true)}
@@ -827,7 +827,7 @@ function MainApp() {
           {/* PENTADBIRAN (ADMIN) */}
           {activeTab === 'admin' && (
             !isAdmin ? (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-8 text-center space-y-4 shadow-2xs">
+              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-8 text-center space-y-4 shadow-2xs">
                 <div className="w-14 h-14 bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-400 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
@@ -851,7 +851,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
                 <AdminDashboard
                   slots={slots}
                   businesses={businesses}
@@ -871,7 +871,7 @@ function MainApp() {
 
           {/* PORTAL MENTOR: HAB BIMBINGAN */}
           {activeTab === 'mentor' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
               <MentorPortal
                 mentors={mentors}
                 registrations={mentorshipRegistrations}
@@ -890,7 +890,7 @@ function MainApp() {
           {/* MERCHANT PORTAL: BISNES SAYA (KHUSUS BELIA) */}
           {activeTab === 'merchant' && (
             isAdmin ? (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-8 text-center space-y-4 shadow-2xs">
+              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-8 text-center space-y-4 shadow-2xs">
                 <div className="w-14 h-14 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
@@ -914,7 +914,7 @@ function MainApp() {
                 </button>
               </div>
             ) : isMentor ? (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-8 text-center space-y-4 shadow-2xs">
+              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-8 text-center space-y-4 shadow-2xs">
                 <div className="w-14 h-14 bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-400 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
@@ -938,7 +938,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
                 <MerchantPortal
                   myBusiness={myBusiness}
                   myProducts={myProducts}
@@ -966,7 +966,7 @@ function MainApp() {
 
           {/* TETAPAN AKAUN & PROFIL */}
           {activeTab === 'settings' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
               <SettingsPage
                 myBusiness={myBusiness}
                 onRefresh={triggerRefresh}

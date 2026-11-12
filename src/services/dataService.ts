@@ -145,6 +145,15 @@ export async function updateBookingStatus(
 ) {
   const path = 'capsule_bookings';
   try {
+    try {
+      localStorage.setItem(`kbelia_status_booking_${bookingId}`, status);
+      if (status === 'approved') {
+        localStorage.setItem('kbelia_has_approved_application', 'true');
+      }
+    } catch (e) {
+      // ignore
+    }
+
     await setDoc(doc(db, path, bookingId), {
       status,
       adminNotes: adminNotes || (status === 'approved' ? 'Permohonan diluluskan. Sila hadir ke pejabat pentadbiran untuk penyerahan kunci.' : 'Permohonan ditolak.'),
@@ -378,6 +387,15 @@ export async function updateGrantApplicationStatus(
 ) {
   const path = 'grant_applications';
   try {
+    try {
+      localStorage.setItem(`kbelia_status_grant_${grantId}`, status);
+      if (status === 'approved') {
+        localStorage.setItem('kbelia_has_approved_application', 'true');
+      }
+    } catch (e) {
+      // ignore
+    }
+
     await setDoc(doc(db, path, grantId), {
       status,
       adminNotes: adminNotes || (status === 'approved' ? 'Permohonan geran diluluskan oleh Urusetia KBelia.' : 'Permohonan ditolak.')

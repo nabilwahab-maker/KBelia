@@ -501,7 +501,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   // Security Barrier: Only Admin or Mentor can enter
   if (!isAdmin && !isMentorUser) {
     return (
-      <div className="py-8 px-4 sm:px-6 max-w-4xl mx-auto animate-in fade-in duration-300">
+      <div className="py-8 px-2 sm:px-4 w-full animate-in fade-in duration-300">
         <div className="bg-slate-900 dark:bg-[#1A262C] text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-purple-800/60 relative overflow-hidden text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center mx-auto shadow-inner">
             <Lock className="w-8 h-8" />

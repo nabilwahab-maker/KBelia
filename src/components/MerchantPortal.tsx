@@ -285,7 +285,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
   if (!user) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+      <div className="w-full px-4 py-16 text-center">
         <div className="p-8 bg-white rounded-2xl border border-slate-200 shadow-md max-w-md mx-auto space-y-4">
           <div className="w-14 h-14 bg-emerald-100 text-emerald-800 rounded-2xl flex items-center justify-center mx-auto">
             <Store className="w-8 h-8" />
