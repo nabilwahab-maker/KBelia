@@ -203,7 +203,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 <span className="text-amber-300">K</span>B
               </div>
               <span className="font-extrabold text-xs text-red-950 dark:text-amber-400 tracking-tight">
-                KBELIA
+                KBelia
               </span>
             </div>
           </div>
@@ -433,14 +433,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                         >
                           Dasar Privasi
                         </button>{' '}
-                        KBELIA Kelantan.
+                        KBelia Kelantan.
                       </>
                     )}
                   </span>
                 </label>
               </div>
 
-              {/* SUBMIT BUTTON (KBELIA THEME CRIMSON RED) */}
+              {/* SUBMIT BUTTON (KBelia THEME CRIMSON RED) */}
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -504,7 +504,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             </div>
 
             <div className="text-center text-[10px] text-slate-400 dark:text-slate-500 pt-1">
-              Hak Cipta Terpelihara © 2026 Portal KBELIA Kelantan
+              Hak Cipta Terpelihara © 2026 Portal KBelia Kelantan
             </div>
           </div>
 
@@ -541,17 +541,17 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-900/15 rounded-full blur-3xl pointer-events-none"></div>
           </div>
 
-          {/* CENTER BRAND EMBLEM & TYPOGRAPHY (MATCHING SCREENSHOT + KBELIA THEME) */}
+          {/* CENTER BRAND EMBLEM & TYPOGRAPHY (MATCHING SCREENSHOT + KBelia THEME) */}
           <div className="relative z-10 flex flex-col items-center text-center max-w-md mx-auto">
             
-            {/* BRAND EMBLEM (ROUNDED-2XL SPRINT ICON WITH KBELIA THEME COLORS) */}
+            {/* BRAND EMBLEM (ROUNDED-2XL SPRINT ICON WITH KBelia THEME COLORS) */}
             <div className="flex items-center gap-3.5 mb-4">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-700 via-red-800 to-amber-600 text-white flex items-center justify-center font-black text-2xl shadow-xl shadow-red-950/50 border border-amber-400/30">
                 <span className="text-amber-300">K</span>
                 <span className="text-white text-lg ml-0.5">B</span>
               </div>
               <span className="text-3xl xl:text-4xl font-black text-white tracking-tight">
-                KBELIA
+                KBelia
               </span>
             </div>
 
@@ -603,7 +603,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2 text-red-700 dark:text-amber-400 font-bold text-sm">
                 <ShieldCheck className="w-4 h-4" />
-                <span>Terma & Syarat Pendaftaran KBELIA 2026</span>
+                <span>Terma & Syarat Pendaftaran KBelia 2026</span>
               </div>
               <button
                 type="button"

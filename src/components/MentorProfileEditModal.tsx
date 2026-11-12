@@ -266,10 +266,10 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
             />
           </div>
 
-          {/* Section: Bidang Kepakaran */}
+          {/* Section: Bidang Pengkhususan */}
           <div>
             <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-              Bidang Kepakaran & Khidmat Nasihat:
+              Bidang Pengkhususan & Khidmat Nasihat:
             </label>
             <div className="flex flex-wrap gap-2 mb-3">
               {expertise.map((tag, idx) => (
@@ -296,7 +296,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 type="text"
                 value={newExpertiseInput}
                 onChange={(e) => setNewExpertiseInput(e.target.value)}
-                placeholder="Taip bidang kepakaran baharu..."
+                placeholder="Taip bidang pengkhususan baharu..."
                 className="flex-1 px-4.5 py-2.5 text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
               />
               <button

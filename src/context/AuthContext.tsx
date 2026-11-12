@@ -407,7 +407,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userId = 'admin-nabil-01';
         const authUserData: AuthUser = {
           uid: userId,
-          displayName: 'Nabil Wahab (Pentadbir KBELIA)',
+          displayName: 'Nabil Wahab (Pentadbir KBelia)',
           email: cleanEmail.includes('@') ? cleanEmail : 'admin@kbelia.gov.my',
           photoURL: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
           isDemo: true
@@ -473,7 +473,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // REJECT IF NOT REGISTERED IN DATABASE
       if (!userRecord) {
-        const notFoundMsg = `Akaun emel "${cleanEmail}" belum berdaftar dalam pangkalan data KBELIA. Sila daftar akaun terlebih dahulu untuk memasukkan maklumat anda.`;
+        const notFoundMsg = `Akaun emel "${cleanEmail}" belum berdaftar dalam pangkalan data KBelia. Sila daftar akaun terlebih dahulu untuk memasukkan maklumat anda.`;
         setAuthError(notFoundMsg);
         return { success: false, error: notFoundMsg };
       }
@@ -638,14 +638,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else if (type === 'admin_sec') {
       authUser = {
         uid: 'admin-urusetia-02',
-        displayName: 'Urusetia KBELIA Negeri Kelantan',
+        displayName: 'Urusetia KBelia Negeri Kelantan',
         email: 'urusetia@kbelia.kelantan.gov.my',
         photoURL: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
         isDemo: true,
       };
       profile = {
         userId: 'admin-urusetia-02',
-        fullName: 'Pegawai Urusetia KBELIA Kelantan',
+        fullName: 'Pegawai Urusetia KBelia Kelantan',
         email: 'urusetia@kbelia.kelantan.gov.my',
         role: 'admin',
         phone: '+6097481000',

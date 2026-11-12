@@ -68,7 +68,7 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     mentorId: 'mentor-1',
     mentorName: 'Prof. Madya Dr. Nik Maheran',
     mentorAgency: 'UMK Institut Keusahawanan (UMK CEED)',
-    mentorDesignation: 'Pakar Pemasaran Strategik & Keusahawanan Digital',
+    mentorDesignation: 'Mentor Pemasaran Strategik & Keusahawanan Digital',
     menteeId: 'mentee-1',
     menteeName: 'Siti Aminah binti Yusof',
     menteePhone: '60112345678',
@@ -88,7 +88,7 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     mentorId: 'mentor-1',
     mentorName: 'Prof. Madya Dr. Nik Maheran',
     mentorAgency: 'UMK Institut Keusahawanan (UMK CEED)',
-    mentorDesignation: 'Pakar Pemasaran Strategik & Keusahawanan Digital',
+    mentorDesignation: 'Mentor Pemasaran Strategik & Keusahawanan Digital',
     menteeId: 'mentee-2',
     menteeName: 'Muhammad Farhan bin Zulkifli',
     menteePhone: '60198765432',
@@ -108,7 +108,7 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     mentorId: 'mentor-1',
     mentorName: 'Prof. Madya Dr. Nik Maheran',
     mentorAgency: 'UMK Institut Keusahawanan (UMK CEED)',
-    mentorDesignation: 'Pakar Pemasaran Strategik & Keusahawanan Digital',
+    mentorDesignation: 'Mentor Pemasaran Strategik & Keusahawanan Digital',
     menteeId: 'mentee-3',
     menteeName: 'Nurul Izzah binti Razak',
     menteePhone: '60133445566',
@@ -1475,7 +1475,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
               <div>
                 <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">
-                  Bidang Kepakaran Bimbingan:
+                  Bidang Pengkhususan Bimbingan:
                 </label>
                 <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                   {currentMentor.expertise.map((exp, idx) => (
@@ -1517,7 +1517,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     Borang Perakuan Rasmi Geran Belia
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Universiti Malaysia Kelantan &bull; Hab Usahawan Belia KBELIA
+                    Universiti Malaysia Kelantan &bull; Hab Usahawan Belia KBelia
                   </p>
                 </div>
               </div>

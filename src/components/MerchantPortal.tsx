@@ -407,7 +407,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       >
         <div className="flex items-center gap-2 text-red-800 dark:text-red-400 text-xs font-bold uppercase tracking-wider">
           <Store className="w-4 h-4" />
-          <span>Pusat Kawalan Usahawan KBELIA</span>
+          <span>Pusat Kawalan Usahawan KBelia</span>
         </div>
         <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">
           Urus Bisnes & Kapsul Saya
@@ -762,7 +762,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       step: 1,
                       title: 'Borang Dihantar',
                       date: '12 Okt 2026',
-                      officer: 'KBELIA Online',
+                      officer: 'KBelia Online',
                       status: 'completed',
                       desc: 'Borang pendaftaran profil & tapak diterima.'
                     },
@@ -1488,7 +1488,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
                     {/* 5. Contact Hub Officer (WhatsApp) */}
                     <a
-                      href={`https://wa.me/601120508890?text=${encodeURIComponent(`Salam Urusetia KBELIA Kelantan, saya ingin membuat pertanyaan mengenai permohonan kiosk slot ${b.slotCode} (${b.slotName}) bagi perniagaan ${b.businessName}.`)}`}
+                      href={`https://wa.me/601120508890?text=${encodeURIComponent(`Salam Urusetia KBelia Kelantan, saya ingin membuat pertanyaan mengenai permohonan kiosk slot ${b.slotCode} (${b.slotName}) bagi perniagaan ${b.businessName}.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -1630,7 +1630,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
                   <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-900 text-[11px] font-semibold">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Status Transaksi: Berjaya & Sah Diperakui Sistem Perakaunan Bersepadu KBELIA.</span>
+                    <span>Status Transaksi: Berjaya & Sah Diperakui Sistem Perakaunan Bersepadu KBelia.</span>
                   </div>
 
                   {/* Actions */}
@@ -1810,7 +1810,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <a
-              href={`https://wa.me/?text=${encodeURIComponent(`Sokong perniagaan ${myBusiness?.businessName || 'Usahawan Belia'} di Portal KBELIA Kelantan: ${window.location.origin}`)}`}
+              href={`https://wa.me/?text=${encodeURIComponent(`Sokong perniagaan ${myBusiness?.businessName || 'Usahawan Belia'} di Portal KBelia Kelantan: ${window.location.origin}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 py-3 px-4 bg-red-700 hover:bg-red-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors"
@@ -2128,7 +2128,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <div className="space-y-1">
                 <div className="text-xs font-bold text-slate-900 dark:text-white">Penyegerakan Data Profil & Direktori</div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Data yang dikemaskini akan disegerakkan terus ke pangkalan data KBELIA dan memaparkan maklumat terkini pada kad usahawan anda.
+                  Data yang dikemaskini akan disegerakkan terus ke pangkalan data KBelia dan memaparkan maklumat terkini pada kad usahawan anda.
                 </p>
               </div>
 

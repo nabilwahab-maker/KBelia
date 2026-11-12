@@ -380,7 +380,7 @@ export async function updateGrantApplicationStatus(
   try {
     await setDoc(doc(db, path, grantId), {
       status,
-      adminNotes: adminNotes || (status === 'approved' ? 'Permohonan geran diluluskan oleh Urusetia KBELIA.' : 'Permohonan ditolak.')
+      adminNotes: adminNotes || (status === 'approved' ? 'Permohonan geran diluluskan oleh Urusetia KBelia.' : 'Permohonan ditolak.')
     }, { merge: true });
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, path);

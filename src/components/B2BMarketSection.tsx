@@ -279,7 +279,7 @@ export const B2BMarketSection: React.FC = () => {
             {/* Direct WhatsApp Call to Action */}
             <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
               <a
-                href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20B2B%20anda%20di%20Portal%20KBELIA:%20${encodeURIComponent(item.title)}`}
+                href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20B2B%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full py-2 px-3 bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 active:scale-98"

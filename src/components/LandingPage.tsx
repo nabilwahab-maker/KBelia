@@ -173,7 +173,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   // All FAQs including checklist additions
   const faqs = [
     {
-      q: 'Siapakah yang layak menyewa Kapsul Niaga KBELIA?',
+      q: 'Siapakah yang layak menyewa Kapsul Niaga KBelia?',
       a: 'Warganegara Malaysia berumur 18 hingga 40 tahun yang bermastautin atau menjalankan perniagaan di negeri Kelantan layak memohon. Keutamaan diberikan kepada usahawan belia baharu yang memerlukan tapak permulaan berniaga.'
     },
     {
@@ -189,12 +189,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       a: 'Tidak semestinya. Skim Dana Benih dan Inkubasi Belia terbuka kepada perniagaan dari rumah, kiosk bergerak, serta perniagaan digital asalkan mempunyai perancangan perniagaan yang jelas.'
     },
     {
-      q: 'Bagaimanakah proses semakan dan kelulusan Geran Dana Benih KBELIA?',
+      q: 'Bagaimanakah proses semakan dan kelulusan Geran Dana Benih KBelia?',
       a: 'Permohonan geran disemak secara digital melalui sistem penjejak (Grant Tracker). Selepas permohonan dihantar, panel urusetia negeri akan membuat penilaian dalam tempoh 7-14 hari bekerja dan pemohon boleh memantau status secara langsung dalam papan pemuka.'
     },
     {
       q: 'Bolehkah saya mendapatkan bimbingan mentor industri secara percuma?',
-      a: 'Ya, semua usahawan belia berdaftar di portal KBELIA layak menyertai sesi padanan mentor perniagaan (Mentorship Hub) dan bengkel akademi keusahawanan secara percuma tanpa sebarang caj tersembunyi.'
+      a: 'Ya, semua usahawan belia berdaftar di portal KBelia layak menyertai sesi padanan mentor perniagaan (Mentorship Hub) dan bengkel akademi keusahawanan secara percuma tanpa sebarang caj tersembunyi.'
     },
     {
       q: 'Adakah platform ini membantu pendaftaran SSM dan pematuhan lesen?',
@@ -226,8 +226,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">KBELIA</span>
-                <span className="text-xs font-semibold text-blue-700 dark:text-blue-400">· UMK CEED</span>
+                <span className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">KBelia</span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal hidden sm:block">
                 {isBM ? 'Portal Keusahawanan & Kapsul Niaga Belia Kelantan' : 'Kelantan Youth Entrepreneurship & Capsule Kiosks'}
@@ -513,40 +512,40 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* STATISTIK IMPAK (SOCIAL PROOF) */}
           {/* ========================================================================= */}
           <div className="pt-6 w-full mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 text-left shadow-sm backdrop-blur hover:border-amber-400/50 hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-amber-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">10</div>
-              <div className="text-xs font-bold text-white mt-0.5">{isBM ? 'Jajahan Liputan' : 'Districts'}</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">{isBM ? 'Seluruh Kelantan' : 'Statewide'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-amber-400 dark:hover:border-amber-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">10</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Jajahan Liputan' : 'Districts'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Seluruh Kelantan' : 'Statewide'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 text-left shadow-sm backdrop-blur hover:border-emerald-400/50 hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">{slots.length}</div>
-              <div className="text-xs font-bold text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
-              <div className="text-[11px] text-emerald-400 mt-0.5 font-bold font-mono">{availableSlotsCount} {isBM ? 'slot sedia' : 'slots ready'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-emerald-400 dark:hover:border-emerald-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">{slots.length}</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
+              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-bold font-mono">{availableSlotsCount} {isBM ? 'slot sedia' : 'slots ready'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 text-left shadow-sm backdrop-blur hover:border-amber-400/50 hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">500+</div>
-              <div className="text-xs font-bold text-white mt-0.5">{isBM ? 'Usahawan Belia' : 'Entrepreneurs'}</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">{isBM ? 'Berdaftar aktif' : 'Active Registered'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-amber-400 dark:hover:border-amber-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">500+</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Usahawan Belia' : 'Entrepreneurs'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Berdaftar aktif' : 'Active Registered'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 text-left shadow-sm backdrop-blur hover:border-amber-400/50 hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-amber-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">RM2.4M</div>
-              <div className="text-xs font-bold text-white mt-0.5">{isBM ? 'Dana Disalurkan' : 'Grants Disbursed'}</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">{isBM ? 'Geran & pembiayaan' : 'Seed funding'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-amber-400 dark:hover:border-amber-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">RM2.4M</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Dana Disalurkan' : 'Grants Disbursed'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Geran & pembiayaan' : 'Seed funding'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 text-left shadow-sm backdrop-blur hover:border-blue-400/50 hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-blue-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">35+</div>
-              <div className="text-xs font-bold text-white mt-0.5">{isBM ? 'Mentor Industri' : 'Mentors'}</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Industry Mentors'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-blue-400 dark:hover:border-blue-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">35+</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Mentor Industri' : 'Mentors'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Industry Mentors'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 text-left shadow-sm backdrop-blur hover:border-emerald-400/50 hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">94.8%</div>
-              <div className="text-xs font-bold text-white mt-0.5">{isBM ? 'Kadar Kejayaan' : 'Success Rate'}</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">{isBM ? 'Inkubasi perniagaan' : 'Business incubation'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-emerald-400 dark:hover:border-emerald-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">94.8%</div>
+              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Kadar Kejayaan' : 'Success Rate'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Inkubasi perniagaan' : 'Business incubation'}</div>
             </div>
           </div>
 
@@ -556,16 +555,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 3B. REEL GAMBAR BERGERAK BERTERUSAN (CONTINUOUS HORIZONTAL MARQUEE TICKER) */}
       {/* ========================================================================= */}
-      <section className="py-6 bg-slate-900 text-white overflow-hidden border-b border-slate-800">
+      <section className="py-6 bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-white overflow-hidden border-b border-slate-200 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-400" />
-            <h3 className="text-xs sm:text-sm font-bold tracking-wide uppercase text-slate-200">
+            <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400" />
+            <h3 className="text-xs sm:text-sm font-bold tracking-wide uppercase text-slate-800 dark:text-slate-200">
               Galeri Kiosk Kapsul & Produk Usahawan Kelantan
             </h3>
           </div>
-          <span className="text-[11px] text-slate-400 hidden sm:inline">
-            Sorotan usahawan belia aktif UMK CEED
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">
+            Sorotan usahawan belia KBelia aktif
           </span>
         </div>
 
@@ -583,7 +582,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     setActiveTab('hepa');
                   }
                 }}
-                className="w-64 sm:w-72 shrink-0 bg-slate-800/90 hover:bg-slate-800 border border-slate-700 hover:border-blue-500 rounded-xl overflow-hidden transition-colors cursor-pointer shadow-sm group"
+                className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 rounded-xl overflow-hidden transition-colors cursor-pointer shadow-2xs group"
               >
                 <div className="relative h-36 overflow-hidden">
                   <img
@@ -606,10 +605,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
 
                 <div className="p-3 space-y-1">
-                  <h4 className="text-xs font-bold text-white truncate group-hover:text-blue-300 transition-colors">
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">
                     {card.title}
                   </h4>
-                  <p className="text-[11px] text-slate-300 truncate">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-300 truncate">
                     {card.subtitle}
                   </p>
                 </div>
@@ -629,7 +628,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Analisis Cabaran & Transformasi
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white text-balance">
-              Cabaran Tradisional vs. Penyelesaian Pintar KBELIA
+              Cabaran Tradisional vs. Penyelesaian Pintar KBelia
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
               Menghapuskan halangan utama yang dihadapi anak muda Kelantan untuk memulakan dan mengembangkan perniagaan.
@@ -689,14 +688,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </ul>
             </div>
 
-            {/* Column 2: Solusi Pintar KBELIA */}
+            {/* Column 2: Solusi Pintar KBelia */}
             <div className="p-7 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 space-y-5">
               <div className="flex items-center gap-3 pb-3 border-b border-emerald-200 dark:border-emerald-900/50">
                 <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-bold">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-base text-emerald-950 dark:text-emerald-200">Penyelesaian Bersepadu KBELIA</h3>
+                  <h3 className="font-extrabold text-base text-emerald-950 dark:text-emerald-200">Penyelesaian Bersepadu KBelia</h3>
                   <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">Inovasi ekosistem keusahawanan negeri</p>
                 </div>
               </div>
@@ -864,7 +863,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Langkah Demi Langkah Mula Berniaga
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Sertai komuniti KBELIA dengan proses pendaftaran pantas tanpa bayaran pendaftaran.
+              Sertai komuniti KBelia dengan proses pendaftaran pantas tanpa bayaran pendaftaran.
             </p>
           </div>
 
@@ -921,17 +920,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 7. TIGA INISIATIF TERAS (CORE PILLARS) */}
       {/* ========================================================================= */}
-      <section id="inisiatif" className="py-16 sm:py-20 border-b border-slate-800 bg-slate-900 text-white">
+      <section id="inisiatif" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <div className="text-center max-w-2xl mx-auto space-y-2 mb-12">
-            <div className="text-xs font-bold uppercase tracking-wider text-blue-400">
+            <div className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
               {isBM ? 'Inisiatif Pembangunan Negeri' : 'State Development Pillars'}
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white text-balance">
-              {isBM ? 'Teras Ekosistem Keusahawanan KBELIA' : 'KBELIA Entrepreneurship Ecosystem Pillars'}
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white text-balance">
+              {isBM ? 'Teras Ekosistem Keusahawanan KBelia' : 'KBelia Entrepreneurship Ecosystem Pillars'}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
               {isBM 
                 ? 'Direka khas bagi menyelesaikan cabaran modal tapak niaga, keterlihatan pasaran digital dan bimbingan berterusan.'
                 : 'Designed to dismantle retail overhead, elevate digital visibility, and provide mentorship.'}
@@ -941,14 +940,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Pillar 1: Kiosk Modular */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-slate-800/80 border border-slate-700 hover:border-amber-400/60 hover:bg-slate-800 transition-all duration-300 space-y-4 shadow-sm backdrop-blur interactive-card group">
-              <div className="w-12 h-12 rounded-xl bg-red-950/80 text-amber-400 border border-red-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-amber-400/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 space-y-4 shadow-2xs dark:shadow-sm interactive-card group">
+              <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-amber-400 border border-red-200 dark:border-red-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Building2 className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white transition-colors duration-200 group-hover:text-amber-300">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-200 group-hover:text-amber-600 dark:group-hover:text-amber-300">
                 {isBM ? '1. Kiosk Kapsul Modular' : '1. Modular Capsule Kiosks'}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 {isBM 
                   ? 'Penyediaan ruang niaga pasang siap di kawasan tumpuan tinggi jajahan. Dilengkapi bekalan elektrik stabil, WiFi 500Mbps dan kawalan keselamatan dengan kadar sewa serendah RM12-RM25/hari.'
                   : 'Turnkey pre-fitted retail pods at high-footfall locations with electricity, 500Mbps WiFi, and security starting at RM12/day.'}
@@ -957,7 +956,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('login')}
-                  className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
+                  className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
                 >
                   <span>{isBM ? 'Log Masuk & Semak Lokasi' : 'Log In to Check Locations'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -966,15 +965,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Pillar 2: Direktori Digital */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-slate-800/80 border border-slate-700 hover:border-emerald-400/60 hover:bg-slate-800 transition-all duration-300 space-y-4 shadow-sm backdrop-blur interactive-card group">
-              <div className="w-12 h-12 rounded-xl bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-emerald-400/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 space-y-4 shadow-2xs dark:shadow-sm interactive-card group">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Store className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white transition-colors duration-200 group-hover:text-emerald-300">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-300">
                 {isBM ? '2. Direktori Pasaran Digital' : '2. Digital Market Directory'}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                {isBM
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                {isBM 
                   ? 'Katalog atas talian rasmi mempamerkan produk keluaran anak muda Kelantan seperti makanan tradisi, kraftangan batik, servis teknologi, dan hasil pertanian terus kepada orang ramai.'
                   : 'Official digital catalog showcasing youth-crafted products—from heritage delicacies to contemporary batik and tech services.'}
               </p>
@@ -982,7 +981,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('login')}
-                  className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
+                  className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
                 >
                   <span>{isBM ? 'Log Masuk & Lihat Usahawan' : 'Log In to Browse Directory'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -991,15 +990,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Pillar 3: Geran & Bantuan */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-slate-800/80 border border-slate-700 hover:border-amber-400/60 hover:bg-slate-800 transition-all duration-300 space-y-4 shadow-sm backdrop-blur interactive-card group">
-              <div className="w-12 h-12 rounded-xl bg-amber-950/80 text-amber-400 border border-amber-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-amber-400/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 space-y-4 shadow-2xs dark:shadow-sm interactive-card group">
+              <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white transition-colors duration-200 group-hover:text-amber-300">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-200 group-hover:text-amber-600 dark:group-hover:text-amber-300">
                 {isBM ? '3. Geran & Inkubasi Modal' : '3. Grants & Seed Capital'}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                {isBM
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                {isBM 
                   ? 'Peluang mendapatkan Dana Benih Belia, geran digitalisasi, serta latihan keusahawanan intensif bersama mentor industri berkaliber bagi memacu pertumbuhan perniagaan.'
                   : 'Fast-tracked youth seed grants, digitalization subsidies, and structured mentorship programs.'}
               </p>
@@ -1007,7 +1006,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('login')}
-                  className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
+                  className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
                 >
                   <span>{isBM ? 'Log Masuk & Maklumat Skim' : 'Log In to View Schemes'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -1195,7 +1194,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Soalan Lazim (FAQ)
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Jawapan kepada pertanyaan lazim berkenaan permohonan kiosk, dana bantuan, mentor, dan direktori KBELIA.
+              Jawapan kepada pertanyaan lazim berkenaan permohonan kiosk, dana bantuan, mentor, dan direktori KBelia.
             </p>
           </div>
 
@@ -1231,16 +1230,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 10. FINAL CALL TO ACTION (CTA BANNER - CHECKLIST ITEM 10) */}
       {/* ========================================================================= */}
-      <section className="py-16 sm:py-20 bg-slate-900 text-white border-b border-slate-800 transition-colors">
+      <section className="py-16 sm:py-20 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 transition-colors">
         <div className="max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
-          <div className="text-xs font-bold uppercase tracking-wider text-blue-400">
+          <div className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
             Peluang Terbuka Sepanjang Tahun 2026/2027
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white text-balance">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-balance">
             Mulakan Langkah Keusahawanan Anda Hari Ini
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
             Sertai ratusan usahawan muda Kelantan yang memanfaatkan fasiliti kiosk modular, bimbingan mentor universiti, dan direktori negeri rasmi.
           </p>
 
@@ -1256,9 +1255,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('login')}
-              className="px-6 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
+              className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold text-sm border border-slate-300 dark:border-slate-700 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
             >
-              <LogIn className="w-4 h-4 text-blue-400" />
+              <LogIn className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span>{isBM ? 'Log Masuk Sistem' : 'Log In System'}</span>
             </button>
           </div>
@@ -1285,17 +1284,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 11. COMPREHENSIVE INSTITUTIONAL FOOTER (CHECKLIST ITEM 11) */}
       {/* ========================================================================= */}
-      <footer className="bg-[#0A1124] text-slate-300 text-xs border-t border-[#1E3158]">
+      <footer className="bg-slate-100 dark:bg-[#0A1124] text-slate-600 dark:text-slate-300 text-xs border-t border-slate-200 dark:border-[#1E3158]">
         
         {/* Newsletter Subscription Row */}
-        <div className="border-b border-[#1E3158] py-10 bg-[#080E1F]">
+        <div className="border-b border-slate-200 dark:border-[#1E3158] py-10 bg-slate-50 dark:bg-[#080E1F]">
           <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-1 text-center md:text-left">
-              <h3 className="text-base font-extrabold text-white flex items-center justify-center md:justify-start gap-2">
-                <Mail className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center justify-center md:justify-start gap-2">
+                <Mail className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Langgan Buletin & Info Peluang Usahawan</span>
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 Terima kemas kini terkini pembukaan slot kiosk, tawaran geran benih, dan bengkel keusahawanan terus ke peti masuk anda.
               </p>
             </div>
@@ -1305,13 +1304,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 type="email"
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
-                placeholder="Emel"
-                className="flex-1 px-4 py-2.5 rounded-xl bg-[#1E2638] border border-[#2C384D] text-white placeholder:text-slate-400 text-xs focus:outline-none focus:border-emerald-500"
+                placeholder="Emel anda"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-[#1E2638] border border-slate-300 dark:border-[#2C384D] text-slate-900 dark:text-white placeholder:text-slate-400 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 required
               />
               <button
                 type="submit"
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Langgan</span>
@@ -1320,8 +1319,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {newsletterSuccess && (
-            <div className="max-w-md mx-auto mt-3 p-2 text-center text-xs text-emerald-400 bg-emerald-950/50 border border-emerald-800 rounded-lg">
-              Terima kasih! Anda kini telah melanggan buletin rasmi KBELIA Kelantan.
+            <div className="max-w-md mx-auto mt-3 p-2 text-center text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+              Terima kasih! Anda kini telah melanggan buletin rasmi KBelia Kelantan.
             </div>
           )}
         </div>
@@ -1335,53 +1334,53 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-red-700 via-red-800 to-amber-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                 KB
               </div>
-              <span className="text-base font-black text-white tracking-tight">KBELIA KELANTAN</span>
+              <span className="text-base font-black text-slate-900 dark:text-white tracking-tight">KBelia Kelantan</span>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Portal Rasmi Pembangunan & Pemerkasaan Usahawan Belia Negeri Kelantan. Menyediakan kiosk pintar modular, pasaran direktori, serta inkubasi dana benih.
             </p>
-            <div className="pt-2 text-[11px] text-slate-500">
+            <div className="pt-2 text-[11px] text-slate-500 dark:text-slate-400">
               Kompleks Kota Darulnaim, 15503 Kota Bharu, Kelantan Darul Naim.
             </div>
           </div>
 
           {/* Col 2: Navigation Links */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-white">Navigasi Portal</h4>
+            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Navigasi Portal</h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <a href="#hero" className="hover:text-amber-400 transition-colors">Laman Utama</a>
+                <a href="#hero" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Laman Utama</a>
               </li>
               <li>
-                <button type="button" onClick={() => setActiveTab('register')} className="hover:text-amber-400 transition-colors text-left">Daftar Akaun Usahawan</button>
+                <button type="button" onClick={() => setActiveTab('register')} className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer">Daftar Akaun Usahawan</button>
               </li>
               <li>
-                <button type="button" onClick={() => setActiveTab('login')} className="hover:text-amber-400 transition-colors text-left">Log Masuk Sistem</button>
+                <button type="button" onClick={() => setActiveTab('login')} className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer">Log Masuk Sistem</button>
               </li>
               <li>
-                <a href="#kiosk" className="hover:text-amber-400 transition-colors">Kiosk Kapsul Modular</a>
+                <a href="#kiosk" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Kiosk Kapsul Modular</a>
               </li>
               <li>
-                <a href="#direktori" className="hover:text-amber-400 transition-colors">Direktori Usahawan</a>
+                <a href="#direktori" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Direktori Usahawan</a>
               </li>
               <li>
-                <a href="#ciri-utama" className="hover:text-amber-400 transition-colors">Ciri-Ciri Utama</a>
+                <a href="#ciri-utama" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Ciri-Ciri Utama</a>
               </li>
               <li>
-                <a href="#faq" className="hover:text-amber-400 transition-colors">Soalan Lazim (FAQ)</a>
+                <a href="#faq" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Soalan Lazim (FAQ)</a>
               </li>
             </ul>
           </div>
 
           {/* Col 3: Legal & Policy */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-white">Pautan Perundangan</h4>
+            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Pautan Perundangan</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="hover:text-amber-400 transition-colors text-left"
+                  className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
                 >
                   Dasar Privasi (Privacy Policy)
                 </button>
@@ -1390,7 +1389,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('terms')}
-                  className="hover:text-amber-400 transition-colors text-left"
+                  className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
                 >
                   Terma & Syarat Perkhidmatan
                 </button>
@@ -1399,7 +1398,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="hover:text-amber-400 transition-colors text-left"
+                  className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
                 >
                   Polisi Keselamatan Siber & Data
                 </button>
@@ -1408,7 +1407,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('terms')}
-                  className="hover:text-amber-400 transition-colors text-left"
+                  className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
                 >
                   Penafian Liabiliti Rasmi
                 </button>
@@ -1418,32 +1417,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Col 4: Contact & Socials */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-white">Hubungi Urusetia</h4>
+            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Hubungi Urusetia</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex items-center gap-2 text-slate-300">
-                <Phone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <Phone className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>+60 9-748 1000 (Pejabat Pentadbiran)</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <Mail className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>urusetia@kbelia.kelantan.gov.my</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>Ahad - Rabu: 8.00 pagi - 5.00 petang</span>
               </div>
             </div>
 
             {/* Social Media Links */}
             <div className="pt-2">
-              <div className="text-[10px] uppercase font-bold text-slate-400 mb-2">Ikuti Media Sosial</div>
+              <div className="text-[10px] uppercase font-bold text-slate-600 dark:text-slate-400 mb-2">Ikuti Media Sosial</div>
               <div className="flex items-center gap-2">
                 <a
                   href="https://facebook.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
-                  title="Facebook KBELIA"
+                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  title="Facebook KBelia"
                 >
                   <Globe className="w-4 h-4" />
                 </a>
@@ -1451,8 +1450,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://instagram.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
-                  title="Instagram KBELIA"
+                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  title="Instagram KBelia"
                 >
                   <Sparkles className="w-4 h-4" />
                 </a>
@@ -1460,8 +1459,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://tiktok.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
-                  title="TikTok KBELIA"
+                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  title="TikTok KBelia"
                 >
                   <Video className="w-4 h-4" />
                 </a>
@@ -1469,7 +1468,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://wa.me/601123456789"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
                   title="WhatsApp Khidmat Bantuan"
                 >
                   <Phone className="w-4 h-4" />
@@ -1481,18 +1480,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* Bottom Bar: Copyright */}
-        <div className="border-t border-slate-800 py-6 text-center text-[11px] text-slate-500">
+        <div className="border-t border-slate-200 dark:border-slate-800 py-6 text-center text-[11px] text-slate-500 dark:text-slate-400">
           <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p>
               Hak Cipta Terpelihara © {new Date().getFullYear()} Kerajaan Negeri Kelantan. Diselaraskan di bawah Inisiatif Pembangunan Ekonomi Belia.
             </p>
             <div className="flex items-center gap-3">
-              <span className="text-slate-400">Versi 2.4.0</span>
+              <span className="text-slate-600 dark:text-slate-400">Versi 2.4.0</span>
               <span>•</span>
               <button 
                 type="button" 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
-                className="hover:text-amber-400 transition-colors"
+                className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
               >
                 Kembali ke Atas ↑
               </button>
@@ -1510,27 +1509,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {legalModalType && (
         <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
           <div className="relative w-full max-w-2xl bg-white dark:bg-[#1C2434] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
-            <div className="p-5 bg-slate-900 dark:bg-[#161D26] text-white flex items-center justify-between border-b border-slate-800">
+            <div className="p-5 bg-slate-50 dark:bg-[#161D26] text-slate-900 dark:text-white flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
               <h3 className="font-extrabold text-base">
                 {legalModalType === 'privacy' ? 'Dasar Privasi & Perlindungan Data' : 'Terma & Syarat Perkhidmatan'}
               </h3>
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+                className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 text-xs text-slate-600 dark:text-slate-300 space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed">
+            <div className="p-6 text-xs text-slate-700 dark:text-slate-300 space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed">
               {legalModalType === 'privacy' ? (
                 <>
                   <p className="font-bold text-slate-900 dark:text-white">
                     1. Pengenalan & Komitmen Privasi
                   </p>
                   <p>
-                    Portal KBELIA diuruskan oleh Urusetia Pembangunan Belia Negeri Kelantan. Kami komited untuk melindungi data peribadi anda mengikut Akta Perlindungan Data Peribadi 2010 (PDPA) Malaysia.
+                    Portal KBelia diuruskan oleh Urusetia Pembangunan Belia Negeri Kelantan. Kami komited untuk melindungi data peribadi anda mengikut Akta Perlindungan Data Peribadi 2010 (PDPA) Malaysia.
                   </p>
                   <p className="font-bold text-slate-900 dark:text-white">
                     2. Pengumpulan Data Peribadi

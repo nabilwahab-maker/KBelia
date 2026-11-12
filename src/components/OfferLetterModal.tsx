@@ -143,7 +143,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-start justify-between pb-4 border-b-2 border-red-800/40 dark:border-slate-700 gap-3">
               <div>
                 <div className="font-black text-base sm:text-lg tracking-tight text-red-950 dark:text-white">
-                  PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBELIA)
+                  PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)
                 </div>
                 <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Inisiatif Bersama Universiti Malaysia Kelantan (UMK) & Kerajaan Negeri Kelantan
@@ -251,7 +251,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
                 <FileCheck2 className="w-4 h-4 text-emerald-600" />
                 <span>Dokumen rasmi dikeluarkan di bawah Akta Pembangunan Keusahawanan Belia Kelantan.</span>
               </div>
-              <span className="font-mono text-[10px] text-slate-400">ID: {booking.id || 'BK-KBELIA-2026'}</span>
+              <span className="font-mono text-[10px] text-slate-400">ID: {booking.id || 'BK-KBelia-2026'}</span>
             </div>
           </div>
         </div>

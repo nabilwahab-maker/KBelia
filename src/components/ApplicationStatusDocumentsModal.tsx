@@ -82,7 +82,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             </div>
             <div>
               <div className="text-[11px] font-extrabold uppercase tracking-widest text-amber-300">
-                Pusat Urusan Rasmi KBELIA
+                Pusat Urusan Rasmi KBelia
               </div>
               <h3 className="font-black text-base sm:text-lg text-white">
                 Semakan Status Permohonan & Dokumen Tawaran
@@ -252,7 +252,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </div>
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400">
-                        Bimbingan Pakar UMK
+                        Bimbingan Mentor UMK
                       </span>
                       <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                         Klinik Usahawan bersama: <span className="text-purple-700 dark:text-purple-300">{userMentorship?.mentorName || 'Prof. Madya Dr. Wan Azhar'}</span>
@@ -389,7 +389,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </div>
                     <div>
                       <h4 className="font-black text-base tracking-tight text-red-950 uppercase">
-                        PUSAT PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBELIA)
+                        PUSAT PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)
                       </h4>
                       <div className="text-[11px] font-semibold text-slate-600">
                         Dengan Kerjasama Institut Perusahaan & Keusahawanan Universiti Malaysia Kelantan (UMK)
@@ -416,7 +416,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 {/* Letter Content */}
                 <div className="text-xs leading-relaxed space-y-3 text-slate-800">
                   <p className="font-bold underline uppercase">
-                    TAWARAN PENEMPATAN & SEWAAN BERSUBSIDI KIOSK MODULAR PINTAR KBELIA SESI 2026
+                    TAWARAN PENEMPATAN & SEWAAN BERSUBSIDI KIOSK MODULAR PINTAR KBelia SESI 2026
                   </p>
                   <p>
                     Sukacita dimaklumkan bahawa Jawatankuasa Pemilihan Usahawan Belia Negeri Kelantan telah meluluskan permohonan anda bagi penempatan kiosk modular pintar di bawah program inisiatif keusahawanan belia negeri.
@@ -459,7 +459,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <div className="pt-4 border-t border-slate-200 flex items-end justify-between">
                   <div>
                     <div className="text-[11px] font-bold text-slate-900">Prof. Madya Dr. Wan Azhar</div>
-                    <div className="text-[10px] text-slate-600">Penyelaras Keusahawanan UMK & Urusetia KBELIA Kelantan</div>
+                    <div className="text-[10px] text-slate-600">Penyelaras Keusahawanan UMK & Urusetia KBelia Kelantan</div>
                     <div className="text-[9px] text-slate-400 mt-1">Dokumen ditandatangani secara digital mengikut Akta Tandatangan Digital 1997.</div>
                   </div>
 
@@ -484,7 +484,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     <h4 className="font-bold text-sm text-slate-900 dark:text-white uppercase">
                       Ringkasan Terma Perjanjian Sewaan Kiosk Modular
                     </h4>
-                    <span className="text-[11px] text-slate-500">Antara KBELIA/PBT dan Penyewa Kiosk {applicantName}</span>
+                    <span className="text-[11px] text-slate-500">Antara KBelia/PBT dan Penyewa Kiosk {applicantName}</span>
                   </div>
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
                     Aktif
@@ -495,7 +495,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <div>
                     <strong className="text-slate-900 dark:text-white block mb-0.5">Klausa 1: Tempoh Sewaan & Pembayaran</strong>
                     <p className="text-[11px]">
-                      Sewaan bermula pada awal bulan dengan tempoh percubaan minima 6 bulan. Bayaran subsidi RM150/bulan hendaklah diselesaikan selewat-lewatnya pada 7hb setiap bulan melalui akaun rasmi UMK/KBELIA.
+                      Sewaan bermula pada awal bulan dengan tempoh percubaan minima 6 bulan. Bayaran subsidi RM150/bulan hendaklah diselesaikan selewat-lewatnya pada 7hb setiap bulan melalui akaun rasmi UMK/KBelia.
                     </p>
                   </div>
 
@@ -544,7 +544,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <QrCode className="w-8 h-8" />
               </div>
               <h4 className="font-bold text-base text-slate-900 dark:text-white">
-                Pengesah Ketulenan Dokumen & Kiosk KBELIA
+                Pengesah Ketulenan Dokumen & Kiosk KBelia
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                 Kod rujukan dokumen anda dilindungi dengan jejak digital rasmi untuk mengelakkan pemalsuan lesen atau surat penempatan di pihak berkuasa tempatan.

@@ -115,7 +115,7 @@ export const SlideBar: React.FC<SlideBarProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-base tracking-tight">KBELIA</span>
+                <span className="font-extrabold text-base tracking-tight">KBelia</span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-400 text-amber-950">
                   KELANTAN
                 </span>

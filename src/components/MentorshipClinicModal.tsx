@@ -374,7 +374,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
             /* View 3: Mentor List */
             <div className="space-y-4">
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                Pilih mentor daripada pakar Universiti Malaysia Kelantan (UMK) dan industri untuk mendapatkan maklum balas perniagaan, penetapan harga, atau pelan pensijilan secara percuma.
+                Pilih mentor daripada Universiti Malaysia Kelantan (UMK) dan industri untuk mendapatkan maklum balas perniagaan, penetapan harga, atau pelan pensijilan secara percuma.
               </p>
 
               <div className="flex flex-col gap-3.5">

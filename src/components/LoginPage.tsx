@@ -234,7 +234,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 <span className="text-amber-300">K</span>B
               </div>
               <span className="font-extrabold text-xs text-red-950 dark:text-amber-400 tracking-tight">
-                KBELIA
+                KBelia
               </span>
             </div>
           </div>
@@ -634,7 +634,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                           >
                             Dasar Privasi
                           </button>{' '}
-                          KBELIA Kelantan.
+                          KBelia Kelantan.
                         </>
                       )}
                     </span>
@@ -727,7 +727,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             </div>
 
             <div className="text-center text-[10px] text-slate-400 dark:text-slate-500 pt-1">
-              Hak Cipta Terpelihara © 2026 Portal KBELIA Kelantan
+              Hak Cipta Terpelihara © 2026 Portal KBelia Kelantan
             </div>
           </div>
 
@@ -780,7 +780,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   <span className="text-white text-base xl:text-lg ml-0.5">B</span>
                 </div>
                 <span className="text-2xl xl:text-3xl font-black text-white tracking-tight">
-                  KBELIA
+                  KBelia
                 </span>
               </div>
             </div>
@@ -793,7 +793,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             {/* WELCOME BADGE: SELAMAT DATANG KE KBELIA */}
             <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-amber-300 shadow-sm backdrop-blur-xs">
               <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              <span>Selamat Datang ke KBELIA</span>
+              <span>Selamat Datang ke KBelia</span>
             </div>
 
           </div>
@@ -836,11 +836,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Untuk keselamatan akaun usahawan berdaftar, sila hubungi Urusetia KBELIA Kelantan atau hantarkan permohonan ke emel rasmi pentadbir kami:
+              Untuk keselamatan akaun usahawan berdaftar, sila hubungi Urusetia KBelia Kelantan atau hantarkan permohonan ke emel rasmi pentadbir kami:
             </p>
 
             <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-              <div className="font-bold text-slate-900 dark:text-white">Urusetia KBELIA Kelantan 2026</div>
+              <div className="font-bold text-slate-900 dark:text-white">Urusetia KBelia Kelantan 2026</div>
               <div className="text-slate-500 dark:text-slate-400 mt-0.5">Emel: urusetia@kbelia.kelantan.gov.my</div>
               <div className="text-slate-500 dark:text-slate-400">Talian: +60 9-748 1957 (Pusat Pentadbiran Negeri)</div>
             </div>

@@ -43,8 +43,8 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
   },
   {
     id: 'notif-mentor-2',
-    title: 'Pelantikan Mentor Pakar Industri Kelantan',
-    message: 'Selamat bertugas kepada barisan mentor pakar industri bagi sesi bimbingan inkubasi 2026.',
+    title: 'Pelantikan Mentor Industri Kelantan',
+    message: 'Selamat bertugas kepada barisan mentor industri bagi sesi bimbingan inkubasi 2026.',
     category: 'status',
     sender: 'Pusat Pembangunan Kerjaya UMK',
     senderRole: 'admin',
@@ -118,7 +118,7 @@ export function emitAdminOrMentorNotification(
   titleOrPayload: string | NotificationPayload,
   message?: string,
   senderRole: 'admin' | 'mentor' = 'admin',
-  senderName: string = 'Pentadbir KBELIA',
+  senderName: string = 'Pentadbir KBelia',
   actionTab: string = 'home'
 ) {
   let title = '';

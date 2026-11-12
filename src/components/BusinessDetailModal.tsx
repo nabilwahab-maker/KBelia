@@ -39,8 +39,8 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
 
   const createWhatsAppOrderLink = (productName?: string) => {
     const text = productName 
-      ? `Assalamualaikum/Hai ${business.businessName}, saya melihat produk *${productName}* di Portal KBELIA Kelantan dan berminat untuk membuat pesanan / pertanyaan.`
-      : `Assalamualaikum/Hai ${business.businessName}, saya ingin membuat pertanyaan mengenai perniagaan anda melalui Portal KBELIA Kelantan.`;
+      ? `Assalamualaikum/Hai ${business.businessName}, saya melihat produk *${productName}* di Portal KBelia Kelantan dan berminat untuk membuat pesanan / pertanyaan.`
+      : `Assalamualaikum/Hai ${business.businessName}, saya ingin membuat pertanyaan mengenai perniagaan anda melalui Portal KBelia Kelantan.`;
     return `https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(text)}`;
   };
 
@@ -48,7 +48,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
     if (navigator.share) {
       navigator.share({
         title: business.businessName,
-        text: `${business.businessName} - ${business.tagline} di KBELIA Kelantan`,
+        text: `${business.businessName} - ${business.tagline} di KBelia Kelantan`,
         url: window.location.href,
       }).catch(console.error);
     } else {

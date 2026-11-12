@@ -50,7 +50,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     avatarUrl: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
     email: 'khairul.audit@smeadvisor.my',
     phone: '60139123456',
-    bio: 'Pakar perakaunan bertauliah membantu usahawan mikro menyediakan buku tunai piawai dan kertas kerja pembiayaan perniagaan sehingga RM50,000.',
+    bio: 'Akauntan bertauliah membantu usahawan mikro menyediakan buku tunai piawai dan kertas kerja pembiayaan perniagaan sehingga RM50,000.',
     availableDays: 'Setiap Rabu & Sabtu (11:00 AM - 3:00 PM)',
     activeMenteesCount: 2,
     pin: '1234'
@@ -74,7 +74,7 @@ export const INITIAL_MENTORSHIP_REGISTRATIONS: MentorshipRegistration[] = [
     preferredTime: '10:00 AM - 11:00 AM',
     mode: 'Bersemuka di Kampus',
     status: 'pending',
-    notes: 'Permohonan baharu didaftarkan melalui Kaunter Urusan Pantas Usahawan KBELIA.',
+    notes: 'Permohonan baharu didaftarkan melalui Kaunter Urusan Pantas Usahawan KBelia.',
     mentorActionPlan: '',
     meetingLink: '',
     createdAt: '2026-03-24T09:30:00Z'

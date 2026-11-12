@@ -181,11 +181,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
   const [adminOfficerName, setAdminOfficerName] = useState(() => {
     try {
       const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).adminOfficerName || 'Pentadbir Nabil (Urusetia KBELIA)';
+      if (saved) return JSON.parse(saved).adminOfficerName || 'Pentadbir Nabil (Urusetia KBelia)';
     } catch (e) {
       // ignore
     }
-    return 'Pentadbir Nabil (Urusetia KBELIA)';
+    return 'Pentadbir Nabil (Urusetia KBelia)';
   });
   const [adminHelpdeskPhone, setAdminHelpdeskPhone] = useState(() => {
     try {
@@ -499,7 +499,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         confetti({ particleCount: 40, spread: 50 });
         setSettingsMessage({ 
           type: 'success', 
-          text: language === 'en' ? 'Academic mentor profile and expertise updated successfully!' : 'Profil mentor akademik dan bidang kepakaran bimbingan UMK berjaya dikemaskini!' 
+          text: language === 'en' ? 'Academic mentor profile and focus updated successfully!' : 'Profil mentor akademik dan bidang pengkhususan bimbingan UMK berjaya dikemaskini!' 
         });
         showToast({
           type: 'success',
@@ -1065,13 +1065,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </div>
             </div>
 
-            {/* MAKLUMAT KEPAKARAN PEMENTORAN (KHUSUS MENTOR) */}
+            {/* MAKLUMAT PENGKHUSUSAN PEMENTORAN (KHUSUS MENTOR) */}
             {isMentor && (
               <div className="pt-4 border-t border-slate-100 dark:border-[#2E3A47] space-y-4">
                 <div className="flex items-center gap-2">
                   <GraduationCap className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   <h5 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">
-                    {language === 'en' ? 'Mentor Academic & Mentoring Expertise' : 'Maklumat Kepakaran & Fakulti Mentor UMK'}
+                    {language === 'en' ? 'Mentor Academic & Mentoring Focus' : 'Maklumat Pengkhususan & Fakulti Mentor UMK'}
                   </h5>
                 </div>
 
@@ -1091,7 +1091,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
                   <div>
                     <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                      {language === 'en' ? 'Area of Mentoring Expertise' : 'Bidang Kepakaran Pementoran'} <span className="text-red-700 dark:text-red-400">*</span>
+                      {language === 'en' ? 'Area of Mentoring Focus' : 'Bidang Pengkhususan Pementoran'} <span className="text-red-700 dark:text-red-400">*</span>
                     </label>
                     <input
                       type="text"
@@ -1572,16 +1572,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 8: TETAPAN PENTADBIR URUSETIA (ADMIN ONLY) */}
         {/* ======================================================== */}
         {isAdmin && (activeSection === 'all' || activeSection === 'admin') && (
-          <div className="bg-slate-900 text-white p-6 sm:p-7 rounded-2xl border border-slate-800 shadow-md space-y-6">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-800">
+          <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-800">
               <div className="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
                 <Sliders className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white">
-                  {language === 'ms' ? 'Panel Parameter Pentadbir & Urusetia KBELIA' : 'Secretariat & Admin Parameter Controls'}
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                  {language === 'ms' ? 'Panel Parameter Pentadbir & Urusetia KBelia' : 'Secretariat & Admin Parameter Controls'}
                 </h4>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   {language === 'ms' ? 'Konfigurasi operasi peringkat pentadbiran kerajaan negeri.' : 'State-level operational and administrative configuration.'}
                 </p>
               </div>
@@ -1590,33 +1590,33 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Pegawai Urusetia */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {language === 'ms' ? 'Nama Pegawai Urusetia Pentadbir' : 'Secretariat Officer Name'}
                 </label>
                 <input
                   type="text"
                   value={adminOfficerName}
                   onChange={(e) => setAdminOfficerName(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-medium text-white focus:outline-hidden focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:outline-hidden focus:border-amber-500"
                 />
               </div>
 
               {/* Talian Meja Bantuan */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {language === 'ms' ? 'Talian WhatsApp Meja Bantuan Rasmi' : 'Official WhatsApp Helpdesk Line'}
                 </label>
                 <input
                   type="text"
                   value={adminHelpdeskPhone}
                   onChange={(e) => setAdminHelpdeskPhone(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-medium text-white focus:outline-hidden focus:border-amber-400 font-mono"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:outline-hidden focus:border-amber-500 font-mono"
                 />
               </div>
 
               {/* Kadar Subsidi Sewaan Kiosk */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {language === 'ms' ? 'Kadar Subsidi Sewaan Kiosk (%)' : 'Kiosk Rent Subsidy Rate (%)'}
                 </label>
                 <input
@@ -1625,13 +1625,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   max="100"
                   value={portalSubsidyRate}
                   onChange={(e) => setPortalSubsidyRate(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-medium text-white focus:outline-hidden focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:outline-hidden focus:border-amber-500"
                 />
               </div>
 
               {/* Had Tempoh Sewaan */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {language === 'ms' ? 'Had Maksimum Tempoh Perjanjian Kiosk (Bulan)' : 'Maximum Tenancy Agreement Limit (Months)'}
                 </label>
                 <input
@@ -1640,7 +1640,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   max="36"
                   value={maxLeaseDurationMonths}
                   onChange={(e) => setMaxLeaseDurationMonths(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-medium text-white focus:outline-hidden focus:border-amber-400"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:outline-hidden focus:border-amber-500"
                 />
               </div>
 

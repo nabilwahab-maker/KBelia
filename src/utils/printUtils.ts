@@ -527,7 +527,7 @@ export const generateOfferLetterOfficialHtml = (
   <div class="screen-toolbar no-print">
     <div class="screen-toolbar-title">
       <span class="screen-toolbar-badge">DOKUMEN RASMI</span>
-      <span>Portal Pembangunan Usahawan Belia Kelantan (KBELIA)</span>
+      <span>Portal Pembangunan Usahawan Belia Kelantan (KBelia)</span>
     </div>
     <div class="toolbar-actions">
       <button class="btn-print-screen" onclick="window.print()">
@@ -684,7 +684,7 @@ export const generateOfferLetterOfficialHtml = (
 
         <div>
           <div class="audit-meta-title">INTEGRITI KOD QR BERSIJIL</div>
-          <div class="audit-meta-sub">Dokumen ini telah disahkan secara kriptografi melalui Sistem Pangkalan Data Berpusat KBELIA.</div>
+          <div class="audit-meta-sub">Dokumen ini telah disahkan secara kriptografi melalui Sistem Pangkalan Data Berpusat KBelia.</div>
           <div class="audit-meta-hash">KOD: ${refNumber}</div>
         </div>
       </div>
@@ -726,7 +726,7 @@ export const generateOfferLetterOfficialHtml = (
  */
 export const openAndPrintDocument = (
   contentHtml: string,
-  documentTitle: string = 'Salinan Dokumen Rasmi KBELIA'
+  documentTitle: string = 'Salinan Dokumen Rasmi KBelia'
 ): Promise<boolean> => {
   return new Promise((resolve) => {
     try {
@@ -769,7 +769,7 @@ export const openAndPrintDocument = (
  */
 export const printHtmlViaIframe = (
   contentHtml: string,
-  documentTitle: string = 'Salinan Dokumen Rasmi KBELIA'
+  documentTitle: string = 'Salinan Dokumen Rasmi KBelia'
 ): Promise<boolean> => {
   return new Promise((resolve) => {
     try {
@@ -858,7 +858,7 @@ export const printHtmlViaIframe = (
 export const downloadHtmlDocument = (
   contentHtml: string,
   fileName: string,
-  documentTitle: string = 'Dokumen Rasmi KBELIA'
+  documentTitle: string = 'Dokumen Rasmi KBelia'
 ): void => {
   const completeHtml = (contentHtml.trim().toLowerCase().startsWith('<!doctype html>') || contentHtml.trim().toLowerCase().startsWith('<html'))
     ? contentHtml

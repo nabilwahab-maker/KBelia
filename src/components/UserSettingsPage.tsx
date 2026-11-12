@@ -116,8 +116,8 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
   }, [userProfile]);
 
   const entrepreneurId = user?.uid 
-    ? `KBELIA-${user.uid.slice(0, 4).toUpperCase()}-${user.uid.slice(-4).toUpperCase()}`
-    : 'KBELIA-2026-0382';
+    ? `KBelia-${user.uid.slice(0, 4).toUpperCase()}-${user.uid.slice(-4).toUpperCase()}`
+    : 'KBelia-2026-0382';
 
   const avatarSrc = userProfile?.avatarUrl || user?.photoURL || (userProfile?.role === 'admin'
     ? '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg'
@@ -214,7 +214,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
               </div>
               <div>
                 <span className="font-extrabold text-sm text-slate-900 tracking-tight">Tetapan Akaun Usahawan</span>
-                <span className="text-[10px] text-slate-500 block -mt-0.5 font-medium">Portal KBELIA Kelantan</span>
+                <span className="text-[10px] text-slate-500 block -mt-0.5 font-medium">Portal KBelia Kelantan</span>
               </div>
             </div>
           </div>
@@ -435,7 +435,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                   <div>
                     <h2 className="text-lg font-black text-slate-900 tracking-tight">Maklumat Am Usahawan</h2>
-                    <p className="text-xs text-slate-500">Maklumat akaun rasmi anda dalam sistem KBELIA Kelantan.</p>
+                    <p className="text-xs text-slate-500">Maklumat akaun rasmi anda dalam sistem KBelia Kelantan.</p>
                   </div>
                   <button
                     type="button"
@@ -498,7 +498,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     </label>
                     <input
                       type="text"
-                      value={user?.isGoogle ? 'Akaun Google (OAuth)' : 'Sistem KBELIA Kelantan'}
+                      value={user?.isGoogle ? 'Akaun Google (OAuth)' : 'Sistem KBelia Kelantan'}
                       disabled
                       className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed"
                     />

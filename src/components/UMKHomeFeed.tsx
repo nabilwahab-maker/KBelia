@@ -463,7 +463,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               )}
 
               <a
-                href={`https://wa.me/601120508890?text=${encodeURIComponent(language === 'en' ? `Hello KBELIA Secretariat, I would like to inquire about kiosk status ${userBooking.slotCode}.` : `Salam Urusetia KBELIA Kelantan, saya ingin membuat pertanyaan status kiosk ${userBooking.slotCode}.`)}`}
+                href={`https://wa.me/601120508890?text=${encodeURIComponent(language === 'en' ? `Hello KBelia Secretariat, I would like to inquire about kiosk status ${userBooking.slotCode}.` : `Salam Urusetia KBelia Kelantan, saya ingin membuat pertanyaan status kiosk ${userBooking.slotCode}.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300/80 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
@@ -793,8 +793,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {filteredBusinesses.slice(0, 6).map((biz) => {
             const cleanPhone = (biz.whatsapp || biz.ownerPhone || '601155552026').replace(/[^0-9]/g, '');
             const waMsg = language === 'en'
-              ? `Hello entrepreneur ${encodeURIComponent(biz.businessName)}, I saw your business on the KBELIA Kelantan Directory and I'm interested in your products.`
-              : `Salam usahawan ${encodeURIComponent(biz.businessName)}, saya melihat profil anda di Direktori KBELIA Kelantan dan berminat dengan produk anda.`;
+              ? `Hello entrepreneur ${encodeURIComponent(biz.businessName)}, I saw your business on the KBelia Kelantan Directory and I'm interested in your products.`
+              : `Salam usahawan ${encodeURIComponent(biz.businessName)}, saya melihat profil anda di Direktori KBelia Kelantan dan berminat dengan produk anda.`;
             const waUrl = `https://wa.me/${cleanPhone}?text=${waMsg}`;
 
             return (

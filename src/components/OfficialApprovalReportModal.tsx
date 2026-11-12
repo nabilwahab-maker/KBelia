@@ -46,7 +46,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
     year: 'numeric'
   });
 
-  const reportRef = `KBELIA/AUDIT-LULUS/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
+  const reportRef = `KBelia/AUDIT-LULUS/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
 
   const handlePrint = () => {
     window.print();
@@ -85,7 +85,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Laporan_Rasmi_Kelulusan_KBELIA_${new Date().toISOString().slice(0, 10)}.html`;
+    a.download = `Laporan_Rasmi_Kelulusan_KBelia_${new Date().toISOString().slice(0, 10)}.html`;
     a.click();
     URL.revokeObjectURL(url);
   };

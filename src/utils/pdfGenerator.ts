@@ -350,7 +350,7 @@ export const generateSinglePageA4OfferLetterHtml = (
                 INTEGRITI KOD QR BERSIJIL
               </div>
               <div style="font-size: 9px; color: #64748b; line-height: 1.3; margin-top: 1px;">
-                Dokumen ini telah disahkan kriptografi melalui Pangkalan Data KBELIA.
+                Dokumen ini telah disahkan kriptografi melalui Pangkalan Data KBelia.
               </div>
               <div style="font-size: 8.5px; font-family: monospace; color: #94a3b8; margin-top: 2px;">
                 KOD: ${refNumber}
@@ -463,7 +463,7 @@ export const downloadOfferLetterPdf = async (
       fallbackPdf.text('SURAT TAWARAN PENEMPATAN KIOSK BELIA', 20, 25);
       fallbackPdf.setFontSize(10);
       fallbackPdf.setFont('helvetica', 'normal');
-      fallbackPdf.text('Portal Pembangunan Usahawan Belia Kelantan (KBELIA)', 20, 32);
+      fallbackPdf.text('Portal Pembangunan Usahawan Belia Kelantan (KBelia)', 20, 32);
       fallbackPdf.text(`No. Rujukan: ${refNumber}    Tarikh: ${formattedDate}`, 20, 38);
       fallbackPdf.line(20, 42, 190, 42);
 

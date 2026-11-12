@@ -117,7 +117,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('admin')}
-              title={isMs ? 'Papan Pemuka Pentadbir' : 'Admin Dashboard'}
+              title={isMs ? 'Pentadbir' : 'Admin'}
               className="w-10 h-10 rounded-xl bg-slate-900 text-amber-300 flex items-center justify-center shadow-xs hover:scale-110 active:scale-95 transition-all cursor-pointer border border-amber-500/40 interactive-press"
             >
               <ShieldCheck className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -126,7 +126,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('mentor')}
-              title={isMs ? 'Papan Pemuka Mentor' : 'Mentor Dashboard'}
+              title={isMs ? 'Mentor' : 'Mentor'}
               className="w-10 h-10 rounded-xl bg-indigo-900 text-white flex items-center justify-center shadow-xs hover:scale-110 active:scale-95 transition-all cursor-pointer border border-purple-400/40 interactive-press"
             >
               <GraduationCap className="w-5 h-5 text-amber-300 transition-transform group-hover:scale-110" />
@@ -135,7 +135,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('merchant')}
-              title={isMs ? 'Papan Pemuka Belia' : 'Youth Dashboard'}
+              title={isMs ? 'Papan Pemuka' : 'Dashboard'}
               className="w-10 h-10 rounded-xl bg-[#003B95] text-white flex items-center justify-center shadow-xs hover:scale-110 active:scale-95 transition-all cursor-pointer border border-blue-400/40 interactive-press"
             >
               <GraduationCap className="w-5 h-5 text-amber-300 transition-transform group-hover:scale-110" />
@@ -444,7 +444,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             }`}
           >
             <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0 transition-transform group-hover:scale-110" />
-            <span>{isMs ? 'Dashboard Pentadbir' : 'Admin Dashboard'}</span>
+            <span>{isMs ? 'Pentadbir' : 'Admin'}</span>
           </button>
         ) : isMentor ? (
           <button
@@ -457,7 +457,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             }`}
           >
             <GraduationCap className="w-4 h-4 text-amber-300 shrink-0 transition-transform group-hover:scale-110" />
-            <span>{isMs ? 'Dashboard Mentor' : 'Mentor Dashboard'}</span>
+            <span>{isMs ? 'Mentor' : 'Mentor'}</span>
           </button>
         ) : (
           <button
@@ -470,7 +470,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             }`}
           >
             <GraduationCap className="w-4 h-4 text-amber-300 shrink-0 transition-transform group-hover:scale-110" />
-            <span>{isMs ? 'Dashboard Belia' : 'Youth Dashboard'}</span>
+            <span>{isMs ? 'Papan Pemuka' : 'Dashboard'}</span>
           </button>
         )}
 
@@ -532,7 +532,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'queue' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Giliran Kelulusan</span>
+                        <span className="truncate">Kelulusan</span>
                       </button>
 
                       {/* Sub 2: Permohonan Kapsul */}
@@ -549,7 +549,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Clock className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'bookings' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Permohonan Kapsul</span>
+                        <span className="truncate">Kapsul</span>
                       </button>
 
                       {/* Sub 3: Direktori Usahawan */}
@@ -566,7 +566,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Store className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'businesses' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Direktori Usahawan</span>
+                        <span className="truncate">Direktori</span>
                       </button>
 
                       {/* Sub 4: Pengurusan Kapsul */}
@@ -583,7 +583,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'slots' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Pengurusan Kapsul</span>
+                        <span className="truncate">Kiosk</span>
                       </button>
 
                       {/* Sub 5: Geran & Inisiatif */}
@@ -600,7 +600,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Award className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'programs' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Geran & Inisiatif</span>
+                        <span className="truncate">Geran</span>
                       </button>
 
                       {/* Sub 6: Bimbingan Mentor */}
@@ -617,7 +617,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <GraduationCap className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'mentors' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Bimbingan Mentor</span>
+                        <span className="truncate">Bimbingan</span>
                       </button>
 
                       {/* Sub 7: Segerak Pangkalan Data */}
@@ -634,7 +634,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Database className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'sync' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Segerak Data</span>
+                        <span className="truncate">Penyegerakan</span>
                       </button>
 
                       {/* Sub 8: Tetapan Operasi */}
@@ -651,7 +651,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Sliders className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'settings' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Tetapan Operasi</span>
+                        <span className="truncate">Tetapan</span>
                       </button>
                     </div>
                   )}
@@ -803,7 +803,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <GraduationCap className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400'}`} />
-                      <span className="truncate">{isMs ? 'Papan Pemuka Mentor' : 'Mentor Dashboard'}</span>
+                      <span className="truncate">{isMs ? 'Papan Pemuka' : 'Dashboard'}</span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isMentorDashboardAccordionOpen ? 'rotate-0' : '-rotate-90'} ${activeTab === 'mentor' ? 'text-purple-700 dark:text-purple-400' : 'text-slate-300 dark:text-slate-600'}`} />
                   </button>
@@ -825,7 +825,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Calendar className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'mentor' && mentorSubTab === 'sessions' ? 'text-white' : 'text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400'}`} />
-                        <span className="truncate">{isMs ? 'Sesi Bimbingan' : 'Mentoring Sessions'}</span>
+                        <span className="truncate">{isMs ? 'Sesi Bimbingan' : 'Sessions'}</span>
                       </button>
 
                       {/* Sub 2: Perakuan Rasmi Geran Belia */}
@@ -842,7 +842,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Award className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'mentor' && mentorSubTab === 'endorsements' ? 'text-white' : 'text-slate-400 group-hover:text-amber-500 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">{isMs ? 'Perakuan Geran Belia' : 'Grant Endorsement'}</span>
+                        <span className="truncate">{isMs ? 'Perakuan Geran' : 'Endorsements'}</span>
                       </button>
 
                       {/* Sub 3: Log Jurnal & Tindakan */}
@@ -859,7 +859,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <FileText className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'mentor' && mentorSubTab === 'logbook' ? 'text-white' : 'text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400'}`} />
-                        <span className="truncate">{isMs ? 'Log Jurnal & Tindakan' : 'Action Logbook'}</span>
+                        <span className="truncate">{isMs ? 'Log Jurnal' : 'Logbook'}</span>
                       </button>
 
                       {/* Sub 4: Profil Mentor & Jadual */}
@@ -876,7 +876,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Settings className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'mentor' && mentorSubTab === 'profile' ? 'text-white' : 'text-slate-400 group-hover:text-purple-600 dark:group-hover:text-purple-400'}`} />
-                        <span className="truncate">{isMs ? 'Profil & Kelapangan' : 'Profile & Availability'}</span>
+                        <span className="truncate">{isMs ? 'Profil & Jadual' : 'Profile'}</span>
                       </button>
                     </div>
                   )}
@@ -898,7 +898,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <Users className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
-                    <span className="truncate">{isMs ? 'Permohonan Bimbingan' : 'Mentorship Applications'}</span>
+                    <span className="truncate">{isMs ? 'Permohonan' : 'Applications'}</span>
                   </div>
                   <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -966,7 +966,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <Award className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                    <span className="truncate">{isMs ? 'Surat Perakuan Rasmi' : 'Official Endorsements'}</span>
+                    <span className="truncate">{isMs ? 'Perakuan Rasmi' : 'Endorsements'}</span>
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -983,7 +983,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span className="truncate">{isMs ? 'Kriteria Dana & Geran' : 'Grant Criteria'}</span>
+                    <span className="truncate">{isMs ? 'Kriteria Geran' : 'Grant Criteria'}</span>
                   </div>
                   <span className="text-[10px] font-mono font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 px-1.5 py-0.5 rounded">RM3K-RM10K</span>
                 </button>
@@ -1011,7 +1011,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <FileCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    <span className="truncate">{isMs ? 'Log Jurnal Bimbingan' : 'Action Logbook'}</span>
+                    <span className="truncate">{isMs ? 'Log Bimbingan' : 'Logbook'}</span>
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -1028,7 +1028,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="truncate">{isMs ? 'Semakan Tugasan Mentee' : 'Mentee Task Review'}</span>
+                    <span className="truncate">{isMs ? 'Semakan Tugasan' : 'Task Review'}</span>
                   </div>
                   <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -1056,7 +1056,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <Settings className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
-                    <span className="truncate">{isMs ? 'Profil & Kelapangan' : 'Profile & Availability'}</span>
+                    <span className="truncate">{isMs ? 'Profil Mentor' : 'Profile'}</span>
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -1076,7 +1076,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <Video className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                    <span className="truncate">{isMs ? 'Bilik Temujanji Maya' : 'Virtual Meet Room'}</span>
+                    <span className="truncate">{isMs ? 'Bilik Maya' : 'Virtual Room'}</span>
                   </div>
                   <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -1093,7 +1093,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <GraduationCap className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span className="truncate">{isMs ? 'Panduan UMK CEED' : 'UMK CEED Guidelines'}</span>
+                    <span className="truncate">{isMs ? 'Panduan Mentor' : 'Mentor Guide'}</span>
                   </div>
                   <ChevronRight className="w-3 h-3 text-slate-300 group-hover:translate-x-0.5 transition-transform" />
                 </button>
@@ -1161,7 +1161,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <BarChart3 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'overview' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Ringkasan Eksekutif</span>
+                        <span className="truncate">Ringkasan</span>
                       </button>
 
                       {/* Sub 2: Profil Perniagaan */}
@@ -1178,7 +1178,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Store className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'profile' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Profil Perniagaan</span>
+                        <span className="truncate">Profil Bisnes</span>
                       </button>
 
                       {/* Sub 3: Katalog Produk */}
@@ -1195,7 +1195,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <ShoppingBag className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'products' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Katalog Produk</span>
+                        <span className="truncate">Katalog</span>
                       </button>
 
                       {/* Sub 4: Permohonan Kapsul */}
@@ -1212,7 +1212,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'bookings' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Permohonan Kapsul</span>
+                        <span className="truncate">Kapsul Niaga</span>
                       </button>
 
                       {/* Sub 5: Buku Tunai Jualan */}
@@ -1229,7 +1229,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <Coins className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'cashflow' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Buku Tunai Jualan</span>
+                        <span className="truncate">Buku Tunai</span>
                       </button>
 
                       {/* Sub 6: Buat Dokumen Sah */}
@@ -1246,7 +1246,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <FileCheck className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'vault' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Buat Dokumen Sah</span>
+                        <span className="truncate">Dokumen Sah</span>
                       </button>
 
                       {/* Sub 7: Kad Digital WhatsApp Link */}
@@ -1263,7 +1263,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       >
                         <MessageCircle className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'card' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
-                        <span className="truncate">Kad Digital WhatsApp Link</span>
+                        <span className="truncate">Kad Digital</span>
                       </button>
                     </div>
                   )}

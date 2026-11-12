@@ -41,7 +41,7 @@ export const UMKRightWidgets: React.FC<UMKRightWidgetsProps> = ({
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#2E3A47] mb-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-            <span className="text-xs font-extrabold text-slate-800 dark:text-white">Sistem KBELIA Aktif</span>
+            <span className="text-xs font-extrabold text-slate-800 dark:text-white">Sistem KBelia Aktif</span>
           </div>
           <span className="text-[10px] text-emerald-800 dark:text-emerald-300 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-900/50">
             Dalam Talian
@@ -115,7 +115,7 @@ export const UMKRightWidgets: React.FC<UMKRightWidgetsProps> = ({
 
         <div className="space-y-2.5">
           <a
-            href="https://wa.me/601155552026?text=Salam%20Urusetia%20KBELIA,%20saya%20ingin%20bertanya%20berkaitan%20sewaan%20kiosk%20niaga"
+            href="https://wa.me/601155552026?text=Salam%20Urusetia%20KBelia,%20saya%20ingin%20bertanya%20berkaitan%20sewaan%20kiosk%20niaga"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow-2xs"

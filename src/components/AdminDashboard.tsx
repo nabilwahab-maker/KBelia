@@ -132,11 +132,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [adminOfficerName, setAdminOfficerName] = useState(() => {
     try {
       const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).adminOfficerName || 'Pentadbir Nabil (Urusetia KBELIA)';
+      if (saved) return JSON.parse(saved).adminOfficerName || 'Pentadbir Nabil (Urusetia KBelia)';
     } catch (e) {
       // ignore
     }
-    return 'Pentadbir Nabil (Urusetia KBELIA)';
+    return 'Pentadbir Nabil (Urusetia KBelia)';
   });
   const [adminHelpdeskPhone, setAdminHelpdeskPhone] = useState(() => {
     try {
@@ -284,7 +284,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         message: `Permohonan sewaan kiosk bagi ${booking.businessName} telah diluluskan rasmi oleh Urusetia Pentadbir Negeri.`,
         type: 'kiosk',
         senderRole: 'admin',
-        sender: 'Pentadbir Urusetia KBELIA'
+        sender: 'Pentadbir Urusetia KBelia'
       });
       onRefresh();
     } catch (err) {
@@ -341,7 +341,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         message: `${slotName} di jajahan ${slotDistrict} kini dibuka untuk permohonan sewaan usahawan (RM${slotMonthlyRate}/bln).`,
         type: 'kiosk',
         senderRole: 'admin',
-        sender: 'Pentadbir Urusetia KBELIA'
+        sender: 'Pentadbir Urusetia KBelia'
       });
 
       setShowSlotForm(false);
@@ -394,7 +394,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         message: `${progTitle} (${progAmount || 'Percuma'}) kini diterbitkan untuk penyertaan usahawan belia Kelantan.`,
         type: 'grant',
         senderRole: 'admin',
-        sender: 'Pentadbir Urusetia KBELIA'
+        sender: 'Pentadbir Urusetia KBelia'
       });
 
       setShowProgramForm(false);
@@ -480,7 +480,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <span>Pusat Kawalan & Pengurusan Pentadbiran</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            Panel Pengurusan & Kelulusan Hab KBELIA
+            Panel Pengurusan & Kelulusan Hab KBelia
           </h2>
           <p className="text-xs text-slate-500 dark:text-[#8A99AD] mt-0.5">
             Semak dan luluskan permohonan sewaan kapsul, geran pembiayaan, profil usahawan dan program belia.
@@ -1538,7 +1538,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <Sliders className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Tetapan & Parameter Operasi Portal KBELIA</h4>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Tetapan & Parameter Operasi Portal KBelia</h4>
                   <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Konfigurasi subsidi sewaan, had tempoh dan status pelayan portal.</p>
                 </div>
               </div>

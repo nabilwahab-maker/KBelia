@@ -161,12 +161,12 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
         {/* Left Column: Exactly Aligned with Sidebar below (w-64 or w-18) */}
         <div className={`${isSidebarCollapsed ? 'w-18 px-2 justify-center gap-1' : 'w-64 px-4 justify-between'} shrink-0 h-full border-r border-slate-200 dark:border-[#2E3A47] flex items-center transition-all duration-200 bg-white dark:bg-[#1C2434]`}>
           
-          {/* KBELIA Brand Wordmark */}
+          {/* KBelia Brand Wordmark */}
           <button
             id="kbelia-logo-btn"
             onClick={() => setShowLogoutConfirm(true)}
             className={`flex items-center gap-2.5 hover:opacity-95 transition-opacity text-left shrink-0 cursor-pointer ${isSidebarCollapsed ? 'justify-center' : ''}`}
-            title="KBELIA - Tekan logo untuk log keluar"
+            title="KBelia - Tekan logo untuk log keluar"
           >
             <div className="w-8 h-8 rounded-lg bg-blue-900 text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-xs shrink-0">
               <span className="font-extrabold text-white">KB</span>
@@ -176,15 +176,11 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               <div className="leading-tight">
                 <div className="flex items-center gap-2">
                   <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
-                    KBELIA
-                  </span>
-                  <span className="text-xs text-slate-300 dark:text-slate-600 font-normal">·</span>
-                  <span className="text-xs font-semibold text-blue-800 dark:text-blue-400">
-                    UMK CEED
+                    KBelia
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">
-                  {isAdmin ? 'Panel Pentadbir' : userProfile?.role === 'mentor' ? 'Portal Mentor Pakar' : 'Portal Usahawan Belia'}
+                  {isAdmin ? 'Panel Pentadbir' : userProfile?.role === 'mentor' ? 'Portal Mentor' : 'Portal Usahawan Belia'}
                 </p>
               </div>
             )}

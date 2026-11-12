@@ -29,13 +29,13 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
     showToast({
       type: 'success',
       title: 'Pautan Disalin!',
-      message: 'Pautan portal KBELIA Kelantan telah disalin ke papan klip anda.'
+      message: 'Pautan portal KBelia Kelantan telah disalin ke papan klip anda.'
     });
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleWhatsAppHelp = () => {
-    const text = encodeURIComponent('Salam sejahtera Urusetia KBELIA Kelantan. Saya ingin bertanya mengenai bantuan geran / sewaan kiosk belia.');
+    const text = encodeURIComponent('Salam sejahtera Urusetia KBelia Kelantan. Saya ingin bertanya mengenai bantuan geran / sewaan kiosk belia.');
     window.open(`https://wa.me/601120508890?text=${text}`, '_blank');
   };
 

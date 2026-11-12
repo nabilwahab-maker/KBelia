@@ -57,7 +57,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
   const cleanPhone = tenantPhone.replace(/[^0-9]/g, '');
 
   const handleWhatsApp = () => {
-    const text = `Assalamualaikum/Hai ${businessName}, saya melihat premis kiosk anda di ${slot.name} (${slot.code}) melalui Portal KBELIA Kelantan dan berminat untuk membuat pertanyaan mengenai produk / perkhidmatan anda.`;
+    const text = `Assalamualaikum/Hai ${businessName}, saya melihat premis kiosk anda di ${slot.name} (${slot.code}) melalui Portal KBelia Kelantan dan berminat untuk membuat pertanyaan mengenai produk / perkhidmatan anda.`;
     window.open(`https://wa.me/${cleanPhone || '60123344556'}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -74,7 +74,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
     if (navigator.share) {
       navigator.share({
         title: `${slot.name} - ${businessName}`,
-        text: `Lihat premis kiosk beroperasi ${businessName} di ${slot.hubLocation} melalui Portal KBELIA Kelantan`,
+        text: `Lihat premis kiosk beroperasi ${businessName} di ${slot.hubLocation} melalui Portal KBelia Kelantan`,
         url: window.location.href,
       }).catch(console.error);
     } else {

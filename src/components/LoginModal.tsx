@@ -136,7 +136,7 @@ export const LoginModal: React.FC = () => {
               <h3 className="font-extrabold text-sm text-white">
                 {activeRoleTab === 'admin' ? 'Portal Pentadbir' : activeRoleTab === 'mentor' ? 'Portal Mentor' : 'Log Masuk Usahawan'}
               </h3>
-              <p className="text-[10px] text-slate-300">KBELIA Kelantan</p>
+              <p className="text-[10px] text-slate-300">KBelia Kelantan</p>
             </div>
           </div>
           <button

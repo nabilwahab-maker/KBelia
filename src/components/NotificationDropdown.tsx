@@ -186,7 +186,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                         ) : (
                           <User className="w-3 h-3" />
                         )}
-                        <span>{n.sender || 'Urusetia KBELIA'}</span>
+                        <span>{n.sender || 'Urusetia KBelia'}</span>
                       </span>
 
                       {n.actionTab && (
