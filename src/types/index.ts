@@ -118,10 +118,12 @@ export interface CapsuleBooking {
   applicantName: string;
   applicantEmail: string;
   applicantPhone: string;
+  applicantMyKad?: string;
   businessName: string;
   businessCategory: BusinessCategory;
   durationMonths: number;
   startDate: string;
+  monthlyRate?: number;
   pitchNotes: string;
   status: BookingStatus;
   adminNotes?: string;
@@ -160,6 +162,7 @@ export interface GrantApplication {
   programId?: string;
   programTitle: string;
   grantAmount: string;
+  amount?: string;
   applicantId: string;
   applicantName: string;
   applicantEmail: string;

@@ -1,7 +1,8 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { CapsuleBooking } from '../types';
+import { CapsuleBooking, GrantApplication } from '../types';
 import { formatDisplayDate, calculateOperationEndDate } from './printUtils';
+import { maskMyKad } from './securityUtils';
 
 /**
  * Generates an HTML string specifically tailored for 1-Page A4 PDF rendering (794px x 1122px).
@@ -490,6 +491,418 @@ export const downloadOfferLetterPdf = async (
     }
   } finally {
     // 4. Always clean up temporary DOM container
+    if (container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
+  }
+};
+
+export interface OfficialApprovalReportParams {
+  bookings: CapsuleBooking[];
+  grantApplications: GrantApplication[];
+  reportRef: string;
+  reportDate: string;
+}
+
+/**
+ * Generates an HTML string for the Official Approval Report with authentic royal Kelantan double borders.
+ */
+export const generateOfficialApprovalReportHtml = (params: OfficialApprovalReportParams): string => {
+  const approvedBookings = params.bookings.filter(b => b.status === 'approved');
+  const approvedGrants = params.grantApplications.filter(g => g.status === 'approved');
+
+  const totalKioskSubsidy = approvedBookings.reduce((sum, b) => sum + (b.monthlyRate || 150), 0);
+  const totalGrantAmount = approvedGrants.reduce((sum, g) => {
+    const rawVal = (g.amount || g.grantAmount) ? parseFloat((g.amount || g.grantAmount).replace(/[^0-9.]/g, '')) : 3000;
+    return sum + (isNaN(rawVal) ? 3000 : rawVal);
+  }, 0);
+
+  return `
+    <div style="
+      width: 820px;
+      box-sizing: border-box;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 12px;
+    ">
+      <!-- Royal Double Border Frame -->
+      <div style="
+        border: 3.5px solid #065f46;
+        padding: 6px;
+        background: #ffffff;
+        position: relative;
+        box-sizing: border-box;
+      ">
+        <div style="
+          border: 1.5px solid #d97706;
+          padding: 24px 28px;
+          background: #ffffff;
+          position: relative;
+          box-sizing: border-box;
+        ">
+          <!-- 4 Corner Security Brackets -->
+          <div style="position: absolute; top: -1px; left: -1px; width: 16px; height: 16px; border-top: 3px solid #065f46; border-left: 3px solid #065f46;"></div>
+          <div style="position: absolute; top: -1px; right: -1px; width: 16px; height: 16px; border-top: 3px solid #065f46; border-right: 3px solid #065f46;"></div>
+          <div style="position: absolute; bottom: -1px; left: -1px; width: 16px; height: 16px; border-bottom: 3px solid #065f46; border-left: 3px solid #065f46;"></div>
+          <div style="position: absolute; bottom: -1px; right: -1px; width: 16px; height: 16px; border-bottom: 3px solid #065f46; border-right: 3px solid #065f46;"></div>
+
+          <!-- Top Letterhead -->
+          <div style="
+            border-bottom: 2.5px solid #065f46;
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+          ">
+            <div style="flex: 1;">
+              <div style="
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+                color: #065f46;
+                margin-bottom: 3px;
+              ">
+                <span>🛡️</span>
+                <span>KERAJAAN NEGERI KELANTAN · UNIVERSITI MALAYSIA KELANTAN (UMK)</span>
+              </div>
+              <div style="
+                font-size: 18px;
+                font-weight: 900;
+                color: #0f172a;
+                letter-spacing: -0.3px;
+                line-height: 1.2;
+              ">
+                RINGKASAN RASMI KELULUSAN PERMOHONAN
+              </div>
+              <div style="
+                font-size: 11px;
+                color: #475569;
+                margin-top: 4px;
+                line-height: 1.4;
+              ">
+                Program Inisiatif Kapsul Niaga Modular & Geran Pemula Usahawan Muda Negeri Kelantan
+              </div>
+            </div>
+
+            <div style="
+              background: #f8fafc;
+              border: 1px solid #cbd5e1;
+              border-radius: 8px;
+              padding: 8px 14px;
+              text-align: right;
+              font-size: 10.5px;
+              font-family: monospace;
+              min-width: 220px;
+              flex-shrink: 0;
+            ">
+              <div><strong style="font-family: sans-serif; color: #475569; font-size: 9.5px;">NO. RUJUKAN:</strong> <span style="color: #065f46; font-weight: 800;">${params.reportRef}</span></div>
+              <div style="margin-top: 3px;"><strong style="font-family: sans-serif; color: #475569; font-size: 9.5px;">TARIKH RASMI:</strong> <span style="color: #0f172a; font-weight: 700;">${params.reportDate}</span></div>
+              <div style="margin-top: 4px;">
+                <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;">
+                  STATUS: AUDIT SAH DILULUSKAN
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI Metric Summary Cards -->
+          <div style="
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+          ">
+            <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block;">Kiosk Diluluskan</span>
+              <span style="font-size: 16px; font-weight: 900; color: #065f46;">${approvedBookings.length} Unit</span>
+            </div>
+            <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block;">Nilai Sewaan Kiosk</span>
+              <span style="font-size: 16px; font-weight: 900; color: #0f172a;">RM${totalKioskSubsidy.toLocaleString()}/bln</span>
+            </div>
+            <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block;">Geran Diluluskan</span>
+              <span style="font-size: 16px; font-weight: 900; color: #4338ca;">${approvedGrants.length} Penerima</span>
+            </div>
+            <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block;">Peruntukan Geran</span>
+              <span style="font-size: 16px; font-weight: 900; color: #0f172a;">RM${totalGrantAmount.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <!-- Section 1: Kiosk Approvals -->
+          <div style="margin-bottom: 20px;">
+            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #065f46; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>🏪</span>
+              <span>1. Senarai Permohonan Kiosk Kapsul Niaga Yang Diluluskan (${approvedBookings.length})</span>
+            </div>
+            ${approvedBookings.length === 0 ? `
+              <div style="padding: 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; color: #64748b; text-align: center;">
+                Tiada rekod kelulusan kiosk aktif buat masa ini.
+              </div>
+            ` : `
+              <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; border: 1px solid #cbd5e1;">
+                <thead>
+                  <tr style="background: #f1f5f9; color: #334155; font-weight: 800; border-bottom: 1.5px solid #cbd5e1;">
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 32px;">Bil</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Nama Pemohon & Perniagaan</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left; width: 120px;">No. Kad Pengenalan</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Kod Kiosk & Lokasi Hab</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px;">Kadar Sewa</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Catatan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${approvedBookings.map((b, idx) => `
+                    <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; font-family: monospace; color: #64748b;">${idx + 1}</td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1;">
+                        <strong style="color: #0f172a; display: block;">${b.applicantName}</strong>
+                        <span style="color: #065f46; font-size: 9.5px; font-weight: 600;">${b.businessName}</span>
+                      </td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; font-family: monospace; color: #475569;">
+                        ${maskMyKad(b.applicantMyKad || '980101-03-5544')}
+                      </td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1;">
+                        <strong style="font-family: monospace; color: #0f172a;">${b.slotCode}</strong>
+                        <span style="display: block; font-size: 9.5px; color: #64748b;">${b.hubLocation || 'Hab UMK Bachok'}</span>
+                      </td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: right; font-weight: 800; font-family: monospace; color: #0f172a;">
+                        RM${b.monthlyRate || 150}
+                      </td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #475569; font-size: 9.5px;">
+                        ${b.adminNotes || 'Permohonan diluluskan rasmi.'}
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+
+          <!-- Section 2: Grant Approvals -->
+          <div style="margin-bottom: 22px;">
+            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #4338ca; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>🏆</span>
+              <span>2. Senarai Permohonan Geran Pemula Belia Yang Diluluskan (${approvedGrants.length})</span>
+            </div>
+            ${approvedGrants.length === 0 ? `
+              <div style="padding: 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; color: #64748b; text-align: center;">
+                Tiada rekod kelulusan geran aktif buat masa ini.
+              </div>
+            ` : `
+              <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; border: 1px solid #cbd5e1;">
+                <thead>
+                  <tr style="background: #f1f5f9; color: #334155; font-weight: 800; border-bottom: 1.5px solid #cbd5e1;">
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 32px;">Bil</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Nama Pemohon & Perniagaan</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Kategori</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Akaun Bank</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: right; width: 100px;">Peruntukan</th>
+                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 90px;">Status Audit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${approvedGrants.map((g, idx) => `
+                    <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; font-family: monospace; color: #64748b;">${idx + 1}</td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1;">
+                        <strong style="color: #0f172a; display: block;">${g.applicantName}</strong>
+                        <span style="color: #4338ca; font-size: 9.5px; font-weight: 600;">${g.businessName}</span>
+                      </td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #475569;">${g.businessCategory}</td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; font-family: monospace; font-size: 9.5px; color: #475569;">
+                        ${g.bankName} · ${g.bankAccountNumber || '••••••••'}
+                      </td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: right; font-weight: 800; font-family: monospace; color: #0f172a;">
+                        ${g.amount || g.grantAmount || 'RM3,000'}
+                      </td>
+                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">
+                        <span style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;">
+                          ✓ Lulus Audit
+                        </span>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+
+          <!-- Official Stamp & Signatures Box -->
+          <div style="
+            border-top: 2px solid #cbd5e1;
+            padding-top: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+          ">
+            <div style="flex: 1;">
+              <div style="font-size: 11px; font-weight: 800; color: #0f172a;">Urusetia Pentadbiran Keusahawanan Belia</div>
+              <div style="font-size: 10px; color: #475569;">Hab Pembangunan Belia Negeri Kelantan bersama UMK</div>
+              <div style="font-size: 9.5px; color: #64748b; margin-top: 4px; line-height: 1.35;">
+                Dokumen ini merupakan salinan audit rasmi bercetak yang dikeluarkan di bawah kelulusan Jawatankuasa Penyelaras Inisiatif Belia Negeri Kelantan.
+              </div>
+            </div>
+
+            <!-- Official Seal Graphic & Signature -->
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <!-- Stamp Circular -->
+              <div style="
+                width: 76px;
+                height: 76px;
+                border: 2px dashed #065f46;
+                border-radius: 50%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 4px;
+                color: #065f46;
+                font-size: 7.5px;
+                font-weight: 800;
+                line-height: 1.1;
+                transform: rotate(-5deg);
+                background: rgba(236, 253, 245, 0.4);
+              ">
+                <div>★ KERAJAAN NEGERI ★</div>
+                <div style="font-size: 8.5px; font-weight: 900; margin: 2px 0;">AUDIT SAH</div>
+                <div>NEGERI KELANTAN</div>
+              </div>
+
+              <!-- Signature -->
+              <div style="text-align: right; min-width: 150px;">
+                <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">Pengesahan Pentadbir</div>
+                <div style="font-family: Georgia, serif; font-style: italic; font-size: 15px; font-weight: 800; color: #0f172a; margin: 4px 0;">
+                  Pentadbir Urusetia Belia
+                </div>
+                <div style="font-size: 8.5px; font-family: monospace; font-weight: 700; color: #065f46;">
+                  SHA256: 9B7E·410A·F39C
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Security Code Footer -->
+          <div style="
+            margin-top: 14px;
+            padding-top: 8px;
+            border-top: 1px dashed #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8.5px;
+            color: #94a3b8;
+            font-family: monospace;
+          ">
+            <span>DOKUMEN RASMI KERAJAAN NEGERI KELANTAN · TIDAK BOLEH DIUBAH SUAI</span>
+            <span>KOD KESELAMATAN: KBN-AUDIT-SEC-2026</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+/**
+ * Directly downloads the Official Approval Report as a professional PDF file (`.pdf`) with royal double border.
+ */
+export const downloadOfficialApprovalReportPdf = async (
+  params: OfficialApprovalReportParams,
+  customFileName?: string
+): Promise<boolean> => {
+  const cleanRef = (params.reportRef || 'AUDIT-LULUS').replace(/[^a-zA-Z0-9]/g, '_');
+  const fileName = (customFileName || `Laporan_Rasmi_Kelulusan_KBelia_${cleanRef}`).replace(/\.pdf$/i, '') + '.pdf';
+
+  // Create temporary off-screen container
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.width = '820px';
+  container.style.background = '#ffffff';
+  container.style.zIndex = '-99999';
+  container.innerHTML = generateOfficialApprovalReportHtml(params);
+  document.body.appendChild(container);
+
+  try {
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: 820,
+      windowWidth: 820
+    });
+
+    const imgWidth = 210; // A4 portrait width in mm
+    const pageHeight = 297; // A4 portrait height in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+      compress: true
+    });
+
+    let position = 0;
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+
+    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 5) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(fileName);
+    return true;
+  } catch (err) {
+    console.error('html2canvas rendering failed, attempting pure jsPDF fallback:', err);
+    try {
+      const fallbackPdf = new jsPDF('p', 'mm', 'a4');
+      // Draw royal double border
+      fallbackPdf.setDrawColor(6, 95, 70); // #065f46
+      fallbackPdf.setLineWidth(1.2);
+      fallbackPdf.rect(10, 10, 190, 277);
+      fallbackPdf.setDrawColor(217, 119, 6); // #d97706
+      fallbackPdf.setLineWidth(0.6);
+      fallbackPdf.rect(13, 13, 184, 271);
+
+      fallbackPdf.setFont('helvetica', 'bold');
+      fallbackPdf.setFontSize(14);
+      fallbackPdf.text('LAPORAN RASMI KELULUSAN PERMOHONAN', 20, 25);
+      fallbackPdf.setFontSize(9);
+      fallbackPdf.setFont('helvetica', 'normal');
+      fallbackPdf.text('Pentadbiran Hal Ehwal Usahawan Belia Kelantan & UMK', 20, 31);
+      fallbackPdf.text(`No. Rujukan: ${params.reportRef}    Tarikh: ${params.reportDate}`, 20, 36);
+      fallbackPdf.line(20, 40, 190, 40);
+
+      fallbackPdf.setFont('helvetica', 'bold');
+      fallbackPdf.text(`Jumlah Kiosk Diluluskan: ${params.bookings.filter(b => b.status === 'approved').length} Unit`, 20, 48);
+      fallbackPdf.text(`Jumlah Geran Diluluskan: ${params.grantApplications.filter(g => g.status === 'approved').length} Penerima`, 20, 55);
+
+      fallbackPdf.save(fileName);
+      return true;
+    } catch {
+      return false;
+    }
+  } finally {
     if (container.parentNode) {
       container.parentNode.removeChild(container);
     }

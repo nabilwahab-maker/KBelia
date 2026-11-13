@@ -434,9 +434,50 @@ function MainApp() {
     }
   }, []);
 
+  // Synchronize slot occupancy with approved/pending bookings and active registered tenants
+  const enrichedSlots = React.useMemo(() => {
+    return slots.map(slot => {
+      // 1. Check if there is an approved booking for this slot
+      const approvedBooking = bookings.find(b => 
+        b.status === 'approved' && (b.slotId === slot.id || b.slotCode === slot.code)
+      );
+      if (approvedBooking) {
+        return {
+          ...slot,
+          status: 'occupied' as SlotStatus,
+          currentTenantBusinessName: approvedBooking.businessName || slot.currentTenantBusinessName,
+          currentTenantId: approvedBooking.applicantId || slot.currentTenantId
+        };
+      }
+
+      // 2. Check if there is a pending booking for this slot
+      const pendingBooking = bookings.find(b => 
+        b.status === 'pending' && (b.slotId === slot.id || b.slotCode === slot.code)
+      );
+      if (pendingBooking && slot.status === 'available') {
+        return {
+          ...slot,
+          status: 'reserved' as SlotStatus,
+          currentTenantBusinessName: pendingBooking.businessName || slot.currentTenantBusinessName
+        };
+      }
+
+      // 3. If slot has registered tenant name, ensure status is strictly 'occupied'
+      if (slot.currentTenantBusinessName && slot.status === 'available') {
+        return {
+          ...slot,
+          status: 'occupied' as SlotStatus
+        };
+      }
+
+      return slot;
+    });
+  }, [slots, bookings]);
+
   const handleOpenBookingForSlot = (slot: CapsuleSlot) => {
     // If slot is occupied, reserved, or has an active tenant, display the Tenant & Capsule details dossier!
-    if (slot.status !== 'available' || Boolean(slot.currentTenantBusinessName)) {
+    const isOccupied = slot.status !== 'available' || Boolean(slot.currentTenantBusinessName);
+    if (isOccupied) {
       setSelectedSlotForTenantDetail(slot);
       setIsTenantDetailModalOpen(true);
       return;
@@ -461,7 +502,8 @@ function MainApp() {
       setActiveTab('admin');
       return;
     }
-    setSelectedSlotForBooking(slots.find(s => s.status === 'available') || slots[0] || null);
+    const firstAvailable = enrichedSlots.find(s => s.status === 'available' && !s.currentTenantBusinessName);
+    setSelectedSlotForBooking(firstAvailable || null);
     setIsBookingModalOpen(true);
   };
 
@@ -497,7 +539,7 @@ function MainApp() {
         <TopProgressBar />
         <LandingPage
           setActiveTab={setActiveTab}
-          slots={slots}
+          slots={enrichedSlots}
           businesses={businesses}
           programs={programs}
           onSelectSlot={handleOpenBookingForSlot}
@@ -510,7 +552,7 @@ function MainApp() {
           isOpen={isBookingModalOpen}
           onClose={() => setIsBookingModalOpen(false)}
           selectedSlot={selectedSlotForBooking}
-          allSlots={slots}
+          allSlots={enrichedSlots}
           onBookingSuccess={triggerRefresh}
         />
 
@@ -550,7 +592,7 @@ function MainApp() {
           isOpen={isBookingModalOpen}
           onClose={() => setIsBookingModalOpen(false)}
           selectedSlot={selectedSlotForBooking}
-          allSlots={slots}
+          allSlots={enrichedSlots}
           onBookingSuccess={triggerRefresh}
         />
 
@@ -579,7 +621,7 @@ function MainApp() {
           isOpen={isBookingModalOpen}
           onClose={() => setIsBookingModalOpen(false)}
           selectedSlot={selectedSlotForBooking}
-          allSlots={slots}
+          allSlots={enrichedSlots}
           onBookingSuccess={triggerRefresh}
         />
 
@@ -605,7 +647,7 @@ function MainApp() {
         isSidebarCollapsed={isSidebarCollapsed}
         setIsSidebarCollapsed={setIsSidebarCollapsed}
         onOpenBooking={handleOpenNewBooking}
-        slots={slots}
+        slots={enrichedSlots}
         businesses={businesses}
         programs={programs}
         onSelectSlot={handleOpenBookingForSlot}
@@ -658,7 +700,7 @@ function MainApp() {
               {isAdmin && (
                 <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
                   <AdminDashboard
-                    slots={slots}
+                    slots={enrichedSlots}
                     businesses={businesses}
                     bookings={bookings}
                     programs={programs}
@@ -698,7 +740,7 @@ function MainApp() {
                     myBusiness={myBusiness}
                     myProducts={myProducts}
                     myBookings={myBookings}
-                    slots={slots}
+                    slots={enrichedSlots}
                     grantApplications={grantApplications.filter(g => g.applicantId === user?.uid || (user?.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase()))}
                     onViewOfferLetter={handleViewOfferLetter}
                     onOpenTenancyAgreement={(booking) => {
@@ -737,7 +779,8 @@ function MainApp() {
               </div>
 
               <CapsuleGrid
-                slots={slots}
+                slots={enrichedSlots}
+                bookings={bookings}
                 onSelectSlot={handleOpenBookingForSlot}
                 onViewTenantDetail={handleOpenTenantDetail}
                 onOpenNewBooking={handleOpenNewBooking}
@@ -853,7 +896,7 @@ function MainApp() {
             ) : (
               <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
                 <AdminDashboard
-                  slots={slots}
+                  slots={enrichedSlots}
                   businesses={businesses}
                   bookings={bookings}
                   programs={programs}

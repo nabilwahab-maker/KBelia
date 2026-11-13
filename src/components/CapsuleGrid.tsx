@@ -17,15 +17,22 @@ import {
   ShieldCheck,
   FileText,
   Eye,
-  ExternalLink
+  ExternalLink,
+  Search,
+  RotateCcw,
+  SlidersHorizontal,
+  X,
+  Lock
 } from 'lucide-react';
-import { CapsuleSlot, KelantanDistrict, SlotStatus } from '../types';
+import { CapsuleBooking, CapsuleSlot, KelantanDistrict, SlotStatus } from '../types';
 import { BudgetSlider } from './BudgetSlider';
 import { Accordion } from './Accordion';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 interface CapsuleGridProps {
   slots: CapsuleSlot[];
+  bookings?: CapsuleBooking[];
   onSelectSlot: (slot: CapsuleSlot) => void;
   onViewTenantDetail?: (slot: CapsuleSlot) => void;
   onOpenNewBooking: () => void;
@@ -39,6 +46,7 @@ interface CapsuleGridProps {
 
 export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   slots,
+  bookings = [],
   onSelectSlot,
   onViewTenantDetail,
   onOpenNewBooking,
@@ -49,10 +57,12 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   onBudgetChange: externalSetBudget,
   isReadOnly = false
 }) => {
+  const { user } = useAuth();
   const { t, language } = useLanguage();
   const [internalHub, setInternalHub] = useState<string>('Semua');
   const [internalBudget, setInternalBudget] = useState<number>(500);
   const [selectedStatus, setSelectedStatus] = useState<string>('Semua');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const selectedHub = externalHub !== undefined ? externalHub : internalHub;
   const setSelectedHub = (hub: string) => {
@@ -68,13 +78,28 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
   const hubs = ['Semua', 'Hub UMK Bachok', 'Hub Belia Kota Bharu', 'Hub Komuniti Jeli', 'Hub Kraf Tumpat'];
 
+  const isFiltered = selectedHub !== 'Semua' || selectedStatus !== 'Semua' || maxBudget < 500 || searchQuery.trim() !== '';
+
+  const handleResetFilters = () => {
+    setSelectedHub('Semua');
+    setSelectedStatus('Semua');
+    setMaxBudget(500);
+    setSearchQuery('');
+  };
+
   const filteredSlots = (slots || []).filter((slot) => {
     const hubLoc = (slot.hubLocation || '').toLowerCase();
     const targetHub = (selectedHub || '').toLowerCase().replace('hub ', '');
     const matchHub = selectedHub === 'Semua' || hubLoc.includes(targetHub);
     const matchStatus = selectedStatus === 'Semua' || slot.status === selectedStatus;
     const matchBudget = !slot.monthlyRate || slot.monthlyRate <= maxBudget;
-    return matchHub && matchStatus && matchBudget;
+    const query = searchQuery.trim().toLowerCase();
+    const matchQuery = !query || 
+      (slot.name && slot.name.toLowerCase().includes(query)) ||
+      (slot.code && slot.code.toLowerCase().includes(query)) ||
+      (slot.hubLocation && slot.hubLocation.toLowerCase().includes(query)) ||
+      (slot.district && slot.district.toLowerCase().includes(query));
+    return matchHub && matchStatus && matchBudget && matchQuery;
   });
 
   const getStatusBadge = (status: SlotStatus) => {
@@ -160,53 +185,145 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
         </div>
       </div>
 
-      {/* Filters Bar */}
-      <div className="bg-white dark:bg-[#24303F] p-4 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs mb-8 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-slate-500 dark:text-[#8A99AD] flex items-center gap-1 mr-2">
-            <Filter className="w-3.5 h-3.5" />
-            Hab Lokasi:
-          </span>
-          {hubs.map((hub) => (
-            <button
-              key={hub}
-              onClick={() => setSelectedHub(hub)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                selectedHub === hub
-                  ? 'bg-emerald-700 text-white font-bold shadow-xs'
-                  : 'bg-slate-100 dark:bg-[#1A222C] text-slate-600 dark:text-[#8A99AD] hover:bg-slate-200 dark:hover:bg-[#2E3A47] dark:hover:text-white'
-              }`}
-            >
-              {hub}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Interactive Modern Budget Slider with Floating Bubble */}
-          <div className="bg-slate-50 dark:bg-[#1A222C] px-3.5 py-2 rounded-2xl border border-slate-200 dark:border-[#2E3A47]">
-            <BudgetSlider
-              value={maxBudget}
-              onChange={setMaxBudget}
-              min={100}
-              max={500}
-              step={20}
-              label="Tapis Bajet Sewa:"
+      {/* Modern Minimalist Filter Section */}
+      <div className="bg-white dark:bg-[#111C3D] p-4 sm:p-5 rounded-2xl border border-slate-200/90 dark:border-[#1E3158] shadow-xs mb-8 transition-all">
+        {/* Top Control Bar: Search & Quick Metas */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-100 dark:border-slate-800">
+          {/* Instant Search Bar */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari kod pod, nama kiosk, atau lokasi hab..."
+              className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 dark:bg-[#0B132B] border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 transition-all font-medium"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg cursor-pointer"
+                title="Kosongkan carian"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500 dark:text-[#8A99AD]">Status:</span>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-1.5 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-300 dark:border-[#2E3A47] rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none font-medium text-slate-700 dark:text-white"
-            >
-              <option value="Semua">Semua Status</option>
-              <option value="available">Tersedia (Kosong)</option>
-              <option value="occupied">Sedang Beroperasi</option>
-              <option value="reserved">Dalam Tempahan</option>
-            </select>
+          {/* Right Controls: Filter Count & Reset */}
+          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/50">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <strong className="font-bold tabular-nums">{filteredSlots.length}</strong> pod sepadan
+            </span>
+
+            {isFiltered && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                title="Tetapkan semula tapisan"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Row: Hubs, Status & Budget Slider */}
+        <div className="pt-3.5 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+          {/* Hab Location Segmented Tabs */}
+          <div className="lg:col-span-6 space-y-1.5">
+            <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                Pilihan Hab Lokasi
+              </span>
+            </div>
+            <div className="p-1 bg-slate-100/90 dark:bg-[#0B132B] rounded-xl flex flex-wrap gap-1 border border-slate-200/60 dark:border-slate-800/60">
+              {hubs.map((hub) => {
+                const isActive = selectedHub === hub;
+                const shortLabel = hub.replace('Hub ', '');
+                return (
+                  <button
+                    key={hub}
+                    type="button"
+                    onClick={() => setSelectedHub(hub)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-white dark:bg-slate-800 text-emerald-800 dark:text-emerald-300 font-bold shadow-xs border border-slate-200/80 dark:border-slate-700'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-800/50'
+                    }`}
+                  >
+                    {hub === 'Semua' ? 'Semua Hab' : shortLabel}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Status Segmented Buttons */}
+          <div className="lg:col-span-3 space-y-1.5">
+            <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Status Pod
+            </div>
+            <div className="p-1 bg-slate-100/90 dark:bg-[#0B132B] rounded-xl flex items-center gap-1 border border-slate-200/60 dark:border-slate-800/60">
+              {[
+                { id: 'Semua', label: 'Semua', dot: null },
+                { id: 'available', label: 'Tersedia', dot: 'bg-emerald-500' },
+                { id: 'occupied', label: 'Disewa', dot: 'bg-slate-400' },
+                { id: 'reserved', label: 'Tempah', dot: 'bg-amber-500' }
+              ].map((st) => {
+                const isActive = selectedStatus === st.id;
+                return (
+                  <button
+                    key={st.id}
+                    type="button"
+                    onClick={() => setSelectedStatus(st.id)}
+                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      isActive
+                        ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200/80 dark:border-slate-700'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                    }`}
+                  >
+                    {st.dot && <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />}
+                    <span>{st.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Integrated Modern Budget Slider */}
+          <div className="lg:col-span-3 space-y-1.5">
+            <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              <span className="flex items-center gap-1">
+                <SlidersHorizontal className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                Had Bajet Sewa
+              </span>
+              <span className="font-extrabold text-emerald-700 dark:text-emerald-400 font-mono text-xs">
+                RM {maxBudget}/bln
+              </span>
+            </div>
+            <div className="px-3 py-2 bg-slate-100/90 dark:bg-[#0B132B] rounded-xl border border-slate-200/60 dark:border-slate-800/60">
+              <div className="relative flex items-center h-4 w-full">
+                <input
+                  type="range"
+                  min={100}
+                  max={500}
+                  step={20}
+                  value={maxBudget}
+                  onChange={(e) => setMaxBudget(Number(e.target.value))}
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                />
+              </div>
+              <div className="flex justify-between text-[9px] text-slate-400 dark:text-slate-500 font-mono mt-0.5">
+                <span>RM 100</span>
+                <span>RM 500</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -221,21 +338,46 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSlots.map((slot) => {
-            const isAvailable = slot.status === 'available';
+            // Check active bookings associated with this slot
+            const slotBookings = (bookings || []).filter(b => 
+              (b.slotId === slot.id || (slot.code && b.slotCode === slot.code)) &&
+              b.status !== 'rejected' && b.status !== 'cancelled'
+            );
+
+            // Check if current user has an application/registration for this slot
+            const myBooking = user ? (bookings || []).find(b => 
+              (b.applicantId === user.uid || (user.email && b.applicantEmail?.toLowerCase() === user.email.toLowerCase())) &&
+              (b.slotId === slot.id || (slot.code && b.slotCode === slot.code)) &&
+              b.status !== 'rejected' && b.status !== 'cancelled'
+            ) : null;
+
+            // Slot is registered if it has an assigned tenant, is occupied/reserved/maintenance, or has active bookings
+            const isOccupiedOrTenant = slot.status === 'occupied' || Boolean(slot.currentTenantBusinessName);
+            const isReserved = slot.status === 'reserved' || (slotBookings.some(b => b.status === 'pending') && slot.status === 'available');
+            const isMaintenance = slot.status === 'maintenance';
+            const isRegistered = isOccupiedOrTenant || isReserved || isMaintenance || slotBookings.length > 0;
+            const isAvailable = slot.status === 'available' && !isRegistered;
 
             return (
               <div
                 key={slot.id}
                 id={`capsule-card-${(slot.code || slot.id || 'slot').toLowerCase()}`}
                 onClick={() => {
-                  if (!isAvailable) {
+                  if (myBooking || isRegistered) {
                     if (onViewTenantDetail) onViewTenantDetail(slot);
-                    else onSelectSlot(slot);
-                  } else if (!isReadOnly) {
+                    return;
+                  }
+                  if (isAvailable && !isReadOnly) {
                     onSelectSlot(slot);
                   }
                 }}
-                className="interactive-card bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-[#2E3A47] hover:border-amber-400/40 dark:hover:border-amber-400/40 overflow-hidden shadow-xs flex flex-col group cursor-pointer"
+                className={`interactive-card bg-white dark:bg-[#24303F] rounded-2xl border overflow-hidden shadow-xs flex flex-col group cursor-pointer transition-all ${
+                  myBooking 
+                    ? 'border-emerald-500/60 ring-1 ring-emerald-500/20' 
+                    : isRegistered 
+                      ? 'border-slate-200 dark:border-[#2E3A47] hover:border-slate-300 dark:hover:border-slate-700' 
+                      : 'border-slate-200 dark:border-[#2E3A47] hover:border-blue-500/50'
+                }`}
               >
                 {/* 1. Gambar Kad Berkadar Tetap (H-48) di Atas - Bersih Tanpa Teks Bertindih */}
                 <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
@@ -252,19 +394,49 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                     </span>
                   </div>
 
-                  {/* Top Right: Status Badge */}
+                  {/* Top Right: Status Badge (Dynamic & Accurate) */}
                   <div className="absolute top-3 right-3">
-                    {getStatusBadge(slot.status)}
+                    {myBooking ? (
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold text-white shadow-xs backdrop-blur-xs ${
+                        myBooking.status === 'approved' ? 'bg-emerald-600' : 'bg-amber-600'
+                      }`}>
+                        {myBooking.status === 'approved' ? (
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        ) : (
+                          <Clock className="w-3.5 h-3.5" />
+                        )}
+                        <span>Pendaftaran Anda ({myBooking.status === 'approved' ? 'Diluluskan' : 'Disemak'})</span>
+                      </span>
+                    ) : isOccupiedOrTenant ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-900/90 text-slate-100 border border-slate-700 shadow-xs backdrop-blur-xs">
+                        <Lock className="w-3 h-3 text-amber-400" />
+                        <span>Telah Berdaftar</span>
+                      </span>
+                    ) : isReserved ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-600/95 text-white border border-amber-500/50 shadow-xs backdrop-blur-xs">
+                        <Clock className="w-3 h-3" />
+                        <span>Dalam Tempahan</span>
+                      </span>
+                    ) : isMaintenance ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-700 text-white shadow-xs">
+                        Penyelenggaraan
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white/95 dark:bg-[#1C2434]/95 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 shadow-xs backdrop-blur-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Tersedia untuk Belia</span>
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 {/* 2. Info Teratur di Bawah - Berhierarki & Bebas Pertindihan */}
                 <div className="p-5 flex-1 flex flex-col justify-between gap-4">
                   <div className="space-y-3.5">
-                    {/* UX RULE: Give prominence to most important elements - Price & Subsidy right at the top */}
+                    {/* Price & Subsidy Header */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-red-700 dark:group-hover:text-amber-400 transition-colors duration-200 leading-snug">
+                        <h3 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-blue-700 dark:group-hover:text-amber-400 transition-colors duration-200 leading-snug">
                           {slot.name}
                         </h3>
                         <div className="flex items-center justify-between gap-1.5 text-xs text-slate-500 dark:text-[#8A99AD] mt-1">
@@ -286,7 +458,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                         </div>
                       </div>
 
-                      {/* Prominent Pricing Block */}
+                      {/* Pricing Block */}
                       <div className="text-right shrink-0">
                         <span className="text-[11px] font-semibold text-blue-800 dark:text-blue-400 block mb-0.5">
                           Subsidi 50%
@@ -308,16 +480,33 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                       </span>
                     </div>
 
-                    {/* Current Tenant Info if Occupied */}
-                    {slot.currentTenantBusinessName && (
-                      <div className="p-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-800 rounded-lg flex items-center gap-2">
-                        <Store className="w-4 h-4 text-slate-600 dark:text-slate-400 shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-normal">Dioperasi oleh:</span>
-                          <span className="text-xs font-semibold text-slate-800 dark:text-white truncate block">{slot.currentTenantBusinessName}</span>
+                    {/* Registration / Occupancy Status Card */}
+                    {myBooking ? (
+                      <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-lg flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-medium min-w-0">
+                          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span className="truncate">Permohonan Anda: {myBooking.businessName || 'Didaftarkan'}</span>
                         </div>
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 shrink-0">
+                          {myBooking.status === 'approved' ? 'Aktif' : 'Semakan'}
+                        </span>
                       </div>
-                    )}
+                    ) : isRegistered ? (
+                      <div className="p-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Store className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" />
+                          <div className="min-w-0">
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-normal">Status Pengisian:</span>
+                            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate block">
+                              {slot.currentTenantBusinessName ? `Dioperasi oleh: ${slot.currentTenantBusinessName}` : 'Pendaftaran Penuh / Beroperasi'}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 shrink-0 ml-2">
+                          Telah Berdaftar
+                        </span>
+                      </div>
+                    ) : null}
 
                     {/* Amenities list */}
                     <div className="space-y-1.5">
@@ -335,24 +524,33 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                     </div>
                   </div>
 
-                  {/* Primary CTA Button in UMK Blue */}
+                  {/* Primary CTA Button: Registered Slots Strictly CANNOT Be Applied For */}
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
-                    {!isAvailable ? (
+                    {myBooking ? (
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (onViewTenantDetail) {
-                            onViewTenantDetail(slot);
-                          } else {
-                            onSelectSlot(slot);
-                          }
+                          if (onViewTenantDetail) onViewTenantDetail(slot);
                         }}
-                        className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                        className="w-full py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white shadow-xs"
                       >
-                        <Store className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400 shrink-0" />
-                        <span>Lihat Butiran Kapsul & Penyewa</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Pendaftaran Anda ({myBooking.status === 'approved' ? 'Telah Diluluskan' : 'Sedang Disemak'})</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    ) : isRegistered ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onViewTenantDetail) onViewTenantDetail(slot);
+                        }}
+                        className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                      >
+                        <Lock className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
+                        <span>Telah Berdaftar (Lihat Butiran Penyewa)</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
                       </button>
                     ) : isReadOnly ? (
                       <div className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold text-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2">
@@ -362,7 +560,10 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                     ) : (
                       <button
                         type="button"
-                        onClick={() => onSelectSlot(slot)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectSlot(slot);
+                        }}
                         className="w-full py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-blue-800 hover:bg-blue-900 active:bg-blue-950 text-white shadow-sm"
                       >
                         <span>Mohon Kapsul Ini (RM{slot.monthlyRate}/bln)</span>
