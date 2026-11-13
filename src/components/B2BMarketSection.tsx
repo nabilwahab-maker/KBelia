@@ -133,16 +133,16 @@ export const B2BMarketSection: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Banner */}
-      <div className="bg-blue-900 rounded-2xl p-6 sm:p-8 text-white shadow-sm relative overflow-hidden">
+      {/* Banner (Important Header) */}
+      <div className="kbelia-important-header dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-2xs relative overflow-hidden">
         <div className="relative z-10 max-w-2xl">
-          <div className="text-xs font-bold uppercase tracking-wider text-blue-200 mb-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300 mb-2.5">
             {isEn ? 'Youth Ads & Commercial Opportunities' : 'Ruang Iklan & Peluang Niaga Belia'}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-800 dark:text-white">
             {isEn ? 'Youth Commercial Ads & Business Opportunities' : 'Pemandangan Belia & Siarkan Iklan Niaga'}
           </h1>
-          <p className="text-xs sm:text-sm text-blue-100 mt-2 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
             {isEn
               ? 'A dedicated platform for youth entrepreneurs to advertise commercial offers, find local business supplies, and explore trade partnerships across 10 Kelantan districts.'
               : 'Platform khas untuk usahawan belia menyiarkan iklan perniagaan, tawaran produk, mencari bekalan tempatan dan memupuk kerjasama niaga di seluruh 10 jajahan Kelantan.'}
@@ -151,7 +151,7 @@ export const B2BMarketSection: React.FC = () => {
       </div>
 
       {/* Control Bar */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="relative w-full md:w-72">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
@@ -159,20 +159,20 @@ export const B2BMarketSection: React.FC = () => {
             placeholder={isEn ? 'Search supplies, ingredients, packaging...' : 'Cari bekalan, ramuan, pembungkusan...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-700"
+            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           {/* Type Toggle */}
-          <div className="flex rounded-lg bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
+          <div className="flex rounded-lg bg-slate-50 dark:bg-slate-900 p-1 border border-slate-200 dark:border-slate-700">
             <button
               type="button"
               onClick={() => setFilterType('all')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'all'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
-                  : 'text-slate-500 dark:text-slate-400'
+                  ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-xs border border-slate-200 dark:border-slate-600'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800'
               }`}
             >
               {isEn ? 'All' : 'Semua'}
@@ -182,8 +182,8 @@ export const B2BMarketSection: React.FC = () => {
               onClick={() => setFilterType('demand')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'demand'
-                  ? 'bg-blue-800 text-white shadow-xs'
-                  : 'text-slate-500 dark:text-slate-400'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800'
               }`}
             >
               {isEn ? 'Seeking / Demand' : 'Mencari'}
@@ -193,8 +193,8 @@ export const B2BMarketSection: React.FC = () => {
               onClick={() => setFilterType('supply')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'supply'
-                  ? 'bg-blue-700 text-white shadow-xs'
-                  : 'text-slate-500 dark:text-slate-400'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800'
               }`}
             >
               {isEn ? 'Supplying / Wholesale' : 'Membekal'}
@@ -205,7 +205,7 @@ export const B2BMarketSection: React.FC = () => {
           <select
             value={filterDistrict}
             onChange={(e) => setFilterDistrict(e.target.value)}
-            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium focus:outline-none"
+            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
           >
             <option value="all">{isEn ? 'All Districts' : 'Semua Jajahan'}</option>
             <option value="Kota Bharu">Kota Bharu</option>
@@ -224,9 +224,9 @@ export const B2BMarketSection: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsPostingModalOpen(true)}
-            className="px-4 py-2 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer ml-auto active:scale-98"
+            className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer ml-auto active:scale-98"
           >
-            <Megaphone className="w-3.5 h-3.5 text-blue-200" />
+            <Megaphone className="w-3.5 h-3.5 text-sky-100" />
             <span>{isEn ? 'Post Advertisement' : 'Siarkan Iklan'}</span>
           </button>
         </div>
@@ -237,15 +237,15 @@ export const B2BMarketSection: React.FC = () => {
         {filteredListings.map((item) => (
           <div
             key={item.id}
-            className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 hover:border-blue-500 shadow-xs flex flex-col justify-between group transition-colors"
+            className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 hover:border-sky-400 shadow-2xs flex flex-col justify-between group transition-colors"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <span
                   className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${
                     item.type === 'supply'
-                      ? 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-900/40'
-                      : 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-900/40'
+                      : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800/40'
                   }`}
                 >
                   {item.type === 'supply' ? (isEn ? 'Supplying / Wholesale' : 'Membekal (Tawaran)') : (isEn ? 'Seeking Supply' : 'Mencari Bekalan')}
@@ -256,7 +256,7 @@ export const B2BMarketSection: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                <h3 className="text-sm font-bold text-slate-800 dark:text-white leading-snug group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                   {item.title}
                 </h3>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
@@ -271,18 +271,18 @@ export const B2BMarketSection: React.FC = () => {
               </p>
 
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 pt-1">
-                <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
                 <span>{item.district}</span>
               </div>
             </div>
 
             {/* Direct WhatsApp Call to Action */}
-            <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
               <a
                 href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20B2B%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full py-2 px-3 bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 active:scale-98"
+                className="w-full py-2 px-3 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2 active:scale-98"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>
@@ -294,26 +294,26 @@ export const B2BMarketSection: React.FC = () => {
 
       {/* New Listing Modal */}
       {isPostingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="fixed inset-0" onClick={() => setIsPostingModalOpen(false)} />
-          <div className="relative bg-white dark:bg-[#1E293B] rounded-3xl max-w-lg w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl z-10 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="relative bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full border border-slate-200 dark:border-slate-700 shadow-2xl z-10 overflow-hidden">
+            <div className="kbelia-important-header px-6 pt-5 pb-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Megaphone className="w-5 h-5 text-red-600 dark:text-amber-400" />
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                <Megaphone className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                <h3 className="text-base font-extrabold text-slate-800 dark:text-white">
                   {isEn ? 'Post Youth Business Advertisement' : 'Siarkan Iklan Perniagaan Belia'}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsPostingModalOpen(false)}
-                className="interactive-press p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 hover:rotate-90 cursor-pointer"
+                className="interactive-press p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200 hover:rotate-90 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateListing} className="space-y-3.5">
+            <form onSubmit={handleCreateListing} className="p-6 space-y-3.5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   {isEn ? 'Notice Category' : 'Jenis Iklan'}
@@ -325,7 +325,7 @@ export const B2BMarketSection: React.FC = () => {
                     className={`py-2 px-3 text-xs font-bold rounded-xl border text-center transition-all cursor-pointer ${
                       newType === 'demand'
                         ? 'bg-amber-500 text-white border-amber-600'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-[#1A222C] dark:text-slate-400 dark:border-slate-700'
+                        : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-700'
                     }`}
                   >
                     {isEn ? 'Seeking Supply' : 'Mencari Pembekal'}
@@ -335,8 +335,8 @@ export const B2BMarketSection: React.FC = () => {
                     onClick={() => setNewType('supply')}
                     className={`py-2 px-3 text-xs font-bold rounded-xl border text-center transition-all cursor-pointer ${
                       newType === 'supply'
-                        ? 'bg-emerald-600 text-white border-emerald-700'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-[#1A222C] dark:text-slate-400 dark:border-slate-700'
+                        ? 'bg-sky-600 text-white border-sky-700'
+                        : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-700'
                     }`}
                   >
                     {isEn ? 'Supplying / Wholesale' : 'Tawarkan Bekalan Borong'}
@@ -354,7 +354,7 @@ export const B2BMarketSection: React.FC = () => {
                   placeholder={isEn ? 'State listing title...' : 'Tajuk tawaran atau keperluan bekalan...'}
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                 />
               </div>
 
@@ -369,7 +369,7 @@ export const B2BMarketSection: React.FC = () => {
                     placeholder="Nama perniagaan anda"
                     value={newBusiness}
                     onChange={(e) => setNewBusiness(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                   />
                 </div>
 
@@ -380,7 +380,7 @@ export const B2BMarketSection: React.FC = () => {
                   <select
                     value={newDistrict}
                     onChange={(e) => setNewDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white font-semibold"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white font-semibold focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                   >
                     <option value="Kota Bharu">Kota Bharu</option>
                     <option value="Bachok">Bachok</option>
@@ -406,7 +406,7 @@ export const B2BMarketSection: React.FC = () => {
                     placeholder="Nama anda"
                     value={newAuthor}
                     onChange={(e) => setNewAuthor(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                   />
                 </div>
 
@@ -420,7 +420,7 @@ export const B2BMarketSection: React.FC = () => {
                     placeholder="Nombor telefon"
                     value={newWhatsApp}
                     onChange={(e) => setNewWhatsApp(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                   />
                 </div>
               </div>
@@ -434,7 +434,7 @@ export const B2BMarketSection: React.FC = () => {
                   placeholder={isEn ? 'State volume, price terms, delivery location...' : 'Nyatakan kuantiti, harga anggaran borong, syarat penghantaran...'}
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white resize-none"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white resize-none focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                 />
               </div>
 
@@ -442,13 +442,13 @@ export const B2BMarketSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsPostingModalOpen(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl"
+                  className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl cursor-pointer"
                 >
                   {isEn ? 'Cancel' : 'Batal'}
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold text-white bg-red-700 hover:bg-red-800 rounded-xl shadow-xs"
+                  className="px-5 py-2 text-xs font-bold text-white bg-sky-600 hover:bg-sky-500 rounded-xl shadow-xs cursor-pointer"
                 >
                   {isEn ? 'Publish Notice' : 'Siarkan Sekarang'}
                 </button>

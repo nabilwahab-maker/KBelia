@@ -51,20 +51,20 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="w-full max-w-lg bg-white dark:bg-[#24303F] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 scale-100 transition-all max-h-[90vh] overflow-hidden flex flex-col my-6"
+        className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[90vh] overflow-hidden flex flex-col my-6"
         role="dialog"
         aria-modal="true"
       >
-        {/* TailAdmin Card Header */}
-        <div className="border-b border-slate-200 dark:border-slate-800 py-4.5 px-6 sm:px-7 flex items-center justify-between bg-white dark:bg-[#24303F] shrink-0">
+        {/* Header */}
+        <div className="kbelia-important-header border-b border-slate-200 dark:border-slate-700 py-4.5 px-6 sm:px-7 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-400 flex items-center justify-center shrink-0">
               <Wrench className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+              <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white tracking-tight">
                 {language === 'en' ? 'Kiosk Maintenance & Issue Ticket' : 'Tiket Aduan & Penyelenggaraan Kiosk'}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -92,14 +92,14 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
 
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                 <div>
                   <span className="text-slate-400 block text-[10px] font-medium uppercase tracking-wider">
                     {language === 'en' ? 'Kiosk Location:' : 'Lokasi Kiosk:'}
                   </span>
-                  <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">{defaultKioskName}</span>
+                  <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white">{defaultKioskName}</span>
                 </div>
-                <span className="font-mono font-bold text-xs sm:text-sm text-red-700 dark:text-red-400 px-2.5 py-1 rounded-md bg-red-100/60 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40">
+                <span className="font-mono font-bold text-xs sm:text-sm text-sky-700 dark:text-sky-300 px-2.5 py-1 rounded-md bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/60">
                   {defaultSlotCode}
                 </span>
               </div>
@@ -107,7 +107,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
               {/* Category Selector */}
               <div>
                 <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                  {language === 'en' ? 'Issue Category:' : 'Kategori Kerosakan:'} <span className="text-red-500">*</span>
+                  {language === 'en' ? 'Issue Category:' : 'Kategori Kerosakan:'} <span className="text-rose-500">*</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2.5">
                   {[
@@ -124,11 +124,11 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                         onClick={() => setCategory(cat as any)}
                         className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-red-50/70 dark:bg-red-950/30 border-red-700 ring-1 ring-red-700/30 text-red-900 dark:text-red-200 font-bold'
-                            : 'bg-white dark:bg-[#1A222C] border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-300'
+                            ? 'bg-sky-50 dark:bg-sky-950/40 border-sky-600 ring-1 ring-sky-600/30 text-sky-900 dark:text-sky-200 font-bold'
+                            : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-sky-300'
                         }`}
                       >
-                        <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-red-700 dark:text-red-400' : 'text-slate-400'}`} />
+                        <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'}`} />
                         <span className="text-xs font-semibold">{language === 'en' ? labelEn : cat}</span>
                       </button>
                     );
@@ -138,7 +138,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
 
               <div>
                 <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                  {language === 'en' ? 'Issue Details / Description:' : 'Keterangan Isu / Kerosakan:'} <span className="text-red-500">*</span>
+                  {language === 'en' ? 'Issue Details / Description:' : 'Keterangan Isu / Kerosakan:'} <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows={3}
@@ -146,7 +146,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={language === 'en' ? 'e.g. Left electrical socket is not functional since this morning...' : 'Contoh: Soket elektrik sebelah kiri tidak berfungsi sejak pagi ini...'}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
               </div>
 
@@ -154,7 +154,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                    {language === 'en' ? 'Reporter Name:' : 'Nama Pengadu:'} <span className="text-red-500">*</span>
+                    {language === 'en' ? 'Reporter Name:' : 'Nama Pengadu:'} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -162,12 +162,12 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                     placeholder={language === 'en' ? 'Your full name' : 'Nama anda'}
                     value={reporterName}
                     onChange={(e) => setReporterName(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                   />
                 </div>
                 <div>
                   <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                    {language === 'en' ? 'Phone No. (WhatsApp):' : 'No. Telefon (WhatsApp):'} <span className="text-red-500">*</span>
+                    {language === 'en' ? 'Phone No. (WhatsApp):' : 'No. Telefon (WhatsApp):'} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="tel"
@@ -175,23 +175,23 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                     placeholder="01120508890"
                     value={reporterPhone}
                     onChange={(e) => setReporterPhone(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                   />
                 </div>
               </div>
 
-              {/* TailAdmin Action Buttons Footer */}
-              <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
+              {/* Action Buttons Footer */}
+              <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                 >
                   {language === 'en' ? 'Cancel' : 'Batal'}
                 </button>
                 <button
                   type="submit"
-                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
                   <span>{language === 'en' ? 'Submit Issue Ticket' : 'Hantar Tiket Aduan'}</span>
@@ -201,7 +201,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
           ) : (
             <div className="text-center py-6">
               <CheckCircle2 className="w-12 h-12 text-emerald-600 dark:text-emerald-400 mx-auto mb-3" />
-              <h4 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-1">
+              <h4 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white mb-1">
                 {language === 'en' ? `Maintenance Ticket #${ticketId} Submitted` : `Tiket Aduan #${ticketId} Berjaya Dihantar`}
               </h4>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm mx-auto mb-6">
@@ -212,7 +212,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 transition-colors cursor-pointer"
+                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 transition-colors cursor-pointer"
               >
                 {language === 'en' ? 'Return to Dashboard' : 'Kembali ke Dashboard'}
               </button>

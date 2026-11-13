@@ -48,7 +48,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           <button
             type="button"
             onClick={handleWhatsAppHelp}
-            className="interactive-press interactive-lift flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white dark:bg-[#1E293B] text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-700 transition-all cursor-pointer group text-xs font-bold"
+            className="interactive-press interactive-lift flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-700 transition-all cursor-pointer group text-xs font-bold"
           >
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 group-hover:text-emerald-600">
               Meja Bantuan
@@ -67,13 +67,13 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
                 setIsOpen(false);
                 onOpenBookingModal();
               }}
-              className="interactive-press interactive-lift flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white dark:bg-[#1E293B] text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-700 transition-all cursor-pointer group text-xs font-bold"
+              className="interactive-press interactive-lift flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg hover:bg-sky-50 dark:hover:bg-sky-950/40 hover:text-sky-700 transition-all cursor-pointer group text-xs font-bold"
             >
-              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 group-hover:text-amber-600">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 group-hover:text-sky-600">
                 Kapsul RM150/bln
               </span>
               <span>Mohon Kiosk Segera</span>
-              <div className="w-7 h-7 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <div className="w-7 h-7 rounded-xl bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                 <Store className="w-4 h-4" />
               </div>
             </button>
@@ -83,13 +83,13 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           <button
             type="button"
             onClick={handleCopyLink}
-            className="interactive-press interactive-lift flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white dark:bg-[#1E293B] text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer text-xs font-bold group"
+            className="interactive-press interactive-lift flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-all cursor-pointer text-xs font-bold group"
           >
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
               {copied ? 'Telah Disalin!' : 'Kongsi Web'}
             </span>
             <span>Salin Pautan Portal</span>
-            <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+            <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
               {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
             </div>
           </button>
@@ -103,8 +103,8 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         aria-label="Bantuan & Tindakan Pantas"
         className={`interactive-press w-13 h-13 rounded-2xl shadow-xl flex items-center justify-center text-white transition-all duration-300 cursor-pointer ${
           isOpen
-            ? 'bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 rotate-90 shadow-slate-900/30'
-            : 'bg-gradient-to-tr from-red-800 to-amber-600 hover:from-red-900 hover:to-amber-700 shadow-red-800/25 hover:shadow-red-800/40 hover:-translate-y-1'
+            ? 'bg-slate-700 hover:bg-slate-800 rotate-90 shadow-slate-700/30'
+            : 'bg-sky-600 hover:bg-sky-700 shadow-sky-600/25 hover:shadow-sky-600/35 hover:-translate-y-1'
         }`}
         title="Bantuan & Tindakan Pantas Usahawan"
       >

@@ -101,7 +101,7 @@ const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: () => void }> = ({ t
         return {
           icon: <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />,
           border: 'border-emerald-200 dark:border-emerald-800/80',
-          bg: 'bg-white dark:bg-[#1E293B]',
+          bg: 'bg-white dark:bg-slate-800',
           bar: 'bg-emerald-500',
           accent: 'text-emerald-800 dark:text-emerald-300'
         };
@@ -109,7 +109,7 @@ const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: () => void }> = ({ t
         return {
           icon: <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />,
           border: 'border-rose-200 dark:border-rose-800/80',
-          bg: 'bg-white dark:bg-[#1E293B]',
+          bg: 'bg-white dark:bg-slate-800',
           bar: 'bg-rose-500',
           accent: 'text-rose-800 dark:text-rose-300'
         };
@@ -117,18 +117,18 @@ const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: () => void }> = ({ t
         return {
           icon: <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />,
           border: 'border-amber-200 dark:border-amber-800/80',
-          bg: 'bg-white dark:bg-[#1E293B]',
+          bg: 'bg-white dark:bg-slate-800',
           bar: 'bg-amber-500',
           accent: 'text-amber-800 dark:text-amber-300'
         };
       case 'info':
       default:
         return {
-          icon: <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />,
-          border: 'border-blue-200 dark:border-blue-800/80',
-          bg: 'bg-white dark:bg-[#1E293B]',
-          bar: 'bg-blue-500',
-          accent: 'text-blue-800 dark:text-blue-300'
+          icon: <Info className="w-5 h-5 text-sky-600 dark:text-sky-400 shrink-0" />,
+          border: 'border-sky-200 dark:border-sky-800/80',
+          bg: 'bg-white dark:bg-slate-800',
+          bar: 'bg-sky-500',
+          accent: 'text-sky-800 dark:text-sky-300'
         };
     }
   };

@@ -67,24 +67,24 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/70 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="w-full max-w-3xl bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl border border-amber-300/60 dark:border-amber-500/30 overflow-hidden flex flex-col max-h-[92vh] transition-all"
+        className="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[92vh] transition-all"
         role="dialog"
         aria-modal="true"
       >
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-red-900 via-red-950 to-amber-900 text-white px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-red-950">
+        <div className="kbelia-important-header dark:bg-slate-800 px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-              <ShieldCheck className="w-6 h-6 text-amber-300" />
+            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center border border-sky-200 dark:border-sky-800">
+              <ShieldCheck className="w-6 h-6 text-sky-600 dark:text-sky-400" />
             </div>
             <div>
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-amber-300">
+              <div className="text-[11px] font-extrabold uppercase tracking-widest text-sky-700 dark:text-sky-400">
                 Pusat Urusan Rasmi KBelia
               </div>
-              <h3 className="font-black text-base sm:text-lg text-white">
+              <h3 className="font-black text-base sm:text-lg text-slate-800 dark:text-white">
                 Semakan Status Permohonan & Dokumen Tawaran
               </h3>
             </div>
@@ -92,19 +92,19 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Sub-Tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-7 pt-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60 shrink-0 overflow-x-auto">
+        <div className="flex items-center gap-2 px-5 sm:px-7 pt-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shrink-0 overflow-x-auto">
           <button
             onClick={() => setActiveTab('status')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'status'
-                ? 'border-red-700 text-red-700 dark:border-amber-400 dark:text-amber-400'
+                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
@@ -115,7 +115,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             onClick={() => setActiveTab('offerLetter')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'offerLetter'
-                ? 'border-red-700 text-red-700 dark:border-amber-400 dark:text-amber-400'
+                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
@@ -127,7 +127,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             onClick={() => setActiveTab('tenancy')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'tenancy'
-                ? 'border-red-700 text-red-700 dark:border-amber-400 dark:text-amber-400'
+                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
@@ -139,7 +139,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             onClick={() => setActiveTab('verify')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'verify'
-                ? 'border-red-700 text-red-700 dark:border-amber-400 dark:text-amber-400'
+                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
@@ -156,21 +156,21 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             <div className="space-y-4 animate-in fade-in duration-200">
               
               {/* Card 1: Modular Kiosk Status */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-50/60 to-white dark:from-[#1E293B] dark:to-slate-850 border border-amber-200 dark:border-amber-900/60 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-amber-200/70 dark:border-slate-800">
+              <div className="p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-800 text-white flex items-center justify-center shrink-0">
-                      <Building2 className="w-5 h-5 text-amber-300" />
+                    <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
+                      <Building2 className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
                         Skim Kiosk Modular Pintar
                       </span>
-                      <h4 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
-                        Penempatan Kiosk: <span className="font-mono text-red-700 dark:text-amber-400">{slotCode}</span>
+                      <h4 className="font-extrabold text-sm sm:text-base text-slate-800 dark:text-white">
+                        Penempatan Kiosk: <span className="font-mono text-sky-700 dark:text-sky-400">{slotCode}</span>
                       </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Lokasi: {hubLocation} &middot; Sewa Subsidi: <span className="font-bold text-slate-900 dark:text-white">RM150/bulan</span>
+                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                        Lokasi: {hubLocation} &middot; Sewa Subsidi: <span className="font-bold text-slate-800 dark:text-white">RM150/bulan</span>
                       </p>
                     </div>
                   </div>
@@ -183,13 +183,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
                 <div className="pt-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
                   <div className="text-slate-600 dark:text-slate-300 text-[11px]">
-                    No. Rujukan Rasmi: <span className="font-mono font-bold text-slate-900 dark:text-white">{bookingRef}</span>
+                    No. Rujukan Rasmi: <span className="font-mono font-bold text-slate-800 dark:text-white">{bookingRef}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setActiveTab('offerLetter')}
-                      className="px-3.5 py-1.5 rounded-xl font-bold bg-red-700 hover:bg-red-800 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-xl font-bold bg-sky-600 hover:bg-sky-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
                       <span>Lihat Surat Tawaran</span>
@@ -197,7 +197,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     <button
                       type="button"
                       onClick={() => setActiveTab('tenancy')}
-                      className="px-3 py-1.5 rounded-xl font-semibold bg-white dark:bg-slate-800 hover:bg-slate-50 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl font-semibold bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                     >
                       Perjanjian Sewa
                     </button>
@@ -206,21 +206,21 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
               </div>
 
               {/* Card 2: SEED Grant Status */}
-              <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center justify-center shrink-0">
                       <Award className="w-5 h-5" />
                     </div>
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                         Skim Bantuan Modal
                       </span>
-                      <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+                      <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white">
                         {userGrant?.programTitle || 'Dana Benih Usahawan Belia Kelantan (SEED)'}
                       </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Peruntukan: <span className="font-bold text-slate-900 dark:text-white">{userGrant?.grantAmount || 'RM3,000'}</span> &middot; Kegunaan: Modal Pusingan Stok & POS
+                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                        Peruntukan: <span className="font-bold text-slate-800 dark:text-white">{userGrant?.grantAmount || 'RM3,000'}</span> &middot; Kegunaan: Modal Pusingan Stok & POS
                       </p>
                     </div>
                   </div>
@@ -231,12 +231,12 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </span>
                 </div>
 
-                <div className="pt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <div className="pt-3 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                   <span>Dokumen SSM & Penyata Bank telah diterima lengkap oleh Urusetia UMK.</span>
                   <button
                     type="button"
                     onClick={onOpenGrantModal}
-                    className="font-bold text-red-700 dark:text-amber-400 hover:underline cursor-pointer"
+                    className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
                   >
                     Kemas Kini Borang &rarr;
                   </button>
@@ -244,20 +244,20 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
               </div>
 
               {/* Card 3: Mentorship Session Status */}
-              <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
                       <GraduationCap className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
                         Bimbingan Mentor UMK
                       </span>
-                      <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
-                        Klinik Usahawan bersama: <span className="text-purple-700 dark:text-purple-300">{userMentorship?.mentorName || 'Prof. Madya Dr. Wan Azhar'}</span>
+                      <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white">
+                        Klinik Usahawan bersama: <span className="text-sky-700 dark:text-sky-300">{userMentorship?.mentorName || 'Prof. Madya Dr. Wan Azhar'}</span>
                       </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-xs text-slate-600 dark:text-slate-400">
                         Topik: {userMentorship?.topic || 'Strategi TikTok Shop & Aliran Tunai'}
                       </p>
                     </div>
@@ -265,7 +265,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
                   <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
                     userMentorship?.status === 'confirmed'
-                      ? 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border-blue-300'
+                      ? 'bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 border-sky-300'
                       : userMentorship?.status === 'completed'
                       ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300'
                       : userMentorship?.status === 'cancelled'
@@ -284,7 +284,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
                 <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                   <div className="text-slate-600 dark:text-slate-300 text-[11px] flex items-center gap-2">
-                    <Calendar className="w-3.5 h-3.5 text-amber-600" />
+                    <Calendar className="w-3.5 h-3.5 text-sky-600" />
                     <span>{userMentorship?.preferredDate || '28 Mac 2026 (Sabtu)'} ({userMentorship?.preferredTime || '10:00 AM'})</span>
                     <span>&bull; {userMentorship?.mode || 'Bersemuka di Kampus'}</span>
                   </div>
@@ -304,7 +304,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     <button
                       type="button"
                       onClick={onOpenMentorship}
-                      className="font-bold text-purple-700 dark:text-purple-400 hover:underline cursor-pointer"
+                      className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
                     >
                       Pilihan Slot & Mentor &rarr;
                     </button>
@@ -364,31 +364,31 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           {activeTab === 'offerLetter' && (
             <div className="space-y-4 animate-in fade-in duration-200">
               
-              <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-xs text-slate-500">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
+                <span className="text-xs text-slate-600 dark:text-slate-400">
                   Surat tawaran rasmi boleh dicetak atau disimpan sebagai rujukan pihak berkuasa tempatan (PBT).
                 </span>
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Cetak Dokumen</span>
                 </button>
               </div>
 
-              {/* Printable Official Document Container */}
-              <div className="bg-white text-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-300 shadow-md font-sans space-y-5 print:border-none print:shadow-none">
+              {/* Printable Official Document Container (Crisp White for Print) */}
+              <div className="bg-white text-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-md font-sans space-y-5 print:border-none print:shadow-none">
                 
                 {/* Letterhead */}
-                <div className="flex items-center justify-between border-b-2 border-red-900 pb-4">
+                <div className="flex items-center justify-between border-b-2 border-emerald-700 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-red-900 text-amber-400 flex items-center justify-center font-black text-lg border-2 border-amber-400">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-700 text-amber-200 flex items-center justify-center font-black text-lg border-2 border-amber-300">
                       KB
                     </div>
                     <div>
-                      <h4 className="font-black text-base tracking-tight text-red-950 uppercase">
+                      <h4 className="font-black text-base tracking-tight text-slate-900 uppercase">
                         PUSAT PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)
                       </h4>
                       <div className="text-[11px] font-semibold text-slate-600">
@@ -401,7 +401,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </div>
                   <div className="text-right hidden sm:block">
                     <div className="text-[10px] font-mono text-slate-500">NO. RUJUKAN:</div>
-                    <div className="text-xs font-mono font-bold text-red-900">{bookingRef}</div>
+                    <div className="text-xs font-mono font-bold text-emerald-700">{bookingRef}</div>
                     <div className="text-[10px] text-slate-500 mt-1">TARIKH: 24 MAC 2026</div>
                   </div>
                 </div>
@@ -426,7 +426,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 text-[11px]">
                     <div className="flex justify-between">
                       <span className="text-slate-600">Kod Kiosk Ditetapkan:</span>
-                      <span className="font-mono font-bold text-red-900">{slotCode}</span>
+                      <span className="font-mono font-bold text-emerald-800">{slotCode}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Lokasi Hab Perniagaan:</span>
@@ -442,7 +442,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Tarikh Akhir Beroperasi:</span>
-                      <span className="font-bold text-red-700">{calculateOperationEndDate(userBooking?.startDate || '2026-06-01', userBooking?.durationMonths || 6)}</span>
+                      <span className="font-bold text-emerald-800">{calculateOperationEndDate(userBooking?.startDate || '2026-06-01', userBooking?.durationMonths || 6)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Kemudahan Termasuk:</span>
@@ -463,9 +463,9 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     <div className="text-[9px] text-slate-400 mt-1">Dokumen ditandatangani secara digital mengikut Akta Tandatangan Digital 1997.</div>
                   </div>
 
-                  <div className="w-20 h-20 rounded-xl border border-red-200 bg-red-50/80 p-1.5 flex flex-col items-center justify-center text-center shrink-0">
-                    <QrCode className="w-8 h-8 text-red-900 mb-0.5" />
-                    <span className="text-[8px] font-mono font-bold text-red-900">VERIFIED</span>
+                  <div className="w-20 h-20 rounded-xl border border-emerald-200 bg-emerald-50/80 p-1.5 flex flex-col items-center justify-center text-center shrink-0">
+                    <QrCode className="w-8 h-8 text-emerald-800 mb-0.5" />
+                    <span className="text-[8px] font-mono font-bold text-emerald-800">VERIFIED</span>
                     <span className="text-[7px] text-slate-500">HASH: 8819-KB</span>
                   </div>
                 </div>
@@ -478,10 +478,10 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           {/* TAB 3: PERJANJIAN SEWAAN (TENANCY AGREEMENT) */}
           {activeTab === 'tenancy' && (
             <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
                   <div>
-                    <h4 className="font-bold text-sm text-slate-900 dark:text-white uppercase">
+                    <h4 className="font-bold text-sm text-slate-800 dark:text-white uppercase">
                       Ringkasan Terma Perjanjian Sewaan Kiosk Modular
                     </h4>
                     <span className="text-[11px] text-slate-500">Antara KBelia/PBT dan Penyewa Kiosk {applicantName}</span>
@@ -493,42 +493,42 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
                 <div className="space-y-2.5">
                   <div>
-                    <strong className="text-slate-900 dark:text-white block mb-0.5">Klausa 1: Tempoh Sewaan & Pembayaran</strong>
+                    <strong className="text-slate-800 dark:text-white block mb-0.5">Klausa 1: Tempoh Sewaan & Pembayaran</strong>
                     <p className="text-[11px]">
                       Sewaan bermula pada awal bulan dengan tempoh percubaan minima 6 bulan. Bayaran subsidi RM150/bulan hendaklah diselesaikan selewat-lewatnya pada 7hb setiap bulan melalui akaun rasmi UMK/KBelia.
                     </p>
                   </div>
 
                   <div>
-                    <strong className="text-slate-900 dark:text-white block mb-0.5">Klausa 2: Waktu Operasi & Kebersihan</strong>
+                    <strong className="text-slate-800 dark:text-white block mb-0.5">Klausa 2: Waktu Operasi & Kebersihan</strong>
                     <p className="text-[11px]">
                       Penyewa dikehendaki membuka kiosk sekurang-kurangnya 5 hari seminggu. Kebersihan perimeter kiosk dalam lingkungan 2 meter adalah tanggungjawab penyewa.
                     </p>
                   </div>
 
                   <div>
-                    <strong className="text-slate-900 dark:text-white block mb-0.5">Klausa 3: Keselamatan & Soket Elektrik</strong>
+                    <strong className="text-slate-800 dark:text-white block mb-0.5">Klausa 3: Keselamatan & Soket Elektrik</strong>
                     <p className="text-[11px]">
                       Sebarang penggunaan peralatan berkuasa tinggi melebihi 2000W wajib dilaporkan melalui Kaunter Aduan Fasiliti bagi mengelakkan suis pintas.
                     </p>
                   </div>
 
                   <div>
-                    <strong className="text-slate-900 dark:text-white block mb-0.5">Klausa 4: Penyertaan Klinik Bimbingan Mentor</strong>
+                    <strong className="text-slate-800 dark:text-white block mb-0.5">Klausa 4: Penyertaan Klinik Bimbingan Mentor</strong>
                     <p className="text-[11px]">
                       Penyewa disyaratkan menghadiri sekurang-kurangnya 1 sesi bimbingan mentor percuma UMK setiap 3 bulan bagi mengekalkan kelayakan subsidi sewa bulanan.
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px]">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px]">
+                  <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-4 h-4" /> Perjanjian Disahkan Secara Digital
                   </span>
                   <button
                     type="button"
                     onClick={handlePrint}
-                    className="font-bold text-red-700 dark:text-amber-400 hover:underline"
+                    className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
                   >
                     Muat Turun Salinan Lengkap &rarr;
                   </button>
@@ -540,19 +540,19 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           {/* TAB 4: PENGESAHAN KOD DIGITAL (VERIFICATION) */}
           {activeTab === 'verify' && (
             <div className="space-y-4 animate-in fade-in duration-200 text-center py-4">
-              <div className="w-16 h-16 rounded-3xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto border border-amber-300">
+              <div className="w-16 h-16 rounded-3xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto border border-sky-200 dark:border-sky-800">
                 <QrCode className="w-8 h-8" />
               </div>
-              <h4 className="font-bold text-base text-slate-900 dark:text-white">
+              <h4 className="font-bold text-base text-slate-800 dark:text-white">
                 Pengesah Ketulenan Dokumen & Kiosk KBelia
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
                 Kod rujukan dokumen anda dilindungi dengan jejak digital rasmi untuk mengelakkan pemalsuan lesen atau surat penempatan di pihak berkuasa tempatan.
               </p>
 
-              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 max-w-sm mx-auto font-mono text-xs">
-                <div className="text-[10px] text-slate-400 uppercase font-bold">Kod Hash Rujukan:</div>
-                <div className="font-bold text-red-800 dark:text-amber-400 text-sm mt-0.5">{bookingRef}</div>
+              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 max-w-sm mx-auto font-mono text-xs">
+                <div className="text-[10px] text-slate-500 uppercase font-bold">Kod Hash Rujukan:</div>
+                <div className="font-bold text-sky-700 dark:text-sky-400 text-sm mt-0.5">{bookingRef}</div>
                 <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center justify-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" /> REKOD SAH DALAM PANGKALAN DATA NEGERI
                 </div>
@@ -565,7 +565,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     onClose();
                     onOpenVerification(bookingRef);
                   }}
-                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-colors cursor-pointer"
+                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-colors cursor-pointer"
                 >
                   Buka Portal Pengesahan Awam PBT
                 </button>
@@ -576,14 +576,14 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:px-7 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between shrink-0">
+        <div className="p-4 sm:px-7 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
           <div className="text-[11px] text-slate-500">
             Perlukan bantuan sokongan? Hubungi Urusetia UMK di <span className="font-bold text-slate-700 dark:text-slate-300">09-771 7000</span>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             Tutup
           </button>

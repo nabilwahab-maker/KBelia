@@ -143,7 +143,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       title: 'Kapsul Niaga KB Sentral B1',
       subtitle: 'Ruang Komersil Smart Pod',
       tag: 'RM20/hari',
-      tagColor: 'bg-blue-900/60 text-blue-200 border-blue-500/40',
+      tagColor: 'bg-sky-900/80 text-sky-100 border-sky-400/40',
       location: 'Kota Bharu',
       type: 'Kiosk Komersil'
     },
@@ -152,7 +152,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       title: 'Batik Belia Kontemporari',
       subtitle: 'Fesyen & Kraf Moden',
       tag: 'Penarafan 4.8',
-      tagColor: 'bg-blue-900/60 text-blue-200 border-blue-500/40',
+      tagColor: 'bg-sky-900/80 text-sky-100 border-sky-400/40',
       location: 'Kota Bharu',
       type: 'Kraf & Fesyen'
     },
@@ -161,7 +161,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       title: "Kapsul F&B A1 · Kopi Nissem",
       subtitle: "D'Kelate Artisan Coffee",
       tag: 'RM15/hari',
-      tagColor: 'bg-blue-900/60 text-blue-200 border-blue-500/40',
+      tagColor: 'bg-sky-900/80 text-sky-100 border-sky-400/40',
       location: 'Bachok',
       type: 'Kiosk F&B'
     }
@@ -202,20 +202,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const activeSlideData = heroSlides[currentSlide];
 
   return (
-    <div id="kbelia-landing-root" className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white transition-colors duration-200">
+    <div id="kbelia-landing-root" className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-sky-600 selection:text-white transition-colors duration-200">
       
       {/* 2. LANDING NAVBAR */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
           
           {/* Logo & Identity */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-800 flex items-center justify-center text-white font-bold text-sm shadow-xs">
+            <div className="w-9 h-9 rounded-lg bg-sky-600 flex items-center justify-center text-white font-bold text-sm shadow-xs">
               <span>KB</span>
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">KBelia</span>
+                <span className="text-base font-extrabold tracking-tight text-slate-800 dark:text-white">KBelia</span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal hidden sm:block">
                 {isBM ? 'Portal Keusahawanan & Kapsul Niaga Belia Kelantan' : 'Kelantan Youth Entrepreneurship & Capsule Kiosks'}
@@ -225,37 +225,35 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Quick Nav Anchors to Landing Sections */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-600 dark:text-slate-300">
-            <a href="#hero" className="hover:text-red-700 dark:hover:text-amber-400 transition-colors">{isBM ? 'Utama' : 'Home'}</a>
-            <a href="#kiosk" className="hover:text-red-700 dark:hover:text-amber-400 transition-colors">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</a>
-            <a href="#direktori" className="hover:text-red-700 dark:hover:text-amber-400 transition-colors">{isBM ? 'Direktori Usahawan' : 'Directory'}</a>
-            <a href="#inisiatif" className="hover:text-red-700 dark:hover:text-amber-400 transition-colors">{isBM ? 'Inisiatif Teras' : 'Initiatives'}</a>
-            <a href="#faq" className="hover:text-red-700 dark:hover:text-amber-400 transition-colors">{isBM ? 'Soalan Lazim' : 'FAQ'}</a>
+            <a href="#hero" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">{isBM ? 'Utama' : 'Home'}</a>
+            <a href="#kiosk" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</a>
+            <a href="#direktori" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">{isBM ? 'Direktori Usahawan' : 'Directory'}</a>
+            <a href="#inisiatif" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">{isBM ? 'Inisiatif Teras' : 'Initiatives'}</a>
+            <a href="#faq" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">{isBM ? 'Soalan Lazim' : 'FAQ'}</a>
           </nav>
 
           {/* Actions: Mod Gelap/Cerah, Penukar Bahasa (BM|EN), Butang Daftar, Butang Log Masuk */}
           <div className="flex items-center gap-2 sm:gap-2.5">
             
-            {/* Animated Dark Mode Switcher (Rotating Sun/Moon Icon matching Dashboard) */}
+            {/* Animated Theme Switcher */}
             <button
               id="landing-darkmode-toggle"
               type="button"
               onClick={toggleTheme}
-              className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-200 dark:border-slate-700 transition-all duration-300 cursor-pointer shadow-2xs group focus:outline-none interactive-press hover:scale-105 active:scale-95"
+              className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-slate-50 hover:bg-sky-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-sky-400 border border-slate-200 dark:border-slate-700 transition-all duration-300 cursor-pointer shadow-2xs group focus:outline-none interactive-press hover:scale-105 active:scale-95"
               title={isDark ? (isBM ? "Tukar ke Mod Cerah" : "Switch to Light Mode") : (isBM ? "Tukar ke Mod Gelap" : "Switch to Dark Mode")}
               aria-label="Tukar tema sistem"
             >
               <div className="relative w-5 h-5 flex items-center justify-center overflow-hidden">
-                {/* Sun Icon (Visible in Light Mode) */}
                 <Sun
-                  className={`w-4 h-4 text-amber-500 absolute transition-all duration-500 ease-out transform ${
+                  className={`w-4 h-4 text-sky-600 absolute transition-all duration-500 ease-out transform ${
                     isDark 
                       ? 'rotate-90 scale-0 opacity-0 pointer-events-none' 
                       : 'rotate-0 scale-100 opacity-100'
                   }`}
                 />
-                {/* Moon Icon (Visible in Dark Mode) */}
                 <Moon
-                  className={`w-4 h-4 text-amber-400 absolute transition-all duration-500 ease-out transform ${
+                  className={`w-4 h-4 text-sky-400 absolute transition-all duration-500 ease-out transform ${
                     isDark 
                       ? 'rotate-0 scale-100 opacity-100' 
                       : '-rotate-90 scale-0 opacity-0 pointer-events-none'
@@ -266,12 +264,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
 
             {/* Penukar Bahasa Global */}
-            <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-bold">
+            <div className="flex items-center bg-slate-50 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-bold">
               <button
                 type="button"
                 onClick={() => setLanguage('ms')}
                 className={`px-2 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
-                  isBM ? 'bg-red-700 text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  isBM ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
                 title="Bahasa Melayu (Rasmi)"
               >
@@ -281,7 +279,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 type="button"
                 onClick={() => setLanguage('en')}
                 className={`px-2 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
-                  !isBM ? 'bg-red-700 text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  !isBM ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
                 title="English (International)"
               >
@@ -294,9 +292,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               type="button"
               id="landing-register-nav-btn"
               onClick={() => setActiveTab('register')}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer interactive-press interactive-lift group"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer interactive-press interactive-lift group"
             >
-              <Users className="w-3.5 h-3.5 text-red-700 dark:text-red-400 transition-transform duration-200 group-hover:scale-110" />
+              <Users className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 transition-transform duration-200 group-hover:scale-110" />
               <span>{isBM ? 'Daftar' : 'Register'}</span>
             </button>
 
@@ -305,9 +303,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               type="button"
               id="landing-login-btn"
               onClick={() => setActiveTab('login')}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-700 hover:bg-red-800 text-white text-xs font-bold shadow-xs transition-all cursor-pointer interactive-press interactive-lift group"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-xs transition-all cursor-pointer interactive-press interactive-lift group"
             >
-              <LogIn className="w-3.5 h-3.5 text-amber-300 transition-transform duration-200 group-hover:translate-x-0.5" />
+              <LogIn className="w-3.5 h-3.5 text-sky-100 transition-transform duration-200 group-hover:translate-x-0.5" />
               <span>{isBM ? 'Log Masuk' : 'Log In'}</span>
             </button>
           </div>
@@ -315,17 +313,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </header>
 
-      {/* 3. HERO SECTION PRESTIJ TEMA KELANTAN & CAROUSEL VISUAL */}
-      <section id="hero" className="relative overflow-hidden pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
-        
-        {/* Subtle radial glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(30,64,175,0.08),transparent_100%)] pointer-events-none" />
-
+      {/* 3. HERO SECTION & CAROUSEL VISUAL (Important Header: Top-Left Soft Sky Glow) */}
+      <section id="hero" className="kbelia-important-header relative overflow-hidden pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 transition-colors">
         <div className="relative max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 text-center space-y-6">
           
           {/* Headline & Subhead */}
           <div className="max-w-4xl mx-auto space-y-4">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15] text-balance">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-800 dark:text-white leading-[1.15] text-balance">
               {isBM 
                 ? 'Platform Bersepadu Usahawan Belia Kelantan Berniaga & Berkembang'
                 : 'Integrated Platform for Kelantan Youth Entrepreneurs to Trade & Grow'}
@@ -371,27 +365,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
               {/* Top Controls Bar within Slide */}
               <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-auto">
-                <div className="flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/15 text-xs">
-                  <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-blue-900/80 text-blue-200 border border-blue-500/30">
+                <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/15 text-xs">
+                  <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-sky-700/90 text-sky-50 border border-sky-400/30">
                     {activeSlideData.badge}
                   </span>
                   <span className="text-white/40 text-[11px] hidden sm:inline">·</span>
-                  <span className="text-blue-300 font-bold text-[11px] flex items-center gap-1">
+                  <span className="text-sky-300 font-bold text-[11px] flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
                     {activeSlideData.location}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/15">
+                <div className="flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/15">
                   <button
                     type="button"
                     onClick={() => setIsAutoPlaying(!isAutoPlaying)}
                     title={isAutoPlaying ? "Jeda gambar bergerak" : "Mainkan gambar bergerak"}
-                    className="p-1 text-white hover:text-amber-400 transition-colors"
+                    className="p-1 text-white hover:text-sky-300 transition-colors"
                   >
                     {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
                   </button>
-                  <span className="text-[10px] text-white/70 font-mono font-bold tabular-nums pr-1">
+                  <span className="text-[10px] text-white/80 font-mono font-bold tabular-nums pr-1">
                     {currentSlide + 1} / {heroSlides.length}
                   </span>
                 </div>
@@ -401,7 +395,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={handlePrevSlide}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-md"
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-slate-900/75 hover:bg-slate-900 text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-md"
                 title="Gambar Sebelum"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -410,7 +404,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={handleNextSlide}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-md"
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-slate-900/75 hover:bg-slate-900 text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-md"
                 title="Gambar Seterusnya"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -419,7 +413,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {/* Bottom Content Overlay for Current Slide */}
               <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 z-20 space-y-3">
                 <div className="max-w-2xl space-y-1.5">
-                  <div className="text-blue-300 text-xs font-bold uppercase tracking-wider">
+                  <div className="text-sky-300 text-xs font-bold uppercase tracking-wider">
                     {activeSlideData.subtitle}
                   </div>
                   <h3 className="text-xl sm:text-3xl font-extrabold text-white leading-tight">
@@ -436,7 +430,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <button
                       type="button"
                       onClick={activeSlideData.onAction}
-                      className="px-5 py-2.5 rounded-lg bg-blue-700 hover:bg-blue-600 text-white font-bold text-xs shadow-md transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
+                      className="px-5 py-2.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-md transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
                     >
                       <span>{activeSlideData.ctaText}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -455,7 +449,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         onClick={() => setCurrentSlide(i)}
                         className={`transition-all duration-300 h-2 rounded-full cursor-pointer hover:scale-105 active:scale-95 ${
                           i === currentSlide 
-                            ? 'w-8 bg-blue-400 shadow-xs' 
+                            ? 'w-8 bg-sky-400 shadow-xs' 
                             : 'w-2 bg-white/40 hover:bg-white/70'
                         }`}
                         title={`Slide ${i + 1}: ${slide.title}`}
@@ -469,7 +463,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {/* Progress Line Indicator at bottom edge */}
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-30">
                 <div 
-                  className="h-full bg-blue-500 transition-all duration-500"
+                  className="h-full bg-sky-500 transition-all duration-500"
                   style={{ width: `${((currentSlide + 1) / heroSlides.length) * 100}%` }}
                 />
               </div>
@@ -482,39 +476,39 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* STATISTIK IMPAK (SOCIAL PROOF) */}
           {/* ========================================================================= */}
           <div className="pt-6 w-full mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-amber-400 dark:hover:border-amber-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">10</div>
-              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Jajahan Liputan' : 'Districts'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">10</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Jajahan Liputan' : 'Districts'}</div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Seluruh Kelantan' : 'Statewide'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-emerald-400 dark:hover:border-emerald-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">{slots.length}</div>
-              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">{slots.length}</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
               <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-bold font-mono">{availableSlotsCount} {isBM ? 'slot sedia' : 'slots ready'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-amber-400 dark:hover:border-amber-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">500+</div>
-              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Usahawan Belia' : 'Entrepreneurs'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">500+</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Usahawan Belia' : 'Entrepreneurs'}</div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Berdaftar aktif' : 'Active Registered'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-amber-400 dark:hover:border-amber-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">RM2.4M</div>
-              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Dana Disalurkan' : 'Grants Disbursed'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">RM2.4M</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Dana Disalurkan' : 'Grants Disbursed'}</div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Geran & pembiayaan' : 'Seed funding'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-blue-400 dark:hover:border-blue-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">35+</div>
-              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Mentor Industri' : 'Mentors'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">35+</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Mentor Industri' : 'Mentors'}</div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Industry Mentors'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-left shadow-2xs dark:shadow-sm hover:border-emerald-400 dark:hover:border-emerald-400/50 hover:bg-slate-50 dark:hover:bg-slate-900/90 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">94.8%</div>
-              <div className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">{isBM ? 'Kadar Kejayaan' : 'Success Rate'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
+              <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">94.8%</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Kadar Kejayaan' : 'Success Rate'}</div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Inkubasi perniagaan' : 'Business incubation'}</div>
             </div>
           </div>
@@ -525,10 +519,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 3B. REEL GAMBAR BERGERAK BERTERUSAN (CONTINUOUS HORIZONTAL MARQUEE TICKER) */}
       {/* ========================================================================= */}
-      <section className="py-6 bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-white overflow-hidden border-b border-slate-200 dark:border-slate-800 transition-colors">
+      <section className="py-6 bg-white dark:bg-slate-900 text-slate-800 dark:text-white overflow-hidden border-b border-slate-200 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400" />
+            <span className="w-2 h-2 rounded-full bg-sky-600 dark:bg-sky-400" />
             <h3 className="text-xs sm:text-sm font-bold tracking-wide uppercase text-slate-800 dark:text-slate-200">
               Galeri Kiosk Kapsul & Produk Usahawan Kelantan
             </h3>
@@ -552,7 +546,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     setActiveTab('hepa');
                   }
                 }}
-                className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 rounded-xl overflow-hidden transition-colors cursor-pointer shadow-2xs group"
+                className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-sky-400 rounded-xl overflow-hidden transition-colors cursor-pointer shadow-2xs group"
               >
                 <div className="relative h-36 overflow-hidden">
                   <img
@@ -560,8 +554,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     alt={card.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-2 left-2 bg-slate-950/85 backdrop-blur px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/10 flex items-center gap-1">
-                    <MapPin className="w-2.5 h-2.5 text-blue-400" />
+                  <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/10 flex items-center gap-1">
+                    <MapPin className="w-2.5 h-2.5 text-sky-400" />
                     <span>{card.location}</span>
                   </div>
                   <div className="absolute top-2 right-2">
@@ -569,13 +563,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       {card.tag}
                     </span>
                   </div>
-                  <div className="absolute bottom-2 left-2 bg-slate-950/70 backdrop-blur px-1.5 py-0.5 rounded text-[9px] font-mono font-bold text-blue-300 uppercase">
+                  <div className="absolute bottom-2 left-2 bg-slate-900/75 backdrop-blur px-1.5 py-0.5 rounded text-[9px] font-mono font-bold text-sky-300 uppercase">
                     {card.type}
                   </div>
                 </div>
 
                 <div className="p-3 space-y-1">
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white truncate group-hover:text-sky-700 dark:group-hover:text-sky-300 transition-colors">
                     {card.title}
                   </h4>
                   <p className="text-[11px] text-slate-500 dark:text-slate-300 truncate">
@@ -594,10 +588,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section id="masalah-solusi" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           <div className="text-center max-w-3xl mx-auto space-y-2 mb-12">
-            <div className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
+            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
               Analisis Cabaran & Transformasi
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
               Cabaran Tradisional vs. Penyelesaian Pintar KBelia
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -716,13 +710,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 5. CIRI-CIRI UTAMA (CORE FEATURES - CHECKLIST ITEM 5) */}
       {/* ========================================================================= */}
-      <section id="ciri-utama" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 transition-colors">
+      <section id="ciri-utama" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           <div className="text-center max-w-3xl mx-auto space-y-2 mb-12">
-            <div className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
+            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
               Modul Pintar Portal
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
               5 Ciri Utama Memperkasakan Bisnes Belia
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -733,85 +727,85 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* Feature 1: Business Analytics */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#1C2434] border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-red-300 dark:hover:border-red-500/50 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 flex items-center justify-center font-bold">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 flex items-center justify-center font-bold">
                 <TrendingUp className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">1. Business Analytics & Reporting</h3>
+              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">1. Business Analytics & Reporting</h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 Pantau rekod jualan harian, pengurusan inventori produk, serta jana laporan prestasi ringkas untuk kegunaan pembentangan kepada pelabur atau pembiaya.
               </p>
-              <div className="pt-2 text-xs font-bold text-red-800 dark:text-red-400 flex items-center gap-1">
+              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
                 <span>Grafik visual & eksport PDF</span>
               </div>
             </div>
 
             {/* Feature 2: Funding & Grant Tracker */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#1C2434] border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-amber-300 dark:hover:border-amber-500/50 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 flex items-center justify-center font-bold">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/80 flex items-center justify-center font-bold">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">2. Funding & Grant Tracker</h3>
+              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">2. Funding & Grant Tracker</h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 Akses senarai skim Dana Benih Negeri, geran pendigitalan MDEC, dan pembiayaan mikro TEKUN/MARA lengkap dengan status semakan permohonan masa nyata.
               </p>
-              <div className="pt-2 text-xs font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1">
+              <div className="pt-2 text-xs font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1">
                 <span>Semakan kelulusan tanpa birokrasi</span>
               </div>
             </div>
 
             {/* Feature 3: Mentorship & Networking */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#1C2434] border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-blue-300 dark:hover:border-blue-500/50 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 flex items-center justify-center font-bold">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 flex items-center justify-center font-bold">
                 <Users className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">3. Mentorship & Networking Hub</h3>
+              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">3. Mentorship & Networking Hub</h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 Padankan diri anda dengan mentor perniagaan berpengalaman, adakan sesi perkongsian industri, dan bina hubungan strategik dengan usahawan belia lain.
               </p>
-              <div className="pt-2 text-xs font-bold text-blue-800 dark:text-blue-400 flex items-center gap-1">
+              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
                 <span>Sesi 1-ke-1 & bimbingan kumpulan</span>
               </div>
             </div>
 
             {/* Feature 4: Upskilling & Academy */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#1C2434] border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-bold">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 flex items-center justify-center font-bold">
                 <BookOpen className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">4. Upskilling & Academy Module</h3>
+              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">4. Upskilling & Academy Module</h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 Modul latihan praktikal percuma merangkumi penstriman TikTok Shop Ads, fotografi produk komersil, penjenamaan jenama, dan literasi perakaunan ringkas.
               </p>
-              <div className="pt-2 text-xs font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-1">
+              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
                 <span>Sijil penyertaan keusahawanan</span>
               </div>
             </div>
 
             {/* Feature 5: Compliance & SSM Guide */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#1C2434] border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-purple-300 dark:hover:border-purple-500/50 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 flex items-center justify-center font-bold">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 flex items-center justify-center font-bold">
                 <FileText className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">5. Compliance & SSM Guide</h3>
+              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">5. Compliance & SSM Guide</h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 Panduan interaktif pendaftaran entiti perniagaan di SSM, panduan pematuhan cukai LHDN, permohonan pensijilan Halal JAKIM, dan lesen pihak berkuasa tempatan (PBT).
               </p>
-              <div className="pt-2 text-xs font-bold text-purple-800 dark:text-purple-400 flex items-center gap-1">
+              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
                 <span>Templat dokumen & senarai semak</span>
               </div>
             </div>
 
             {/* Feature 6: Kiosk Modular IoT Hub */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-[#1C2434] border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-red-300 dark:hover:border-red-500/50 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-slate-900 dark:text-amber-300 flex items-center justify-center font-bold">
+            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-slate-800 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-slate-700 flex items-center justify-center font-bold">
                 <Building2 className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">6. Modular Capsule IoT Hub</h3>
+              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">6. Modular Capsule IoT Hub</h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 Sistem kunci digital pintar, pemantauan status penggunaan kiosk secara atas talian, serta sokongan teknikal bersepadu bagi penyewa kiosk modular 10 jajahan.
               </p>
-              <div className="pt-2 text-xs font-bold text-slate-800 dark:text-slate-300 flex items-center gap-1">
+              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
                 <span>Pengurusan sewaan automatik</span>
               </div>
             </div>
@@ -821,15 +815,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* 6. LANGKAH BERMULA (HOW IT WORKS - CHECKLIST ITEM 6) */}
+      {/* 6. LANGKAH BERMULA */}
       {/* ========================================================================= */}
       <section className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           <div className="text-center max-w-3xl mx-auto space-y-2 mb-14">
-            <div className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
+            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
               Proses Mudah 4-Langkah
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
               Langkah Demi Langkah Mula Berniaga
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -840,44 +834,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
             
             {/* Step 1 */}
-            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-[#161D26] border border-slate-200 dark:border-slate-800 relative space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-red-700 text-white font-black text-sm flex items-center justify-center shadow-xs">
+            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 relative space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                 1
               </div>
-              <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Daftar Akaun Belia</h4>
+              <h4 className="font-extrabold text-base text-slate-800 dark:text-white">Daftar Akaun Belia</h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Cipta akaun percuma menggunakan emel atau Google. Akses terbuka kepada semua warganegara belia Kelantan.
               </p>
             </div>
 
             {/* Step 2 */}
-            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-[#161D26] border border-slate-200 dark:border-slate-800 relative space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-slate-900 text-amber-300 font-black text-sm flex items-center justify-center shadow-xs">
+            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 relative space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-sky-500 text-white font-black text-sm flex items-center justify-center shadow-xs">
                 2
               </div>
-              <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Isi Profil Perniagaan</h4>
+              <h4 className="font-extrabold text-base text-slate-800 dark:text-white">Isi Profil Perniagaan</h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Lengkapkan profil bisnes anda, muat naik katalog produk tempatan, logo jenama serta pautan WhatsApp dan media sosial.
               </p>
             </div>
 
             {/* Step 3 */}
-            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-[#161D26] border border-slate-200 dark:border-slate-800 relative space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 font-black text-sm flex items-center justify-center shadow-xs">
+            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 relative space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white font-black text-sm flex items-center justify-center shadow-xs">
                 3
               </div>
-              <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Semak Kiosk & Geran</h4>
+              <h4 className="font-extrabold text-base text-slate-800 dark:text-white">Semak Kiosk & Geran</h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Pilih slot kiosk kapsul bersubsidi di jajahan anda atau mohon Skim Dana Benih untuk melengkapkan peralatan bisnes.
               </p>
             </div>
 
             {/* Step 4 */}
-            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-[#161D26] border border-slate-200 dark:border-slate-800 relative space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
+            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 relative space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                 4
               </div>
-              <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Kembangkan Bisnes</h4>
+              <h4 className="font-extrabold text-base text-slate-800 dark:text-white">Kembangkan Bisnes</h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Terima bimbingan mentor berpengalaman, pantau analitik jualan, dan tingkatkan keterlihatan pasaran di seluruh negeri.
               </p>
@@ -888,16 +882,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. TIGA INISIATIF TERAS (CORE PILLARS) */}
+      {/* 7. TIGA INISIATIF TERAS */}
       {/* ========================================================================= */}
-      <section id="inisiatif" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors">
+      <section id="inisiatif" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <div className="text-center max-w-2xl mx-auto space-y-2 mb-12">
-            <div className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
               {isBM ? 'Inisiatif Pembangunan Negeri' : 'State Development Pillars'}
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
               {isBM ? 'Teras Ekosistem Keusahawanan KBelia' : 'KBelia Entrepreneurship Ecosystem Pillars'}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -910,11 +904,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Pillar 1: Kiosk Modular */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-amber-400/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 space-y-4 shadow-2xs dark:shadow-sm interactive-card group">
-              <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-amber-400 border border-red-200 dark:border-red-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-all duration-300 space-y-4 shadow-2xs interactive-card group">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-slate-900 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-slate-700 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Building2 className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-200 group-hover:text-amber-600 dark:group-hover:text-amber-300">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white transition-colors duration-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">
                 {isBM ? '1. Kiosk Kapsul Modular' : '1. Modular Capsule Kiosks'}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -926,7 +920,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('login')}
-                  className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
+                  className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:text-sky-800 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
                 >
                   <span>{isBM ? 'Log Masuk & Semak Lokasi' : 'Log In to Check Locations'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -935,11 +929,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Pillar 2: Direktori Digital */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-emerald-400/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 space-y-4 shadow-2xs dark:shadow-sm interactive-card group">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-all duration-300 space-y-4 shadow-2xs interactive-card group">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-slate-900 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-slate-700 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Store className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-300">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white transition-colors duration-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">
                 {isBM ? '2. Direktori Pasaran Digital' : '2. Digital Market Directory'}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -951,7 +945,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('login')}
-                  className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
+                  className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:text-sky-800 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
                 >
                   <span>{isBM ? 'Log Masuk & Lihat Usahawan' : 'Log In to Browse Directory'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -960,11 +954,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Pillar 3: Geran & Bantuan */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 hover:border-amber-400/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 space-y-4 shadow-2xs dark:shadow-sm interactive-card group">
-              <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-all duration-300 space-y-4 shadow-2xs interactive-card group">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-200 group-hover:text-amber-600 dark:group-hover:text-amber-300">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white transition-colors duration-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">
                 {isBM ? '3. Geran & Inkubasi Modal' : '3. Grants & Seed Capital'}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -976,7 +970,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('login')}
-                  className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
+                  className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:text-sky-800 flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press"
                 >
                   <span>{isBM ? 'Log Masuk & Maklumat Skim' : 'Log In to View Schemes'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -990,8 +984,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* ASAL: PREVIEW KIOSK KAPSUL NIAGA */}
-      {/* ========================================================================= */}
       {/* 8. PREVIEW KIOSK MODULAR */}
       {/* ========================================================================= */}
       <section id="kiosk" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
@@ -999,10 +991,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
+              <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
                 Lokasi Pilihan Jajahan
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1 text-balance">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mt-1 text-balance">
                 Kapsul & Kiosk Niaga Sedia Dimohon
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
@@ -1022,7 +1014,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div 
                   key={slot.id} 
                   onClick={() => onSelectSlot(slot)}
-                  className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-blue-500 hover:shadow-md transition-all flex flex-col justify-between h-full group cursor-pointer"
+                  className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 overflow-hidden hover:border-sky-400 hover:shadow-md transition-all flex flex-col justify-between h-full group cursor-pointer"
                 >
                   <div>
                     <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-slate-800">
@@ -1031,12 +1023,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         alt={slot.name} 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                       />
-                      <div className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur px-2.5 py-1 rounded-md text-[11px] font-bold text-white shadow-xs flex items-center gap-1 border border-white/10">
-                        <MapPin className="w-3 h-3 text-blue-400" />
+                      <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur px-2.5 py-1 rounded-md text-[11px] font-bold text-white shadow-xs flex items-center gap-1 border border-white/10">
+                        <MapPin className="w-3 h-3 text-sky-400" />
                         <span>{slot.district}</span>
                       </div>
                       <div className="absolute top-3 right-3">
-                        <span className="px-2.5 py-1 rounded-md text-[10px] font-bold border border-emerald-500/30 bg-emerald-950/80 text-emerald-200 shadow-xs inline-block">
+                        <span className="px-2.5 py-1 rounded-md text-[10px] font-bold border border-emerald-400/30 bg-emerald-900/85 text-emerald-100 shadow-xs inline-block">
                           Kekosongan Sedia
                         </span>
                       </div>
@@ -1044,18 +1036,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                     <div className="p-5 sm:p-6 space-y-3">
                       <div>
-                        <h4 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{slot.name}</h4>
+                        <h4 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white leading-snug group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">{slot.name}</h4>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{slot.hubLocation}</p>
                       </div>
 
                       {/* Amenities */}
-                      <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 pt-1 border-t border-slate-200/80 dark:border-slate-700">
                         <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300">
                           <Zap className="w-3 h-3 text-amber-500" /> Elektrik
                         </span>
                         <span aria-hidden="true" className="text-slate-300 dark:text-slate-600">·</span>
                         <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300">
-                          <Wifi className="w-3 h-3 text-blue-500" /> WiFi 500M
+                          <Wifi className="w-3 h-3 text-sky-600" /> WiFi 500M
                         </span>
                         <span aria-hidden="true" className="text-slate-300 dark:text-slate-600">·</span>
                         <span className="text-slate-500 dark:text-slate-400">{slot.size}</span>
@@ -1063,10 +1055,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                   </div>
 
-                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 flex items-center justify-between border-t border-slate-200/80 dark:border-slate-700">
                     <div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Kadar Sewaan Bersubsidi</div>
-                      <div className="text-sm sm:text-base font-extrabold text-blue-800 dark:text-blue-400 tabular-nums">
+                      <div className="text-sm sm:text-base font-extrabold text-sky-700 dark:text-sky-400 tabular-nums">
                         RM{slot.dailyRate} <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">/ hari</span>
                       </div>
                     </div>
@@ -1081,19 +1073,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* ASAL: PREVIEW DIREKTORI USAHAWAN BELIA */}
-      {/* ========================================================================= */}
       {/* 9. PREVIEW DIREKTORI USAHAWAN BELIA */}
       {/* ========================================================================= */}
-      <section id="direktori" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 transition-colors">
+      <section id="direktori" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
+              <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
                 Direktori Produk Tempatan
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1 text-balance">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mt-1 text-balance">
                 Karya & Perniagaan Belia Kelantan
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
@@ -1107,22 +1097,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div 
                 key={biz.id}
                 onClick={() => onSelectBusiness(biz)}
-                className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 hover:border-blue-500 hover:shadow-md transition-all flex flex-col justify-between group cursor-pointer"
+                className="rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 hover:border-sky-400 hover:shadow-md transition-all flex flex-col justify-between group cursor-pointer"
               >
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <img
                       src={biz.logoUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${biz.id}`}
                       alt={biz.businessName}
-                      className="w-12 h-12 rounded-lg object-cover bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0"
+                      className="w-12 h-12 rounded-lg object-cover bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0"
                     />
                     <div className="min-w-0">
-                      <div className="text-[10px] text-blue-700 dark:text-blue-400 font-bold uppercase tracking-wide">{biz.category}</div>
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                      <div className="text-[10px] text-sky-700 dark:text-sky-400 font-bold uppercase tracking-wide">{biz.category}</div>
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-white truncate group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                         {biz.businessName}
                       </h4>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-slate-400" />
+                        <MapPin className="w-3 h-3 text-sky-600" />
                         <span>{biz.district}</span>
                       </div>
                     </div>
@@ -1133,9 +1123,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-3 flex items-center justify-between text-xs">
+                <div className="pt-3 border-t border-slate-200/80 dark:border-slate-700 mt-3 flex items-center justify-between text-xs">
                   <span className="text-slate-600 dark:text-slate-400 text-[11px]">{biz.ownerName}</span>
-                  <span className="text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800">
+                  <span className="text-[11px] font-semibold text-sky-800 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/40 px-2 py-0.5 rounded border border-sky-200 dark:border-sky-800">
                     {biz.district}
                   </span>
                 </div>
@@ -1153,10 +1143,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-5xl w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <div className="text-center space-y-2 mb-10">
-            <div className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
+            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
               Bantuan & Panduan
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
               Soalan Lazim (FAQ)
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -1170,18 +1160,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               return (
                 <div 
                   key={index}
-                  className="rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors"
+                  className="rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors"
                 >
                   <button
                     type="button"
                     onClick={() => setActiveFaq(isOpen ? null : index)}
-                    className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-slate-900 dark:text-white hover:bg-slate-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-slate-800 dark:text-white hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   >
                     <span>{faq.q}</span>
-                    <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-blue-600' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-sky-600' : ''}`} />
                   </button>
                   {isOpen && (
-                    <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-200 dark:border-slate-700/60 pt-3">
+                    <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-200 dark:border-slate-700/60 pt-3 bg-white dark:bg-slate-800">
                       {faq.a}
                     </div>
                   )}
@@ -1194,15 +1184,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* 10. FINAL CALL TO ACTION (CTA BANNER - CHECKLIST ITEM 10) */}
+      {/* 10. FINAL CALL TO ACTION */}
       {/* ========================================================================= */}
-      <section className="py-16 sm:py-20 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 transition-colors">
+      <section className="kbelia-important-header py-16 sm:py-20 text-slate-800 dark:text-white border-b border-slate-200 dark:border-slate-800 transition-colors">
         <div className="max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
-          <div className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+          <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
             Peluang Terbuka Sepanjang Tahun 2026/2027
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-balance">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-800 dark:text-white text-balance">
             Mulakan Langkah Keusahawanan Anda Hari Ini
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
@@ -1213,7 +1203,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('register')}
-              className="px-6 py-3 rounded-lg bg-blue-800 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
+              className="px-6 py-3 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow-sm transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
             >
               <Users className="w-4 h-4" />
               <span>{isBM ? 'Daftar Akaun Percuma' : 'Register Free Account'}</span>
@@ -1221,9 +1211,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('login')}
-              className="px-6 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold text-sm border border-slate-300 dark:border-slate-700 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
+              className="px-6 py-3 rounded-lg bg-white hover:bg-sky-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold text-sm border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
             >
-              <LogIn className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <LogIn className="w-4 h-4 text-sky-700 dark:text-sky-400" />
               <span>{isBM ? 'Log Masuk Sistem' : 'Log In System'}</span>
             </button>
           </div>
@@ -1248,9 +1238,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* 11. COMPREHENSIVE INSTITUTIONAL FOOTER (CHECKLIST ITEM 11) */}
+      {/* 11. COMPREHENSIVE INSTITUTIONAL FOOTER */}
       {/* ========================================================================= */}
-      <footer className="bg-slate-100 dark:bg-[#0A1124] text-slate-600 dark:text-slate-300 text-xs border-t border-slate-200 dark:border-[#1E3158]">
+      <footer className="bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 text-xs border-t border-slate-200 dark:border-slate-800">
 
         {/* 4-Column Footer Content */}
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -1258,10 +1248,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Col 1: Identity & Intro */}
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-red-700 via-red-800 to-amber-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
+              <div className="w-8 h-8 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
                 KB
               </div>
-              <span className="text-base font-black text-slate-900 dark:text-white tracking-tight">KBelia Kelantan</span>
+              <span className="text-base font-black text-slate-800 dark:text-white tracking-tight">KBelia Kelantan</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Portal Rasmi Pembangunan & Pemerkasaan Usahawan Belia Negeri Kelantan. Menyediakan kiosk pintar modular, pasaran direktori, serta inkubasi dana benih.
@@ -1273,28 +1263,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Col 2: Navigation Links */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Navigasi Portal</h4>
+            <h4 className="font-extrabold text-sm text-slate-800 dark:text-white">Navigasi Portal</h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <a href="#hero" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Laman Utama</a>
+                <a href="#hero" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">Laman Utama</a>
               </li>
               <li>
-                <button type="button" onClick={() => setActiveTab('register')} className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer">Daftar Akaun Usahawan</button>
+                <button type="button" onClick={() => setActiveTab('register')} className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors text-left cursor-pointer">Daftar Akaun Usahawan</button>
               </li>
               <li>
-                <button type="button" onClick={() => setActiveTab('login')} className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer">Log Masuk Sistem</button>
+                <button type="button" onClick={() => setActiveTab('login')} className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors text-left cursor-pointer">Log Masuk Sistem</button>
               </li>
               <li>
-                <a href="#kiosk" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Kiosk Kapsul Modular</a>
+                <a href="#kiosk" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">Kiosk Kapsul Modular</a>
               </li>
               <li>
-                <a href="#direktori" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Direktori Usahawan</a>
+                <a href="#direktori" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">Direktori Usahawan</a>
               </li>
               <li>
-                <a href="#ciri-utama" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Ciri-Ciri Utama</a>
+                <a href="#ciri-utama" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">Ciri-Ciri Utama</a>
               </li>
               <li>
-                <a href="#faq" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Soalan Lazim (FAQ)</a>
+                <a href="#faq" className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors">Soalan Lazim (FAQ)</a>
               </li>
             </ul>
           </div>
@@ -1307,7 +1297,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
+                  className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors text-left cursor-pointer"
                 >
                   Dasar Privasi (Privacy Policy)
                 </button>
@@ -1316,7 +1306,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('terms')}
-                  className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
+                  className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors text-left cursor-pointer"
                 >
                   Terma & Syarat Perkhidmatan
                 </button>
@@ -1325,7 +1315,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
+                  className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors text-left cursor-pointer"
                 >
                   Polisi Keselamatan Siber & Data
                 </button>
@@ -1334,7 +1324,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('terms')}
-                  className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
+                  className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors text-left cursor-pointer"
                 >
                   Penafian Liabiliti Rasmi
                 </button>
@@ -1344,18 +1334,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Col 4: Contact & Socials */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Hubungi Urusetia</h4>
+            <h4 className="font-extrabold text-sm text-slate-800 dark:text-slate-100">Hubungi Urusetia</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                <Phone className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                <Phone className="w-3.5 h-3.5 text-sky-700 dark:text-sky-400 shrink-0" />
                 <span>+60 9-748 1000 (Pejabat Pentadbiran)</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                <Mail className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                <Mail className="w-3.5 h-3.5 text-sky-700 dark:text-sky-400 shrink-0" />
                 <span>urusetia@kbelia.kelantan.gov.my</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                <Clock className="w-3.5 h-3.5 text-sky-700 dark:text-sky-400 shrink-0" />
                 <span>Ahad - Rabu: 8.00 pagi - 5.00 petang</span>
               </div>
             </div>
@@ -1368,7 +1358,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://facebook.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-700 dark:hover:text-white transition-colors"
                   title="Facebook KBelia"
                 >
                   <Globe className="w-4 h-4" />
@@ -1377,7 +1367,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://instagram.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-700 dark:hover:text-white transition-colors"
                   title="Instagram KBelia"
                 >
                   <Sparkles className="w-4 h-4" />
@@ -1386,7 +1376,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://tiktok.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-700 dark:hover:text-white transition-colors"
                   title="TikTok KBelia"
                 >
                   <Video className="w-4 h-4" />
@@ -1395,7 +1385,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://wa.me/601123456789"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-transparent flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-sky-700 dark:hover:text-white transition-colors"
                   title="WhatsApp Khidmat Bantuan"
                 >
                   <Phone className="w-4 h-4" />
@@ -1418,7 +1408,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button 
                 type="button" 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
-                className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer"
+                className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors cursor-pointer"
               >
                 Kembali ke Atas ↑
               </button>
@@ -1434,37 +1424,37 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* MODAL 2: LEGAL & PRIVACY VIEWER (CHECKLIST ITEM 12) */}
       {/* ========================================================================= */}
       {legalModalType && (
-        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
-          <div className="relative w-full max-w-2xl bg-white dark:bg-[#1C2434] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
-            <div className="p-5 bg-slate-50 dark:bg-[#161D26] text-slate-900 dark:text-white flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden my-8">
+            <div className="p-5 kbelia-important-header dark:bg-slate-800/80 text-slate-800 dark:text-slate-100 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
               <h3 className="font-extrabold text-base">
                 {legalModalType === 'privacy' ? 'Dasar Privasi & Perlindungan Data' : 'Terma & Syarat Perkhidmatan'}
               </h3>
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}
-                className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-sky-50 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 hover:text-sky-800 dark:hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 text-xs text-slate-700 dark:text-slate-300 space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed">
+            <div className="p-6 text-xs text-slate-600 dark:text-slate-300 space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed">
               {legalModalType === 'privacy' ? (
                 <>
-                  <p className="font-bold text-slate-900 dark:text-white">
+                  <p className="font-bold text-slate-800 dark:text-slate-100">
                     1. Pengenalan & Komitmen Privasi
                   </p>
                   <p>
                     Portal KBelia diuruskan oleh Urusetia Pembangunan Belia Negeri Kelantan. Kami komited untuk melindungi data peribadi anda mengikut Akta Perlindungan Data Peribadi 2010 (PDPA) Malaysia.
                   </p>
-                  <p className="font-bold text-slate-900 dark:text-white">
+                  <p className="font-bold text-slate-800 dark:text-slate-100">
                     2. Pengumpulan Data Peribadi
                   </p>
                   <p>
                     Data yang dikumpulkan termasuk nama penuh, nombor kad pengenalan, nombor pendaftaran SSM, lokasi perniagaan, nombor telefon dan maklumat akaun bank pemohon bagi tujuan penyaluran geran dan pengurusan sewaan kiosk.
                   </p>
-                  <p className="font-bold text-slate-900 dark:text-white">
+                  <p className="font-bold text-slate-800 dark:text-slate-100">
                     3. Keselamatan & Perlindungan Data
                   </p>
                   <p>
@@ -1473,19 +1463,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </>
               ) : (
                 <>
-                  <p className="font-bold text-slate-900 dark:text-white">
+                  <p className="font-bold text-slate-800 dark:text-slate-100">
                     1. Syarat Kelayakan Pengguna
                   </p>
                   <p>
                     Pengguna mestilah warganegara Malaysia berumur antara 18 hingga 40 tahun yang beroperasi atau bermastautin di negeri Kelantan Darul Naim.
                   </p>
-                  <p className="font-bold text-slate-900 dark:text-white">
+                  <p className="font-bold text-slate-800 dark:text-slate-100">
                     2. Tanggungjawab Penyewa Kiosk
                   </p>
                   <p>
                     Penyewa bertanggungjawab menjaga kebersihan, keselamatan peralatan, dan mematuhi peraturan waktu operasi yang ditetapkan oleh pihak pengurusan hab dan pihak berkuasa tempatan (PBT).
                   </p>
-                  <p className="font-bold text-slate-900 dark:text-white">
+                  <p className="font-bold text-slate-800 dark:text-slate-100">
                     3. Integriti Permohonan Geran
                   </p>
                   <p>
@@ -1495,11 +1485,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               )}
             </div>
 
-            <div className="p-4 bg-slate-50 dark:bg-[#161D26] border-t border-slate-200 dark:border-slate-800 text-right">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700 text-right">
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-red-700 dark:hover:bg-red-800 text-white font-bold text-xs rounded-xl transition-colors"
+                className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer"
               >
                 Saya Faham & Setuju
               </button>

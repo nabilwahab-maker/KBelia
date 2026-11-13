@@ -473,17 +473,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   return (
     <div className="w-full px-1 sm:px-3 py-4">
       
-      {/* Admin Subheader & Quick Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-[#2E3A47] mb-6">
+      {/* Admin Subheader & Quick Action Bar (Important Header Only) */}
+      <div className="kbelia-important-header rounded-2xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 mb-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
             <Shield className="w-4 h-4" />
             <span>Pusat Kawalan & Pengurusan Pentadbiran</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white tracking-tight">
             Panel Pengurusan & Kelulusan Hab KBelia
           </h2>
-          <p className="text-xs text-slate-500 dark:text-[#8A99AD] mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Semak dan luluskan permohonan sewaan kapsul, geran pembiayaan, profil usahawan dan program belia.
           </p>
         </div>
@@ -492,57 +492,57 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           type="button"
           onClick={handleSeedDatabase}
           disabled={loading}
-          className="interactive-press interactive-lift px-4 py-2.5 bg-slate-900 dark:bg-[#2E3A47] hover:bg-slate-800 dark:hover:bg-[#384556] text-white rounded-xl text-xs font-bold flex items-center gap-2 border border-slate-700 shadow-xs shrink-0 transition-all cursor-pointer self-start sm:self-auto"
+          className="interactive-press interactive-lift px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs shrink-0 transition-all cursor-pointer self-start sm:self-auto"
         >
-          <Database className="w-4 h-4 text-amber-400" />
+          <Database className="w-4 h-4 text-sky-100" />
           <span>{loading ? 'Sedang Memproses...' : 'Sync / Isi Data Permulaan'}</span>
         </button>
       </div>
 
-      {/* KPI Cards (TailAdmin wireframe layout) */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
-        <div className="interactive-card group bg-white dark:bg-[#24303F] p-5 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-1 hover:border-amber-400/50 dark:hover:border-amber-400/50 cursor-default">
-          <div className="flex items-center justify-between text-slate-500 dark:text-[#8A99AD] text-xs">
+        <div className="interactive-card group bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-1 hover:border-amber-300 dark:hover:border-amber-500/50 cursor-default">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
             <span className="font-medium">Permohonan Menunggu</span>
             <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/40 text-amber-700 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{pendingBookingsCount}</div>
-          <div className="text-[11px] text-slate-400 dark:text-slate-500">Menunggu tindakan semakan pegawai</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400">Menunggu tindakan semakan pegawai</div>
         </div>
 
-        <div className="interactive-card group bg-white dark:bg-[#24303F] p-5 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-1 hover:border-emerald-400/50 dark:hover:border-emerald-400/50 cursor-default">
-          <div className="flex items-center justify-between text-slate-500 dark:text-[#8A99AD] text-xs">
+        <div className="interactive-card group bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-1 hover:border-sky-300 dark:hover:border-sky-500/50 cursor-default">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
             <span className="font-medium">Usahawan Belia Berdaftar</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-900/40 text-sky-700 dark:text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Store className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-emerald-800 dark:text-emerald-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{businesses.length}</div>
-          <div className="text-[11px] text-slate-400 dark:text-slate-500">Direktori komersil belia sah SSM</div>
+          <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{businesses.length}</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400">Direktori komersil belia sah SSM</div>
         </div>
 
-        <div className="interactive-card group bg-white dark:bg-[#24303F] p-5 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-1 hover:border-teal-400/50 dark:hover:border-teal-400/50 cursor-default">
-          <div className="flex items-center justify-between text-slate-500 dark:text-[#8A99AD] text-xs">
+        <div className="interactive-card group bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-1 hover:border-sky-300 dark:hover:border-sky-500/50 cursor-default">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
             <span className="font-medium">Kadar Terisi Kapsul</span>
-            <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-900/40 text-teal-700 dark:text-teal-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-900/40 text-sky-700 dark:text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Building2 className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-teal-700 dark:text-teal-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{occupancyRate}%</div>
-          <div className="text-[11px] text-slate-400 dark:text-slate-500">{occupiedSlotsCount} drpd {slots.length} unit beroperasi</div>
+          <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{occupancyRate}%</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400">{occupiedSlotsCount} drpd {slots.length} unit beroperasi</div>
         </div>
 
-        <div className="interactive-card group bg-white dark:bg-[#24303F] p-5 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-1 hover:border-indigo-400/50 dark:hover:border-indigo-400/50 cursor-default">
-          <div className="flex items-center justify-between text-slate-500 dark:text-[#8A99AD] text-xs">
+        <div className="interactive-card group bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-1 hover:border-sky-300 dark:hover:border-sky-500/50 cursor-default">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
             <span className="font-medium">Program & Geran Aktif</span>
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-900/40 text-indigo-700 dark:text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-900/40 text-sky-700 dark:text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
               <Award className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-indigo-800 dark:text-indigo-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{programs.length}</div>
-          <div className="text-[11px] text-slate-400 dark:text-slate-500">Dana & latihan keusahawanan aktif</div>
+          <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{programs.length}</div>
+          <div className="text-[11px] text-slate-500 dark:text-slate-400">Dana & latihan keusahawanan aktif</div>
         </div>
       </div>
 
@@ -585,20 +585,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Senarai Permohonan Sewaan Kapsul</h3>
-              <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Semak cadangan perniagaan dan sahkan kelulusan peruntukan kiosk.</p>
+              <h3 className="text-base font-bold text-slate-800 dark:text-white">Senarai Permohonan Sewaan Kapsul</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Semak cadangan perniagaan dan sahkan kelulusan peruntukan kiosk.</p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-400 dark:text-[#8A99AD]">Tapis:</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Tapis:</span>
               {(['pending', 'approved', 'rejected', 'all'] as const).map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setBookingFilter(filter)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer ${
                     bookingFilter === filter
-                      ? 'bg-emerald-800 dark:bg-emerald-600 text-white'
-                      : 'bg-slate-100 dark:bg-[#1A222C] text-slate-600 dark:text-[#8A99AD] hover:bg-slate-200 dark:hover:bg-[#2E3A47] dark:hover:text-white'
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700'
                   }`}
                 >
                   {filter === 'pending' ? 'Menunggu' : filter === 'approved' ? 'Diluluskan' : filter === 'rejected' ? 'Ditolak' : 'Semua'}
@@ -608,7 +608,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
 
           {filteredBookings.length === 0 ? (
-            <div className="p-12 text-center bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-[#2E3A47]">
+            <div className="p-12 text-center bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
               <Clock className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
               <h4 className="font-bold text-slate-700 dark:text-slate-300 text-sm">Tiada Permohonan Dalam Kategori Ini</h4>
             </div>
@@ -617,18 +617,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {filteredBookings.map((b) => (
                 <div
                   key={b.id}
-                  className="bg-white dark:bg-[#24303F] p-6 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-4 transition-colors"
+                  className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-4 transition-colors"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-slate-100 dark:border-[#2E3A47]">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-700">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded bg-slate-900 dark:bg-[#1A222C] text-white font-mono text-xs font-bold border border-transparent dark:border-[#2E3A47]">
+                        <span className="px-2.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800 font-mono text-xs font-bold">
                           {b.slotCode}
                         </span>
-                        <h4 className="text-base font-extrabold text-slate-900 dark:text-white">{b.businessName}</h4>
-                        <span className="text-xs text-emerald-800 dark:text-emerald-400 font-semibold">({b.businessCategory})</span>
+                        <h4 className="text-base font-extrabold text-slate-800 dark:text-white">{b.businessName}</h4>
+                        <span className="text-xs text-sky-700 dark:text-sky-400 font-semibold">({b.businessCategory})</span>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-[#8A99AD] mt-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                         Kapsul Dipohon: <strong className="text-slate-700 dark:text-slate-200">{b.slotName}</strong> ({b.hubLocation})
                       </p>
                     </div>
@@ -653,10 +653,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
 
                   {/* Applicant Details */}
-                  <div className="grid sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-[#1A222C] p-3.5 rounded-xl text-xs text-slate-600 dark:text-[#8A99AD] border border-slate-100 dark:border-[#2E3A47]">
+                  <div className="grid sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-xl text-xs text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                     <div>
                       <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Pemohon:</span>
-                      <strong className="text-slate-900 dark:text-white">{b.applicantName}</strong>
+                      <strong className="text-slate-800 dark:text-white">{b.applicantName}</strong>
                     </div>
                     <div>
                       <span className="text-slate-400 dark:text-slate-500 block text-[10px]">E-mel / Telefon:</span>
@@ -670,8 +670,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                   {/* Pitch Notes */}
                   {b.pitchNotes && (
-                    <div className="text-xs text-slate-700 dark:text-slate-300 bg-emerald-50/50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-800/40">
-                      <span className="font-bold text-emerald-950 dark:text-emerald-300 block mb-0.5">Cadangan Pitching Usahawan:</span>
+                    <div className="text-xs text-slate-700 dark:text-slate-300 bg-sky-50/50 dark:bg-sky-950/30 p-3 rounded-xl border border-sky-200/70 dark:border-sky-800/40">
+                      <span className="font-bold text-sky-900 dark:text-sky-300 block mb-0.5">Cadangan Pitching Usahawan:</span>
                       <p>{b.pitchNotes}</p>
                     </div>
                   )}
@@ -688,7 +688,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           placeholder="cth. Diluluskan. Sila hadir ke Pejabat Hab UMK Bachok pada hari Isnin untuk serah kunci."
                           value={reviewNoteInput[b.id] || ''}
                           onChange={(e) => setReviewNoteInput({ ...reviewNoteInput, [b.id]: e.target.value })}
-                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-[#1A222C] border border-slate-300 dark:border-[#2E3A47] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none"
                         />
                       </div>
 
@@ -696,14 +696,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <button
                           onClick={() => handleRejectBooking(b)}
                           disabled={loading}
-                          className="px-4 py-2 bg-rose-100 dark:bg-rose-950/80 hover:bg-rose-200 dark:hover:bg-rose-900 text-rose-800 dark:text-rose-300 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                          className="px-4 py-2 bg-rose-50 dark:bg-rose-950/80 hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold text-xs rounded-xl transition-colors cursor-pointer"
                         >
                           Tolak Permohonan
                         </button>
                         <button
                           onClick={() => handleApproveBooking(b)}
                           disabled={loading}
-                          className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                          className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Luluskan Permohonan</span>
@@ -713,8 +713,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   )}
 
                   {b.adminNotes && b.status !== 'pending' && (
-                    <div className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-[#1A222C] p-2.5 rounded-xl border border-slate-200 dark:border-[#2E3A47]">
-                      <strong className="text-slate-900 dark:text-white">Catatan Pentadbir:</strong> {b.adminNotes}
+                    <div className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                      <strong className="text-slate-800 dark:text-white">Catatan Pentadbir:</strong> {b.adminNotes}
                     </div>
                   )}
                 </div>
@@ -729,15 +729,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Pengurusan Direktori Usahawan</h3>
-              <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Kawal status penyerapan dan promosi jenama belia di portal.</p>
+              <h3 className="text-base font-bold text-slate-800 dark:text-white">Pengurusan Direktori Usahawan</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Kawal status penyerapan dan promosi jenama belia di portal.</p>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-[#2E3A47] overflow-hidden shadow-xs transition-colors">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-xs transition-colors">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-                <thead className="bg-slate-50 dark:bg-[#1C2434] border-b border-slate-200 dark:border-[#2E3A47] text-[11px] uppercase tracking-wider text-slate-500 dark:text-[#8A99AD] font-bold">
+                <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
                   <tr>
                     <th className="p-4">Perniagaan & Pengasas</th>
                     <th className="p-4">Kategori & Jajahan</th>
@@ -746,25 +746,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <th className="p-4 text-right">Tindakan</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-[#2E3A47]">
+                <tbody className="divide-y divide-slate-200/80 dark:divide-slate-700">
                   {businesses.map((biz) => (
-                    <tr key={biz.id} className="hover:bg-slate-50/80 dark:hover:bg-[#1C2434]/50 transition-colors">
+                    <tr key={biz.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <img
                             src={biz.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                             alt=""
-                            className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-[#2E3A47] bg-white dark:bg-[#1A222C]"
+                            className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                           />
                           <div>
-                            <div className="font-extrabold text-slate-900 dark:text-white text-sm">{biz.businessName}</div>
-                            <div className="text-[11px] text-slate-500 dark:text-[#8A99AD]">{biz.ownerName} ({biz.ownerEmail})</div>
+                            <div className="font-extrabold text-slate-800 dark:text-white text-sm">{biz.businessName}</div>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400">{biz.ownerName} ({biz.ownerEmail})</div>
                           </div>
                         </div>
                       </td>
                       <td className="p-4">
                         <span className="font-semibold text-slate-800 dark:text-slate-200">{biz.category}</span>
-                        <div className="text-slate-400 dark:text-slate-400">{biz.district}</div>
+                        <div className="text-slate-500 dark:text-slate-400">{biz.district}</div>
                       </td>
                       <td className="p-4">
                         {biz.ssmNumber ? (
@@ -779,7 +779,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           className={`px-2.5 py-1 rounded-lg font-bold text-[11px] flex items-center gap-1 transition-colors cursor-pointer ${
                             biz.isFeatured
                               ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
-                              : 'bg-slate-100 dark:bg-[#1A222C] text-slate-500 dark:text-[#8A99AD] hover:bg-slate-200 dark:hover:bg-[#2E3A47]'
+                              : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700'
                           }`}
                         >
                           <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-400" />
@@ -815,15 +815,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Inventori & Pengurusan Kapsul Jajahan</h3>
-              <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Urus pendaftaran slot kapsul niaga, tetapkan kadar sewa bulanan, dan padam unit yang ditamatkan perkhidmatan.</p>
+              <h3 className="text-base font-bold text-slate-800 dark:text-white">Inventori & Pengurusan Kapsul Jajahan</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Urus pendaftaran slot kapsul niaga, tetapkan kadar sewa bulanan, dan padam unit yang ditamatkan perkhidmatan.</p>
             </div>
 
             <button
               type="button"
               id="btn-admin-add-slot-toggle"
               onClick={() => setShowSlotForm(!showSlotForm)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-700 hover:bg-red-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer shrink-0"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer shrink-0"
             >
               <Building2 className="w-4 h-4" />
               <span>{showSlotForm ? 'Tutup Borang' : 'Daftar Kapsul Niaga'}</span>
@@ -832,10 +832,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* New Slot Form */}
           {showSlotForm && (
-            <div className="bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden animate-in fade-in transition-colors">
-              <div className="border-b border-slate-200 dark:border-slate-800 py-4 px-6 flex items-center justify-between">
-                <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-red-700 dark:text-red-400" />
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs overflow-hidden animate-in fade-in transition-colors">
+              <div className="kbelia-important-header border-b border-slate-200 dark:border-slate-700 py-4 px-6 flex items-center justify-between">
+                <h4 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-sky-700 dark:text-sky-400" />
                   <span>Borang Daftar Kapsul Niaga Baharu</span>
                 </h4>
                 <button
@@ -851,7 +851,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Kod Kapsul: <span className="text-red-500">*</span>
+                      Kod Kapsul: <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -859,12 +859,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       placeholder="cth. CAP-UMK-05"
                       value={slotCode}
                       onChange={(e) => setSlotCode(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all font-mono"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-mono"
                     />
                   </div>
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Nama Kapsul: <span className="text-red-500">*</span>
+                      Nama Kapsul: <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -872,12 +872,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       placeholder="cth. Kapsul F&B Kafe Belia A5"
                       value={slotName}
                       onChange={(e) => setSlotName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all font-medium"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-medium"
                     />
                   </div>
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Kadar Sewa (RM/Bulan): <span className="text-red-500">*</span>
+                      Kadar Sewa (RM/Bulan): <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -885,7 +885,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       placeholder="150"
                       value={slotMonthlyRate}
                       onChange={(e) => setSlotMonthlyRate(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all font-bold"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-bold"
                     />
                   </div>
                 </div>
@@ -900,7 +900,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       placeholder="cth. Hub UMK Kampus Bachok"
                       value={slotHub}
                       onChange={(e) => setSlotHub(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
                   <div>
@@ -910,10 +910,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <select
                       value={slotDistrict}
                       onChange={(e) => setSlotDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                     >
                       {DISTRICTS.map((d) => (
-                        <option key={d} value={d} className="dark:bg-[#1A222C]">{d}</option>
+                        <option key={d} value={d} className="dark:bg-slate-900">{d}</option>
                       ))}
                     </select>
                   </div>
@@ -924,12 +924,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <select
                       value={slotStatus}
                       onChange={(e) => setSlotStatus(e.target.value as SlotStatus)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                     >
-                      <option value="available" className="dark:bg-[#1A222C]">Tersedia (Kosong)</option>
-                      <option value="occupied" className="dark:bg-[#1A222C]">Sedang Beroperasi</option>
-                      <option value="reserved" className="dark:bg-[#1A222C]">Dalam Tempahan</option>
-                      <option value="maintenance" className="dark:bg-[#1A222C]">Penyelenggaraan</option>
+                      <option value="available" className="dark:bg-slate-900">Tersedia (Kosong)</option>
+                      <option value="occupied" className="dark:bg-slate-900">Sedang Beroperasi</option>
+                      <option value="reserved" className="dark:bg-slate-900">Dalam Tempahan</option>
+                      <option value="maintenance" className="dark:bg-slate-900">Penyelenggaraan</option>
                     </select>
                   </div>
                 </div>
@@ -943,7 +943,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     placeholder="Palam Elektrik 13A, WiFi 500Mbps, Rak Paparan Kaca"
                     value={slotAmenities}
                     onChange={(e) => setSlotAmenities(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                   />
                 </div>
 
@@ -959,19 +959,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   />
                 </div>
 
-                {/* TailAdmin Action Buttons Footer */}
-                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setShowSlotForm(false)}
-                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <span>{loading ? 'Menyimpan...' : 'Simpan Kapsul'}</span>
                   </button>
@@ -981,10 +980,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           )}
 
           {/* Slots Table */}
-          <div className="bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-[#2E3A47] overflow-hidden shadow-xs transition-colors">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-xs transition-colors">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-                <thead className="bg-slate-50 dark:bg-[#1C2434] border-b border-slate-200 dark:border-[#2E3A47] text-[11px] uppercase tracking-wider text-slate-500 dark:text-[#8A99AD] font-bold">
+                <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
                   <tr>
                     <th className="p-4">Kod & Nama Kapsul</th>
                     <th className="p-4">Hab & Jajahan</th>
@@ -993,30 +992,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <th className="p-4 text-right">Tindakan</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-[#2E3A47]">
+                <tbody className="divide-y divide-slate-200/80 dark:divide-slate-700">
                   {slots.map((s) => (
-                    <tr key={s.id} className="hover:bg-slate-50/80 dark:hover:bg-[#1C2434]/50 transition-colors">
+                    <tr key={s.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
                       <td className="p-4">
-                        <div className="font-mono font-bold text-slate-900 dark:text-white">{s.code}</div>
+                        <div className="font-mono font-bold text-slate-800 dark:text-white">{s.code}</div>
                         <div className="font-semibold text-slate-800 dark:text-slate-200 text-xs">{s.name}</div>
-                        <div className="text-[10px] text-slate-400 dark:text-slate-400">{s.size}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400">{s.size}</div>
                       </td>
                       <td className="p-4">
                         <div className="font-medium text-slate-800 dark:text-slate-200">{s.hubLocation}</div>
-                        <div className="text-slate-400 dark:text-slate-400">{s.district}</div>
+                        <div className="text-slate-500 dark:text-slate-400">{s.district}</div>
                       </td>
                       <td className="p-4">
-                        <span className="font-extrabold text-emerald-800 dark:text-emerald-400">RM{s.monthlyRate}/bln</span>
+                        <span className="font-extrabold text-sky-700 dark:text-sky-400">RM{s.monthlyRate}/bln</span>
                       </td>
                       <td className="p-4">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold capitalize ${
                           s.status === 'available' ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300' :
-                          s.status === 'occupied' ? 'bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300' : 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300'
+                          s.status === 'occupied' ? 'bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300' : 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300'
                         }`}>
                           {s.status}
                         </span>
                         {s.currentTenantBusinessName && (
-                          <div className="text-[11px] text-slate-600 dark:text-[#8A99AD] mt-1 font-semibold">
+                          <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-1 font-semibold">
                             {s.currentTenantBusinessName}
                           </div>
                         )}
@@ -1050,15 +1049,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Pengurusan Inisiatif Geran & Program Belia</h3>
-              <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Terbit, kemas kini dan padam hebahan rasmi program latihan serta geran usahawan belia Kelantan.</p>
+              <h3 className="text-base font-bold text-slate-800 dark:text-white">Pengurusan Inisiatif Geran & Program Belia</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Terbit, kemas kini dan padam hebahan rasmi program latihan serta geran usahawan belia Kelantan.</p>
             </div>
 
             <button
               type="button"
               id="btn-admin-add-prog-toggle"
               onClick={() => setShowProgramForm(!showProgramForm)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer shrink-0"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer shrink-0"
             >
               <Award className="w-4 h-4" />
               <span>{showProgramForm ? 'Tutup Borang' : 'Terbitkan Program Baharu'}</span>
@@ -1067,10 +1066,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* New Program Form */}
           {showProgramForm && (
-            <div className="bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden animate-in fade-in transition-colors">
-              <div className="border-b border-slate-200 dark:border-slate-800 py-4 px-6 flex items-center justify-between">
-                <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
-                  <Award className="w-4 h-4 text-red-700 dark:text-red-400" />
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs overflow-hidden animate-in fade-in transition-colors">
+              <div className="kbelia-important-header border-b border-slate-200 dark:border-slate-700 py-4 px-6 flex items-center justify-between">
+                <h4 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                  <Award className="w-4 h-4 text-sky-700 dark:text-sky-400" />
                   <span>Borang Terbit Program Keusahawanan Baharu</span>
                 </h4>
                 <button
@@ -1086,7 +1085,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Tajuk Program / Geran: <span className="text-red-500">*</span>
+                      Tajuk Program / Geran: <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -1094,22 +1093,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       placeholder="cth. Geran Inovasi Belia Kelantan RM5,000"
                       value={progTitle}
                       onChange={(e) => setProgTitle(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all font-bold"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-bold"
                     />
                   </div>
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Kategori Program: <span className="text-red-500">*</span>
+                      Kategori Program: <span className="text-rose-500">*</span>
                     </label>
                     <select
                       value={progCategory}
                       onChange={(e) => setProgCategory(e.target.value as YouthProgram['category'])}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                     >
-                      <option value="Geran & Dana" className="dark:bg-[#1A222C]">Geran & Dana</option>
-                      <option value="Bengkel & Latihan" className="dark:bg-[#1A222C]">Bengkel & Latihan</option>
-                      <option value="Pameran & Ekspo" className="dark:bg-[#1A222C]">Pameran & Ekspo</option>
-                      <option value="Pitching & Inkubasi" className="dark:bg-[#1A222C]">Pitching & Inkubasi</option>
+                      <option value="Geran & Dana" className="dark:bg-slate-900">Geran & Dana</option>
+                      <option value="Bengkel & Latihan" className="dark:bg-slate-900">Bengkel & Latihan</option>
+                      <option value="Pameran & Ekspo" className="dark:bg-slate-900">Pameran & Ekspo</option>
+                      <option value="Pitching & Inkubasi" className="dark:bg-slate-900">Pitching & Inkubasi</option>
                     </select>
                   </div>
                 </div>
@@ -1124,7 +1123,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       placeholder="cth. Permohonan dibuka setiap bulan"
                       value={progDate}
                       onChange={(e) => setProgDate(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
                   <div>
@@ -1136,7 +1135,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       placeholder="cth. Hub UMK Bachok / Atas Talian"
                       value={progLocation}
                       onChange={(e) => setProgLocation(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
                   <div>
@@ -1148,7 +1147,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       placeholder="cth. RM3,000 / Percuma"
                       value={progAmount}
                       onChange={(e) => setProgAmount(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all font-bold text-red-700 dark:text-red-400"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-bold text-sky-700 dark:text-sky-400"
                     />
                   </div>
                 </div>
@@ -1162,7 +1161,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     placeholder="Syarat kelayakan, objektif bengkel, dan maklumat pendaftaran..."
                     value={progDesc}
                     onChange={(e) => setProgDesc(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                   />
                 </div>
 
@@ -1178,19 +1177,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   />
                 </div>
 
-                {/* TailAdmin Action Buttons Footer */}
-                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setShowProgramForm(false)}
-                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <span>{loading ? 'Menerbitkan...' : 'Terbitkan Program'}</span>
                   </button>
@@ -1203,11 +1201,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {safePrograms.map((p) => (
               <div
                 key={p.id}
-                className="bg-white dark:bg-[#24303F] p-5 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs flex flex-col justify-between transition-colors"
+                className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs flex flex-col justify-between transition-colors"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 rounded text-[10px] font-bold">
+                    <span className="px-2 py-0.5 bg-sky-50 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded text-[10px] font-bold">
                       {p.category}
                     </span>
                     <button
@@ -1223,10 +1221,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <Trash2 className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                     </button>
                   </div>
-                  <h4 className="font-bold text-slate-900 dark:text-white text-sm">{p.title}</h4>
-                  <p className="text-xs text-slate-500 dark:text-[#8A99AD] line-clamp-2">{p.description}</p>
+                  <h4 className="font-bold text-slate-800 dark:text-white text-sm">{p.title}</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{p.description}</p>
                   {p.grantAmount && (
-                    <div className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/40 p-2 rounded-lg">
+                    <div className="text-xs font-bold text-sky-800 dark:text-sky-300 bg-slate-50 dark:bg-sky-950/40 border border-slate-200 dark:border-sky-900/40 p-2 rounded-lg">
                       Bantuan: {p.grantAmount}
                     </div>
                   )}
@@ -1240,20 +1238,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* TAB: MENTOR & MENTEE MONITORING HUB */}
       {adminTab === 'mentors' && (
         <div className="space-y-6 animate-in fade-in duration-200">
-          <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 p-6 rounded-2xl text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-purple-800">
+          <div className="kbelia-important-header p-6 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-200 dark:border-slate-700">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-purple-800/80 text-purple-200 text-[11px] font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-[11px] font-bold uppercase tracking-wider">
                 <GraduationCap className="w-3.5 h-3.5" />
                 <span>Hab Pengurusan Bimbingan & Inkubasi UMK</span>
               </div>
-              <h3 className="text-xl font-bold text-white">Pemantauan Mentor & Usahawan Negeri Kelantan</h3>
-              <p className="text-xs text-purple-200 max-w-2xl leading-relaxed">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Pemantauan Mentor & Usahawan Negeri Kelantan</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
                 Pemantauan sesi temujanji bimbingan usahawan belia bersama mentor UMK dan jurulatih industri.
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1.5 rounded-xl bg-white/10 text-xs font-bold border border-white/20">
+              <span className="px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/50 text-sky-800 dark:text-sky-300 text-xs font-bold border border-sky-200 dark:border-sky-800">
                 {mentorshipRegistrations.length} Pendaftaran Bimbingan
               </span>
             </div>
@@ -1262,8 +1260,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* Mentor Management Grid */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <h4 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                 <span>Senarai Panel Mentor Bertauliah Negeri ({mentors.length})</span>
               </h4>
               <span className="text-xs text-slate-500">Klik "Sunting Profil" untuk mengurus maklumat & PIN</span>
@@ -1275,7 +1273,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 return (
                   <div 
                     key={m.id}
-                    className="p-4 bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs flex flex-col justify-between space-y-3 hover:border-emerald-300 transition-colors"
+                    className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs flex flex-col justify-between space-y-3 hover:border-sky-300 transition-colors"
                   >
                     <div className="space-y-2.5">
                       <div className="flex items-center gap-3">
@@ -1285,10 +1283,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           className="w-11 h-11 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0" 
                         />
                         <div className="min-w-0">
-                          <h5 className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                          <h5 className="font-bold text-xs text-slate-800 dark:text-white truncate">
                             {m.name}
                           </h5>
-                          <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold truncate">
+                          <div className="text-[10px] text-sky-700 dark:text-sky-400 font-semibold truncate">
                             {m.agency.split('(')[0].trim()}
                           </div>
                         </div>
@@ -1298,10 +1296,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         {m.title}
                       </div>
 
-                      <div className="pt-2 border-t border-slate-100 dark:border-[#2E3A47] space-y-1 text-[11px]">
+                      <div className="pt-2 border-t border-slate-200/80 dark:border-slate-700 space-y-1 text-[11px]">
                         <div className="flex items-center justify-between">
                           <span className="text-slate-500">Usahawan Berdaftar:</span>
-                          <span className="font-bold text-emerald-600 dark:text-emerald-400">{menteeCount} Usahawan</span>
+                          <span className="font-bold text-sky-700 dark:text-sky-400">{menteeCount} Usahawan</span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-slate-500">PIN Akses:</span>
@@ -1313,7 +1311,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <button
                       type="button"
                       onClick={() => setSelectedMentorForEdit(m)}
-                      className="w-full py-1.5 px-3 bg-slate-100 hover:bg-emerald-50 dark:bg-slate-800 dark:hover:bg-emerald-950/40 text-slate-700 hover:text-emerald-800 dark:text-slate-300 dark:hover:text-emerald-300 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      className="w-full py-1.5 px-3 bg-slate-50 hover:bg-sky-50 dark:bg-slate-900 dark:hover:bg-sky-950/40 text-slate-700 hover:text-sky-800 dark:text-slate-300 dark:hover:text-sky-300 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                       <span>Sunting Profil & PIN</span>
@@ -1325,9 +1323,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
 
           {/* Mentee List Table */}
-          <div className="bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-slate-200 dark:border-[#2E3A47] flex items-center justify-between">
-              <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <h4 className="text-sm font-bold text-slate-800 dark:text-white">
                 Senarai Usahawan Berdaftar Mengikut Mentor
               </h4>
               <span className="text-xs text-slate-500">10 Jajahan Kelantan</span>
@@ -1335,7 +1333,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 dark:bg-[#1A222C] text-slate-500 border-b border-slate-200 dark:border-[#2E3A47] text-[11px]">
+                <thead className="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700 text-[11px]">
                   <tr>
                     <th className="py-3 px-4">Usahawan & Perniagaan</th>
                     <th className="py-3 px-4">Mentor Ditugaskan</th>
@@ -1345,7 +1343,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <th className="py-3 px-4">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                <tbody className="divide-y divide-slate-200/80 dark:divide-slate-700 text-slate-700 dark:text-slate-300">
                   {mentorshipRegistrations.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center py-8 text-slate-400">
@@ -1354,14 +1352,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </tr>
                   ) : (
                     mentorshipRegistrations.map((m) => (
-                      <tr key={m.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                      <tr key={m.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-900/40">
                         <td className="py-3 px-4">
-                          <div className="font-bold text-slate-900 dark:text-white">{m.entrepreneurName}</div>
-                          <div className="text-[11px] text-purple-700 dark:text-purple-400 font-semibold">{m.businessName}</div>
+                          <div className="font-bold text-slate-800 dark:text-white">{m.entrepreneurName}</div>
+                          <div className="text-[11px] text-sky-700 dark:text-sky-400 font-semibold">{m.businessName}</div>
                           <div className="text-[10px] text-slate-400">{m.entrepreneurPhone}</div>
                         </td>
                         <td className="py-3 px-4">
-                          <div className="font-semibold text-slate-900 dark:text-white">{m.mentorName}</div>
+                          <div className="font-semibold text-slate-800 dark:text-white">{m.mentorName}</div>
                         </td>
                         <td className="py-3 px-4 max-w-xs">
                           <div className="font-medium text-slate-800 dark:text-slate-200">{m.topic}</div>
@@ -1379,7 +1377,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <td className="py-3 px-4 whitespace-nowrap">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                             m.status === 'confirmed'
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                              ? 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300'
                               : m.status === 'completed'
                               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
                               : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
@@ -1401,20 +1399,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {adminTab === 'settings' && (
         <div className="space-y-6">
           {/* Header Banner */}
-          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-red-950 p-6 rounded-2xl text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-700">
+          <div className="kbelia-important-header p-6 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-200 dark:border-slate-700">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-red-800/80 text-amber-300 text-[11px] font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-[11px] font-bold uppercase tracking-wider">
                 <Shield className="w-3.5 h-3.5" />
                 <span>Pengurusan Sistem Pentadbir</span>
               </div>
-              <h3 className="text-xl font-bold text-white">Tetapan Sistem & Profil Pentadbir</h3>
-              <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Tetapan Sistem & Profil Pentadbir</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
                 Kawalan menyeluruh untuk parameter sewaan kiosk kapsul, pengurusan perhubungan urusetia, pembersihan cache sesi dan penyelarasan data usahawan belia.
               </p>
             </div>
             <div className="shrink-0 flex items-center gap-2">
-              <span className="px-3 py-1.5 bg-amber-400/20 text-amber-300 border border-amber-400/30 rounded-xl text-xs font-semibold flex items-center gap-1.5">
-                <UserCheck className="w-4 h-4 text-amber-400" />
+              <span className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+                <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Super Admin Berkuasa Penuh
               </span>
             </div>
@@ -1439,14 +1437,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <form onSubmit={handleSaveAdminSettings} className="space-y-6">
             {/* Section 1: Profil Urusetia Pentadbir */}
-            <div className="bg-white dark:bg-[#24303F] p-6 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-5 transition-colors">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-[#2E3A47]">
-                <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-950/80 text-red-800 dark:text-red-400 flex items-center justify-center font-bold">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
+              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center font-bold">
                   <UserCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Profil Urusetia & Saluran Sokongan Rasmi</h4>
-                  <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Maklumat pentadbir yang mengurus portal dan kelulusan usahawan.</p>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-white">Profil Urusetia & Saluran Sokongan Rasmi</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Maklumat pentadbir yang mengurus portal dan kelulusan usahawan.</p>
                 </div>
               </div>
 
@@ -1454,7 +1452,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {/* Nama Pentadbir */}
                 <div>
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Nama Pegawai / Urusetia Pentadbir <span className="text-red-700 dark:text-red-400">*</span>
+                    Nama Pegawai / Urusetia Pentadbir <span className="text-rose-600 dark:text-rose-400">*</span>
                   </label>
                   <div className="relative">
                     <UserCheck className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -1464,7 +1462,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       value={adminOfficerName}
                       onChange={(e) => setAdminOfficerName(e.target.value)}
                       placeholder="Nama penuh"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1C2434] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                     />
                   </div>
                 </div>
@@ -1481,7 +1479,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       disabled
                       value="nabilwahab03020302@gmail.com"
                       placeholder="Emel"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-[#1C2434] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-not-allowed"
                     />
                   </div>
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">Akaun Pentadbir Utama Firestore & Auth.</span>
@@ -1490,7 +1488,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {/* Talian Sokongan WhatsApp Urusetia */}
                 <div>
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Talian Khidmat Pelanggan / WhatsApp Pentadbiran <span className="text-red-700 dark:text-red-400">*</span>
+                    Talian Khidmat Pelanggan / WhatsApp Pentadbiran <span className="text-rose-600 dark:text-rose-400">*</span>
                   </label>
                   <div className="relative">
                     <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -1500,7 +1498,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       value={adminHelpdeskPhone}
                       onChange={(e) => setAdminHelpdeskPhone(e.target.value)}
                       placeholder="Talian Khidmat Pelanggan / WhatsApp Pentadbiran"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1C2434] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-mono"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-mono"
                     />
                   </div>
                 </div>
@@ -1510,8 +1508,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
                     Tahap Kuasa Akses Sistem
                   </label>
-                  <div className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <span>Super Admin Pentadbiran (Level 1)</span>
                   </div>
                 </div>
@@ -1519,14 +1517,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Section 2: Tetapan & Parameter Portal */}
-            <div className="bg-white dark:bg-[#24303F] p-6 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-5 transition-colors">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-[#2E3A47]">
-                <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 flex items-center justify-center font-bold">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
+              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center justify-center font-bold">
                   <Sliders className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Tetapan & Parameter Operasi Portal KBelia</h4>
-                  <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Konfigurasi subsidi sewaan, had tempoh dan status pelayan portal.</p>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-white">Tetapan & Parameter Operasi Portal KBelia</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Konfigurasi subsidi sewaan, had tempoh dan status pelayan portal.</p>
                 </div>
               </div>
 
@@ -1543,7 +1541,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     value={portalSubsidyRate}
                     onChange={(e) => setPortalSubsidyRate(e.target.value)}
                     placeholder="Kadar subsidi"
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1C2434] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   />
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">Peratusan potongan kos sewa untuk usahawan belia.</span>
                 </div>
@@ -1560,7 +1558,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     value={maxLeaseDurationMonths}
                     onChange={(e) => setMaxLeaseDurationMonths(e.target.value)}
                     placeholder="Tempoh sewaan"
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1C2434] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   />
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">Tempoh maksimum satu kitaran sewaan kiosk.</span>
                 </div>
@@ -1573,7 +1571,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <select
                     value={systemStatus}
                     onChange={(e) => setSystemStatus(e.target.value as 'active' | 'maintenance')}
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1C2434] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
                   >
                     <option value="active">Portal Aktif & Permohonan Dibuka</option>
                     <option value="maintenance">Mod Penyelenggaraan Sistem (Sementara)</option>
@@ -1590,36 +1588,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     value={portalAnnouncement}
                     onChange={(e) => setPortalAnnouncement(e.target.value)}
                     placeholder="Pengumuman portal"
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1C2434] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   />
                 </div>
               </div>
             </div>
 
             {/* Section 3: Ringkasan Pengguna & Kawalan Pangkalan Data */}
-            <div className="bg-white dark:bg-[#24303F] p-6 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-4 transition-colors">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-[#2E3A47]">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 flex items-center justify-center font-bold">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-4 transition-colors">
+              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center font-bold">
                   <Database className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Kawalan Pangkalan Data & Penyelenggaraan Sesi</h4>
-                  <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Tindakan kecemasan untuk menyegerakkan data dan memadam cache sistem.</p>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-white">Kawalan Pangkalan Data & Penyelenggaraan Sesi</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Tindakan kecemasan untuk menyegerakkan data dan memadam cache sistem.</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                <div className="p-4 bg-slate-50 dark:bg-[#1A222C] rounded-xl border border-slate-200 dark:border-[#2E3A47]">
-                  <div className="text-xl font-bold text-slate-900 dark:text-white">{safeBusinesses.length}</div>
-                  <div className="text-xs text-slate-500 dark:text-[#8A99AD] font-medium">Usahawan Berdaftar</div>
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="text-xl font-bold text-slate-800 dark:text-white">{safeBusinesses.length}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Usahawan Berdaftar</div>
                 </div>
-                <div className="p-4 bg-slate-50 dark:bg-[#1A222C] rounded-xl border border-slate-200 dark:border-[#2E3A47]">
-                  <div className="text-xl font-bold text-slate-900 dark:text-white">{safeBookings.length}</div>
-                  <div className="text-xs text-slate-500 dark:text-[#8A99AD] font-medium">Jumlah Permohonan Kapsul</div>
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="text-xl font-bold text-slate-800 dark:text-white">{safeBookings.length}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Jumlah Permohonan Kapsul</div>
                 </div>
-                <div className="p-4 bg-slate-50 dark:bg-[#1A222C] rounded-xl border border-slate-200 dark:border-[#2E3A47]">
-                  <div className="text-xl font-bold text-slate-900 dark:text-white">{safeSlots.length}</div>
-                  <div className="text-xs text-slate-500 dark:text-[#8A99AD] font-medium">Slot Kiosk Terkawal</div>
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="text-xl font-bold text-slate-800 dark:text-white">{safeSlots.length}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Slot Kiosk Terkawal</div>
                 </div>
               </div>
 
@@ -1628,16 +1626,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   type="button"
                   onClick={handleSeedDatabase}
                   disabled={loading}
-                  className="px-4 py-2.5 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-xs font-bold flex items-center gap-2 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+                  className="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
                 >
-                  <Database className="w-4 h-4 text-amber-400 dark:text-amber-600" />
+                  <Database className="w-4 h-4 text-sky-100" />
                   <span>{loading ? 'Sedang Memproses...' : 'Segerak Semula Data Permulaan'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleClearLocalSessionCache}
-                  className="px-4 py-2.5 bg-slate-100 dark:bg-[#1A222C] hover:bg-slate-200 dark:hover:bg-[#2E3A47] text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold flex items-center gap-2 border border-slate-200 dark:border-[#2E3A47] transition-colors cursor-pointer"
+                  className="px-4 py-2.5 bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold flex items-center gap-2 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                 >
                   <RefreshCw className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                   <span>Kosongkan Cache Sesi Tempatan</span>
@@ -1646,10 +1644,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Bottom Submit Action */}
-            <div className="bg-slate-50 dark:bg-[#1C2434] p-5 rounded-2xl border border-slate-200 dark:border-[#2E3A47] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
+            <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
               <div className="space-y-1">
-                <div className="text-xs font-bold text-slate-900 dark:text-white">Pengesahan Tetapan Pentadbir</div>
-                <p className="text-[11px] text-slate-500 dark:text-[#8A99AD]">
+                <div className="text-xs font-bold text-slate-800 dark:text-white">Pengesahan Tetapan Pentadbir</div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   Semua parameter yang disimpan akan berkuat kuasa serta-merta pada sistem portal usahawan.
                 </p>
               </div>
@@ -1657,9 +1655,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <button
                 type="submit"
                 disabled={savingAdminSettings}
-                className="px-6 py-3 bg-red-700 hover:bg-red-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
+                className="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
               >
-                <Save className="w-4 h-4 text-amber-300" />
+                <Save className="w-4 h-4 text-sky-100" />
                 <span>{savingAdminSettings ? 'Menyimpan...' : 'Simpan Tetapan Pentadbir'}</span>
               </button>
             </div>

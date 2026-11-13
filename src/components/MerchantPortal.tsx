@@ -286,19 +286,19 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   if (!user) {
     return (
       <div className="w-full px-4 py-16 text-center">
-        <div className="p-8 bg-white rounded-2xl border border-slate-200 shadow-md max-w-md mx-auto space-y-4">
-          <div className="w-14 h-14 bg-emerald-100 text-emerald-800 rounded-2xl flex items-center justify-center mx-auto">
+        <div className="p-8 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm max-w-md mx-auto space-y-4">
+          <div className="w-14 h-14 bg-sky-50 border border-sky-200 text-sky-700 dark:bg-sky-950/60 dark:border-sky-800 dark:text-sky-300 rounded-2xl flex items-center justify-center mx-auto">
             <Store className="w-8 h-8" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900">Portal Usahawan Belia</h3>
-          <p className="text-xs text-slate-600 leading-relaxed">
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white">Portal Usahawan Belia</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
             Sila log masuk untuk mendaftar perniagaan anda, mengurus produk katalog, dan memantau status sewaan Kapsul Niaga Kelantan.
           </p>
           <button
             onClick={openLoginModal}
-            className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors"
+            className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
           >
-            <LogIn className="w-4 h-4 text-amber-400" />
+            <LogIn className="w-4 h-4 text-sky-100" />
             <span>Log Masuk / Pilih Profil Demo</span>
           </button>
         </div>
@@ -403,16 +403,16 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       {/* Header */}
       <div 
         id="merchant-portal-header" 
-        className="pb-6 border-b border-slate-200 dark:border-[#2E3A47] transition-colors"
+        className="kbelia-important-header rounded-2xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 mb-2 transition-colors"
       >
-        <div className="flex items-center gap-2 text-red-800 dark:text-red-400 text-xs font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider">
           <Store className="w-4 h-4" />
           <span>Pusat Kawalan Usahawan KBelia</span>
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">
+        <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight mt-1">
           Urus Bisnes & Kapsul Saya
         </h2>
-        <p className="text-xs text-slate-500 dark:text-[#8A99AD] mt-0.5">
+        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
           Selamat kembali, <span className="font-semibold text-slate-800 dark:text-slate-200">{user.displayName || 'Usahawan Belia'}</span> ({user.email})
         </p>
       </div>
@@ -429,26 +429,25 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         </div>
       )}
 
-      {/* Tab 0: TailAdmin Executive Overview Hub */}
+      {/* Tab 0: Executive Overview Hub */}
       {activeTab === 'overview' && (
         <div className="mt-6 space-y-6">
           
           {/* Executive Greeting Banner */}
-          <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-red-950 p-6 sm:p-7 text-white border border-slate-800 shadow-sm relative overflow-hidden">
-            <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-[radial-gradient(ellipse_at_top_right,rgba(185,28,28,0.25),transparent_70%)] pointer-events-none" />
+          <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 sm:p-7 border border-slate-200 dark:border-slate-700 shadow-xs relative overflow-hidden">
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-semibold text-amber-300 tracking-wider uppercase">
+                <div className="flex items-center gap-2 text-xs font-semibold text-sky-700 dark:text-sky-400 tracking-wider uppercase">
                   <Activity className="w-3.5 h-3.5" />
                   <span>Papan Pemuka Usahawan Belia Kelantan</span>
-                  <span className="text-white/30">·</span>
-                  <span className="text-slate-300 font-mono text-[11px]">Sesi 2026 Aktif</span>
+                  <span className="text-slate-300 dark:text-slate-600">·</span>
+                  <span className="text-slate-600 dark:text-slate-300 font-mono text-[11px]">Sesi 2026 Aktif</span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                <h3 className="text-xl sm:text-2xl font-black tracking-tight text-slate-800 dark:text-white">
                   {myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Usahawan Belia'}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-                  Pemilik: <span className="font-semibold text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span> · {myBusiness?.district || userProfile?.district || 'Kota Bharu'} · SSM: <span className="font-mono text-amber-300">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'TR0294811-M'}</span>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+                  Pemilik: <span className="font-semibold text-slate-800 dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span> · {myBusiness?.district || userProfile?.district || 'Kota Bharu'} · SSM: <span className="font-mono text-emerald-700 dark:text-emerald-400 font-semibold">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'TR0294811-M'}</span>
                 </p>
               </div>
 
@@ -456,41 +455,41 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('cashflow')}
-                  className="py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                  className="py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <Coins className="w-4 h-4 text-amber-300" />
+                  <Coins className="w-4 h-4 text-sky-100" />
                   <span>Rekod Jualan Tunai</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('products')}
-                  className="py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-200 border border-white/20 hover:bg-white/10 transition-all flex items-center gap-2 cursor-pointer"
+                  className="py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <ShoppingBag className="w-4 h-4 text-amber-300" />
+                  <ShoppingBag className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                   <span>Daftar Produk</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* 4 TailAdmin Executive KPI Metric Cards */}
+          {/* 4 Executive KPI Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
             {/* KPI 1: Jualan Bulanan */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#24303F] p-5 shadow-2xs transition-colors">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
                   Hasil Jualan Bulan Ini
                 </span>
-                <div className="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900/40 text-red-700 dark:text-red-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
                   <TrendingUp className="w-4 h-4" />
                 </div>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-900 dark:text-white">
+                <span className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-800 dark:text-white">
                   RM 14,850
                 </span>
-                <span className="inline-flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="inline-flex items-center text-xs font-semibold text-emerald-700 dark:text-emerald-400">
                   <ArrowUpRight className="w-3.5 h-3.5" />
                   +18.4%
                 </span>
@@ -501,17 +500,17 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {/* KPI 2: Kiosk & Tapak Aktif */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#24303F] p-5 shadow-2xs transition-colors">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
                   Status Tapak Kiosk
                 </span>
-                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/40 text-amber-700 dark:text-amber-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 flex items-center justify-center">
                   <Building2 className="w-4 h-4" />
                 </div>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white truncate">
+                <span className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white truncate">
                   {safeBookings.length > 0 ? safeBookings[0].slotCode : 'KB Sentral A-02'}
                 </span>
                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
@@ -524,17 +523,17 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {/* KPI 3: Status Geran Belia */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#24303F] p-5 shadow-2xs transition-colors">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
                   Geran Pemangkin Aktif
                 </span>
-                <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-900/40 text-blue-700 dark:text-blue-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center">
                   <FileCheck className="w-4 h-4" />
                 </div>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-900 dark:text-white">
+                <span className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-800 dark:text-white">
                   RM 15,000
                 </span>
               </div>
@@ -545,16 +544,16 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {/* KPI 4: Sesi Mentor Terdekat */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#24303F] p-5 shadow-2xs transition-colors">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
                   Klinik Mentoring Seterusnya
                 </span>
-                <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-900/40 text-purple-700 dark:text-purple-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center">
                   <Calendar className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
+              <div className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">
                 Khamis, 10:30 AM
               </div>
               <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 truncate">
@@ -564,18 +563,18 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
           </div>
 
-          {/* TailAdmin 3-Column Grid matching reference wireframe */}
+          {/* 3-Column Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             {/* Kolum 1: Carta Analitik Jualan Interaktif & Ringkasan Transaksi */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#24303F] shadow-2xs overflow-hidden transition-colors flex flex-col">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-2xs overflow-hidden transition-colors flex flex-col">
               
               {/* Card Header */}
-              <div className="border-b border-slate-200 dark:border-slate-800 py-4.5 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#24303F]">
+              <div className="border-b border-slate-200 dark:border-slate-700 py-4.5 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-red-700 dark:text-red-400" />
-                    <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                    <BarChart3 className="w-4 h-4 text-sky-700 dark:text-sky-400" />
+                    <h4 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">
                       Analitik Aliran Jualan Kiosk
                     </h4>
                   </div>
@@ -585,13 +584,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 </div>
 
                 {/* Period Selector Tabs */}
-                <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-[#1A222C] rounded-lg border border-slate-200/80 dark:border-slate-700/80 self-start sm:self-auto">
+                <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 self-start sm:self-auto">
                   <button
                     type="button"
                     onClick={() => setSalesPeriod('weekly')}
                     className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
                       salesPeriod === 'weekly'
-                        ? 'bg-white dark:bg-[#24303F] text-slate-900 dark:text-white shadow-2xs'
+                        ? 'bg-sky-600 text-white shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                     }`}
                   >
@@ -602,7 +601,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     onClick={() => setSalesPeriod('monthly')}
                     className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
                       salesPeriod === 'monthly'
-                        ? 'bg-white dark:bg-[#24303F] text-slate-900 dark:text-white shadow-2xs'
+                        ? 'bg-sky-600 text-white shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                     }`}
                   >
@@ -613,7 +612,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     onClick={() => setSalesPeriod('quarterly')}
                     className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
                       salesPeriod === 'quarterly'
-                        ? 'bg-white dark:bg-[#24303F] text-slate-900 dark:text-white shadow-2xs'
+                        ? 'bg-sky-600 text-white shadow-2xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                     }`}
                   >
@@ -626,28 +625,28 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
                 
                 {/* Metric Strip */}
-                <div className="grid grid-cols-3 gap-2 pb-4 mb-4 border-b border-slate-100 dark:border-slate-800 text-center">
+                <div className="grid grid-cols-3 gap-2 pb-4 mb-4 border-b border-slate-200 dark:border-slate-700 text-center">
                   <div>
-                    <span className="text-[10px] text-slate-400 block font-medium">Terkumpul</span>
-                    <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                    <span className="text-[10px] text-slate-500 block font-medium">Terkumpul</span>
+                    <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-800 dark:text-white">
                       {salesPeriod === 'weekly' ? 'RM 4,850' : salesPeriod === 'monthly' ? 'RM 14,850' : 'RM 44,800'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 block font-medium">Purata/Hari</span>
-                    <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                    <span className="text-[10px] text-slate-500 block font-medium">Purata/Hari</span>
+                    <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-800 dark:text-white">
                       {salesPeriod === 'weekly' ? 'RM 692' : salesPeriod === 'monthly' ? 'RM 495' : 'RM 498'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 block font-medium">Puncak</span>
+                    <span className="text-[10px] text-slate-500 block font-medium">Puncak</span>
                     <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-emerald-700 dark:text-emerald-400">
                       {salesPeriod === 'weekly' ? 'RM 1,280' : salesPeriod === 'monthly' ? 'RM 2,840' : 'RM 15,200'}
                     </span>
                   </div>
                 </div>
 
-                {/* Interactive SVG Bar Chart */}
+                {/* Interactive Bar Chart */}
                 <div className="relative pt-2 pb-2">
                   <div className="h-48 w-full flex items-end justify-between gap-1.5 sm:gap-2 px-1">
                     {(salesPeriod === 'weekly' ? [
@@ -683,19 +682,19 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         >
                           {/* Tooltip on Hover */}
                           {isHovered && (
-                            <div className="absolute -top-12 z-20 px-2.5 py-1 rounded-lg bg-slate-900 text-white text-[10px] font-mono shadow-lg whitespace-nowrap animate-in fade-in duration-150 border border-slate-700 pointer-events-none">
-                              <span className="font-bold text-amber-300">RM {item.value.toLocaleString()}</span>
+                            <div className="absolute -top-12 z-20 px-2.5 py-1 rounded-lg bg-slate-800 text-white text-[10px] font-mono shadow-lg whitespace-nowrap animate-in fade-in duration-150 border border-slate-700 pointer-events-none">
+                              <span className="font-bold text-sky-300">RM {item.value.toLocaleString()}</span>
                               <span className="block text-[9px] text-slate-300">{item.tx} tx · {item.qr}% QR</span>
                             </div>
                           )}
 
                           {/* Bar Element */}
-                          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-t-md h-36 flex items-end overflow-hidden p-0.5">
+                          <div className="w-full bg-slate-50 dark:bg-slate-900 rounded-t-md h-36 flex items-end overflow-hidden p-0.5 border border-slate-200/80 dark:border-slate-700/60">
                             <div 
                               className={`w-full rounded-t-sm transition-all duration-300 ${
                                 isHovered 
-                                  ? 'bg-red-600 dark:bg-red-500 shadow-sm' 
-                                  : 'bg-red-700/80 dark:bg-red-700/90 group-hover:bg-red-700'
+                                  ? 'bg-sky-500 dark:bg-sky-400 shadow-sm' 
+                                  : 'bg-sky-600/85 dark:bg-sky-600 group-hover:bg-sky-600'
                               }`}
                               style={{ height: `${heightPercent}%` }}
                             />
@@ -703,7 +702,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
                           {/* X-axis Label */}
                           <span className={`text-[10px] font-medium transition-colors ${
-                            isHovered ? 'text-red-700 dark:text-red-400 font-bold' : 'text-slate-500 dark:text-slate-400'
+                            isHovered ? 'text-sky-700 dark:text-sky-400 font-bold' : 'text-slate-500 dark:text-slate-400'
                           }`}>
                             {item.label}
                           </span>
@@ -714,12 +713,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 </div>
 
                 {/* Footer notes & Cashflow shortcut */}
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span className="text-[11px] truncate">Buku Tunai Transaksi Sah</span>
                   <button
                     type="button"
                     onClick={() => setActiveTab('cashflow')}
-                    className="text-red-700 dark:text-red-400 hover:underline font-bold flex items-center gap-1 cursor-pointer shrink-0"
+                    className="text-sky-700 dark:text-sky-400 hover:underline font-bold flex items-center gap-1 cursor-pointer shrink-0"
                   >
                     <span>Buka Rekod</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -731,14 +730,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {/* Kolum 2: Stepper Penjejak Permohonan Berperingkat */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#24303F] shadow-2xs overflow-hidden transition-colors flex flex-col">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-2xs overflow-hidden transition-colors flex flex-col">
               
               {/* Card Header */}
-              <div className="border-b border-slate-200 dark:border-slate-800 py-4.5 px-5 sm:px-6 flex items-center justify-between bg-white dark:bg-[#24303F]">
+              <div className="border-b border-slate-200 dark:border-slate-700 py-4.5 px-5 sm:px-6 flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <FileCheck className="w-4 h-4 text-red-700 dark:text-red-400" />
-                    <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                    <FileCheck className="w-4 h-4 text-sky-700 dark:text-sky-400" />
+                    <h4 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">
                       Penjejak Permohonan
                     </h4>
                   </div>
@@ -747,7 +746,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   </p>
                 </div>
 
-                <span className="font-mono text-[11px] font-bold text-red-700 dark:text-red-400 px-2 py-0.5 rounded bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900/40">
+                <span className="font-mono text-[11px] font-bold text-sky-800 dark:text-sky-300 px-2 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800">
                   #KB-2026-8812
                 </span>
               </div>
@@ -809,8 +808,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         onClick={() => setSelectedStepperIndex(idx)}
                         className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-slate-50 dark:bg-[#1A222C] border-red-300 dark:border-red-900/60 shadow-xs'
-                            : 'border-transparent hover:bg-slate-50/70 dark:hover:bg-[#1A222C]/50'
+                            ? 'bg-slate-50 dark:bg-slate-900 border-sky-300 dark:border-sky-700 shadow-xs'
+                            : 'border-transparent hover:bg-slate-50/80 dark:hover:bg-slate-900/50'
                         }`}
                       >
                         <div className="flex items-start gap-2.5">
@@ -819,7 +818,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             isCompleted
                               ? 'bg-emerald-600 text-white'
                               : isCurrent
-                              ? 'bg-red-700 text-white ring-2 ring-red-100 dark:ring-red-950/60 animate-pulse'
+                              ? 'bg-amber-500 text-white ring-2 ring-amber-100 dark:ring-amber-950/60 animate-pulse'
                               : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                           }`}>
                             {isCompleted ? <Check className="w-3.5 h-3.5" /> : stepItem.step}
@@ -829,7 +828,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-1.5">
                               <h5 className={`text-xs font-bold truncate ${
-                                isCurrent ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-white'
+                                isCurrent ? 'text-sky-700 dark:text-sky-400' : 'text-slate-800 dark:text-white'
                               }`}>
                                 {stepItem.title}
                               </h5>
@@ -838,7 +837,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                   ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300'
                                   : isCurrent
                                   ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300'
-                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                                  : 'bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400'
                               }`}>
                                 {isCompleted ? 'Selesai' : isCurrent ? 'Diproses' : 'Menunggu'}
                               </span>
@@ -851,7 +850,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             </div>
 
                             {isSelected && (
-                              <p className="mt-1.5 text-[11px] text-slate-600 dark:text-slate-300 bg-white dark:bg-[#24303F] p-2 rounded-lg border border-slate-200 dark:border-slate-700 leading-relaxed animate-in fade-in duration-150">
+                              <p className="mt-1.5 text-[11px] text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700 leading-relaxed animate-in fade-in duration-150">
                                 {stepItem.desc}
                               </p>
                             )}
@@ -863,7 +862,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 </div>
 
                 {/* Direct Action Buttons for Timeline */}
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -873,16 +872,16 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         setActiveTab('bookings');
                       }
                     }}
-                    className="py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-1.5 cursor-pointer"
+                    className="py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5 cursor-pointer"
                   >
-                    <FileText className="w-3.5 h-3.5 text-red-700 dark:text-red-400" />
+                    <FileText className="w-3.5 h-3.5 text-sky-700 dark:text-sky-400" />
                     <span>Surat Tawaran</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setActiveTab('bookings')}
-                    className="py-1.5 px-3 rounded-lg text-xs font-semibold text-white bg-red-700 hover:bg-red-800 transition-all flex items-center gap-1.5 cursor-pointer"
+                    className="py-1.5 px-3 rounded-lg text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 transition-all flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>Urus Kiosk</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -894,14 +893,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {/* Kolum 3: Pusat Notifikasi & Tindakan Segera Usahawan */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#24303F] shadow-2xs overflow-hidden transition-colors flex flex-col">
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-2xs overflow-hidden transition-colors flex flex-col">
               
               {/* Card Header */}
-              <div className="border-b border-slate-200 dark:border-slate-800 py-4.5 px-5 sm:px-6 flex items-center justify-between bg-white dark:bg-[#24303F]">
+              <div className="border-b border-slate-200 dark:border-slate-700 py-4.5 px-5 sm:px-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-red-700 dark:text-red-400" />
+                  <Bell className="w-4 h-4 text-sky-700 dark:text-sky-400" />
                   <div>
-                    <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                    <h4 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">
                       Notifikasi & Makluman
                     </h4>
                   </div>
@@ -914,12 +913,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               {/* Notification Items */}
               <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-3">
                 <div className="space-y-3">
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700/80 space-y-1">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Jadual Mentor</span>
                       <span className="text-[10px] text-slate-400 font-mono">Hari ini</span>
                     </div>
-                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">
+                    <h5 className="text-xs font-bold text-slate-800 dark:text-white">
                       Klinik Mentoring Digital #04
                     </h5>
                     <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -927,12 +926,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700/80 space-y-1">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Fasiliti Kiosk</span>
                       <span className="text-[10px] text-slate-400 font-mono">Semalam</span>
                     </div>
-                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">
+                    <h5 className="text-xs font-bold text-slate-800 dark:text-white">
                       Suis Elektrik Disahkan
                     </h5>
                     <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -940,12 +939,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700/80 space-y-1">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Peluang Geran</span>
+                      <span className="text-[10px] font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider">Peluang Geran</span>
                       <span className="text-[10px] text-slate-400 font-mono">3 hari lalu</span>
                     </div>
-                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">
+                    <h5 className="text-xs font-bold text-slate-800 dark:text-white">
                       Geran Digital Belia Kelantan
                     </h5>
                     <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -955,18 +954,18 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 </div>
 
                 {/* Quick Action Shortcuts */}
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => setActiveTab('card')}
-                    className="flex-1 py-2 px-2.5 rounded-lg text-[11px] font-bold bg-slate-100 dark:bg-[#1A222C] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#2E3A47] transition-all text-center cursor-pointer"
+                    className="flex-1 py-2 px-2.5 rounded-lg text-[11px] font-bold bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700 transition-all text-center cursor-pointer"
                   >
                     Kad Digital
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab('products')}
-                    className="flex-1 py-2 px-2.5 rounded-lg text-[11px] font-bold bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all text-center cursor-pointer"
+                    className="flex-1 py-2 px-2.5 rounded-lg text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800 hover:bg-sky-100 dark:hover:bg-sky-900/60 transition-all text-center cursor-pointer"
                   >
                     Urus Produk
                   </button>
@@ -983,18 +982,18 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
       {/* Tab 1: Profile Form */}
       {activeTab === 'profile' && (
-        <div className="mt-6 bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden w-full transition-colors">
-          {/* TailAdmin Card Header */}
-          <div className="border-b border-slate-200 dark:border-slate-800 py-4.5 px-6 sm:px-7 flex items-center justify-between bg-white dark:bg-[#24303F]">
+        <div className="mt-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs overflow-hidden w-full transition-colors">
+          {/* Card Header */}
+          <div className="kbelia-important-header border-b border-slate-200 dark:border-slate-700 py-4.5 px-6 sm:px-7 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center shrink-0">
                 <Store className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white tracking-tight">
                   Maklumat Asas & Jenama Perniagaan
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   Penyelarasan profil bisnes bagi pendaftaran direktori usahawan belia Kelantan
                 </p>
               </div>
@@ -1006,7 +1005,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                  Nama Perniagaan: <span className="text-red-500">*</span>
+                  Nama Perniagaan: <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1014,7 +1013,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   placeholder="Nama perniagaan anda"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all font-medium"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-medium"
                 />
               </div>
 
@@ -1027,7 +1026,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   placeholder="Slogan atau ringkasan perniagaan anda"
                   value={tagline}
                   onChange={(e) => setTagline(e.target.value)}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
               </div>
             </div>
@@ -1036,30 +1035,30 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                  Kategori Perniagaan: <span className="text-red-500">*</span>
+                  Kategori Perniagaan: <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as BusinessCategory)}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                 >
                   {CATEGORIES.map((c) => (
-                    <option key={c} value={c} className="dark:bg-[#1A222C]">{c}</option>
+                    <option key={c} value={c} className="dark:bg-slate-900">{c}</option>
                   ))}
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                  Jajahan Operasi: <span className="text-red-500">*</span>
+                  Jajahan Operasi: <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                 >
                   {DISTRICTS.map((d) => (
-                    <option key={d} value={d} className="dark:bg-[#1A222C]">{d}</option>
+                    <option key={d} value={d} className="dark:bg-slate-900">{d}</option>
                   ))}
                 </select>
               </div>
@@ -1076,13 +1075,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   placeholder="Nombor pendaftaran SSM"
                   value={ssmNumber}
                   onChange={(e) => setSsmNumber(e.target.value)}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                  Nombor WhatsApp Bisnes: <span className="text-red-500">*</span>
+                  Nombor WhatsApp Bisnes: <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="tel"
@@ -1090,7 +1089,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   placeholder="Nombor telefon"
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
               </div>
             </div>
@@ -1105,7 +1104,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 placeholder="Ceritakan tentang produk, keunikan, proses pembuatan atau servis yang ditawarkan..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
               />
             </div>
 
@@ -1120,7 +1119,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   placeholder="Akaun Instagram"
                   value={instagram}
                   onChange={(e) => setInstagram(e.target.value)}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
               </div>
 
@@ -1133,7 +1132,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   placeholder="Akaun TikTok"
                   value={tiktok}
                   onChange={(e) => setTiktok(e.target.value)}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
               </div>
             </div>
@@ -1165,12 +1164,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               </div>
             </div>
 
-            {/* TailAdmin Action Buttons Footer */}
-            <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
+            {/* Action Buttons Footer */}
+            <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
               <button
                 type="submit"
                 disabled={loading}
-                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{loading ? 'Menyimpan...' : 'Simpan Profil Perniagaan'}</span>
@@ -1185,25 +1184,25 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         <div className="mt-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Katalog Menu & Produk Anda</h3>
-              <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Pelanggan boleh membuat pesanan terus melalui WhatsApp.</p>
+              <h3 className="text-base font-bold text-slate-800 dark:text-white">Katalog Menu & Produk Anda</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400">Pelanggan boleh membuat pesanan terus melalui WhatsApp.</p>
             </div>
 
             <button
               onClick={() => setShowAddProduct(!showAddProduct)}
-              className="py-2.5 px-5 rounded-lg bg-red-700 hover:bg-red-800 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm cursor-pointer transition-all"
+              className="py-2.5 px-5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm cursor-pointer transition-all"
             >
               <ShoppingBag className="w-4 h-4" />
               <span>Daftar Produk Baharu</span>
             </button>
           </div>
 
-          {/* Add Product Form Box (TailAdmin Form Layout) */}
+          {/* Add Product Form Box */}
           {showAddProduct && (
-            <div className="bg-white dark:bg-[#24303F] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden animate-in fade-in transition-colors">
-              <div className="border-b border-slate-200 dark:border-slate-800 py-4 px-6 flex items-center justify-between">
-                <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-red-700 dark:text-red-400" />
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs overflow-hidden animate-in fade-in transition-colors">
+              <div className="kbelia-important-header border-b border-slate-200 dark:border-slate-700 py-4 px-6 flex items-center justify-between">
+                <h4 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                  <ShoppingBag className="w-4 h-4 text-sky-700 dark:text-sky-400" />
                   <span>Borang Tambah Produk Baharu</span>
                 </h4>
                 <button
@@ -1219,7 +1218,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Nama Produk: <span className="text-red-500">*</span>
+                      Nama Produk: <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -1227,12 +1226,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       placeholder="Nama produk anda"
                       value={prodName}
                       onChange={(e) => setProdName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all font-medium"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-medium"
                     />
                   </div>
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Harga Jualan (RM): <span className="text-red-500">*</span>
+                      Harga Jualan (RM): <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -1241,7 +1240,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       placeholder="0.00"
                       value={prodPrice}
                       onChange={(e) => setProdPrice(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
                   <div>
@@ -1253,7 +1252,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       placeholder="Kategori produk"
                       value={prodCategory}
                       onChange={(e) => setProdCategory(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
                 </div>
@@ -1268,7 +1267,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       placeholder="Penerangan ringkas produk..."
                       value={prodDesc}
                       onChange={(e) => setProdDesc(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
                   <div>
@@ -1284,19 +1283,19 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   </div>
                 </div>
 
-                {/* TailAdmin Action Buttons Footer */}
-                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
+                {/* Action Buttons Footer */}
+                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setShowAddProduct(false)}
-                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700 transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-[0.98] disabled:opacity-50"
+                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-[0.98] disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     <span>{loading ? 'Menyimpan...' : `Simpan Produk Ini (RM${prodPrice ? Number(prodPrice).toFixed(2) : '0.00'})`}</span>
@@ -1308,27 +1307,27 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
           {/* List of Products */}
           {safeProducts.length === 0 ? (
-            <div className="p-8 text-center bg-white dark:bg-[#24303F] rounded-2xl border border-dashed border-slate-300 dark:border-[#2E3A47]">
+            <div className="p-8 text-center bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
               <ShoppingBag className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
               <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">Belum Ada Produk Disenaraikan</h4>
-              <p className="text-xs text-slate-500 dark:text-[#8A99AD] mt-0.5">Tekan butang di atas untuk memasukkan produk pertama anda.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Tekan butang di atas untuk memasukkan produk pertama anda.</p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {safeProducts.map((prod) => (
                 <div
                   key={prod.id}
-                  className="bg-white dark:bg-[#24303F] p-4 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-2xs flex gap-3 items-center justify-between transition-colors"
+                  className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs flex gap-3 items-center justify-between transition-colors"
                 >
                   <img
                     src={prod.imageUrl}
                     alt={prod.name}
-                    className="w-16 h-16 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0"
+                    className="w-16 h-16 rounded-xl object-cover bg-slate-50 dark:bg-slate-900 shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <h5 className="font-bold text-xs text-slate-900 dark:text-white truncate">{prod.name}</h5>
-                    <p className="text-[11px] text-slate-500 dark:text-[#8A99AD] truncate">{prod.category}</p>
-                    <div className="text-xs font-extrabold text-emerald-800 dark:text-emerald-400 mt-1">
+                    <h5 className="font-bold text-xs text-slate-800 dark:text-white truncate">{prod.name}</h5>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{prod.category}</p>
+                    <div className="text-xs font-extrabold text-sky-700 dark:text-sky-400 mt-1">
                       RM{prod.price.toFixed(2)}
                     </div>
                   </div>
@@ -1350,8 +1349,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         <div className="mt-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Rekod Permohonan Kapsul Niaga Anda</h3>
-              <p className="text-xs text-slate-500 dark:text-[#8A99AD]">Status semakan dan peruntukan kiosk oleh pihak pengurusan hub.</p>
+              <h3 className="text-base font-bold text-slate-800 dark:text-white">Rekod Permohonan Kapsul Niaga Anda</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400">Status semakan dan peruntukan kiosk oleh pihak pengurusan hub.</p>
             </div>
 
             <button
@@ -1363,7 +1362,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   onOpenBookingTab();
                 }
               }}
-              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-xs transition-all cursor-pointer interactive-press"
+              className="px-4 py-2 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-xs transition-all cursor-pointer interactive-press"
             >
               <Building2 className="w-4 h-4" />
               <span>Mohon Slot Kapsul</span>
@@ -1371,17 +1370,17 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           </div>
 
           {safeBookings.length === 0 ? (
-            <div className="p-8 text-center bg-white dark:bg-[#24303F] rounded-2xl border border-dashed border-slate-300 dark:border-[#2E3A47]">
+            <div className="p-8 text-center bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
               <Building2 className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
               <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">Tiada Permohonan Kapsul</h4>
-              <p className="text-xs text-slate-500 dark:text-[#8A99AD] mt-0.5 mb-4">Anda belum memohon sewaan slot kapsul niaga belia.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-4">Anda belum memohon sewaan slot kapsul niaga belia.</p>
               <button
                 type="button"
                 onClick={() => {
                   if (onOpenBookingModal) onOpenBookingModal();
                   else if (onOpenBookingTab) onOpenBookingTab();
                 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer interactive-press"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer interactive-press"
               >
                 <Building2 className="w-4 h-4" />
                 <span>Pilih & Mohon Kapsul Niaga Sekarang</span>
@@ -1392,36 +1391,36 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               {safeBookings.map((b) => (
                 <div
                   key={b.id}
-                  className="bg-white dark:bg-[#24303F] p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-4 transition-colors"
+                  className="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-4 transition-colors"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-[#2E3A47]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-900 dark:bg-[#1A222C] text-white border border-transparent dark:border-[#2E3A47]">
+                        <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                           {b.slotCode}
                         </span>
-                        <h4 className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">{b.slotName}</h4>
+                        <h4 className="font-bold text-slate-800 dark:text-white text-sm sm:text-base">{b.slotName}</h4>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-[#8A99AD]">
-                        {b.hubLocation} • Tempoh: <strong>{b.durationMonths} Bulan</strong> • Mula: <strong>{formatDisplayDate(b.startDate)}</strong> • Akhir: <strong className="text-red-700 dark:text-amber-400">{calculateOperationEndDate(b.startDate, b.durationMonths)}</strong>
+                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                        {b.hubLocation} • Tempoh: <strong>{b.durationMonths} Bulan</strong> • Mula: <strong>{formatDisplayDate(b.startDate)}</strong> • Akhir: <strong className="text-sky-700 dark:text-sky-400">{calculateOperationEndDate(b.startDate, b.durationMonths)}</strong>
                       </p>
                     </div>
 
                     <div className="shrink-0 flex items-center gap-2">
                       {b.status === 'pending' && (
-                        <span className="px-3 py-1 bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 rounded-full text-xs font-bold flex items-center gap-1.5 border border-amber-300 dark:border-amber-800">
+                        <span className="px-3 py-1 bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 rounded-full text-xs font-bold flex items-center gap-1.5 border border-amber-200 dark:border-amber-800">
                           <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                           Dalam Semakan Urusetia
                         </span>
                       )}
                       {b.status === 'approved' && (
-                        <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 rounded-full text-xs font-bold flex items-center gap-1.5 border border-emerald-300 dark:border-emerald-800">
+                        <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 rounded-full text-xs font-bold flex items-center gap-1.5 border border-emerald-200 dark:border-emerald-800">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                           Permohonan Diluluskan
                         </span>
                       )}
                       {b.status === 'rejected' && (
-                        <span className="px-3 py-1 bg-rose-100 dark:bg-rose-950/80 text-rose-900 dark:text-rose-300 rounded-full text-xs font-bold flex items-center gap-1.5 border border-rose-300 dark:border-rose-800">
+                        <span className="px-3 py-1 bg-rose-50 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 rounded-full text-xs font-bold flex items-center gap-1.5 border border-rose-200 dark:border-rose-800">
                           <AlertCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                           Tidak Berjaya
                         </span>
@@ -1430,34 +1429,34 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   </div>
 
                   {b.adminNotes && (
-                    <div className="text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-[#1A222C] p-3 rounded-xl border border-slate-200 dark:border-[#2E3A47]">
-                      <span className="font-bold text-slate-900 dark:text-white block mb-0.5">Arahan & Catatan Urusetia Pentadbir:</span>
+                    <div className="text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                      <span className="font-bold text-slate-800 dark:text-white block mb-0.5">Arahan & Catatan Urusetia Pentadbir:</span>
                       <p>{b.adminNotes}</p>
                     </div>
                   )}
 
-                  {/* ACTION BUTTONS TOOLBAR (FUNGSI PENUH PESANAN/TEMPAHAN) */}
+                  {/* ACTION BUTTONS TOOLBAR */}
                   <div className="pt-1 flex flex-wrap items-center gap-2 text-xs">
                     
                     {/* 1. Official Receipt */}
                     <button
                       type="button"
                       onClick={() => setSelectedReceiptBooking(b)}
-                      className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                       title="Cetak atau muat turun resit bayaran rasmi"
                     >
-                      <Printer className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
+                      <Printer className="w-3.5 h-3.5 text-sky-700 dark:text-sky-400" />
                       <span>Resit Rasmi Bayaran</span>
                     </button>
 
-                    {/* 2. Offer Letter (If approved or available) */}
+                    {/* 2. Offer Letter */}
                     {b.status === 'approved' && onViewOfferLetter && (
                       <button
                         type="button"
                         onClick={() => onViewOfferLetter(b)}
-                        className="px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                        className="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                       >
-                        <FileText className="w-3.5 h-3.5 text-emerald-200" />
+                        <FileText className="w-3.5 h-3.5 text-sky-100" />
                         <span>Surat Tawaran</span>
                       </button>
                     )}
@@ -1467,7 +1466,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       <button
                         type="button"
                         onClick={() => onOpenTenancyAgreement(b)}
-                        className="px-3 py-2 rounded-xl bg-white dark:bg-[#1A222C] hover:bg-amber-50 dark:hover:bg-amber-950/40 border border-amber-300 text-amber-900 dark:text-amber-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                        className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <PenTool className="w-3.5 h-3.5 text-amber-600" />
                         <span>Perjanjian Sewa Kiosk</span>
@@ -1479,9 +1478,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       <button
                         type="button"
                         onClick={() => onOpenVerification(`KBN-${b.slotCode}`)}
-                        className="px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 border border-purple-200 dark:border-purple-800 text-purple-900 dark:text-purple-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                        className="px-3 py-2 rounded-xl bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 border border-sky-200 dark:border-sky-800 text-sky-900 dark:text-sky-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
-                        <QrCode className="w-3.5 h-3.5 text-purple-600" />
+                        <QrCode className="w-3.5 h-3.5 text-sky-600" />
                         <span>Sahkan Lesen QR</span>
                       </button>
                     )}
@@ -1491,7 +1490,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       href={`https://wa.me/601120508890?text=${encodeURIComponent(`Salam Urusetia KBelia Kelantan, saya ingin membuat pertanyaan mengenai permohonan kiosk slot ${b.slotCode} (${b.slotName}) bagi perniagaan ${b.businessName}.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
                       <span>WhatsApp Urusetia Hab</span>
@@ -1505,7 +1504,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         setComplaintSuccess(null);
                         setComplaintNotes('');
                       }}
-                      className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#1A222C] hover:bg-slate-100 border border-slate-300 dark:border-[#2E3A47] text-slate-700 dark:text-slate-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                       title="Lapor kerosakan lampu/elektrik/pintu kiosk"
                     >
                       <Wrench className="w-3.5 h-3.5 text-amber-600" />
@@ -1522,7 +1521,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             onRefresh();
                           }
                         }}
-                        className="px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-800 dark:text-rose-300 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ml-auto"
+                        className="px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ml-auto"
                       >
                         <XCircle className="w-3.5 h-3.5 text-rose-600" />
                         <span>Batal Permohonan</span>
@@ -1537,24 +1536,24 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
           {/* MODAL 1: OFFICIAL RECEIPT (RESIT RASMI BAYARAN KBELIA) */}
           {selectedReceiptBooking && (
-            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
+            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
               <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden text-slate-900">
                 
                 {/* Receipt Header */}
-                <div className="p-5 bg-gradient-to-r from-red-800 via-red-900 to-amber-700 text-white flex items-center justify-between">
+                <div className="p-5 kbelia-important-header border-b border-slate-200 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black">
+                    <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black shadow-xs">
                       <span className="text-base font-black">KB</span>
                     </div>
                     <div>
-                      <h4 className="font-black text-sm uppercase tracking-wide">Resit Rasmi Bayaran Subsidi Kiosk</h4>
-                      <p className="text-[10px] text-amber-200">Urusetia Pembangunan Keusahawanan Belia Kelantan</p>
+                      <h4 className="font-black text-sm uppercase tracking-wide text-slate-800">Resit Rasmi Bayaran Subsidi Kiosk</h4>
+                      <p className="text-[10px] text-sky-700 font-semibold">Urusetia Pembangunan Keusahawanan Belia Kelantan</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setSelectedReceiptBooking(null)}
-                    className="p-1.5 text-white/80 hover:text-white rounded-lg hover:bg-white/10"
+                    className="p-1.5 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 cursor-pointer"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -1564,13 +1563,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 <div className="p-6 space-y-4 text-xs">
                   <div className="flex justify-between items-start pb-3 border-b border-slate-200">
                     <div>
-                      <span className="text-slate-400 text-[10px] uppercase font-bold block">No. Rujukan Resit</span>
-                      <span className="font-mono font-extrabold text-sm text-red-950">
+                      <span className="text-slate-500 text-[10px] uppercase font-bold block">No. Rujukan Resit</span>
+                      <span className="font-mono font-extrabold text-sm text-sky-800">
                         REC-{selectedReceiptBooking.slotCode}-{selectedReceiptBooking.id.substring(0, 8).toUpperCase()}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-slate-400 text-[10px] uppercase font-bold block">Tarikh Pembayaran</span>
+                      <span className="text-slate-500 text-[10px] uppercase font-bold block">Tarikh Pembayaran</span>
                       <span className="font-semibold text-slate-800">{new Date().toLocaleDateString('ms-MY')}</span>
                     </div>
                   </div>
@@ -1586,7 +1585,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Kapsul Diperuntukkan:</span>
-                      <span className="font-bold text-red-900">{selectedReceiptBooking.slotCode} ({selectedReceiptBooking.slotName})</span>
+                      <span className="font-bold text-sky-800">{selectedReceiptBooking.slotCode} ({selectedReceiptBooking.slotName})</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Lokasi Hab:</span>
@@ -1601,13 +1600,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   {/* Fee Breakdown */}
                   <div className="border border-slate-200 rounded-2xl overflow-hidden">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                      <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
                         <tr>
                           <th className="p-3">Keterangan Urusniaga</th>
                           <th className="p-3 text-right">Jumlah (RM)</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-slate-200">
                         <tr>
                           <td className="p-3 font-medium">Yuran Komitmen Sewaan Kiosk Modular Subsidi Belia (Sebulan)</td>
                           <td className="p-3 text-right font-mono font-bold">150.00</td>
@@ -1616,13 +1615,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           <td className="p-3 font-medium">Deposit Kebersihan & Keselamatan Utiliti Elektrik 13A</td>
                           <td className="p-3 text-right font-mono font-bold">50.00</td>
                         </tr>
-                        <tr className="bg-emerald-50 text-emerald-950 font-bold">
+                        <tr className="bg-emerald-50 text-emerald-900 font-bold">
                           <td className="p-3">Subsidi Kerajaan Negeri Kelantan (Kadar Khas)</td>
                           <td className="p-3 text-right font-mono">-50.00</td>
                         </tr>
-                        <tr className="bg-slate-900 text-white font-extrabold text-sm">
+                        <tr className="bg-sky-600 text-white font-extrabold text-sm">
                           <td className="p-3">JUMLAH DIBAYAR</td>
-                          <td className="p-3 text-right font-mono text-amber-300">RM 150.00</td>
+                          <td className="p-3 text-right font-mono text-sky-50">RM 150.00</td>
                         </tr>
                       </tbody>
                     </table>
@@ -1638,15 +1637,15 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     <button
                       type="button"
                       onClick={() => window.print()}
-                      className="px-4 py-2.5 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-xs cursor-pointer"
+                      className="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-xs cursor-pointer"
                     >
-                      <Printer className="w-4 h-4 text-amber-300" />
+                      <Printer className="w-4 h-4 text-sky-100" />
                       <span>Cetak Salinan Resit</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setSelectedReceiptBooking(null)}
-                      className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer"
+                      className="px-4 py-2.5 bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer"
                     >
                       Tutup
                     </button>
@@ -1659,22 +1658,22 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
           {/* MODAL 2: ADUAN & PENYELENGGARAAN FASILITI KIOSK */}
           {maintenanceComplaintBooking && (
-            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
-              <div className="w-full max-w-md bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden text-slate-900 dark:text-white">
-                <div className="p-5 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between border-b border-slate-700">
+            <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
+              <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden text-slate-800 dark:text-white">
+                <div className="p-5 kbelia-important-header dark:bg-slate-800 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+                    <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center font-bold">
                       <Wrench className="w-4 h-4" />
                     </div>
                     <div>
-                      <h4 className="font-extrabold text-sm">Borang Aduan Fasiliti Kiosk</h4>
-                      <p className="text-[10px] text-slate-300">Slot {maintenanceComplaintBooking.slotCode} • {maintenanceComplaintBooking.hubLocation}</p>
+                      <h4 className="font-extrabold text-sm text-slate-800 dark:text-white">Borang Aduan Fasiliti Kiosk</h4>
+                      <p className="text-[10px] text-slate-600 dark:text-slate-300">Slot {maintenanceComplaintBooking.slotCode} • {maintenanceComplaintBooking.hubLocation}</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setMaintenanceComplaintBooking(null)}
-                    className="p-1.5 text-white/80 hover:text-white rounded-lg hover:bg-white/10 cursor-pointer"
+                    className="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -1693,7 +1692,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       <button
                         type="button"
                         onClick={() => setMaintenanceComplaintBooking(null)}
-                        className="w-full mt-2 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold cursor-pointer"
+                        className="w-full mt-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold cursor-pointer"
                       >
                         Selesai & Tutup
                       </button>
@@ -1713,7 +1712,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         <select
                           value={complaintType}
                           onChange={(e) => setComplaintType(e.target.value)}
-                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                         >
                           <option value="Bekalan Elektrik 13A & Lampu">Bekalan Elektrik 13A & Lampu Kiosk</option>
                           <option value="Kunci & Roller Shutter Kiosk">Kunci & Pintu Pengatup (Roller Shutter)</option>
@@ -1734,7 +1733,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           value={complaintNotes}
                           onChange={(e) => setComplaintNotes(e.target.value)}
                           placeholder="Terangkan masalah yang dihadapi di kiosk anda..."
-                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                         />
                       </div>
 
@@ -1742,13 +1741,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         <button
                           type="button"
                           onClick={() => setMaintenanceComplaintBooking(null)}
-                          className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold cursor-pointer"
+                          className="px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold cursor-pointer"
                         >
                           Batal
                         </button>
                         <button
                           type="submit"
-                          className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          className="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           <Wrench className="w-3.5 h-3.5" />
                           <span>Hantar Aduan Sekarang</span>
@@ -1787,8 +1786,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
       {/* Tab 4: Digital Card & QR Promo */}
       {activeTab === 'card' && (
-        <div className="mt-6 max-w-xl mx-auto bg-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-800 text-center space-y-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-amber-400 text-slate-950 text-xs font-bold uppercase tracking-wider">
+        <div className="mt-6 max-w-xl mx-auto bg-white dark:bg-slate-800 text-slate-800 dark:text-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 text-center space-y-6">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-800 dark:bg-sky-950/60 dark:border-sky-800 dark:text-sky-300 text-xs font-bold uppercase tracking-wider">
             <span>Kad Profil Usahawan Belia Kelantan</span>
           </div>
 
@@ -1796,16 +1795,16 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             <img
               src={myBusiness?.logoUrl || user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.uid}`}
               alt=""
-              className="w-20 h-20 rounded-2xl mx-auto border-2 border-slate-700 object-cover bg-white"
+              className="w-20 h-20 rounded-2xl mx-auto border-2 border-slate-200 dark:border-slate-700 object-cover bg-white"
             />
-            <h3 className="text-xl font-bold text-white">{myBusiness?.businessName || 'Nama Bisnes Belia'}</h3>
-            <p className="text-xs text-slate-300 font-medium">{myBusiness?.tagline || 'Inisiatif Usahawan Muda Kelantan'}</p>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white">{myBusiness?.businessName || 'Nama Bisnes Belia'}</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">{myBusiness?.tagline || 'Inisiatif Usahawan Muda Kelantan'}</p>
           </div>
 
-          <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700 text-xs space-y-2 text-slate-200 text-left">
-            <div className="flex justify-between"><span>Jajahan:</span> <span className="font-bold text-white">{myBusiness?.district || 'Kota Bharu'}</span></div>
-            <div className="flex justify-between"><span>Kategori:</span> <span className="font-bold text-white">{myBusiness?.category || 'F&B'}</span></div>
-            <div className="flex justify-between"><span>WhatsApp:</span> <span className="font-mono text-emerald-400">{myBusiness?.whatsapp || userProfile?.phone || '-'}</span></div>
+          <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs space-y-2 text-slate-700 dark:text-slate-200 text-left">
+            <div className="flex justify-between"><span>Jajahan:</span> <span className="font-bold text-slate-900 dark:text-white">{myBusiness?.district || 'Kota Bharu'}</span></div>
+            <div className="flex justify-between"><span>Kategori:</span> <span className="font-bold text-slate-900 dark:text-white">{myBusiness?.category || 'F&B'}</span></div>
+            <div className="flex justify-between"><span>WhatsApp:</span> <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">{myBusiness?.whatsapp || userProfile?.phone || '-'}</span></div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
@@ -1813,7 +1812,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               href={`https://wa.me/?text=${encodeURIComponent(`Sokong perniagaan ${myBusiness?.businessName || 'Usahawan Belia'} di Portal KBelia Kelantan: ${window.location.origin}`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 py-3 px-4 bg-red-700 hover:bg-red-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors"
+              className="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
               <span>Kongsi ke WhatsApp</span>
@@ -1826,20 +1825,20 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       {activeTab === 'settings' && (
         <div className="mt-6 w-full space-y-6">
           {/* Header Banner */}
-          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-red-950 p-6 rounded-2xl text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-700">
+          <div className="kbelia-important-header dark:bg-slate-800 p-6 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-200 dark:border-slate-700">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-red-800/80 text-amber-300 text-[11px] font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-800 dark:bg-sky-950/60 dark:border-sky-800 dark:text-sky-300 text-[11px] font-bold uppercase tracking-wider">
                 <Settings className="w-3.5 h-3.5" />
                 <span>Pengurusan Maklumat Usahawan</span>
               </div>
-              <h3 className="text-xl font-bold text-white">Tetapan Profil & Perniagaan</h3>
-              <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Tetapan Profil & Perniagaan</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
                 Kemaskini maklumat pengenalan peribadi, nombor telefon WhatsApp untuk dihubungi pelanggan, pendaftaran SSM dan jajahan operasi perniagaan anda di Kelantan.
               </p>
             </div>
             <div className="shrink-0 flex items-center gap-2">
-              <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span className="px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Akaun Disahkan
               </span>
             </div>
@@ -1872,13 +1871,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
           <form onSubmit={handleSaveSettings} className="space-y-6">
             {/* Section 1: Profil Peribadi & Hubungan */}
-            <div className="bg-white dark:bg-[#24303F] p-6 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-5 transition-colors">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-[#2E3A47]">
-                <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-400 flex items-center justify-center font-bold">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
+              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <div className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-200 dark:bg-sky-950/60 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center font-bold">
                   <User className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Maklumat Peribadi & Nombor Perhubungan</h4>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-white">Maklumat Peribadi & Nombor Perhubungan</h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Maklumat sah pemilik akaun usahawan belia.</p>
                 </div>
               </div>
@@ -1887,7 +1886,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 {/* Nama Penuh */}
                 <div>
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Nama Penuh <span className="text-red-700 dark:text-red-400">*</span>
+                    Nama Penuh <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -1897,7 +1896,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       value={settingsFullName}
                       onChange={(e) => setSettingsFullName(e.target.value)}
                       placeholder="Nama penuh"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1A222C] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -1914,7 +1913,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       value={settingsIcNumber}
                       onChange={(e) => setSettingsIcNumber(e.target.value)}
                       placeholder="Masukkan No. Kad Pengenalan"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1A222C] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white font-mono"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white font-mono"
                     />
                   </div>
                 </div>
@@ -1931,7 +1930,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       disabled
                       value={user.email || ''}
                       placeholder="Emel"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-[#1A222C]/60 border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-not-allowed"
                     />
                   </div>
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">Emel berdaftar tidak boleh diubah untuk tujuan keselamatan sesi.</span>
@@ -1940,7 +1939,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 {/* Nombor Telefon / WhatsApp */}
                 <div>
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Nombor Telefon / WhatsApp <span className="text-red-700 dark:text-red-400">*</span>
+                    Nombor Telefon / WhatsApp <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -1950,7 +1949,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       value={settingsPhone}
                       onChange={(e) => setSettingsPhone(e.target.value)}
                       placeholder="Nombor Telefon / WhatsApp"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1A222C] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white font-mono"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white font-mono"
                     />
                   </div>
                 </div>
@@ -1958,14 +1957,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 {/* Jajahan Operasi / Kediaman */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Jajahan Kediaman & Operasi Utama (Kelantan) <span className="text-red-700 dark:text-red-400">*</span>
+                    Jajahan Kediaman & Operasi Utama (Kelantan) <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                     <select
                       value={settingsDistrict}
                       onChange={(e) => setSettingsDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1A222C] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
                     >
                       {DISTRICTS.map((d) => (
                         <option key={d} value={d}>
@@ -1979,13 +1978,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {/* Section 2: Maklumat Bisnes & Pendaftaran SSM */}
-            <div className="bg-white dark:bg-[#24303F] p-6 rounded-2xl border border-slate-200 dark:border-[#2E3A47] shadow-xs space-y-5 transition-colors">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-[#2E3A47]">
-                <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 flex items-center justify-center font-bold">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
+              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/60 dark:border-amber-800 text-amber-800 dark:text-amber-300 flex items-center justify-center font-bold">
                   <Briefcase className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Maklumat Bisnes, SSM & Jajahan Operasi</h4>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-white">Maklumat Bisnes, SSM & Jajahan Operasi</h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Penyelarasan profil komersil bagi permohonan kapsul dan direktori.</p>
                 </div>
               </div>
@@ -2003,7 +2002,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       value={settingsBusinessName}
                       onChange={(e) => setSettingsBusinessName(e.target.value)}
                       placeholder="Nama perniagaan"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1A222C] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -2016,7 +2015,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <select
                     value={settingsCategory}
                     onChange={(e) => setSettingsCategory(e.target.value as BusinessCategory)}
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1A222C] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -2034,7 +2033,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <select
                     value={settingsSsmStatus}
                     onChange={(e) => setSettingsSsmStatus(e.target.value as 'registered' | 'in_progress' | 'not_registered')}
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1A222C] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
                   >
                     <option value="registered">Berdaftar Rasmi dengan SSM</option>
                     <option value="in_progress">Dalam Proses Pendaftaran SSM</option>
@@ -2054,7 +2053,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       value={settingsSsmNumber}
                       onChange={(e) => setSettingsSsmNumber(e.target.value)}
                       placeholder="No. pendaftaran SSM"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-[#2E3A47] rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-[#1A222C] focus:outline-hidden focus:ring-2 focus:ring-red-700/20 focus:border-red-700 transition-all text-slate-900 dark:text-white font-mono"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white font-mono"
                     />
                   </div>
                 </div>
@@ -2067,54 +2066,54 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <label className={`cursor-pointer p-3 rounded-xl border flex items-center gap-3 transition-all ${
                       settingsBusinessStage === 'idea'
-                        ? 'border-red-700 bg-red-50/50 dark:bg-red-950/30 ring-1 ring-red-700'
-                        : 'border-slate-200 dark:border-[#2E3A47] hover:bg-slate-50 dark:hover:bg-[#1A222C]'
+                        ? 'border-sky-600 bg-sky-50/70 dark:bg-sky-950/30 ring-1 ring-sky-600'
+                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900'
                     }`}>
                       <input
                         type="radio"
                         name="settingsBusinessStage"
                         checked={settingsBusinessStage === 'idea'}
                         onChange={() => setSettingsBusinessStage('idea')}
-                        className="text-red-700 focus:ring-red-700"
+                        className="text-sky-600 focus:ring-sky-600"
                       />
                       <div>
-                        <div className="text-xs font-bold text-slate-900 dark:text-white">Peringkat Idea / R&D</div>
+                        <div className="text-xs font-bold text-slate-800 dark:text-white">Peringkat Idea / R&D</div>
                         <div className="text-[11px] text-slate-500 dark:text-slate-400">Membangunkan produk permulaan</div>
                       </div>
                     </label>
 
                     <label className={`cursor-pointer p-3 rounded-xl border flex items-center gap-3 transition-all ${
                       settingsBusinessStage === 'startup'
-                        ? 'border-red-700 bg-red-50/50 dark:bg-red-950/30 ring-1 ring-red-700'
-                        : 'border-slate-200 dark:border-[#2E3A47] hover:bg-slate-50 dark:hover:bg-[#1A222C]'
+                        ? 'border-sky-600 bg-sky-50/70 dark:bg-sky-950/30 ring-1 ring-sky-600'
+                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900'
                     }`}>
                       <input
                         type="radio"
                         name="settingsBusinessStage"
                         checked={settingsBusinessStage === 'startup'}
                         onChange={() => setSettingsBusinessStage('startup')}
-                        className="text-red-700 focus:ring-red-700"
+                        className="text-sky-600 focus:ring-sky-600"
                       />
                       <div>
-                        <div className="text-xs font-bold text-slate-900 dark:text-white">Permulaan (Startup)</div>
+                        <div className="text-xs font-bold text-slate-800 dark:text-white">Permulaan (Startup)</div>
                         <div className="text-[11px] text-slate-500 dark:text-slate-400">Beroperasi di bawah 3 tahun</div>
                       </div>
                     </label>
 
                     <label className={`cursor-pointer p-3 rounded-xl border flex items-center gap-3 transition-all ${
                       settingsBusinessStage === 'growth'
-                        ? 'border-red-700 bg-red-50/50 dark:bg-red-950/30 ring-1 ring-red-700'
-                        : 'border-slate-200 dark:border-[#2E3A47] hover:bg-slate-50 dark:hover:bg-[#1A222C]'
+                        ? 'border-sky-600 bg-sky-50/70 dark:bg-sky-950/30 ring-1 ring-sky-600'
+                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900'
                     }`}>
                       <input
                         type="radio"
                         name="settingsBusinessStage"
                         checked={settingsBusinessStage === 'growth'}
                         onChange={() => setSettingsBusinessStage('growth')}
-                        className="text-red-700 focus:ring-red-700"
+                        className="text-sky-600 focus:ring-sky-600"
                       />
                       <div>
-                        <div className="text-xs font-bold text-slate-900 dark:text-white">Perkembangan (Growth)</div>
+                        <div className="text-xs font-bold text-slate-800 dark:text-white">Perkembangan (Growth)</div>
                         <div className="text-[11px] text-slate-500 dark:text-slate-400">Mempunyai cawangan / pasaran luar</div>
                       </div>
                     </label>
@@ -2124,10 +2123,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {/* Section 3: Ringkasan Akaun & Kawalan */}
-            <div className="bg-slate-50 dark:bg-[#24303F] p-5 rounded-2xl border border-slate-200 dark:border-[#2E3A47] flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
+            <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
               <div className="space-y-1">
-                <div className="text-xs font-bold text-slate-900 dark:text-white">Penyegerakan Data Profil & Direktori</div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                <div className="text-xs font-bold text-slate-800 dark:text-white">Penyegerakan Data Profil & Direktori</div>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400">
                   Data yang dikemaskini akan disegerakkan terus ke pangkalan data KBelia dan memaparkan maklumat terkini pada kad usahawan anda.
                 </p>
               </div>
@@ -2135,9 +2134,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <button
                 type="submit"
                 disabled={savingSettings}
-                className="px-6 py-3 bg-red-700 hover:bg-red-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-colors shrink-0 disabled:opacity-50"
+                className="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
               >
-                <Save className="w-4 h-4 text-amber-300" />
+                <Save className="w-4 h-4 text-sky-100" />
                 <span>{savingSettings ? 'Menyimpan Tetapan...' : 'Simpan Perubahan Tetapan'}</span>
               </button>
             </div>

@@ -48,15 +48,15 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
       
       {/* Toast Notification Banner if clicked */}
       {activeNotice && (
-        <div className="mb-6 p-4 bg-slate-900 dark:bg-[#1C2434] text-white rounded-xl border border-slate-700 dark:border-[#2E3A47] flex items-center justify-between gap-3 shadow-lg animate-in fade-in">
-          <div className="flex items-center gap-2 text-xs">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="mb-6 p-4 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-xl border border-emerald-200 dark:border-emerald-800 flex items-center justify-between gap-3 shadow-sm animate-in fade-in">
+          <div className="flex items-center gap-2 text-xs font-medium">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{activeNotice}</span>
           </div>
           <button 
             type="button"
             onClick={() => setActiveNotice(null)} 
-            className="text-slate-400 hover:text-white p-1"
+            className="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1"
           >
             <X className="w-4 h-4" />
           </button>
@@ -66,10 +66,10 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">
             {language === 'en' ? 'Youth Entrepreneurship Grants & Programs' : 'Geran & Program Keusahawanan Belia'}
           </h2>
-          <p className="text-slate-600 dark:text-[#8A99AD] text-sm mt-1 max-w-2xl leading-relaxed">
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1 max-w-2xl leading-relaxed">
             {language === 'en'
               ? 'Join specialized incubation programs, digital skill workshops, TEKUN/MARA/UMK funding matching, and kiosk lease subsidy grants to accelerate your business.'
               : 'Sertai program inkubasi khas, bengkel kemahiran digital, padanan pembiayaan TEKUN/MARA/UMK, dan geran subsidi sewa kapsul niaga untuk memacu perniagaan anda.'}
@@ -80,7 +80,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           <button
             type="button"
             onClick={onAddProgram}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-xs font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
           >
             <Award className="w-4 h-4" />
             <span>{language === 'en' ? 'Publish Program & Grant' : 'Terbitkan Program & Geran'}</span>
@@ -97,8 +97,8 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             onClick={() => setSelectedCategory(cat.key)}
             className={`interactive-press px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedCategory === cat.key
-                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs'
-                : 'bg-white dark:bg-[#24303F] text-slate-600 dark:text-[#8A99AD] hover:bg-slate-100 dark:hover:bg-[#1A222C] dark:hover:text-white border border-slate-200 dark:border-[#2E3A47]'
+                ? 'bg-sky-600 text-white shadow-xs'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700 hover:text-sky-800 dark:hover:text-white border border-slate-200 dark:border-slate-700'
             }`}
           >
             {cat.label}
@@ -112,17 +112,17 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           <div
             key={prog.id}
             id={`program-card-${prog.id}`}
-            className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 overflow-hidden shadow-xs flex flex-col justify-between group transition-colors"
+            className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-500/60 overflow-hidden shadow-xs flex flex-col justify-between group transition-colors"
           >
             <div className="p-6 space-y-4">
               
               {/* Category & Featured Badge */}
               <div className="flex items-center justify-between">
-                <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-semibold">
+                <span className="px-2.5 py-0.5 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded text-[11px] font-semibold">
                   {prog.category}
                 </span>
                 {prog.isFeatured && (
-                  <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50 rounded text-[10px] font-bold">
+                  <span className="px-2 py-0.5 bg-sky-50 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 rounded text-[10px] font-bold">
                     {language === 'en' ? 'Featured' : 'Utama'}
                   </span>
                 )}
@@ -130,7 +130,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
 
               {/* Title & Description */}
               <div>
-                <h3 className="font-bold text-slate-900 dark:text-white text-base leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                <h3 className="font-bold text-slate-800 dark:text-white text-base leading-snug group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                   {prog.title}
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
@@ -140,29 +140,29 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
 
               {/* Grant amount callout if present */}
               {prog.grantAmount && (
-                <div className="p-3 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/50 rounded-lg text-xs flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-blue-700 dark:text-blue-400 shrink-0" />
+                <div className="p-3 bg-sky-50/80 dark:bg-sky-950/40 border border-sky-200/80 dark:border-sky-800/60 rounded-lg text-xs flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
                   <div>
-                    <span className="text-[10px] text-blue-800 dark:text-blue-300 font-medium block">
+                    <span className="text-[10px] text-sky-700 dark:text-sky-300 font-medium block">
                       {language === 'en' ? 'Aid Value / Grant Amount:' : 'Nilai Bantuan / Hadiah:'}
                     </span>
-                    <span className="font-extrabold text-blue-950 dark:text-blue-200 tabular-nums">{prog.grantAmount}</span>
+                    <span className="font-extrabold text-sky-900 dark:text-sky-200 tabular-nums">{prog.grantAmount}</span>
                   </div>
                 </div>
               )}
 
               {/* Date & Location Details */}
-              <div className="space-y-1.5 pt-1 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
+              <div className="space-y-1.5 pt-1 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/80 dark:border-slate-700">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <Calendar className="w-3.5 h-3.5 text-sky-600/80" />
                   <span>{prog.date}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  <MapPin className="w-3.5 h-3.5 text-sky-600/80" />
                   <span>{prog.location}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="w-3.5 h-3.5 text-slate-400" />
+                  <Users className="w-3.5 h-3.5 text-sky-600/80" />
                   <span className="truncate">
                     {language === 'en' ? 'Organized by:' : 'Anjuran:'} {prog.organizer}
                   </span>
@@ -171,10 +171,10 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             </div>
 
             {/* Footer Action */}
-            <div className="p-4 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800">
+            <div className="p-4 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-700">
             {isReadOnly ? (
-              <div className="w-full py-2 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium flex items-center justify-center gap-2">
-                <Eye className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <div className="w-full py-2 px-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium flex items-center justify-center gap-2">
+                <Eye className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                 <span>{language === 'en' ? 'Status: State Initiative (Monitored)' : 'Status: Inisiatif Negeri (Dipantau)'}</span>
               </div>
             ) : (
@@ -191,7 +191,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                     );
                   }
                 }}
-                className="w-full py-2.5 px-4 bg-blue-800 hover:bg-blue-900 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer active:scale-98"
+                className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer active:scale-98"
               >
                 <span>{language === 'en' ? 'Register / Apply Program' : 'Daftar / Mohon Program'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />

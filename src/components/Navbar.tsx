@@ -44,17 +44,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200/80 shadow-xs">
+    <header className="sticky top-0 z-40 kbelia-important-header backdrop-blur border-b border-slate-200 shadow-xs">
       {/* Top Notification / Banner */}
-      <div className="bg-gradient-to-r from-emerald-800 via-emerald-900 to-amber-900 text-white text-xs py-1.5 px-4">
+      <div className="bg-sky-50 border-b border-sky-200/80 text-sky-900 text-xs py-1.5 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 font-medium">
-            <span className="bg-amber-400 text-amber-950 px-2 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wider">
+            <span className="bg-sky-600 text-white px-2 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wider">
               Inisiatif Belia Kelantan
             </span>
             <span className="hidden sm:inline">Pusat Inkubasi & Kapsul Niaga Mikro Usahawan Belia (Inspirasi UMK Capsule)</span>
           </div>
-          <div className="flex items-center gap-3 text-emerald-200 text-[11px]">
+          <div className="flex items-center gap-3 text-sky-700 font-medium text-[11px]">
             <span>Hub: UMK Bachok • KB Sentral • Jeli</span>
           </div>
         </div>
@@ -70,9 +70,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 id="nav-slidebar-toggle-btn"
                 onClick={onToggleSlideBar}
                 title="Buka Slide Bar / Menu Sisi"
-                className="p-2 rounded-xl text-slate-700 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 border border-slate-200 transition-all flex items-center gap-1.5 shadow-2xs"
+                className="p-2 rounded-xl text-slate-700 bg-slate-50 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 border border-slate-200 transition-all flex items-center gap-1.5 shadow-2xs"
               >
-                <Sliders className="w-4 h-4 text-emerald-700" />
+                <Sliders className="w-4 h-4 text-sky-600" />
                 <span className="hidden md:inline text-xs font-bold">Slide Bar</span>
               </button>
             )}
@@ -83,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}
               className="flex items-center gap-3 text-left group"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-amber-600 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
                 <Store className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -110,11 +110,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onClick={() => setActiveTab(item.id)}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all ${
                     isActive
-                      ? 'bg-emerald-50 text-emerald-800 font-semibold shadow-xs border border-emerald-200/60'
+                      ? 'bg-sky-50 text-sky-800 font-semibold shadow-xs border border-sky-200'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-700' : 'text-slate-500'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-sky-600' : 'text-slate-500'}`} />
                   {item.label}
                 </button>
               );
@@ -127,7 +127,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => setActiveTab('admin')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ml-1 ${
                   activeTab === 'admin'
-                    ? 'bg-amber-500 text-slate-950 shadow-xs'
+                    ? 'bg-amber-500 text-slate-900 shadow-xs'
                     : 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300/80'
                 }`}
               >
@@ -146,7 +146,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   id="nav-merchant-btn"
                   onClick={() => setActiveTab('merchant')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-700 text-white hover:bg-emerald-800 transition-colors shadow-xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white hover:bg-sky-500 transition-colors shadow-xs"
                 >
                   <Briefcase className="w-3.5 h-3.5" />
                   <span>Daftar / Urus Bisnes</span>
@@ -156,7 +156,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <img
                     src={user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.uid}`}
                     alt="Profil"
-                    className="w-8 h-8 rounded-full border border-emerald-300 object-cover"
+                    className="w-8 h-8 rounded-full border border-sky-200 object-cover"
                   />
                   <div className="hidden xl:block text-left">
                     <div className="text-xs font-semibold text-slate-900 truncate max-w-[120px] flex items-center gap-1">
@@ -183,9 +183,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="nav-login-modal-btn"
                 onClick={openLoginModal}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-xs"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-sky-600 text-white hover:bg-sky-500 transition-all shadow-xs cursor-pointer"
               >
-                <LogIn className="w-4 h-4 text-amber-400" />
+                <LogIn className="w-4 h-4 text-sky-100" />
                 <span>Log Masuk Belia</span>
               </button>
             )}
@@ -197,7 +197,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="mobile-slidebar-toggle-btn"
                 onClick={onToggleSlideBar}
-                className="p-2 rounded-lg text-emerald-800 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100"
+                className="p-2 rounded-lg text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100"
                 title="Buka Slide Bar"
               >
                 <Sliders className="w-5 h-5" />
@@ -206,7 +206,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {!user && (
               <button
                 onClick={openLoginModal}
-                className="px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-semibold"
+                className="px-3 py-1.5 bg-sky-600 text-white rounded-lg text-xs font-semibold"
               >
                 Log Masuk
               </button>
@@ -237,11 +237,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
                   isActive
-                    ? 'bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200'
+                    ? 'bg-sky-50 text-sky-800 font-semibold border border-sky-200'
                     : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-700' : 'text-slate-500'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-sky-600' : 'text-slate-500'}`} />
                 {item.label}
               </button>
             );
@@ -266,7 +266,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <img
                   src={user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.uid}`}
                   alt=""
-                  className="w-8 h-8 rounded-full border border-emerald-300"
+                  className="w-8 h-8 rounded-full border border-sky-200"
                 />
                 <div className="text-left">
                   <div className="text-xs font-semibold text-slate-900">{user.displayName}</div>

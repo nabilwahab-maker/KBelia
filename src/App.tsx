@@ -11,6 +11,7 @@ import {
   BusinessListing, 
   CapsuleBooking, 
   CapsuleSlot, 
+  SlotStatus,
   ProductItem, 
   YouthProgram,
   GrantApplication,
@@ -535,7 +536,7 @@ function MainApp() {
   // 0. STANDALONE LANDING PAGE (Welcoming homepage on initial link load)
   if (activeTab === 'landing') {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B132B] text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
         <TopProgressBar />
         <LandingPage
           setActiveTab={setActiveTab}
@@ -582,7 +583,7 @@ function MainApp() {
   // 1. STANDALONE LOGIN PAGE (Separated from dashboard)
   if (activeTab === 'login') {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B132B] text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
         <LoginPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -611,7 +612,7 @@ function MainApp() {
   // 1b. STANDALONE REGISTER PAGE (Dedicated Laman Pendaftaran Usahawan Belia)
   if (activeTab === 'register') {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B132B] text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
         <RegisterPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -638,7 +639,7 @@ function MainApp() {
   }
 
   return (
-    <div className="h-screen bg-[#F8FAFC] dark:bg-[#0B132B] flex flex-col text-slate-900 dark:text-[#E2E8F0] font-sans antialiased transition-colors duration-200 overflow-hidden">
+    <div className="h-screen bg-slate-50 dark:bg-slate-900 flex flex-col text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200 overflow-hidden">
       <TopProgressBar />
       {/* 1. TOP HEADER BAR */}
       <UMKHeader
@@ -682,7 +683,7 @@ function MainApp() {
         />
 
         {/* Center/Right Dynamic Body - Fully stretched for full-screen mode */}
-        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3.5 lg:p-4 w-full max-w-none min-w-0 scroll-smooth bg-[#F8FAFC] dark:bg-[#0B132B]">
+        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3.5 lg:p-4 w-full max-w-none min-w-0 scroll-smooth bg-slate-50 dark:bg-slate-900">
           
           {/* Universal Dashboard Banner Header following reference layout */}
           <DashboardBannerHeader
@@ -698,7 +699,7 @@ function MainApp() {
             <>
               {/* 1. ADMIN DASHBOARD VIEW */}
               {isAdmin && (
-                <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+                <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
                   <AdminDashboard
                     slots={enrichedSlots}
                     businesses={businesses}
@@ -717,7 +718,7 @@ function MainApp() {
 
               {/* 2. MENTOR DASHBOARD VIEW */}
               {isMentor && (
-                <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+                <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
                   <MentorPortal
                     mentors={mentors}
                     registrations={mentorshipRegistrations}
@@ -735,7 +736,7 @@ function MainApp() {
 
               {/* 3. YOUTH ENTREPRENEUR DASHBOARD VIEW */}
               {isYouth && (
-                <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+                <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
                   <MerchantPortal
                     myBusiness={myBusiness}
                     myProducts={myProducts}
@@ -764,16 +765,16 @@ function MainApp() {
 
           {/* KAPSUL NIAGA VIEW */}
           {activeTab === 'academic' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
-              <div className="mb-6 pb-4 border-b border-slate-200 dark:border-[#2E3A47]">
-                <div className="flex items-center gap-2 text-red-700 dark:text-red-400 text-xs font-bold uppercase tracking-wider mb-1">
+            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
                   <Building2 className="w-4 h-4" />
                   <span>{t('tab_kiosk_title')}</span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                   {t('tab_kiosk_heading')}
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-[#8A99AD] mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
                   {t('tab_kiosk_desc')}
                 </p>
               </div>
@@ -796,16 +797,16 @@ function MainApp() {
 
           {/* DIREKTORI USAHAWAN KELANTAN */}
           {activeTab === 'hepa' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
-              <div className="mb-6 pb-4 border-b border-slate-200 dark:border-[#2E3A47]">
-                <div className="flex items-center gap-2 text-red-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
+            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
                   <Store className="w-4 h-4" />
                   <span>{t('tab_directory_title')}</span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                   {t('tab_directory_title')}
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-[#CBD5E1] mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
                   {t('tab_directory_desc')}
                 </p>
               </div>
@@ -820,16 +821,16 @@ function MainApp() {
 
           {/* GERAN & DANA BELIA */}
           {activeTab === 'ceed' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
-              <div className="mb-6 pb-4 border-b border-slate-200 dark:border-[#2E3A47]">
-                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
+            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
                   <Award className="w-4 h-4" />
                   <span>{t('tab_grants_title')}</span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                   {t('tab_grants_heading')}
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-[#8A99AD] mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
                   {t('tab_grants_desc')}
                 </p>
               </div>
@@ -845,21 +846,21 @@ function MainApp() {
 
           {/* JADUAL ACARA & KARNIVAL BELIA */}
           {activeTab === 'events' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
               <EventsSection />
             </div>
           )}
 
           {/* RUANG IKLAN & PELUANG NIAGA BELIA */}
           {activeTab === 'b2b' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
               <B2BMarketSection />
             </div>
           )}
 
           {/* KALKULATOR KELAYAKAN GERAN & PEMBIAYAAN */}
           {activeTab === 'calculator' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
               <GrantCalculatorSection 
                 onOpenGrantModal={handleOpenGrantModal}
                 onOpenMentorship={() => setIsMentorshipModalOpen(true)}
@@ -870,15 +871,15 @@ function MainApp() {
           {/* PENTADBIRAN (ADMIN) */}
           {activeTab === 'admin' && (
             !isAdmin ? (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-8 text-center space-y-4 shadow-2xs">
-                <div className="w-14 h-14 bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-400 rounded-2xl flex items-center justify-center mx-auto">
+              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-8 text-center space-y-4 shadow-2xs">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                     {language === 'en' ? 'Administrator Access Only' : 'Akses Khusus Pentadbir Sistem Sahaja'}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
                     {isMentor 
                       ? 'Akaun anda adalah Mentor Bertauliah. Modul kawalan pentadbir sistem dikhaskan kepada pihak urus setia kerajaan.'
                       : 'Halaman ini dikhaskan kepada Pentadbir Sistem Kerajaan Negeri & UMK.'}
@@ -887,14 +888,14 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab(isMentor ? 'mentor' : 'home')}
-                  className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2"
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
                 >
-                  <ShieldCheck className="w-4 h-4 text-amber-400" />
+                  <ShieldCheck className="w-4 h-4" />
                   <span>{isMentor ? 'Kembali ke Hab Mentor' : 'Kembali ke Laman Utama'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
                 <AdminDashboard
                   slots={enrichedSlots}
                   businesses={businesses}
@@ -914,7 +915,7 @@ function MainApp() {
 
           {/* PORTAL MENTOR: HAB BIMBINGAN */}
           {activeTab === 'mentor' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
               <MentorPortal
                 mentors={mentors}
                 registrations={mentorshipRegistrations}
@@ -933,15 +934,15 @@ function MainApp() {
           {/* MERCHANT PORTAL: BISNES SAYA (KHUSUS BELIA) */}
           {activeTab === 'merchant' && (
             isAdmin ? (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-8 text-center space-y-4 shadow-2xs">
-                <div className="w-14 h-14 bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 rounded-2xl flex items-center justify-center mx-auto">
+              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-8 text-center space-y-4 shadow-2xs">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                     {language === 'en' ? 'Youth Entrepreneur Portal Only' : 'Akses Khusus Usahawan Belia Sahaja'}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
                     {language === 'en'
                       ? 'You are logged in with an Administrator account. Merchant business operations and kiosk management are reserved for registered youth.'
                       : 'Akaun anda adalah Pentadbir Sistem (Admin). Modul pengurusan bisnes usahawan dikhaskan kepada usahawan belia Kelantan.'}
@@ -950,22 +951,22 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('admin')}
-                  className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2"
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>{language === 'en' ? 'Back to Admin Control Panel' : 'Kembali ke Pusat Kawalan Pentadbir'}</span>
                 </button>
               </div>
             ) : isMentor ? (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-8 text-center space-y-4 shadow-2xs">
-                <div className="w-14 h-14 bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-400 rounded-2xl flex items-center justify-center mx-auto">
+              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-8 text-center space-y-4 shadow-2xs">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                     {language === 'en' ? 'Youth Entrepreneur Portal Only' : 'Akses Khusus Usahawan Belia Sahaja'}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
                     {language === 'en'
                       ? 'You are logged in with an Academic Mentor account. Business management is reserved for youth mentees. Please use the Mentor Coaching Hub.'
                       : 'Akaun anda adalah Mentor Bimbingan UMK. Modul pengurusan bisnes dikhaskan kepada usahawan belia. Sila gunakan Hab Mentor untuk menyemak dan membimbing usahawan.'}
@@ -974,19 +975,19 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('mentor')}
-                  className="px-5 py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2"
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>{language === 'en' ? 'Back to Mentor Coaching Hub' : 'Kembali ke Hab Bimbingan Mentor'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
                 <MerchantPortal
                   myBusiness={myBusiness}
                   myProducts={myProducts}
                   myBookings={myBookings}
-                  slots={slots}
+                  slots={enrichedSlots}
                   grantApplications={grantApplications.filter(g => g.applicantId === user?.uid || (user?.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase()))}
                   onViewOfferLetter={handleViewOfferLetter}
                   onOpenTenancyAgreement={(booking) => {
@@ -1009,7 +1010,7 @@ function MainApp() {
 
           {/* TETAPAN AKAUN & PROFIL */}
           {activeTab === 'settings' && (
-            <div className="bg-white dark:bg-[#24303F] rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-[#2E3A47] p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
               <SettingsPage
                 myBusiness={myBusiness}
                 onRefresh={triggerRefresh}
@@ -1025,7 +1026,7 @@ function MainApp() {
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
         selectedSlot={selectedSlotForBooking}
-        allSlots={slots}
+        allSlots={enrichedSlots}
         onBookingSuccess={triggerRefresh}
       />
 

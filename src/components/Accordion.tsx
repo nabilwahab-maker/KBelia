@@ -45,8 +45,8 @@ export const Accordion: React.FC<AccordionProps> = ({
             key={item.id}
             className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
               isOpen
-                ? 'border-red-200 dark:border-amber-900/60 bg-white dark:bg-[#1E293B] shadow-xs'
-                : 'border-slate-200/90 dark:border-slate-800 bg-white/70 dark:bg-[#1E293B]/60 hover:border-slate-300 dark:hover:border-slate-700'
+                ? 'border-sky-300 dark:border-sky-700/60 bg-white dark:bg-slate-800 shadow-xs'
+                : 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 hover:border-sky-200 dark:hover:border-slate-600'
             }`}
           >
             {/* Header Button with min 44px tap target */}
@@ -60,7 +60,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                 {item.icon && (
                   <div className={`p-1.5 rounded-xl shrink-0 ${
                     isOpen 
-                      ? 'bg-red-50 text-red-700 dark:bg-amber-950/40 dark:text-amber-400' 
+                      ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-400' 
                       : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
                   }`}>
                     {item.icon}
@@ -68,11 +68,11 @@ export const Accordion: React.FC<AccordionProps> = ({
                 )}
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                    <span className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white leading-snug">
                       {item.title}
                     </span>
                     {item.badge && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-sky-50 text-sky-800 border border-sky-200 dark:bg-sky-950 dark:text-sky-300 dark:border-sky-800/60">
                         {item.badge}
                       </span>
                     )}
@@ -87,7 +87,7 @@ export const Accordion: React.FC<AccordionProps> = ({
 
               <div
                 className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-slate-400 transition-transform duration-200 ${
-                  isOpen ? 'rotate-180 text-red-700 dark:text-amber-400' : ''
+                  isOpen ? 'rotate-180 text-sky-700 dark:text-sky-400' : ''
                 }`}
               >
                 <ChevronDown className="w-4 h-4" />
@@ -96,7 +96,7 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             {/* Collapsible Content */}
             {isOpen && (
-              <div className="px-4 pb-4 pt-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800/80 animate-in fade-in duration-150">
+              <div className="px-4 pb-4 pt-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-200/80 dark:border-slate-700/80 animate-in fade-in duration-150">
                 {item.content}
               </div>
             )}

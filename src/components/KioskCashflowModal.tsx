@@ -109,24 +109,24 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/70 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="w-full max-w-3xl bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl border border-emerald-300/60 dark:border-emerald-500/30 overflow-hidden flex flex-col max-h-[92vh] transition-all"
+        className="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[92vh] transition-all"
         role="dialog"
         aria-modal="true"
       >
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-800 via-emerald-900 to-teal-900 text-white px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-emerald-950">
+        <div className="kbelia-important-header text-slate-800 dark:text-white px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-              <Coins className="w-6 h-6 text-emerald-300" />
+            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center border border-sky-200 dark:border-sky-800/60">
+              <Coins className="w-6 h-6 text-sky-700 dark:text-sky-300" />
             </div>
             <div>
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-200">
+              <div className="text-[11px] font-extrabold uppercase tracking-widest text-sky-700 dark:text-sky-400">
                 Sistem Pengurusan Kewangan Kiosk
               </div>
-              <h3 className="font-black text-base sm:text-lg text-white">
+              <h3 className="font-black text-base sm:text-lg text-slate-800 dark:text-white">
                 Buku Tunai & Jualan Kiosk Pintar
               </h3>
             </div>
@@ -134,19 +134,19 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Sub-tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-7 pt-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60 shrink-0">
+        <div className="flex items-center gap-2 px-5 sm:px-7 pt-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 shrink-0">
           <button
             onClick={() => setActiveTab('sales')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'sales'
-                ? 'border-emerald-600 text-emerald-700 dark:border-emerald-400 dark:text-emerald-400'
+                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
@@ -158,7 +158,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
             onClick={() => setActiveTab('qr')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'qr'
-                ? 'border-emerald-600 text-emerald-700 dark:border-emerald-400 dark:text-emerald-400'
+                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
@@ -175,9 +175,9 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
               
               {/* Financial KPI Strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700">
                   <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Jumlah Kasar</span>
-                  <div className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tabular-nums mt-0.5">
+                  <div className="text-lg sm:text-xl font-black text-slate-800 dark:text-white tabular-nums mt-0.5">
                     RM {totalRevenue.toFixed(2)}
                   </div>
                 </div>
@@ -205,10 +205,10 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
               </div>
 
               {/* Form Tambah Rekod */}
-              <div className="bg-slate-50 dark:bg-slate-800/60 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700">
+              <div className="bg-slate-50 dark:bg-slate-900/60 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3 flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
-                    <Coins className="w-4 h-4 text-emerald-600" />
+                    <Coins className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     Tambah Rekod Jualan Hari Ini
                   </span>
                   <span className="text-[11px] font-normal text-slate-500">{kioskName}</span>
@@ -235,7 +235,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white"
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                       />
                     </div>
 
@@ -247,7 +247,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                         placeholder="0.00"
                         value={cash}
                         onChange={(e) => setCash(e.target.value)}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white"
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                       />
                     </div>
 
@@ -259,7 +259,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                         placeholder="0.00"
                         value={qr}
                         onChange={(e) => setQr(e.target.value)}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white"
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                       />
                     </div>
 
@@ -271,7 +271,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                         placeholder="0.00"
                         value={expenses}
                         onChange={(e) => setExpenses(e.target.value)}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white"
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                       />
                     </div>
                   </div>
@@ -282,11 +282,11 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                       placeholder="Catatan jualan (cth: Habis 60 cawan kopi waktu pagi)..."
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
+                      className="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                     />
                     <button
                       type="submit"
-                      className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-colors cursor-pointer shrink-0"
+                      className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-colors cursor-pointer shrink-0"
                     >
                       + Simpan Jualan
                     </button>
@@ -297,21 +297,21 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
               {/* Senarai Lejar Jualan */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white">
                     Sejarah Transaksi Jualan ({salesRecords.length} Hari Direkodkan)
                   </h4>
                   <button
                     type="button"
                     onClick={handlePrint}
-                    className="text-[11px] text-emerald-700 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] text-sky-700 dark:text-sky-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <Printer className="w-3.5 h-3.5" /> Cetak Lejar
                   </button>
                 </div>
 
-                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+                <div className="border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-500 border-b border-slate-200 dark:border-slate-800 text-[11px]">
+                    <thead className="bg-slate-50 dark:bg-slate-900/80 text-slate-500 border-b border-slate-200 dark:border-slate-700 text-[11px]">
                       <tr>
                         <th className="py-2.5 px-3">Tarikh</th>
                         <th className="py-2.5 px-3">Tunai</th>
@@ -322,7 +322,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                         <th className="py-2.5 px-3 text-right">Tindakan</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                    <tbody className="divide-y divide-slate-200/70 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                       {salesRecords.map((r) => {
                         const dailyNet = (r.cashSales + r.qrSales) - r.expenses;
                         return (
@@ -382,7 +382,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
                 >
                   <Printer className="w-4 h-4" />
                   <span>Cetak Stand QR Kiosk</span>
@@ -394,14 +394,14 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="p-4 sm:px-7 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between shrink-0">
+        <div className="p-4 sm:px-7 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between shrink-0">
           <div className="text-[11px] text-slate-500">
             Data disimpan secara automatik dalam simpanan selamat peranti anda.
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             Tutup
           </button>

@@ -98,7 +98,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     return (
       <aside 
         id="kbelia-left-sidebar"
-        className="w-18 h-full bg-white dark:bg-[#1E2530] text-slate-700 dark:text-[#DEE4EE] border-r border-slate-200 dark:border-[#3E4C5F] py-4 flex flex-col items-center justify-between shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0"
+        className="w-18 h-full bg-white border-r border-slate-200 py-4 flex flex-col items-center justify-between shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0"
       >
         <div className="flex flex-col items-center gap-2.5 w-full px-2 pt-1">
 
@@ -112,11 +112,11 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_admin_control')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'admin' 
-                    ? 'bg-amber-100 text-amber-950 dark:bg-amber-500/20 dark:text-amber-400 font-bold border border-amber-300 dark:border-amber-500/40 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
-                <ShieldCheck className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                <ShieldCheck className="w-5 h-5 text-sky-600" />
               </button>
 
               <button
@@ -125,8 +125,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_kiosk_monitoring')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'academic' 
-                    ? 'bg-amber-100 text-amber-950 dark:bg-amber-500/20 dark:text-amber-400 font-bold border border-amber-300 dark:border-amber-500/40 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Building2 className="w-5 h-5" />
@@ -139,8 +139,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_grant_monitoring')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'ceed' 
-                    ? 'bg-amber-100 text-amber-950 dark:bg-amber-500/20 dark:text-amber-400 font-bold border border-amber-300 dark:border-amber-500/40 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Award className="w-5 h-5" />
@@ -152,8 +152,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_district_analytics')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'b2b' 
-                    ? 'bg-amber-100 text-amber-950 dark:bg-amber-500/20 dark:text-amber-400 font-bold border border-amber-300 dark:border-amber-500/40 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Network className="w-5 h-5" />
@@ -166,8 +166,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_audit_ssm')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'hepa' 
-                    ? 'bg-amber-100 text-amber-950 dark:bg-amber-500/20 dark:text-amber-400 font-bold border border-amber-300 dark:border-amber-500/40 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Store className="w-5 h-5" />
@@ -179,8 +179,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_settings')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'settings' 
-                    ? 'bg-amber-100 text-amber-950 dark:bg-amber-500/20 dark:text-amber-400 font-bold border border-amber-300 dark:border-amber-500/40 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Settings className="w-5 h-5" />
@@ -190,7 +190,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
           {isMentor && (
             <>
-              {/* Sub 0: Ringkasan Eksekutif */}
               <button
                 type="button"
                 onClick={() => {
@@ -200,14 +199,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={isMs ? 'Ringkasan' : 'Overview'}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'mentor' && mentorSubTab === 'overview'
-                    ? 'bg-purple-100 text-purple-900 dark:bg-purple-900/40 dark:text-purple-300 font-bold border border-purple-300 dark:border-purple-800 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
-                <LayoutDashboard className="w-5 h-5 text-purple-700 dark:text-purple-400" />
+                <LayoutDashboard className="w-5 h-5 text-sky-600" />
               </button>
 
-              {/* Sub 1: Sesi Bimbingan */}
               <button
                 type="button"
                 onClick={() => {
@@ -217,14 +215,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={isMs ? 'Sesi Bimbingan' : 'Sessions'}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'mentor' && mentorSubTab === 'sessions'
-                    ? 'bg-purple-100 text-purple-900 dark:bg-purple-900/40 dark:text-purple-300 font-bold border border-purple-300 dark:border-purple-800 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
-                <Calendar className="w-5 h-5 text-purple-700 dark:text-purple-400" />
+                <Calendar className="w-5 h-5 text-sky-600" />
               </button>
 
-              {/* Sub 2: Perakuan Geran */}
               <button
                 type="button"
                 onClick={() => {
@@ -234,14 +231,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={isMs ? 'Perakuan Geran' : 'Endorsements'}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'mentor' && mentorSubTab === 'endorsements'
-                    ? 'bg-purple-100 text-purple-900 dark:bg-purple-900/40 dark:text-purple-300 font-bold border border-purple-300 dark:border-purple-800 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
-                <Award className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                <Award className="w-5 h-5 text-sky-600" />
               </button>
 
-              {/* Sub 3: Log Jurnal */}
               <button
                 type="button"
                 onClick={() => {
@@ -251,14 +247,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={isMs ? 'Log Jurnal' : 'Logbook'}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'mentor' && mentorSubTab === 'logbook'
-                    ? 'bg-purple-100 text-purple-900 dark:bg-purple-900/40 dark:text-purple-300 font-bold border border-purple-300 dark:border-purple-800 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
-                <FileText className="w-5 h-5 text-purple-700 dark:text-purple-400" />
+                <FileText className="w-5 h-5 text-sky-600" />
               </button>
 
-              {/* Sub 4: Profil & Jadual */}
               <button
                 type="button"
                 onClick={() => {
@@ -268,26 +263,25 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={isMs ? 'Profil & Jadual' : 'Profile & Schedule'}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'mentor' && mentorSubTab === 'profile'
-                    ? 'bg-purple-100 text-purple-900 dark:bg-purple-900/40 dark:text-purple-300 font-bold border border-purple-300 dark:border-purple-800 shadow-xs' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
-                <Settings className="w-5 h-5 text-purple-700 dark:text-purple-400" />
+                <Settings className="w-5 h-5 text-sky-600" />
               </button>
             </>
           )}
 
           {isYouth && (
             <>
-              {/* Category 1: Pengurusan */}
               <button
                 type="button"
                 onClick={() => setActiveTab('merchant')}
                 title={t('dashboard')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'merchant' || activeTab === 'home'
-                    ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white font-bold shadow-xs border border-red-200 dark:border-transparent' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <LayoutDashboard className="w-5 h-5" />
@@ -299,8 +293,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_my_kiosk')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'academic' 
-                    ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white font-bold shadow-xs border border-red-200 dark:border-transparent' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Building2 className="w-5 h-5" />
@@ -312,22 +306,21 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_sales_pos')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'b2b' 
-                    ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white font-bold shadow-xs border border-red-200 dark:border-transparent' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Coins className="w-5 h-5" />
               </button>
 
-              {/* Category 2: Dana & Bimbingan */}
               <button
                 type="button"
                 onClick={() => setActiveTab('ceed')}
                 title={t('nav_grant_application')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'ceed' 
-                    ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white font-bold shadow-xs border border-red-200 dark:border-transparent' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Award className="w-5 h-5" />
@@ -339,22 +332,21 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_mentor_clinic')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'events' 
-                    ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white font-bold shadow-xs border border-red-200 dark:border-transparent' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <GraduationCap className="w-5 h-5" />
               </button>
 
-              {/* Category 3: Direktori & Profil */}
               <button
                 type="button"
                 onClick={() => setActiveTab('hepa')}
                 title={t('directory')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'hepa' 
-                    ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white font-bold shadow-xs border border-red-200 dark:border-transparent' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Store className="w-5 h-5" />
@@ -366,8 +358,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_settings')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'settings' 
-                    ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white font-bold shadow-xs border border-red-200 dark:border-transparent' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-[#8A99AD] dark:hover:bg-[#2A3444] dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
+                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
                 }`}
               >
                 <Settings className="w-5 h-5" />
@@ -380,39 +372,30 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     );
   }
 
-  // =========================================================================
-  // 2. EXPANDED SIDEBAR VIEW (Grouped by 3 Categories matching UMK reference)
-  // =========================================================================
   return (
     <aside 
       id="kbelia-left-sidebar"
-      className="w-64 h-full bg-white dark:bg-[#1E2530] text-slate-800 dark:text-[#DEE4EE] border-r border-slate-200 dark:border-[#3E4C5F] p-4 flex flex-col justify-between shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30 sticky top-0"
+      className="w-64 h-full bg-white border-r border-slate-200 p-4 flex flex-col justify-between shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30 sticky top-0"
     >
       <div className="space-y-4">
         
-        {/* ================================================================= */}
-        {/* 1. SEARCH SIDEBAR INPUT (Positioned at the top above the button)  */}
-        {/* ================================================================= */}
+        {/* 1. SEARCH SIDEBAR INPUT */}
         <div className="relative group">
           <input
             type="text"
             placeholder={t('search_sidebar')}
             value={sidebarSearch}
             onChange={(e) => setSidebarSearch(e.target.value)}
-            className="w-full pl-3.5 pr-8 py-2 text-xs bg-slate-50 dark:bg-[#242D3B] border border-slate-200 dark:border-[#3E4C5F] rounded-xl text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all duration-200"
+            className="w-full pl-3.5 pr-8 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all duration-200"
           />
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-amber-500" />
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-sky-600" />
         </div>
 
-        {/* =================================================================== */}
-        {/* ROLE A: PENTADBIR KERAJAAN (ADMIN PORTAL ONLY) - 3 KATEGORI         */}
-        {/* =================================================================== */}
+        {/* ROLE A: PENTADBIR KERAJAAN */}
         {isAdmin && (
           <div className="space-y-4">
-            
-            {/* KATEGORI 1: PENGURUSAN */}
             <div className="space-y-1">
-              <div className="text-[11px] font-black tracking-wider text-amber-700 dark:text-amber-400 uppercase px-2 pt-1 pb-1">
+              <div className="text-[11px] font-black tracking-wider text-sky-700 uppercase px-2 pt-1 pb-1">
                 {isMs ? 'PENGURUSAN' : 'MANAGEMENT'}
               </div>
 
@@ -434,21 +417,19 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     }}
                     className={`interactive-press w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                       activeTab === 'admin'
-                        ? 'bg-amber-500/15 text-amber-950 dark:text-amber-300 border border-amber-300/80 dark:border-amber-500/40 shadow-2xs font-bold'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <ShieldCheck className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'admin' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`} />
+                      <ShieldCheck className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'admin' ? 'text-sky-600' : 'text-slate-400'}`} />
                       <span className="truncate">{t('nav_admin_control')}</span>
                     </div>
-                    <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isAdminDashboardAccordionOpen ? 'rotate-0' : '-rotate-90'} ${activeTab === 'admin' ? 'text-amber-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isAdminDashboardAccordionOpen ? 'rotate-0' : '-rotate-90'} ${activeTab === 'admin' ? 'text-sky-700' : 'text-slate-400'}`} />
                   </button>
 
-                  {/* SUB-MENU AKORDION PENTADBIR (8 MODUL PENUH) */}
                   {isAdminDashboardAccordionOpen && (
-                    <div className="ml-3 pl-2.5 border-l-2 border-amber-300 dark:border-amber-600/70 space-y-1 pt-0.5 pb-1 animate-in fade-in slide-in-from-top-1 duration-200">
-                      {/* Sub 1: Giliran Kelulusan */}
+                    <div className="ml-3 pl-2.5 border-l-2 border-emerald-200 space-y-1 pt-0.5 pb-1 animate-in fade-in slide-in-from-top-1 duration-200">
                       <button
                         type="button"
                         onClick={() => {
@@ -457,15 +438,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'admin' && adminSubTab === 'queue'
-                            ? 'bg-amber-600 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'queue' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
+                        <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'queue' ? 'text-white' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Kelulusan</span>
                       </button>
 
-                      {/* Sub 2: Permohonan Kapsul */}
                       <button
                         type="button"
                         onClick={() => {
@@ -474,15 +454,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'admin' && adminSubTab === 'bookings'
-                            ? 'bg-amber-600 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <Clock className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'bookings' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
+                        <Clock className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'bookings' ? 'text-white' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Kapsul</span>
                       </button>
 
-                      {/* Sub 3: Direktori Usahawan */}
                       <button
                         type="button"
                         onClick={() => {
@@ -491,15 +470,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'admin' && adminSubTab === 'businesses'
-                            ? 'bg-amber-600 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <Store className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'businesses' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
+                        <Store className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'businesses' ? 'text-white' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Direktori</span>
                       </button>
 
-                      {/* Sub 4: Pengurusan Kapsul */}
                       <button
                         type="button"
                         onClick={() => {
@@ -508,15 +486,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'admin' && adminSubTab === 'slots'
-                            ? 'bg-amber-600 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'slots' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
+                        <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'slots' ? 'text-white' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Kiosk</span>
                       </button>
 
-                      {/* Sub 5: Geran & Inisiatif */}
                       <button
                         type="button"
                         onClick={() => {
@@ -525,15 +502,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'admin' && adminSubTab === 'programs'
-                            ? 'bg-amber-600 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <Award className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'programs' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
+                        <Award className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'programs' ? 'text-white' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Geran</span>
                       </button>
 
-                      {/* Sub 6: Bimbingan Mentor */}
                       <button
                         type="button"
                         onClick={() => {
@@ -542,15 +518,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'admin' && adminSubTab === 'mentors'
-                            ? 'bg-amber-600 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <GraduationCap className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'mentors' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
+                        <GraduationCap className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'mentors' ? 'text-white' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Bimbingan</span>
                       </button>
 
-                      {/* Sub 7: Segerak Pangkalan Data */}
                       <button
                         type="button"
                         onClick={() => {
@@ -559,15 +534,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'admin' && adminSubTab === 'sync'
-                            ? 'bg-amber-600 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <Database className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'sync' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
+                        <Database className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'sync' ? 'text-white' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Penyegerakan</span>
                       </button>
 
-                      {/* Sub 8: Tetapan Operasi */}
                       <button
                         type="button"
                         onClick={() => {
@@ -576,11 +550,11 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'admin' && adminSubTab === 'settings'
-                            ? 'bg-amber-600 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <Sliders className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'settings' ? 'text-white' : 'text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400'}`} />
+                        <Sliders className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'settings' ? 'text-white' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Tetapan</span>
                       </button>
                     </div>
@@ -594,22 +568,22 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('academic')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'academic'
-                      ? 'bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-300/80 dark:border-amber-500/40 shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Building2 className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'academic' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`} />
+                    <Building2 className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'academic' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_kiosk_monitoring')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'academic' ? 'text-amber-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'academic' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
             </div>
 
             {/* KATEGORI 2: DANA DAN BIMBINGAN */}
             <div className="space-y-1">
-              <div className="text-[11px] font-black tracking-wider text-amber-700 dark:text-amber-400 uppercase px-2 pt-2 pb-1">
+              <div className="text-[11px] font-black tracking-wider text-sky-700 uppercase px-2 pt-2 pb-1">
                 {isMs ? 'DANA DAN BIMBINGAN' : 'GRANTS & COACHING'}
               </div>
 
@@ -619,15 +593,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('ceed')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'ceed'
-                      ? 'bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-300/80 dark:border-amber-500/40 shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Award className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'ceed' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`} />
+                    <Award className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'ceed' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_grant_monitoring')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'ceed' ? 'text-amber-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'ceed' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
 
@@ -637,22 +611,22 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('b2b')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'b2b'
-                      ? 'bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-300/80 dark:border-amber-500/40 shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Network className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'b2b' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`} />
+                    <Network className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'b2b' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_district_analytics')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'b2b' ? 'text-amber-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'b2b' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
             </div>
 
             {/* KATEGORI 3: DIREKTORI & PROFIL */}
             <div className="space-y-1">
-              <div className="text-[11px] font-black tracking-wider text-amber-700 dark:text-amber-400 uppercase px-2 pt-2 pb-1">
+              <div className="text-[11px] font-black tracking-wider text-sky-700 uppercase px-2 pt-2 pb-1">
                 {isMs ? 'DIREKTORI & PROFIL' : 'DIRECTORY & PROFILE'}
               </div>
 
@@ -662,15 +636,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('hepa')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'hepa'
-                      ? 'bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-300/80 dark:border-amber-500/40 shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Store className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'hepa' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`} />
+                    <Store className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'hepa' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_audit_ssm')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'hepa' ? 'text-amber-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'hepa' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
 
@@ -680,15 +654,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('settings')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'settings'
-                      ? 'bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-300/80 dark:border-amber-500/40 shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Settings className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'settings' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`} />
+                    <Settings className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'settings' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_settings')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'settings' ? 'text-amber-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'settings' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
             </div>
@@ -696,12 +670,9 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
           </div>
         )}
 
-        {/* =================================================================== */}
-        {/* ROLE B: MENTOR SISTEM (5 MODUL UTAMA DENGAN RINGKASAN EKSEKUTIF)    */}
-        {/* =================================================================== */}
+        {/* ROLE B: MENTOR SISTEM */}
         {isMentor && (
           <div className="space-y-1.5">
-            {/* Butang 0: Ringkasan Eksekutif */}
             {matchesSearch('ringkasan papan pemuka overview status tindakan usahawan geran dashboard') && (
               <button
                 type="button"
@@ -711,19 +682,18 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }}
                 className={`interactive-press w-full flex items-center justify-between px-3 py-2.5 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                   activeTab === 'mentor' && mentorSubTab === 'overview'
-                    ? 'bg-purple-500/15 text-purple-950 dark:text-purple-300 border border-purple-300/80 dark:border-purple-500/40 shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <LayoutDashboard className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'overview' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400'}`} />
+                  <LayoutDashboard className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'overview' ? 'text-sky-600' : 'text-slate-400'}`} />
                   <span className="truncate">{isMs ? 'Ringkasan' : 'Overview'}</span>
                 </div>
-                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'overview' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'overview' ? 'text-sky-700' : 'text-slate-300'}`} />
               </button>
             )}
 
-            {/* Butang 1: Sesi Bimbingan */}
             {matchesSearch('sesi bimbingan kalendar temujanji mentee maya google meet jadual') && (
               <button
                 type="button"
@@ -733,19 +703,18 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }}
                 className={`interactive-press w-full flex items-center justify-between px-3 py-2.5 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                   activeTab === 'mentor' && mentorSubTab === 'sessions'
-                    ? 'bg-purple-500/15 text-purple-950 dark:text-purple-300 border border-purple-300/80 dark:border-purple-500/40 shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <Calendar className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'sessions' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400'}`} />
+                  <Calendar className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'sessions' ? 'text-sky-600' : 'text-slate-400'}`} />
                   <span className="truncate">{isMs ? 'Sesi Bimbingan' : 'Sessions'}</span>
                 </div>
-                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'sessions' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'sessions' ? 'text-sky-700' : 'text-slate-300'}`} />
               </button>
             )}
 
-            {/* Butang 2: Perakuan Geran */}
             {matchesSearch('perakuan geran dana sokongan surat kelulusan benih pemangkin') && (
               <button
                 type="button"
@@ -755,19 +724,18 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }}
                 className={`interactive-press w-full flex items-center justify-between px-3 py-2.5 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                   activeTab === 'mentor' && mentorSubTab === 'endorsements'
-                    ? 'bg-purple-500/15 text-purple-950 dark:text-purple-300 border border-purple-300/80 dark:border-purple-500/40 shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <Award className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'endorsements' ? 'text-amber-500' : 'text-slate-400'}`} />
+                  <Award className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'endorsements' ? 'text-sky-600' : 'text-slate-400'}`} />
                   <span className="truncate">{isMs ? 'Perakuan Geran' : 'Endorsements'}</span>
                 </div>
-                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'endorsements' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'endorsements' ? 'text-sky-700' : 'text-slate-300'}`} />
               </button>
             )}
 
-            {/* Butang 3: Log Jurnal */}
             {matchesSearch('log jurnal minit bimbingan tindakan kpi kemajuan tugasan') && (
               <button
                 type="button"
@@ -777,19 +745,18 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }}
                 className={`interactive-press w-full flex items-center justify-between px-3 py-2.5 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                   activeTab === 'mentor' && mentorSubTab === 'logbook'
-                    ? 'bg-purple-500/15 text-purple-950 dark:text-purple-300 border border-purple-300/80 dark:border-purple-500/40 shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <FileText className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'logbook' ? 'text-emerald-500' : 'text-slate-400'}`} />
+                  <FileText className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'logbook' ? 'text-sky-600' : 'text-slate-400'}`} />
                   <span className="truncate">{isMs ? 'Log Jurnal' : 'Logbook'}</span>
                 </div>
-                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'logbook' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'logbook' ? 'text-sky-700' : 'text-slate-300'}`} />
               </button>
             )}
 
-            {/* Butang 4: Profil & Jadual */}
             {matchesSearch('profil jadual kelapangan mentor tetapan akaun waktu bimbingan') && (
               <button
                 type="button"
@@ -799,33 +766,28 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }}
                 className={`interactive-press w-full flex items-center justify-between px-3 py-2.5 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                   activeTab === 'mentor' && mentorSubTab === 'profile'
-                    ? 'bg-purple-500/15 text-purple-950 dark:text-purple-300 border border-purple-300/80 dark:border-purple-500/40 shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <Settings className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'profile' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400'}`} />
+                  <Settings className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'mentor' && mentorSubTab === 'profile' ? 'text-sky-600' : 'text-slate-400'}`} />
                   <span className="truncate">{isMs ? 'Profil & Jadual' : 'Profile & Schedule'}</span>
                 </div>
-                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'profile' ? 'text-purple-600 dark:text-purple-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'mentor' && mentorSubTab === 'profile' ? 'text-sky-700' : 'text-slate-300'}`} />
               </button>
             )}
           </div>
         )}
 
-        {/* =================================================================== */}
-        {/* ROLE C: USAHAWAN BELIA (YOUTH ENTREPRENEUR PORTAL ONLY) - 3 KATEGORI*/}
-        {/* =================================================================== */}
+        {/* ROLE C: USAHAWAN BELIA */}
         {isYouth && (
           <div className="space-y-4">
-            
-            {/* KATEGORI 1: PENGURUSAN */}
             <div className="space-y-1">
-              <div className="text-[11px] font-black tracking-wider text-amber-600 dark:text-amber-400 uppercase px-2 pt-1 pb-1">
+              <div className="text-[11px] font-black tracking-wider text-sky-700 uppercase px-2 pt-1 pb-1">
                 {isMs ? 'PENGURUSAN' : 'MANAGEMENT'}
               </div>
 
-              {/* DASHBOARD UTAMA DENGAN SUB-MENU AKORDION */}
               {matchesSearch('papan pemuka usahawan belia jualan status dashboard ringkasan eksekutif profil perniagaan katalog produk sewa kapsul buku tunai jualan dokumen sah kad digital whatsapp') && (
                 <div className="space-y-1">
                   <button
@@ -843,21 +805,19 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     }}
                     className={`interactive-press w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                       activeTab === 'merchant' || activeTab === 'home'
-                        ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white border border-red-200 dark:border-transparent shadow-2xs font-bold'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <LayoutDashboard className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'merchant' || activeTab === 'home' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'}`} />
+                      <LayoutDashboard className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'merchant' || activeTab === 'home' ? 'text-sky-600' : 'text-slate-400'}`} />
                       <span className="truncate">{t('dashboard')}</span>
                     </div>
-                    <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isDashboardAccordionOpen ? 'rotate-0' : '-rotate-90'} ${activeTab === 'merchant' || activeTab === 'home' ? 'text-red-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isDashboardAccordionOpen ? 'rotate-0' : '-rotate-90'} ${activeTab === 'merchant' || activeTab === 'home' ? 'text-sky-700' : 'text-slate-400'}`} />
                   </button>
 
-                  {/* SUB-MENU AKORDION PENDAPATAN/PENGURUSAN PENIAGA */}
                   {isDashboardAccordionOpen && (
-                    <div className="ml-3 pl-2.5 border-l-2 border-red-200 dark:border-slate-700/80 space-y-1 pt-0.5 pb-1 animate-in fade-in slide-in-from-top-1 duration-200">
-                      {/* Sub 1: Ringkasan Eksekutif */}
+                    <div className="ml-3 pl-2.5 border-l-2 border-emerald-200 space-y-1 pt-0.5 pb-1 animate-in fade-in slide-in-from-top-1 duration-200">
                       <button
                         type="button"
                         onClick={() => {
@@ -866,15 +826,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'merchant' && merchantSubTab === 'overview'
-                            ? 'bg-red-700 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <BarChart3 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'overview' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
+                        <BarChart3 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'overview' ? 'text-sky-100' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Ringkasan</span>
                       </button>
 
-                      {/* Sub 2: Profil Perniagaan */}
                       <button
                         type="button"
                         onClick={() => {
@@ -883,15 +842,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'merchant' && merchantSubTab === 'profile'
-                            ? 'bg-red-700 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <Store className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'profile' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
+                        <Store className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'profile' ? 'text-sky-100' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Profil Bisnes</span>
                       </button>
 
-                      {/* Sub 3: Katalog Produk */}
                       <button
                         type="button"
                         onClick={() => {
@@ -900,15 +858,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'merchant' && merchantSubTab === 'products'
-                            ? 'bg-red-700 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <ShoppingBag className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'products' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
+                        <ShoppingBag className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'products' ? 'text-sky-100' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Katalog</span>
                       </button>
 
-                      {/* Sub 4: Permohonan Kapsul */}
                       <button
                         type="button"
                         onClick={() => {
@@ -917,15 +874,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'merchant' && merchantSubTab === 'bookings'
-                            ? 'bg-red-700 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'bookings' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
+                        <Building2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'bookings' ? 'text-sky-100' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Kapsul Niaga</span>
                       </button>
 
-                      {/* Sub 5: Buku Tunai Jualan */}
                       <button
                         type="button"
                         onClick={() => {
@@ -934,15 +890,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'merchant' && merchantSubTab === 'cashflow'
-                            ? 'bg-red-700 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <Coins className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'cashflow' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
+                        <Coins className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'cashflow' ? 'text-sky-100' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Buku Tunai</span>
                       </button>
 
-                      {/* Sub 6: Buat Dokumen Sah */}
                       <button
                         type="button"
                         onClick={() => {
@@ -951,15 +906,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'merchant' && merchantSubTab === 'vault'
-                            ? 'bg-red-700 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <FileCheck className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'vault' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
+                        <FileCheck className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'vault' ? 'text-sky-100' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Dokumen Sah</span>
                       </button>
 
-                      {/* Sub 7: Kad Digital WhatsApp Link */}
                       <button
                         type="button"
                         onClick={() => {
@@ -968,11 +922,11 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }}
                         className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'merchant' && merchantSubTab === 'card'
-                            ? 'bg-red-700 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444]/70 hover:text-slate-900 dark:hover:text-white'
+                            ? 'bg-sky-600 text-white font-bold shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
                         }`}
                       >
-                        <MessageCircle className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'card' ? 'text-amber-300' : 'text-slate-400 group-hover:text-red-600 dark:group-hover:text-amber-400'}`} />
+                        <MessageCircle className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'card' ? 'text-sky-100' : 'text-slate-400 group-hover:text-sky-600'}`} />
                         <span className="truncate">Kad Digital</span>
                       </button>
                     </div>
@@ -986,15 +940,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('academic')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'academic'
-                      ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white border border-red-200 dark:border-transparent shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Building2 className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'academic' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'}`} />
+                    <Building2 className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'academic' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_my_kiosk')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'academic' ? 'text-red-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'academic' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
 
@@ -1004,22 +958,22 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('b2b')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'b2b'
-                      ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white border border-red-200 dark:border-transparent shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Coins className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'b2b' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'}`} />
+                    <Coins className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'b2b' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_sales_pos')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'b2b' ? 'text-red-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'b2b' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
             </div>
 
             {/* KATEGORI 2: DANA DAN BIMBINGAN */}
             <div className="space-y-1">
-              <div className="text-[11px] font-black tracking-wider text-amber-600 dark:text-amber-400 uppercase px-2 pt-2 pb-1">
+              <div className="text-[11px] font-black tracking-wider text-sky-700 uppercase px-2 pt-2 pb-1">
                 {isMs ? 'DANA DAN BIMBINGAN' : 'GRANTS & COACHING'}
               </div>
 
@@ -1029,15 +983,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('ceed')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'ceed'
-                      ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white border border-red-200 dark:border-transparent shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Award className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'ceed' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'}`} />
+                    <Award className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'ceed' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_grant_application')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'ceed' ? 'text-red-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'ceed' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
 
@@ -1047,22 +1001,22 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('events')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'events'
-                      ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white border border-red-200 dark:border-transparent shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <GraduationCap className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'events' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'}`} />
+                    <GraduationCap className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'events' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_mentor_clinic')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'events' ? 'text-red-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'events' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
             </div>
 
             {/* KATEGORI 3: DIREKTORI & PROFIL */}
             <div className="space-y-1">
-              <div className="text-[11px] font-black tracking-wider text-amber-600 dark:text-amber-400 uppercase px-2 pt-2 pb-1">
+              <div className="text-[11px] font-black tracking-wider text-sky-700 uppercase px-2 pt-2 pb-1">
                 {isMs ? 'DIREKTORI & PROFIL' : 'DIRECTORY & PROFILE'}
               </div>
 
@@ -1072,15 +1026,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('hepa')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'hepa'
-                      ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white border border-red-200 dark:border-transparent shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Store className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'hepa' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'}`} />
+                    <Store className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'hepa' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('directory')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'hepa' ? 'text-red-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'hepa' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
 
@@ -1090,15 +1044,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   onClick={() => setActiveTab('settings')}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'settings'
-                      ? 'bg-red-50 text-red-700 dark:bg-[#2A3444] dark:text-white border border-red-200 dark:border-transparent shadow-2xs font-bold'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2A3444] hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Settings className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'settings' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'}`} />
+                    <Settings className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'settings' ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_settings')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'settings' ? 'text-red-700 dark:text-amber-400' : 'text-slate-300 dark:text-slate-600'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'settings' ? 'text-sky-700' : 'text-slate-300'}`} />
                 </button>
               )}
             </div>

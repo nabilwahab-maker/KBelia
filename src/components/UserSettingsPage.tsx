@@ -188,17 +188,17 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
   };
 
   return (
-    <div className="min-h-screen bg-[#F3F6F9] text-slate-900 font-sans selection:bg-teal-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-sky-600 selection:text-white">
       
       {/* 1. TOP HEADER & BREADCRUMB NAVIGATION */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-2xs">
+      <header className="kbelia-important-header border-b border-slate-200 sticky top-0 z-40 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setActiveTab(isAdmin ? 'admin' : 'merchant')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
               title="Kembali ke Papan Pemuka"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
@@ -209,11 +209,11 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
             <div className="h-4 w-px bg-slate-200 hidden sm:block" />
 
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-red-700 to-amber-600 text-white flex items-center justify-center font-black text-xs shadow-2xs">
+              <div className="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-black text-xs shadow-2xs">
                 KB
               </div>
               <div>
-                <span className="font-extrabold text-sm text-slate-900 tracking-tight">Tetapan Akaun Usahawan</span>
+                <span className="font-extrabold text-sm text-slate-800 tracking-tight">Tetapan Akaun Usahawan</span>
                 <span className="text-[10px] text-slate-500 block -mt-0.5 font-medium">Portal KBelia Kelantan</span>
               </div>
             </div>
@@ -225,7 +225,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
               type="button"
               onClick={() => handleSaveChanges()}
               disabled={isSaving}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-sm transition-all active:scale-[0.98] disabled:opacity-60"
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
             >
               {isSaving ? (
                 <>
@@ -271,27 +271,27 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
           <div className="lg:col-span-4 space-y-4">
             
             {/* User Identity Card */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs text-center relative overflow-hidden">
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs text-center relative overflow-hidden">
               <div className="relative inline-block mb-3">
                 <img
                   src={avatarSrc}
                   alt={fullName}
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover mx-auto border-2 border-white shadow-md bg-slate-100"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover mx-auto border-2 border-white shadow-md bg-slate-50"
                 />
-                {/* Online Indicator Dot at Top Right (like in user image) */}
+                {/* Online Indicator Dot at Top Right */}
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-xs" title="Akaun Aktif & Disahkan" />
               </div>
 
               {/* ID & Full Name */}
               <div className="space-y-1">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 text-red-900 text-[11px] font-mono font-bold border border-red-200">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-800 text-[11px] font-mono font-bold border border-sky-200">
                   <span>{entrepreneurId}</span>
                 </div>
-                <h3 className="font-black text-sm sm:text-base text-slate-900 tracking-tight uppercase leading-snug">
+                <h3 className="font-black text-sm sm:text-base text-slate-800 tracking-tight uppercase leading-snug">
                   {fullName}
                 </h3>
                 {businessName && (
-                  <p className="text-xs font-semibold text-teal-700">
+                  <p className="text-xs font-semibold text-sky-700">
                     {businessName}
                   </p>
                 )}
@@ -302,15 +302,15 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                 <button
                   type="button"
                   onClick={() => setActiveSection('notifications')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold hover:bg-purple-100 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold hover:bg-emerald-100 transition-colors cursor-pointer"
                 >
-                  <Bell className="w-3.5 h-3.5 text-purple-600" />
+                  <Bell className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Notifikasi Aktif</span>
                 </button>
               </div>
 
               {/* Quick Metadata Details */}
-              <div className="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3 text-left text-xs">
+              <div className="mt-5 pt-4 border-t border-slate-200 grid grid-cols-2 gap-3 text-left text-xs">
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Username:</span>
                   <span className="font-semibold text-slate-800 text-[11px] truncate block">{username}</span>
@@ -326,19 +326,19 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
               </div>
             </div>
 
-            {/* Vertical Navigation Menu matching Reference Image */}
-            <nav className="bg-white rounded-2xl border border-slate-200/90 p-2 shadow-2xs space-y-1 text-xs font-bold">
+            {/* Vertical Navigation Menu */}
+            <nav className="bg-white rounded-2xl border border-slate-200 p-2 shadow-2xs space-y-1 text-xs font-bold">
               
               <button
                 type="button"
                 onClick={() => setActiveSection('general')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left cursor-pointer ${
                   activeSection === 'general'
-                    ? 'bg-teal-50 text-teal-900 font-extrabold border border-teal-200/80 shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-sky-50 text-sky-900 font-extrabold border border-sky-200/80 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
                 }`}
               >
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'general' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'general' ? 'bg-sky-600 text-white' : 'bg-slate-50 text-slate-500'}`}>
                   <FileText className="w-4 h-4" />
                 </div>
                 <span>Maklumat Am (General)</span>
@@ -347,13 +347,13 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
               <button
                 type="button"
                 onClick={() => setActiveSection('profile')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left cursor-pointer ${
                   activeSection === 'profile'
-                    ? 'bg-teal-50 text-teal-900 font-extrabold border border-teal-200/80 shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-sky-50 text-sky-900 font-extrabold border border-sky-200/80 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
                 }`}
               >
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'profile' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'profile' ? 'bg-sky-600 text-white' : 'bg-slate-50 text-slate-500'}`}>
                   <User className="w-4 h-4" />
                 </div>
                 <span>Profil Usahawan (Profile)</span>
@@ -362,13 +362,13 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
               <button
                 type="button"
                 onClick={() => setActiveSection('business')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left cursor-pointer ${
                   activeSection === 'business'
-                    ? 'bg-teal-50 text-teal-900 font-extrabold border border-teal-200/80 shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-sky-50 text-sky-900 font-extrabold border border-sky-200/80 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
                 }`}
               >
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'business' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'business' ? 'bg-sky-600 text-white' : 'bg-slate-50 text-slate-500'}`}>
                   <Store className="w-4 h-4" />
                 </div>
                 <span>Profil Bisnes & SSM</span>
@@ -377,13 +377,13 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
               <button
                 type="button"
                 onClick={() => setActiveSection('password')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left cursor-pointer ${
                   activeSection === 'password'
-                    ? 'bg-teal-50 text-teal-900 font-extrabold border border-teal-200/80 shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-sky-50 text-sky-900 font-extrabold border border-sky-200/80 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
                 }`}
               >
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'password' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'password' ? 'bg-sky-600 text-white' : 'bg-slate-50 text-slate-500'}`}>
                   <Lock className="w-4 h-4" />
                 </div>
                 <span>Keselamatan & Kata Laluan</span>
@@ -392,13 +392,13 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
               <button
                 type="button"
                 onClick={() => setActiveSection('notifications')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left cursor-pointer ${
                   activeSection === 'notifications'
-                    ? 'bg-teal-50 text-teal-900 font-extrabold border border-teal-200/80 shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-sky-50 text-sky-900 font-extrabold border border-sky-200/80 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
                 }`}
               >
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'notifications' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'notifications' ? 'bg-sky-600 text-white' : 'bg-slate-50 text-slate-500'}`}>
                   <Bell className="w-4 h-4" />
                 </div>
                 <span>Notifikasi & Saluran</span>
@@ -407,13 +407,13 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
               <button
                 type="button"
                 onClick={() => setActiveSection('devices')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-left cursor-pointer ${
                   activeSection === 'devices'
-                    ? 'bg-teal-50 text-teal-900 font-extrabold border border-teal-200/80 shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-sky-50 text-sky-900 font-extrabold border border-sky-200/80 shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
                 }`}
               >
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'devices' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeSection === 'devices' ? 'bg-sky-600 text-white' : 'bg-slate-50 text-slate-500'}`}>
                   <Laptop className="w-4 h-4" />
                 </div>
                 <span>Sesi & Peranti (Devices)</span>
@@ -426,7 +426,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
           {/* =========================================
               RIGHT COLUMN: SETTINGS FORM CONTENT (Col Span 8)
               ========================================= */}
-          <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-2xs space-y-6">
+          <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-2xs space-y-6">
             
             {/* ---------------- SECTION 1: GENERAL INFORMATION ---------------- */}
             {activeSection === 'general' && (
@@ -441,7 +441,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     type="button"
                     onClick={() => handleSaveChanges()}
                     disabled={isSaving}
-                    className="self-start sm:self-auto px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-2xs transition-all active:scale-[0.98]"
+                    className="self-start sm:self-auto px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-2xs transition-all active:scale-[0.98]"
                   >
                     Simpan Perubahan
                   </button>
@@ -459,7 +459,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Username"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
 
@@ -473,7 +473,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                       value={nickname}
                       onChange={(e) => setNickname(e.target.value)}
                       placeholder="Nama Samaran / Gelaran"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
 
@@ -560,7 +560,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     type="button"
                     onClick={() => handleSaveChanges()}
                     disabled={isSaving}
-                    className="self-start sm:self-auto px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-2xs transition-all active:scale-[0.98]"
+                    className="self-start sm:self-auto px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-2xs transition-all active:scale-[0.98]"
                   >
                     Simpan Perubahan
                   </button>
@@ -578,7 +578,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Nama penuh"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
 
@@ -592,7 +592,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                       value={icNumber}
                       onChange={(e) => setIcNumber(e.target.value)}
                       placeholder="Masukkan No. Kad Pengenalan"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
 
@@ -606,7 +606,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="No. telefon"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
 
@@ -618,7 +618,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     <select
                       value={district}
                       onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     >
                       {JAJAHAN_OPTIONS.map((j) => (
                         <option key={j} value={j}>{j}</option>
@@ -644,7 +644,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     type="button"
                     onClick={() => handleSaveChanges()}
                     disabled={isSaving}
-                    className="self-start sm:self-auto px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-2xs transition-all active:scale-[0.98]"
+                    className="self-start sm:self-auto px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-2xs transition-all active:scale-[0.98]"
                   >
                     Simpan Perubahan
                   </button>
@@ -662,7 +662,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
                       placeholder="Nama perniagaan"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
 
@@ -674,7 +674,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as BusinessCategory)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     >
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -690,7 +690,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     <select
                       value={businessStage}
                       onChange={(e) => setBusinessStage(e.target.value as any)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     >
                       <option value="idea">Fasa Idea / R&D (Belum mula berniaga)</option>
                       <option value="startup">Fasa Permulaan (1 - 12 bulan)</option>
@@ -706,7 +706,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     <select
                       value={ssmStatus}
                       onChange={(e) => setSsmStatus(e.target.value as any)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     >
                       <option value="registered">Sudah Berdaftar dengan SSM</option>
                       <option value="in_progress">Dalam Proses Pendaftaran</option>
@@ -724,7 +724,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                       value={ssmNumber}
                       onChange={(e) => setSsmNumber(e.target.value)}
                       placeholder="No. pendaftaran SSM"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
 
@@ -738,7 +738,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                       value={businessAddress}
                       onChange={(e) => setBusinessAddress(e.target.value)}
                       placeholder="Lokasi premis perniagaan atau tapak kiosk"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all"
                     />
                   </div>
 
@@ -770,7 +770,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder="Kata Laluan Semasa"
-                        className="w-full px-3.5 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all text-xs"
+                        className="w-full px-3.5 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all text-xs"
                       />
                       <button
                         type="button"
@@ -794,7 +794,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="Kata Laluan Baharu"
-                        className="w-full px-3.5 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all text-xs"
+                        className="w-full px-3.5 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all text-xs"
                       />
                       <button
                         type="button"
@@ -817,7 +817,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                       value={confirmNewPassword}
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
                       placeholder="Sahkan Kata Laluan Baharu"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-teal-600 focus:bg-white focus:outline-none transition-all text-xs"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:bg-white focus:outline-none transition-all text-xs"
                     />
                   </div>
 
@@ -825,9 +825,9 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     <button
                       type="submit"
                       disabled={isSaving}
-                      className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-2xs transition-all flex items-center gap-2"
+                      className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-xs shadow-2xs transition-all flex items-center gap-2 cursor-pointer"
                     >
-                      <KeyRound className="w-4 h-4 text-amber-400" />
+                      <KeyRound className="w-4 h-4 text-sky-100" />
                       <span>Kemas Kini Kata Laluan</span>
                     </button>
                   </div>
@@ -836,7 +836,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
 
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 text-xs text-slate-600">
                   <div className="flex items-center gap-2 font-bold text-slate-900">
-                    <ShieldCheck className="w-4 h-4 text-teal-600" />
+                    <ShieldCheck className="w-4 h-4 text-sky-600" />
                     <span>Perlindungan Enkripsi Sesi 256-Bit SSL</span>
                   </div>
                   <p className="text-[11px] text-slate-500">
@@ -860,7 +860,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                     type="button"
                     onClick={() => handleSaveChanges()}
                     disabled={isSaving}
-                    className="self-start sm:self-auto px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-2xs transition-all active:scale-[0.98]"
+                    className="self-start sm:self-auto px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-2xs transition-all active:scale-[0.98]"
                   >
                     Simpan Perubahan
                   </button>
@@ -880,7 +880,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                         onChange={(e) => setNotifyEmail(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>
+                      <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-600"></div>
                     </label>
                   </div>
 
@@ -896,7 +896,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                         onChange={(e) => setNotifyWhatsapp(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>
+                      <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-600"></div>
                     </label>
                   </div>
 
@@ -912,7 +912,7 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                         onChange={(e) => setNotifySms(e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>
+                      <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-600"></div>
                     </label>
                   </div>
 
@@ -933,15 +933,15 @@ export const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ setActiveTab
                 <div className="space-y-3">
                   
                   {/* Current Active Device */}
-                  <div className="p-4 rounded-2xl bg-teal-50/50 border border-teal-200 flex items-center justify-between gap-4 text-xs">
+                  <div className="p-4 rounded-2xl bg-sky-50/50 border border-sky-200 flex items-center justify-between gap-4 text-xs">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold">
                         <Laptop className="w-5 h-5" />
                       </div>
                       <div>
-                        <div className="font-extrabold text-slate-900 flex items-center gap-2">
+                        <div className="font-extrabold text-slate-800 flex items-center gap-2">
                           <span>Peranti Semasa (Pelayar Web)</span>
-                          <span className="px-2 py-0.2 bg-teal-100 text-teal-800 rounded font-bold text-[10px]">Aktif Sekarang</span>
+                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Aktif Sekarang</span>
                         </div>
                         <p className="text-[11px] text-slate-500 mt-0.5">
                           Lokasi: Negeri Kelantan, Malaysia · Sesi Terkini

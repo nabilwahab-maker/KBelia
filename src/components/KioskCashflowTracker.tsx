@@ -91,12 +91,12 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     : 0;
 
   return (
-    <div className="rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 p-6 md:p-8 shadow-sm">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-slate-100 dark:border-slate-800">
+    <div className="rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 md:p-8 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-slate-200 dark:border-slate-700">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-amber-700 dark:text-amber-400">
-              <Coins className="w-3.5 h-3.5 text-amber-600" />
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-sky-700 dark:text-sky-400">
+              <Coins className="w-3.5 h-3.5 text-sky-600" />
               Buku Tunai & Jualan Harian Kiosk
             </span>
             <span className="text-slate-300 dark:text-slate-700">·</span>
@@ -104,7 +104,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               {kioskName}
             </span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
             Rekod Aliran Tunai & Untung Bersih
           </h2>
         </div>
@@ -112,16 +112,16 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
 
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 my-6">
-        <div className="rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800">
+        <div className="rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
           <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-0.5">
             Jumlah Jualan Kasar
           </span>
-          <span className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums tracking-tight">
+          <span className="text-2xl font-bold text-slate-800 dark:text-white tabular-nums tracking-tight">
             RM {totalRevenue.toLocaleString()}
           </span>
         </div>
 
-        <div className="rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800">
+        <div className="rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
           <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-0.5">
             Kos & Belanja Stok
           </span>
@@ -130,21 +130,21 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
           </span>
         </div>
 
-        <div className="rounded-2xl p-4 bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/60">
-          <span className="text-[11px] font-bold text-amber-800 dark:text-amber-300 block mb-0.5">
+        <div className="rounded-2xl p-4 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+          <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 block mb-0.5">
             Untung Bersih Terkumpul
           </span>
-          <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums tracking-tight">
+          <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 tabular-nums tracking-tight">
             RM {netProfit.toLocaleString()}
           </span>
         </div>
 
-        <div className="rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800">
+        <div className="rounded-2xl p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
           <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-0.5">
             Nisbah Bayaran DuitNow QR
           </span>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400 tabular-nums tracking-tight">
+            <span className="text-2xl font-bold text-sky-700 dark:text-sky-400 tabular-nums tracking-tight">
               {qrPercentage}%
             </span>
             <span className="text-xs text-slate-400">Cashless</span>
@@ -153,7 +153,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
       </div>
 
       {/* Record Input Form */}
-      <form onSubmit={handleAddRecord} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/70 dark:border-slate-800 mb-6">
+      <form onSubmit={handleAddRecord} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 mb-6">
         {validationError && (
           <div className="mb-3 p-2.5 rounded-xl bg-rose-50 text-rose-700 text-xs font-semibold border border-rose-200">
             {validationError}
@@ -169,7 +169,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+              className="w-full px-3 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
             />
           </div>
           <div>
@@ -179,7 +179,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               placeholder="0.00"
               value={cash}
               onChange={(e) => setCash(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+              className="w-full px-3 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
             />
           </div>
           <div>
@@ -189,7 +189,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               placeholder="0.00"
               value={qr}
               onChange={(e) => setQr(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+              className="w-full px-3 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
             />
           </div>
           <div>
@@ -199,13 +199,13 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               placeholder="0.00"
               value={expenses}
               onChange={(e) => setExpenses(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+              className="w-full px-3 py-1.5 rounded-xl text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
             />
           </div>
           <div className="flex items-end">
             <button
               type="submit"
-              className="w-full py-2 px-4 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors shadow-sm flex items-center justify-center gap-1.5"
+              className="w-full py-2 px-4 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 transition-colors shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" /> Simpan Rekod
             </button>
@@ -227,16 +227,16 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               <th className="py-2.5 px-3 text-right">Tindakan</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-slate-200/80 dark:divide-slate-800">
             {salesRecords.map((r) => {
               const dailyNet = (r.cashSales + r.qrSales) - r.expenses;
               return (
-                <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                  <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-white tabular-nums">
+                <tr key={r.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
+                  <td className="py-2.5 px-3 font-semibold text-slate-800 dark:text-white tabular-nums">
                     {r.date}
                   </td>
                   <td className="py-2.5 px-3 tabular-nums">RM {r.cashSales.toFixed(2)}</td>
-                  <td className="py-2.5 px-3 tabular-nums text-blue-600 dark:text-blue-400">RM {r.qrSales.toFixed(2)}</td>
+                  <td className="py-2.5 px-3 tabular-nums text-sky-700 dark:text-sky-400 font-semibold">RM {r.qrSales.toFixed(2)}</td>
                   <td className="py-2.5 px-3 tabular-nums text-rose-600 dark:text-rose-400">RM {r.expenses.toFixed(2)}</td>
                   <td className="py-2.5 px-3 tabular-nums font-bold text-emerald-600 dark:text-emerald-400">
                     RM {dailyNet.toFixed(2)}

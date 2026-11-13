@@ -139,11 +139,11 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({
           onDrop={handleDrop}
           className={`w-full p-6 rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center cursor-pointer select-none ${
             isDragging
-              ? 'border-red-600 bg-red-50/70 dark:bg-red-950/40 text-red-700 dark:text-red-300 scale-[0.99]'
-              : 'border-slate-300 dark:border-slate-700 hover:border-red-500/70 dark:hover:border-amber-500/70 bg-slate-50/80 dark:bg-slate-900/60 hover:bg-slate-100/70 text-slate-600 dark:text-slate-400'
+              ? 'border-sky-600 bg-sky-50/70 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 scale-[0.99]'
+              : 'border-slate-200 dark:border-slate-700 hover:border-sky-500/70 dark:hover:border-sky-500/70 bg-slate-50 dark:bg-slate-900/60 hover:bg-sky-50/40 text-slate-600 dark:text-slate-400'
           }`}
         >
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-2xs border border-slate-200/80 dark:border-slate-700 flex items-center justify-center mb-2.5 text-red-700 dark:text-amber-400">
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-2xs border border-slate-200 dark:border-slate-700 flex items-center justify-center mb-2.5 text-sky-600 dark:text-sky-400">
             <Upload className="w-5 h-5" />
           </div>
           <div className="text-xs font-bold text-slate-800 dark:text-slate-200">

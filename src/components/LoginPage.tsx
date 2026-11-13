@@ -208,32 +208,32 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
   return (
     <div 
       id="kbelia-login-page" 
-      className="min-h-screen w-full bg-white dark:bg-[#1A222C] text-slate-900 dark:text-white transition-colors duration-200"
+      className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-200"
     >
       <main className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-12 relative">
         
         {/* ======================================================== */}
         {/* RIGHT COLUMN (DESKTOP): EXPANDED AUTHENTICATION FORM     */}
         {/* ======================================================== */}
-        <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-14 xl:p-16 w-full min-h-screen z-10 lg:col-span-7 xl:col-span-8 order-1 lg:order-2">
+        <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-14 xl:p-16 w-full min-h-screen z-10 lg:col-span-7 xl:col-span-8 order-1 lg:order-2 bg-white dark:bg-slate-900">
           
           {/* TOP BAR: BACK TO DASHBOARD */}
           <div className="w-full flex items-center justify-between pt-2 pb-6">
             <button
               type="button"
               onClick={() => setActiveTab('landing')}
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-red-700 dark:hover:text-amber-400 transition-colors cursor-pointer group"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-sky-700 dark:hover:text-sky-400 transition-colors cursor-pointer group"
             >
-              <ChevronLeft className="w-4 h-4 text-slate-400 group-hover:text-red-700 dark:group-hover:text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
+              <ChevronLeft className="w-4 h-4 text-slate-400 group-hover:text-sky-700 dark:group-hover:text-sky-400 group-hover:-translate-x-0.5 transition-transform" />
               <span>{isEn ? 'Back' : 'Kembali'}</span>
             </button>
 
             {/* Mobile-only brand badge */}
             <div className="lg:hidden flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-red-700 via-red-800 to-amber-600 text-white flex items-center justify-center font-black text-xs shadow-xs">
-                <span className="text-amber-300">K</span>B
+              <div className="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center font-black text-xs shadow-xs">
+                KB
               </div>
-              <span className="font-extrabold text-xs text-red-950 dark:text-amber-400 tracking-tight">
+              <span className="font-extrabold text-xs text-slate-800 dark:text-sky-300 tracking-tight">
                 KBelia
               </span>
             </div>
@@ -313,7 +313,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 
                 {/* ROLE PILLS (Usahawan / Mentor / Pentadbir) */}
-                <div className="p-1 bg-slate-100 dark:bg-[#24303F] rounded-xl flex items-center gap-1 border border-slate-200/60 dark:border-slate-700/60">
+                <div className="p-1 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center gap-1 border border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => {
@@ -322,8 +322,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                     }}
                     className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
                       activeRole === 'user'
-                        ? 'bg-red-700 text-white shadow-xs'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-sky-700 dark:hover:text-white'
                     }`}
                   >
                     <Store className="w-3.5 h-3.5 shrink-0" />
@@ -338,8 +338,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                     }}
                     className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
                       activeRole === 'mentor'
-                        ? 'bg-purple-700 text-white shadow-xs'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-sky-700 dark:hover:text-white'
                     }`}
                   >
                     <GraduationCap className="w-3.5 h-3.5 shrink-0" />
@@ -354,8 +354,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                     }}
                     className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
                       activeRole === 'admin'
-                        ? 'bg-slate-900 text-amber-300 shadow-xs'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-sky-700 dark:hover:text-white'
                     }`}
                   >
                     <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
@@ -366,7 +366,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 {/* EMAIL INPUT */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                    {isEn ? 'Email' : 'Emel'}<span className="text-red-500">*</span>
+                    {isEn ? 'Email' : 'Emel'}<span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -375,7 +375,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={isEn ? 'Email' : 'Emel'}
-                      className="w-full px-4 py-3.5 text-sm bg-slate-50/70 dark:bg-[#151D28] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all font-medium"
+                      className="w-full px-4 py-3.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all font-medium"
                     />
                   </div>
                 </div>
@@ -383,7 +383,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 {/* PASSWORD INPUT WITH SHOW/HIDE EYE */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                    {isEn ? 'Password' : 'Kata Laluan'}<span className="text-red-500">*</span>
+                    {isEn ? 'Password' : 'Kata Laluan'}<span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -392,7 +392,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder={isEn ? 'Password' : 'Kata Laluan'}
-                      className="w-full pl-4 pr-11 py-3.5 text-sm bg-slate-50/70 dark:bg-[#151D28] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all font-medium"
+                      className="w-full pl-4 pr-11 py-3.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all font-medium"
                     />
                     <button
                       type="button"
@@ -412,7 +412,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       type="checkbox"
                       checked={keepLoggedIn}
                       onChange={(e) => setKeepLoggedIn(e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-300 text-red-700 focus:ring-red-600 cursor-pointer accent-red-700"
+                      className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer accent-sky-600"
                     />
                     <span>{isEn ? 'Keep me logged in' : 'Kekal log masuk'}</span>
                   </label>
@@ -420,23 +420,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   <button
                     type="button"
                     onClick={() => setShowForgotModal(true)}
-                    className="font-semibold text-red-700 dark:text-red-400 hover:text-red-800 dark:hover:text-amber-400 transition-colors cursor-pointer"
+                    className="font-semibold text-sky-700 dark:text-sky-400 hover:text-sky-800 transition-colors cursor-pointer"
                   >
                     {isEn ? 'Forgot password?' : 'Lupa kata laluan?'}
                   </button>
                 </div>
 
-                {/* SUBMIT BUTTON (KBELIA THEME CRIMSON RED) */}
+                {/* SUBMIT BUTTON */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full mt-2.5 py-3.5 px-6 bg-red-700 hover:bg-red-800 active:scale-[0.99] text-white rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-md shadow-red-700/20 hover:shadow-lg hover:shadow-red-700/30 transition-all cursor-pointer disabled:opacity-60"
+                  className="w-full mt-2.5 py-3.5 px-6 bg-sky-600 hover:bg-sky-500 active:scale-[0.99] text-white rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60"
                 >
-                  <LogIn className="w-4 h-4 text-amber-300" />
+                  <LogIn className="w-4 h-4 text-sky-100" />
                   <span>{isSubmitting ? (isEn ? 'Processing...' : 'Memproses...') : (isEn ? 'Sign In' : 'Log Masuk')}</span>
                 </button>
 
-                {/* GOOGLE SIGN IN - HANYA UNTUK PERANAN USAHAWAN (HILANG BILA TEKAN MENTOR/PENTADBIR) */}
+                {/* GOOGLE SIGN IN - HANYA UNTUK PERANAN USAHAWAN */}
                 {activeRole === 'user' && (
                   <div className="pt-1">
                     {/* DIVIDER: ATAU / OR */}
@@ -444,7 +444,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
                       </div>
-                      <span className="relative bg-white dark:bg-[#1A222C] px-3.5 text-xs text-slate-400 dark:text-slate-500 font-medium">
+                      <span className="relative bg-white dark:bg-slate-900 px-3.5 text-xs text-slate-400 dark:text-slate-500 font-medium">
                         {isEn ? 'Or sign in with' : 'Atau log masuk dengan'}
                       </span>
                     </div>
@@ -453,7 +453,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       type="button"
                       onClick={handleGoogleLogin}
                       disabled={isSubmitting}
-                      className="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-[#24303F] dark:hover:bg-[#2A3749] border border-slate-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60"
+                      className="w-full py-3 px-4 rounded-xl bg-slate-50 hover:bg-sky-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60"
                     >
                       <GoogleIcon className="w-4 h-4 shrink-0" />
                       <span>{isEn ? 'Sign in with Google' : 'Log masuk Google'}</span>
@@ -472,7 +472,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                         setActiveRole('user');
                         clearAuthError();
                       }}
-                      className="font-bold text-red-700 dark:text-amber-400 hover:underline cursor-pointer"
+                      className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
                     >
                       {isEn ? 'Sign Up' : 'Daftar Sekarang'}
                     </button>
@@ -481,14 +481,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
               </form>
             ) : (
-              /* FORM 2: SIGN UP MODE (MATCHING SCREENSHOT) */
+              /* FORM 2: SIGN UP MODE */
               <form onSubmit={handleRegisterSubmit} className="space-y-4">
                 
-                {/* FIRST NAME & LAST NAME (2-COLUMN ROW AS IN SCREENSHOT) */}
+                {/* FIRST NAME & LAST NAME */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                      {isEn ? 'First Name' : 'Nama Pertama'}<span className="text-red-500">*</span>
+                      {isEn ? 'First Name' : 'Nama Pertama'}<span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -496,13 +496,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       value={regFirstName}
                       onChange={(e) => setRegFirstName(e.target.value)}
                       placeholder={isEn ? 'First Name' : 'Nama Pertama'}
-                      className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50/60 dark:bg-[#151D28] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                      {isEn ? 'Last Name' : 'Nama Terakhir'}<span className="text-red-500">*</span>
+                      {isEn ? 'Last Name' : 'Nama Terakhir'}<span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -510,7 +510,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       value={regLastName}
                       onChange={(e) => setRegLastName(e.target.value)}
                       placeholder={isEn ? 'Last Name' : 'Nama Terakhir'}
-                      className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50/60 dark:bg-[#151D28] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
                     />
                   </div>
                 </div>
@@ -518,7 +518,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 {/* EMAIL */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                    {isEn ? 'Email' : 'Emel'}<span className="text-red-500">*</span>
+                    {isEn ? 'Email' : 'Emel'}<span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -526,14 +526,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
                     placeholder={isEn ? 'Email' : 'Emel'}
-                    className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50/60 dark:bg-[#151D28] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all"
+                    className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
                   />
                 </div>
 
                 {/* PASSWORD WITH SHOW/HIDE EYE */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                    {isEn ? 'Password' : 'Kata Laluan'}<span className="text-red-500">*</span>
+                    {isEn ? 'Password' : 'Kata Laluan'}<span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -542,7 +542,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
                       placeholder={isEn ? 'Password' : 'Kata Laluan'}
-                      className="w-full pl-3.5 pr-11 py-3 text-xs sm:text-sm bg-slate-50/60 dark:bg-[#151D28] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full pl-3.5 pr-11 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
                     />
                     <button
                       type="button"
@@ -564,7 +564,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                     <select
                       value={regDistrict}
                       onChange={(e) => setRegDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full px-2.5 py-2 text-xs bg-slate-50/60 dark:bg-[#151D28] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600 cursor-pointer"
+                      className="w-full px-2.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 cursor-pointer"
                     >
                       {DISTRICT_LIST.map((d) => (
                         <option key={d} value={d}>{d}</option>
@@ -581,12 +581,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       value={regPhone}
                       onChange={(e) => setRegPhone(e.target.value)}
                       placeholder={isEn ? 'Phone / WhatsApp' : 'No. Telefon'}
-                      className="w-full px-3 py-2 text-xs bg-slate-50/60 dark:bg-[#151D28] border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-red-600"
+                      className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                     />
                   </div>
                 </div>
 
-                {/* TERMS & PRIVACY CHECKBOX AS IN SCREENSHOT */}
+                {/* TERMS & PRIVACY CHECKBOX */}
                 <div className="pt-1">
                   <label className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400 cursor-pointer select-none">
                     <input
@@ -594,7 +594,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       required
                       checked={regAgreeTerms}
                       onChange={(e) => setRegAgreeTerms(e.target.checked)}
-                      className="w-4 h-4 mt-0.5 rounded border-slate-300 text-red-700 focus:ring-red-600 cursor-pointer accent-red-700 shrink-0"
+                      className="w-4 h-4 mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer accent-sky-600 shrink-0"
                     />
                     <span className="leading-snug">
                       {isEn ? (
@@ -603,7 +603,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                           <button 
                             type="button" 
                             onClick={(e) => { e.preventDefault(); setShowForgotModal(true); }}
-                            className="font-bold text-slate-900 dark:text-white hover:underline inline"
+                            className="font-bold text-slate-800 dark:text-white hover:underline inline"
                           >
                             Terms and Conditions
                           </button>
@@ -611,7 +611,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                           <button 
                             type="button" 
                             onClick={(e) => { e.preventDefault(); setShowForgotModal(true); }}
-                            className="font-bold text-slate-900 dark:text-white hover:underline inline"
+                            className="font-bold text-slate-800 dark:text-white hover:underline inline"
                           >
                             Privacy Policy
                           </button>
@@ -622,7 +622,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                           <button 
                             type="button" 
                             onClick={(e) => { e.preventDefault(); setShowForgotModal(true); }}
-                            className="font-bold text-slate-900 dark:text-white hover:underline inline"
+                            className="font-bold text-slate-800 dark:text-white hover:underline inline"
                           >
                             Terma dan Syarat
                           </button>
@@ -630,7 +630,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                           <button 
                             type="button" 
                             onClick={(e) => { e.preventDefault(); setShowForgotModal(true); }}
-                            className="font-bold text-slate-900 dark:text-white hover:underline inline"
+                            className="font-bold text-slate-800 dark:text-white hover:underline inline"
                           >
                             Dasar Privasi
                           </button>{' '}
@@ -641,13 +641,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   </label>
                 </div>
 
-                {/* SUBMIT BUTTON (KBELIA THEME CRIMSON RED) */}
+                {/* SUBMIT BUTTON */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full mt-2 py-3.5 px-4 bg-red-700 hover:bg-red-800 active:scale-[0.99] text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-red-700/20 hover:shadow-lg transition-all cursor-pointer disabled:opacity-60"
+                  className="w-full mt-2 py-3.5 px-4 bg-sky-600 hover:bg-sky-500 active:scale-[0.99] text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60"
                 >
-                  <UserPlus className="w-4 h-4 text-amber-300" />
+                  <UserPlus className="w-4 h-4 text-sky-100" />
                   <span>
                     {isSubmitting 
                       ? (isEn ? 'Processing...' : 'Memproses...') 
@@ -664,7 +664,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       setAuthMode('login');
                       clearAuthError();
                     }}
-                    className="font-bold text-red-700 dark:text-amber-400 hover:underline cursor-pointer"
+                    className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
                   >
                     {isEn ? 'Sign In' : 'Log Masuk'}
                   </button>
@@ -676,7 +676,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
           </div>
 
           {/* BOTTOM QUICK DEMO TESTING FOOTER */}
-          <div className="w-full pt-4 border-t border-slate-200/80 dark:border-slate-800 space-y-2.5">
+          <div className="w-full pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
             <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
               <span>{isEn ? 'Quick Testing Demo Accounts:' : 'Akaun Pengujian Pantas (Demo):'}</span>
               <span className="text-[10px] text-slate-400">1-Klik Terus Masuk</span>
@@ -686,10 +686,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={handleDemoBelia}
-                className="p-2.5 bg-emerald-50 hover:bg-emerald-100/90 dark:bg-emerald-950/30 dark:hover:bg-emerald-900/40 border border-emerald-200/80 dark:border-emerald-800/60 rounded-xl text-left transition-colors cursor-pointer group"
+                className="p-2.5 bg-sky-50 hover:bg-sky-100/80 dark:bg-sky-950/30 dark:hover:bg-sky-900/40 border border-sky-200 dark:border-sky-800/60 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-emerald-900 dark:text-emerald-300">
-                  <Store className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 shrink-0" />
+                <div className="flex items-center gap-1.5 font-bold text-xs text-sky-900 dark:text-sky-300">
+                  <Store className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
                   <span>Demo Belia</span>
                 </div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
@@ -700,10 +700,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={handleDemoMentor}
-                className="p-2.5 bg-purple-50 hover:bg-purple-100/90 dark:bg-purple-950/30 dark:hover:bg-purple-900/40 border border-purple-200/80 dark:border-purple-800/60 rounded-xl text-left transition-colors cursor-pointer group"
+                className="p-2.5 bg-slate-50 hover:bg-sky-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-purple-900 dark:text-purple-300">
-                  <GraduationCap className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400 shrink-0" />
+                <div className="flex items-center gap-1.5 font-bold text-xs text-slate-800 dark:text-sky-300">
+                  <GraduationCap className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
                   <span>Demo Mentor</span>
                 </div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
@@ -714,10 +714,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={handleDemoAdmin}
-                className="p-2.5 bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 rounded-xl text-left transition-colors cursor-pointer group"
+                className="p-2.5 bg-slate-50 hover:bg-sky-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900 dark:text-white">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <div className="flex items-center gap-1.5 font-bold text-xs text-slate-800 dark:text-white">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                   <span>Demo Admin</span>
                 </div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
@@ -734,65 +734,57 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
         </div>
 
         {/* ======================================================== */}
-        {/* LEFT COLUMN (DESKTOP): COMPACT HERO WITH BRAND EMBLEM    */}
+        {/* LEFT COLUMN (DESKTOP): CRISP WHITE + TOP-LEFT SKY GLOW   */}
         {/* ======================================================== */}
-        <div className="hidden lg:flex flex-col items-center justify-center p-8 xl:p-12 relative overflow-hidden bg-[#0C1222] dark:bg-[#080D18] select-none lg:col-span-5 xl:col-span-4 order-2 lg:order-1 border-r border-slate-800/80">
+        <div className="hidden lg:flex flex-col items-center justify-center p-8 xl:p-12 relative overflow-hidden kbelia-important-header dark:bg-slate-800 select-none lg:col-span-5 xl:col-span-4 order-2 lg:order-1 border-r border-slate-200 dark:border-slate-700">
           
-          {/* GEOMETRIC BLUEPRINT GRID PATTERN WITH DRIFTING PARTICLES */}
+          {/* SOFT GEOMETRIC ACCENT PATTERN */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <svg 
-              className="w-full h-full opacity-20" 
+              className="w-full h-full opacity-35" 
               xmlns="http://www.w3.org/2000/svg"
               width="100%" 
               height="100%"
             >
               <defs>
                 <pattern id="login-grid-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
-                  <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="0.7" />
+                  <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(14, 165, 233, 0.14)" strokeWidth="0.75" />
                 </pattern>
               </defs>
               <rect width="100%" height="100%" fill="url(#login-grid-pattern)" />
             </svg>
 
-            {/* Moving Animated Accent Grid Squares */}
-            <div className="absolute top-[18%] right-[20%] w-[52px] h-[52px] bg-indigo-500/15 border border-indigo-400/30 rounded-lg animate-hero-float-slow shadow-lg shadow-indigo-950/40"></div>
-            <div className="absolute top-[34%] right-[10%] w-[48px] h-[48px] bg-red-500/15 border border-red-400/30 rounded-lg animate-hero-float-reverse shadow-lg shadow-red-950/40"></div>
-            <div className="absolute bottom-[26%] left-[14%] w-[54px] h-[54px] bg-amber-500/15 border border-amber-400/30 rounded-lg animate-hero-float-fast shadow-lg shadow-amber-950/40"></div>
-            <div className="absolute bottom-[12%] right-[24%] w-[46px] h-[46px] bg-blue-500/15 border border-blue-400/30 rounded-lg animate-hero-float-slow shadow-lg shadow-blue-950/40"></div>
-
-            {/* Floating Songket Geometric Diamonds */}
-            <div className="absolute top-[28%] left-[12%] w-4 h-4 rotate-45 border border-amber-400/40 bg-amber-500/10 animate-hero-float-fast"></div>
-            <div className="absolute top-[62%] right-[16%] w-3.5 h-3.5 rotate-45 border border-red-400/40 bg-red-500/15 animate-hero-float-reverse"></div>
-            <div className="absolute bottom-[38%] left-[22%] w-3 h-3 rotate-45 border border-emerald-400/40 bg-emerald-500/10 animate-hero-float-slow"></div>
-
-            {/* Animated Wandering Radial Glow in Center */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] bg-gradient-to-tr from-red-900/25 via-amber-900/15 to-blue-900/20 rounded-full blur-3xl pointer-events-none animate-hero-drift-glow"></div>
+            {/* Moving Animated Soft Sky & Slate Accent Squares */}
+            <div className="absolute top-[18%] right-[20%] w-[52px] h-[52px] bg-sky-100/50 border border-sky-200/70 rounded-lg animate-hero-float-slow"></div>
+            <div className="absolute top-[34%] right-[10%] w-[48px] h-[48px] bg-sky-50/70 border border-sky-200/60 rounded-lg animate-hero-float-reverse"></div>
+            <div className="absolute bottom-[26%] left-[14%] w-[54px] h-[54px] bg-slate-100/70 border border-slate-200/80 rounded-lg animate-hero-float-fast"></div>
+            <div className="absolute bottom-[12%] right-[24%] w-[46px] h-[46px] bg-sky-50/60 border border-sky-200/60 rounded-lg animate-hero-float-slow"></div>
           </div>
 
-          {/* CENTER BRAND EMBLEM & TYPOGRAPHY (WITH GENTLE LEVITATING MOTION) */}
+          {/* CENTER BRAND EMBLEM & TYPOGRAPHY */}
           <div className="relative z-10 flex flex-col items-center text-center max-w-xs xl:max-w-sm mx-auto">
             
-            {/* BRAND EMBLEM WITH FLOATING ANIMATION & PULSING GLOW */}
+            {/* BRAND EMBLEM */}
             <div className="animate-hero-float-slow">
               <div className="flex items-center gap-3 mb-3.5">
-                <div className="w-13 h-13 xl:w-15 xl:h-15 rounded-2xl bg-gradient-to-tr from-red-700 via-red-800 to-amber-600 text-white flex items-center justify-center font-black text-xl xl:text-2xl shadow-xl shadow-red-950/60 border border-amber-400/40 animate-hero-pulse-glow">
-                  <span className="text-amber-300">K</span>
-                  <span className="text-white text-base xl:text-lg ml-0.5">B</span>
+                <div className="w-13 h-13 xl:w-15 xl:h-15 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-xl xl:text-2xl shadow-md shadow-sky-600/20 border border-sky-500">
+                  <span>K</span>
+                  <span className="text-sky-100 text-base xl:text-lg ml-0.5">B</span>
                 </div>
-                <span className="text-2xl xl:text-3xl font-black text-white tracking-tight">
+                <span className="text-2xl xl:text-3xl font-black text-slate-800 dark:text-white tracking-tight">
                   KBelia
                 </span>
               </div>
             </div>
 
             {/* SUBTITLE MOTTO */}
-            <p className="text-xs xl:text-sm text-slate-400 font-normal leading-relaxed max-w-xs mt-1">
+            <p className="text-xs xl:text-sm text-slate-600 dark:text-slate-300 font-normal leading-relaxed max-w-xs mt-1">
               Portal Rasmi Kapsul Niaga & Keusahawanan Belia Kelantan 2026
             </p>
 
-            {/* WELCOME BADGE: SELAMAT DATANG KE KBELIA */}
-            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-amber-300 shadow-sm backdrop-blur-xs">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            {/* WELCOME BADGE */}
+            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-sky-50 border border-sky-200 text-sky-800 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-sky-600" />
               <span>Selamat Datang ke KBelia</span>
             </div>
 
@@ -804,12 +796,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             onClick={toggleTheme}
             aria-label="Tukar Mod Cerah/Gelap"
             title={theme === 'dark' ? 'Tukar ke Mod Cerah' : 'Tukar ke Mod Gelap'}
-            className="absolute bottom-6 left-6 w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white flex items-center justify-center shadow-xl shadow-blue-900/40 transition-all cursor-pointer z-30 interactive-lift"
+            className="absolute bottom-6 left-6 w-11 h-11 rounded-full bg-white hover:bg-sky-50 active:scale-95 text-sky-700 border border-slate-200 flex items-center justify-center shadow-sm transition-all cursor-pointer z-30 interactive-lift"
           >
             {theme === 'dark' ? (
-              <Sun className="w-5 h-5 text-amber-300" />
+              <Sun className="w-5 h-5 text-amber-500" />
             ) : (
-              <Moon className="w-5 h-5 text-white" />
+              <Moon className="w-5 h-5 text-sky-700" />
             )}
           </button>
 
@@ -819,10 +811,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
       {/* FORGOT PASSWORD MODAL */}
       {showForgotModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-slide-up">
-          <div className="w-full max-w-md bg-white dark:bg-[#1E293B] rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2 text-red-700 dark:text-amber-400 font-bold text-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-xs p-4 animate-fade-slide-up">
+          <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden">
+            <div className="kbelia-important-header px-6 pt-5 pb-3.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 font-bold text-sm">
                 <HelpCircle className="w-4 h-4" />
                 <span>Tetapan Semula Kata Laluan</span>
               </div>
@@ -835,23 +827,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Untuk keselamatan akaun usahawan berdaftar, sila hubungi Urusetia KBelia Kelantan atau hantarkan permohonan ke emel rasmi pentadbir kami:
-            </p>
+            <div className="p-6 space-y-4">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Untuk keselamatan akaun usahawan berdaftar, sila hubungi Urusetia KBelia Kelantan atau hantarkan permohonan ke emel rasmi pentadbir kami:
+              </p>
 
-            <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-              <div className="font-bold text-slate-900 dark:text-white">Urusetia KBelia Kelantan 2026</div>
-              <div className="text-slate-500 dark:text-slate-400 mt-0.5">Emel: urusetia@kbelia.kelantan.gov.my</div>
-              <div className="text-slate-500 dark:text-slate-400">Talian: +60 9-748 1957 (Pusat Pentadbiran Negeri)</div>
+              <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+                <div className="font-bold text-slate-800 dark:text-white">Urusetia KBelia Kelantan 2026</div>
+                <div className="text-slate-600 dark:text-slate-400 mt-0.5">Emel: urusetia@kbelia.kelantan.gov.my</div>
+                <div className="text-slate-600 dark:text-slate-400">Talian: +60 9-748 1957 (Pusat Pentadbiran Negeri)</div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowForgotModal(false)}
+                className="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              >
+                Faham & Tutup
+              </button>
             </div>
-
-            <button
-              type="button"
-              onClick={() => setShowForgotModal(false)}
-              className="w-full py-2.5 bg-red-700 hover:bg-red-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
-            >
-              Faham & Tutup
-            </button>
           </div>
         </div>
       )}

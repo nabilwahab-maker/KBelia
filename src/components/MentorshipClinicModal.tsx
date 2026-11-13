@@ -101,23 +101,23 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/70 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="w-full max-w-2xl bg-white dark:bg-[#24303F] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 scale-100 transition-all max-h-[92vh] flex flex-col overflow-hidden my-6"
+        className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[92vh] flex flex-col overflow-hidden my-6"
         role="dialog"
         aria-modal="true"
       >
-        {/* TailAdmin Card Header */}
-        <div className="border-b border-slate-200 dark:border-slate-800 py-4.5 px-6 sm:px-7 flex items-center justify-between bg-white dark:bg-[#24303F] shrink-0">
+        {/* Header */}
+        <div className="border-b border-slate-200 dark:border-slate-700 py-4.5 px-6 sm:px-7 flex items-center justify-between kbelia-important-header shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-400 flex items-center justify-center shrink-0">
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+              <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white tracking-tight">
                 Hab Temujanji Klinik Usahawan & Mentor
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-600 dark:text-slate-300">
                 Bimbingan 1-ke-1 Percuma Bersama Mentor UMK & Industri (Tajaan Dana Belia)
               </p>
             </div>
@@ -125,7 +125,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -136,27 +136,27 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
           {/* View 1: Success Screen */}
           {isSubmitted ? (
             <div className="py-6 text-center space-y-4 animate-in zoom-in-95 duration-200">
-              <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto border border-emerald-300">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mx-auto border border-emerald-300">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
               
               <div className="space-y-1">
-                <h4 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                <h4 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white">
                   Permohonan Bimbingan Berjaya Dihantar!
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto">
-                  Permohonan anda telah dihantar terus ke papan pemuka <span className="font-bold text-red-700 dark:text-red-400">{selectedMentor?.name}</span>. Mentor akan menyemak butiran dan mengesahkan temujanji anda.
+                  Permohonan anda telah dihantar terus ke papan pemuka <span className="font-bold text-sky-700 dark:text-sky-400">{selectedMentor?.name}</span>. Mentor akan menyemak butiran dan mengesahkan temujanji anda.
                 </p>
               </div>
 
-              <div className="bg-slate-50 dark:bg-[#1A222C] p-4.5 rounded-xl border border-slate-200 dark:border-slate-700 max-w-md mx-auto text-left text-xs sm:text-sm space-y-2">
+              <div className="bg-slate-50 dark:bg-slate-900 p-4.5 rounded-xl border border-slate-200 dark:border-slate-700 max-w-md mx-auto text-left text-xs sm:text-sm space-y-2">
                 <div className="flex justify-between">
                   <span className="text-slate-500 font-medium">Mentor:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">{selectedMentor?.name}</span>
+                  <span className="font-bold text-slate-800 dark:text-white">{selectedMentor?.name}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 font-medium">Usahawan / Perniagaan:</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{entrepreneurName} ({businessName})</span>
+                  <span className="font-semibold text-slate-800 dark:text-white">{entrepreneurName} ({businessName})</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 font-medium">Tarikh & Waktu:</span>
@@ -164,7 +164,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 font-medium">Mod Bimbingan:</span>
-                  <span className="font-bold text-red-700 dark:text-red-400">{mode}</span>
+                  <span className="font-bold text-sky-700 dark:text-sky-400">{mode}</span>
                 </div>
               </div>
 
@@ -175,14 +175,14 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     setSelectedMentor(null);
                     setIsSubmitted(false);
                   }}
-                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                 >
                   Pilih Mentor Lain
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all cursor-pointer"
+                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all cursor-pointer"
                 >
                   Selesai & Tutup
                 </button>
@@ -191,20 +191,20 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
           ) : selectedMentor ? (
             /* View 2: Booking Form for Selected Mentor */
             <div className="space-y-5 animate-in fade-in duration-200">
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center shrink-0">
                     <GraduationCap className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">{selectedMentor.name}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">{selectedMentor.title} &middot; {selectedMentor.agency}</div>
+                    <div className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white">{selectedMentor.name}</div>
+                    <div className="text-xs text-slate-600 dark:text-slate-400">{selectedMentor.title} &middot; {selectedMentor.agency}</div>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedMentor(null)}
-                  className="text-xs font-semibold text-red-700 dark:text-red-400 hover:underline cursor-pointer"
+                  className="text-xs font-semibold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
                 >
                   Tukar Mentor
                 </button>
@@ -221,20 +221,20 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Nama Penuh Usahawan: <span className="text-red-500">*</span>
+                      Nama Penuh Usahawan: <span className="text-rose-600">*</span>
                     </label>
                     <input
                       type="text"
                       required
                       value={entrepreneurName}
                       onChange={(e) => setEntrepreneurName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Nombor WhatsApp: <span className="text-red-500">*</span>
+                      Nombor WhatsApp: <span className="text-rose-600">*</span>
                     </label>
                     <input
                       type="text"
@@ -242,7 +242,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       value={entrepreneurPhone}
                       onChange={(e) => setEntrepreneurPhone(e.target.value)}
                       placeholder="Nombor telefon"
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
                 </div>
@@ -251,36 +251,36 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Nama Perniagaan / Kiosk: <span className="text-red-500">*</span>
+                      Nama Perniagaan / Kiosk: <span className="text-rose-600">*</span>
                     </label>
                     <input
                       type="text"
                       required
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Jajahan Premis: <span className="text-red-500">*</span>
+                      Jajahan Premis: <span className="text-rose-600">*</span>
                     </label>
                     <select
                       value={district}
                       onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                     >
-                      <option value="Kota Bharu" className="dark:bg-[#1A222C]">Kota Bharu</option>
-                      <option value="Bachok" className="dark:bg-[#1A222C]">Bachok</option>
-                      <option value="Pasir Mas" className="dark:bg-[#1A222C]">Pasir Mas</option>
-                      <option value="Tumpat" className="dark:bg-[#1A222C]">Tumpat</option>
-                      <option value="Tanah Merah" className="dark:bg-[#1A222C]">Tanah Merah</option>
-                      <option value="Machang" className="dark:bg-[#1A222C]">Machang</option>
-                      <option value="Pasir Puteh" className="dark:bg-[#1A222C]">Pasir Puteh</option>
-                      <option value="Kuala Krai" className="dark:bg-[#1A222C]">Kuala Krai</option>
-                      <option value="Gua Musang" className="dark:bg-[#1A222C]">Gua Musang</option>
-                      <option value="Jeli" className="dark:bg-[#1A222C]">Jeli</option>
+                      <option value="Kota Bharu" className="dark:bg-slate-900">Kota Bharu</option>
+                      <option value="Bachok" className="dark:bg-slate-900">Bachok</option>
+                      <option value="Pasir Mas" className="dark:bg-slate-900">Pasir Mas</option>
+                      <option value="Tumpat" className="dark:bg-slate-900">Tumpat</option>
+                      <option value="Tanah Merah" className="dark:bg-slate-900">Tanah Merah</option>
+                      <option value="Machang" className="dark:bg-slate-900">Machang</option>
+                      <option value="Pasir Puteh" className="dark:bg-slate-900">Pasir Puteh</option>
+                      <option value="Kuala Krai" className="dark:bg-slate-900">Kuala Krai</option>
+                      <option value="Gua Musang" className="dark:bg-slate-900">Gua Musang</option>
+                      <option value="Jeli" className="dark:bg-slate-900">Jeli</option>
                     </select>
                   </div>
                 </div>
@@ -288,19 +288,19 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 {/* Topik Bimbingan */}
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                    Topik Bimbingan Utama yang Diperlukan: <span className="text-red-500">*</span>
+                    Topik Bimbingan Utama yang Diperlukan: <span className="text-rose-600">*</span>
                   </label>
                   <select
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                   >
-                    <option value="Strategi Pemasaran Digital & TikTok Shop" className="dark:bg-[#1A222C]">Strategi Pemasaran Digital & TikTok Shop</option>
-                    <option value="Pengurusan Aliran Tunai & Penyata Kewangan Kiosk" className="dark:bg-[#1A222C]">Pengurusan Aliran Tunai & Penyata Kewangan Kiosk</option>
-                    <option value="Permohonan Pembiayaan TEKUN, MARA & Geran Negeri" className="dark:bg-[#1A222C]">Permohonan Pembiayaan TEKUN, MARA & Geran Negeri</option>
-                    <option value="Penembusan Pasaran Eksport & Fesyen Batik Warisan" className="dark:bg-[#1A222C]">Penembusan Pasaran Eksport & Fesyen Batik Warisan</option>
-                    <option value="Pensijilan Halal JAKIM & Piawaian Makanan MeSTI" className="dark:bg-[#1A222C]">Pensijilan Halal JAKIM & Piawaian Makanan MeSTI</option>
-                    <option value="Rundingan Pembekal & Pengurusan Inventori" className="dark:bg-[#1A222C]">Rundingan Pembekal & Pengurusan Inventori</option>
+                    <option value="Strategi Pemasaran Digital & TikTok Shop" className="dark:bg-slate-900">Strategi Pemasaran Digital & TikTok Shop</option>
+                    <option value="Pengurusan Aliran Tunai & Penyata Kewangan Kiosk" className="dark:bg-slate-900">Pengurusan Aliran Tunai & Penyata Kewangan Kiosk</option>
+                    <option value="Permohonan Pembiayaan TEKUN, MARA & Geran Negeri" className="dark:bg-slate-900">Permohonan Pembiayaan TEKUN, MARA & Geran Negeri</option>
+                    <option value="Penembusan Pasaran Eksport & Fesyen Batik Warisan" className="dark:bg-slate-900">Penembusan Pasaran Eksport & Fesyen Batik Warisan</option>
+                    <option value="Pensijilan Halal JAKIM & Piawaian Makanan MeSTI" className="dark:bg-slate-900">Pensijilan Halal JAKIM & Piawaian Makanan MeSTI</option>
+                    <option value="Rundingan Pembekal & Pengurusan Inventori" className="dark:bg-slate-900">Rundingan Pembekal & Pengurusan Inventori</option>
                   </select>
                 </div>
 
@@ -314,7 +314,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     value={challenges}
                     onChange={(e) => setChallenges(e.target.value)}
                     placeholder="Nyatakan soalan atau cabaran anda secara ringkas..."
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                   />
                 </div>
 
@@ -322,47 +322,47 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Pilihan Tarikh & Masa: <span className="text-red-500">*</span>
+                      Pilihan Tarikh & Masa: <span className="text-rose-600">*</span>
                     </label>
                     <select
                       value={preferredDate}
                       onChange={(e) => setPreferredDate(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                     >
-                      <option value="28 Mac 2026 (Sabtu)" className="dark:bg-[#1A222C]">28 Mac 2026 (Sabtu) - 10:00 AM</option>
-                      <option value="30 Mac 2026 (Isnin)" className="dark:bg-[#1A222C]">30 Mac 2026 (Isnin) - 11:30 AM</option>
-                      <option value="2 April 2026 (Khamis)" className="dark:bg-[#1A222C]">2 April 2026 (Khamis) - 2:30 PM</option>
-                      <option value="5 April 2026 (Ahad)" className="dark:bg-[#1A222C]">5 April 2026 (Ahad) - 10:00 AM</option>
+                      <option value="28 Mac 2026 (Sabtu)" className="dark:bg-slate-900">28 Mac 2026 (Sabtu) - 10:00 AM</option>
+                      <option value="30 Mac 2026 (Isnin)" className="dark:bg-slate-900">30 Mac 2026 (Isnin) - 11:30 AM</option>
+                      <option value="2 April 2026 (Khamis)" className="dark:bg-slate-900">2 April 2026 (Khamis) - 2:30 PM</option>
+                      <option value="5 April 2026 (Ahad)" className="dark:bg-slate-900">5 April 2026 (Ahad) - 10:00 AM</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                      Mod Sesi Bimbingan: <span className="text-red-500">*</span>
+                      Mod Sesi Bimbingan: <span className="text-rose-600">*</span>
                     </label>
                     <select
                       value={mode}
                       onChange={(e) => setMode(e.target.value as any)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                     >
-                      <option value="Bersemuka di Kampus" className="dark:bg-[#1A222C]">Bersemuka di Kampus UMK</option>
-                      <option value="Google Meet Maya" className="dark:bg-[#1A222C]">Google Meet Maya (Atas Talian)</option>
+                      <option value="Bersemuka di Kampus" className="dark:bg-slate-900">Bersemuka di Kampus UMK</option>
+                      <option value="Google Meet Maya" className="dark:bg-slate-900">Google Meet Maya (Atas Talian)</option>
                     </select>
                   </div>
                 </div>
 
-                {/* TailAdmin Action Buttons Footer */}
-                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
+                {/* Action Buttons Footer */}
+                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
                     onClick={() => setSelectedMentor(null)}
-                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                   >
                     Kembali
                   </button>
                   <button
                     type="submit"
-                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
                     <span>Hantar Permohonan Bimbingan</span>
@@ -381,21 +381,21 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 {mentors.map((mentor) => (
                   <div
                     key={mentor.id}
-                    className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1A222C] hover:border-red-600 transition-all shadow-xs"
+                    className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-sky-500 transition-all shadow-xs"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800">
+                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                             {mentor.agency}
                           </span>
-                          <span className="text-[11px] text-slate-400">&bull; {mentor.availableDays}</span>
+                          <span className="text-[11px] text-slate-500">&bull; {mentor.availableDays}</span>
                         </div>
                         
-                        <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">
                           {mentor.name}
                         </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <p className="text-xs text-slate-600 dark:text-slate-400">
                           {mentor.title}
                         </p>
                       </div>
@@ -403,7 +403,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleStartBooking(mentor)}
-                        className="py-2 px-4 rounded-lg text-xs font-semibold text-white bg-red-700 hover:bg-red-800 transition-colors shadow-xs shrink-0 cursor-pointer self-start sm:self-auto flex items-center gap-1.5"
+                        className="py-2 px-4 rounded-lg text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 transition-colors shadow-xs shrink-0 cursor-pointer self-start sm:self-auto flex items-center gap-1.5"
                       >
                         <span>Pilih Mentor & Tempah</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -411,9 +411,9 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     </div>
 
                     {/* Expertise Tags */}
-                    <div className="flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-200 dark:border-slate-700">
                       {mentor.expertise.map((exp, idx) => (
-                        <span key={idx} className="text-[10px] font-medium bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+                        <span key={idx} className="text-[10px] font-medium bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
                           {exp}
                         </span>
                       ))}

@@ -117,10 +117,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   // Sync selected slot if prop changes or when modal is opened
   useEffect(() => {
     if (isOpen) {
-      if (activeSlot && activeSlot.status === 'available') {
-        setSelectedSlotId(activeSlot.id);
+      const isSlotFree = (s?: CapsuleSlot | null) => Boolean(s && s.status === 'available' && !s.currentTenantBusinessName);
+      if (isSlotFree(activeSlot)) {
+        setSelectedSlotId(activeSlot!.id);
       } else if (safeAllSlots.length > 0) {
-        const firstAvailable = safeAllSlots.find(s => s && s.status === 'available');
+        const firstAvailable = safeAllSlots.find(s => isSlotFree(s));
         if (firstAvailable) {
           setSelectedSlotId(firstAvailable.id);
         } else if (activeSlot) {
@@ -135,6 +136,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   if (!isOpen) return null;
 
   const currentSlot = safeAllSlots.find(s => s && s.id === selectedSlotId) || activeSlot || safeAllSlots[0];
+  const isCurrentSlotAvailable = Boolean(currentSlot && currentSlot.status === 'available' && !currentSlot.currentTenantBusinessName);
 
   const handleNextStep = () => {
     setError(null);
@@ -145,8 +147,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         setError('Sila pilih lokasi kiosk yang sah.');
         return;
       }
-      if (currentSlot.status !== 'available') {
-        setError(`Kapsul ${currentSlot.code} (${currentSlot.name}) sedang beroperasi oleh penyewa berdaftar. Permohonan baharu tidak dibuka bagi unit ini. Sila pilih unit berstatus Tersedia.`);
+      if (!isCurrentSlotAvailable) {
+        setError(`Kapsul ${currentSlot.code} (${currentSlot.name}) telah berdaftar / sedang beroperasi. Permohonan baharu tidak dibuka bagi unit ini. Sila pilih unit berstatus Tersedia.`);
         return;
       }
       setStep(2);
@@ -237,24 +239,24 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/75 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="w-full max-w-2xl bg-white dark:bg-[#24303F] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 scale-100 transition-all max-h-[90vh] flex flex-col overflow-hidden my-auto"
+        className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[90vh] flex flex-col overflow-hidden my-auto"
         role="dialog"
         aria-modal="true"
       >
         
-        {/* TailAdmin Card Header - STICKY & SHRINK-0 */}
-        <div className="border-b border-slate-200 dark:border-slate-800 py-4 px-6 sm:px-7 flex items-center justify-between bg-white dark:bg-[#24303F] shrink-0 sticky top-0 z-10">
+        {/* Header - STICKY & SHRINK-0 */}
+        <div className="border-b border-slate-200 dark:border-slate-700 py-4 px-6 sm:px-7 flex items-center justify-between kbelia-important-header dark:bg-slate-800 shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-400 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
               <Store className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+              <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white tracking-tight">
                 Permohonan Kapsul Niaga Modular
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-600 dark:text-slate-300">
                 Universiti Malaysia Kelantan (UMK) & Kerajaan Negeri Kelantan
               </p>
             </div>
@@ -262,7 +264,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           <button
             type="button"
             onClick={handleResetAndClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer interactive-press hover:rotate-90 duration-200"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/80 dark:hover:bg-slate-700 transition-all cursor-pointer interactive-press hover:rotate-90 duration-200"
             title="Tutup"
           >
             <X className="w-5 h-5" />
@@ -271,7 +273,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
         {/* Interactive Stepper */}
         {!submitted && (
-          <div className="bg-slate-50 dark:bg-[#1A222C] px-6 py-4 border-b border-slate-200/80 dark:border-slate-800 shrink-0">
+          <div className="bg-slate-50 dark:bg-slate-900 px-6 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
             <div className="flex items-center justify-between max-w-md mx-auto">
               
               {/* Step 1 Node */}
@@ -280,19 +282,19 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   <div className="w-full h-0.5 opacity-0" />
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                     step > 1 
-                      ? 'bg-emerald-600 text-white shadow-xs' 
+                      ? 'bg-sky-600 text-white shadow-xs' 
                       : step === 1 
-                        ? 'bg-red-700 text-white ring-4 ring-red-100 dark:ring-red-950/70 shadow-xs' 
+                        ? 'bg-sky-600 text-white ring-4 ring-sky-100 dark:ring-sky-950/70 shadow-xs' 
                         : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
                   }`}>
                     {step > 1 ? <Check className="w-4 h-4 stroke-[3]" /> : '1'}
                   </div>
                   <div className={`w-full h-0.5 transition-colors ${
-                    step > 1 ? 'bg-emerald-500' : 'bg-slate-200 dark:border-slate-700'
+                    step > 1 ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'
                   }`} />
                 </div>
                 <span className={`text-[11px] font-bold text-center leading-tight ${
-                  step === 1 ? 'text-red-700 dark:text-red-400 font-extrabold' : step > 1 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'
+                  step === 1 ? 'text-sky-700 dark:text-sky-400 font-extrabold' : step > 1 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'
                 }`}>
                   Pakej & Lokasi
                 </span>
@@ -302,23 +304,23 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               <div className="flex flex-col items-center gap-1.5 flex-1">
                 <div className="flex items-center w-full">
                   <div className={`w-full h-0.5 transition-colors ${
-                    step > 1 ? 'bg-emerald-500' : 'bg-slate-200 dark:border-slate-700'
+                    step > 1 ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'
                   }`} />
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                     step > 2 
-                      ? 'bg-emerald-600 text-white shadow-xs' 
+                      ? 'bg-sky-600 text-white shadow-xs' 
                       : step === 2 
-                        ? 'bg-red-700 text-white ring-4 ring-red-100 dark:ring-red-950/70 shadow-xs' 
+                        ? 'bg-sky-600 text-white ring-4 ring-sky-100 dark:ring-sky-950/70 shadow-xs' 
                         : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
                   }`}>
                     {step > 2 ? <Check className="w-4 h-4 stroke-[3]" /> : '2'}
                   </div>
                   <div className={`w-full h-0.5 transition-colors ${
-                    step > 2 ? 'bg-emerald-500' : 'bg-slate-200 dark:border-slate-700'
+                    step > 2 ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'
                   }`} />
                 </div>
                 <span className={`text-[11px] font-bold text-center leading-tight ${
-                  step === 2 ? 'text-red-700 dark:text-red-400 font-extrabold' : step > 2 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'
+                  step === 2 ? 'text-sky-700 dark:text-sky-400 font-extrabold' : step > 2 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'
                 }`}>
                   Profil Usahawan
                 </span>
@@ -328,11 +330,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               <div className="flex flex-col items-center gap-1.5 flex-1">
                 <div className="flex items-center w-full">
                   <div className={`w-full h-0.5 transition-colors ${
-                    step > 2 ? 'bg-emerald-500' : 'bg-slate-200 dark:border-slate-700'
+                    step > 2 ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'
                   }`} />
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                     step === 3 
-                      ? 'bg-red-700 text-white ring-4 ring-red-100 dark:ring-red-950/70 shadow-xs' 
+                      ? 'bg-sky-600 text-white ring-4 ring-sky-100 dark:ring-sky-950/70 shadow-xs' 
                       : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
                   }`}>
                     3
@@ -340,7 +342,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   <div className="w-full h-0.5 opacity-0" />
                 </div>
                 <span className={`text-[11px] font-bold text-center leading-tight ${
-                  step === 3 ? 'text-red-700 dark:text-red-400 font-extrabold' : 'text-slate-400'
+                  step === 3 ? 'text-sky-700 dark:text-sky-400 font-extrabold' : 'text-slate-400'
                 }`}>
                   Prapapar & Sah
                 </span>
@@ -361,11 +363,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
           {!user ? (
             <div className="text-center py-8">
-              <LogIn className="w-10 h-10 text-red-700 dark:text-red-400 mx-auto mb-3" />
-              <h4 className="text-base font-bold text-slate-900 dark:text-white mb-2">
+              <LogIn className="w-10 h-10 text-sky-600 dark:text-sky-400 mx-auto mb-3" />
+              <h4 className="text-base font-bold text-slate-800 dark:text-white mb-2">
                 Log Masuk Diperlukan untuk Memohon
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
+              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto mb-6">
                 Sila log masuk dengan akaun Google anda terlebih dahulu supaya status permohonan dan surat tawaran dapat dipautkan terus ke akaun anda.
               </p>
               <button
@@ -374,7 +376,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   onClose();
                   openLoginModal();
                 }}
-                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 transition-colors shadow-sm"
+                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 transition-colors shadow-sm cursor-pointer"
               >
                 Log Masuk dengan Google
               </button>
@@ -382,19 +384,19 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           ) : submitted ? (
             <div className="text-center py-6">
               <CheckCircle2 className="w-12 h-12 text-emerald-600 dark:text-emerald-400 mx-auto mb-3" />
-              <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
+              <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-1">
                 Permohonan Kiosk Berjaya Dihantar!
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed mb-4">
                 Pegawai penyelaras UMK sedang menyemak butiran anda. Sila pantau kad penjejak di papan pemuka anda. Sebaik diluluskan, Surat Tawaran Digital rasmi berkod QR akan dijana secara automatik.
               </p>
-              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-xs text-red-900 dark:text-red-200 mb-6 max-w-sm mx-auto">
+              <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200 mb-6 max-w-sm mx-auto">
                 No. Rujukan Anda: <strong>KBN-{currentSlot?.code}-{new Date().getFullYear()}</strong>
               </div>
               <button
                 type="button"
                 onClick={handleResetAndClose}
-                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 transition-colors cursor-pointer"
+                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 transition-colors cursor-pointer"
               >
                 Kembali ke Dashboard
               </button>
@@ -406,49 +408,58 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 <div className="space-y-5">
                   <div>
                     <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                      Pilih Hub Kiosk Kapsul: <span className="text-red-500">*</span>
+                      Pilih Hub Kiosk Kapsul: <span className="text-rose-600">*</span>
                     </label>
                     <select
                       value={selectedSlotId}
                       onChange={(e) => setSelectedSlotId(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:ring-1 focus:ring-red-600 focus:border-red-600 focus:outline-none transition-all cursor-pointer"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none transition-all cursor-pointer"
                     >
-                      {safeAllSlots.map((s) => (
-                        <option key={s.id} value={s.id} className="dark:bg-[#1A222C]">
-                          {s.code} — {s.name} ({s.hubLocation}, {s.district}) {s.status === 'available' ? '· [Tersedia]' : '· [Sedang Beroperasi]'}
-                        </option>
-                      ))}
+                      {safeAllSlots.map((s) => {
+                        const isFree = s.status === 'available' && !s.currentTenantBusinessName;
+                        return (
+                          <option key={s.id} value={s.id} disabled={!isFree} className="dark:bg-slate-900">
+                            {s.code} — {s.name} ({s.hubLocation}, {s.district}) {isFree ? '· [Tersedia]' : '· [Telah Berdaftar - Penuh]'}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 
                   {currentSlot && (
-                    <div className="p-4.5 rounded-xl bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 flex flex-col gap-3">
+                    <div className="p-4.5 rounded-xl bg-slate-50/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex flex-col gap-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <span className="font-mono text-xs font-bold text-red-700 dark:text-red-400">
+                          <span className="font-mono text-xs font-bold text-sky-700 dark:text-sky-400">
                             {currentSlot.code}
                           </span>
-                          <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                          <h4 className="text-sm font-bold text-slate-800 dark:text-white mt-0.5">
                             {currentSlot.name}
                           </h4>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
-                            <MapPin className="w-3.5 h-3.5 text-red-600 dark:text-red-400 shrink-0" />
+                          <p className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1 mt-0.5">
+                            <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
                             {currentSlot.hubLocation} ({currentSlot.district})
                           </p>
                         </div>
-                        <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                          Tersedia untuk Belia
-                        </span>
+                        {isCurrentSlotAvailable ? (
+                          <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            Tersedia untuk Belia
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                            Unit Telah Berdaftar / Penuh
+                          </span>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 text-xs pt-2.5 border-t border-slate-200 dark:border-slate-700">
-                        <div className="p-2.5 rounded-lg bg-white dark:bg-[#24303F] border border-slate-200 dark:border-slate-700">
+                        <div className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                           <span className="text-slate-500 text-[10px] font-medium block">Kadar Pasaran Biasa:</span>
                           <span className="line-through text-slate-400 font-semibold text-xs">RM 300 / bulan</span>
                         </div>
-                        <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40">
-                          <span className="text-red-800 dark:text-red-300 text-[10px] font-bold block">Kadar Subsidi Belia (50%):</span>
-                          <span className="text-sm sm:text-base font-black text-red-700 dark:text-red-400">
+                        <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40">
+                          <span className="text-emerald-800 dark:text-emerald-300 text-[10px] font-bold block">Kadar Subsidi Belia (50%):</span>
+                          <span className="text-sm sm:text-base font-black text-emerald-700 dark:text-emerald-400">
                             RM 150 / bulan
                           </span>
                         </div>
@@ -463,7 +474,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   {/* Duration Cards */}
                   <div>
                     <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                      Pilih Pakej Tempoh Sewaan Kiosk: <span className="text-red-500">*</span>
+                      Pilih Pakej Tempoh Sewaan Kiosk: <span className="text-rose-600">*</span>
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
@@ -473,7 +484,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           subtitle: 'Pakej Permulaan',
                           total: 'RM 450',
                           badge: 'Uji Pasaran',
-                          badgeColor: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                          badgeColor: 'bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300'
                         },
                         {
                           months: 6,
@@ -481,7 +492,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           subtitle: 'Pakej Semester UMK',
                           total: 'RM 900',
                           badge: 'Paling Popular',
-                          badgeColor: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 font-bold'
+                          badgeColor: 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 font-bold'
                         },
                         {
                           months: 12,
@@ -489,7 +500,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           subtitle: 'Pakej Tahunan Penuh',
                           total: 'RM 1,800',
                           badge: 'Jimat & Stabil',
-                          badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                          badgeColor: 'bg-sky-50 text-sky-800 border border-sky-200 dark:bg-sky-950/40 dark:text-sky-300'
                         }
                       ].map((pkg) => {
                         const isSelected = durationMonths === pkg.months;
@@ -500,8 +511,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                             onClick={() => setDurationMonths(pkg.months)}
                             className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer relative flex flex-col justify-between ${
                               isSelected
-                                ? 'border-red-700 bg-red-50/70 dark:bg-red-950/20 ring-1 ring-red-700/30 shadow-xs'
-                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1E293B] hover:border-slate-300 dark:hover:border-slate-600'
+                                ? 'border-sky-600 bg-sky-50/70 dark:bg-sky-950/20 ring-1 ring-sky-600/30 shadow-xs'
+                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-sky-400 dark:hover:border-slate-600'
                             }`}
                           >
                             <div className="flex items-center justify-between gap-1 mb-2">
@@ -510,23 +521,23 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                               </span>
                               <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                                 isSelected 
-                                  ? 'border-red-700 bg-red-700 text-white' 
+                                  ? 'border-sky-600 bg-sky-600 text-white' 
                                   : 'border-slate-300 dark:border-slate-600'
                               }`}>
                                 {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
                               </div>
                             </div>
                             <div>
-                              <div className="font-extrabold text-sm text-slate-900 dark:text-white">
+                              <div className="font-extrabold text-sm text-slate-800 dark:text-white">
                                 {pkg.title}
                               </div>
                               <div className="text-[11px] text-slate-500 dark:text-slate-400">
                                 {pkg.subtitle}
                               </div>
                             </div>
-                            <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700 flex items-baseline justify-between">
+                            <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-700 flex items-baseline justify-between">
                               <span className="text-[10px] text-slate-400">Jumlah:</span>
-                              <span className="text-xs font-black text-red-700 dark:text-red-400">{pkg.total}</span>
+                              <span className="text-xs font-black text-sky-700 dark:text-sky-400">{pkg.total}</span>
                             </div>
                           </button>
                         );
@@ -537,7 +548,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   {/* Start Date */}
                   <div>
                     <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                      Tarikh Dijangka Mula Berniaga: <span className="text-red-500">*</span>
+                      Tarikh Dijangka Mula Berniaga: <span className="text-rose-600">*</span>
                     </label>
                     <div className="relative">
                       <Calendar className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -545,24 +556,25 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full pl-11 pr-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-1 focus:ring-red-600 focus:border-red-600 focus:outline-none transition-all cursor-pointer"
+                        className="w-full pl-11 pr-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none transition-all cursor-pointer"
                       />
                     </div>
                   </div>
 
-                  {/* TailAdmin Action Buttons Footer */}
-                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
+                  {/* Action Buttons Footer */}
+                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
                     <button
                       type="button"
                       onClick={handleResetAndClose}
-                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                     >
                       Batal
                     </button>
                     <button
                       type="button"
+                      disabled={!isCurrentSlotAvailable}
                       onClick={handleNextStep}
-                      className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                      className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center gap-2 cursor-pointer"
                     >
                       <span>Seterusnya</span>
                       <ArrowRight className="w-4 h-4" />
@@ -571,14 +583,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 </div>
               )}
 
-              {/* STEP 2: PROFIL USAHAWAN (TailAdmin 2-Column Form Layout) */}
+              {/* STEP 2: PROFIL USAHAWAN */}
               {step === 2 && (
                 <div className="space-y-5">
                   {/* Row 1: Nama Perniagaan + Kategori */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                       <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                        Nama Perniagaan / Jenama <span className="text-red-500">*</span>
+                        Nama Perniagaan / Jenama <span className="text-rose-600">*</span>
                       </label>
                       <input
                         type="text"
@@ -589,11 +601,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           setBusinessName(e.target.value);
                           if (fieldErrors.businessName) setFieldErrors(prev => ({ ...prev, businessName: '' }));
                         }}
-                        className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border ${
+                        className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border ${
                           fieldErrors.businessName 
                             ? 'border-rose-500 focus:ring-rose-500' 
-                            : 'border-slate-200 dark:border-slate-700 focus:border-red-600 focus:ring-red-600'
-                        } text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 transition-all`}
+                            : 'border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-sky-500 focus:ring-sky-500/20'
+                        } text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-2 transition-all`}
                       />
                       {fieldErrors.businessName && (
                         <p className="mt-1.5 text-[11px] text-rose-600 dark:text-rose-400 flex items-center gap-1 font-medium">
@@ -605,15 +617,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
                     <div>
                       <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                        Kategori Perniagaan <span className="text-red-500">*</span>
+                        Kategori Perniagaan <span className="text-rose-600">*</span>
                       </label>
                       <select
                         value={businessCategory}
                         onChange={(e) => setBusinessCategory(e.target.value as BusinessCategory)}
-                        className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all cursor-pointer"
+                        className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
                       >
                         {CATEGORIES.map((c) => (
-                          <option key={c} value={c} className="dark:bg-[#1A222C]">{c}</option>
+                          <option key={c} value={c} className="dark:bg-slate-900">{c}</option>
                         ))}
                       </select>
                     </div>
@@ -623,7 +635,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                       <label className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 block mb-2">
-                        No. Telefon (WhatsApp) <span className="text-red-500">*</span>
+                        No. Telefon (WhatsApp) <span className="text-rose-600">*</span>
                       </label>
                       <input
                         type="tel"
@@ -634,11 +646,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           setPhone(e.target.value);
                           if (fieldErrors.phone) setFieldErrors(prev => ({ ...prev, phone: '' }));
                         }}
-                        className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-transparent dark:bg-[#1A222C] border ${
+                        className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border ${
                           fieldErrors.phone 
                             ? 'border-rose-500 focus:ring-rose-500' 
-                            : 'border-slate-200 dark:border-slate-700 focus:border-red-600 focus:ring-red-600'
-                        } text-slate-900 dark:text-white focus:outline-none focus:ring-1 transition-all`}
+                            : 'border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-sky-500 focus:ring-sky-500/20'
+                        } text-slate-900 dark:text-white focus:outline-none focus:ring-2 transition-all`}
                       />
                       {fieldErrors.phone && (
                         <p className="mt-1.5 text-[11px] text-rose-600 dark:text-rose-400 flex items-center gap-1 font-medium">
@@ -664,11 +676,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           setIcNumber(e.target.value);
                           if (fieldErrors.icNumber) setFieldErrors(prev => ({ ...prev, icNumber: '' }));
                         }}
-                        className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-transparent dark:bg-[#1A222C] border ${
+                        className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border ${
                           fieldErrors.icNumber 
                             ? 'border-rose-500 focus:ring-rose-500' 
-                            : 'border-slate-200 dark:border-slate-700 focus:border-red-600 focus:ring-red-600'
-                        } text-slate-900 dark:text-white focus:outline-none focus:ring-1 transition-all`}
+                            : 'border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-sky-500 focus:ring-sky-500/20'
+                        } text-slate-900 dark:text-white focus:outline-none focus:ring-2 transition-all`}
                       />
                       {fieldErrors.icNumber ? (
                         <p className="mt-1.5 text-[11px] text-rose-600 dark:text-rose-400 flex items-center gap-1 font-medium">
@@ -693,16 +705,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       placeholder="Penerangan ringkas produk dan operasi kiosk..."
                       value={pitchNotes}
                       onChange={(e) => setPitchNotes(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-transparent dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-red-600 focus:ring-1 focus:ring-red-600 focus:outline-none transition-all"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-none transition-all"
                     />
                   </div>
 
-                  {/* TailAdmin Action Buttons Footer */}
-                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
+                  {/* Action Buttons Footer */}
+                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer flex items-center gap-2"
+                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       <span>Kembali</span>
@@ -710,7 +722,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <button
                       type="button"
                       onClick={handleNextStep}
-                      className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                      className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
                     >
                       <span>Seterusnya</span>
                       <ArrowRight className="w-4 h-4" />
@@ -722,69 +734,69 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               {/* STEP 3: PRAPAPAR RINGKASAN & PERSETUJUAN PDPA */}
               {step === 3 && (
                 <div className="space-y-5">
-                  <div className="p-5 rounded-xl bg-slate-50 dark:bg-[#1A222C] border border-slate-200 dark:border-slate-700 space-y-4">
+                  <div className="p-5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-4">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
                       <div>
-                        <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white">
                           Ringkasan Pakej Permohonan Kiosk
                         </h4>
                         <p className="text-[11px] text-slate-500">Sila semak maklumat sebelum pengesahan akhir</p>
                       </div>
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200 dark:bg-sky-950 dark:text-sky-300">
                         Pakej {durationMonths} Bulan
                       </span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
                       <div>
-                        <span className="text-slate-400 text-xs block font-medium">Premis Kiosk:</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">{currentSlot?.code} — {currentSlot?.name}</span>
+                        <span className="text-slate-500 text-xs block font-medium">Premis Kiosk:</span>
+                        <span className="font-semibold text-slate-800 dark:text-white">{currentSlot?.code} — {currentSlot?.name}</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 text-xs block font-medium">Lokasi Hab:</span>
+                        <span className="text-slate-500 text-xs block font-medium">Lokasi Hab:</span>
                         <span className="font-semibold text-slate-800 dark:text-slate-200">{currentSlot?.hubLocation}</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 text-xs block font-medium">Nama Perniagaan:</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">{businessName}</span>
+                        <span className="text-slate-500 text-xs block font-medium">Nama Perniagaan:</span>
+                        <span className="font-semibold text-slate-800 dark:text-white">{businessName}</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 text-xs block font-medium">Kategori Bisnes:</span>
+                        <span className="text-slate-500 text-xs block font-medium">Kategori Bisnes:</span>
                         <span className="font-medium text-slate-700 dark:text-slate-300">{businessCategory}</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 text-xs block font-medium">Kadar Sewa Bersubsidi:</span>
-                        <span className="font-bold text-red-700 dark:text-red-400 text-base">RM 150 / bulan</span>
+                        <span className="text-slate-500 text-xs block font-medium">Kadar Sewa Bersubsidi:</span>
+                        <span className="font-bold text-emerald-700 dark:text-emerald-400 text-base">RM 150 / bulan</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 text-xs block font-medium">Tarikh Mula:</span>
+                        <span className="text-slate-500 text-xs block font-medium">Tarikh Mula:</span>
                         <span className="font-medium text-slate-700 dark:text-slate-300">{startDate}</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* TailAdmin Checkbox */}
-                  <label className="flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1A222C] cursor-pointer hover:border-red-600 transition-all select-none">
+                  {/* Checkbox */}
+                  <label className="flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 cursor-pointer hover:border-sky-500 transition-all select-none">
                     <input
                       type="checkbox"
                       checked={pdpaConsent}
                       onChange={(e) => setPdpaConsent(e.target.checked)}
-                      className="mt-1 h-4.5 w-4.5 rounded border-slate-300 text-red-700 focus:ring-red-600 cursor-pointer shrink-0"
+                      className="mt-1 h-4.5 w-4.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer shrink-0"
                     />
                     <div className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                      <strong className="text-slate-900 dark:text-white font-semibold block mb-0.5">
+                      <strong className="text-slate-800 dark:text-white font-semibold block mb-0.5">
                         Persetujuan Rasmi PDPA & Integriti Belia:
                       </strong>
                       Saya mengesahkan semua maklumat perniagaan dan peribadi di atas adalah benar serta bersetuju dengan pemprosesan data di bawah Akta Perlindungan Data Peribadi 2010 (PDPA) bagi permohonan kiosk negeri Kelantan.
                     </div>
                   </label>
 
-                  {/* TailAdmin Action Buttons Footer */}
-                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
+                  {/* Action Buttons Footer */}
+                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer flex items-center gap-2 interactive-press interactive-lift group"
+                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2 interactive-press interactive-lift group"
                     >
                       <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" />
                       <span>Kembali</span>
@@ -793,7 +805,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       type="button"
                       disabled={loading || !pdpaConsent}
                       onClick={handleSubmit}
-                      className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-red-700 hover:bg-red-800 disabled:opacity-50 transition-all shadow-sm flex items-center gap-2 cursor-pointer interactive-press interactive-lift group"
+                      className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-50 transition-all shadow-sm flex items-center gap-2 cursor-pointer interactive-press interactive-lift group"
                     >
                       <CheckCircle2 className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
                       <span>{loading ? 'Menghantar Permohonan...' : 'Hantar Permohonan Sewaan (RM150/bln)'}</span>

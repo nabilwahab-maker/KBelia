@@ -14,12 +14,9 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
     try {
-      const savedTheme = localStorage.getItem('kbelia_theme');
+      const savedTheme = localStorage.getItem('kbelia_theme_mode');
       if (savedTheme === 'light' || savedTheme === 'dark') {
         return savedTheme;
-      }
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
       }
     } catch {
       // ignore
@@ -37,7 +34,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       root.classList.remove('dark');
     }
     try {
-      localStorage.setItem('kbelia_theme', theme);
+      localStorage.setItem('kbelia_theme_mode', theme);
     } catch {
       // ignore
     }
