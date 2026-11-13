@@ -29,7 +29,6 @@ interface DashboardBannerHeaderProps {
 export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
   activeTab,
   role,
-  userName = 'Usahawan KBelia',
   onNavigateHome
 }) => {
   const { language } = useLanguage();
@@ -210,8 +209,6 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
     }
   })();
 
-  const displayName = userName?.trim() || (isMs ? 'Pengguna KBelia' : 'KBelia User');
-
   return (
     <div className="w-full kbelia-important-header rounded-t-2xl rounded-b-none border border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-3.5 sm:py-4 shadow-2xs transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -241,12 +238,8 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           </nav>
         </div>
 
-        {/* Date & Active User Context */}
-        <div className="self-start sm:self-auto flex items-center gap-3 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg text-xs shadow-2xs">
-          <span className="hidden md:inline text-slate-500 dark:text-slate-400 font-medium truncate max-w-[180px]">
-            {displayName}
-          </span>
-          <span className="hidden md:inline text-slate-300 dark:text-slate-600">&middot;</span>
+        {/* Today's Date */}
+        <div className="self-start sm:self-auto flex items-center gap-2.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg text-xs shadow-2xs">
           <span className="text-slate-500 dark:text-slate-400 font-medium capitalize">
             {isMs ? 'hari ini' : 'today'}
           </span>
