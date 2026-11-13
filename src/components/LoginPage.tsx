@@ -63,6 +63,7 @@ const GoogleIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' })
 export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
   const { 
     user, 
+    userProfile,
     isAdmin, 
     loginInitialTab,
     loginWithGoogle, 
@@ -73,6 +74,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
     authError, 
     clearAuthError 
   } = useAuth();
+  const isMentor = userProfile?.role === 'mentor';
 
   const { theme, toggleTheme } = useTheme();
   const { language } = useLanguage();
@@ -156,7 +158,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
       regDistrict,
       regPhone.trim() || '+60110000000',
       `${fullName} Enterprise`,
-      regPassword.trim() || 'kbelia123'
+      regPassword.trim()
     );
     setIsSubmitting(false);
 
@@ -241,20 +243,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
           {/* ACTIVE USER SESSION BANNER IF ALREADY LOGGED IN */}
           {user && (
-            <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl flex items-center justify-between text-xs animate-fade-slide-up">
+            <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl flex items-center justify-between text-xs">
               <div>
                 <div className="font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  {isEn ? 'Active Session:' : 'Sesi Aktif:'} {user.email}
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span>{isEn ? 'Active Session:' : 'Sesi Aktif:'} {user.email}</span>
                 </div>
                 <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
-                  {isEn ? 'Role:' : 'Peranan:'} {isAdmin ? 'Pentadbir Urusetia' : 'Usahawan Belia'}
+                  {isEn ? 'Role:' : 'Peranan:'} {isAdmin ? 'Pentadbir Urusetia' : isMentor ? 'Mentor UMK' : 'Usahawan Belia'}
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'merchant')}
+                  onClick={() => setActiveTab(isAdmin ? 'admin' : isMentor ? 'mentor' : 'merchant')}
                   className="px-3 py-1.5 bg-emerald-700 text-white rounded-lg font-bold text-xs hover:bg-emerald-800 transition-colors cursor-pointer"
                 >
                   Dashboard &rarr;
@@ -262,7 +264,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 <button
                   type="button"
                   onClick={() => logout()}
-                  className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-semibold text-xs hover:bg-slate-300 cursor-pointer transition-colors"
+                  className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-semibold text-xs hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer transition-colors"
                 >
                   {isEn ? 'Logout' : 'Log Keluar'}
                 </button>
@@ -675,11 +677,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
           </div>
 
-          {/* BOTTOM QUICK DEMO TESTING FOOTER */}
+          {/* BOTTOM ISOLATED DEMO TESTING FOOTER */}
           <div className="w-full pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
             <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-              <span>{isEn ? 'Quick Testing Demo Accounts:' : 'Akaun Pengujian Pantas (Demo):'}</span>
-              <span className="text-[10px] text-slate-400">1-Klik Terus Masuk</span>
+              <span>{isEn ? 'Isolated Development Demo Mode:' : 'Mod Demo Pembangunan (Sesi Terasing):'}</span>
+              <span className="text-[10px] text-slate-400">Ujian Luar Talian</span>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">

@@ -21,23 +21,26 @@ import {
   LayoutDashboard,
   Award
 } from 'lucide-react';
-import { CapsuleBooking, GrantApplication, CapsuleSlot, KelantanDistrict, YouthProgram, SlotStatus } from '../types';
+import { CapsuleBooking, GrantApplication, CapsuleSlot, KelantanDistrict, YouthProgram, MaintenanceTicket } from '../types';
 import { maskMyKad } from '../utils/securityUtils';
 import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
 import { OfficialApprovalReportModal } from './OfficialApprovalReportModal';
 import { saveCapsuleSlot, saveProgram } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { ImageDropzone } from './ImageDropzone';
+import { showToast } from './ToastNotification';
 
 interface AdminApprovalQueueProps {
   bookings: CapsuleBooking[];
   grantApplications: GrantApplication[];
   slots: CapsuleSlot[];
+  maintenanceTickets?: MaintenanceTicket[];
   onApproveBooking: (bookingId: string, notes?: string) => Promise<void>;
   onRejectBooking: (bookingId: string, notes?: string) => Promise<void>;
   onApproveGrant: (grantId: string, notes?: string) => Promise<void>;
   onRejectGrant: (grantId: string, notes?: string) => Promise<void>;
   onUpdateSlotStatus?: (slotId: string, newStatus: 'available' | 'occupied' | 'maintenance') => Promise<void>;
+  onUpdateTicketStatus?: (ticketId: string, status: MaintenanceTicket['status'], adminNotes?: string) => Promise<void>;
   onRefresh?: () => void;
 }
 
@@ -45,11 +48,13 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   bookings,
   grantApplications,
   slots,
+  maintenanceTickets = [],
   onApproveBooking,
   onRejectBooking,
   onApproveGrant,
   onRejectGrant,
   onUpdateSlotStatus,
+  onUpdateTicketStatus,
   onRefresh
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'kiosks' | 'grants' | 'facility' | 'audit'>('overview');
@@ -163,7 +168,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   const [slotSize, setSlotSize] = useState('10ft x 10ft Smart Pod');
   const [slotMonthlyRate, setSlotMonthlyRate] = useState('150');
   const [slotAmenities, setSlotAmenities] = useState('Palam Elektrik 13A, WiFi 500Mbps, Rak Paparan Bertingkat');
-  const [slotImageUrl, setSlotImageUrl] = useState('/public/assets/generated/kiosk_modular_kbelia.jpg');
+  const [slotImageUrl, setSlotImageUrl] = useState('/assets/generated/kiosk_modular_kbelia.jpg');
   const [savingSlot, setSavingSlot] = useState(false);
 
   // State for Add Program Modal
@@ -181,7 +186,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   const handleCreateSlot = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!slotCode.trim() || !slotName.trim()) {
-      alert('Sila lengkapkan kod dan nama kapsul niaga.');
+      showToast('Sila lengkapkan kod dan nama kapsul niaga.', 'error');
       return;
     }
     try {
@@ -211,10 +216,11 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
       setShowAddSlotModal(false);
       setSlotCode('');
       setSlotName('');
+      showToast('Kapsul niaga baharu berjaya didaftarkan!', 'success');
       if (onRefresh) onRefresh();
     } catch (err) {
       console.error(err);
-      alert('Gagal menambah kapsul niaga baharu.');
+      showToast('Gagal menambah kapsul niaga baharu.', 'error');
     } finally {
       setSavingSlot(false);
     }
@@ -224,7 +230,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   const handleCreateProgram = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!progTitle.trim()) {
-      alert('Sila lengkapkan tajuk program / geran.');
+      showToast('Sila lengkapkan tajuk program / geran.', 'error');
       return;
     }
     try {
@@ -251,10 +257,11 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
       setShowAddProgramModal(false);
       setProgTitle('');
       setProgDesc('');
+      showToast('Program & geran baharu berjaya diterbitkan!', 'success');
       if (onRefresh) onRefresh();
     } catch (err) {
       console.error(err);
-      alert('Gagal menambah program geran baharu.');
+      showToast('Gagal menambah program geran baharu.', 'error');
     } finally {
       setSavingProgram(false);
     }
@@ -494,7 +501,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-[10px] font-bold text-sky-700">{g.grantAmount || 'RM 3,000'}</span>
-                            <span className="text-[10px] text-slate-400">· {g.district}</span>
+                            <span className="text-[10px] text-slate-400">· {g.district || g.businessCategory || 'Kelantan'}</span>
                           </div>
                           <h5 className="text-xs font-bold text-slate-800 dark:text-white">{g.programTitle}</h5>
                           <p className="text-[10px] text-slate-500">{g.applicantName} ({g.businessName})</p>
@@ -867,76 +874,154 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
       )}
 
       {/* TAB 3: FACILITY & KIOSK MAINTENANCE CONTROL */}
+      {/* TAB 3: FACILITY & KIOSK MAINTENANCE CONTROL */}
       {activeTab === 'facility' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {slots.map((slot) => (
-            <div 
-              key={slot.id}
-              className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-xs font-bold text-sky-700 dark:text-sky-400">
-                    {slot.code}
-                  </span>
-                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
-                    slot.status === 'available'
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                      : slot.status === 'maintenance'
-                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
-                        : 'bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600'
-                  }`}>
-                    {slot.status === 'available' ? 'Tersedia' : slot.status === 'maintenance' ? 'Dalam Pembaikan' : 'Diduduki'}
-                  </span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {slots.map((slot) => (
+              <div 
+                key={slot.id}
+                className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-mono text-xs font-bold text-sky-700 dark:text-sky-400">
+                      {slot.code}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                      slot.status === 'available'
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                        : slot.status === 'maintenance'
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                          : 'bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600'
+                    }`}>
+                      {slot.status === 'available' ? 'Tersedia' : slot.status === 'maintenance' ? 'Dalam Pembaikan' : 'Diduduki'}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-white mb-1">
+                    {slot.name}
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 tabular-nums">
+                    {slot.hubLocation} ({slot.district}) · RM{slot.monthlyRate}/bln
+                  </p>
                 </div>
-                <h4 className="text-sm font-bold text-slate-800 dark:text-white mb-1">
-                  {slot.name}
+
+                {/* Status Toggle Controls */}
+                {onUpdateSlotStatus && (
+                  <div className="pt-3 border-t border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => onUpdateSlotStatus(slot.id, 'available')}
+                      className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                        slot.status === 'available'
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-emerald-50 border border-slate-200 dark:border-slate-700'
+                      }`}
+                    >
+                      Buka
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onUpdateSlotStatus(slot.id, 'maintenance')}
+                      className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                        slot.status === 'maintenance'
+                          ? 'bg-amber-600 text-white'
+                          : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-amber-50 border border-slate-200 dark:border-slate-700'
+                      }`}
+                    >
+                      Baiki
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onUpdateSlotStatus(slot.id, 'occupied')}
+                      className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                        slot.status === 'occupied'
+                          ? 'bg-slate-700 text-white'
+                          : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 border border-slate-200 dark:border-slate-700'
+                      }`}
+                    >
+                      Isi
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Aduan & Tiket Penyelenggaraan Penyewa */}
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                  <Wrench className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                  <span>Tiket Aduan Penyelenggaraan Penyewa ({maintenanceTickets.length})</span>
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
-                  {slot.hubLocation} ({slot.district}) · RM{slot.monthlyRate}/bln
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Kemas kini status baik pulih aduan kerosakan teknikal daripada usahawan kapsul.
                 </p>
               </div>
-
-              {/* Status Toggle Controls */}
-              {onUpdateSlotStatus && (
-                <div className="pt-3 border-t border-slate-200/80 dark:border-slate-700 flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => onUpdateSlotStatus(slot.id, 'available')}
-                    className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
-                      slot.status === 'available'
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-emerald-50 border border-slate-200 dark:border-slate-700'
-                    }`}
-                  >
-                    Buka
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onUpdateSlotStatus(slot.id, 'maintenance')}
-                    className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
-                      slot.status === 'maintenance'
-                        ? 'bg-amber-600 text-white'
-                        : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-amber-50 border border-slate-200 dark:border-slate-700'
-                    }`}
-                  >
-                    Baiki
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onUpdateSlotStatus(slot.id, 'occupied')}
-                    className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
-                      slot.status === 'occupied'
-                        ? 'bg-slate-700 text-white'
-                        : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 border border-slate-200 dark:border-slate-700'
-                    }`}
-                  >
-                    Isi
-                  </button>
-                </div>
-              )}
             </div>
-          ))}
+
+            {maintenanceTickets.length === 0 ? (
+              <div className="p-6 text-center rounded-xl border border-dashed border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400">
+                Tiada aduan kerosakan aktif diterima daripada penyewa buat masa ini.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {maintenanceTickets.map((ticket) => (
+                  <div
+                    key={ticket.id}
+                    className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono text-[11px] font-bold text-sky-700 dark:text-sky-400">{ticket.slotCode}</span>
+                        <span className="text-xs font-bold text-slate-800 dark:text-white">{ticket.kioskName}</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">· {ticket.issueCategory}</span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300">{ticket.description}</p>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                        Pelapor: {ticket.reporterName} ({ticket.reporterPhone})
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                      <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${
+                        ticket.status === 'resolved'
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                          : ticket.status === 'in_progress'
+                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                            : 'bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300'
+                      }`}>
+                        {ticket.status === 'resolved' ? 'Selesai' : ticket.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
+                      </span>
+
+                      {onUpdateTicketStatus && ticket.status !== 'resolved' && (
+                        <>
+                          {ticket.status === 'received' && (
+                            <button
+                              type="button"
+                              onClick={() => onUpdateTicketStatus(ticket.id, 'in_progress', 'Juruteknik telah ditugaskan untuk pemeriksaan.')}
+                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+                            >
+                              Tugaskan
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => onUpdateTicketStatus(ticket.id, 'resolved', 'Kerja baik pulih selesai dan disahkan.')}
+                            className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                          >
+                            Selesai
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

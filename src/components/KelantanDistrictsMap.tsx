@@ -224,9 +224,9 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-700">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-sky-50 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
-              <span className="w-2 h-2 rounded-full bg-sky-600 animate-pulse" />
-              <span>Google Maps Style Explorer</span>
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300">
+              <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+              <span>Peta Interaktif Negeri</span>
             </span>
             <span className="text-slate-300 dark:text-slate-700">•</span>
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">

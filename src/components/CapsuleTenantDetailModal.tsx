@@ -56,10 +56,9 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
   const tenantPhone = tenantBusiness?.whatsapp || tenantBusiness?.ownerPhone || '+60123344556';
   const cleanPhone = tenantPhone.replace(/[^0-9]/g, '');
 
-  const handleWhatsApp = () => {
-    const text = `Assalamualaikum/Hai ${businessName}, saya melihat premis kiosk anda di ${slot.name} (${slot.code}) melalui Portal KBelia Kelantan dan berminat untuk membuat pertanyaan mengenai produk / perkhidmatan anda.`;
-    window.open(`https://wa.me/${cleanPhone || '60123344556'}?text=${encodeURIComponent(text)}`, '_blank');
-  };
+  const whatsappHref = `https://wa.me/${cleanPhone || '60123344556'}?text=${encodeURIComponent(
+    `Assalamualaikum/Hai ${businessName}, saya melihat premis kiosk anda di ${slot.name} (${slot.code}) melalui Portal KBelia Kelantan dan berminat untuk membuat pertanyaan mengenai produk / perkhidmatan anda.`
+  )}`;
 
   const handleSaveInterest = () => {
     setInterestSaved(true);
@@ -103,7 +102,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
                   {slot.code}
                 </span>
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-900/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   Berpenyewa & Aktif Beroperasi
                 </span>
               </div>
@@ -140,7 +139,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
           <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
             <div className="h-48 sm:h-56 w-full relative">
               <img
-                src={slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia.jpg'}
+                src={slot.imageUrl || '/assets/generated/kiosk_modular_kbelia.jpg'}
                 alt={slot.name}
                 className="w-full h-full object-cover"
               />
@@ -247,14 +246,15 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
 
             {/* Action to Contact Tenant */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <button
-                type="button"
-                onClick={handleWhatsApp}
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>Hubungi Usahawan / WhatsApp</span>
-              </button>
+              </a>
 
               {tenantBusiness && onSelectBusiness && (
                 <button

@@ -47,6 +47,9 @@ import {
   BusinessCategory, 
   KelantanDistrict,
   GrantApplication,
+  KioskDailySale,
+  MaintenanceTicket,
+  MentorshipRegistration,
   MerchantSubTab
 } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -54,11 +57,13 @@ import {
   saveBusinessListing, 
   saveProduct, 
   deleteProduct,
-  updateBookingStatus
+  updateBookingStatus,
+  createMaintenanceTicket
 } from '../services/dataService';
 import { KioskCashflowTracker } from './KioskCashflowTracker';
 import { UserDocumentsVault } from './UserDocumentsVault';
 import { ImageDropzone } from './ImageDropzone';
+import { showToast } from './ToastNotification';
 import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
 import confetti from 'canvas-confetti';
 
@@ -68,11 +73,17 @@ interface MerchantPortalProps {
   myBookings?: CapsuleBooking[];
   slots?: CapsuleSlot[];
   grantApplications?: GrantApplication[];
+  cashflowRecords?: KioskDailySale[];
+  maintenanceTickets?: MaintenanceTicket[];
+  mentorshipRegistrations?: MentorshipRegistration[];
   onViewOfferLetter?: (booking: CapsuleBooking) => void;
   onOpenTenancyAgreement?: (booking: CapsuleBooking) => void;
   onOpenVerification?: (refCode?: string) => void;
   onOpenBookingTab?: () => void;
   onOpenBookingModal?: () => void;
+  onOpenSettingsTab?: () => void;
+  onOpenMentorshipClinic?: () => void;
+  onOpenMaintenanceModal?: () => void;
   onRefresh: () => void;
   activeSubTab?: MerchantSubTab;
   onSelectSubTab?: (subTab: MerchantSubTab) => void;
@@ -106,11 +117,17 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   myBookings = [],
   slots = [],
   grantApplications = [],
+  cashflowRecords = [],
+  maintenanceTickets = [],
+  mentorshipRegistrations = [],
   onViewOfferLetter,
   onOpenTenancyAgreement,
   onOpenVerification,
   onOpenBookingTab,
   onOpenBookingModal,
+  onOpenSettingsTab,
+  onOpenMentorshipClinic,
+  onOpenMaintenanceModal,
   onRefresh,
   activeSubTab = 'overview',
   onSelectSubTab
@@ -119,8 +136,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const safeProducts = myProducts || [];
   const safeBookings = myBookings || [];
   const safeSlots = slots || [];
+  const safeCashflow = cashflowRecords || [];
+  const safeTickets = maintenanceTickets || [];
+  const safeMentorships = mentorshipRegistrations || [];
 
-  const [internalTab, setInternalTab] = useState<'overview' | 'profile' | 'products' | 'bookings' | 'cashflow' | 'vault' | 'card' | 'settings'>('overview');
+  const [internalTab, setInternalTab] = useState<MerchantSubTab>('overview');
 
   // Synchronize internal tab state with external activeSubTab prop
   React.useEffect(() => {
@@ -129,17 +149,17 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     }
   }, [activeSubTab]);
 
-  const activeTab = activeSubTab || internalTab;
-  const setActiveTab = (tab: 'overview' | 'profile' | 'products' | 'bookings' | 'cashflow' | 'vault' | 'card' | 'settings') => {
+  const activeTab: MerchantSubTab = activeSubTab || internalTab;
+  const setActiveTab = (tab: MerchantSubTab) => {
     setInternalTab(tab);
-    if (onSelectSubTab && (tab === 'overview' || tab === 'profile' || tab === 'products' || tab === 'bookings' || tab === 'cashflow' || tab === 'vault' || tab === 'card')) {
+    if (onSelectSubTab) {
       onSelectSubTab(tab);
     }
   };
 
   const [salesPeriod, setSalesPeriod] = useState<'weekly' | 'monthly' | 'quarterly'>('weekly');
   const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null);
-  const [selectedStepperIndex, setSelectedStepperIndex] = useState<number>(2);
+  const [selectedStepperIndex, setSelectedStepperIndex] = useState<number>(0);
 
   // Business Form State
   const [businessName, setBusinessName] = useState(myBusiness?.businessName || '');
@@ -151,25 +171,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const [whatsapp, setWhatsapp] = useState(myBusiness?.whatsapp || userProfile?.phone || '');
   const [instagram, setInstagram] = useState(myBusiness?.instagram || '');
   const [tiktok, setTiktok] = useState(myBusiness?.tiktok || '');
-  const [logoUrl, setLogoUrl] = useState(myBusiness?.logoUrl || '/public/assets/generated/avatar_youth_male_1793924250192.jpg');
-  const [bannerUrl, setBannerUrl] = useState(myBusiness?.bannerUrl || '/public/assets/generated/banner_kelantan_landmark_1793924253242.jpg');
-
-  // Settings Tab State
-  const [settingsFullName, setSettingsFullName] = useState(userProfile?.fullName || user?.displayName || '');
-  const [settingsIcNumber, setSettingsIcNumber] = useState(userProfile?.icNumber || '');
-  const [settingsPhone, setSettingsPhone] = useState(userProfile?.phone || userProfile?.whatsapp || myBusiness?.whatsapp || '');
-  const [settingsDistrict, setSettingsDistrict] = useState<KelantanDistrict>((userProfile?.district as KelantanDistrict) || myBusiness?.district || 'Kota Bharu');
-  const [settingsBusinessName, setSettingsBusinessName] = useState(userProfile?.businessName || myBusiness?.businessName || '');
-  const [settingsCategory, setSettingsCategory] = useState<BusinessCategory>(userProfile?.category || myBusiness?.category || 'Makanan & Minuman (F&B)');
-  const [settingsSsmStatus, setSettingsSsmStatus] = useState<'registered' | 'in_progress' | 'not_registered'>(
-    userProfile?.ssmStatus || (myBusiness?.ssmNumber ? 'registered' : 'in_progress')
-  );
-  const [settingsSsmNumber, setSettingsSsmNumber] = useState(userProfile?.ssmNumber || myBusiness?.ssmNumber || '');
-  const [settingsBusinessStage, setSettingsBusinessStage] = useState<'idea' | 'startup' | 'growth'>(
-    userProfile?.businessStage || 'startup'
-  );
-  const [savingSettings, setSavingSettings] = useState(false);
-  const [settingsMessage, setSettingsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [logoUrl, setLogoUrl] = useState(myBusiness?.logoUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg');
+  const [bannerUrl, setBannerUrl] = useState(myBusiness?.bannerUrl || '/assets/generated/banner_kelantan_landmark_1793924253242.jpg');
 
   // Sync state if myBusiness changes
   React.useEffect(() => {
@@ -188,100 +191,26 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     }
   }, [myBusiness]);
 
-  // Sync settings state if userProfile or myBusiness changes
-  React.useEffect(() => {
-    if (userProfile) {
-      if (userProfile.fullName) setSettingsFullName(userProfile.fullName);
-      if (userProfile.icNumber) setSettingsIcNumber(userProfile.icNumber);
-      if (userProfile.phone) setSettingsPhone(userProfile.phone);
-      if (userProfile.district) setSettingsDistrict(userProfile.district as KelantanDistrict);
-      if (userProfile.businessName) setSettingsBusinessName(userProfile.businessName);
-      if (userProfile.category) setSettingsCategory(userProfile.category);
-      if (userProfile.ssmStatus) setSettingsSsmStatus(userProfile.ssmStatus);
-      if (userProfile.ssmNumber) setSettingsSsmNumber(userProfile.ssmNumber);
-      if (userProfile.businessStage) setSettingsBusinessStage(userProfile.businessStage);
-    } else if (user) {
-      if (user.displayName) setSettingsFullName(user.displayName);
-    }
-    if (myBusiness) {
-      if (!userProfile?.businessName && myBusiness.businessName) setSettingsBusinessName(myBusiness.businessName);
-      if (!userProfile?.ssmNumber && myBusiness.ssmNumber) setSettingsSsmNumber(myBusiness.ssmNumber);
-      if (!userProfile?.category && myBusiness.category) setSettingsCategory(myBusiness.category);
-      if (!userProfile?.phone && myBusiness.whatsapp) setSettingsPhone(myBusiness.whatsapp);
-    }
-  }, [userProfile, user, myBusiness]);
-
   // Product Form State
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [prodName, setProdName] = useState('');
   const [prodPrice, setProdPrice] = useState('');
   const [prodDesc, setProdDesc] = useState('');
   const [prodCategory, setProdCategory] = useState('Menu Utama');
-  const [prodImageUrl, setProdImageUrl] = useState('/public/assets/generated/product_kelantan_delights_1793924253401.jpg');
+  const [prodImageUrl, setProdImageUrl] = useState('/assets/generated/product_kelantan_delights_1793924253401.jpg');
 
   // Booking action states
   const [selectedReceiptBooking, setSelectedReceiptBooking] = useState<CapsuleBooking | null>(null);
+  const [confirmCancelBooking, setConfirmCancelBooking] = useState<CapsuleBooking | null>(null);
+  const [cancellingBooking, setCancellingBooking] = useState(false);
   const [maintenanceComplaintBooking, setMaintenanceComplaintBooking] = useState<CapsuleBooking | null>(null);
   const [complaintType, setComplaintType] = useState('Bekalan Elektrik 13A & Lampu');
   const [complaintNotes, setComplaintNotes] = useState('');
+  const [submittingComplaint, setSubmittingComplaint] = useState(false);
   const [complaintSuccess, setComplaintSuccess] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-  const handleSaveSettings = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!settingsFullName.trim()) {
-      setSettingsMessage({ type: 'error', text: 'Sila masukkan nama penuh anda.' });
-      return;
-    }
-    if (!settingsPhone.trim()) {
-      setSettingsMessage({ type: 'error', text: 'Sila masukkan nombor telefon / WhatsApp.' });
-      return;
-    }
-
-    try {
-      setSavingSettings(true);
-      setSettingsMessage(null);
-
-      // 1. Update User Profile in AuthContext & Firestore / localStorage
-      await updateProfileData({
-        fullName: settingsFullName.trim(),
-        icNumber: settingsIcNumber.trim(),
-        phone: settingsPhone.trim(),
-        whatsapp: settingsPhone.trim(),
-        district: settingsDistrict,
-        businessName: settingsBusinessName.trim(),
-        category: settingsCategory,
-        ssmStatus: settingsSsmStatus,
-        ssmNumber: settingsSsmNumber.trim(),
-        businessStage: settingsBusinessStage
-      });
-
-      // 2. Also keep business listing in sync if existing
-      if (myBusiness) {
-        await saveBusinessListing({
-          ...myBusiness,
-          ownerName: settingsFullName.trim(),
-          ownerPhone: settingsPhone.trim(),
-          whatsapp: settingsPhone.trim(),
-          district: settingsDistrict,
-          businessName: settingsBusinessName.trim() || myBusiness.businessName,
-          category: settingsCategory,
-          ssmNumber: settingsSsmNumber.trim()
-        });
-      }
-
-      confetti({ particleCount: 50, spread: 60 });
-      setSettingsMessage({ type: 'success', text: 'Tetapan maklumat peribadi & bisnes berjaya disimpan dan disegerakkan!' });
-      onRefresh();
-    } catch (err) {
-      console.error(err);
-      setSettingsMessage({ type: 'error', text: 'Gagal menyimpan tetapan. Sila cuba sebentar lagi.' });
-    } finally {
-      setSavingSettings(false);
-    }
-  };
 
   if (!user) {
     return (
@@ -295,7 +224,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             Sila log masuk untuk mendaftar perniagaan anda, mengurus produk katalog, dan memantau status sewaan Kapsul Niaga Kelantan.
           </p>
           <button
-            onClick={openLoginModal}
+            type="button"
+            onClick={() => openLoginModal()}
             className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
           >
             <LogIn className="w-4 h-4 text-sky-100" />
@@ -355,8 +285,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       setMessage({ type: 'error', text: 'Sila daftar profil perniagaan anda terlebih dahulu sebelum menambah produk.' });
       return;
     }
-    if (!prodName.trim() || !prodPrice) {
-      setMessage({ type: 'error', text: 'Sila isi nama dan harga produk.' });
+    const parsedPrice = parseFloat(prodPrice);
+    if (!prodName.trim() || !prodPrice || isNaN(parsedPrice) || parsedPrice < 0) {
+      setMessage({ type: 'error', text: 'Sila isi nama dan harga jualan yang sah (RM0.00 atau lebih).' });
       return;
     }
 
@@ -365,8 +296,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       await saveProduct({
         businessId: myBusiness.id,
         ownerId: user.uid,
-        name: prodName,
-        price: parseFloat(prodPrice),
+        name: prodName.trim(),
+        price: parsedPrice,
         description: prodDesc,
         category: prodCategory,
         imageUrl: prodImageUrl,
@@ -430,7 +361,192 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       )}
 
       {/* Tab 0: Executive Overview Hub */}
-      {activeTab === 'overview' && (
+      {activeTab === 'overview' && (() => {
+        // Real Cashflow Computation
+        const totalSalesAll = safeCashflow.reduce((sum, r) => sum + (Number(r.cashSales) || 0) + (Number(r.qrSales) || 0), 0);
+        const totalQrAll = safeCashflow.reduce((sum, r) => sum + (Number(r.qrSales) || 0), 0);
+        const qrPercentAll = totalSalesAll > 0 ? Math.round((totalQrAll / totalSalesAll) * 100) : 0;
+        const avgDailySales = safeCashflow.length > 0 ? Math.round(totalSalesAll / safeCashflow.length) : 0;
+
+        // Real Kiosk Status
+        const approvedBooking = safeBookings.find(b => b.status === 'approved') || null;
+        const pendingBooking = safeBookings.find(b => b.status === 'pending') || null;
+        const primaryBooking = approvedBooking || pendingBooking || safeBookings[0] || null;
+        const activeSlotInfo = primaryBooking ? safeSlots.find(s => s.id === primaryBooking.slotId || s.code === primaryBooking.slotCode) : null;
+
+        // Real Grant Computation
+        const latestGrant = grantApplications[0] || null;
+        const approvedGrants = grantApplications.filter(g => g.status === 'approved');
+        const parseAmount = (amt?: string) => {
+          const num = Number((amt || '0').replace(/[^0-9.]/g, ''));
+          return isNaN(num) ? 0 : num;
+        };
+        const totalGrantValue = (approvedGrants.length > 0 ? approvedGrants : grantApplications)
+          .reduce((sum, g) => sum + parseAmount(g.grantAmount || g.amount), 0);
+
+        // Real Mentorship Computation
+        const upcomingMentor = safeMentorships.find(m => m.status === 'confirmed' || m.status === 'pending') || safeMentorships[0] || null;
+
+        // Build Chart Bars from real cashflowRecords
+        const now = new Date();
+        const chartBars = (() => {
+          if (salesPeriod === 'weekly') {
+            const days = ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'];
+            const buckets = Array.from({ length: 7 }, (_, i) => {
+              const d = new Date(now);
+              d.setDate(now.getDate() - (6 - i));
+              const iso = d.toISOString().split('T')[0];
+              const dayRecs = safeCashflow.filter(r => r.date === iso);
+              const cash = dayRecs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+              const qr = dayRecs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+              const value = cash + qr;
+              return {
+                label: days[d.getDay()],
+                value,
+                tx: dayRecs.length,
+                qr: value > 0 ? Math.round((qr / value) * 100) : 0
+              };
+            });
+            return buckets;
+          }
+          if (salesPeriod === 'monthly') {
+            const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogo', 'Sep', 'Okt', 'Nov', 'Dis'];
+            return Array.from({ length: 6 }, (_, i) => {
+              const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+              const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+              const recs = safeCashflow.filter(r => (r.date || '').startsWith(ym));
+              const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+              const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+              const value = cash + qr;
+              return {
+                label: months[d.getMonth()],
+                value,
+                tx: recs.length,
+                qr: value > 0 ? Math.round((qr / value) * 100) : 0
+              };
+            });
+          }
+          return [0, 1, 2, 3].map((qIdx) => {
+            const qLabel = `S${qIdx + 1}`;
+            const startMonth = qIdx * 3;
+            const recs = safeCashflow.filter(r => {
+              if (!r.date) return false;
+              const dt = new Date(r.date);
+              return dt.getFullYear() === now.getFullYear() && dt.getMonth() >= startMonth && dt.getMonth() <= startMonth + 2;
+            });
+            const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+            const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+            const value = cash + qr;
+            return {
+              label: qLabel,
+              value,
+              tx: recs.length,
+              qr: value > 0 ? Math.round((qr / value) * 100) : 0
+            };
+          });
+        })();
+
+        const periodTotal = chartBars.reduce((s, b) => s + b.value, 0);
+        const periodMax = Math.max(...chartBars.map(b => b.value), 0);
+        const periodAvg = chartBars.length > 0 ? Math.round(periodTotal / chartBars.length) : 0;
+
+        // Dynamic Application Stepper based on user's actual state
+        const hasBusiness = Boolean(myBusiness || userProfile?.businessName);
+        const hasSsm = Boolean(myBusiness?.ssmNumber || userProfile?.ssmNumber);
+        const hasBooking = safeBookings.length > 0;
+        const isBookingApproved = Boolean(approvedBooking);
+        const isTenancySigned = Boolean(approvedBooking?.tenancySigned);
+
+        const stepperItems = [
+          {
+            step: 1,
+            title: 'Profil Bisnes & Usahawan',
+            date: myBusiness?.createdAt ? formatDisplayDate(myBusiness.createdAt.split('T')[0]) : 'Langkah 1',
+            officer: 'KBelia Online',
+            status: hasBusiness ? 'completed' : 'current',
+            desc: hasBusiness
+              ? `Profil "${myBusiness?.businessName || userProfile?.businessName}" telah didaftarkan.`
+              : 'Lengkapkan profil perniagaan anda di tab Profil Bisnes.'
+          },
+          {
+            step: 2,
+            title: 'Pengesahan SSM & Hubungi',
+            date: hasSsm ? 'Disahkan' : 'Menunggu',
+            officer: 'Urusetia PBT',
+            status: hasSsm ? 'completed' : hasBusiness ? 'current' : 'upcoming',
+            desc: hasSsm
+              ? `No. SSM (${myBusiness?.ssmNumber || userProfile?.ssmNumber}) telah direkodkan.`
+              : 'Masukkan nombor SSM (jika ada) di Tetapan Akaun atau Profil Bisnes.'
+          },
+          {
+            step: 3,
+            title: 'Permohonan Slot Kapsul Niaga',
+            date: primaryBooking ? formatDisplayDate(primaryBooking.createdAt?.split('T')[0]) : 'Belum Mohon',
+            officer: 'Jawatankuasa Hub',
+            status: isBookingApproved ? 'completed' : hasBooking ? 'current' : 'upcoming',
+            desc: primaryBooking
+              ? `Permohonan ${primaryBooking.slotCode} (${primaryBooking.hubLocation}) berstatus: ${primaryBooking.status === 'approved' ? 'Diluluskan' : primaryBooking.status === 'rejected' ? 'Ditolak' : 'Dalam Semakan'}.`
+              : 'Pilih tapak kiosk kapsul di menu Kapsul Niaga untuk mula berniaga.'
+          },
+          {
+            step: 4,
+            title: 'Surat Tawaran & Perjanjian Digital',
+            date: isBookingApproved ? (isTenancySigned ? 'Dimeterai' : 'Sedia Ditandatangani') : 'Menunggu Kelulusan',
+            officer: 'Penyelaras UMK',
+            status: isTenancySigned ? 'completed' : isBookingApproved ? 'current' : 'upcoming',
+            desc: isTenancySigned
+              ? 'Perjanjian sewaan digital telah ditandatangani.'
+              : isBookingApproved
+              ? 'Surat tawaran sedia dimuat turun. Sila meterai perjanjian digital.'
+              : 'Surat tawaran dijana sebaik permohonan kapsul diluluskan.'
+          },
+          {
+            step: 5,
+            title: 'Operasi Kiosk & Rekod Jualan',
+            date: isTenancySigned ? 'Aktif Beroperasi' : 'Peringkat Akhir',
+            officer: 'Penyelia Tapak',
+            status: isTenancySigned && safeCashflow.length > 0 ? 'completed' : isTenancySigned ? 'current' : 'upcoming',
+            desc: safeCashflow.length > 0
+              ? `${safeCashflow.length} rekod jualan tunai/QR telah dicatatkan.`
+              : 'Catat jualan harian anda melalui Buku Tunai Kiosk selepas beroperasi.'
+          }
+        ];
+
+        // Dynamic live notifications / alerts from real user records
+        const liveAlerts: { tag: string; tagColor: string; time: string; title: string; body: string; action?: () => void }[] = [];
+        if (upcomingMentor) {
+          liveAlerts.push({
+            tag: 'Jadual Mentor',
+            tagColor: 'text-amber-700 dark:text-amber-400',
+            time: upcomingMentor.preferredDate || 'Dijadualkan',
+            title: `Sesi Bimbingan: ${upcomingMentor.topic}`,
+            body: `${upcomingMentor.mentorName} · ${upcomingMentor.preferredTime} (${upcomingMentor.mode}).`,
+            action: onOpenMentorshipClinic
+          });
+        }
+        if (safeTickets.length > 0) {
+          const latestTicket = safeTickets[0];
+          liveAlerts.push({
+            tag: 'Tiket Fasiliti',
+            tagColor: 'text-emerald-700 dark:text-emerald-400',
+            time: latestTicket.status === 'resolved' ? 'Selesai' : latestTicket.status === 'in_progress' ? 'Diproses' : 'Diterima',
+            title: `Aduan ${latestTicket.slotCode}: ${latestTicket.issueCategory}`,
+            body: latestTicket.description,
+            action: () => setActiveTab('bookings')
+          });
+        }
+        if (latestGrant) {
+          liveAlerts.push({
+            tag: 'Permohonan Geran',
+            tagColor: 'text-sky-700 dark:text-sky-400',
+            time: latestGrant.status === 'approved' ? 'Diluluskan' : latestGrant.status === 'rejected' ? 'Ditolak' : 'Dalam Semakan',
+            title: latestGrant.programTitle,
+            body: `Jumlah dipohon: ${latestGrant.grantAmount} (${latestGrant.businessName}).`,
+            action: () => setActiveTab('vault')
+          });
+        }
+
+        return (
         <div className="mt-6 space-y-6">
           
           {/* Executive Greeting Banner */}
@@ -441,13 +557,15 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <Activity className="w-3.5 h-3.5" />
                   <span>Papan Pemuka Usahawan Belia Kelantan</span>
                   <span className="text-slate-300 dark:text-slate-600">·</span>
-                  <span className="text-slate-600 dark:text-slate-300 font-mono text-[11px]">Sesi 2026 Aktif</span>
+                  <span className="text-slate-600 dark:text-slate-300 font-mono text-[11px]">
+                    {primaryBooking ? `Slot ${primaryBooking.slotCode}` : 'Akaun Berdaftar'}
+                  </span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight text-slate-800 dark:text-white">
                   {myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Usahawan Belia'}
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-                  Pemilik: <span className="font-semibold text-slate-800 dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span> · {myBusiness?.district || userProfile?.district || 'Kota Bharu'} · SSM: <span className="font-mono text-emerald-700 dark:text-emerald-400 font-semibold">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'TR0294811-M'}</span>
+                  Pemilik: <span className="font-semibold text-slate-800 dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span> · {myBusiness?.district || userProfile?.district || 'Kota Bharu'} · SSM: <span className="font-mono text-emerald-700 dark:text-emerald-400 font-semibold">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Belum Didaftarkan'}</span>
                 </p>
               </div>
 
@@ -466,7 +584,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   className="py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <ShoppingBag className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-                  <span>Daftar Produk</span>
+                  <span>Daftar Produk ({safeProducts.length})</span>
                 </button>
               </div>
             </div>
@@ -475,11 +593,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           {/* 4 Executive KPI Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             
-            {/* KPI 1: Jualan Bulanan */}
+            {/* KPI 1: Hasil Jualan Direkodkan */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Hasil Jualan Bulan Ini
+                  Hasil Jualan Direkodkan
                 </span>
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
                   <TrendingUp className="w-4 h-4" />
@@ -487,15 +605,19 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-800 dark:text-white">
-                  RM 14,850
+                  RM {totalSalesAll.toLocaleString('ms-MY', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                 </span>
-                <span className="inline-flex items-center text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                  +18.4%
-                </span>
+                {safeCashflow.length > 0 && (
+                  <span className="inline-flex items-center text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    {safeCashflow.length} rekod
+                  </span>
+                )}
               </div>
               <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-                Purata RM 495 / hari · 72% DuitNow QR
+                {safeCashflow.length > 0
+                  ? `Purata RM ${avgDailySales.toLocaleString()} / rekod · ${qrPercentAll}% DuitNow QR`
+                  : 'Belum ada rekod jualan. Mula catat di Buku Tunai.'}
               </div>
             </div>
 
@@ -511,14 +633,22 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white truncate">
-                  {safeBookings.length > 0 ? safeBookings[0].slotCode : 'KB Sentral A-02'}
+                  {primaryBooking ? primaryBooking.slotCode : 'Belum Memohon'}
                 </span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
-                  Aktif
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                  approvedBooking
+                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
+                    : pendingBooking
+                    ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                }`}>
+                  {approvedBooking ? 'Aktif' : pendingBooking ? 'Semakan' : 'Kosong'}
                 </span>
               </div>
-              <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-                Palam 13A & Wi-Fi · Baki sewa 42 hari
+              <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                {primaryBooking
+                  ? `${primaryBooking.hubLocation} · ${primaryBooking.durationMonths} bln`
+                  : `${safeSlots.filter(s => s.status === 'available').length} unit kapsul tersedia untuk dimohon`}
               </div>
             </div>
 
@@ -526,7 +656,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Geran Pemangkin Aktif
+                  Permohonan Geran Belia
                 </span>
                 <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center">
                   <FileCheck className="w-4 h-4" />
@@ -534,12 +664,18 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-800 dark:text-white">
-                  RM 15,000
+                  RM {totalGrantValue.toLocaleString('ms-MY')}
                 </span>
               </div>
               <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-                <span>Saringan Temuduga Geran (Lulus Bersyarat)</span>
+                <span className={`w-2 h-2 rounded-full shrink-0 ${
+                  approvedGrants.length > 0 ? 'bg-emerald-500' : latestGrant ? 'bg-amber-500' : 'bg-slate-300'
+                }`} />
+                <span className="truncate">
+                  {latestGrant
+                    ? `${latestGrant.programTitle} (${latestGrant.status === 'approved' ? 'Diluluskan' : latestGrant.status === 'rejected' ? 'Ditolak' : 'Dalam Semakan'})`
+                    : 'Tiada permohonan geran dihantar lagi'}
+                </span>
               </div>
             </div>
 
@@ -553,11 +689,21 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <Calendar className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">
-                Khamis, 10:30 AM
+              <div className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white truncate">
+                {upcomingMentor ? `${upcomingMentor.preferredDate}, ${upcomingMentor.preferredTime}` : 'Tiada Sesi Aktif'}
               </div>
               <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                Dr. Azlan · Pemasaran Digital UMK (Maya)
+                {upcomingMentor
+                  ? `${upcomingMentor.mentorName} · ${upcomingMentor.mode}`
+                  : (
+                    <button
+                      type="button"
+                      onClick={onOpenMentorshipClinic}
+                      className="text-sky-700 dark:text-sky-400 hover:underline font-semibold cursor-pointer"
+                    >
+                      Tempah sesi bimbingan mentor →
+                    </button>
+                  )}
               </div>
             </div>
 
@@ -579,7 +725,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </h4>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Transaksi fizikal & DuitNow QR
+                    Transaksi tunai & DuitNow QR sebenar
                   </p>
                 </div>
 
@@ -591,7 +737,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
                       salesPeriod === 'weekly'
                         ? 'bg-sky-600 text-white shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Mingguan
@@ -602,7 +748,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
                       salesPeriod === 'monthly'
                         ? 'bg-sky-600 text-white shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Bulanan
@@ -613,7 +759,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
                       salesPeriod === 'quarterly'
                         ? 'bg-sky-600 text-white shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     Suku
@@ -629,87 +775,77 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <div>
                     <span className="text-[10px] text-slate-500 block font-medium">Terkumpul</span>
                     <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-800 dark:text-white">
-                      {salesPeriod === 'weekly' ? 'RM 4,850' : salesPeriod === 'monthly' ? 'RM 14,850' : 'RM 44,800'}
+                      RM {periodTotal.toLocaleString()}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 block font-medium">Purata/Hari</span>
+                    <span className="text-[10px] text-slate-500 block font-medium">Purata/Tempoh</span>
                     <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-800 dark:text-white">
-                      {salesPeriod === 'weekly' ? 'RM 692' : salesPeriod === 'monthly' ? 'RM 495' : 'RM 498'}
+                      RM {periodAvg.toLocaleString()}
                     </span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-500 block font-medium">Puncak</span>
                     <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-emerald-700 dark:text-emerald-400">
-                      {salesPeriod === 'weekly' ? 'RM 1,280' : salesPeriod === 'monthly' ? 'RM 2,840' : 'RM 15,200'}
+                      RM {periodMax.toLocaleString()}
                     </span>
                   </div>
                 </div>
 
                 {/* Interactive Bar Chart */}
                 <div className="relative pt-2 pb-2">
-                  <div className="h-48 w-full flex items-end justify-between gap-1.5 sm:gap-2 px-1">
-                    {(salesPeriod === 'weekly' ? [
-                      { label: 'Isn', value: 420, max: 1400, tx: 32, qr: 70 },
-                      { label: 'Sel', value: 380, max: 1400, tx: 28, qr: 65 },
-                      { label: 'Rab', value: 510, max: 1400, tx: 41, qr: 75 },
-                      { label: 'Kha', value: 490, max: 1400, tx: 38, qr: 72 },
-                      { label: 'Jum', value: 820, max: 1400, tx: 64, qr: 80 },
-                      { label: 'Sab', value: 1280, max: 1400, tx: 95, qr: 85 },
-                      { label: 'Ahd', value: 950, max: 1400, tx: 72, qr: 78 }
-                    ] : salesPeriod === 'monthly' ? [
-                      { label: 'Mei', value: 11200, max: 16000, tx: 720, qr: 68 },
-                      { label: 'Jun', value: 12850, max: 16000, tx: 840, qr: 70 },
-                      { label: 'Jul', value: 13400, max: 16000, tx: 890, qr: 74 },
-                      { label: 'Ogo', value: 14100, max: 16000, tx: 920, qr: 75 },
-                      { label: 'Sep', value: 13950, max: 16000, tx: 905, qr: 73 },
-                      { label: 'Okt', value: 14850, max: 16000, tx: 960, qr: 78 }
-                    ] : [
-                      { label: 'S1', value: 32500, max: 50000, tx: 2100, qr: 65 },
-                      { label: 'S2', value: 38400, max: 50000, tx: 2540, qr: 70 },
-                      { label: 'S3', value: 41200, max: 50000, tx: 2800, qr: 74 },
-                      { label: 'S4', value: 44800, max: 50000, tx: 3100, qr: 78 }
-                    ]).map((item, idx) => {
-                      const heightPercent = Math.round((item.value / item.max) * 100);
-                      const isHovered = hoveredBarIndex === idx;
+                  {periodMax === 0 ? (
+                    <div className="h-48 flex flex-col items-center justify-center text-center bg-slate-50/70 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 px-4">
+                      <BarChart3 className="w-7 h-7 text-slate-300 dark:text-slate-600 mb-2" />
+                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">Tiada Rekod Jualan Dalam Tempoh Ini</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                        Rekod jualan harian di tab Buku Tunai untuk memaparkan graf prestasi sebenar.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="h-48 w-full flex items-end justify-between gap-1.5 sm:gap-2 px-1">
+                      {chartBars.map((item, idx) => {
+                        const heightPercent = item.value > 0 ? Math.max(8, Math.round((item.value / periodMax) * 100)) : 2;
+                        const isHovered = hoveredBarIndex === idx;
 
-                      return (
-                        <div 
-                          key={item.label}
-                          className="flex-1 flex flex-col items-center gap-1.5 group cursor-pointer relative"
-                          onMouseEnter={() => setHoveredBarIndex(idx)}
-                          onMouseLeave={() => setHoveredBarIndex(null)}
-                        >
-                          {/* Tooltip on Hover */}
-                          {isHovered && (
-                            <div className="absolute -top-12 z-20 px-2.5 py-1 rounded-lg bg-slate-800 text-white text-[10px] font-mono shadow-lg whitespace-nowrap animate-in fade-in duration-150 border border-slate-700 pointer-events-none">
-                              <span className="font-bold text-sky-300">RM {item.value.toLocaleString()}</span>
-                              <span className="block text-[9px] text-slate-300">{item.tx} tx · {item.qr}% QR</span>
+                        return (
+                          <div 
+                            key={item.label}
+                            className="flex-1 flex flex-col items-center gap-1.5 group cursor-pointer relative"
+                            onMouseEnter={() => setHoveredBarIndex(idx)}
+                            onMouseLeave={() => setHoveredBarIndex(null)}
+                          >
+                            {/* Tooltip on Hover */}
+                            {isHovered && (
+                              <div className="absolute -top-12 z-20 px-2.5 py-1 rounded-lg bg-slate-800 text-white text-[10px] font-mono shadow-lg whitespace-nowrap animate-in fade-in duration-150 border border-slate-700 pointer-events-none">
+                                <span className="font-bold text-sky-300">RM {item.value.toLocaleString()}</span>
+                                <span className="block text-[9px] text-slate-300">{item.tx} rekod · {item.qr}% QR</span>
+                              </div>
+                            )}
+
+                            {/* Bar Element */}
+                            <div className="w-full bg-slate-50 dark:bg-slate-900 rounded-t-md h-36 flex items-end overflow-hidden p-0.5 border border-slate-200/80 dark:border-slate-700/60">
+                              <div 
+                                className={`w-full rounded-t-sm transition-all duration-300 ${
+                                  isHovered 
+                                    ? 'bg-sky-500 dark:bg-sky-400 shadow-sm' 
+                                    : 'bg-sky-600/85 dark:bg-sky-600 group-hover:bg-sky-600'
+                                }`}
+                                style={{ height: `${heightPercent}%` }}
+                              />
                             </div>
-                          )}
 
-                          {/* Bar Element */}
-                          <div className="w-full bg-slate-50 dark:bg-slate-900 rounded-t-md h-36 flex items-end overflow-hidden p-0.5 border border-slate-200/80 dark:border-slate-700/60">
-                            <div 
-                              className={`w-full rounded-t-sm transition-all duration-300 ${
-                                isHovered 
-                                  ? 'bg-sky-500 dark:bg-sky-400 shadow-sm' 
-                                  : 'bg-sky-600/85 dark:bg-sky-600 group-hover:bg-sky-600'
-                              }`}
-                              style={{ height: `${heightPercent}%` }}
-                            />
+                            {/* X-axis Label */}
+                            <span className={`text-[10px] font-medium transition-colors ${
+                              isHovered ? 'text-sky-700 dark:text-sky-400 font-bold' : 'text-slate-500 dark:text-slate-400'
+                            }`}>
+                              {item.label}
+                            </span>
                           </div>
-
-                          {/* X-axis Label */}
-                          <span className={`text-[10px] font-medium transition-colors ${
-                            isHovered ? 'text-sky-700 dark:text-sky-400 font-bold' : 'text-slate-500 dark:text-slate-400'
-                          }`}>
-                            {item.label}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Footer notes & Cashflow shortcut */}
@@ -742,12 +878,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </h4>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Garis masa semakan PBT & UMK
+                    Status semakan semasa PBT & UMK
                   </p>
                 </div>
 
                 <span className="font-mono text-[11px] font-bold text-sky-800 dark:text-sky-300 px-2 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800">
-                  #KB-2026-8812
+                  {primaryBooking ? primaryBooking.slotCode : hasBusiness ? 'PROFIL-AKTIF' : 'BELUM-MOHON'}
                 </span>
               </div>
 
@@ -756,48 +892,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 
                 {/* 5-Step Vertical Stepper */}
                 <div className="space-y-3">
-                  {[
-                    {
-                      step: 1,
-                      title: 'Borang Dihantar',
-                      date: '12 Okt 2026',
-                      officer: 'KBelia Online',
-                      status: 'completed',
-                      desc: 'Borang pendaftaran profil & tapak diterima.'
-                    },
-                    {
-                      step: 2,
-                      title: 'Semakan Dokumen & SSM',
-                      date: '15 Okt 2026',
-                      officer: 'Urusetia PBT',
-                      status: 'completed',
-                      desc: 'MyKad dan nombor SSM disahkan patuh kriteria.'
-                    },
-                    {
-                      step: 3,
-                      title: 'Saringan & Temuduga Geran Belia',
-                      date: '24 Okt 2026',
-                      officer: 'Panel Penilai UMK',
-                      status: 'current',
-                      desc: 'Pitching ringkas. Status: Lulus Bersyarat.'
-                    },
-                    {
-                      step: 4,
-                      title: 'Surat Tawaran & Perjanjian',
-                      date: 'Dijangka: 02 Nov',
-                      officer: 'Penyelaras UMK',
-                      status: 'upcoming',
-                      desc: 'Dokumen perjanjian sewaan sedang disiapkan.'
-                    },
-                    {
-                      step: 5,
-                      title: 'Penyerahan Kunci Kapsul',
-                      date: 'Dijangka: 08 Nov',
-                      officer: 'Penyelia Tapak',
-                      status: 'upcoming',
-                      desc: 'Pemeriksaan fizikal palam 13A & penyerahan stiker.'
-                    }
-                  ].map((stepItem, idx) => {
+                  {stepperItems.map((stepItem, idx) => {
                     const isCompleted = stepItem.status === 'completed';
                     const isCurrent = stepItem.status === 'current';
                     const isSelected = selectedStepperIndex === idx;
@@ -818,7 +913,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             isCompleted
                               ? 'bg-emerald-600 text-white'
                               : isCurrent
-                              ? 'bg-amber-500 text-white ring-2 ring-amber-100 dark:ring-amber-950/60 animate-pulse'
+                              ? 'bg-amber-500 text-white ring-2 ring-amber-100 dark:ring-amber-950/60'
                               : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                           }`}>
                             {isCompleted ? <Check className="w-3.5 h-3.5" /> : stepItem.step}
@@ -866,8 +961,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      if (safeBookings.length > 0 && onViewOfferLetter) {
-                        onViewOfferLetter(safeBookings[0]);
+                      if (approvedBooking && onViewOfferLetter) {
+                        onViewOfferLetter(approvedBooking);
                       } else {
                         setActiveTab('bookings');
                       }
@@ -901,66 +996,79 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <Bell className="w-4 h-4 text-sky-700 dark:text-sky-400" />
                   <div>
                     <h4 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">
-                      Notifikasi & Makluman
+                      Ringkasan Aktiviti & Tindakan
                     </h4>
                   </div>
                 </div>
                 <span className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400">
-                  3 Terkini
+                  {liveAlerts.length} Rekod
                 </span>
               </div>
 
-              {/* Notification Items */}
+              {/* Live Alert Items */}
               <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-3">
                 <div className="space-y-3">
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Jadual Mentor</span>
-                      <span className="text-[10px] text-slate-400 font-mono">Hari ini</span>
+                  {liveAlerts.length === 0 ? (
+                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-2 text-center">
+                      <p className="text-xs font-bold text-slate-800 dark:text-white">
+                        Mulakan Langkah Usahawan Anda
+                      </p>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Lengkapkan profil perniagaan, tempah klinik bimbingan mentor, atau laporkan sebarang aduan fasiliti kiosk anda.
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-2 pt-1">
+                        {onOpenMentorshipClinic && (
+                          <button
+                            type="button"
+                            onClick={onOpenMentorshipClinic}
+                            className="px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-[11px] font-semibold cursor-pointer"
+                          >
+                            Klinik Mentor
+                          </button>
+                        )}
+                        {onOpenMaintenanceModal && (
+                          <button
+                            type="button"
+                            onClick={onOpenMaintenanceModal}
+                            className="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[11px] font-semibold cursor-pointer"
+                          >
+                            Aduan Fasiliti
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <h5 className="text-xs font-bold text-slate-800 dark:text-white">
-                      Klinik Mentoring Digital #04
-                    </h5>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                      Sesi Dr. Azlan dijadualkan Khamis 10:30 AM via Meet. Sedia pautan media sosial bisnes anda.
-                    </p>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Fasiliti Kiosk</span>
-                      <span className="text-[10px] text-slate-400 font-mono">Semalam</span>
-                    </div>
-                    <h5 className="text-xs font-bold text-slate-800 dark:text-white">
-                      Suis Elektrik Disahkan
-                    </h5>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                      Palam 13A di Pod A-02 disahkan sedia dan selamat untuk perkakasan peniaga.
-                    </p>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider">Peluang Geran</span>
-                      <span className="text-[10px] text-slate-400 font-mono">3 hari lalu</span>
-                    </div>
-                    <h5 className="text-xs font-bold text-slate-800 dark:text-white">
-                      Geran Digital Belia Kelantan
-                    </h5>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                      Subsidi peranti POS sehingga RM 5,000 kini dibuka untuk usahawan mikro.
-                    </p>
-                  </div>
+                  ) : (
+                    liveAlerts.slice(0, 3).map((item, idx) => (
+                      <div
+                        key={idx}
+                        onClick={item.action}
+                        className={`p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1 ${
+                          item.action ? 'cursor-pointer hover:border-sky-300 dark:hover:border-sky-700 transition-colors' : ''
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${item.tagColor}`}>{item.tag}</span>
+                          <span className="text-[10px] text-slate-400 font-mono">{item.time}</span>
+                        </div>
+                        <h5 className="text-xs font-bold text-slate-800 dark:text-white truncate">
+                          {item.title}
+                        </h5>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2">
+                          {item.body}
+                        </p>
+                      </div>
+                    ))
+                  )}
                 </div>
 
                 {/* Quick Action Shortcuts */}
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
                   <button
                     type="button"
-                    onClick={() => setActiveTab('card')}
+                    onClick={() => (onOpenSettingsTab ? onOpenSettingsTab() : setActiveTab('card'))}
                     className="flex-1 py-2 px-2.5 rounded-lg text-[11px] font-bold bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700 transition-all text-center cursor-pointer"
                   >
-                    Kad Digital
+                    Tetapan Akaun
                   </button>
                   <button
                     type="button"
@@ -978,7 +1086,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           </div>
 
         </div>
-      )}
+        );
+      })()}
 
       {/* Tab 1: Profile Form */}
       {activeTab === 'profile' && (
@@ -1235,6 +1344,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </label>
                     <input
                       type="number"
+                      min="0"
                       step="0.10"
                       required
                       placeholder="0.00"
@@ -1511,16 +1621,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       <span>Aduan Kiosk</span>
                     </button>
 
-                    {/* 7. Cancel Pending Booking */}
+                    {/* 7. Cancel Pending Booking (Inline React Confirm Modal) */}
                     {b.status === 'pending' && (
                       <button
                         type="button"
-                        onClick={async () => {
-                          if (window.confirm(`Adakah anda pasti ingin membatalkan permohonan slot ${b.slotCode}?`)) {
-                            await updateBookingStatus(b.id, 'rejected', 'Permohonan dibatalkan oleh usahawan.');
-                            onRefresh();
-                          }
-                        }}
+                        onClick={() => setConfirmCancelBooking(b)}
                         className="px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ml-auto"
                       >
                         <XCircle className="w-3.5 h-3.5 text-rose-600" />
@@ -1534,26 +1639,123 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           )}
 
+          {/* Existing Maintenance Tickets List */}
+          {safeTickets.length > 0 && (
+            <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                  <Wrench className="w-4 h-4 text-amber-600" />
+                  <span>Tiket Aduan Fasiliti Anda ({safeTickets.length})</span>
+                </h4>
+                {onOpenMaintenanceModal && (
+                  <button
+                    type="button"
+                    onClick={onOpenMaintenanceModal}
+                    className="text-xs font-semibold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
+                  >
+                    + Aduan Baharu
+                  </button>
+                )}
+              </div>
+              <div className="space-y-2">
+                {safeTickets.slice(0, 4).map((t) => (
+                  <div key={t.id} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3 text-xs">
+                    <div className="min-w-0">
+                      <div className="font-bold text-slate-800 dark:text-white truncate">
+                        {t.slotCode} · {t.issueCategory}
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{t.description}</p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                      t.status === 'resolved'
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                        : t.status === 'in_progress'
+                        ? 'bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300'
+                        : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                    }`}>
+                      {t.status === 'resolved' ? 'Selesai' : t.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* CANCEL CONFIRMATION MODAL */}
+          {confirmCancelBooking && (
+            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+              <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                    <AlertCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                      Batalkan Permohonan Slot?
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+                      Adakah anda pasti ingin membatalkan permohonan slot <span className="font-mono font-bold">{confirmCancelBooking.slotCode}</span> ({confirmCancelBooking.slotName})?
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                  <button
+                    type="button"
+                    disabled={cancellingBooking}
+                    onClick={() => setConfirmCancelBooking(null)}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 cursor-pointer"
+                  >
+                    Kembali
+                  </button>
+                  <button
+                    type="button"
+                    disabled={cancellingBooking}
+                    onClick={async () => {
+                      try {
+                        setCancellingBooking(true);
+                        await updateBookingStatus(confirmCancelBooking.id, 'rejected', 'Permohonan dibatalkan oleh usahawan.');
+                        showToast({
+                          type: 'info',
+                          title: 'Permohonan Dibatalkan',
+                          message: `Permohonan slot ${confirmCancelBooking.slotCode} telah dibatalkan.`
+                        });
+                        setConfirmCancelBooking(null);
+                        onRefresh();
+                      } catch {
+                        showToast('Gagal membatalkan permohonan. Sila cuba lagi.', 'error');
+                      } finally {
+                        setCancellingBooking(false);
+                      }
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 cursor-pointer"
+                  >
+                    {cancellingBooking ? 'Memproses...' : 'Ya, Batalkan'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* MODAL 1: OFFICIAL RECEIPT (RESIT RASMI BAYARAN KBELIA) */}
           {selectedReceiptBooking && (
             <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
-              <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden text-slate-900">
+              <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden text-slate-900 dark:text-white">
                 
                 {/* Receipt Header */}
-                <div className="p-5 kbelia-important-header border-b border-slate-200 flex items-center justify-between">
+                <div className="p-5 kbelia-important-header border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black shadow-xs">
                       <span className="text-base font-black">KB</span>
                     </div>
                     <div>
-                      <h4 className="font-black text-sm uppercase tracking-wide text-slate-800">Resit Rasmi Bayaran Subsidi Kiosk</h4>
-                      <p className="text-[10px] text-sky-700 font-semibold">Urusetia Pembangunan Keusahawanan Belia Kelantan</p>
+                      <h4 className="font-black text-sm uppercase tracking-wide text-slate-800 dark:text-white">Resit Rasmi Bayaran Subsidi Kiosk</h4>
+                      <p className="text-[10px] text-sky-700 dark:text-sky-400 font-semibold">Urusetia Pembangunan Keusahawanan Belia Kelantan</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setSelectedReceiptBooking(null)}
-                    className="p-1.5 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 cursor-pointer"
+                    className="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -1561,74 +1763,79 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
                 {/* Receipt Content */}
                 <div className="p-6 space-y-4 text-xs">
-                  <div className="flex justify-between items-start pb-3 border-b border-slate-200">
+                  <div className="flex justify-between items-start pb-3 border-b border-slate-200 dark:border-slate-700">
                     <div>
-                      <span className="text-slate-500 text-[10px] uppercase font-bold block">No. Rujukan Resit</span>
-                      <span className="font-mono font-extrabold text-sm text-sky-800">
+                      <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold block">No. Rujukan Resit</span>
+                      <span className="font-mono font-extrabold text-sm text-sky-800 dark:text-sky-400">
                         REC-{selectedReceiptBooking.slotCode}-{selectedReceiptBooking.id.substring(0, 8).toUpperCase()}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-slate-500 text-[10px] uppercase font-bold block">Tarikh Pembayaran</span>
-                      <span className="font-semibold text-slate-800">{new Date().toLocaleDateString('ms-MY')}</span>
+                      <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold block">Tarikh Permohonan</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{formatDisplayDate(selectedReceiptBooking.createdAt?.split('T')[0])}</span>
                     </div>
                   </div>
 
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                  <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Nama Usahawan:</span>
-                      <span className="font-bold text-slate-900">{selectedReceiptBooking.applicantName}</span>
+                      <span className="text-slate-500 dark:text-slate-400">Nama Usahawan:</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{selectedReceiptBooking.applicantName}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Jenama Perniagaan:</span>
-                      <span className="font-bold text-slate-900">{selectedReceiptBooking.businessName}</span>
+                      <span className="text-slate-500 dark:text-slate-400">Jenama Perniagaan:</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{selectedReceiptBooking.businessName}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Kapsul Diperuntukkan:</span>
-                      <span className="font-bold text-sky-800">{selectedReceiptBooking.slotCode} ({selectedReceiptBooking.slotName})</span>
+                      <span className="text-slate-500 dark:text-slate-400">Kapsul Diperuntukkan:</span>
+                      <span className="font-bold text-sky-800 dark:text-sky-400">{selectedReceiptBooking.slotCode} ({selectedReceiptBooking.slotName})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Lokasi Hab:</span>
-                      <span className="font-semibold text-slate-800">{selectedReceiptBooking.hubLocation}</span>
+                      <span className="text-slate-500 dark:text-slate-400">Lokasi Hab:</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedReceiptBooking.hubLocation}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Tempoh Perjanjian:</span>
-                      <span className="font-semibold text-slate-800">{selectedReceiptBooking.durationMonths} Bulan ({formatDisplayDate(selectedReceiptBooking.startDate)} hingga {calculateOperationEndDate(selectedReceiptBooking.startDate, selectedReceiptBooking.durationMonths)})</span>
+                      <span className="text-slate-500 dark:text-slate-400">Tempoh Perjanjian:</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedReceiptBooking.durationMonths} Bulan ({formatDisplayDate(selectedReceiptBooking.startDate)} hingga {calculateOperationEndDate(selectedReceiptBooking.startDate, selectedReceiptBooking.durationMonths)})</span>
                     </div>
                   </div>
 
                   {/* Fee Breakdown */}
-                  <div className="border border-slate-200 rounded-2xl overflow-hidden">
+                  {(() => {
+                    const rate = Number(selectedReceiptBooking.monthlyRate || 150);
+                    return (
+                  <div className="border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                      <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
                         <tr>
                           <th className="p-3">Keterangan Urusniaga</th>
                           <th className="p-3 text-right">Jumlah (RM)</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200">
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                         <tr>
                           <td className="p-3 font-medium">Yuran Komitmen Sewaan Kiosk Modular Subsidi Belia (Sebulan)</td>
-                          <td className="p-3 text-right font-mono font-bold">150.00</td>
+                          <td className="p-3 text-right font-mono font-bold tabular-nums">{rate.toFixed(2)}</td>
                         </tr>
                         <tr>
                           <td className="p-3 font-medium">Deposit Kebersihan & Keselamatan Utiliti Elektrik 13A</td>
-                          <td className="p-3 text-right font-mono font-bold">50.00</td>
+                          <td className="p-3 text-right font-mono font-bold tabular-nums">50.00</td>
                         </tr>
-                        <tr className="bg-emerald-50 text-emerald-900 font-bold">
+                        <tr className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 font-bold">
                           <td className="p-3">Subsidi Kerajaan Negeri Kelantan (Kadar Khas)</td>
-                          <td className="p-3 text-right font-mono">-50.00</td>
+                          <td className="p-3 text-right font-mono tabular-nums">-50.00</td>
                         </tr>
                         <tr className="bg-sky-600 text-white font-extrabold text-sm">
                           <td className="p-3">JUMLAH DIBAYAR</td>
-                          <td className="p-3 text-right font-mono text-sky-50">RM 150.00</td>
+                          <td className="p-3 text-right font-mono tabular-nums text-sky-50">RM {rate.toFixed(2)}</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
+                    );
+                  })()}
 
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-900 text-[11px] font-semibold">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center gap-2 text-emerald-900 dark:text-emerald-200 text-[11px] font-semibold">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>Status Transaksi: Berjaya & Sah Diperakui Sistem Perakaunan Bersepadu KBelia.</span>
                   </div>
 
@@ -1645,7 +1852,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     <button
                       type="button"
                       onClick={() => setSelectedReceiptBooking(null)}
-                      className="px-4 py-2.5 bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer"
+                      className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl cursor-pointer"
                     >
                       Tutup
                     </button>
@@ -1662,7 +1869,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden text-slate-800 dark:text-white">
                 <div className="p-5 kbelia-important-header dark:bg-slate-800 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center font-bold">
+                    <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center font-bold">
                       <Wrench className="w-4 h-4" />
                     </div>
                     <div>
@@ -1699,9 +1906,40 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </div>
                   ) : (
                     <form
-                      onSubmit={(e) => {
+                      onSubmit={async (e) => {
                         e.preventDefault();
-                        setComplaintSuccess(`Tiket aduan #${Math.floor(1000 + Math.random() * 9000)} didaftarkan bagi kategori "${complaintType}".`);
+                        if (!complaintNotes.trim()) return;
+                        const categoryMap: Record<string, MaintenanceTicket['issueCategory']> = {
+                          'Bekalan Elektrik 13A & Lampu': 'Elektrik & Suis',
+                          'Kunci & Roller Shutter Kiosk': 'Pintu & Kunci',
+                          'Sistem Paip & Saliran Air': 'Paip & Air',
+                          'Wi-Fi Hab & Rangkaian Internet': 'Lain-lain',
+                          'Kebersihan & Pelupusan Sisa': 'Lain-lain',
+                          'Lain-lain Isu Fizikal': 'Lain-lain'
+                        };
+                        try {
+                          setSubmittingComplaint(true);
+                          const created = await createMaintenanceTicket({
+                            ownerId: user.uid,
+                            slotCode: maintenanceComplaintBooking.slotCode,
+                            kioskName: maintenanceComplaintBooking.slotName,
+                            reporterName: userProfile?.fullName || user.displayName || maintenanceComplaintBooking.applicantName,
+                            reporterPhone: userProfile?.phone || maintenanceComplaintBooking.applicantPhone || '-',
+                            issueCategory: categoryMap[complaintType] || 'Lain-lain',
+                            description: `[${complaintType}] ${complaintNotes.trim()}`
+                          });
+                          setComplaintSuccess(`Tiket aduan ${created.id} didaftarkan bagi kategori "${complaintType}".`);
+                          showToast({
+                            type: 'success',
+                            title: 'Aduan Fasiliti Diterima',
+                            message: `Tiket ${created.id} telah dihantar ke Urusetia Hub.`
+                          });
+                          onRefresh();
+                        } catch {
+                          showToast('Gagal menghantar aduan fasiliti. Sila cuba lagi.', 'error');
+                        } finally {
+                          setSubmittingComplaint(false);
+                        }
                       }}
                       className="space-y-3.5"
                     >
@@ -1712,7 +1950,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         <select
                           value={complaintType}
                           onChange={(e) => setComplaintType(e.target.value)}
-                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                         >
                           <option value="Bekalan Elektrik 13A & Lampu">Bekalan Elektrik 13A & Lampu Kiosk</option>
                           <option value="Kunci & Roller Shutter Kiosk">Kunci & Pintu Pengatup (Roller Shutter)</option>
@@ -1733,7 +1971,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           value={complaintNotes}
                           onChange={(e) => setComplaintNotes(e.target.value)}
                           placeholder="Terangkan masalah yang dihadapi di kiosk anda..."
-                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                         />
                       </div>
 
@@ -1747,10 +1985,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         </button>
                         <button
                           type="submit"
-                          className="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                          disabled={submittingComplaint}
+                          className="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
                         >
                           <Wrench className="w-3.5 h-3.5" />
-                          <span>Hantar Aduan Sekarang</span>
+                          <span>{submittingComplaint ? 'Menghantar...' : 'Hantar Aduan Sekarang'}</span>
                         </button>
                       </div>
                     </form>
@@ -1818,329 +2057,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <span>Kongsi ke WhatsApp</span>
             </a>
           </div>
-        </div>
-      )}
-
-      {/* Tab 5: Account & Business Settings */}
-      {activeTab === 'settings' && (
-        <div className="mt-6 w-full space-y-6">
-          {/* Header Banner */}
-          <div className="kbelia-important-header dark:bg-slate-800 p-6 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-200 dark:border-slate-700">
-            <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-800 dark:bg-sky-950/60 dark:border-sky-800 dark:text-sky-300 text-[11px] font-bold uppercase tracking-wider">
-                <Settings className="w-3.5 h-3.5" />
-                <span>Pengurusan Maklumat Usahawan</span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-800 dark:text-white">Tetapan Profil & Perniagaan</h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-                Kemaskini maklumat pengenalan peribadi, nombor telefon WhatsApp untuk dihubungi pelanggan, pendaftaran SSM dan jajahan operasi perniagaan anda di Kelantan.
-              </p>
-            </div>
-            <div className="shrink-0 flex items-center gap-2">
-              <span className="px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                Akaun Disahkan
-              </span>
-            </div>
-          </div>
-
-          {/* Feedback Alert */}
-          {settingsMessage && (
-            <div className={`p-4 rounded-xl text-xs font-medium flex items-center justify-between shadow-xs ${
-              settingsMessage.type === 'success'
-                ? 'bg-emerald-50 text-emerald-900 border border-emerald-300'
-                : 'bg-rose-50 text-rose-900 border border-rose-300'
-            }`}>
-              <div className="flex items-center gap-2">
-                {settingsMessage.type === 'success' ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                ) : (
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                )}
-                <span>{settingsMessage.text}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSettingsMessage(null)}
-                className="text-xs font-bold opacity-60 hover:opacity-100 px-2 py-0.5"
-              >
-                ×
-              </button>
-            </div>
-          )}
-
-          <form onSubmit={handleSaveSettings} className="space-y-6">
-            {/* Section 1: Profil Peribadi & Hubungan */}
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
-                <div className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-200 dark:bg-sky-950/60 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center font-bold">
-                  <User className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-800 dark:text-white">Maklumat Peribadi & Nombor Perhubungan</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Maklumat sah pemilik akaun usahawan belia.</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Nama Penuh */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Nama Penuh <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                    <input
-                      type="text"
-                      required
-                      value={settingsFullName}
-                      onChange={(e) => setSettingsFullName(e.target.value)}
-                      placeholder="Nama penuh"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                {/* No. MyKad */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    No. MyKad / Kad Pengenalan
-                  </label>
-                  <div className="relative">
-                    <FileText className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                    <input
-                      type="text"
-                      value={settingsIcNumber}
-                      onChange={(e) => setSettingsIcNumber(e.target.value)}
-                      placeholder="Masukkan No. Kad Pengenalan"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white font-mono"
-                    />
-                  </div>
-                </div>
-
-                {/* Alamat Emel */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Emel
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                    <input
-                      type="email"
-                      disabled
-                      value={user.email || ''}
-                      placeholder="Emel"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-not-allowed"
-                    />
-                  </div>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">Emel berdaftar tidak boleh diubah untuk tujuan keselamatan sesi.</span>
-                </div>
-
-                {/* Nombor Telefon / WhatsApp */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Nombor Telefon / WhatsApp <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                    <input
-                      type="tel"
-                      required
-                      value={settingsPhone}
-                      onChange={(e) => setSettingsPhone(e.target.value)}
-                      placeholder="Nombor Telefon / WhatsApp"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white font-mono"
-                    />
-                  </div>
-                </div>
-
-                {/* Jajahan Operasi / Kediaman */}
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Jajahan Kediaman & Operasi Utama (Kelantan) <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                    <select
-                      value={settingsDistrict}
-                      onChange={(e) => setSettingsDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
-                    >
-                      {DISTRICTS.map((d) => (
-                        <option key={d} value={d}>
-                          Jajahan {d}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Section 2: Maklumat Bisnes & Pendaftaran SSM */}
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
-                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/60 dark:border-amber-800 text-amber-800 dark:text-amber-300 flex items-center justify-center font-bold">
-                  <Briefcase className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-800 dark:text-white">Maklumat Bisnes, SSM & Jajahan Operasi</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Penyelarasan profil komersil bagi permohonan kapsul dan direktori.</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Nama Perniagaan */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Nama Perniagaan / Jenama Komersil
-                  </label>
-                  <div className="relative">
-                    <Store className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                    <input
-                      type="text"
-                      value={settingsBusinessName}
-                      onChange={(e) => setSettingsBusinessName(e.target.value)}
-                      placeholder="Nama perniagaan"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                {/* Kategori Perniagaan */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Kategori Perniagaan
-                  </label>
-                  <select
-                    value={settingsCategory}
-                    onChange={(e) => setSettingsCategory(e.target.value as BusinessCategory)}
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Status Pendaftaran SSM */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Status Pendaftaran SSM
-                  </label>
-                  <select
-                    value={settingsSsmStatus}
-                    onChange={(e) => setSettingsSsmStatus(e.target.value as 'registered' | 'in_progress' | 'not_registered')}
-                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
-                  >
-                    <option value="registered">Berdaftar Rasmi dengan SSM</option>
-                    <option value="in_progress">Dalam Proses Pendaftaran SSM</option>
-                    <option value="not_registered">Belum Mendaftar SSM</option>
-                  </select>
-                </div>
-
-                {/* No. Pendaftaran SSM */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">
-                    Nombor Pendaftaran SSM
-                  </label>
-                  <div className="relative">
-                    <FileText className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                    <input
-                      type="text"
-                      value={settingsSsmNumber}
-                      onChange={(e) => setSettingsSsmNumber(e.target.value)}
-                      placeholder="No. pendaftaran SSM"
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white font-mono"
-                    />
-                  </div>
-                </div>
-
-                {/* Peringkat Perkembangan Bisnes */}
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">
-                    Peringkat Perkembangan Perniagaan Belia
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label className={`cursor-pointer p-3 rounded-xl border flex items-center gap-3 transition-all ${
-                      settingsBusinessStage === 'idea'
-                        ? 'border-sky-600 bg-sky-50/70 dark:bg-sky-950/30 ring-1 ring-sky-600'
-                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="settingsBusinessStage"
-                        checked={settingsBusinessStage === 'idea'}
-                        onChange={() => setSettingsBusinessStage('idea')}
-                        className="text-sky-600 focus:ring-sky-600"
-                      />
-                      <div>
-                        <div className="text-xs font-bold text-slate-800 dark:text-white">Peringkat Idea / R&D</div>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400">Membangunkan produk permulaan</div>
-                      </div>
-                    </label>
-
-                    <label className={`cursor-pointer p-3 rounded-xl border flex items-center gap-3 transition-all ${
-                      settingsBusinessStage === 'startup'
-                        ? 'border-sky-600 bg-sky-50/70 dark:bg-sky-950/30 ring-1 ring-sky-600'
-                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="settingsBusinessStage"
-                        checked={settingsBusinessStage === 'startup'}
-                        onChange={() => setSettingsBusinessStage('startup')}
-                        className="text-sky-600 focus:ring-sky-600"
-                      />
-                      <div>
-                        <div className="text-xs font-bold text-slate-800 dark:text-white">Permulaan (Startup)</div>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400">Beroperasi di bawah 3 tahun</div>
-                      </div>
-                    </label>
-
-                    <label className={`cursor-pointer p-3 rounded-xl border flex items-center gap-3 transition-all ${
-                      settingsBusinessStage === 'growth'
-                        ? 'border-sky-600 bg-sky-50/70 dark:bg-sky-950/30 ring-1 ring-sky-600'
-                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="settingsBusinessStage"
-                        checked={settingsBusinessStage === 'growth'}
-                        onChange={() => setSettingsBusinessStage('growth')}
-                        className="text-sky-600 focus:ring-sky-600"
-                      />
-                      <div>
-                        <div className="text-xs font-bold text-slate-800 dark:text-white">Perkembangan (Growth)</div>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400">Mempunyai cawangan / pasaran luar</div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Section 3: Ringkasan Akaun & Kawalan */}
-            <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors">
-              <div className="space-y-1">
-                <div className="text-xs font-bold text-slate-800 dark:text-white">Penyegerakan Data Profil & Direktori</div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                  Data yang dikemaskini akan disegerakkan terus ke pangkalan data KBelia dan memaparkan maklumat terkini pada kad usahawan anda.
-                </p>
-              </div>
-
-              <button
-                type="submit"
-                disabled={savingSettings}
-                className="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors shrink-0 disabled:opacity-50 cursor-pointer"
-              >
-                <Save className="w-4 h-4 text-sky-100" />
-                <span>{savingSettings ? 'Menyimpan Tetapan...' : 'Simpan Perubahan Tetapan'}</span>
-              </button>
-            </div>
-          </form>
         </div>
       )}
 

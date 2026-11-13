@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { 
-  Wrench, 
-  X, 
-  CheckCircle2, 
-  AlertCircle, 
+import React, { useState, useEffect } from 'react';
+import {
+  Wrench,
+  X,
+  CheckCircle2,
+  AlertCircle,
   Send,
   Zap,
   Droplets,
@@ -12,6 +12,9 @@ import {
 } from 'lucide-react';
 import { MaintenanceTicket } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+import { createMaintenanceTicket } from '../services/dataService';
+import { showToast } from './ToastNotification';
 
 interface KioskMaintenanceModalProps {
   isOpen: boolean;
@@ -26,33 +29,75 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
   defaultSlotCode = 'CAP-KB-01',
   defaultKioskName = 'Hub Belia KB Sentral'
 }) => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
+  const { user, userProfile } = useAuth();
   const [category, setCategory] = useState<MaintenanceTicket['issueCategory']>('Elektrik & Suis');
   const [description, setDescription] = useState('');
   const [reporterName, setReporterName] = useState('');
   const [reporterPhone, setReporterPhone] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [ticketId, setTicketId] = useState('TK-KB-' + Math.floor(1000 + Math.random() * 9000));
+  const [submitting, setSubmitting] = useState(false);
+  const [ticketId, setTicketId] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSubmitted(false);
+      setErrorMsg(null);
+      setDescription('');
+      setReporterName(userProfile?.fullName || user?.displayName || '');
+      setReporterPhone(userProfile?.phone || '');
+    }
+  }, [isOpen, userProfile, user]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     if (!description.trim()) {
-      setErrorMsg(language === 'en' 
-        ? 'Please describe the maintenance or repair issue encountered.' 
+      setErrorMsg(language === 'en'
+        ? 'Please describe the maintenance or repair issue encountered.'
         : 'Sila nyatakan butiran kerosakan yang dihadapi pada kiosk anda.');
       return;
     }
-    setTicketId('TK-KB-' + Math.floor(1000 + Math.random() * 9000));
-    setSubmitted(true);
+    if (!reporterName.trim() || !reporterPhone.trim()) {
+      setErrorMsg(language === 'en'
+        ? 'Please provide reporter name and contact phone number.'
+        : 'Sila masukkan nama pengadu dan nombor telefon yang sah.');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const created = await createMaintenanceTicket({
+        ownerId: user?.uid || 'guest',
+        slotCode: defaultSlotCode,
+        kioskName: defaultKioskName,
+        reporterName: reporterName.trim(),
+        reporterPhone: reporterPhone.trim(),
+        issueCategory: category,
+        description: description.trim()
+      });
+      setTicketId(created.id);
+      setSubmitted(true);
+      showToast({
+        type: 'success',
+        title: language === 'en' ? 'Maintenance Ticket Submitted' : 'Tiket Aduan Diterima',
+        message: `No. Rujukan: ${created.id}`
+      });
+    } catch (err: any) {
+      setErrorMsg(err?.message || (language === 'en'
+        ? 'Failed to submit ticket. Please try again.'
+        : 'Gagal menghantar tiket aduan. Sila cuba lagi.'));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
-      <div 
+      <div
         className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[90vh] overflow-hidden flex flex-col my-6"
         role="dialog"
         aria-modal="true"
@@ -75,7 +120,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -121,7 +166,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                       <button
                         key={cat}
                         type="button"
-                        onClick={() => setCategory(cat as any)}
+                        onClick={() => setCategory(cat as MaintenanceTicket['issueCategory'])}
                         className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-sky-50 dark:bg-sky-950/40 border-sky-600 ring-1 ring-sky-600/30 text-sky-900 dark:text-sky-200 font-bold'
@@ -146,7 +191,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={language === 'en' ? 'e.g. Left electrical socket is not functional since this morning...' : 'Contoh: Soket elektrik sebelah kiri tidak berfungsi sejak pagi ini...'}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
               </div>
 
@@ -162,7 +207,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                     placeholder={language === 'en' ? 'Your full name' : 'Nama anda'}
                     value={reporterName}
                     onChange={(e) => setReporterName(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                   />
                 </div>
                 <div>
@@ -175,7 +220,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                     placeholder="01120508890"
                     value={reporterPhone}
                     onChange={(e) => setReporterPhone(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                   />
                 </div>
               </div>
@@ -191,10 +236,11 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                  disabled={submitting}
+                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-50 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
-                  <span>{language === 'en' ? 'Submit Issue Ticket' : 'Hantar Tiket Aduan'}</span>
+                  <span>{submitting ? (language === 'en' ? 'Submitting...' : 'Menghantar...') : (language === 'en' ? 'Submit Issue Ticket' : 'Hantar Tiket Aduan')}</span>
                 </button>
               </div>
             </form>
@@ -205,8 +251,8 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                 {language === 'en' ? `Maintenance Ticket #${ticketId} Submitted` : `Tiket Aduan #${ticketId} Berjaya Dihantar`}
               </h4>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm mx-auto mb-6">
-                {language === 'en' 
-                  ? 'The facilities technical team has been notified. An on-duty technician will contact you within 2-4 working hours.' 
+                {language === 'en'
+                  ? 'The facilities technical team has been notified. An on-duty technician will contact you within 2-4 working hours.'
                   : 'Pasukan teknikal fasiliti UMK telah dimaklumkan. Juruteknik bertugas akan menghubungi anda dalam tempoh 2-4 jam waktu bekerja.'}
               </p>
               <button
@@ -223,4 +269,3 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
     </div>
   );
 };
-

@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  LayoutDashboard, 
-  Send, 
-  ShieldCheck, 
-  Store, 
-  Building2, 
-  Award, 
-  Search, 
-  GraduationCap, 
-  Calendar, 
-  Network, 
-  Coins, 
-  Users, 
+import {
+  LayoutDashboard,
+  ShieldCheck,
+  Store,
+  Building2,
+  Award,
+  Search,
+  GraduationCap,
+  Calendar,
+  Network,
+  Coins,
   Settings,
   ChevronRight,
   ChevronDown,
@@ -24,7 +22,7 @@ import {
   Database,
   Sliders,
   FileText,
-  Video
+  X
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
 import { useAuth } from '../context/AuthContext';
@@ -35,7 +33,10 @@ interface UMKSidebarProps {
   activeTab: UMKTab;
   setActiveTab: (tab: UMKTab) => void;
   isCollapsed: boolean;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
   onOpenBooking: () => void;
+  onOpenMentorshipClinic?: () => void;
   merchantSubTab?: MerchantSubTab;
   onSelectMerchantSubTab?: (subTab: MerchantSubTab) => void;
   adminSubTab?: AdminSubTab;
@@ -48,7 +49,9 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   activeTab,
   setActiveTab,
   isCollapsed,
-  onOpenBooking,
+  isMobileOpen = false,
+  onCloseMobile,
+  onOpenMentorshipClinic,
   merchantSubTab = 'overview',
   onSelectMerchantSubTab,
   adminSubTab = 'queue',
@@ -75,7 +78,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   useEffect(() => {
     if (activeTab === 'admin' || (activeTab === 'home' && isAdmin)) {
       setIsAdminDashboardAccordionOpen(true);
-    } else if (activeTab !== 'admin' && activeTab !== 'home') {
+    } else if (activeTab !== 'home') {
       setIsAdminDashboardAccordionOpen(false);
     }
   }, [activeTab, isAdmin]);
@@ -91,14 +94,19 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     return text.toLowerCase().includes(sidebarSearch.toLowerCase());
   };
 
+  const navigateAndClose = (action: () => void) => {
+    action();
+    if (onCloseMobile) onCloseMobile();
+  };
+
   // =========================================================================
-  // 1. COLLAPSED SIDEBAR VIEW (Mini Icon Bar without Profile Card)
+  // 1. COLLAPSED SIDEBAR VIEW (Desktop only Mini Icon Bar)
   // =========================================================================
-  if (isCollapsed) {
+  if (isCollapsed && !isMobileOpen) {
     return (
       <aside 
         id="kbelia-left-sidebar"
-        className="w-18 h-full bg-white border-r border-slate-200 py-4 flex flex-col items-center justify-between shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0"
+        className="hidden md:flex w-18 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 py-4 flex-col items-center justify-between shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0"
       >
         <div className="flex flex-col items-center gap-2.5 w-full px-2 pt-1">
 
@@ -148,12 +156,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
               <button
                 type="button"
-                onClick={() => setActiveTab('b2b')}
+                onClick={() => {
+                  setActiveTab('admin');
+                  if (onSelectAdminSubTab) onSelectAdminSubTab('queue');
+                }}
                 title={t('nav_district_analytics')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
-                  activeTab === 'b2b' 
-                    ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200 shadow-xs' 
-                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
+                  activeTab === 'admin' 
+                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 font-bold border border-sky-200 dark:border-sky-800 shadow-xs' 
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50/70 dark:hover:bg-slate-800 hover:text-sky-700'
                 }`}
               >
                 <Network className="w-5 h-5" />
@@ -302,12 +313,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
               <button
                 type="button"
-                onClick={() => setActiveTab('b2b')}
+                onClick={() => {
+                  setActiveTab('merchant');
+                  if (onSelectMerchantSubTab) onSelectMerchantSubTab('cashflow');
+                }}
                 title={t('nav_sales_pos')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
-                  activeTab === 'b2b' 
-                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
-                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
+                  activeTab === 'merchant' && merchantSubTab === 'cashflow'
+                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 font-bold shadow-xs border border-sky-200 dark:border-sky-800' 
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50/70 dark:hover:bg-slate-800 hover:text-sky-700'
                 }`}
               >
                 <Coins className="w-5 h-5" />
@@ -319,8 +333,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 title={t('nav_grant_application')}
                 className={`p-2.5 rounded-xl transition-all cursor-pointer ${
                   activeTab === 'ceed' 
-                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
-                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
+                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 font-bold shadow-xs border border-sky-200 dark:border-sky-800' 
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50/70 dark:hover:bg-slate-800 hover:text-sky-700'
                 }`}
               >
                 <Award className="w-5 h-5" />
@@ -328,13 +342,12 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
               <button
                 type="button"
-                onClick={() => setActiveTab('events')}
+                onClick={() => {
+                  if (onOpenMentorshipClinic) onOpenMentorshipClinic();
+                  else setActiveTab('events');
+                }}
                 title={t('nav_mentor_clinic')}
-                className={`p-2.5 rounded-xl transition-all cursor-pointer ${
-                  activeTab === 'events' 
-                    ? 'bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-200' 
-                    : 'text-slate-500 hover:bg-sky-50/70 hover:text-sky-700'
-                }`}
+                className="p-2.5 rounded-xl transition-all cursor-pointer text-slate-500 dark:text-slate-400 hover:bg-sky-50/70 dark:hover:bg-slate-800 hover:text-sky-700"
               >
                 <GraduationCap className="w-5 h-5" />
               </button>
@@ -372,12 +385,24 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     );
   }
 
-  return (
+  const sidebarBody = (
     <aside 
       id="kbelia-left-sidebar"
-      className="w-64 h-full bg-white border-r border-slate-200 p-4 flex flex-col justify-between shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30 sticky top-0"
+      className="w-64 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30"
     >
       <div className="space-y-4">
+        {isMobileOpen && onCloseMobile && (
+          <div className="md:hidden flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200">Navigasi KBelia</span>
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
         
         {/* 1. SEARCH SIDEBAR INPUT */}
         <div className="relative group">
@@ -386,20 +411,19 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             placeholder={t('search_sidebar')}
             value={sidebarSearch}
             onChange={(e) => setSidebarSearch(e.target.value)}
-            className="w-full pl-3.5 pr-8 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all duration-200"
+            className="w-full pl-3.5 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all duration-200"
           />
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-sky-600" />
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
 
         {/* ROLE A: PENTADBIR KERAJAAN */}
         {isAdmin && (
           <div className="space-y-4">
             <div className="space-y-1">
-              <div className="text-[11px] font-black tracking-wider text-sky-700 uppercase px-2 pt-1 pb-1">
+              <div className="text-[11px] font-black tracking-wider text-sky-700 dark:text-sky-400 uppercase px-2 pt-1 pb-1">
                 {isMs ? 'PENGURUSAN' : 'MANAGEMENT'}
               </div>
 
-              {/* PUSAT KAWALAN PENTADBIR DENGAN SUB-MENU AKORDION */}
               {matchesSearch('pusat kawalan pentadbir giliran kelulusan permohonan kapsul direktori usahawan pengurusan kapsul geran inisiatif bimbingan mentor segerak pangkalan data tetapan operasi admin control') && (
                 <div className="space-y-1">
                   <button
@@ -408,38 +432,38 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       if (activeTab === 'admin') {
                         setIsAdminDashboardAccordionOpen(!isAdminDashboardAccordionOpen);
                       } else {
-                        setActiveTab('admin');
-                        if (onSelectAdminSubTab) {
-                          onSelectAdminSubTab('queue');
-                        }
+                        navigateAndClose(() => {
+                          setActiveTab('admin');
+                          if (onSelectAdminSubTab) onSelectAdminSubTab('queue');
+                        });
                         setIsAdminDashboardAccordionOpen(true);
                       }
                     }}
-                    className={`interactive-press w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
+                    className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                       activeTab === 'admin'
-                        ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
-                        : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-900 dark:text-sky-300 border border-sky-200 dark:border-sky-800 shadow-2xs font-bold'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-sky-700'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <ShieldCheck className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'admin' ? 'text-sky-600' : 'text-slate-400'}`} />
+                      <ShieldCheck className={`w-4 h-4 shrink-0 ${activeTab === 'admin' ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'}`} />
                       <span className="truncate">{t('nav_admin_control')}</span>
                     </div>
-                    <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isAdminDashboardAccordionOpen ? 'rotate-0' : '-rotate-90'} ${activeTab === 'admin' ? 'text-sky-700' : 'text-slate-400'}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isAdminDashboardAccordionOpen ? 'rotate-0' : '-rotate-90'} ${activeTab === 'admin' ? 'text-sky-700 dark:text-sky-400' : 'text-slate-400'}`} />
                   </button>
 
                   {isAdminDashboardAccordionOpen && (
-                    <div className="ml-3 pl-2.5 border-l-2 border-emerald-200 space-y-1 pt-0.5 pb-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-slate-700 space-y-1 pt-0.5 pb-1">
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={() => navigateAndClose(() => {
                           setActiveTab('admin');
                           if (onSelectAdminSubTab) onSelectAdminSubTab('queue');
-                        }}
-                        className={`interactive-press w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
+                        })}
+                        className={`w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all text-left cursor-pointer group ${
                           activeTab === 'admin' && adminSubTab === 'queue'
                             ? 'bg-sky-600 text-white font-bold shadow-2xs'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-sky-700'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-sky-700'
                         }`}
                       >
                         <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'admin' && adminSubTab === 'queue' ? 'text-white' : 'text-slate-400 group-hover:text-sky-600'}`} />
@@ -608,18 +632,21 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               {matchesSearch('analitik taburan 10 jajahan kelantan statistik analytics') && (
                 <button
                   type="button"
-                  onClick={() => setActiveTab('b2b')}
+                  onClick={() => navigateAndClose(() => {
+                    setActiveTab('admin');
+                    if (onSelectAdminSubTab) onSelectAdminSubTab('queue');
+                  })}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
-                    activeTab === 'b2b'
-                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
-                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
+                    activeTab === 'admin' && adminSubTab === 'queue'
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-900 dark:text-sky-300 border border-sky-200 dark:border-sky-800 shadow-2xs font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Network className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'b2b' ? 'text-sky-600' : 'text-slate-400'}`} />
+                    <Network className={`w-4 h-4 shrink-0 ${activeTab === 'admin' ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_district_analytics')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'b2b' ? 'text-sky-700' : 'text-slate-300'}`} />
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 text-slate-300 dark:text-slate-600" />
                 </button>
               )}
             </div>
@@ -817,7 +844,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   </button>
 
                   {isDashboardAccordionOpen && (
-                    <div className="ml-3 pl-2.5 border-l-2 border-emerald-200 space-y-1 pt-0.5 pb-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-slate-700 space-y-1 pt-0.5 pb-1">
                       <button
                         type="button"
                         onClick={() => {
@@ -955,61 +982,99 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               {matchesSearch('jualan aliran tunai pos rekod harian untung sales cashflow') && (
                 <button
                   type="button"
-                  onClick={() => setActiveTab('b2b')}
+                  onClick={() => navigateAndClose(() => {
+                    setActiveTab('merchant');
+                    if (onSelectMerchantSubTab) onSelectMerchantSubTab('cashflow');
+                  })}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
-                    activeTab === 'b2b'
-                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
-                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
+                    activeTab === 'merchant' && merchantSubTab === 'cashflow'
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-900 dark:text-sky-300 border border-sky-200 dark:border-sky-800 shadow-2xs font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Coins className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'b2b' ? 'text-sky-600' : 'text-slate-400'}`} />
+                    <Coins className={`w-4 h-4 shrink-0 ${activeTab === 'merchant' && merchantSubTab === 'cashflow' ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_sales_pos')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'b2b' ? 'text-sky-700' : 'text-slate-300'}`} />
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 text-slate-300 dark:text-slate-600" />
                 </button>
               )}
             </div>
 
             {/* KATEGORI 2: DANA DAN BIMBINGAN */}
             <div className="space-y-1">
-              <div className="text-[11px] font-black tracking-wider text-sky-700 uppercase px-2 pt-2 pb-1">
+              <div className="text-[11px] font-black tracking-wider text-sky-700 dark:text-sky-400 uppercase px-2 pt-2 pb-1">
                 {isMs ? 'DANA DAN BIMBINGAN' : 'GRANTS & COACHING'}
               </div>
 
               {matchesSearch('permohonan geran benih pembiayaan modal grant') && (
                 <button
                   type="button"
-                  onClick={() => setActiveTab('ceed')}
+                  onClick={() => navigateAndClose(() => setActiveTab('ceed'))}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
                     activeTab === 'ceed'
-                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
-                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-900 dark:text-sky-300 border border-sky-200 dark:border-sky-800 shadow-2xs font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Award className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'ceed' ? 'text-sky-600' : 'text-slate-400'}`} />
+                    <Award className={`w-4 h-4 shrink-0 ${activeTab === 'ceed' ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'}`} />
                     <span className="truncate">{t('nav_grant_application')}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'ceed' ? 'text-sky-700' : 'text-slate-300'}`} />
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 text-slate-300 dark:text-slate-600" />
                 </button>
               )}
 
-              {matchesSearch('sesi bimbingan mentor konsultasi bengkel mentoring') && (
+              {matchesSearch('sesi bimbingan mentor konsultasi mentoring clinic') && (
                 <button
                   type="button"
-                  onClick={() => setActiveTab('events')}
+                  onClick={() => navigateAndClose(() => {
+                    if (onOpenMentorshipClinic) onOpenMentorshipClinic();
+                    else setActiveTab('events');
+                  })}
+                  className="w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-sky-700"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <GraduationCap className="w-4 h-4 shrink-0 text-slate-400 group-hover:text-sky-600" />
+                    <span className="truncate">{t('nav_mentor_clinic')}</span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 text-slate-300 dark:text-slate-600" />
+                </button>
+              )}
+
+              {matchesSearch('ruang iklan b2b peluang niaga pembekal market') && (
+                <button
+                  type="button"
+                  onClick={() => navigateAndClose(() => setActiveTab('b2b'))}
                   className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
-                    activeTab === 'events'
-                      ? 'bg-sky-50 text-sky-900 border border-sky-200 shadow-2xs font-bold'
-                      : 'text-slate-700 hover:bg-slate-50 hover:text-sky-700'
+                    activeTab === 'b2b'
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-900 dark:text-sky-300 border border-sky-200 dark:border-sky-800 shadow-2xs font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-sky-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <GraduationCap className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${activeTab === 'events' ? 'text-sky-600' : 'text-slate-400'}`} />
-                    <span className="truncate">{t('nav_mentor_clinic')}</span>
+                    <Network className={`w-4 h-4 shrink-0 ${activeTab === 'b2b' ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'}`} />
+                    <span className="truncate">{isMs ? 'Ruang Niaga B2B' : 'B2B Marketplace'}</span>
                   </div>
-                  <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${activeTab === 'events' ? 'text-sky-700' : 'text-slate-300'}`} />
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 text-slate-300 dark:text-slate-600" />
+                </button>
+              )}
+
+              {matchesSearch('acara karnival ekspo bengkel jadual events') && (
+                <button
+                  type="button"
+                  onClick={() => navigateAndClose(() => setActiveTab('events'))}
+                  className={`w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl transition-all text-left cursor-pointer group ${
+                    activeTab === 'events'
+                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-900 dark:text-sky-300 border border-sky-200 dark:border-sky-800 shadow-2xs font-bold'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-sky-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Calendar className={`w-4 h-4 shrink-0 ${activeTab === 'events' ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'}`} />
+                    <span className="truncate">{isMs ? 'Acara & Karnival' : 'Events & Expo'}</span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0 text-slate-300 dark:text-slate-600" />
                 </button>
               )}
             </div>
@@ -1061,8 +1126,26 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
         )}
 
       </div>
-
     </aside>
+  );
+
+  return (
+    <>
+      <div className="hidden md:flex h-full shrink-0">
+        {sidebarBody}
+      </div>
+      {isMobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs"
+            onClick={onCloseMobile}
+          />
+          <div className="relative z-10 h-full shadow-2xl">
+            {sidebarBody}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

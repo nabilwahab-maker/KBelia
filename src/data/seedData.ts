@@ -14,7 +14,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     amenities: ['Palam Elektrik 13A', 'Bekalan Air Bersih', 'WiFi 500Mbps', 'Rak Paparan Kaca', 'Sistem POS Berpusat'],
     currentTenantBusinessName: "D'Kelate Artisan Coffee & Pastry",
     currentTenantId: 'demo-tenant-1',
-    imageUrl: '/public/assets/generated/kiosk_modular_kbelia.jpg',
+    imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
     createdAt: new Date().toISOString()
   },
   {
@@ -28,9 +28,9 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     dailyRate: 20,
     status: 'occupied',
     amenities: ['Penyaman Udara Terkawal', 'Paparan Skrin Digital LED', 'High-Speed WiFi', 'Ruang Kaunter Bersepadu', 'CCTV 24 Jam'],
-    currentTenantBusinessName: 'Studio Belia Multimedia KB',
-    currentTenantId: 'demo-tenant-3',
-    imageUrl: '/public/assets/generated/kiosk_modular_kbelia.jpg',
+    currentTenantBusinessName: 'Batik Belia Kontemporari',
+    currentTenantId: 'demo-tenant-2',
+    imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
     createdAt: new Date().toISOString()
   },
   {
@@ -44,7 +44,52 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     dailyRate: 14,
     status: 'available',
     amenities: ['Chiller & Ruang Simpanan Sejuk', 'Palam Kuasa 13A', 'WiFi Komuniti', 'Rak Paparan Buluh Moden', 'Bantuan Logistik'],
-    imageUrl: '/public/assets/generated/madu_kelulut_rimba.jpg',
+    imageUrl: '/assets/generated/madu_kelulut_rimba.jpg',
+    createdAt: new Date().toISOString()
+  },
+  // +3 Demo Capsule Slots Tambahan
+  {
+    id: 'cap-tumpat-01',
+    code: 'CAP-TMP-01',
+    name: 'Kapsul Kraf & Batik Tumpat T1',
+    hubLocation: 'Hub Kraf & Budaya Tumpat (Pantai Sri Tujoh)',
+    district: 'Tumpat',
+    size: '10ft x 10ft Craft Pod',
+    monthlyRate: 140,
+    dailyRate: 15,
+    status: 'available',
+    amenities: ['Rak Pameran Seni Kraf', 'Lampu Spotlight Galeri', 'Palam Elektrik 13A', 'WiFi Komuniti', 'Kunci Pintar'],
+    imageUrl: '/assets/generated/wau_bulan_kelantan.jpg',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'cap-kb-02',
+    code: 'CAP-KB-02',
+    name: 'Kapsul Kreatif & Digital KB B2',
+    hubLocation: 'Pusat Transformasi Belia Kota Bharu (KB Sentral)',
+    district: 'Kota Bharu',
+    size: '10ft x 10ft Studio Pod',
+    monthlyRate: 190,
+    dailyRate: 18,
+    status: 'occupied',
+    amenities: ['Dinding Akustik Mini Studio', 'Lampu Studio LED', 'High-Speed WiFi 1Gbps', 'Penyaman Udara', 'CCTV 24 Jam'],
+    currentTenantBusinessName: 'Studio Belia Multimedia KB',
+    currentTenantId: 'demo-tenant-3',
+    imageUrl: '/assets/generated/kiosk_modular_kbelia_1793924253417.jpg',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'cap-pm-01',
+    code: 'CAP-PM-01',
+    name: 'Kapsul Makanan Tradisi Pasir Mas P1',
+    hubLocation: 'Hub Niaga Belia Bandar Pasir Mas',
+    district: 'Pasir Mas',
+    size: '10ft x 8ft Culinary Kiosk',
+    monthlyRate: 135,
+    dailyRate: 14,
+    status: 'available',
+    amenities: ['Saluran Air & Sinki Keluli', 'Palam Kuasa Heavy Duty', 'Kaunter Servis Hadapan', 'Ekzos Pengudaraan'],
+    imageUrl: '/assets/generated/keropok_lekor_kelantan.jpg',
     createdAt: new Date().toISOString()
   }
 ];
@@ -65,8 +110,8 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     whatsapp: '601123456789',
     instagram: '@dkelate.artisan',
     tiktok: '@dkelatecoffee',
-    logoUrl: '/public/assets/generated/usahawan_belia_lelaki.jpg',
-    bannerUrl: '/public/assets/generated/kopi_nissem_melaka.jpg',
+    logoUrl: '/assets/generated/usahawan_belia_lelaki.jpg',
+    bannerUrl: '/assets/generated/kopi_nissem_melaka.jpg',
     isApproved: true,
     isFeatured: true,
     capsuleSlotId: 'cap-umk-01',
@@ -89,8 +134,8 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     whatsapp: '60198765432',
     instagram: '@batikbelia.co',
     tiktok: '@batikkontemporari',
-    logoUrl: '/public/assets/generated/usahawan_belia_wanita.jpg',
-    bannerUrl: '/public/assets/generated/batik_canting_kelantan.jpg',
+    logoUrl: '/assets/generated/usahawan_belia_wanita.jpg',
+    bannerUrl: '/assets/generated/batik_canting_kelantan.jpg',
     isApproved: true,
     isFeatured: true,
     capsuleSlotId: 'cap-kb-01',
@@ -113,11 +158,11 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     whatsapp: '60139988776',
     instagram: '@studiobelia.kb',
     tiktok: '@studiobeliamedia',
-    logoUrl: '/public/assets/generated/usahawan_belia_lelaki.jpg',
-    bannerUrl: '/public/assets/generated/banner_kelantan_landmark_1793924253242.jpg',
+    logoUrl: '/assets/generated/usahawan_belia_lelaki.jpg',
+    bannerUrl: '/assets/generated/banner_kelantan_landmark_1793924253242.jpg',
     isApproved: true,
     isFeatured: true,
-    capsuleSlotId: 'cap-kb-01',
+    capsuleSlotId: 'cap-kb-02',
     rating: 5.0,
     reviewsCount: 19,
     createdAt: new Date().toISOString()
@@ -133,7 +178,7 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
     price: 8.50,
     description: 'Espresso double shot dicampur susu segar berkrim dan sirap nisan kelapa asli Kelantan.',
     category: 'Minuman Kopi',
-    imageUrl: '/public/assets/generated/kopi_nissem_melaka.jpg',
+    imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
     inStock: true,
     createdAt: new Date().toISOString()
   },
@@ -145,7 +190,7 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
     price: 180.00,
     description: 'Batik lukis tangan asli atas fabrik sutera crepe berkualiti tinggi, corak geometri kontemporari.',
     category: 'Tekstil & Fesyen',
-    imageUrl: '/public/assets/generated/batik_canting_kelantan.jpg',
+    imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
     inStock: true,
     createdAt: new Date().toISOString()
   },
@@ -157,7 +202,44 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
     price: 150.00,
     description: 'Sesi penggambaran 10 keping foto produk beresolusi tinggi beserta 1 video reel 15 saat siap suntingan.',
     category: 'Perkhidmatan Media',
-    imageUrl: '/public/assets/generated/product_kelantan_delights_1793924253401.jpg',
+    imageUrl: '/assets/generated/product_kelantan_delights_1793924253401.jpg',
+    inStock: true,
+    createdAt: new Date().toISOString()
+  },
+  // +3 Demo Products Tambahan
+  {
+    id: 'prod-04',
+    businessId: 'biz-01',
+    ownerId: 'demo-tenant-1',
+    name: 'Set Akok Kedut Tradisional & Karamel Pandan (6 Biji)',
+    price: 10.00,
+    description: 'Akok bakar segar menggunakan telur itik pilihan, santan pekat, dan manisan nisan kampung.',
+    category: 'Pastri & Kuih Tradisi',
+    imageUrl: '/assets/generated/akok_kelantan_tradisi.jpg',
+    inStock: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'prod-05',
+    businessId: 'biz-01',
+    ownerId: 'demo-tenant-1',
+    name: 'Keropok Lekor Rangup & Sos Pencicah Kelate (Pek 500g)',
+    price: 12.00,
+    description: 'Keropok lekor ikan tamban segar vakum siap goreng beserta sos cili manis buatan sendiri.',
+    category: 'Makanan Sedia Masak',
+    imageUrl: '/assets/generated/keropok_lekor_kelantan.jpg',
+    inStock: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'prod-06',
+    businessId: 'biz-02',
+    ownerId: 'demo-tenant-2',
+    name: 'Miniatur Wau Bulan Hiasan Kraf & Bingkai Eksklusif',
+    price: 65.00,
+    description: 'Cenderamata kraf warisan Kelantan buatan tangan belia Tumpat sesuai sebagai hadiah korporat.',
+    category: 'Kraf & Cenderamata',
+    imageUrl: '/assets/generated/wau_bulan_kelantan.jpg',
     inStock: true,
     createdAt: new Date().toISOString()
   }

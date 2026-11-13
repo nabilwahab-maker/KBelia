@@ -36,7 +36,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { NotificationDropdown } from './NotificationDropdown';
-import { CapsuleSlot, BusinessListing, YouthProgram } from '../types';
+import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab } from '../types';
 
 export type UMKTab = 
   | 'home' 
@@ -59,6 +59,8 @@ interface UMKHeaderProps {
   setActiveTab: (tab: UMKTab) => void;
   isSidebarCollapsed: boolean;
   setIsSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  onToggleMobileSidebar?: () => void;
+  onSelectMerchantSubTab?: (sub: MerchantSubTab) => void;
   onOpenBooking?: () => void;
   slots?: CapsuleSlot[];
   businesses?: BusinessListing[];
@@ -73,7 +75,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   setActiveTab,
   isSidebarCollapsed,
   setIsSidebarCollapsed,
-  onOpenBooking,
+  onToggleMobileSidebar,
+  onSelectMerchantSubTab,
   slots = [],
   businesses = [],
   programs = [],
@@ -81,8 +84,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   onSelectBusiness,
   onOpenGrantModal
 }) => {
-  const { user, userProfile, isAdmin, logout, loginAsDemoUser } = useAuth();
-  const { theme, isDark, toggleTheme, setTheme } = useTheme();
+  const { user, userProfile, isAdmin, isDemoSession, logout, loginAsDemoUser } = useAuth();
+  const { isDark, setTheme } = useTheme();
   const { t, language } = useLanguage();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -132,7 +135,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
     ).slice(0, 3);
 
     const matchedBiz = (businesses || []).filter(b =>
-      (b.name && b.name.toLowerCase().includes(q)) ||
+      (b.businessName && b.businessName.toLowerCase().includes(q)) ||
+      (b.ownerName && b.ownerName.toLowerCase().includes(q)) ||
       (b.category && b.category.toLowerCase().includes(q)) ||
       (b.district && b.district.toLowerCase().includes(q))
     ).slice(0, 3);
@@ -148,25 +152,39 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
   const displayName = userProfile?.fullName || user?.displayName || (isAdmin ? 'Pentadbir Sistem' : 'Usahawan Belia');
   const avatarSrc = userProfile?.avatarUrl || user?.photoURL || (isAdmin 
-    ? '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg' 
+    ? '/assets/generated/avatar_admin_kelantan_1793924251898.jpg' 
     : userProfile?.role === 'mentor' 
-      ? '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg' 
-      : '/public/assets/generated/avatar_youth_male_1793924250192.jpg');
+      ? '/assets/generated/avatar_mentor_umk_1793924250411.jpg' 
+      : '/assets/generated/avatar_youth_male_1793924250192.jpg');
 
   return (
-    <header className="bg-white/95 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40 transition-colors duration-200 shadow-2xs w-full shrink-0">
+    <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40 transition-colors duration-200 shadow-2xs w-full shrink-0">
       {/* Top Main Navigation Row */}
       <div className="w-full flex items-stretch h-15 sm:h-16">
         
-        {/* Left Column: Exactly Aligned with Sidebar below (w-64 or w-18) */}
-        <div className={`${isSidebarCollapsed ? 'w-18 px-2 justify-center gap-1' : 'w-64 px-4 justify-between'} shrink-0 h-full border-r border-slate-200 flex items-center transition-all duration-200 kbelia-important-header`}>
+        {/* Left Column: Aligned with Sidebar below */}
+        <div className={`${isSidebarCollapsed ? 'md:w-18 px-3 md:px-2 md:justify-center gap-1.5' : 'md:w-64 px-3 sm:px-4 justify-between'} shrink-0 h-full md:border-r border-slate-200 dark:border-slate-700 flex items-center transition-all duration-200 kbelia-important-header`}>
           
-          {/* KBelia Brand Wordmark */}
+          {/* Mobile Drawer Hamburger */}
+          {onToggleMobileSidebar && (
+            <button
+              type="button"
+              onClick={onToggleMobileSidebar}
+              className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-sky-700 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-slate-800 transition-colors cursor-pointer mr-1"
+              title="Buka Menu"
+              aria-label="Buka menu sisi"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+
+          {/* KBelia Brand Wordmark -> Navigate Home cleanly */}
           <button
             id="kbelia-logo-btn"
-            onClick={() => setShowLogoutConfirm(true)}
+            type="button"
+            onClick={() => setActiveTab(user ? 'home' : 'landing')}
             className={`flex items-center gap-2.5 hover:opacity-95 transition-opacity text-left shrink-0 cursor-pointer ${isSidebarCollapsed ? 'justify-center' : ''}`}
-            title="KBelia - Tekan logo untuk log keluar"
+            title="KBelia - Kembali ke Laman Utama"
           >
             <div className="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-xs shrink-0">
               <span className="font-extrabold text-white">KB</span>
@@ -175,60 +193,58 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
             {!isSidebarCollapsed && (
               <div className="leading-tight">
                 <div className="flex items-center gap-2">
-                  <span className="text-base font-bold tracking-tight text-slate-900">
+                  <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white">
                     KBelia
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 font-normal">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">
                   {isAdmin ? 'Panel Pentadbir' : userProfile?.role === 'mentor' ? 'Portal Mentor' : 'Portal Usahawan Belia'}
                 </p>
               </div>
             )}
           </button>
 
-          {/* Toggle Sidebar Collapse Button (<< or >>) placed at right of brand box matching reference image */}
+          {/* Toggle Desktop Sidebar Collapse Button */}
           <button
             id="toggle-sidebar-collapse-btn"
+            type="button"
             onClick={() => setIsSidebarCollapsed(prev => !prev)}
             title={isSidebarCollapsed ? t('nav_expand_sidebar') : t('nav_collapse_sidebar')}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-sky-700 hover:bg-sky-50 transition-all cursor-pointer interactive-press active:scale-90"
+            className="hidden md:flex p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-sky-700 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
           >
             {isSidebarCollapsed ? (
-              <ChevronsRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              <ChevronsRight className="w-4 h-4" />
             ) : (
-              <ChevronsLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
+              <ChevronsLeft className="w-4 h-4" />
             )}
           </button>
         </div>
 
-        {/* Right Section: Navigation Links & Action Controls */}
+        {/* Right Section */}
         <div className="flex-1 min-w-0 px-3 sm:px-4 lg:px-6 flex items-center justify-between h-full gap-3 lg:gap-4">
           
-          {/* Left Spacer so controls sit gracefully on the right */}
           <div className="flex-1" />
 
-        {/* Right Section: Search Popover + Theme Selector Dropdown + Notifications + User Menu */}
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           
-          {/* Global Search Button & Popover (Only shows icon; opens input & results underneath on click) */}
+          {/* Global Search Button & Popover */}
           <div ref={searchContainerRef} className="relative">
             <button
               type="button"
               onClick={() => setIsSearchOpen(prev => !prev)}
-              className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center border transition-all duration-200 cursor-pointer shadow-2xs group focus:outline-none interactive-press hover:scale-105 active:scale-95 ${
+              className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center border transition-all duration-200 cursor-pointer shadow-2xs focus:outline-none ${
                 isSearchOpen
-                  ? 'bg-sky-50 text-sky-700 border-sky-200'
-                  : 'bg-slate-50 hover:bg-sky-50 text-slate-700 border-slate-200'
+                  ? 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-slate-800 dark:text-sky-400 dark:border-sky-600'
+                  : 'bg-slate-50 hover:bg-sky-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700'
               }`}
               title="Carian Sistem"
               aria-label="Buka carian"
             >
-              <Search className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+              <Search className="w-4 h-4" />
             </button>
 
-            {/* Dropdown Popover below Search Icon */}
             {isSearchOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
                 <div className="relative flex items-center mb-2">
                   <input
                     ref={searchInputRef}
@@ -236,7 +252,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     placeholder={t('search_global_ph') || 'Cari kiosk, usahawan, geran...'}
                     value={globalSearch}
                     onChange={(e) => setGlobalSearch(e.target.value)}
-                    className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 shadow-2xs"
+                    className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 shadow-2xs"
                   />
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
                   {globalSearch && (
@@ -265,7 +281,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         {/* Kiosks results */}
                         {searchResults.matchedSlots.length > 0 && (
                           <div>
-                            <div className="text-[10px] font-extrabold uppercase tracking-wider text-sky-700 px-2 mb-1 flex items-center gap-1.5">
+                            <div className="text-[10px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-400 px-2 mb-1 flex items-center gap-1.5">
                               <Building2 className="w-3 h-3" />
                               <span>{t('search_results_kiosks')}</span>
                             </div>
@@ -276,7 +292,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                   type="button"
                                   onClick={() => {
                                     if (onSelectSlot) onSelectSlot(slot);
-                                    else setActiveTab('hepa');
+                                    else setActiveTab('academic');
                                     setIsSearchOpen(false);
                                     setGlobalSearch('');
                                   }}
@@ -286,7 +302,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                     <span className="font-bold text-xs text-slate-900 dark:text-white block">
                                       {slot.name} ({slot.code})
                                     </span>
-                                    <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 tabular-nums">
                                       {slot.district} · RM{slot.monthlyRate}/bln
                                     </span>
                                   </div>
@@ -305,7 +321,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
                         {/* Merchants results */}
                         {searchResults.matchedBiz.length > 0 && (
-                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                          <div className="pt-2 border-t border-slate-100 dark:border-slate-700">
                             <div className="text-[10px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-400 px-2 mb-1 flex items-center gap-1.5">
                               <Store className="w-3 h-3" />
                               <span>{t('search_results_merchants')}</span>
@@ -325,14 +341,14 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                 >
                                   <div>
                                     <span className="font-bold text-xs text-slate-900 dark:text-white block">
-                                      {biz.name}
+                                      {biz.businessName}
                                     </span>
                                     <span className="text-[10px] text-slate-500 dark:text-slate-400">
                                       {biz.category} · {biz.district}
                                     </span>
                                   </div>
                                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300">
-                                    SSM ✓
+                                    SSM Disahkan
                                   </span>
                                 </button>
                               ))}
@@ -469,17 +485,17 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                   mobileMenuOpen 
-                    ? 'bg-sky-50 text-sky-700 border-sky-200' 
-                    : 'text-slate-600 hover:text-sky-700 hover:bg-sky-50 border-slate-200'
+                    ? 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-slate-800 dark:text-sky-400 dark:border-sky-600' 
+                    : 'text-slate-600 dark:text-slate-300 hover:text-sky-700 hover:bg-sky-50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700'
                 }`}
-                title="Pilihan Navigasi Lanjut (3-Dots)"
+                title="Pilihan Navigasi Lanjut"
                 aria-label="Menu navigasi skrin kecil"
               >
                 <MoreVertical className="w-4 h-4" />
               </button>
 
               {mobileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
                   <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider px-2.5 py-1 mb-1">
                     {t('nav_quick_nav')}
                   </div>
@@ -489,167 +505,96 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
                         activeTab === 'home' 
-                          ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                          : 'text-slate-700 hover:bg-slate-50'
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800' 
+                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'
                       }`}
                     >
-                      <Home className="w-4 h-4 text-sky-600" />
+                      <Home className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                       <span>{t('nav_portal_main')}</span>
                     </button>
 
-                    {/* A. ADMIN MOBILE MENU */}
                     {isAdmin && (
                       <>
                         <button
                           type="button"
                           onClick={() => { setActiveTab('admin'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'admin' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <ShieldCheck className="w-4 h-4 text-sky-600" />
+                          <ShieldCheck className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>{t('nav_admin_control')}</span>
                         </button>
-
                         <button
                           type="button"
                           onClick={() => { setActiveTab('academic'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'academic' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <Building2 className="w-4 h-4 text-sky-600" />
+                          <Building2 className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>{t('nav_kiosk_approval')}</span>
                         </button>
-
                         <button
                           type="button"
                           onClick={() => { setActiveTab('ceed'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'ceed' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <Award className="w-4 h-4 text-sky-600" />
+                          <Award className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>{t('nav_grant_approval')}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => { setActiveTab('b2b'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'b2b' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
-                        >
-                          <Network className="w-4 h-4 text-sky-600" />
-                          <span>{t('nav_district_analytics')}</span>
                         </button>
                       </>
                     )}
 
-                    {/* B. MENTOR MOBILE MENU */}
                     {!isAdmin && userProfile?.role === 'mentor' && (
                       <>
                         <button
                           type="button"
                           onClick={() => { setActiveTab('mentor'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'mentor' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <GraduationCap className="w-4 h-4 text-sky-600" />
+                          <GraduationCap className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>{t('nav_mentor_main_hub')}</span>
                         </button>
-
-                        <button
-                          type="button"
-                          onClick={() => { setActiveTab('events'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'events' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
-                        >
-                          <Calendar className="w-4 h-4 text-sky-600" />
-                          <span>{t('nav_clinic_schedule')}</span>
-                        </button>
-
                         <button
                           type="button"
                           onClick={() => { setActiveTab('hepa'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'hepa' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <Users className="w-4 h-4 text-sky-600" />
+                          <Users className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>{t('nav_entrepreneurs')}</span>
                         </button>
                       </>
                     )}
 
-                    {/* C. YOUTH ENTREPRENEUR MOBILE MENU */}
                     {!isAdmin && userProfile?.role !== 'mentor' && (
                       <>
                         <button
                           type="button"
-                          onClick={() => { setActiveTab('merchant'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'merchant' || activeTab === 'home'
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
+                          onClick={() => { setActiveTab('merchant'); if (onSelectMerchantSubTab) onSelectMerchantSubTab('overview'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <LayoutDashboard className="w-4 h-4 text-sky-600" />
+                          <LayoutDashboard className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>{t('dashboard')}</span>
                         </button>
-
                         <button
                           type="button"
                           onClick={() => { setActiveTab('academic'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'academic' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <Building2 className="w-4 h-4 text-sky-600" />
+                          <Building2 className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>{t('nav_my_kiosk')}</span>
                         </button>
-
                         <button
                           type="button"
-                          onClick={() => { setActiveTab('b2b'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'b2b' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
+                          onClick={() => { setActiveTab('merchant'); if (onSelectMerchantSubTab) onSelectMerchantSubTab('cashflow'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <Coins className="w-4 h-4 text-sky-600" />
+                          <Coins className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>{t('nav_sales_pos')}</span>
                         </button>
-
                         <button
                           type="button"
                           onClick={() => { setActiveTab('ceed'); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
-                            activeTab === 'ceed' 
-                              ? 'bg-sky-50 text-sky-800 border border-sky-200' 
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <Award className="w-4 h-4 text-sky-600" />
+                          <Award className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                           <span>{t('grants')}</span>
                         </button>
                       </>
@@ -664,15 +609,16 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               <div ref={profileDropdownRef} className="relative">
               <button
                 id="kbelia-user-profile-btn"
+                type="button"
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center gap-2.5 pl-3 sm:pl-4 pr-2.5 py-1.5 rounded-xl bg-slate-50 hover:bg-sky-50/70 transition-all border border-slate-200 hover:border-sky-200 cursor-pointer shadow-2xs group interactive-press interactive-lift"
+                className="flex items-center gap-2.5 pl-3 sm:pl-4 pr-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-sky-50/70 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 hover:border-sky-200 cursor-pointer shadow-2xs group"
                 title={`${displayName} - ${isAdmin ? 'Pentadbiran' : userProfile?.role === 'mentor' ? 'Mentor' : 'Usahawan'}`}
               >
                 <div className="text-right hidden sm:block">
-                  <div className="text-xs font-bold text-slate-900 leading-tight whitespace-nowrap group-hover:text-sky-700 transition-colors">
+                  <div className="text-xs font-bold text-slate-900 dark:text-white leading-tight whitespace-nowrap group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                     {displayName}
                   </div>
-                  <div className="text-[10.5px] font-bold text-sky-700 whitespace-nowrap">
+                  <div className="text-[10.5px] font-bold text-sky-700 dark:text-sky-400 whitespace-nowrap">
                     {isAdmin ? 'Pentadbiran' : userProfile?.role === 'mentor' ? t('role_mentor') : t('role_youth')}
                   </div>
                 </div>
@@ -681,104 +627,107 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                   src={avatarSrc}
                   alt={displayName}
                   referrerPolicy="no-referrer"
-                  className="w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-lg object-cover border border-sky-200 shadow-2xs shrink-0 transition-transform duration-200 group-hover:scale-108"
+                  className="w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-lg object-cover border border-sky-200 dark:border-slate-600 shadow-2xs shrink-0"
                 />
 
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-600 transition-transform duration-200 group-hover:translate-y-0.5 shrink-0" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-600 shrink-0" />
               </button>
 
               {/* Profile Dropdown Menu */}
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="p-2.5 bg-slate-50 rounded-xl mb-2 border border-slate-200">
-                    <div className="text-xs font-bold text-slate-900 truncate">{displayName}</div>
-                    <div className="text-[11px] text-slate-500 truncate">{user.email}</div>
-                    <div className="mt-1 flex items-center gap-1 text-[10px] text-emerald-700 font-medium">
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2 border border-slate-200 dark:border-slate-700">
+                    <div className="text-xs font-bold text-slate-900 dark:text-white truncate">{displayName}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user.email}</div>
+                    <div className="mt-1 flex items-center gap-1 text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">
                       <Clock className="w-3 h-3" />
-                      <span>{t('active_session')}</span>
+                      <span>{isDemoSession ? 'Mod Demo Ujian' : t('active_session')}</span>
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <button
                       id="kbelia-dropdown-setting-btn"
+                      type="button"
                       onClick={() => { setActiveTab('settings'); setProfileDropdownOpen(false); }}
                       className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold rounded-xl text-left transition-colors cursor-pointer ${
                         activeTab === 'settings'
-                          ? 'bg-sky-50 text-sky-800 font-bold border border-sky-200'
-                          : 'text-slate-700 hover:bg-slate-50'
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 font-bold border border-sky-200 dark:border-sky-800'
+                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <Settings className={`w-4 h-4 ${activeTab === 'settings' ? 'text-sky-600' : 'text-slate-400'}`} />
+                        <Settings className={`w-4 h-4 ${activeTab === 'settings' ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'}`} />
                         <span>{language === 'en' ? 'Account Settings' : 'Tetapan Akaun'}</span>
                       </div>
                     </button>
 
-                    {/* QUICK ROLE SWITCHER FOR TESTING */}
-                    <div className="pt-2 border-t border-slate-200 mt-1.5">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-1.5 flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-sky-500" />
-                        <span>{t('quick_role_switch')}</span>
+                    {/* QUICK ROLE SWITCHER STRICTLY RESTRICTED TO ISOLATED DEMO SESSIONS */}
+                    {isDemoSession && (
+                      <div className="pt-2 border-t border-slate-200 dark:border-slate-700 mt-1.5">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-1.5 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-sky-500" />
+                          <span>Mod Demo Ujian</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1 px-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              loginAsDemoUser('merchant_faizul');
+                              setActiveTab('merchant');
+                              setProfileDropdownOpen(false);
+                            }}
+                            className={`px-1.5 py-1 rounded text-[10px] font-bold text-center transition-colors cursor-pointer ${
+                              !isAdmin && userProfile?.role !== 'mentor'
+                                ? 'bg-sky-600 text-white'
+                                : 'bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700'
+                            }`}
+                          >
+                            {t('role_youth')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              loginAsDemoUser('mentor_wanazhar');
+                              setActiveTab('mentor');
+                              setProfileDropdownOpen(false);
+                            }}
+                            className={`px-1.5 py-1 rounded text-[10px] font-bold text-center transition-colors cursor-pointer ${
+                              userProfile?.role === 'mentor'
+                                ? 'bg-sky-600 text-white'
+                                : 'bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700'
+                            }`}
+                          >
+                            {t('role_mentor')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              loginAsDemoUser('admin');
+                              setActiveTab('admin');
+                              setProfileDropdownOpen(false);
+                            }}
+                            className={`px-1.5 py-1 rounded text-[10px] font-bold text-center transition-colors cursor-pointer ${
+                              isAdmin
+                                ? 'bg-sky-600 text-white font-black'
+                                : 'bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700'
+                            }`}
+                          >
+                            {t('role_admin')}
+                          </button>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-1 px-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            loginAsDemoUser('merchant_faizul');
-                            setActiveTab('merchant');
-                            setProfileDropdownOpen(false);
-                          }}
-                          className={`px-1.5 py-1 rounded text-[10px] font-bold text-center transition-colors cursor-pointer ${
-                            !isAdmin && userProfile?.role !== 'mentor'
-                              ? 'bg-sky-600 text-white'
-                              : 'bg-slate-50 text-slate-700 hover:bg-sky-50'
-                          }`}
-                        >
-                          {t('role_youth')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            loginAsDemoUser('mentor_wanazhar');
-                            setActiveTab('mentor');
-                            setProfileDropdownOpen(false);
-                          }}
-                          className={`px-1.5 py-1 rounded text-[10px] font-bold text-center transition-colors cursor-pointer ${
-                            userProfile?.role === 'mentor'
-                              ? 'bg-sky-600 text-white'
-                              : 'bg-slate-50 text-slate-700 hover:bg-sky-50'
-                          }`}
-                        >
-                          {t('role_mentor')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            loginAsDemoUser('admin');
-                            setActiveTab('admin');
-                            setProfileDropdownOpen(false);
-                          }}
-                          className={`px-1.5 py-1 rounded text-[10px] font-bold text-center transition-colors cursor-pointer ${
-                            isAdmin
-                              ? 'bg-sky-600 text-white font-black'
-                              : 'bg-slate-50 text-slate-700 hover:bg-sky-50'
-                          }`}
-                        >
-                          {t('role_admin')}
-                        </button>
-                      </div>
-                    </div>
+                    )}
 
-                    <div className="pt-2 border-t border-slate-200 mt-1.5 space-y-1">
+                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700 mt-1.5 space-y-1">
                       <button
                         id="kbelia-dropdown-logout-btn"
-                        onClick={async () => {
+                        type="button"
+                        onClick={() => {
                           setProfileDropdownOpen(false);
-                          await logout();
-                          setActiveTab('login');
+                          setShowLogoutConfirm(true);
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-50 rounded-xl text-left transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs font-bold text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl text-left transition-colors cursor-pointer"
                       >
                         <LogOut className="w-4 h-4 text-rose-500" />
                         <span>{t('logout')}</span>
@@ -791,6 +740,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
           ) : (
             <button
               id="kbelia-header-login-btn"
+              type="button"
               onClick={() => setActiveTab('login')}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-2xs transition-colors cursor-pointer"
             >
@@ -804,25 +754,25 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
       </div>
     </div>
 
-    {/* Confirmation Modal: Adakah anda ingin log keluar? */}
+    {/* Confirmation Modal */}
     {showLogoutConfirm && (
       <div 
         id="kbelia-logout-confirm-modal"
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-800/35 backdrop-blur-xs animate-in fade-in duration-150"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/45 backdrop-blur-xs animate-in fade-in duration-150"
       >
         <div 
           className="fixed inset-0" 
           onClick={() => setShowLogoutConfirm(false)}
         />
-        <div className="relative bg-white rounded-3xl max-w-sm w-full p-6 border border-slate-200 shadow-2xl text-center space-y-4 z-10">
-          <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 border border-sky-200 mx-auto flex items-center justify-center">
+        <div className="relative bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-700 shadow-2xl text-center space-y-4 z-10">
+          <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800 mx-auto flex items-center justify-center">
             <LogOut className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-base font-extrabold text-slate-900">
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
               {t('logout_confirm_title')}
             </h3>
-            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
               {t('logout_confirm_desc')}
             </p>
           </div>
@@ -831,7 +781,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               type="button"
               id="btn-logout-confirm-no"
               onClick={() => setShowLogoutConfirm(false)}
-              className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+              className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
             >
               {t('cancel')}
             </button>

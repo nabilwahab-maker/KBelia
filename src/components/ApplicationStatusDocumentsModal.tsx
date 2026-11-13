@@ -53,14 +53,15 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
   if (!isOpen) return null;
 
-  // Reference codes
-  const slotCode = userBooking?.slotCode || 'CAP-KB-01';
-  const bookingRef = `KBN-${slotCode.replace('CAP-', '')}-2026-8819`;
-  const applicantName = userBooking?.applicantName || 'Ahmad Nabil Bin Yusoff';
-  const businessName = userBooking?.businessName || 'Kopi Tok Bali & Pastri Pantai';
-  const hubLocation = userBooking?.hubLocation || 'Hub Belia KB Sentral';
-  const userGrant = grantApplications[0];
-  const userMentorship = mentorshipRegistrations.find(m => m.entrepreneurName.toLowerCase().includes(applicantName.toLowerCase()) || m.entrepreneurName.includes('Nabil')) || mentorshipRegistrations[0];
+  // Reference codes derived strictly from active user booking
+  const slotCode = userBooking?.slotCode || '';
+  const bookingRef = userBooking ? `KBN-${slotCode.replace('CAP-', '')}-${new Date(userBooking.createdAt || Date.now()).getFullYear()}-8819` : '';
+  const applicantName = userBooking?.applicantName || '';
+  const businessName = userBooking?.businessName || '';
+  const hubLocation = userBooking?.hubLocation || '';
+  const monthlyRate = userBooking?.monthlyRate || 150;
+  const userGrant = grantApplications[0] || null;
+  const userMentorship = mentorshipRegistrations[0] || null;
 
   const handlePrint = () => {
     window.print();
@@ -156,160 +157,242 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             <div className="space-y-4 animate-in fade-in duration-200">
               
               {/* Card 1: Modular Kiosk Status */}
-              <div className="p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+              {userBooking ? (
+                <div className="p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
+                        <Building2 className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                          Skim Kiosk Modular Pintar
+                        </span>
+                        <h4 className="font-extrabold text-sm sm:text-base text-slate-800 dark:text-white">
+                          Penempatan Kiosk: <span className="font-mono text-sky-700 dark:text-sky-400">{slotCode}</span>
+                        </h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">
+                          Lokasi: {hubLocation} &middot; Sewa Subsidi: <span className="font-bold text-slate-800 dark:text-white tabular-nums">RM{monthlyRate}/bulan</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
+                      userBooking.status === 'approved'
+                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                        : userBooking.status === 'rejected'
+                          ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800'
+                          : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                    }`}>
+                      {userBooking.status === 'approved' ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Clock className="w-4 h-4 text-amber-600" />}
+                      <span>
+                        {userBooking.status === 'approved' ? 'Permohonan Diluluskan' : userBooking.status === 'rejected' ? 'Tidak Berjaya' : 'Sedang Disemak'}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="pt-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div className="text-slate-600 dark:text-slate-300 text-[11px]">
+                      No. Rujukan Rasmi: <span className="font-mono font-bold text-slate-800 dark:text-white">{bookingRef}</span>
+                    </div>
+                    {userBooking.status === 'approved' && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('offerLetter')}
+                          className="px-3.5 py-1.5 rounded-xl font-bold bg-sky-600 hover:bg-sky-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Lihat Surat Tawaran</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('tenancy')}
+                          className="px-3 py-1.5 rounded-xl font-semibold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                        >
+                          Perjanjian Sewa
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0">
                       <Building2 className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-                        Skim Kiosk Modular Pintar
-                      </span>
-                      <h4 className="font-extrabold text-sm sm:text-base text-slate-800 dark:text-white">
-                        Penempatan Kiosk: <span className="font-mono text-sky-700 dark:text-sky-400">{slotCode}</span>
-                      </h4>
-                      <p className="text-xs text-slate-600 dark:text-slate-400">
-                        Lokasi: {hubLocation} &middot; Sewa Subsidi: <span className="font-bold text-slate-800 dark:text-white">RM150/bulan</span>
-                      </p>
+                      <h4 className="font-bold text-sm text-slate-800 dark:text-white">Tiada Permohonan Kapsul Aktif</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Anda belum menghantar sebarang permohonan sewaan kapsul modular.</p>
                     </div>
                   </div>
-
-                  <span className="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Permohonan Diluluskan</span>
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { onClose(); onOpenBooking(); }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white transition-colors cursor-pointer shrink-0"
+                  >
+                    Mohon Kapsul Sekarang
+                  </button>
                 </div>
-
-                <div className="pt-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-                  <div className="text-slate-600 dark:text-slate-300 text-[11px]">
-                    No. Rujukan Rasmi: <span className="font-mono font-bold text-slate-800 dark:text-white">{bookingRef}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('offerLetter')}
-                      className="px-3.5 py-1.5 rounded-xl font-bold bg-sky-600 hover:bg-sky-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Lihat Surat Tawaran</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('tenancy')}
-                      className="px-3 py-1.5 rounded-xl font-semibold bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
-                    >
-                      Perjanjian Sewa
-                    </button>
-                  </div>
-                </div>
-              </div>
+              )}
 
               {/* Card 2: SEED Grant Status */}
-              <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+              {userGrant ? (
+                <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center justify-center shrink-0">
+                        <Award className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                          Skim Bantuan Modal
+                        </span>
+                        <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white">
+                          {userGrant.programTitle}
+                        </h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">
+                          Peruntukan: <span className="font-bold text-slate-800 dark:text-white">{userGrant.grantAmount}</span> &middot; {userGrant.businessName}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
+                      userGrant.status === 'approved'
+                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                        : userGrant.status === 'rejected'
+                          ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800'
+                          : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                    }`}>
+                      <Clock className="w-4 h-4" />
+                      <span>
+                        {userGrant.status === 'approved' ? 'Diluluskan' : userGrant.status === 'rejected' ? 'Ditolak' : 'Sedang Dinilai Urusetia'}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="pt-3 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+                    <span>{userGrant.adminNotes || 'Permohonan geran telah direkodkan oleh Urusetia KBelia.'}</span>
+                    <button
+                      type="button"
+                      onClick={onOpenGrantModal}
+                      className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer shrink-0 ml-2"
+                    >
+                      Mohon Geran Lain &rarr;
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0">
                       <Award className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                        Skim Bantuan Modal
-                      </span>
-                      <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white">
-                        {userGrant?.programTitle || 'Dana Benih Usahawan Belia Kelantan (SEED)'}
-                      </h4>
-                      <p className="text-xs text-slate-600 dark:text-slate-400">
-                        Peruntukan: <span className="font-bold text-slate-800 dark:text-white">{userGrant?.grantAmount || 'RM3,000'}</span> &middot; Kegunaan: Modal Pusingan Stok & POS
-                      </p>
+                      <h4 className="font-bold text-sm text-slate-800 dark:text-white">Tiada Permohonan Geran Aktif</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Mohon skim dana permulaan atau transformasi digital untuk bisnes anda.</p>
                     </div>
                   </div>
-
-                  <span className="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-amber-600" />
-                    <span>Sedang Dinilai Urusetia</span>
-                  </span>
-                </div>
-
-                <div className="pt-3 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-                  <span>Dokumen SSM & Penyata Bank telah diterima lengkap oleh Urusetia UMK.</span>
                   <button
                     type="button"
-                    onClick={onOpenGrantModal}
-                    className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
+                    onClick={() => { onClose(); onOpenGrantModal(); }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
                   >
-                    Kemas Kini Borang &rarr;
+                    Mohon Geran Belia
                   </button>
                 </div>
-              </div>
+              )}
 
               {/* Card 3: Mentorship Session Status */}
-              <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+              {userMentorship ? (
+                <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
+                        <GraduationCap className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                          Bimbingan Mentor UMK
+                        </span>
+                        <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white">
+                          Klinik Usahawan bersama: <span className="text-sky-700 dark:text-sky-300">{userMentorship.mentorName}</span>
+                        </h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">
+                          Topik: {userMentorship.topic}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
+                      userMentorship.status === 'confirmed'
+                        ? 'bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 border-sky-300'
+                        : userMentorship.status === 'completed'
+                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300'
+                        : userMentorship.status === 'cancelled'
+                        ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300'
+                        : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300'
+                    }`}>
+                      {userMentorship.status === 'confirmed'
+                        ? 'Temujanji Disahkan'
+                        : userMentorship.status === 'completed'
+                        ? 'Selesai'
+                        : userMentorship.status === 'cancelled'
+                        ? 'Dibatalkan'
+                        : 'Menunggu Pengesahan'}
+                    </span>
+                  </div>
+
+                  <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <div className="text-slate-600 dark:text-slate-300 text-[11px] flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                      <span>{userMentorship.preferredDate} ({userMentorship.preferredTime})</span>
+                      <span>&bull; {userMentorship.mode}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
+                      {userMentorship.status !== 'completed' && userMentorship.status !== 'cancelled' && (
+                        <button
+                          type="button"
+                          onClick={() => setIsCancelConfirmOpen(true)}
+                          className="px-3 py-1 rounded-lg text-xs font-bold text-rose-700 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>Batal Pendaftaran</span>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={onOpenMentorship}
+                        className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
+                      >
+                        Pilihan Slot & Mentor &rarr;
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0">
                       <GraduationCap className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-                        Bimbingan Mentor UMK
-                      </span>
-                      <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white">
-                        Klinik Usahawan bersama: <span className="text-sky-700 dark:text-sky-300">{userMentorship?.mentorName || 'Prof. Madya Dr. Wan Azhar'}</span>
-                      </h4>
-                      <p className="text-xs text-slate-600 dark:text-slate-400">
-                        Topik: {userMentorship?.topic || 'Strategi TikTok Shop & Aliran Tunai'}
-                      </p>
+                      <h4 className="font-bold text-sm text-slate-800 dark:text-white">Tiada Temujanji Klinik Mentor</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Tempah sesi bimbingan perniagaan 1-ke-1 bersama mentor industri UMK.</p>
                     </div>
                   </div>
-
-                  <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
-                    userMentorship?.status === 'confirmed'
-                      ? 'bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 border-sky-300'
-                      : userMentorship?.status === 'completed'
-                      ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300'
-                      : userMentorship?.status === 'cancelled'
-                      ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300'
-                      : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300'
-                  }`}>
-                    {userMentorship?.status === 'confirmed' 
-                      ? '✓ Temujanji Disahkan' 
-                      : userMentorship?.status === 'completed' 
-                      ? '✓ Selesai' 
-                      : userMentorship?.status === 'cancelled'
-                      ? '✕ Pendaftaran Dibatalkan'
-                      : '⏳ Menunggu Pengesahan'}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => { onClose(); onOpenMentorship(); }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                  >
+                    Tempah Klinik Mentor
+                  </button>
                 </div>
-
-                <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                  <div className="text-slate-600 dark:text-slate-300 text-[11px] flex items-center gap-2">
-                    <Calendar className="w-3.5 h-3.5 text-sky-600" />
-                    <span>{userMentorship?.preferredDate || '28 Mac 2026 (Sabtu)'} ({userMentorship?.preferredTime || '10:00 AM'})</span>
-                    <span>&bull; {userMentorship?.mode || 'Bersemuka di Kampus'}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 self-start sm:self-auto">
-                    {userMentorship && userMentorship.status !== 'completed' && userMentorship.status !== 'cancelled' && (
-                      <button
-                        type="button"
-                        onClick={() => setIsCancelConfirmOpen(true)}
-                        className="px-3 py-1 rounded-lg text-xs font-bold text-rose-700 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 transition-colors flex items-center gap-1 cursor-pointer"
-                      >
-                        <XCircle className="w-3.5 h-3.5" />
-                        <span>Batal Pendaftaran</span>
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={onOpenMentorship}
-                      className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
-                    >
-                      Pilihan Slot & Mentor &rarr;
-                    </button>
-                  </div>
-                </div>
+              )}
 
                 {/* Mentorship Cancellation Confirmation Sub-Modal */}
                 {isCancelConfirmOpen && (
@@ -355,13 +438,21 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </div>
                   </div>
                 )}
-              </div>
 
             </div>
           )}
 
           {/* TAB 2: SURAT TAWARAN KIOSK RASMI */}
           {activeTab === 'offerLetter' && (
+            !userBooking || userBooking.status !== 'approved' ? (
+              <div className="py-12 text-center space-y-3">
+                <FileText className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
+                <h4 className="font-bold text-sm text-slate-800 dark:text-white">Surat Tawaran Belum Tersedia</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                  Surat tawaran digital akan dijana secara automatik sebaik sahaja permohonan kapsul modular anda diluluskan oleh pihak Urusetia UMK.
+                </p>
+              </div>
+            ) : (
             <div className="space-y-4 animate-in fade-in duration-200">
               
               <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
@@ -402,7 +493,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <div className="text-right hidden sm:block">
                     <div className="text-[10px] font-mono text-slate-500">NO. RUJUKAN:</div>
                     <div className="text-xs font-mono font-bold text-emerald-700">{bookingRef}</div>
-                    <div className="text-[10px] text-slate-500 mt-1">TARIKH: 24 MAC 2026</div>
+                    <div className="text-[10px] text-slate-500 mt-1">TARIKH: {formatDisplayDate(userBooking.createdAt)}</div>
                   </div>
                 </div>
 
@@ -416,7 +507,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 {/* Letter Content */}
                 <div className="text-xs leading-relaxed space-y-3 text-slate-800">
                   <p className="font-bold underline uppercase">
-                    TAWARAN PENEMPATAN & SEWAAN BERSUBSIDI KIOSK MODULAR PINTAR KBelia SESI 2026
+                    TAWARAN PENEMPATAN & SEWAAN BERSUBSIDI KIOSK MODULAR PINTAR KBelia SESI {new Date(userBooking.createdAt || Date.now()).getFullYear()}
                   </p>
                   <p>
                     Sukacita dimaklumkan bahawa Jawatankuasa Pemilihan Usahawan Belia Negeri Kelantan telah meluluskan permohonan anda bagi penempatan kiosk modular pintar di bawah program inisiatif keusahawanan belia negeri.
@@ -434,19 +525,19 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Kadar Sewaan Bersubsidi:</span>
-                      <span className="font-bold text-emerald-800">RM150.00 / Sebulan (Kadar Asal Pasaran: RM450)</span>
+                      <span className="font-bold text-emerald-800 tabular-nums">RM{monthlyRate.toFixed(2)} / Sebulan (Kadar Asal Pasaran: RM{monthlyRate * 2})</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Tarikh Mula Operasi:</span>
-                      <span className="font-bold text-slate-900">{formatDisplayDate(userBooking?.startDate || '2026-06-01')}</span>
+                      <span className="font-bold text-slate-900">{formatDisplayDate(userBooking.startDate)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Tarikh Akhir Beroperasi:</span>
-                      <span className="font-bold text-emerald-800">{calculateOperationEndDate(userBooking?.startDate || '2026-06-01', userBooking?.durationMonths || 6)}</span>
+                      <span className="font-bold text-emerald-800">{calculateOperationEndDate(userBooking.startDate, userBooking.durationMonths)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Kemudahan Termasuk:</span>
-                      <span className="text-slate-800">Bekalan Solar & Elektrik, Rak Display, Kunci Digital Pintar</span>
+                      <span className="text-slate-800">Bekalan Elektrik, Rak Display, Kunci Digital Pintar</span>
                     </div>
                   </div>
 
@@ -466,17 +557,27 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <div className="w-20 h-20 rounded-xl border border-emerald-200 bg-emerald-50/80 p-1.5 flex flex-col items-center justify-center text-center shrink-0">
                     <QrCode className="w-8 h-8 text-emerald-800 mb-0.5" />
                     <span className="text-[8px] font-mono font-bold text-emerald-800">VERIFIED</span>
-                    <span className="text-[7px] text-slate-500">HASH: 8819-KB</span>
+                    <span className="text-[7px] text-slate-500">HASH: {slotCode}</span>
                   </div>
                 </div>
 
               </div>
 
             </div>
+            )
           )}
 
           {/* TAB 3: PERJANJIAN SEWAAN (TENANCY AGREEMENT) */}
           {activeTab === 'tenancy' && (
+            !userBooking || userBooking.status !== 'approved' ? (
+              <div className="py-12 text-center space-y-3">
+                <Award className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
+                <h4 className="font-bold text-sm text-slate-800 dark:text-white">Perjanjian Sewaan Belum Tersedia</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                  Terma perjanjian sewaan rasmi hanya diaktifkan selepas permohonan kapsul anda diluluskan.
+                </p>
+              </div>
+            ) : (
             <div className="space-y-4 animate-in fade-in duration-200">
               <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
@@ -486,8 +587,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </h4>
                     <span className="text-[11px] text-slate-500">Antara KBelia/PBT dan Penyewa Kiosk {applicantName}</span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    Aktif
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                    {userBooking.tenancySigned ? 'Dimeterai' : 'Menunggu Tandatangan'}
                   </span>
                 </div>
 
@@ -495,7 +596,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <div>
                     <strong className="text-slate-800 dark:text-white block mb-0.5">Klausa 1: Tempoh Sewaan & Pembayaran</strong>
                     <p className="text-[11px]">
-                      Sewaan bermula pada awal bulan dengan tempoh percubaan minima 6 bulan. Bayaran subsidi RM150/bulan hendaklah diselesaikan selewat-lewatnya pada 7hb setiap bulan melalui akaun rasmi UMK/KBelia.
+                      Sewaan bermula pada {formatDisplayDate(userBooking.startDate)} bagi tempoh {userBooking.durationMonths} bulan. Bayaran subsidi RM{monthlyRate}/bulan hendaklah diselesaikan selewat-lewatnya pada 7hb setiap bulan melalui akaun rasmi UMK/KBelia.
                     </p>
                   </div>
 
@@ -523,18 +624,19 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px]">
                   <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4" /> Perjanjian Disahkan Secara Digital
+                    <CheckCircle2 className="w-4 h-4" /> {userBooking.tenancySigned ? 'Perjanjian Disahkan Secara Digital' : 'Sedia Untuk Tandatangan Digital'}
                   </span>
                   <button
                     type="button"
                     onClick={handlePrint}
                     className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
                   >
-                    Muat Turun Salinan Lengkap &rarr;
+                    Cetak Salinan &rarr;
                   </button>
                 </div>
               </div>
             </div>
+            )
           )}
 
           {/* TAB 4: PENGESAHAN KOD DIGITAL (VERIFICATION) */}
@@ -552,9 +654,9 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
               <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 max-w-sm mx-auto font-mono text-xs">
                 <div className="text-[10px] text-slate-500 uppercase font-bold">Kod Hash Rujukan:</div>
-                <div className="font-bold text-sky-700 dark:text-sky-400 text-sm mt-0.5">{bookingRef}</div>
+                <div className="font-bold text-sky-700 dark:text-sky-400 text-sm mt-0.5">{bookingRef || 'REG-2026-BELIA'}</div>
                 <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center justify-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> REKOD SAH DALAM PANGKALAN DATA NEGERI
+                  <ShieldCheck className="w-3.5 h-3.5" /> SEMAKAN DALAM PANGKALAN DATA NEGERI
                 </div>
               </div>
 
@@ -563,7 +665,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   type="button"
                   onClick={() => {
                     onClose();
-                    onOpenVerification(bookingRef);
+                    onOpenVerification(bookingRef || 'REG-2026-BELIA');
                   }}
                   className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-colors cursor-pointer"
                 >

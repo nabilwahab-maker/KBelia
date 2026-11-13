@@ -28,6 +28,7 @@ export const LoginModal: React.FC = () => {
     isLoginModalOpen, 
     closeLoginModal, 
     loginInitialTab,
+    loginWithGoogle,
     loginWithCredentials,
     registerNewUser,
     loginAsDemoUser, 
@@ -99,7 +100,7 @@ export const LoginModal: React.FC = () => {
       regDistrict,
       regPhone.trim(),
       regBusiness.trim() || undefined,
-      regPassword.trim() || 'kbelia123'
+      regPassword.trim()
     );
     setIsSubmitting(false);
 
@@ -108,6 +109,18 @@ export const LoginModal: React.FC = () => {
       setTimeout(() => {
         closeLoginModal();
       }, 700);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsSubmitting(true);
+    setSuccessNotice(null);
+    clearAuthError();
+    const res = await loginWithGoogle();
+    setIsSubmitting(false);
+    if (res.success) {
+      setSuccessNotice('Log masuk Google berjaya!');
+      setTimeout(() => closeLoginModal(), 500);
     }
   };
 
@@ -220,15 +233,15 @@ export const LoginModal: React.FC = () => {
           )}
 
           {authError && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 rounded-xl text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
               <span className="flex-1">{authError}</span>
             </div>
           )}
 
           {successNotice && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span className="font-bold flex-1">{successNotice}</span>
             </div>
           )}
@@ -246,8 +259,8 @@ export const LoginModal: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Emel"
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    placeholder="Emel rasmi anda"
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                   />
                 </div>
               </div>
@@ -260,7 +273,7 @@ export const LoginModal: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-[10px] text-slate-500 hover:text-sky-700 cursor-pointer"
+                    className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-sky-700 dark:hover:text-sky-300 cursor-pointer"
                   >
                     {showPassword ? 'Sembunyi' : 'Papar'}
                   </button>
@@ -272,8 +285,8 @@ export const LoginModal: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={activeRoleTab === 'mentor' ? 'PIN' : 'Kata Laluan'}
-                    className="w-full pl-9 pr-10 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    placeholder={activeRoleTab === 'mentor' ? 'PIN keselamatan' : 'Minimum 6 aksara'}
+                    className="w-full pl-9 pr-10 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                   />
                 </div>
               </div>
@@ -286,6 +299,23 @@ export const LoginModal: React.FC = () => {
                 <LogIn className="w-4 h-4" />
                 <span>{isSubmitting ? 'Memproses...' : 'Log Masuk Sekarang'}</span>
               </button>
+
+              {activeRoleTab === 'user' && (
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60"
+                >
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.87c2.27-2.09 3.67-5.17 3.67-9.15z" />
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.87-3.05c-1.08.72-2.45 1.16-4.06 1.16-3.13 0-5.78-2.11-6.73-4.96H1.26v3.15C3.25 21.36 7.35 24 12 24z" />
+                    <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.26C.46 8.23 0 10.06 0 12s.46 3.77 1.26 5.39l4.01-3.15z" />
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.25 2.64 1.26 6.61l4.01 3.15c.95-2.85 3.6-4.96 6.73-4.96z" />
+                  </svg>
+                  <span>Log Masuk dengan Google</span>
+                </button>
+              )}
             </form>
           )}
 
@@ -374,42 +404,58 @@ export const LoginModal: React.FC = () => {
             </form>
           )}
 
-          {/* 1 Demo Admin & 1 Demo Mentor buttons */}
-          <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-1.5">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">
-              Log Masuk Pantas Demo
+          {/* Isolated Development Demo Mode Buttons */}
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">
+              Mod Demo Pembangunan (Terasing)
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  loginAsDemoUser('merchant_faizul');
+                  setSuccessNotice('Log masuk Mod Demo Belia berjaya!');
+                  setTimeout(() => closeLoginModal(), 400);
+                }}
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-sky-950/30 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
+              >
+                <div className="text-[11px] font-bold text-slate-800 dark:text-white flex items-center gap-1">
+                  <Store className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                  <span>Belia</span>
+                </div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Ahmad Faizul</div>
+              </button>
+
               <button
                 type="button"
                 onClick={() => {
                   loginAsDemoUser('mentor_wanazhar');
-                  setSuccessNotice('Log masuk sebagai Mentor Demo berjaya!');
-                  setTimeout(() => closeLoginModal(), 500);
+                  setSuccessNotice('Log masuk Mod Demo Mentor berjaya!');
+                  setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-sky-50 dark:bg-sky-950/30 hover:bg-sky-100/80 border border-sky-200 dark:border-sky-800 rounded-xl text-left cursor-pointer"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-sky-950/30 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
               >
-                <div className="text-xs font-bold text-sky-900 dark:text-sky-300 flex items-center gap-1">
-                  <GraduationCap className="w-3.5 h-3.5 text-sky-700 dark:text-sky-400" />
-                  <span>Demo Mentor</span>
+                <div className="text-[11px] font-bold text-slate-800 dark:text-white flex items-center gap-1">
+                  <GraduationCap className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                  <span>Mentor</span>
                 </div>
-                <div className="text-[10px] text-slate-500 truncate">Dr. Wan Azhar</div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Dr. Wan Azhar</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => {
                   loginAsDemoUser('admin');
-                  setSuccessNotice('Log masuk sebagai Admin Demo berjaya!');
-                  setTimeout(() => closeLoginModal(), 500);
+                  setSuccessNotice('Log masuk Mod Demo Admin berjaya!');
+                  setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-800 hover:bg-sky-50/80 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-sky-950/30 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
               >
-                <div className="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Demo Admin</span>
+                <div className="text-[11px] font-bold text-slate-800 dark:text-white flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <span>Admin</span>
                 </div>
-                <div className="text-[10px] text-slate-500 truncate">Nabil (Urusetia)</div>
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Urusetia</div>
               </button>
             </div>
           </div>

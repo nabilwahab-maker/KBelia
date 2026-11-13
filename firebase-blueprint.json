@@ -2,7 +2,7 @@
   "entities": {
     "UserProfile": {
       "title": "UserProfile",
-      "description": "Maklumat profil belia usahawan atau pengguna berdaftar",
+      "description": "Maklumat profil belia usahawan, mentor atau pentadbir berdaftar",
       "type": "object",
       "properties": {
         "userId": { "type": "string", "maxLength": 128 },
@@ -10,12 +10,17 @@
         "email": { "type": "string", "maxLength": 120 },
         "phone": { "type": "string", "maxLength": 30 },
         "district": { "type": "string", "maxLength": 50 },
-        "role": { "type": "string", "enum": ["user", "admin"] },
+        "role": { "type": "string", "enum": ["user", "mentor", "admin"] },
+        "mentorId": { "type": "string", "maxLength": 128 },
         "avatarUrl": { "type": "string", "maxLength": 500 },
-        "icNumber": { "type": "string", "maxLength": 20 },
+        "icNumber": { "type": "string", "maxLength": 25 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "ssmNumber": { "type": "string", "maxLength": 50 },
+        "bankName": { "type": "string", "maxLength": 80 },
+        "bankAccountNumber": { "type": "string", "maxLength": 40 },
         "createdAt": { "type": "string", "maxLength": 50 }
       },
-      "required": ["userId", "fullName", "email"]
+      "required": ["userId", "fullName", "email", "role"]
     },
     "BusinessListing": {
       "title": "BusinessListing",
@@ -29,7 +34,7 @@
         "ownerPhone": { "type": "string", "maxLength": 30 },
         "businessName": { "type": "string", "maxLength": 150 },
         "tagline": { "type": "string", "maxLength": 200 },
-        "category": { "type": "string", "maxLength": 50 },
+        "category": { "type": "string", "maxLength": 60 },
         "district": { "type": "string", "maxLength": 50 },
         "description": { "type": "string", "maxLength": 2000 },
         "ssmNumber": { "type": "string", "maxLength": 50 },
@@ -53,7 +58,7 @@
         "id": { "type": "string", "maxLength": 128 },
         "code": { "type": "string", "maxLength": 30 },
         "name": { "type": "string", "maxLength": 100 },
-        "hubLocation": { "type": "string", "maxLength": 120 },
+        "hubLocation": { "type": "string", "maxLength": 150 },
         "district": { "type": "string", "maxLength": 50 },
         "size": { "type": "string", "maxLength": 50 },
         "monthlyRate": { "type": "number" },
@@ -75,20 +80,52 @@
         "id": { "type": "string", "maxLength": 128 },
         "slotId": { "type": "string", "maxLength": 128 },
         "slotCode": { "type": "string", "maxLength": 50 },
+        "slotName": { "type": "string", "maxLength": 120 },
+        "hubLocation": { "type": "string", "maxLength": 150 },
+        "applicantId": { "type": "string", "maxLength": 128 },
+        "applicantName": { "type": "string", "maxLength": 120 },
+        "applicantEmail": { "type": "string", "maxLength": 120 },
+        "applicantPhone": { "type": "string", "maxLength": 30 },
+        "applicantMyKad": { "type": "string", "maxLength": 25 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "businessCategory": { "type": "string", "maxLength": 60 },
+        "durationMonths": { "type": "number" },
+        "startDate": { "type": "string", "maxLength": 30 },
+        "monthlyRate": { "type": "number" },
+        "pitchNotes": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "adminNotes": { "type": "string", "maxLength": 1000 },
+        "tenancySigned": { "type": "boolean" },
+        "tenancySignedAt": { "type": "string", "maxLength": 50 },
+        "tenancySignatureName": { "type": "string", "maxLength": 120 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "slotId", "applicantId", "applicantName", "businessName", "status"]
+    },
+    "GrantApplication": {
+      "title": "GrantApplication",
+      "description": "Permohonan geran dan dana bantuan pemula usahawan belia",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "programId": { "type": "string", "maxLength": 128 },
+        "programTitle": { "type": "string", "maxLength": 200 },
+        "grantAmount": { "type": "string", "maxLength": 100 },
         "applicantId": { "type": "string", "maxLength": 128 },
         "applicantName": { "type": "string", "maxLength": 120 },
         "applicantEmail": { "type": "string", "maxLength": 120 },
         "applicantPhone": { "type": "string", "maxLength": 30 },
         "businessName": { "type": "string", "maxLength": 150 },
-        "businessCategory": { "type": "string", "maxLength": 50 },
-        "durationMonths": { "type": "number" },
-        "startDate": { "type": "string", "maxLength": 30 },
-        "pitchNotes": { "type": "string", "maxLength": 2000 },
+        "businessCategory": { "type": "string", "maxLength": 60 },
+        "ssmNumber": { "type": "string", "maxLength": 50 },
+        "bankName": { "type": "string", "maxLength": 80 },
+        "bankAccountNumber": { "type": "string", "maxLength": 40 },
+        "fundPurpose": { "type": "string", "maxLength": 2000 },
         "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
         "adminNotes": { "type": "string", "maxLength": 1000 },
         "createdAt": { "type": "string", "maxLength": 50 }
       },
-      "required": ["id", "slotId", "applicantId", "applicantName", "businessName", "status"]
+      "required": ["id", "programTitle", "applicantId", "applicantName", "businessName", "status"]
     },
     "ProductItem": {
       "title": "ProductItem",
@@ -101,12 +138,12 @@
         "name": { "type": "string", "maxLength": 150 },
         "price": { "type": "number" },
         "description": { "type": "string", "maxLength": 1000 },
-        "category": { "type": "string", "maxLength": 50 },
+        "category": { "type": "string", "maxLength": 60 },
         "imageUrl": { "type": "string", "maxLength": 500 },
         "inStock": { "type": "boolean" },
         "createdAt": { "type": "string", "maxLength": 50 }
       },
-      "required": ["id", "businessId", "name", "price"]
+      "required": ["id", "businessId", "ownerId", "name", "price"]
     },
     "YouthProgram": {
       "title": "YouthProgram",
@@ -115,7 +152,7 @@
       "properties": {
         "id": { "type": "string", "maxLength": 128 },
         "title": { "type": "string", "maxLength": 200 },
-        "category": { "type": "string", "maxLength": 50 },
+        "category": { "type": "string", "maxLength": 60 },
         "date": { "type": "string", "maxLength": 100 },
         "location": { "type": "string", "maxLength": 150 },
         "description": { "type": "string", "maxLength": 2000 },
@@ -126,12 +163,179 @@
         "createdAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "title", "category", "description"]
+    },
+    "CashflowRecord": {
+      "title": "CashflowRecord",
+      "description": "Rekod aliran tunai harian kiosk usahawan belia",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "ownerId": { "type": "string", "maxLength": 128 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "date": { "type": "string", "maxLength": 30 },
+        "cashSales": { "type": "number" },
+        "qrSales": { "type": "number" },
+        "expenses": { "type": "number" },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "ownerId", "date", "cashSales", "qrSales", "expenses"]
+    },
+    "MaintenanceTicket": {
+      "title": "MaintenanceTicket",
+      "description": "Laporan kerosakan fizikal dan penyelenggaraan kiosk",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "ownerId": { "type": "string", "maxLength": 128 },
+        "slotCode": { "type": "string", "maxLength": 50 },
+        "kioskName": { "type": "string", "maxLength": 120 },
+        "reporterName": { "type": "string", "maxLength": 120 },
+        "reporterPhone": { "type": "string", "maxLength": 30 },
+        "issueCategory": { "type": "string", "maxLength": 60 },
+        "description": { "type": "string", "maxLength": 1500 },
+        "status": { "type": "string", "enum": ["received", "in_progress", "resolved"] },
+        "adminNotes": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "ownerId", "slotCode", "issueCategory", "description", "status"]
+    },
+    "MentorProfile": {
+      "title": "MentorProfile",
+      "description": "Profil dan jadual kelapangan mentor bertauliah",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "title": { "type": "string", "maxLength": 180 },
+        "agency": { "type": "string", "maxLength": 150 },
+        "expertise": { "type": "array" },
+        "avatarUrl": { "type": "string", "maxLength": 500 },
+        "email": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "bio": { "type": "string", "maxLength": 1500 },
+        "availableDays": { "type": "string", "maxLength": 200 }
+      },
+      "required": ["id", "name", "email", "agency"]
+    },
+    "MentorshipRegistration": {
+      "title": "MentorshipRegistration",
+      "description": "Permohonan dan rekod sesi klinik bimbingan mentor",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "mentorId": { "type": "string", "maxLength": 128 },
+        "mentorName": { "type": "string", "maxLength": 120 },
+        "applicantId": { "type": "string", "maxLength": 128 },
+        "entrepreneurName": { "type": "string", "maxLength": 120 },
+        "entrepreneurEmail": { "type": "string", "maxLength": 120 },
+        "entrepreneurPhone": { "type": "string", "maxLength": 30 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "district": { "type": "string", "maxLength": 50 },
+        "topic": { "type": "string", "maxLength": 200 },
+        "preferredDate": { "type": "string", "maxLength": 50 },
+        "preferredTime": { "type": "string", "maxLength": 50 },
+        "mode": { "type": "string", "maxLength": 60 },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "completed", "cancelled"] },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "mentorId", "entrepreneurName", "businessName", "status"]
+    },
+    "GrantEndorsement": {
+      "title": "GrantEndorsement",
+      "description": "Surat perakuan geran rasmi yang dikeluarkan oleh mentor",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "endorsementCode": { "type": "string", "maxLength": 80 },
+        "mentorId": { "type": "string", "maxLength": 128 },
+        "mentorName": { "type": "string", "maxLength": 120 },
+        "menteeId": { "type": "string", "maxLength": 128 },
+        "menteeName": { "type": "string", "maxLength": 120 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "recommendedAmount": { "type": "string", "maxLength": 40 },
+        "grantProgramTitle": { "type": "string", "maxLength": 200 },
+        "justification": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["active", "revoked"] },
+        "issuedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "endorsementCode", "mentorId", "menteeName", "businessName", "status"]
+    },
+    "MentoringLogEntry": {
+      "title": "MentoringLogEntry",
+      "description": "Log jurnal minit bimbingan dan pelan tindakan mentee",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "mentorId": { "type": "string", "maxLength": 128 },
+        "menteeName": { "type": "string", "maxLength": 120 },
+        "businessName": { "type": "string", "maxLength": 150 },
+        "sessionDate": { "type": "string", "maxLength": 50 },
+        "topic": { "type": "string", "maxLength": 200 },
+        "minutes": { "type": "string", "maxLength": 3000 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "mentorId", "menteeName", "topic", "minutes"]
+    },
+    "B2BListing": {
+      "title": "B2BListing",
+      "description": "Iklan rangkaian bekalan dan permintaan niaga B2B belia",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "ownerId": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 120 },
+        "authorBusiness": { "type": "string", "maxLength": 150 },
+        "district": { "type": "string", "maxLength": 50 },
+        "type": { "type": "string", "enum": ["supply", "demand"] },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 1500 },
+        "whatsapp": { "type": "string", "maxLength": 30 },
+        "date": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "authorName", "authorBusiness", "type", "title"]
+    },
+    "YouthNotification": {
+      "title": "YouthNotification",
+      "description": "Notifikasi rasmi antara pentadbir, mentor dan usahawan belia",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 180 },
+        "message": { "type": "string", "maxLength": 1000 },
+        "category": { "type": "string", "enum": ["status", "announcement", "reminder"] },
+        "sender": { "type": "string", "maxLength": 120 },
+        "senderRole": { "type": "string", "enum": ["admin", "mentor", "system"] },
+        "targetRole": { "type": "string", "enum": ["youth", "mentor", "admin", "all"] },
+        "targetUserId": { "type": "string", "maxLength": 128 },
+        "isRead": { "type": "boolean" },
+        "actionTab": { "type": "string", "maxLength": 40 }
+      },
+      "required": ["id", "title", "message", "category", "targetRole"]
+    },
+    "PortalSettings": {
+      "title": "PortalSettings",
+      "description": "Tetapan operasi global Portal KBelia",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "portalSubsidyRate": { "type": "number" },
+        "maxLeaseDurationMonths": { "type": "number" },
+        "systemStatus": { "type": "string", "enum": ["operational", "maintenance"] },
+        "portalAnnouncement": { "type": "string", "maxLength": 1000 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "portalSubsidyRate", "maxLeaseDurationMonths", "systemStatus"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
-      "description": "Profil pengguna dan belia usahawan"
+      "description": "Profil pengguna, belia usahawan, mentor dan pentadbir"
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Senarai ID pentadbir berdaftar"
     },
     "/businesses/{businessId}": {
       "schema": { "$ref": "#/entities/BusinessListing" },
@@ -145,6 +349,10 @@
       "schema": { "$ref": "#/entities/CapsuleBooking" },
       "description": "Rekod permohonan dan tempahan slot kapsul"
     },
+    "/grant_applications/{grantId}": {
+      "schema": { "$ref": "#/entities/GrantApplication" },
+      "description": "Permohonan geran dan pembiayaan usahawan belia"
+    },
     "/products/{productId}": {
       "schema": { "$ref": "#/entities/ProductItem" },
       "description": "Katalog produk usahawan belia"
@@ -153,9 +361,41 @@
       "schema": { "$ref": "#/entities/YouthProgram" },
       "description": "Hebahan program, geran dan latihan belia"
     },
-    "/admins/{adminId}": {
-      "schema": { "$ref": "#/entities/UserProfile" },
-      "description": "Senarai ID admin berdaftar"
+    "/cashflow_records/{recordId}": {
+      "schema": { "$ref": "#/entities/CashflowRecord" },
+      "description": "Rekod aliran tunai harian usahawan"
+    },
+    "/maintenance_tickets/{ticketId}": {
+      "schema": { "$ref": "#/entities/MaintenanceTicket" },
+      "description": "Tiket aduan penyelenggaraan kiosk"
+    },
+    "/mentor_profiles/{mentorId}": {
+      "schema": { "$ref": "#/entities/MentorProfile" },
+      "description": "Profil dan jadual klinik mentor"
+    },
+    "/mentor_sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/MentorshipRegistration" },
+      "description": "Tempahan sesi bimbingan mentor"
+    },
+    "/mentor_endorsements/{endorsementId}": {
+      "schema": { "$ref": "#/entities/GrantEndorsement" },
+      "description": "Surat perakuan geran rasmi oleh mentor"
+    },
+    "/mentor_logs/{logId}": {
+      "schema": { "$ref": "#/entities/MentoringLogEntry" },
+      "description": "Log jurnal sesi bimbingan mentor"
+    },
+    "/b2b_listings/{listingId}": {
+      "schema": { "$ref": "#/entities/B2BListing" },
+      "description": "Papan iklan rangkaian bekalan dan permintaan B2B"
+    },
+    "/notifications/{notifId}": {
+      "schema": { "$ref": "#/entities/YouthNotification" },
+      "description": "Hebahan dan pemberitahuan portal"
+    },
+    "/portal_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/PortalSettings" },
+      "description": "Konfigurasi operasi sistem pentadbir"
     }
   }
 }

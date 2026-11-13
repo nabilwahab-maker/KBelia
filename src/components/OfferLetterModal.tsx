@@ -18,7 +18,7 @@ import {
   ExternalLink,
   Loader2
 } from 'lucide-react';
-import { CapsuleBooking } from '../types';
+import { CapsuleBooking, CapsuleSlot } from '../types';
 import { 
   openAndPrintDocument,
   printHtmlViaIframe, 
@@ -32,6 +32,7 @@ import { downloadOfferLetterPdf } from '../utils/pdfGenerator';
 
 interface OfferLetterModalProps {
   booking: CapsuleBooking | null;
+  slots?: CapsuleSlot[];
   isOpen: boolean;
   onClose: () => void;
   onOpenVerification?: (refCode?: string) => void;
@@ -39,6 +40,7 @@ interface OfferLetterModalProps {
 
 export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
   booking,
+  slots = [],
   isOpen,
   onClose,
   onOpenVerification
@@ -50,6 +52,10 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
   const letterRef = useRef<HTMLDivElement | null>(null);
 
   if (!isOpen || !booking) return null;
+
+  const matchedSlot = slots.find(s => s.id === booking.slotId || s.code === booking.slotCode);
+  const monthlyRate = booking.monthlyRate || matchedSlot?.monthlyRate || 150;
+  const marketRate = monthlyRate * 2;
 
   const refNumber = `KBN-${booking.slotCode || 'KB01'}-${new Date(booking.createdAt || Date.now()).getFullYear()}-8819`;
   const formattedDate = new Date(booking.createdAt || Date.now()).toLocaleDateString('ms-MY', { 
@@ -208,8 +214,8 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
 
                 <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
                   <span className="text-slate-400 dark:text-slate-500 block text-[11px]">Kadar Sewa Bersubsidi:</span>
-                  <span className="font-extrabold text-emerald-700 dark:text-emerald-400 text-sm">RM 150.00 / bulan</span>
-                  <div className="text-emerald-700 dark:text-emerald-400 font-medium">Subsidi 50% Ditaja Negeri (Kadar Asal RM300)</div>
+                  <span className="font-extrabold text-emerald-700 dark:text-emerald-400 text-sm tabular-nums">RM {monthlyRate.toFixed(2)} / bulan</span>
+                  <div className="text-emerald-700 dark:text-emerald-400 font-medium">Subsidi 50% Ditaja Negeri (Kadar Asal RM{marketRate})</div>
                 </div>
 
                 <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">

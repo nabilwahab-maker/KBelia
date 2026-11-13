@@ -50,6 +50,8 @@ export const generateOfferLetterOfficialHtml = (
 ): string => {
   const formattedStart = formatDisplayDate(booking.startDate);
   const formattedEnd = calculateOperationEndDate(booking.startDate, booking.durationMonths);
+  const subsidizedRate = Number(booking.monthlyRate || 150);
+  const marketRate = subsidizedRate * 2;
 
   return `<!DOCTYPE html>
 <html lang="ms">
@@ -602,8 +604,8 @@ export const generateOfferLetterOfficialHtml = (
       <tr>
         <th>Kadar Sewa Bersubsidi</th>
         <td>
-          <span class="price-highlight">RM 150.00 / sebulan</span>
-          <span class="subsidy-tag">Subsidi 50% Ditaja Negeri (Asal RM300.00)</span>
+          <span class="price-highlight">RM ${subsidizedRate.toFixed(2)} / sebulan</span>
+          <span class="subsidy-tag">Subsidi 50% Ditaja Negeri (Asal RM${marketRate.toFixed(2)})</span>
         </td>
       </tr>
       <tr>
@@ -721,47 +723,13 @@ export const generateOfferLetterOfficialHtml = (
 };
 
 /**
- * Opens a dedicated printable page/window with the document and triggers immediate printing.
- * Fallbacks seamlessly to iframe print if window popup is blocked by the browser.
+ * Opens a dedicated printable document via hidden iframe without blocked popups.
  */
 export const openAndPrintDocument = (
   contentHtml: string,
   documentTitle: string = 'Salinan Dokumen Rasmi KBelia'
 ): Promise<boolean> => {
-  return new Promise((resolve) => {
-    try {
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.open();
-        printWindow.document.write(contentHtml);
-        printWindow.document.close();
-        printWindow.focus();
-
-        const triggerPrint = () => {
-          try {
-            printWindow.focus();
-            printWindow.print();
-            resolve(true);
-          } catch {
-            printHtmlViaIframe(contentHtml, documentTitle).then(resolve);
-          }
-        };
-
-        if (printWindow.document.readyState === 'complete') {
-          setTimeout(triggerPrint, 300);
-        } else {
-          printWindow.onload = () => setTimeout(triggerPrint, 300);
-          setTimeout(triggerPrint, 800);
-        }
-        return;
-      }
-    } catch {
-      // Popup blocked or not supported in this frame
-    }
-
-    // Direct iframe printing fallback
-    printHtmlViaIframe(contentHtml, documentTitle).then(resolve);
-  });
+  return printHtmlViaIframe(contentHtml, documentTitle);
 };
 
 /**

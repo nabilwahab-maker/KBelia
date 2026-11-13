@@ -40,7 +40,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { BusinessListing, BusinessCategory, KelantanDistrict } from '../types';
-import { saveBusinessListing, seedInitialData } from '../services/dataService';
+import { saveBusinessListing, seedInitialData, loadLocalPortalSettings, savePortalSettingsRecord } from '../services/dataService';
 import confetti from 'canvas-confetti';
 import { ToggleSwitch } from './ToggleSwitch';
 import { Accordion } from './Accordion';
@@ -178,51 +178,22 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
   const logoFileInputRef = useRef<HTMLInputElement>(null);
 
   // Admin Settings State (if admin)
-  const [adminOfficerName, setAdminOfficerName] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).adminOfficerName || 'Pentadbir Nabil (Urusetia KBelia)';
-    } catch (e) {
-      // ignore
-    }
-    return 'Pentadbir Nabil (Urusetia KBelia)';
-  });
-  const [adminHelpdeskPhone, setAdminHelpdeskPhone] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).adminHelpdeskPhone || '+6011-2050 8890';
-    } catch (e) {
-      // ignore
-    }
-    return '+6011-2050 8890';
-  });
-  const [portalSubsidyRate, setPortalSubsidyRate] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).portalSubsidyRate || '50';
-    } catch (e) {
-      // ignore
-    }
-    return '50';
-  });
-  const [maxLeaseDurationMonths, setMaxLeaseDurationMonths] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).maxLeaseDurationMonths || '12';
-    } catch (e) {
-      // ignore
-    }
-    return '12';
-  });
-  const [portalAnnouncement, setPortalAnnouncement] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).portalAnnouncement || 'Permohonan Kapsul Niaga & Geran Belia Kelantan 2026/2027 Kini Dibuka!';
-    } catch (e) {
-      // ignore
-    }
-    return 'Permohonan Kapsul Niaga & Geran Belia Kelantan 2026/2027 Kini Dibuka!';
-  });
+  const initialPortalSettings = useMemo(() => loadLocalPortalSettings(), []);
+  const [adminOfficerName, setAdminOfficerName] = useState(
+    initialPortalSettings.adminOfficerName || 'Pentadbir Nabil (Urusetia KBelia)'
+  );
+  const [adminHelpdeskPhone, setAdminHelpdeskPhone] = useState(
+    initialPortalSettings.adminHelpdeskPhone || '+6011-2050 8890'
+  );
+  const [portalSubsidyRate, setPortalSubsidyRate] = useState(
+    String(initialPortalSettings.portalSubsidyRate ?? 50)
+  );
+  const [maxLeaseDurationMonths, setMaxLeaseDurationMonths] = useState(
+    String(initialPortalSettings.maxLeaseDurationMonths ?? 12)
+  );
+  const [portalAnnouncement, setPortalAnnouncement] = useState(
+    initialPortalSettings.portalAnnouncement || 'Permohonan Kapsul Niaga & Geran Belia Kelantan 2026/2027 Kini Dibuka!'
+  );
 
   // Sync settings state if userProfile or myBusiness changes
   useEffect(() => {
@@ -382,7 +353,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
     try {
       setIsChangingPassword(true);
-      const res = await changeUserPassword(newPassword);
+      const res = await changeUserPassword(newPassword, currentPassword);
       if (res.success) {
         setPasswordNotice({ 
           type: 'success', 
@@ -517,15 +488,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           notifyEmail: settingsNotifyEmail
         });
 
-        const payload = {
-          adminOfficerName,
-          adminHelpdeskPhone,
-          portalSubsidyRate,
-          maxLeaseDurationMonths,
-          portalAnnouncement,
-          updatedAt: new Date().toISOString()
-        };
-        localStorage.setItem('kbelia_admin_settings', JSON.stringify(payload));
+        const currentPortal = loadLocalPortalSettings();
+        await savePortalSettingsRecord({
+          ...currentPortal,
+          adminOfficerName: adminOfficerName.trim() || 'Pentadbir Urusetia KBelia',
+          adminHelpdeskPhone: adminHelpdeskPhone.trim() || '+6011-2050 8890',
+          portalSubsidyRate: Number(portalSubsidyRate) || 50,
+          maxLeaseDurationMonths: Number(maxLeaseDurationMonths) || 12,
+          portalAnnouncement: portalAnnouncement.trim()
+        });
 
         setSettingsMessage({ 
           type: 'success', 
@@ -1597,7 +1568,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   type="text"
                   value={adminOfficerName}
                   onChange={(e) => setAdminOfficerName(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                 />
               </div>
 
@@ -1610,7 +1581,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   type="text"
                   value={adminHelpdeskPhone}
                   onChange={(e) => setAdminHelpdeskPhone(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 font-mono"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 font-mono"
                 />
               </div>
 
@@ -1625,7 +1596,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   max="100"
                   value={portalSubsidyRate}
                   onChange={(e) => setPortalSubsidyRate(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                 />
               </div>
 
@@ -1640,7 +1611,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   max="36"
                   value={maxLeaseDurationMonths}
                   onChange={(e) => setMaxLeaseDurationMonths(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                 />
               </div>
 
@@ -1653,7 +1624,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   type="text"
                   value={portalAnnouncement}
                   onChange={(e) => setPortalAnnouncement(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                 />
               </div>
             </div>

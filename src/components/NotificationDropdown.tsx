@@ -90,7 +90,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       >
         <Bell className="w-4 h-4 transition-transform duration-200 group-hover:scale-110 hover-bell-icon" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-sky-600 text-white text-[9px] font-extrabold flex items-center justify-center tabular-nums ring-2 ring-white dark:ring-slate-900 animate-pulse">
+          <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-sky-600 text-white text-[9px] font-extrabold flex items-center justify-center tabular-nums ring-2 ring-white dark:ring-slate-900">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

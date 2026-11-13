@@ -2,9 +2,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Helper Primitives
     function isValidId(id) {
-      return id is string && id.size() <= 128;
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
     function isSignedIn() {
@@ -16,53 +21,242 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return (
-        (isSignedIn() && (
-          request.auth.token.email == 'nabilwahab03020302@gmail.com' ||
-          request.auth.token.email == 's24b0382@siswa.umk.edu.my' ||
-          exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-        )) || true
+      return isSignedIn() && (
+        (
+          request.auth.token.email_verified == true && (
+            request.auth.token.email == 'nabilwahab03020302@gmail.com' ||
+            request.auth.token.email == 's24b0382@siswa.umk.edu.my'
+          )
+        ) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
       );
     }
 
-    // Users Collection
+    function isMentor() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'mentor';
+    }
+
+    function validStr(val, maxLen) {
+      return val is string && val.size() <= maxLen;
+    }
+
+    // 1. Users Collection (PII Protected)
     match /users/{userId} {
-      allow read, write: if true;
+      allow get, list: if isAdmin() || isOwner(userId);
+      allow create: if isSignedIn() && isValidId(userId) && (
+        isAdmin() || (
+          isOwner(userId) &&
+          request.resource.data.userId == request.auth.uid &&
+          request.resource.data.role == 'user' &&
+          validStr(request.resource.data.fullName, 120) &&
+          validStr(request.resource.data.email, 120)
+        )
+      );
+      allow update: if isSignedIn() && isValidId(userId) && (
+        isAdmin() || (
+          isOwner(userId) &&
+          request.resource.data.userId == resource.data.userId &&
+          request.resource.data.role == resource.data.role
+        )
+      );
+      allow delete: if isAdmin() && isValidId(userId);
     }
 
-    // Admins Collection
+    // 2. Admins Collection
     match /admins/{adminId} {
-      allow read, write: if true;
+      allow get: if isAdmin() || isOwner(adminId);
+      allow list: if isAdmin();
+      allow write: if isAdmin() && isValidId(adminId);
     }
 
-    // Businesses Collection
+    // 3. Businesses Collection
     match /businesses/{businessId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(businessId) && (
+        isAdmin() || (
+          request.resource.data.ownerId == request.auth.uid &&
+          validStr(request.resource.data.businessName, 150) &&
+          validStr(request.resource.data.description, 2000)
+        )
+      );
+      allow update: if isSignedIn() && isValidId(businessId) && (
+        isAdmin() || (
+          resource.data.ownerId == request.auth.uid &&
+          request.resource.data.ownerId == resource.data.ownerId &&
+          request.resource.data.isApproved == resource.data.isApproved &&
+          request.resource.data.isFeatured == resource.data.isFeatured
+        )
+      );
+      allow delete: if isSignedIn() && isValidId(businessId) && (
+        isAdmin() || resource.data.ownerId == request.auth.uid
+      );
     }
 
-    // Capsule Slots Collection
+    // 4. Capsule Slots Collection
     match /capsule_slots/{slotId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidId(slotId);
     }
 
-    // Capsule Bookings Collection
+    // 5. Capsule Bookings Collection
     match /capsule_bookings/{bookingId} {
-      allow read, write: if true;
+      allow get: if isAdmin() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
+      allow list: if isAdmin() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(bookingId) && (
+        isAdmin() || (
+          request.resource.data.applicantId == request.auth.uid &&
+          request.resource.data.status == 'pending' &&
+          validStr(request.resource.data.businessName, 150) &&
+          validStr(request.resource.data.pitchNotes, 2000)
+        )
+      );
+      allow update: if isSignedIn() && isValidId(bookingId) && (
+        isAdmin() || (
+          resource.data.applicantId == request.auth.uid &&
+          request.resource.data.applicantId == resource.data.applicantId &&
+          request.resource.data.status == resource.data.status &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tenancySigned', 'tenancySignedAt', 'tenancySignatureName', 'pitchNotes', 'applicantPhone'])
+        )
+      );
+      allow delete: if isAdmin() && isValidId(bookingId);
     }
 
-    // Products Collection
+    // 6. Grant Applications Collection
+    match /grant_applications/{grantId} {
+      allow get: if isAdmin() || isMentor() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
+      allow list: if isAdmin() || isMentor() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(grantId) && (
+        isAdmin() || (
+          request.resource.data.applicantId == request.auth.uid &&
+          request.resource.data.status == 'pending' &&
+          validStr(request.resource.data.businessName, 150) &&
+          validStr(request.resource.data.fundPurpose, 2000)
+        )
+      );
+      allow update, delete: if isAdmin() && isValidId(grantId);
+    }
+
+    // 7. Products Collection
     match /products/{productId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(productId) && (
+        isAdmin() || (
+          request.resource.data.ownerId == request.auth.uid &&
+          validStr(request.resource.data.name, 150) &&
+          validStr(request.resource.data.description, 1000)
+        )
+      );
+      allow update: if isSignedIn() && isValidId(productId) && (
+        isAdmin() || (
+          resource.data.ownerId == request.auth.uid &&
+          request.resource.data.ownerId == resource.data.ownerId
+        )
+      );
+      allow delete: if isSignedIn() && isValidId(productId) && (
+        isAdmin() || resource.data.ownerId == request.auth.uid
+      );
     }
 
-    // Programs & Announcements Collection
+    // 8. Programs & Announcements Collection
     match /programs/{programId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidId(programId);
     }
 
-    // Test connection doc
+    // 9. Cashflow Records Collection
+    match /cashflow_records/{recordId} {
+      allow get, list: if isAdmin() || (isSignedIn() && resource.data.ownerId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(recordId) && (
+        isAdmin() || request.resource.data.ownerId == request.auth.uid
+      );
+      allow update, delete: if isSignedIn() && isValidId(recordId) && (
+        isAdmin() || resource.data.ownerId == request.auth.uid
+      );
+    }
+
+    // 10. Maintenance Tickets Collection
+    match /maintenance_tickets/{ticketId} {
+      allow get, list: if isAdmin() || (isSignedIn() && resource.data.ownerId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(ticketId) && (
+        isAdmin() || (
+          request.resource.data.ownerId == request.auth.uid &&
+          request.resource.data.status == 'received' &&
+          validStr(request.resource.data.description, 1500)
+        )
+      );
+      allow update, delete: if isAdmin() && isValidId(ticketId);
+    }
+
+    // 11. Mentor Profiles Collection
+    match /mentor_profiles/{mentorId} {
+      allow read: if true;
+      allow create, delete: if isAdmin() && isValidId(mentorId);
+      allow update: if isSignedIn() && isValidId(mentorId) && (isAdmin() || isMentor());
+    }
+
+    // 12. Mentor Sessions Collection
+    match /mentor_sessions/{sessionId} {
+      allow get, list: if isAdmin() || isMentor() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(sessionId) && (
+        isAdmin() || isMentor() || (
+          request.resource.data.applicantId == request.auth.uid &&
+          request.resource.data.status == 'pending'
+        )
+      );
+      allow update: if isSignedIn() && isValidId(sessionId) && (
+        isAdmin() || isMentor() || (
+          resource.data.applicantId == request.auth.uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        )
+      );
+      allow delete: if isAdmin() && isValidId(sessionId);
+    }
+
+    // 13. Mentor Endorsements Collection
+    match /mentor_endorsements/{endorsementId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(endorsementId) && (isAdmin() || isMentor());
+      allow delete: if isAdmin() && isValidId(endorsementId);
+    }
+
+    // 14. Mentor Logs Collection
+    match /mentor_logs/{logId} {
+      allow get, list: if isAdmin() || isMentor();
+      allow create, update: if isSignedIn() && isValidId(logId) && (isAdmin() || isMentor());
+      allow delete: if isAdmin() && isValidId(logId);
+    }
+
+    // 15. B2B Listings Collection
+    match /b2b_listings/{listingId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(listingId) && (
+        isAdmin() || request.resource.data.ownerId == request.auth.uid
+      );
+      allow update, delete: if isSignedIn() && isValidId(listingId) && (
+        isAdmin() || resource.data.ownerId == request.auth.uid
+      );
+    }
+
+    // 16. Notifications Collection
+    match /notifications/{notifId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(notifId) && (isAdmin() || isMentor());
+      allow update: if isSignedIn() && isValidId(notifId);
+      allow delete: if isAdmin() && isValidId(notifId);
+    }
+
+    // 17. Portal Settings Collection
+    match /portal_settings/{settingId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidId(settingId);
+    }
+
+    // 18. Test connection doc (read-only ping)
     match /test/{docId} {
-      allow read, write: if true;
+      allow get: if true;
+      allow write: if isAdmin();
     }
   }
 }

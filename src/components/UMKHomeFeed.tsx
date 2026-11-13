@@ -800,7 +800,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               >
                 <div className="flex items-start gap-3">
                   <img
-                    src={biz.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
+                    src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                     alt={biz.businessName}
                     referrerPolicy="no-referrer"
                     className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0 group-hover:scale-105 transition-transform"
@@ -810,7 +810,12 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                       <span className="text-xs font-bold text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors truncate">
                         {biz.businessName}
                       </span>
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" title={language === 'en' ? 'SSM Verified Entrepreneur' : 'Usahawan Disahkan SSM'} />
+                      <span
+                        className="shrink-0 flex items-center"
+                        title={language === 'en' ? 'SSM Verified Entrepreneur' : 'Usahawan Disahkan SSM'}
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      </span>
                     </div>
                     <div className="text-[10px] text-slate-600 dark:text-slate-300 font-semibold truncate mt-0.5">
                       {biz.category}

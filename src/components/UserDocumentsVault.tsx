@@ -73,7 +73,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                   Surat Tawaran Kiosk Kapsul Bersubsidi
                 </h4>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
-                  {b.businessName} · {b.hubLocation} (Sewa RM150/bulan disubsidi negeri).
+                  {b.businessName} · {b.hubLocation} (Sewa RM{b.monthlyRate || 150}/bulan disubsidi negeri).
                 </p>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-4 bg-slate-50 dark:bg-slate-900/60 p-2 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                   <span>Mula: <strong className="text-slate-800 dark:text-slate-200">{formatDisplayDate(b.startDate)}</strong></span>
@@ -81,7 +81,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex flex-wrap gap-2">
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex flex-wrap gap-2 print:hidden">
                 <button
                   type="button"
                   onClick={() => onViewOfferLetter(b)}
@@ -94,7 +94,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                   <button
                     type="button"
                     onClick={() => onOpenTenancyAgreement(b)}
-                    className="py-1.5 px-3 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 transition-colors flex items-center gap-1 cursor-pointer"
+                    className="py-1.5 px-3 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <FileText className="w-3.5 h-3.5 text-sky-600" /> Perjanjian Sewa
                   </button>
@@ -104,7 +104,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                   <button
                     type="button"
                     onClick={() => onOpenVerification(`KBN-${b.slotCode}`)}
-                    className="p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 cursor-pointer"
+                    className="p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer"
                     title="Semak Kod QR Integriti"
                   >
                     <QrCode className="w-4 h-4" />
@@ -119,11 +119,50 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
             <h5 className="text-xs font-bold text-slate-700 dark:text-slate-300">
               Tiada Surat Tawaran Kiosk Lagi
             </h5>
-            <p className="text-[11px] text-slate-500 max-w-xs mt-0.5">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-xs mt-0.5">
               Sebaik sahaja permohonan kiosk anda disahkan oleh Urusetia UMK, surat tawaran digital rasmi akan tersimpan di sini secara automatik.
             </p>
           </div>
         )}
+
+        {/* Approved Grants */}
+        {approvedGrants.map((g) => (
+          <div
+            key={g.id}
+            className="rounded-2xl p-5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <CheckCircle2 className="w-3 h-3" /> Kelulusan Geran ({g.grantAmount})
+                </span>
+                <span className="font-mono text-xs font-bold text-slate-400">
+                  {g.id.slice(0, 12).toUpperCase()}
+                </span>
+              </div>
+
+              <h4 className="text-base font-bold text-slate-800 dark:text-white mb-1">
+                {g.programTitle}
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                {g.businessName} · Bank Penerima: {g.bankName} ({g.bankAccountNumber})
+              </p>
+            </div>
+
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2 print:hidden">
+              <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold">
+                {g.adminNotes || 'Diluluskan untuk pengagihan dana'}
+              </span>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="py-1.5 px-3 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-50 hover:bg-sky-50 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <Printer className="w-3.5 h-3.5" /> Cetak
+              </button>
+            </div>
+          </div>
+        ))}
 
         {/* Document 2: Certificate of Youth Entrepreneurship */}
         <div className="rounded-2xl p-5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm flex flex-col justify-between">
@@ -145,7 +184,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
             </p>
           </div>
 
-          <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center gap-2">
+          <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center gap-2 print:hidden">
             <button
               type="button"
               onClick={() => window.print()}

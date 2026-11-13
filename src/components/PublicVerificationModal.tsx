@@ -1,72 +1,152 @@
-import React, { useState } from 'react';
-import { 
-  ShieldCheck, 
-  X, 
-  CheckCircle2, 
-  QrCode, 
-  Lock, 
+import React, { useState, useEffect } from 'react';
+import {
+  ShieldCheck,
+  X,
+  CheckCircle2,
+  Lock,
   Search,
-  ExternalLink,
-  Award
+  AlertTriangle
 } from 'lucide-react';
+import { BusinessListing, CapsuleBooking } from '../types';
+import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
+import { maskMyKad } from '../utils/securityUtils';
 
 interface PublicVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultRefCode?: string;
+  bookings?: CapsuleBooking[];
+  businesses?: BusinessListing[];
+}
+
+interface VerifiedRecordState {
+  refCode: string;
+  status: 'valid' | 'invalid';
+  recipient: string;
+  kioskLocation: string;
+  district: string;
+  rate: string;
+  issueDate: string;
+  expiryDate: string;
+  issuer: string;
 }
 
 export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = ({
   isOpen,
   onClose,
-  defaultRefCode = 'KBN-KB-2026-8819'
+  defaultRefCode = '',
+  bookings = [],
+  businesses = []
 }) => {
   const [inputRef, setInputRef] = useState(defaultRefCode);
-  const [verifiedRecord, setVerifiedRecord] = useState<{
-    refCode: string;
-    status: 'valid' | 'invalid';
-    recipient: string;
-    kioskLocation: string;
-    district: string;
-    rate: string;
-    issueDate: string;
-    expiryDate: string;
-    issuer: string;
-  } | null>({
-    refCode: defaultRefCode,
-    status: 'valid',
-    recipient: 'Ahmad Faiz (010502-03-****)',
-    kioskLocation: 'Hub Belia KB Sentral (Kiosk Kapsul #CAP-KB-01)',
-    district: 'Kota Bharu',
-    rate: 'RM 150/bulan (Subsidi Penuh Kerajaan Negeri)',
-    issueDate: '15 Januari 2026',
-    expiryDate: '14 Januari 2027',
-    issuer: 'Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK)'
-  });
+  const [verifiedRecord, setVerifiedRecord] = useState<VerifiedRecordState | null>(null);
+
+  const performLookup = (rawQuery: string): VerifiedRecordState | null => {
+    const q = rawQuery.trim().toUpperCase();
+    if (!q) return null;
+
+    // 1. Match against real approved bookings (by booking id, slotCode, KBN-*, or AGR-*)
+    const matchedBooking = bookings.find(b => {
+      if (b.status !== 'approved') return false;
+      const code = (b.slotCode || '').toUpperCase();
+      const shortCode = code.replace('CAP-', '');
+      const year = new Date(b.createdAt || Date.now()).getFullYear();
+      const candidates = [
+        b.id.toUpperCase(),
+        code,
+        `KBN-${code}`,
+        `KBN-${code}-${year}-8819`,
+        `KBN-${shortCode}-${year}-8819`,
+        `AGR-${code}-${year}`
+      ];
+      return candidates.some(c => c === q || q.includes(code));
+    });
+
+    if (matchedBooking) {
+      const rateVal = matchedBooking.monthlyRate || 150;
+      return {
+        refCode: q,
+        status: 'valid',
+        recipient: `${matchedBooking.applicantName}${matchedBooking.applicantMyKad ? ` (${maskMyKad(matchedBooking.applicantMyKad)})` : ''}`,
+        kioskLocation: `${matchedBooking.hubLocation} (${matchedBooking.slotCode})`,
+        district: matchedBooking.businessName,
+        rate: `RM ${rateVal}/bulan (Subsidi KBelia)`,
+        issueDate: formatDisplayDate(matchedBooking.startDate),
+        expiryDate: calculateOperationEndDate(matchedBooking.startDate, matchedBooking.durationMonths),
+        issuer: 'Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK)'
+      };
+    }
+
+    // 2. Match against approved registered businesses / SSM or certificate reference
+    const matchedBusiness = businesses.find(b =>
+      b.isApproved && (
+        b.id.toUpperCase() === q ||
+        (b.ssmNumber && b.ssmNumber.toUpperCase() === q)
+      )
+    );
+
+    if (matchedBusiness) {
+      return {
+        refCode: q,
+        status: 'valid',
+        recipient: `${matchedBusiness.ownerName} (${matchedBusiness.businessName})`,
+        kioskLocation: matchedBusiness.businessAddress || matchedBusiness.district,
+        district: matchedBusiness.district,
+        rate: `Kategori: ${matchedBusiness.category}`,
+        issueDate: formatDisplayDate(matchedBusiness.createdAt),
+        expiryDate: 'Aktif Berdaftar',
+        issuer: 'Direktori Usahawan Belia Kelantan (KBelia)'
+      };
+    }
+
+    // 3. Match standard membership cert code
+    if (q === 'REG-2026-BELIA') {
+      return {
+        refCode: q,
+        status: 'valid',
+        recipient: 'Ahli Berdaftar Portal KBelia Kelantan',
+        kioskLocation: 'Seluruh Jajahan Negeri Kelantan',
+        district: 'Negeri Kelantan',
+        rate: 'Sijil Keahlian Usahawan Belia Rasmi',
+        issueDate: 'Januari 2026',
+        expiryDate: 'Disember 2026',
+        issuer: 'Kerajaan Negeri Kelantan & Universiti Malaysia Kelantan (UMK)'
+      };
+    }
+
+    return {
+      refCode: q,
+      status: 'invalid',
+      recipient: '-',
+      kioskLocation: '-',
+      district: '-',
+      rate: '-',
+      issueDate: '-',
+      expiryDate: '-',
+      issuer: '-'
+    };
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      const code = defaultRefCode || '';
+      setInputRef(code);
+      setVerifiedRecord(code ? performLookup(code) : null);
+    }
+  }, [isOpen, defaultRefCode, bookings, businesses]);
 
   if (!isOpen) return null;
 
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputRef.trim().length > 5) {
-      setVerifiedRecord({
-        refCode: inputRef.trim().toUpperCase(),
-        status: 'valid',
-        recipient: 'Pemohon Sah Berdaftar (010***-**-****)',
-        kioskLocation: 'Hub Kapsul Usahawan Kelantan',
-        district: 'Kelantan Darul Naim',
-        rate: 'RM 150/bulan (Tajaan Subsidi Negeri)',
-        issueDate: '2026',
-        expiryDate: '2027',
-        issuer: 'Kerajaan Negeri Kelantan & Universiti Malaysia Kelantan'
-      });
-    }
+    if (!inputRef.trim()) return;
+    setVerifiedRecord(performLookup(inputRef));
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div 
-        className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-amber-300/60 dark:border-amber-500/30 scale-100 transition-all max-h-[90vh] overflow-y-auto"
+      <div
+        className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[90vh] overflow-y-auto"
         role="dialog"
         aria-modal="true"
       >
@@ -87,7 +167,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -96,7 +176,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
         {/* Search Ref Bar */}
         <form onSubmit={handleVerify} className="mb-6">
           <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 block mb-1.5">
-            Masukkan No. Rujukan Surat Tawaran / Sijil:
+            Masukkan No. Rujukan Surat Tawaran / Kod Kapsul / SSM:
           </label>
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -105,13 +185,13 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
                 type="text"
                 value={inputRef}
                 onChange={(e) => setInputRef(e.target.value)}
-                placeholder="Contoh: KBN-KB-2026-8819"
+                placeholder="Contoh: KBN-CAP-KB-01-2026-8819 atau REG-2026-BELIA"
                 className="w-full pl-9 pr-3 py-2 rounded-xl text-xs font-mono font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 uppercase"
               />
             </div>
             <button
               type="submit"
-              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors cursor-pointer"
             >
               Sahkan
             </button>
@@ -119,7 +199,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
         </form>
 
         {/* Verification Result Card */}
-        {verifiedRecord && (
+        {verifiedRecord && verifiedRecord.status === 'valid' && (
           <div className="rounded-2xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/20 p-5 flex flex-col gap-3">
             <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
               <CheckCircle2 className="w-5 h-5 shrink-0" />
@@ -138,11 +218,11 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
                 <span className="font-bold text-slate-900 dark:text-white">{verifiedRecord.recipient}</span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Lokasi Kiosk:</span>
+                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Lokasi / Premis:</span>
                 <span className="font-semibold text-slate-800 dark:text-slate-200">{verifiedRecord.kioskLocation}</span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Kadar Sewa:</span>
+                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Butiran Kadar / Status:</span>
                 <span className="font-semibold text-emerald-700 dark:text-emerald-300">{verifiedRecord.rate}</span>
               </div>
               <div>
@@ -162,11 +242,25 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
           </div>
         )}
 
+        {verifiedRecord && verifiedRecord.status === 'invalid' && (
+          <div className="rounded-2xl border border-rose-300 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-950/30 p-5 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+            <div className="text-xs space-y-1">
+              <div className="font-extrabold uppercase tracking-wider text-rose-700 dark:text-rose-300">
+                Rekod Tidak Dijumpai ({verifiedRecord.refCode})
+              </div>
+              <p className="text-rose-700/90 dark:text-rose-300/90 leading-relaxed">
+                Nombor rujukan ini tiada dalam senarai kelulusan aktif atau belum disahkan oleh Urusetia UMK. Sila semak semula ejaan nombor rujukan anda.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="mt-6 flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
+            className="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             Tutup
           </button>

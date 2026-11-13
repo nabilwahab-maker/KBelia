@@ -11,13 +11,12 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
       'Strategi E-Dagang & Penjenamaan',
       'Pengembangan Perniagaan Belia'
     ],
-    avatarUrl: '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg',
+    avatarUrl: '/assets/generated/avatar_mentor_umk_1793924250411.jpg',
     email: 'wanazhar@umk.edu.my',
     phone: '60199887711',
     bio: 'Berpengalaman lebih 15 tahun membimbing usahawan belia dan pelajar IPT di Pantai Timur mencapai jualan 6 angka melalui saluran digital.',
     availableDays: 'Setiap Isnin & Rabu (10:00 AM - 1:00 PM)',
-    activeMenteesCount: 3,
-    pin: '1234'
+    activeMenteesCount: 3
   },
   {
     id: 'mentor-2',
@@ -29,13 +28,12 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
       'Kawalan Kualiti Produk & Rantaian Bekalan',
       'Keusahawanan Wanita & Kraf Warisan'
     ],
-    avatarUrl: '/public/assets/generated/usahawan_belia_wanita.jpg',
+    avatarUrl: '/assets/generated/usahawan_belia_wanita.jpg',
     email: 'sitiaminah.coach@insken.gov.my',
     phone: '60129876543',
     bio: 'Pemenang Anugerah Usahawanita Inovatif Kelantan dan panel bimbingan INSKEN yang telah mengeksport produk kraf ke 8 negara.',
     availableDays: 'Setiap Selasa & Khamis (2:30 PM - 5:00 PM)',
-    activeMenteesCount: 2,
-    pin: '1234'
+    activeMenteesCount: 2
   },
   {
     id: 'mentor-3',
@@ -47,24 +45,41 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
       'Permohonan Pembiayaan TEKUN, MARA & PUNB',
       'Pengurusan Cukai & Aliran Tunai'
     ],
-    avatarUrl: '/public/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
+    avatarUrl: '/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
     email: 'khairul.audit@smeadvisor.my',
     phone: '60139123456',
     bio: 'Akauntan bertauliah membantu usahawan mikro menyediakan buku tunai piawai dan kertas kerja pembiayaan perniagaan sehingga RM50,000.',
     availableDays: 'Setiap Rabu & Sabtu (11:00 AM - 3:00 PM)',
-    activeMenteesCount: 2,
-    pin: '1234'
+    activeMenteesCount: 2
+  },
+  {
+    id: 'mentor-4',
+    name: 'Ts. Dr. Norazila Binti Mat Deris',
+    title: 'Pensyarah Kanan Agroteknologi & Pemprosesan Makanan (UMK Jeli)',
+    agency: 'Fakulti Industri Asas Tani UMK (FIAT)',
+    expertise: [
+      'Pembungkusan & Ketahanan Produk Makanan',
+      'Pensijilan Halal & MeSTI KKM',
+      'Rantaian Bekalan Agrotek Kelantan'
+    ],
+    avatarUrl: '/assets/generated/avatar_youth_female_1793924250745.jpg',
+    email: 'norazila.fiat@umk.edu.my',
+    phone: '60145556677',
+    bio: 'Pakar pensijilan makanan dan pembangunan produk asas tani membantu usahawan mikro luar bandar menembusi pasaran pasar raya.',
+    availableDays: 'Setiap Ahad & Khamis (9:30 AM - 12:30 PM)',
+    activeMenteesCount: 1
   }
 ];
 
 export const INITIAL_MENTORSHIP_REGISTRATIONS: MentorshipRegistration[] = [
   {
     id: 'mentee-reg-1',
+    applicantId: 'demo-tenant-1',
     mentorId: 'mentor-1',
     mentorName: 'Prof. Madya Dr. Wan Azhar',
-    entrepreneurName: 'Ahmad Nabil Bin Yusoff',
+    entrepreneurName: 'Ahmad Faizul Bin Razak',
     entrepreneurPhone: '601123456789',
-    entrepreneurEmail: 'nabil.kopi@gmail.com',
+    entrepreneurEmail: 'faizul.artisan@gmail.com',
     businessName: "D'Kelate Artisan Coffee & Pastry",
     district: 'Bachok',
     businessCategory: 'Makanan & Minuman (F&B)',
@@ -81,11 +96,12 @@ export const INITIAL_MENTORSHIP_REGISTRATIONS: MentorshipRegistration[] = [
   },
   {
     id: 'mentee-reg-2',
+    applicantId: 'demo-tenant-2',
     mentorId: 'mentor-1',
     mentorName: 'Prof. Madya Dr. Wan Azhar',
-    entrepreneurName: 'Wan Nur Insyirah',
-    entrepreneurPhone: '60139988112',
-    entrepreneurEmail: 'insyirah.art@gmail.com',
+    entrepreneurName: 'Nur Syafiqah Binti Zakaria',
+    entrepreneurPhone: '60198765432',
+    entrepreneurEmail: 'syafiqah.batik@gmail.com',
     businessName: 'Batik Belia Kontemporari',
     district: 'Kota Bharu',
     businessCategory: 'Fesyen, Batik & Kraf Kelantan',
@@ -95,29 +111,30 @@ export const INITIAL_MENTORSHIP_REGISTRATIONS: MentorshipRegistration[] = [
     preferredTime: '11:30 AM - 12:30 PM',
     mode: 'Google Meet Maya',
     status: 'confirmed',
-    notes: 'Sesi telah disahkan oleh Prof Wan Azhar. Usahawan diminta sediakan 3 sampel foto produk.',
+    notes: 'Sesi telah disahkan oleh Prof. Madya Dr. Wan Azhar. Usahawan diminta sediakan 3 sampel foto produk.',
     mentorActionPlan: '1. Rangka 5 penceritaan (storytelling) warisan Kelantan.\n2. Tetapkan harga diskaun khas bundle pelancong.\n3. Gunakan pencahayaan studio ringkas untuk sesi Live.',
     meetingLink: 'https://meet.google.com/kbe-wanz-2026',
     createdAt: '2026-03-22T14:15:00Z'
   },
   {
     id: 'mentee-reg-3',
+    applicantId: 'demo-tenant-3',
     mentorId: 'mentor-2',
     mentorName: 'Puan Siti Aminah Binti Yusof',
-    entrepreneurName: 'Siti Sarah Binti Daud',
-    entrepreneurPhone: '60178877665',
-    entrepreneurEmail: 'sarah.kraf@yahoo.com',
-    businessName: 'Anyaman Buluh Kraf Bachok',
-    district: 'Bachok',
-    businessCategory: 'Fesyen, Batik & Kraf Kelantan',
+    entrepreneurName: 'Muhammad Harith Bin Yusoff',
+    entrepreneurPhone: '60139988776',
+    entrepreneurEmail: 'harith.multimedia@gmail.com',
+    businessName: 'Studio Belia Multimedia KB',
+    district: 'Kota Bharu',
+    businessCategory: 'Teknologi & Servis Digital',
     topic: 'Penembusan Pasaran Cenderamata Korporat & Eksport',
-    challenges: 'Produk anyaman kami diminati tetapi belum mempunyai pembungkusan piawai untuk pasaran antarabangsa.',
+    challenges: 'Klien korporat memerlukan pakej profil syarikat dan pembungkusan digital piawai.',
     preferredDate: '25 Mac 2026 (Rabu)',
     preferredTime: '2:30 PM - 3:30 PM',
     mode: 'Google Meet Maya',
     status: 'completed',
-    notes: 'Sesi bimbingan pembungkusan produk kraftangan dan pengiraan kos telah selesai.',
-    mentorActionPlan: '1. Sediakan kad cerita warisan ("craft artisan story card") di dalam setiap kotak.\n2. Hubungi MATRADE untuk geran eksport MDG.\n3. Tetapkan MOQ 50 unit bagi tempahan korporat.',
+    notes: 'Sesi bimbingan penjenamaan korporat dan pengiraan kos telah selesai.',
+    mentorActionPlan: '1. Sediakan kad katalog pakej korporat.\n2. Hubungi MATRADE/MDEC untuk geran digital.\n3. Tetapkan MOQ bagi tempahan tahunan.',
     meetingLink: 'https://meet.google.com/kbe-insken-2026',
     createdAt: '2026-03-20T10:00:00Z'
   }

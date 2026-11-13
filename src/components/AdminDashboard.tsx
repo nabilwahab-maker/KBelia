@@ -39,7 +39,10 @@ import {
   SlotStatus,
   MentorshipRegistration,
   MentorProfile,
-  AdminSubTab
+  AdminSubTab,
+  MaintenanceTicket,
+  PortalSettings,
+  GrantApplication
 } from '../types';
 import { 
   updateBookingStatus, 
@@ -50,9 +53,11 @@ import {
   deleteBusinessListing,
   saveBusinessListing,
   seedInitialData,
-  updateGrantApplicationStatus
+  updateGrantApplicationStatus,
+  updateMaintenanceTicketStatus,
+  savePortalSettingsRecord,
+  loadLocalPortalSettings
 } from '../services/dataService';
-import { GrantApplication } from '../types';
 import { AdminApprovalQueue } from './AdminApprovalQueue';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { ImageDropzone } from './ImageDropzone';
@@ -69,6 +74,8 @@ interface AdminDashboardProps {
   grantApplications?: GrantApplication[];
   mentorshipRegistrations?: MentorshipRegistration[];
   mentors?: MentorProfile[];
+  maintenanceTickets?: MaintenanceTicket[];
+  portalSettings?: PortalSettings;
   onUpdateMentor?: (updatedMentor: MentorProfile) => void;
   onRefresh: () => void;
   activeSubTab?: AdminSubTab;
@@ -105,6 +112,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   grantApplications = [],
   mentorshipRegistrations = [],
   mentors = INITIAL_MENTOR_PROFILES,
+  maintenanceTickets = [],
+  portalSettings,
   onUpdateMentor,
   onRefresh,
   activeSubTab,
@@ -129,83 +138,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const [selectedMentorForEdit, setSelectedMentorForEdit] = useState<MentorProfile | null>(null);
 
+  const resolvedInitialSettings = portalSettings || loadLocalPortalSettings();
+
   // Admin Settings State
-  const [adminOfficerName, setAdminOfficerName] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).adminOfficerName || 'Pentadbir Nabil (Urusetia KBelia)';
-    } catch (e) {
-      // ignore
-    }
-    return 'Pentadbir Nabil (Urusetia KBelia)';
-  });
-  const [adminHelpdeskPhone, setAdminHelpdeskPhone] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).adminHelpdeskPhone || '+6011-23456789';
-    } catch (e) {
-      // ignore
-    }
-    return '+6011-23456789';
-  });
-  const [portalSubsidyRate, setPortalSubsidyRate] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).portalSubsidyRate || '50';
-    } catch (e) {
-      // ignore
-    }
-    return '50';
-  });
-  const [maxLeaseDurationMonths, setMaxLeaseDurationMonths] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).maxLeaseDurationMonths || '12';
-    } catch (e) {
-      // ignore
-    }
-    return '12';
-  });
-  const [systemStatus, setSystemStatus] = useState<'active' | 'maintenance'>(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).systemStatus || 'active';
-    } catch (e) {
-      // ignore
-    }
-    return 'active';
-  });
-  const [portalAnnouncement, setPortalAnnouncement] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_admin_settings');
-      if (saved) return JSON.parse(saved).portalAnnouncement || 'Permohonan Kapsul Niaga & Geran Belia Kelantan 2026 Kini Dibuka!';
-    } catch (e) {
-      // ignore
-    }
-    return 'Permohonan Kapsul Niaga & Geran Belia Kelantan 2026 Kini Dibuka!';
-  });
+  const [adminOfficerName, setAdminOfficerName] = useState(
+    resolvedInitialSettings.adminOfficerName || 'Pentadbir Nabil (Urusetia KBelia)'
+  );
+  const [adminHelpdeskPhone, setAdminHelpdeskPhone] = useState(
+    resolvedInitialSettings.adminHelpdeskPhone || '+6011-23456789'
+  );
+  const [portalSubsidyRate, setPortalSubsidyRate] = useState(
+    String(resolvedInitialSettings.portalSubsidyRate ?? 50)
+  );
+  const [maxLeaseDurationMonths, setMaxLeaseDurationMonths] = useState(
+    String(resolvedInitialSettings.maxLeaseDurationMonths ?? 12)
+  );
+  const [systemStatus, setSystemStatus] = useState<'operational' | 'maintenance'>(
+    resolvedInitialSettings.systemStatus === 'maintenance' ? 'maintenance' : 'operational'
+  );
+  const [portalAnnouncement, setPortalAnnouncement] = useState(
+    resolvedInitialSettings.portalAnnouncement || 'Permohonan Kapsul Niaga & Geran Belia Kelantan 2026 Kini Dibuka!'
+  );
   const [savingAdminSettings, setSavingAdminSettings] = useState(false);
   const [adminSettingsSuccess, setAdminSettingsSuccess] = useState<string | null>(null);
 
-  const handleSaveAdminSettings = (e: React.FormEvent) => {
+  React.useEffect(() => {
+    if (!portalSettings) return;
+    if (portalSettings.adminOfficerName) setAdminOfficerName(portalSettings.adminOfficerName);
+    if (portalSettings.adminHelpdeskPhone) setAdminHelpdeskPhone(portalSettings.adminHelpdeskPhone);
+    setPortalSubsidyRate(String(portalSettings.portalSubsidyRate ?? 50));
+    setMaxLeaseDurationMonths(String(portalSettings.maxLeaseDurationMonths ?? 12));
+    setSystemStatus(portalSettings.systemStatus === 'maintenance' ? 'maintenance' : 'operational');
+    if (portalSettings.portalAnnouncement) setPortalAnnouncement(portalSettings.portalAnnouncement);
+  }, [portalSettings]);
+
+  const handleSaveAdminSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingAdminSettings(true);
     setAdminSettingsSuccess(null);
     try {
-      const payload = {
-        adminOfficerName,
-        adminHelpdeskPhone,
-        portalSubsidyRate,
-        maxLeaseDurationMonths,
+      await savePortalSettingsRecord({
+        id: 'global',
+        adminOfficerName: adminOfficerName.trim(),
+        adminHelpdeskPhone: adminHelpdeskPhone.trim(),
+        portalSubsidyRate: Math.min(100, Math.max(0, Number(portalSubsidyRate) || 50)),
+        maxLeaseDurationMonths: Math.min(36, Math.max(1, Number(maxLeaseDurationMonths) || 12)),
         systemStatus,
-        portalAnnouncement,
-        updatedAt: new Date().toISOString()
-      };
-      localStorage.setItem('kbelia_admin_settings', JSON.stringify(payload));
+        portalAnnouncement: portalAnnouncement.trim()
+      });
       confetti({ particleCount: 50, spread: 60 });
       setAdminSettingsSuccess('Tetapan sistem pentadbir & operasi portal berjaya disimpan!');
+      showToast('Tetapan sistem & parameter operasi portal disimpan!', 'success');
     } catch (err) {
       console.error(err);
+      showToast('Gagal menyimpan tetapan portal.', 'error');
     } finally {
       setSavingAdminSettings(false);
     }
@@ -220,6 +206,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         localStorage.setItem('niagabelia_auth_session', adminSession);
       }
       setAdminSettingsSuccess('Cache sesi tempatan telah dibersihkan!');
+      showToast('Cache sesi tempatan telah dibersihkan.', 'info');
     } catch (err) {
       console.error(err);
     }
@@ -244,7 +231,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [slotMonthlyRate, setSlotMonthlyRate] = useState('150');
   const [slotStatus, setSlotStatus] = useState<SlotStatus>('available');
   const [slotAmenities, setSlotAmenities] = useState('Palam Elektrik 13A, WiFi 500Mbps, Rak Paparan Bertingkat');
-  const [slotImageUrl, setSlotImageUrl] = useState('/public/assets/generated/kiosk_modular_kbelia.jpg');
+  const [slotImageUrl, setSlotImageUrl] = useState('/assets/generated/kiosk_modular_kbelia.jpg');
 
   // Program form state
   const [showProgramForm, setShowProgramForm] = useState(false);
@@ -546,12 +533,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </div>
 
+      {message && (
+        <div className={`mb-5 p-4 rounded-xl text-xs font-medium flex items-center justify-between border ${
+          message.type === 'success'
+            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
+            : 'bg-rose-50 dark:bg-rose-950/50 text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-800'
+        }`}>
+          <div className="flex items-center gap-2">
+            {message.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            )}
+            <span>{message.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMessage(null)}
+            className="text-xs font-bold opacity-60 hover:opacity-100 px-2 py-0.5 cursor-pointer"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* TAB 0: ADVANCED 1-CLICK APPROVAL QUEUE & AUDIT EXPORTS */}
       {adminTab === 'queue' && (
         <AdminApprovalQueue
           bookings={safeBookings}
           grantApplications={grantApplications || []}
           slots={safeSlots}
+          maintenanceTickets={maintenanceTickets || []}
           onApproveBooking={async (bId, notes) => {
             const b = safeBookings.find(x => x.id === bId);
             if (b) await handleApproveBooking({ ...b, adminNotes: notes });
@@ -575,6 +587,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               await saveCapsuleSlot({ ...slot, status: newStatus });
               onRefresh();
             }
+          }}
+          onUpdateTicketStatus={async (ticketId, status, adminNotes) => {
+            await updateMaintenanceTicketStatus(ticketId, status, adminNotes);
+            showToast('Status aduan fasiliti dikemaskini!', 'success');
+            onRefresh();
           }}
           onRefresh={onRefresh}
         />
@@ -752,7 +769,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <img
-                            src={biz.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
+                            src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                             alt=""
                             className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
                           />
@@ -1264,7 +1281,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <GraduationCap className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                 <span>Senarai Panel Mentor Bertauliah Negeri ({mentors.length})</span>
               </h4>
-              <span className="text-xs text-slate-500">Klik "Sunting Profil" untuk mengurus maklumat & PIN</span>
+              <span className="text-xs text-slate-500">Klik "Sunting Profil Mentor" untuk mengurus maklumat</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
@@ -1278,7 +1295,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <div className="space-y-2.5">
                       <div className="flex items-center gap-3">
                         <img 
-                          src={m.avatarUrl || '/public/assets/generated/avatar_mentor_umk_1793924250411.jpg'} 
+                          src={m.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg'} 
                           alt={m.name}
                           className="w-11 h-11 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0" 
                         />
@@ -1299,11 +1316,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <div className="pt-2 border-t border-slate-200/80 dark:border-slate-700 space-y-1 text-[11px]">
                         <div className="flex items-center justify-between">
                           <span className="text-slate-500">Usahawan Berdaftar:</span>
-                          <span className="font-bold text-sky-700 dark:text-sky-400">{menteeCount} Usahawan</span>
+                          <span className="font-bold text-sky-700 dark:text-sky-400 tabular-nums">{menteeCount} Usahawan</span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-slate-500">PIN Akses:</span>
-                          <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{m.pin || '1234'}</span>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-slate-500 shrink-0">Emel Rasmi:</span>
+                          <span className="font-mono text-[10px] text-slate-700 dark:text-slate-300 truncate">{m.email}</span>
                         </div>
                       </div>
                     </div>
@@ -1314,7 +1331,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       className="w-full py-1.5 px-3 bg-slate-50 hover:bg-sky-50 dark:bg-slate-900 dark:hover:bg-sky-950/40 text-slate-700 hover:text-sky-800 dark:text-slate-300 dark:hover:text-sky-300 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
-                      <span>Sunting Profil & PIN</span>
+                      <span>Sunting Profil Mentor</span>
                     </button>
                   </div>
                 );
@@ -1570,10 +1587,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </label>
                   <select
                     value={systemStatus}
-                    onChange={(e) => setSystemStatus(e.target.value as 'active' | 'maintenance')}
+                    onChange={(e) => setSystemStatus(e.target.value as 'operational' | 'maintenance')}
                     className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all text-slate-900 dark:text-white"
                   >
-                    <option value="active">Portal Aktif & Permohonan Dibuka</option>
+                    <option value="operational">Portal Aktif & Permohonan Dibuka</option>
                     <option value="maintenance">Mod Penyelenggaraan Sistem (Sementara)</option>
                   </select>
                 </div>

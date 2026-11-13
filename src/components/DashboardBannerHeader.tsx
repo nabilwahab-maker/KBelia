@@ -29,9 +29,8 @@ interface DashboardBannerHeaderProps {
 export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
   activeTab,
   role,
-  userName = 'MUHAMMAD NABIL BIN ABDUL WAHAB',
-  onNavigateHome,
-  onNavigateTab
+  userName = 'Usahawan KBelia',
+  onNavigateHome
 }) => {
   const { language } = useLanguage();
   const isMs = language === 'ms';
@@ -211,47 +210,47 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
     }
   })();
 
-  const displayName = (userName && userName.trim().length > 0) 
-    ? userName.toUpperCase() 
-    : 'MUHAMMAD NABIL BIN ABDUL WAHAB';
+  const displayName = userName?.trim() || (isMs ? 'Pengguna KBelia' : 'KBelia User');
 
   return (
-    <div className="w-full kbelia-important-header rounded-t-2xl rounded-b-none border border-b border-slate-200 px-4 sm:px-6 py-3.5 sm:py-4 shadow-2xs transition-colors">
+    <div className="w-full kbelia-important-header rounded-t-2xl rounded-b-none border border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-3.5 sm:py-4 shadow-2xs transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         
         {/* Navigation Breadcrumb */}
         <div className="flex items-center gap-2.5 text-xs sm:text-sm flex-wrap">
-          <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center shrink-0 border border-sky-200">
+          <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 flex items-center justify-center shrink-0 border border-sky-200 dark:border-sky-800">
             <IconComponent className="w-4 h-4" />
           </div>
-          {/* Main bold title on left */}
-          <span className="text-slate-900 font-extrabold text-base sm:text-lg tracking-tight">
+          <span className="text-slate-900 dark:text-white font-extrabold text-base sm:text-lg tracking-tight">
             {meta.pageLabel}
           </span>
 
-          {/* Breadcrumb path: Home • Dashboard */}
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-400">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-400 dark:text-slate-400">
             <button
               type="button"
               onClick={onNavigateHome}
-              className="hover:text-sky-600 transition-colors cursor-pointer flex items-center gap-1 interactive-press group"
+              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer flex items-center gap-1 group"
             >
-              <Home className="w-3.5 h-3.5 inline transition-transform duration-200 group-hover:scale-110" />
+              <Home className="w-3.5 h-3.5 inline" />
               <span>{isMs ? 'Utama' : 'Home'}</span>
             </button>
-            <span className="text-slate-300 font-bold">&bull;</span>
-            <span className="text-slate-600 font-semibold">
+            <span className="text-slate-300 dark:text-slate-600 font-bold">&bull;</span>
+            <span className="text-slate-600 dark:text-slate-300 font-semibold">
               {meta.breadcrumb}
             </span>
           </nav>
         </div>
 
-        {/* Date Badge: Dynamic based on language setting */}
-        <div className="self-start sm:self-auto flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm shadow-2xs interactive-lift cursor-default">
-          <span className="text-slate-500 font-semibold capitalize">
+        {/* Date & Active User Context */}
+        <div className="self-start sm:self-auto flex items-center gap-3 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg text-xs shadow-2xs">
+          <span className="hidden md:inline text-slate-500 dark:text-slate-400 font-medium truncate max-w-[180px]">
+            {displayName}
+          </span>
+          <span className="hidden md:inline text-slate-300 dark:text-slate-600">&middot;</span>
+          <span className="text-slate-500 dark:text-slate-400 font-medium capitalize">
             {isMs ? 'hari ini' : 'today'}
           </span>
-          <span className="text-slate-800 font-bold tracking-tight tabular-nums">
+          <span className="text-slate-800 dark:text-slate-200 font-bold tracking-tight tabular-nums">
             {formattedTodayDate}
           </span>
         </div>

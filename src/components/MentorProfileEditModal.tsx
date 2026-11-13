@@ -42,7 +42,6 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
   const [avatarUrl, setAvatarUrl] = useState(mentor.avatarUrl || '');
   const [availableDays, setAvailableDays] = useState(mentor.availableDays);
   const [bio, setBio] = useState(mentor.bio);
-  const [pin, setPin] = useState(mentor.pin || '1234');
   const [expertise, setExpertise] = useState<string[]>(mentor.expertise || []);
   const [newExpertiseInput, setNewExpertiseInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -58,7 +57,6 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
       setAvatarUrl(mentor.avatarUrl || '');
       setAvailableDays(mentor.availableDays);
       setBio(mentor.bio);
-      setPin(mentor.pin || '1234');
       setExpertise(mentor.expertise || []);
       setSuccessToast(null);
     }
@@ -93,7 +91,6 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
       avatarUrl: avatarUrl.trim() || mentor.avatarUrl,
       availableDays: availableDays.trim(),
       bio: bio.trim(),
-      pin: pin.trim() || '1234',
       expertise: expertise.length > 0 ? expertise : ['Bimbingan Keusahawanan', 'Pemasaran']
     };
 
@@ -169,7 +166,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
               />
             </div>
 
@@ -182,7 +179,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
               />
             </div>
           </div>
@@ -198,7 +195,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 required
                 value={agency}
                 onChange={(e) => setAgency(e.target.value)}
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
               />
             </div>
 
@@ -212,44 +209,24 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="No. Telefon / WhatsApp"
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
               />
             </div>
           </div>
 
-          {/* 2-Column Row 3: Emel + PIN */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                Emel <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Emel"
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200">
-                  PIN Keselamatan <span className="text-rose-500">*</span>
-                </label>
-                <span className="text-[10px] text-slate-400 font-medium">4-Digit</span>
-              </div>
-              <input
-                type="text"
-                maxLength={6}
-                required
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                placeholder="PIN Keselamatan"
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-              />
-            </div>
+          {/* Row 3: Emel Rasmi */}
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
+              Emel Rasmi Mentor <span className="text-rose-500">*</span>
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Emel rasmi UMK / agensi"
+              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+            />
           </div>
 
           <div>
@@ -262,7 +239,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
               value={availableDays}
               onChange={(e) => setAvailableDays(e.target.value)}
               placeholder="Contoh: Setiap Isnin & Rabu (10:00 AM - 1:00 PM)"
-              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
             />
           </div>
 
@@ -297,7 +274,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 value={newExpertiseInput}
                 onChange={(e) => setNewExpertiseInput(e.target.value)}
                 placeholder="Taip bidang pengkhususan baharu..."
-                className="flex-1 px-4.5 py-2.5 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                className="flex-1 px-4.5 py-2.5 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
               />
               <button
                 type="button"
@@ -320,7 +297,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Pengalaman industri, anugerah, atau fokus bimbingan anda..."
-              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
             />
           </div>
 

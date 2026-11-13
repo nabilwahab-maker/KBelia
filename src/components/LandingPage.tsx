@@ -42,6 +42,7 @@ import {
 import { UMKTab } from './UMKHeader';
 import { CapsuleSlot, BusinessListing, YouthProgram, KelantanDistrict } from '../types';
 import { INITIAL_CAPSULE_SLOTS } from '../data/seedData';
+import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -88,8 +89,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       description: 'Kiosk pasang-siap moden dilengkapi kemudahan palam elektrik 13A, Wi-Fi 500Mbps dan sistem kawalan keselamatan berpusat dengan kadar sewa subsidi serendah RM15/hari.',
       badge: 'Kekosongan Sedia Dimohon',
       location: 'Hub UMK Bachok & KB Sentral',
-      imageUrl: '/public/assets/generated/kiosk_modular_kbelia.jpg',
-      stat: '3 Kapsul Strategik',
+      imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
+      stat: `${slots.length} Kapsul Strategik`,
       ctaText: 'Mohon Sewa Kapsul',
       onAction: () => setActiveTab('login')
     },
@@ -100,7 +101,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       description: 'Inovasi kraftangan canting batik tempatan berwajah segar dengan motif flora moden pada kemeja cuban dan totebag kanvas yang menembusi pasaran eksport.',
       badge: 'Usahawan Kraf Bimbingan UMK',
       location: 'Kota Bharu',
-      imageUrl: '/public/assets/generated/batik_canting_kelantan.jpg',
+      imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
       stat: 'Penilaian 4.8 / 5.0',
       ctaText: 'Teroka Direktori Usahawan',
       onAction: () => setActiveTab('login')
@@ -112,7 +113,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       description: 'Kombinasi kopi barista espresso dengan pencuci mulut tradisi seperti Akok Tart dan Kopi Nissem Melaka yang kini beroperasi aktif di kiosk inkubator belia.',
       badge: 'Inkubasi F&B Berjaya',
       location: 'Hub UMK Bachok',
-      imageUrl: '/public/assets/generated/kopi_nissem_melaka.jpg',
+      imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
       stat: '42 Ulasan Pelanggan',
       ctaText: 'Lihat Produk & Menu',
       onAction: () => setActiveTab('login')
@@ -136,10 +137,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     setCurrentSlide(prev => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
-  // Continuous auto-moving horizontal photo strip cards (Pruned to 3 canonical items)
+  // Continuous auto-moving horizontal photo strip cards
   const movingPhotoCards = [
     {
-      img: '/public/assets/generated/kiosk_modular_kbelia.jpg',
+      img: '/assets/generated/kiosk_modular_kbelia.jpg',
       title: 'Kapsul Niaga KB Sentral B1',
       subtitle: 'Ruang Komersil Smart Pod',
       tag: 'RM20/hari',
@@ -148,7 +149,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       type: 'Kiosk Komersil'
     },
     {
-      img: '/public/assets/generated/batik_canting_kelantan.jpg',
+      img: '/assets/generated/batik_canting_kelantan.jpg',
       title: 'Batik Belia Kontemporari',
       subtitle: 'Fesyen & Kraf Moden',
       tag: 'Penarafan 4.8',
@@ -157,7 +158,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       type: 'Kraf & Fesyen'
     },
     {
-      img: '/public/assets/generated/kopi_nissem_melaka.jpg',
+      img: '/assets/generated/kopi_nissem_melaka.jpg',
       title: "Kapsul F&B A1 · Kopi Nissem",
       subtitle: "D'Kelate Artisan Coffee",
       tag: 'RM15/hari',
@@ -473,43 +474,43 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* ========================================================================= */}
-          {/* STATISTIK IMPAK (SOCIAL PROOF) */}
+          {/* STATISTIK EKOSISTEM SEMASA (LIVE METRICS) */}
           {/* ========================================================================= */}
           <div className="pt-6 w-full mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">10</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+              <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 tabular-nums">10</div>
               <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Jajahan Liputan' : 'Districts'}</div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Seluruh Kelantan' : 'Statewide'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">{slots.length}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+              <div className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tabular-nums">{slots.length}</div>
               <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
-              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-bold font-mono">{availableSlotsCount} {isBM ? 'slot sedia' : 'slots ready'}</div>
+              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-bold tabular-nums">{availableSlotsCount} {isBM ? 'slot sedia' : 'slots ready'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white font-mono transition-transform duration-200 group-hover:scale-105 origin-left">500+</div>
-              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Usahawan Belia' : 'Entrepreneurs'}</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Berdaftar aktif' : 'Active Registered'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+              <div className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tabular-nums">{businesses.length}</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Usahawan Direktori' : 'Listed Merchants'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Disahkan SSM' : 'SSM Verified'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">RM2.4M</div>
-              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Dana Disalurkan' : 'Grants Disbursed'}</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Geran & pembiayaan' : 'Seed funding'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+              <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 tabular-nums">{programs.length}</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Program & Geran' : 'Programs & Grants'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Inisiatif aktif' : 'Active initiatives'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">35+</div>
-              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Mentor Industri' : 'Mentors'}</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Industry Mentors'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+              <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums">{INITIAL_MENTOR_PROFILES.length}</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Panel Mentor' : 'Industry Mentors'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Certified mentors'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-2xs hover:border-sky-300 transition-all duration-300 interactive-lift cursor-default group">
-              <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 font-mono transition-transform duration-200 group-hover:scale-105 origin-left">94.8%</div>
-              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Kadar Kejayaan' : 'Success Rate'}</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Inkubasi perniagaan' : 'Business incubation'}</div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+              <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 tabular-nums">50%</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Subsidi Sewaan' : 'Rental Subsidy'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Serendah RM12/hari' : 'From RM12/day'}</div>
             </div>
           </div>
 
@@ -1019,7 +1020,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <div>
                     <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-slate-800">
                       <img 
-                        src={slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia.jpg'} 
+                        src={slot.imageUrl || '/assets/generated/kiosk_modular_kbelia.jpg'} 
                         alt={slot.name} 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                       />
@@ -1424,8 +1425,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* MODAL 2: LEGAL & PRIVACY VIEWER (CHECKLIST ITEM 12) */}
       {/* ========================================================================= */}
       {legalModalType && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
-          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden my-8">
+        <div
+          className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setLegalModalType(null)}
+        >
+          <div
+            className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-5 kbelia-important-header dark:bg-slate-800/80 text-slate-800 dark:text-slate-100 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
               <h3 className="font-extrabold text-base">
                 {legalModalType === 'privacy' ? 'Dasar Privasi & Perlindungan Data' : 'Terma & Syarat Perkhidmatan'}

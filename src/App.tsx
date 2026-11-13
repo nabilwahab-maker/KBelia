@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
   collection, 
-  onSnapshot 
+  doc,
+  onSnapshot,
+  query,
+  where
 } from 'firebase/firestore';
-import { db } from './lib/firebase';
+import { auth, db } from './lib/firebase';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { useTheme } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
@@ -17,6 +20,9 @@ import {
   GrantApplication,
   MentorProfile,
   MentorshipRegistration,
+  KioskDailySale,
+  MaintenanceTicket,
+  PortalSettings,
   MerchantSubTab,
   AdminSubTab,
   MentorSubTab
@@ -31,7 +37,14 @@ import {
   INITIAL_MENTOR_PROFILES, 
   INITIAL_MENTORSHIP_REGISTRATIONS 
 } from './data/mentorData';
-import { getDeletedIds, seedInitialData } from './services/dataService';
+import { 
+  getDeletedIds, 
+  seedInitialData, 
+  DEFAULT_PORTAL_SETTINGS, 
+  loadLocalPortalSettings,
+  saveMentorshipRegistrationRecord,
+  saveMentorProfileRecord
+} from './services/dataService';
 import { UMKHeader, UMKTab } from './components/UMKHeader';
 import { UMKSidebar } from './components/UMKSidebar';
 import { UMKHomeFeed } from './components/UMKHomeFeed';
@@ -76,7 +89,7 @@ import {
 } from 'lucide-react';
 
 function MainApp() {
-  const { user, userProfile, isAdmin } = useAuth();
+  const { user, userProfile, isAdmin, isDemoSession } = useAuth();
   const { t, language } = useLanguage();
   const isMentor = userProfile?.role === 'mentor';
   const isYouth = !isAdmin && !isMentor;
@@ -85,6 +98,7 @@ function MainApp() {
   // Default to 'landing' page so opening the link presents a welcoming landing page
   const [activeTab, setActiveTab] = useState<UMKTab>('landing');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Sync dark mode class consistently across all tabs
   useEffect(() => {
@@ -95,18 +109,21 @@ function MainApp() {
     }
   }, [theme]);
 
-  // Trigger YouTube-style top progress bar whenever navigating tabs
+  // Trigger top progress bar whenever navigating tabs
   useEffect(() => {
     triggerTopNavigationProgress(400);
   }, [activeTab]);
 
-  // Core Firestore States
+  // Core States
   const [slots, setSlots] = useState<CapsuleSlot[]>(INITIAL_CAPSULE_SLOTS);
   const [businesses, setBusinesses] = useState<BusinessListing[]>(INITIAL_BUSINESSES);
   const [products, setProducts] = useState<ProductItem[]>(INITIAL_PRODUCTS);
   const [programs, setPrograms] = useState<YouthProgram[]>(INITIAL_PROGRAMS);
   const [bookings, setBookings] = useState<CapsuleBooking[]>([]);
   const [grantApplications, setGrantApplications] = useState<GrantApplication[]>([]);
+  const [cashflowRecords, setCashflowRecords] = useState<KioskDailySale[]>([]);
+  const [maintenanceTickets, setMaintenanceTickets] = useState<MaintenanceTicket[]>([]);
+  const [portalSettings, setPortalSettings] = useState<PortalSettings>(() => loadLocalPortalSettings());
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Filters for Kapsul Niaga
@@ -205,142 +222,190 @@ function MainApp() {
 
   const handleUpdateMentorProfile = (updated: MentorProfile) => {
     setMentors(prev => prev.map(m => m.id === updated.id ? updated : m));
+    saveMentorProfileRecord(updated).catch(() => {});
   };
 
   const handleUpdateMentorshipRegistration = (updated: MentorshipRegistration) => {
     setMentorshipRegistrations(prev => prev.map(r => r.id === updated.id ? updated : r));
+    saveMentorshipRegistrationRecord(updated).catch(() => {});
   };
 
   const handleAddMentorshipRegistration = (newReg: MentorshipRegistration) => {
-    setMentorshipRegistrations(prev => [newReg, ...prev]);
+    const withOwner: MentorshipRegistration = {
+      ...newReg,
+      applicantId: newReg.applicantId || user?.uid
+    };
+    setMentorshipRegistrations(prev => [withOwner, ...prev]);
+    saveMentorshipRegistrationRecord(withOwner).catch(() => {});
   };
 
-  // 1. Real-time Slots Listener
+  // Helper to normalize legacy /public/assets paths into /assets
+  const normalizeAsset = (url?: string, fallback = '') => {
+    if (!url) return fallback;
+    return url.replace('/public/assets/generated', '/assets/generated');
+  };
+
+  // 0. Portal Global Settings Listener
+  useEffect(() => {
+    const handleLocalSettings = (e: Event) => {
+      const custom = e as CustomEvent<PortalSettings>;
+      if (custom.detail) setPortalSettings(custom.detail);
+    };
+    window.addEventListener('kbelia_portal_settings_updated', handleLocalSettings);
+
+    const unsubSettings = onSnapshot(
+      doc(db, 'portal_settings', 'global'),
+      (snap) => {
+        if (snap.exists()) {
+          setPortalSettings({ ...DEFAULT_PORTAL_SETTINGS, ...snap.data() } as PortalSettings);
+        }
+      },
+      () => {
+        setPortalSettings(loadLocalPortalSettings());
+      }
+    );
+
+    return () => {
+      window.removeEventListener('kbelia_portal_settings_updated', handleLocalSettings);
+      unsubSettings();
+    };
+  }, [refreshTrigger]);
+
+  // 1. Public Catalog Listeners (Slots, Businesses, Products, Programs) + Demo localStorage merge
   useEffect(() => {
     const deletedIds = getDeletedIds();
+    const loadDemoSlots = (): CapsuleSlot[] => {
+      try {
+        return JSON.parse(localStorage.getItem('kbelia_demo_slots') || '[]');
+      } catch {
+        return [];
+      }
+    };
+
     const unsubSlots = onSnapshot(collection(db, 'capsule_slots'), (snapshot) => {
       const deleted = getDeletedIds();
-      if (!snapshot.empty) {
-        const loadedSlots: CapsuleSlot[] = [];
-        snapshot.forEach((doc) => {
-          // Exclude pruned demo slots
-          if (doc.id.startsWith('cap-') && !INITIAL_CAPSULE_SLOTS.some(s => s.id === doc.id)) {
-            return;
-          }
-          if (!deleted.includes(doc.id)) {
-            const data = doc.data();
-            const seedSlot = INITIAL_CAPSULE_SLOTS.find(s => s.id === doc.id);
-            const imageUrl = (seedSlot?.imageUrl?.startsWith('/public/assets/generated') || !data.imageUrl || data.imageUrl.includes('kiosk_modular_kbelia')) 
-              ? (seedSlot?.imageUrl || data.imageUrl) 
-              : data.imageUrl;
-            loadedSlots.push({
-              id: doc.id,
-              ...data,
-              imageUrl,
-              amenities: Array.isArray(data.amenities) ? data.amenities : ['Palam Elektrik', 'WiFi 500Mbps', 'Rak Display']
-            } as CapsuleSlot);
-          }
-        });
-        const existingSlotIds = new Set(loadedSlots.map(s => s.id));
-        const mergedSlots = [
-          ...loadedSlots, 
-          ...INITIAL_CAPSULE_SLOTS.filter(s => !existingSlotIds.has(s.id) && !deleted.includes(s.id))
-        ];
-        setSlots(mergedSlots);
-      } else {
-        setSlots(INITIAL_CAPSULE_SLOTS.filter(s => !deleted.includes(s.id)));
-      }
-    }, (error) => {
-      console.warn('Using local slots cache:', error.message);
-      setSlots(INITIAL_CAPSULE_SLOTS.filter(s => !deletedIds.includes(s.id)));
+      const loadedSlots: CapsuleSlot[] = [];
+      snapshot.forEach((docSnap) => {
+        if (!deleted.includes(docSnap.id)) {
+          const data = docSnap.data();
+          const seedSlot = INITIAL_CAPSULE_SLOTS.find(s => s.id === docSnap.id);
+          const rawImg = normalizeAsset(data.imageUrl);
+          const imageUrl = (!rawImg || rawImg.includes('kiosk_modular_kbelia'))
+            ? (seedSlot?.imageUrl || rawImg || '/assets/generated/kiosk_modular_kbelia.jpg')
+            : rawImg;
+          loadedSlots.push({
+            id: docSnap.id,
+            ...data,
+            imageUrl,
+            amenities: Array.isArray(data.amenities) ? data.amenities : ['Palam Elektrik', 'WiFi 500Mbps', 'Rak Display']
+          } as CapsuleSlot);
+        }
+      });
+
+      const demoExtra = loadDemoSlots();
+      const seen = new Set(loadedSlots.map(s => s.id));
+      const merged = [
+        ...demoExtra.filter(d => !deleted.includes(d.id) && !seen.has(d.id)),
+        ...loadedSlots,
+        ...INITIAL_CAPSULE_SLOTS.filter(s => !seen.has(s.id) && !demoExtra.some(d => d.id === s.id) && !deleted.includes(s.id))
+      ];
+      setSlots(merged);
+    }, () => {
+      const demoExtra = loadDemoSlots();
+      const seen = new Set(demoExtra.map(s => s.id));
+      setSlots([
+        ...demoExtra.filter(d => !deletedIds.includes(d.id)),
+        ...INITIAL_CAPSULE_SLOTS.filter(s => !seen.has(s.id) && !deletedIds.includes(s.id))
+      ]);
     });
 
     return () => unsubSlots();
   }, [refreshTrigger]);
 
-  // 2. Real-time Businesses Listener (Merges with INITIAL_BUSINESSES to ensure active 3 demo stores appear)
+  // 2. Real-time Businesses Listener
   useEffect(() => {
     const deletedIds = getDeletedIds();
+    const loadDemoBiz = (): BusinessListing[] => {
+      try {
+        return JSON.parse(localStorage.getItem('kbelia_demo_businesses') || '[]');
+      } catch {
+        return [];
+      }
+    };
+
     const unsubBiz = onSnapshot(collection(db, 'businesses'), (snapshot) => {
       const deleted = getDeletedIds();
-      if (!snapshot.empty) {
-        const loadedBiz: BusinessListing[] = [];
-        snapshot.forEach((doc) => {
-          // Exclude pruned demo businesses
-          if (doc.id.startsWith('biz-') && !INITIAL_BUSINESSES.some(b => b.id === doc.id)) {
-            return;
-          }
-          if (!deleted.includes(doc.id)) {
-            const data = doc.data();
-            const seedBiz = INITIAL_BUSINESSES.find(b => b.id === doc.id);
-            const bannerUrl = (seedBiz?.bannerUrl?.startsWith('/public/assets/generated') || !data.bannerUrl || data.bannerUrl.includes('banner_kelantan_landmark') || data.bannerUrl.includes('kiosk_modular'))
-              ? (seedBiz?.bannerUrl || data.bannerUrl)
-              : data.bannerUrl;
-            const logoUrl = (seedBiz?.logoUrl?.startsWith('/public/assets/generated') || !data.logoUrl || data.logoUrl.includes('avatar_youth_') || data.logoUrl.includes('product_kelantan_delights') || data.logoUrl.includes('banner_kelantan'))
-              ? (seedBiz?.logoUrl || data.logoUrl)
-              : data.logoUrl;
-            loadedBiz.push({ 
-              id: doc.id, 
-              ...data,
-              bannerUrl,
-              logoUrl
-            } as BusinessListing);
-          }
-        });
-        const existingBizIds = new Set(loadedBiz.map(b => b.id));
-        const mergedBiz = [
-          ...loadedBiz,
-          ...INITIAL_BUSINESSES.filter(b => !existingBizIds.has(b.id) && !deleted.includes(b.id))
-        ];
-        setBusinesses(mergedBiz);
-      } else {
-        setBusinesses(INITIAL_BUSINESSES.filter(b => !deleted.includes(b.id)));
-      }
-    }, (error) => {
-      console.warn('Using local businesses cache:', error.message);
-      setBusinesses(INITIAL_BUSINESSES.filter(b => !deletedIds.includes(b.id)));
+      const loadedBiz: BusinessListing[] = [];
+      snapshot.forEach((docSnap) => {
+        if (!deleted.includes(docSnap.id)) {
+          const data = docSnap.data();
+          const seedBiz = INITIAL_BUSINESSES.find(b => b.id === docSnap.id);
+          loadedBiz.push({
+            id: docSnap.id,
+            ...data,
+            bannerUrl: normalizeAsset(data.bannerUrl, seedBiz?.bannerUrl || '/assets/generated/banner_kelantan_landmark_1793924253242.jpg'),
+            logoUrl: normalizeAsset(data.logoUrl, seedBiz?.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg')
+          } as BusinessListing);
+        }
+      });
+      const demoExtra = loadDemoBiz();
+      const seen = new Set([...demoExtra.map(d => d.id), ...loadedBiz.map(b => b.id)]);
+      setBusinesses([
+        ...demoExtra.filter(d => !deleted.includes(d.id)),
+        ...loadedBiz.filter(b => !demoExtra.some(d => d.id === b.id)),
+        ...INITIAL_BUSINESSES.filter(b => !seen.has(b.id) && !deleted.includes(b.id))
+      ]);
+    }, () => {
+      const demoExtra = loadDemoBiz();
+      const seen = new Set(demoExtra.map(d => d.id));
+      setBusinesses([
+        ...demoExtra.filter(d => !deletedIds.includes(d.id)),
+        ...INITIAL_BUSINESSES.filter(b => !seen.has(b.id) && !deletedIds.includes(b.id))
+      ]);
     });
 
     return () => unsubBiz();
   }, [refreshTrigger]);
 
-  // 3. Real-time Products Listener (Merges with INITIAL_PRODUCTS to ensure active 3 demo products appear)
+  // 3. Real-time Products Listener
   useEffect(() => {
     const deletedIds = getDeletedIds();
+    const loadDemoProd = (): ProductItem[] => {
+      try {
+        return JSON.parse(localStorage.getItem('kbelia_demo_products') || '[]');
+      } catch {
+        return [];
+      }
+    };
+
     const unsubProd = onSnapshot(collection(db, 'products'), (snapshot) => {
       const deleted = getDeletedIds();
-      if (!snapshot.empty) {
-        const loadedProd: ProductItem[] = [];
-        snapshot.forEach((doc) => {
-          // Exclude pruned demo products
-          if (doc.id.startsWith('prod-') && !INITIAL_PRODUCTS.some(p => p.id === doc.id)) {
-            return;
-          }
-          if (!deleted.includes(doc.id)) {
-            const data = doc.data();
-            const seedProd = INITIAL_PRODUCTS.find(p => p.id === doc.id);
-            const imageUrl = (seedProd?.imageUrl?.startsWith('/public/assets/generated') || !data.imageUrl || data.imageUrl.includes('product_kelantan_delights') || data.imageUrl.includes('kiosk_modular') || data.imageUrl.includes('avatar_') || data.imageUrl.includes('banner_kelantan'))
-              ? (seedProd?.imageUrl || data.imageUrl)
-              : data.imageUrl;
-            loadedProd.push({ 
-              id: doc.id, 
-              ...data,
-              imageUrl
-            } as ProductItem);
-          }
-        });
-        const existingProdIds = new Set(loadedProd.map(p => p.id));
-        const mergedProd = [
-          ...loadedProd,
-          ...INITIAL_PRODUCTS.filter(p => !existingProdIds.has(p.id) && !deleted.includes(p.id))
-        ];
-        setProducts(mergedProd);
-      } else {
-        setProducts(INITIAL_PRODUCTS.filter(p => !deleted.includes(p.id)));
-      }
-    }, (error) => {
-      console.warn('Using local products cache:', error.message);
-      setProducts(INITIAL_PRODUCTS.filter(p => !deletedIds.includes(p.id)));
+      const loadedProd: ProductItem[] = [];
+      snapshot.forEach((docSnap) => {
+        if (!deleted.includes(docSnap.id)) {
+          const data = docSnap.data();
+          const seedProd = INITIAL_PRODUCTS.find(p => p.id === docSnap.id);
+          loadedProd.push({
+            id: docSnap.id,
+            ...data,
+            imageUrl: normalizeAsset(data.imageUrl, seedProd?.imageUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg')
+          } as ProductItem);
+        }
+      });
+      const demoExtra = loadDemoProd();
+      const seen = new Set([...demoExtra.map(d => d.id), ...loadedProd.map(p => p.id)]);
+      setProducts([
+        ...demoExtra.filter(d => !deleted.includes(d.id)),
+        ...loadedProd.filter(p => !demoExtra.some(d => d.id === p.id)),
+        ...INITIAL_PRODUCTS.filter(p => !seen.has(p.id) && !deleted.includes(p.id))
+      ]);
+    }, () => {
+      const demoExtra = loadDemoProd();
+      const seen = new Set(demoExtra.map(d => d.id));
+      setProducts([
+        ...demoExtra.filter(d => !deletedIds.includes(d.id)),
+        ...INITIAL_PRODUCTS.filter(p => !seen.has(p.id) && !deletedIds.includes(p.id))
+      ]);
     });
 
     return () => unsubProd();
@@ -349,78 +414,159 @@ function MainApp() {
   // 4. Real-time Programs Listener
   useEffect(() => {
     const deletedIds = getDeletedIds();
+    const loadDemoProg = (): YouthProgram[] => {
+      try {
+        return JSON.parse(localStorage.getItem('kbelia_demo_programs') || '[]');
+      } catch {
+        return [];
+      }
+    };
+
     const unsubProg = onSnapshot(collection(db, 'programs'), (snapshot) => {
       const deleted = getDeletedIds();
-      if (!snapshot.empty) {
-        const loadedProg: YouthProgram[] = [];
-        snapshot.forEach((doc) => {
-          // Exclude pruned demo programs
-          if (doc.id.startsWith('prog-') && !INITIAL_PROGRAMS.some(p => p.id === doc.id)) {
-            return;
-          }
-          if (!deleted.includes(doc.id)) {
-            loadedProg.push({ id: doc.id, ...doc.data() } as YouthProgram);
-          }
-        });
-        const existingProgIds = new Set(loadedProg.map(p => p.id));
-        const mergedProg = [
-          ...loadedProg,
-          ...INITIAL_PROGRAMS.filter(p => !existingProgIds.has(p.id) && !deleted.includes(p.id))
-        ];
-        setPrograms(mergedProg);
-      } else {
-        setPrograms(INITIAL_PROGRAMS.filter(p => !deleted.includes(p.id)));
-      }
-    }, (error) => {
-      console.warn('Using local programs cache:', error.message);
-      setPrograms(prev => prev.filter(p => !deletedIds.includes(p.id)));
+      const loadedProg: YouthProgram[] = [];
+      snapshot.forEach((docSnap) => {
+        if (!deleted.includes(docSnap.id)) {
+          loadedProg.push({ id: docSnap.id, ...docSnap.data() } as YouthProgram);
+        }
+      });
+      const demoExtra = loadDemoProg();
+      const seen = new Set([...demoExtra.map(d => d.id), ...loadedProg.map(p => p.id)]);
+      setPrograms([
+        ...demoExtra.filter(d => !deleted.includes(d.id)),
+        ...loadedProg.filter(p => !demoExtra.some(d => d.id === p.id)),
+        ...INITIAL_PROGRAMS.filter(p => !seen.has(p.id) && !deleted.includes(p.id))
+      ]);
+    }, () => {
+      const demoExtra = loadDemoProg();
+      const seen = new Set(demoExtra.map(d => d.id));
+      setPrograms([
+        ...demoExtra.filter(d => !deletedIds.includes(d.id)),
+        ...INITIAL_PROGRAMS.filter(p => !seen.has(p.id) && !deletedIds.includes(p.id))
+      ]);
     });
 
     return () => unsubProg();
   }, [refreshTrigger]);
 
-  // 5. Real-time Bookings Listener
+  // 5. Protected Collections Listeners (Firestore ONLY when Firebase authenticated; Isolated Demo storage otherwise)
   useEffect(() => {
-    const deletedIds = getDeletedIds();
-    const unsubBookings = onSnapshot(collection(db, 'capsule_bookings'), (snapshot) => {
+    const loadDemoProtectedState = () => {
+      try {
+        const deleted = getDeletedIds();
+        const demoBookings: CapsuleBooking[] = JSON.parse(localStorage.getItem('kbelia_demo_bookings') || '[]');
+        setBookings(demoBookings.filter(b => !deleted.includes(b.id)));
+
+        const demoGrants: GrantApplication[] = JSON.parse(localStorage.getItem('kbelia_demo_grants') || '[]');
+        setGrantApplications(demoGrants);
+
+        const demoTickets: MaintenanceTicket[] = JSON.parse(localStorage.getItem('kbelia_demo_maintenance_tickets') || '[]');
+        setMaintenanceTickets(demoTickets);
+
+        if (user?.uid) {
+          const cfRaw = localStorage.getItem(`kbelia_cashflow_records_${user.uid}`);
+          setCashflowRecords(cfRaw ? JSON.parse(cfRaw) : []);
+        } else {
+          setCashflowRecords([]);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    const handleDemoUpdate = () => {
+      loadDemoProtectedState();
+      setRefreshTrigger(prev => prev + 1);
+    };
+
+    window.addEventListener('kbelia_demo_data_updated', handleDemoUpdate);
+    window.addEventListener('kbelia_cashflow_updated', handleDemoUpdate);
+
+    // If unauthenticated or in Demo session, never attach protected Firestore snapshot listeners
+    if (!user || user.isDemo || !auth.currentUser) {
+      loadDemoProtectedState();
+      return () => {
+        window.removeEventListener('kbelia_demo_data_updated', handleDemoUpdate);
+        window.removeEventListener('kbelia_cashflow_updated', handleDemoUpdate);
+      };
+    }
+
+    const bookingsQuery = (isAdmin || isMentor)
+      ? collection(db, 'capsule_bookings')
+      : query(collection(db, 'capsule_bookings'), where('applicantId', '==', user.uid));
+
+    const unsubBookings = onSnapshot(bookingsQuery, (snapshot) => {
       const deleted = getDeletedIds();
-      if (!snapshot.empty) {
-        const loadedBookings: CapsuleBooking[] = [];
-        snapshot.forEach((doc) => {
-          if (!deleted.includes(doc.id)) {
-            loadedBookings.push({ id: doc.id, ...doc.data() } as CapsuleBooking);
-          }
-        });
-        setBookings(loadedBookings);
-      }
+      const loadedBookings: CapsuleBooking[] = [];
+      snapshot.forEach((docSnap) => {
+        if (!deleted.includes(docSnap.id)) {
+          loadedBookings.push({ id: docSnap.id, ...docSnap.data() } as CapsuleBooking);
+        }
+      });
+      setBookings(loadedBookings);
     }, (error) => {
-      console.warn('Bookings fetch note:', error.message);
+      console.warn('Bookings listener notice:', error.message);
+      setBookings([]);
     });
 
-    return () => unsubBookings();
-  }, [refreshTrigger]);
+    const grantsQuery = (isAdmin || isMentor)
+      ? collection(db, 'grant_applications')
+      : query(collection(db, 'grant_applications'), where('applicantId', '==', user.uid));
 
-  // 6. Real-time Grant Applications Listener
-  useEffect(() => {
-    const unsubGrant = onSnapshot(collection(db, 'grant_applications'), (snapshot) => {
-      if (!snapshot.empty) {
-        const loadedGrants: GrantApplication[] = [];
-        snapshot.forEach((doc) => {
-          loadedGrants.push({ id: doc.id, ...doc.data() } as GrantApplication);
-        });
-        setGrantApplications(loadedGrants);
-      } else {
-        setGrantApplications([]);
-      }
+    const unsubGrants = onSnapshot(grantsQuery, (snapshot) => {
+      const loaded: GrantApplication[] = [];
+      snapshot.forEach((docSnap) => {
+        loaded.push({ id: docSnap.id, ...docSnap.data() } as GrantApplication);
+      });
+      setGrantApplications(loaded);
     }, (error) => {
-      console.warn('Grant applications fetch note:', error.message);
+      console.warn('Grants listener notice:', error.message);
+      setGrantApplications([]);
     });
 
-    return () => unsubGrant();
-  }, [refreshTrigger]);
+    const cashflowQuery = (isAdmin || isMentor)
+      ? collection(db, 'cashflow_records')
+      : query(collection(db, 'cashflow_records'), where('ownerId', '==', user.uid));
 
-  // Auto-sync initial 30 demo stores and 40 products to Firestore once
+    const unsubCashflow = onSnapshot(cashflowQuery, (snapshot) => {
+      const loaded: KioskDailySale[] = [];
+      snapshot.forEach((docSnap) => {
+        loaded.push({ id: docSnap.id, ...docSnap.data() } as KioskDailySale);
+      });
+      setCashflowRecords(loaded);
+    }, (error) => {
+      console.warn('Cashflow listener notice:', error.message);
+      setCashflowRecords([]);
+    });
+
+    const ticketsQuery = isAdmin
+      ? collection(db, 'maintenance_tickets')
+      : query(collection(db, 'maintenance_tickets'), where('ownerId', '==', user.uid));
+
+    const unsubTickets = onSnapshot(ticketsQuery, (snapshot) => {
+      const loaded: MaintenanceTicket[] = [];
+      snapshot.forEach((docSnap) => {
+        loaded.push({ id: docSnap.id, ...docSnap.data() } as MaintenanceTicket);
+      });
+      setMaintenanceTickets(loaded);
+    }, (error) => {
+      console.warn('Tickets listener notice:', error.message);
+      setMaintenanceTickets([]);
+    });
+
+    return () => {
+      window.removeEventListener('kbelia_demo_data_updated', handleDemoUpdate);
+      window.removeEventListener('kbelia_cashflow_updated', handleDemoUpdate);
+      unsubBookings();
+      unsubGrants();
+      unsubCashflow();
+      unsubTickets();
+    };
+  }, [user?.uid, user?.isDemo, isAdmin, isMentor, refreshTrigger]);
+
+  // Auto-seed catalog once only when authenticated as Firebase Admin
   useEffect(() => {
+    if (!user || user.isDemo || !auth.currentUser || !isAdmin) return;
     try {
       const seeded = localStorage.getItem('kbelia_seeded_v30');
       if (!seeded) {
@@ -430,10 +576,10 @@ function MainApp() {
           }
         });
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
-  }, []);
+  }, [user?.uid, user?.isDemo, isAdmin]);
 
   // Synchronize slot occupancy with approved/pending bookings and active registered tenants
   const enrichedSlots = React.useMemo(() => {
@@ -554,6 +700,7 @@ function MainApp() {
           onClose={() => setIsBookingModalOpen(false)}
           selectedSlot={selectedSlotForBooking}
           allSlots={enrichedSlots}
+          portalSettings={portalSettings}
           onBookingSuccess={triggerRefresh}
         />
 
@@ -594,6 +741,7 @@ function MainApp() {
           onClose={() => setIsBookingModalOpen(false)}
           selectedSlot={selectedSlotForBooking}
           allSlots={enrichedSlots}
+          portalSettings={portalSettings}
           onBookingSuccess={triggerRefresh}
         />
 
@@ -623,6 +771,7 @@ function MainApp() {
           onClose={() => setIsBookingModalOpen(false)}
           selectedSlot={selectedSlotForBooking}
           allSlots={enrichedSlots}
+          portalSettings={portalSettings}
           onBookingSuccess={triggerRefresh}
         />
 
@@ -647,6 +796,11 @@ function MainApp() {
         setActiveTab={setActiveTab}
         isSidebarCollapsed={isSidebarCollapsed}
         setIsSidebarCollapsed={setIsSidebarCollapsed}
+        onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
+        onSelectMerchantSubTab={(sub) => {
+          setActiveTab('merchant');
+          setMerchantSubTab(sub);
+        }}
         onOpenBooking={handleOpenNewBooking}
         slots={enrichedSlots}
         businesses={businesses}
@@ -659,12 +813,15 @@ function MainApp() {
       {/* 2. MAIN APPLICATION CONTAINER (Sidebar + Content Grid) */}
       <div className="flex-1 flex overflow-hidden min-h-0 relative">
         
-        {/* Left Collapsible Sidebar */}
+        {/* Left Collapsible Sidebar + Responsive Mobile Drawer */}
         <UMKSidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           isCollapsed={isSidebarCollapsed}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
           onOpenBooking={handleOpenNewBooking}
+          onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
           merchantSubTab={merchantSubTab}
           onSelectMerchantSubTab={(sub) => {
             setActiveTab('merchant');
@@ -682,14 +839,23 @@ function MainApp() {
           }}
         />
 
-        {/* Center/Right Dynamic Body - Fully stretched for full-screen mode */}
+        {/* Center/Right Dynamic Body */}
         <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3.5 lg:p-4 w-full max-w-none min-w-0 scroll-smooth bg-slate-50 dark:bg-slate-900">
           
-          {/* Universal Dashboard Banner Header following reference layout */}
+          {/* Portal Maintenance / Announcement Bar from Admin Settings */}
+          {portalSettings.systemStatus === 'maintenance' && !isAdmin && (
+            <div className="mb-3 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3">
+              <span className="font-semibold">
+                Mod Penyelenggaraan Sistem Aktif — Sebahagian permohonan baharu ditutup buat sementara waktu. {portalSettings.portalAnnouncement}
+              </span>
+            </div>
+          )}
+
+          {/* Universal Dashboard Banner Header */}
           <DashboardBannerHeader
             activeTab={activeTab}
             role={isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia'}
-            userName={userProfile?.fullName || user?.displayName || 'MUHAMMAD NABIL BIN ABDUL WAHAB'}
+            userName={userProfile?.fullName || user?.displayName || 'Pengguna KBelia'}
             onNavigateHome={() => setActiveTab('home')}
             onNavigateTab={(tab) => setActiveTab(tab)}
           />
@@ -708,6 +874,8 @@ function MainApp() {
                     grantApplications={grantApplications}
                     mentorshipRegistrations={mentorshipRegistrations}
                     mentors={mentors}
+                    maintenanceTickets={maintenanceTickets}
+                    portalSettings={portalSettings}
                     onUpdateMentor={handleUpdateMentorProfile}
                     onRefresh={triggerRefresh}
                     activeSubTab={adminSubTab}
@@ -725,7 +893,7 @@ function MainApp() {
                     onUpdateRegistration={handleUpdateMentorshipRegistration}
                     onUpdateMentor={handleUpdateMentorProfile}
                     onAddRegistration={handleAddMentorshipRegistration}
-                    onBackToHome={() => setActiveTab('merchant')}
+                    onBackToHome={() => setActiveTab('hepa')}
                     onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
                     onOpenAdminDashboard={() => setActiveTab('admin')}
                     activeSubTab={mentorSubTab}
@@ -743,17 +911,23 @@ function MainApp() {
                     myBookings={myBookings}
                     slots={enrichedSlots}
                     grantApplications={grantApplications.filter(g => g.applicantId === user?.uid || (user?.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase()))}
+                    cashflowRecords={cashflowRecords}
+                    maintenanceTickets={maintenanceTickets}
+                    mentorshipRegistrations={mentorshipRegistrations.filter(r => r.applicantId === user?.uid || (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))}
                     onViewOfferLetter={handleViewOfferLetter}
                     onOpenTenancyAgreement={(booking) => {
                       setSelectedBookingForTenancy(booking);
                       setIsTenancyModalOpen(true);
                     }}
                     onOpenVerification={(refCode) => {
-                      setVerificationRefCode(refCode || 'KBN-KB-2026-8819');
+                      setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');
                       setIsVerificationModalOpen(true);
                     }}
                     onOpenBookingModal={handleOpenNewBooking}
                     onOpenBookingTab={() => setActiveTab('academic')}
+                    onOpenSettingsTab={() => setActiveTab('settings')}
+                    onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
+                    onOpenMaintenanceModal={() => setIsMaintenanceModalOpen(true)}
                     onRefresh={triggerRefresh}
                     activeSubTab={merchantSubTab}
                     onSelectSubTab={setMerchantSubTab}
@@ -904,6 +1078,8 @@ function MainApp() {
                   grantApplications={grantApplications}
                   mentorshipRegistrations={mentorshipRegistrations}
                   mentors={mentors}
+                  maintenanceTickets={maintenanceTickets}
+                  portalSettings={portalSettings}
                   onUpdateMentor={handleUpdateMentorProfile}
                   onRefresh={triggerRefresh}
                   activeSubTab={adminSubTab}
@@ -913,22 +1089,48 @@ function MainApp() {
             )
           )}
 
-          {/* PORTAL MENTOR: HAB BIMBINGAN */}
+          {/* PORTAL MENTOR: HAB BIMBINGAN (STRICT ROLE GUARD) */}
           {activeTab === 'mentor' && (
-            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
-              <MentorPortal
-                mentors={mentors}
-                registrations={mentorshipRegistrations}
-                onUpdateRegistration={handleUpdateMentorshipRegistration}
-                onUpdateMentor={handleUpdateMentorProfile}
-                onAddRegistration={handleAddMentorshipRegistration}
-                onBackToHome={() => setActiveTab('home')}
-                onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
-                onOpenAdminDashboard={() => setActiveTab('admin')}
-                activeSubTab={mentorSubTab}
-                onSelectSubTab={setMentorSubTab}
-              />
-            </div>
+            !isMentor && !isAdmin ? (
+              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-8 text-center space-y-4 shadow-2xs">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                  <GraduationCap className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                    {language === 'en' ? 'Certified Mentor Access Only' : 'Akses Khusus Mentor Bertauliah Sahaja'}
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                    {language === 'en'
+                      ? 'The Mentor Coaching Hub is reserved for certified UMK & INSKEN academic mentors.'
+                      : 'Hab Bimbingan Mentor dikhaskan kepada panel mentor bertauliah UMK & agensi keusahawanan.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('home')}
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>{language === 'en' ? 'Back to Dashboard' : 'Kembali ke Laman Utama'}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+                <MentorPortal
+                  mentors={mentors}
+                  registrations={mentorshipRegistrations}
+                  onUpdateRegistration={handleUpdateMentorshipRegistration}
+                  onUpdateMentor={handleUpdateMentorProfile}
+                  onAddRegistration={handleAddMentorshipRegistration}
+                  onBackToHome={() => setActiveTab('hepa')}
+                  onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
+                  onOpenAdminDashboard={() => setActiveTab('admin')}
+                  activeSubTab={mentorSubTab}
+                  onSelectSubTab={setMentorSubTab}
+                />
+              </div>
+            )
           )}
 
           {/* MERCHANT PORTAL: BISNES SAYA (KHUSUS BELIA) */}
@@ -989,17 +1191,23 @@ function MainApp() {
                   myBookings={myBookings}
                   slots={enrichedSlots}
                   grantApplications={grantApplications.filter(g => g.applicantId === user?.uid || (user?.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase()))}
+                  cashflowRecords={cashflowRecords}
+                  maintenanceTickets={maintenanceTickets}
+                  mentorshipRegistrations={mentorshipRegistrations.filter(r => r.applicantId === user?.uid || (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))}
                   onViewOfferLetter={handleViewOfferLetter}
                   onOpenTenancyAgreement={(booking) => {
                     setSelectedBookingForTenancy(booking);
                     setIsTenancyModalOpen(true);
                   }}
                   onOpenVerification={(refCode) => {
-                    setVerificationRefCode(refCode || 'KBN-KB-2026-8819');
+                    setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');
                     setIsVerificationModalOpen(true);
                   }}
                   onOpenBookingModal={handleOpenNewBooking}
                   onOpenBookingTab={() => setActiveTab('academic')}
+                  onOpenSettingsTab={() => setActiveTab('settings')}
+                  onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
+                  onOpenMaintenanceModal={() => setIsMaintenanceModalOpen(true)}
                   onRefresh={triggerRefresh}
                   activeSubTab={merchantSubTab}
                   onSelectSubTab={setMerchantSubTab}
@@ -1027,6 +1235,7 @@ function MainApp() {
         onClose={() => setIsBookingModalOpen(false)}
         selectedSlot={selectedSlotForBooking}
         allSlots={enrichedSlots}
+        portalSettings={portalSettings}
         onBookingSuccess={triggerRefresh}
       />
 
@@ -1064,6 +1273,7 @@ function MainApp() {
       <OfferLetterModal
         isOpen={isOfferLetterOpen}
         booking={selectedBookingForOffer}
+        slots={enrichedSlots}
         onClose={() => setIsOfferLetterOpen(false)}
         onOpenVerification={(refCode) => {
           if (refCode) setVerificationRefCode(refCode);
@@ -1076,6 +1286,7 @@ function MainApp() {
         <DigitalTenancyAgreementModal
           isOpen={isTenancyModalOpen}
           booking={selectedBookingForTenancy}
+          slots={enrichedSlots}
           onClose={() => setIsTenancyModalOpen(false)}
           onAgreementSigned={() => triggerRefresh()}
         />
@@ -1085,6 +1296,8 @@ function MainApp() {
       <PublicVerificationModal
         isOpen={isVerificationModalOpen}
         defaultRefCode={verificationRefCode}
+        bookings={bookings}
+        businesses={businesses}
         onClose={() => setIsVerificationModalOpen(false)}
       />
 
@@ -1093,17 +1306,18 @@ function MainApp() {
         isOpen={isStatusDocumentsModalOpen}
         onClose={() => setIsStatusDocumentsModalOpen(false)}
         userBooking={myBookings[0] || null}
-        grantApplications={grantApplications}
-        mentorshipRegistrations={mentorshipRegistrations}
+        grantApplications={grantApplications.filter(g => g.applicantId === user?.uid || (user?.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase()))}
+        mentorshipRegistrations={mentorshipRegistrations.filter(r => r.applicantId === user?.uid || (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))}
         onOpenBooking={handleOpenNewBooking}
         onOpenGrantModal={handleOpenGrantModal}
         onOpenMentorship={() => setIsMentorshipModalOpen(true)}
         onOpenVerification={(refCode) => {
-          setVerificationRefCode(refCode || 'KBN-KB-2026-8819');
+          setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');
           setIsVerificationModalOpen(true);
         }}
         onCancelMentorship={(regId) => {
-          setMentorshipRegistrations(prev => prev.map(r => r.id === regId ? { ...r, status: 'cancelled' } : r));
+          const target = mentorshipRegistrations.find(r => r.id === regId);
+          if (target) handleUpdateMentorshipRegistration({ ...target, status: 'cancelled' });
         }}
       />
 
@@ -1111,8 +1325,8 @@ function MainApp() {
       <KioskCashflowModal
         isOpen={isCashflowModalOpen}
         onClose={() => setIsCashflowModalOpen(false)}
-        kioskName={myBookings[0]?.slotName || 'Kiosk Modular #CAP-KB-01'}
-        businessName={myBusiness?.businessName || 'Kopi Tok Bali & Pastri Pantai'}
+        kioskName={myBookings[0]?.slotName || 'Kiosk Modular KBelia'}
+        businessName={myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Anda'}
       />
 
       {/* 8. Micro-Learning Academy Modal */}
@@ -1127,15 +1341,15 @@ function MainApp() {
         onClose={() => setIsMentorshipModalOpen(false)}
         mentors={mentors}
         onBookMentorship={handleAddMentorshipRegistration}
-        defaultEntrepreneurName={user?.displayName || 'Ahmad Nabil Bin Yusoff'}
-        defaultBusinessName={myBusiness?.businessName || 'Kopi Tok Bali & Pastri Pantai'}
+        defaultEntrepreneurName={userProfile?.fullName || user?.displayName || 'Usahawan Belia'}
+        defaultBusinessName={myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Anda'}
       />
 
       {/* 10. Kiosk Maintenance Modal */}
       <KioskMaintenanceModal
         isOpen={isMaintenanceModalOpen}
-        defaultSlotCode={myBookings[0]?.slotCode || 'CAP-KB-01'}
-        defaultKioskName={myBookings[0]?.slotName || 'Hub Belia KB Sentral'}
+        defaultSlotCode={myBookings[0]?.slotCode || 'CAP-UMK-01'}
+        defaultKioskName={myBookings[0]?.slotName || 'Kiosk Modular KBelia'}
         onClose={() => setIsMaintenanceModalOpen(false)}
       />
 

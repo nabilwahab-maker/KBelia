@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { 
   FileText, 
   X, 
@@ -9,14 +9,16 @@ import {
   ShieldCheck,
   RotateCcw
 } from 'lucide-react';
-import { CapsuleBooking } from '../types';
-import { maskMyKad } from '../utils/securityUtils';
-import { openAndPrintDocument, printHtmlViaIframe, downloadHtmlDocument, formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
+import { CapsuleBooking, CapsuleSlot } from '../types';
+import { signBookingTenancyAgreement } from '../services/dataService';
+import { showToast } from './ToastNotification';
+import { openAndPrintDocument, downloadHtmlDocument, formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
 
 interface DigitalTenancyAgreementModalProps {
   isOpen: boolean;
   onClose: () => void;
   booking: CapsuleBooking;
+  slots?: CapsuleSlot[];
   onAgreementSigned?: (bookingId: string) => void;
 }
 
@@ -24,17 +26,29 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
   isOpen,
   onClose,
   booking,
+  slots = [],
   onAgreementSigned
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const agreementRef = useRef<HTMLDivElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSignature, setHasSignature] = useState(false);
-  const [isSigned, setIsSigned] = useState(false);
+  const [isSigned, setIsSigned] = useState(Boolean(booking?.tenancySigned));
+  const [isSaving, setIsSaving] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
 
+  useEffect(() => {
+    if (isOpen) {
+      setIsSigned(Boolean(booking?.tenancySigned));
+      setHasSignature(false);
+    }
+  }, [isOpen, booking?.id, booking?.tenancySigned]);
+
   if (!isOpen) return null;
+
+  const matchedSlot = slots.find(s => s.id === booking.slotId || s.code === booking.slotCode);
+  const monthlyRate = booking.monthlyRate || matchedSlot?.monthlyRate || 150;
 
   // Drawing Canvas Handlers
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -84,10 +98,27 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
     setHasSignature(false);
   };
 
-  const handleConfirmSignature = () => {
-    setIsSigned(true);
-    if (onAgreementSigned) {
-      onAgreementSigned(booking.id);
+  const handleConfirmSignature = async () => {
+    try {
+      setIsSaving(true);
+      await signBookingTenancyAgreement(booking.id, booking.applicantName || 'Penyewa KBelia');
+      setIsSigned(true);
+      showToast({
+        type: 'success',
+        title: 'Perjanjian Dimeterai',
+        message: `Perjanjian sewaan kapsul ${booking.slotCode} telah disahkan dan disimpan.`
+      });
+      if (onAgreementSigned) {
+        onAgreementSigned(booking.id);
+      }
+    } catch (err: any) {
+      showToast({
+        type: 'error',
+        title: 'Ralat Pengesahan',
+        message: err?.message || 'Gagal menyimpan pengesahan tandatangan digital.'
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -140,10 +171,10 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
 
           <ol className="list-decimal pl-4 space-y-2 text-[11px]">
             <li><strong>Premis:</strong> Kiosk Kapsul bertanda kod <strong>{booking.slotCode}</strong> bertempat di <strong>{booking.hubLocation}</strong>.</li>
-            <li><strong>Kadar Sewa Bersubsidi:</strong> Kadar sewa bulanan adalah sebanyak <strong>RM 150.00 sebulan</strong> (selepas penolakan subsidi 50% tajaan dana usahawan belia negeri).</li>
+            <li><strong>Kadar Sewa Bersubsidi:</strong> Kadar sewa bulanan adalah sebanyak <strong>RM {monthlyRate.toFixed(2)} sebulan</strong> (selepas penolakan subsidi tajaan dana usahawan belia negeri).</li>
             <li><strong>Tempoh Penyewaan & Operasi:</strong> Tempoh penyewaan adalah selama <strong>{booking.durationMonths} bulan</strong> bermula dari tarikh mula operasi <strong>{formatDisplayDate(booking.startDate)}</strong> sehingga tarikh akhir beroperasi pada <strong>{calculateOperationEndDate(booking.startDate, booking.durationMonths)}</strong>.</li>
             <li><strong>Kebersihan & Tatatertib:</strong> Penyewa wajib menjaga kebersihan ruang kiosk, mematuhi standard pensijilan Halal dan arahan pihak berkuasa tempatan (PBT).</li>
-            <li><strong>Hak Eksklusif:</strong> Kiosk ini tidak boleh disewakan kepada pihak ketiga (*strictly no Ali-Baba sub-leasing*).</li>
+            <li><strong>Hak Eksklusif:</strong> Kiosk ini tidak boleh disewakan kepada pihak ketiga (dilarang sewa atas sewa).</li>
           </ol>
         </div>
 
@@ -187,11 +218,11 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                 </span>
                 <button
                   type="button"
-                  disabled={!hasSignature}
+                  disabled={!hasSignature || isSaving}
                   onClick={handleConfirmSignature}
                   className="py-2 px-5 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-40 transition-all shadow-sm cursor-pointer"
                 >
-                  Sahkan & Meterai Perjanjian
+                  {isSaving ? 'Menyimpan...' : 'Sahkan & Meterai Perjanjian'}
                 </button>
               </div>
             </div>

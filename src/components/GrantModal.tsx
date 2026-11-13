@@ -13,7 +13,7 @@ import {
   FileCheck2,
   FileText
 } from 'lucide-react';
-import { BusinessCategory, GrantApplication } from '../types';
+import { BusinessCategory, GrantApplication, PortalSettings } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { createGrantApplication } from '../services/dataService';
 import confetti from 'canvas-confetti';
@@ -26,6 +26,7 @@ interface GrantModalProps {
   onSuccess?: (grant: GrantApplication) => void;
   initialProgramTitle?: string;
   initialGrantAmount?: string;
+  portalSettings?: PortalSettings;
 }
 
 const CATEGORIES: BusinessCategory[] = [
@@ -37,20 +38,36 @@ const CATEGORIES: BusinessCategory[] = [
   'Runcit & Gaya Hidup'
 ];
 
+const BANKS = [
+  'Maybank',
+  'CIMB Bank',
+  'Bank Islam Malaysia',
+  'RHB Bank',
+  'Bank Simpanan Nasional (BSN)',
+  'Public Bank',
+  'Bank Muamalat',
+  'Hong Leong Bank'
+];
+
 export const GrantModal: React.FC<GrantModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
   initialProgramTitle = 'Dana Benih Usahawan Belia Kelantan (RM3,000)',
-  initialGrantAmount = 'RM3,000'
+  initialGrantAmount = 'RM3,000',
+  portalSettings
 }) => {
   const { user, userProfile, openLoginModal } = useAuth();
+  const isMaintenanceMode = portalSettings?.systemStatus === 'maintenance';
 
   const [programTitle, setProgramTitle] = useState(initialProgramTitle);
   const [grantAmount, setGrantAmount] = useState(initialGrantAmount);
   const [businessName, setBusinessName] = useState(userProfile?.businessName || '');
   const [businessCategory, setBusinessCategory] = useState<BusinessCategory>(userProfile?.category || 'Makanan & Minuman (F&B)');
-  const [district, setDistrict] = useState('Kota Bharu');
+  const [district, setDistrict] = useState(userProfile?.district || 'Kota Bharu');
+  const [ssmNumber, setSsmNumber] = useState(userProfile?.ssmNumber || '');
+  const [bankName, setBankName] = useState(userProfile?.bankName || 'Maybank');
+  const [bankAccountNumber, setBankAccountNumber] = useState(userProfile?.bankAccountNumber || '');
   const [fundPurpose, setFundPurpose] = useState('');
   
   const [loading, setLoading] = useState(false);
@@ -58,11 +75,15 @@ export const GrantModal: React.FC<GrantModalProps> = ({
   const [submitted, setSubmitted] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  // Sync if props change
+  // Sync if props or profile change
   React.useEffect(() => {
     if (initialProgramTitle) setProgramTitle(initialProgramTitle);
     if (initialGrantAmount) setGrantAmount(initialGrantAmount);
     if (userProfile?.businessName && !businessName) setBusinessName(userProfile.businessName);
+    if (userProfile?.ssmNumber && !ssmNumber) setSsmNumber(userProfile.ssmNumber);
+    if (userProfile?.bankName) setBankName(userProfile.bankName);
+    if (userProfile?.bankAccountNumber && !bankAccountNumber) setBankAccountNumber(userProfile.bankAccountNumber);
+    if (userProfile?.district && userProfile.district !== 'Semua Jajahan') setDistrict(userProfile.district);
   }, [initialProgramTitle, initialGrantAmount, userProfile]);
 
   if (!isOpen) return null;
@@ -74,10 +95,19 @@ export const GrantModal: React.FC<GrantModalProps> = ({
       return;
     }
 
+    if (isMaintenanceMode) {
+      setError('Sistem permohonan geran sedang diselenggara sementara waktu.');
+      return;
+    }
+
     const errors: Record<string, string> = {};
 
     if (!businessName.trim()) {
       errors.businessName = 'Sila masukkan nama perniagaan atau jenama anda.';
+    }
+
+    if (!bankAccountNumber.trim() || !/^\d{6,20}$/.test(bankAccountNumber.replace(/[\s-]/g, ''))) {
+      errors.bankAccountNumber = 'Sila masukkan nombor akaun bank perniagaan/pemohon yang sah (digit sahaja).';
     }
 
     if (!fundPurpose.trim()) {
@@ -104,9 +134,9 @@ export const GrantModal: React.FC<GrantModalProps> = ({
         applicantPhone: userProfile?.phone || '-',
         businessName: businessName.trim(),
         businessCategory,
-        ssmNumber: '-',
-        bankName: 'Maybank',
-        bankAccountNumber: '-',
+        ssmNumber: ssmNumber.trim() || 'Dalam Proses / Tiada',
+        bankName,
+        bankAccountNumber: bankAccountNumber.replace(/[\s-]/g, ''),
         fundPurpose: `${fundPurpose.trim()} (Jajahan: ${district})`
       });
 
@@ -222,7 +252,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                   </span>
                   <button
                     type="button"
-                    onClick={openLoginModal}
+                    onClick={() => openLoginModal()}
                     className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg cursor-pointer transition-colors shrink-0"
                   >
                     Log Masuk
@@ -378,26 +408,84 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
-                    Jajahan Operasi Perniagaan: <span className="text-rose-600">*</span>
-                  </label>
-                  <select
-                    value={district}
-                    onChange={(e) => setDistrict(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
-                  >
-                    <option value="Kota Bharu" className="dark:bg-slate-900">Kota Bharu</option>
-                    <option value="Bachok" className="dark:bg-slate-900">Bachok</option>
-                    <option value="Pasir Mas" className="dark:bg-slate-900">Pasir Mas</option>
-                    <option value="Tumpat" className="dark:bg-slate-900">Tumpat</option>
-                    <option value="Tanah Merah" className="dark:bg-slate-900">Tanah Merah</option>
-                    <option value="Machang" className="dark:bg-slate-900">Machang</option>
-                    <option value="Pasir Puteh" className="dark:bg-slate-900">Pasir Puteh</option>
-                    <option value="Kuala Krai" className="dark:bg-slate-900">Kuala Krai</option>
-                    <option value="Gua Musang" className="dark:bg-slate-900">Gua Musang</option>
-                    <option value="Jeli" className="dark:bg-slate-900">Jeli</option>
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
+                      Jajahan Operasi Perniagaan: <span className="text-rose-600">*</span>
+                    </label>
+                    <select
+                      value={district}
+                      onChange={(e) => setDistrict(e.target.value)}
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
+                    >
+                      <option value="Kota Bharu" className="dark:bg-slate-900">Kota Bharu</option>
+                      <option value="Bachok" className="dark:bg-slate-900">Bachok</option>
+                      <option value="Pasir Mas" className="dark:bg-slate-900">Pasir Mas</option>
+                      <option value="Tumpat" className="dark:bg-slate-900">Tumpat</option>
+                      <option value="Tanah Merah" className="dark:bg-slate-900">Tanah Merah</option>
+                      <option value="Machang" className="dark:bg-slate-900">Machang</option>
+                      <option value="Pasir Puteh" className="dark:bg-slate-900">Pasir Puteh</option>
+                      <option value="Kuala Krai" className="dark:bg-slate-900">Kuala Krai</option>
+                      <option value="Gua Musang" className="dark:bg-slate-900">Gua Musang</option>
+                      <option value="Jeli" className="dark:bg-slate-900">Jeli</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
+                      No. Pendaftaran SSM (Jika Ada):
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Cth: 202403123456 (TR0294811-M)"
+                      value={ssmNumber}
+                      onChange={(e) => setSsmNumber(e.target.value)}
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Banking Details for Grant Disbursement */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
+                      Nama Bank Penerima: <span className="text-rose-600">*</span>
+                    </label>
+                    <select
+                      value={bankName}
+                      onChange={(e) => setBankName(e.target.value)}
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
+                    >
+                      {BANKS.map((bank) => (
+                        <option key={bank} value={bank} className="dark:bg-slate-900">{bank}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">
+                      No. Akaun Bank: <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Masukkan nombor akaun bank"
+                      value={bankAccountNumber}
+                      onChange={(e) => {
+                        setBankAccountNumber(e.target.value);
+                        if (fieldErrors.bankAccountNumber) setFieldErrors(prev => ({ ...prev, bankAccountNumber: '' }));
+                      }}
+                      className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border ${
+                        fieldErrors.bankAccountNumber ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-sky-500 focus:ring-sky-500/20'
+                      } text-slate-900 dark:text-white focus:outline-none focus:ring-2 transition-all`}
+                    />
+                    {fieldErrors.bankAccountNumber && (
+                      <p className="mt-1.5 text-[11px] text-rose-600 dark:text-rose-400 flex items-center gap-1 font-medium">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        {fieldErrors.bankAccountNumber}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 

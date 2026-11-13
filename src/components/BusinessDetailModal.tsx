@@ -15,6 +15,7 @@ import {
   Star
 } from 'lucide-react';
 import { BusinessListing, ProductItem } from '../types';
+import { showToast } from './ToastNotification';
 
 interface BusinessDetailModalProps {
   business: BusinessListing | null;
@@ -34,7 +35,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
   const safeProducts = products || [];
   const businessProducts = safeProducts.filter(p => p && p.businessId === business.id);
 
-  const rawWhatsapp = business.whatsapp || business.phone || '';
+  const rawWhatsapp = business.whatsapp || business.ownerPhone || '';
   const cleanWhatsapp = typeof rawWhatsapp === 'string' ? rawWhatsapp.replace(/[^0-9]/g, '') : '';
 
   const createWhatsAppOrderLink = (productName?: string) => {
@@ -53,7 +54,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
       }).catch(console.error);
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('Pautan perniagaan telah disalin ke papan keratan (clipboard)!');
+      showToast('Pautan perniagaan telah disalin ke papan keratan!', 'success');
     }
   };
 
@@ -64,7 +65,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
         {/* Banner with close button */}
         <div className="relative h-40 sm:h-48 bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden">
           <img
-            src={business.bannerUrl || '/public/assets/generated/banner_kelantan_landmark_1793924253242.jpg'}
+            src={business.bannerUrl || '/assets/generated/banner_kelantan_landmark_1793924253242.jpg'}
             alt={business.businessName}
             className="w-full h-full object-cover"
           />
@@ -107,7 +108,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
                 <img
-                  src={business.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
+                  src={business.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                   alt={business.businessName}
                   className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs object-cover bg-white dark:bg-slate-900 shrink-0"
                 />

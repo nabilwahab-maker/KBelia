@@ -44,10 +44,14 @@ import {
   GrantEndorsementLetter, 
   MentoringLogEntry 
 } from '../types';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
+import { saveGrantEndorsementRecord, saveMentoringLogRecord } from '../services/dataService';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
+import { showToast as triggerToast } from './ToastNotification';
 
 interface MentorPortalProps {
   mentors: MentorProfile[];
@@ -67,9 +71,9 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     id: 'end-1',
     endorsementCode: 'PERAKUAN-UMK-2026-8812',
     mentorId: 'mentor-1',
-    mentorName: 'Prof. Madya Dr. Nik Maheran',
-    mentorAgency: 'UMK Institut Keusahawanan (UMK CEED)',
-    mentorDesignation: 'Mentor Pemasaran Strategik & Keusahawanan Digital',
+    mentorName: 'Prof. Madya Dr. Wan Azhar',
+    mentorAgency: 'Universiti Malaysia Kelantan (UMK)',
+    mentorDesignation: 'Pengarah Institut Keusahawanan Universiti Malaysia Kelantan (UMK)',
     menteeId: 'mentee-1',
     menteeName: 'Siti Aminah binti Yusof',
     menteePhone: '60112345678',
@@ -87,9 +91,9 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     id: 'end-2',
     endorsementCode: 'PERAKUAN-UMK-2026-9043',
     mentorId: 'mentor-1',
-    mentorName: 'Prof. Madya Dr. Nik Maheran',
-    mentorAgency: 'UMK Institut Keusahawanan (UMK CEED)',
-    mentorDesignation: 'Mentor Pemasaran Strategik & Keusahawanan Digital',
+    mentorName: 'Prof. Madya Dr. Wan Azhar',
+    mentorAgency: 'Universiti Malaysia Kelantan (UMK)',
+    mentorDesignation: 'Pengarah Institut Keusahawanan Universiti Malaysia Kelantan (UMK)',
     menteeId: 'mentee-2',
     menteeName: 'Muhammad Farhan bin Zulkifli',
     menteePhone: '60198765432',
@@ -107,9 +111,9 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     id: 'end-3',
     endorsementCode: 'PERAKUAN-UMK-2026-7734',
     mentorId: 'mentor-1',
-    mentorName: 'Prof. Madya Dr. Nik Maheran',
-    mentorAgency: 'UMK Institut Keusahawanan (UMK CEED)',
-    mentorDesignation: 'Mentor Pemasaran Strategik & Keusahawanan Digital',
+    mentorName: 'Prof. Madya Dr. Wan Azhar',
+    mentorAgency: 'Universiti Malaysia Kelantan (UMK)',
+    mentorDesignation: 'Pengarah Institut Keusahawanan Universiti Malaysia Kelantan (UMK)',
     menteeId: 'mentee-3',
     menteeName: 'Nurul Izzah binti Razak',
     menteePhone: '60133445566',
@@ -183,8 +187,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   activeSubTab = 'overview',
   onSelectSubTab
 }) => {
-  const { userProfile, isAdmin, openLoginModal, logout } = useAuth();
-  const { t, language } = useLanguage();
+  const { user, userProfile, isAdmin, isDemoSession, openLoginModal } = useAuth();
+  const { language } = useLanguage();
   const isEn = language === 'en';
   const isMentorUser = userProfile?.role === 'mentor';
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -211,11 +215,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     return mentors[0]?.id || 'mentor-1';
   });
 
-  // Endorsements State (Local Storage persistent)
+  // Endorsements State (Local + Firestore persistent)
   const [endorsements, setEndorsements] = useState<GrantEndorsementLetter[]>(() => {
     try {
-      const saved = localStorage.getItem('kbelia_mentor_grant_endorsements');
-      if (saved) return JSON.parse(saved);
+      const saved = localStorage.getItem('kbelia_mentor_endorsements_v1') || localStorage.getItem('kbelia_mentor_grant_endorsements');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch (e) {
       console.error(e);
     }
@@ -225,17 +232,20 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const saveEndorsements = (updated: GrantEndorsementLetter[]) => {
     setEndorsements(updated);
     try {
-      localStorage.setItem('kbelia_mentor_grant_endorsements', JSON.stringify(updated));
+      localStorage.setItem('kbelia_mentor_endorsements_v1', JSON.stringify(updated));
     } catch (e) {
       console.error(e);
     }
   };
 
-  // Logbook State (Local Storage persistent)
+  // Logbook State (Local + Firestore persistent)
   const [logEntries, setLogEntries] = useState<MentoringLogEntry[]>(() => {
     try {
-      const saved = localStorage.getItem('kbelia_mentor_action_logbook');
-      if (saved) return JSON.parse(saved);
+      const saved = localStorage.getItem('kbelia_mentor_logs_v1') || localStorage.getItem('kbelia_mentor_action_logbook');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch (e) {
       console.error(e);
     }
@@ -245,11 +255,45 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const saveLogEntries = (updated: MentoringLogEntry[]) => {
     setLogEntries(updated);
     try {
-      localStorage.setItem('kbelia_mentor_action_logbook', JSON.stringify(updated));
+      localStorage.setItem('kbelia_mentor_logs_v1', JSON.stringify(updated));
     } catch (e) {
       console.error(e);
     }
   };
+
+  // Real-time Firestore sync for non-demo authenticated Mentor/Admin users
+  useEffect(() => {
+    if (!user || isDemoSession || user.isDemo || !auth.currentUser) return;
+
+    const unsubEndorsements = onSnapshot(
+      collection(db, 'mentor_endorsements'),
+      (snap) => {
+        if (!snap.empty) {
+          const items = snap.docs.map(d => d.data() as GrantEndorsementLetter);
+          items.sort((a, b) => (b.issuedAt || '').localeCompare(a.issuedAt || ''));
+          setEndorsements(items);
+        }
+      },
+      (err) => console.warn('Mentor endorsements listener notice:', err)
+    );
+
+    const unsubLogs = onSnapshot(
+      collection(db, 'mentor_logs'),
+      (snap) => {
+        if (!snap.empty) {
+          const items = snap.docs.map(d => d.data() as MentoringLogEntry);
+          items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+          setLogEntries(items);
+        }
+      },
+      (err) => console.warn('Mentor logs listener notice:', err)
+    );
+
+    return () => {
+      unsubEndorsements();
+      unsubLogs();
+    };
+  }, [user, isDemoSession]);
 
   // Filters for Sessions Tab
   const [searchQuery, setSearchQuery] = useState('');
@@ -379,17 +423,22 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
   // Toggle logbook task completion
   const handleToggleLogTask = (logId: string, taskId: string) => {
+    let targetUpdatedLog: MentoringLogEntry | null = null;
     const updated = logEntries.map(log => {
       if (log.id !== logId) return log;
-      return {
+      targetUpdatedLog = {
         ...log,
         actionItems: log.actionItems.map(task => {
           if (task.id !== taskId) return task;
           return { ...task, completed: !task.completed };
         })
       };
+      return targetUpdatedLog;
     });
     saveLogEntries(updated);
+    if (targetUpdatedLog) {
+      void saveMentoringLogRecord(targetUpdatedLog).catch(console.error);
+    }
     showToast('Status semakan tugasan usahawan dikemaskini!');
   };
 
@@ -397,11 +446,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const handleCreateGrantEndorsement = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEndorsementMenteeName || !newEndorsementBusinessName || !newEndorsementJustification) {
-      alert('Sila lengkapkan nama usahawan, nama perniagaan dan ulasan justifikasi perakuan.');
+      triggerToast('Sila lengkapkan nama usahawan, nama perniagaan dan ulasan justifikasi perakuan.', 'error');
       return;
     }
     if (!isEndorsementConfirmed) {
-      alert('Sila tandakan kotak perakuan integriti profesional mentor.');
+      triggerToast('Sila tandakan kotak perakuan integriti profesional mentor.', 'warning');
       return;
     }
 
@@ -433,6 +482,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     };
 
     saveEndorsements([newEndorsement, ...endorsements]);
+    void saveGrantEndorsementRecord(newEndorsement).catch(console.error);
     setIsNewEndorsementModalOpen(false);
     setSelectedEndorsementForView(newEndorsement);
     showToast(`Surat Perakuan Rasmi ${uniqueCode} berjaya dikeluarkan!`);
@@ -449,7 +499,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const handleCreateLogEntry = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newLogMenteeName || !newLogBusinessName || !newLogTopic || !newLogMinutes) {
-      alert('Sila isi nama mentee, bisnes, topik dan minit bimbingan.');
+      triggerToast('Sila isi nama mentee, bisnes, topik dan minit bimbingan.', 'error');
       return;
     }
 
@@ -484,6 +534,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     };
 
     saveLogEntries([newEntry, ...logEntries]);
+    void saveMentoringLogRecord(newEntry).catch(console.error);
     setIsNewLogModalOpen(false);
     showToast('Log jurnal minit bimbingan berjaya direkodkan!');
 
@@ -804,7 +855,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <Clock className="w-3 h-3 text-slate-400" />
                           <span>{reg.preferredDate || 'Akan ditetapkan'} &middot; {reg.preferredTime || '10:00 AM'}</span>
                           <span>&middot;</span>
-                          <span>{reg.mode === 'online' ? 'Google Meet Maya' : 'Bersemuka Kampus'}</span>
+                          <span>{reg.mode === 'Google Meet Maya' ? 'Google Meet Maya' : 'Bersemuka Kampus'}</span>
                         </div>
                       </div>
 
@@ -2149,8 +2200,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Signature & Seal Block */}
             <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:items-end justify-between gap-4 font-sans text-xs">
               <div className="space-y-2">
-                <div className="w-24 h-12 border-b-2 border-slate-800 flex items-end">
-                  <span className="font-serif italic text-emerald-900 font-bold text-sm">N.Maheran</span>
+                <div className="min-w-24 h-12 border-b-2 border-slate-800 flex items-end pb-1">
+                  <span className="font-serif italic text-emerald-900 font-bold text-sm">
+                    {selectedEndorsementForView.mentorName
+                      .replace(/^(Prof\.|Madya|Dr\.|Ts\.|En\.|Puan|Hj\.|Hjh\.)\s*/gi, '')
+                      .trim()
+                      .split(/\s+/)
+                      .slice(0, 2)
+                      .join(' ') || selectedEndorsementForView.mentorName}
+                  </span>
                 </div>
                 <div>
                   <strong className="block text-slate-900">{selectedEndorsementForView.mentorName}</strong>

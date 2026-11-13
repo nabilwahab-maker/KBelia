@@ -124,7 +124,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
               placeholder={t('search_business_ph')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 transition-colors"
             />
           </div>
 
@@ -133,7 +133,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none font-medium text-slate-700 dark:text-white transition-colors"
+              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none font-medium text-slate-700 dark:text-white transition-colors"
             >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
@@ -148,7 +148,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value as KelantanDistrict)}
-              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none font-medium text-slate-700 dark:text-white transition-colors"
+              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none font-medium text-slate-700 dark:text-white transition-colors"
             >
               {DISTRICTS.map((d) => (
                 <option key={d} value={d}>
@@ -189,7 +189,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBusinesses.map((biz) => {
-            const rawPhone = biz.whatsapp || biz.phone || '';
+            const rawPhone = biz.whatsapp || biz.ownerPhone || '';
             const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
             const waGreeting = language === 'en'
               ? `Hello ${biz.businessName}, I saw your business profile on the Kelantan Youth Portal.`
@@ -206,9 +206,9 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                 <div>
                   <div className="relative h-36 bg-slate-100 dark:bg-slate-900 overflow-hidden">
                     <img
-                      src={biz.bannerUrl || '/public/assets/generated/banner_kelantan_landmark_1793924253242.jpg'}
+                      src={biz.bannerUrl || '/assets/generated/banner_kelantan_landmark_1793924253242.jpg'}
                       alt={biz.businessName}
-                      className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
 
@@ -229,7 +229,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
 
                     {/* Logo avatar floating */}
                     <img
-                      src={biz.logoUrl || '/public/assets/generated/product_kelantan_delights_1793924253401.jpg'}
+                      src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                       alt={biz.businessName}
                       className="absolute -bottom-3 left-4 w-12 h-12 rounded-lg border-2 border-white dark:border-slate-800 shadow-sm object-cover bg-white dark:bg-slate-900"
                     />

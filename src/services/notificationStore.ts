@@ -1,13 +1,14 @@
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 import { YouthNotification } from '../types';
 
 const STORAGE_KEY = 'kbelia_live_notifications';
 
 export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
-  // Pemberitahuan Khusus Belia
   {
     id: 'notif-youth-1',
     title: 'Pengambilan Kiosk Modular Sesi 2026',
-    message: 'Permohonan terbuka di Hab Kota Bharu, Bachok, dan Pasir Mas dengan subsidi sewa 50% untuk belia Kelantan.',
+    message: 'Permohonan terbuka di Hab Kota Bharu, Bachok, Tumpat, dan Pasir Mas dengan subsidi sewa sehingga 50% untuk belia Kelantan.',
     category: 'announcement',
     sender: 'Urusetia Pentadbir Belia',
     senderRole: 'admin',
@@ -28,7 +29,6 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     isRead: false,
     actionTab: 'ceed'
   },
-  // Pemberitahuan Khusus Mentor
   {
     id: 'notif-mentor-1',
     title: 'Jadual Klinik Bimbingan Usahawan',
@@ -53,10 +53,9 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     isRead: true,
     actionTab: 'mentor'
   },
-  // Pemberitahuan Khusus Pentadbir
   {
     id: 'notif-admin-1',
-    title: 'Audit Permohonan Kiosk & Geran Menunggu',
+    title: 'Semakan Permohonan Kiosk & Geran Menunggu',
     message: 'Terdapat permohonan baharu dalam barisan menunggu yang memerlukan semakan dan kelulusan rasmi.',
     category: 'status',
     sender: 'Sistem Integriti Pentadbiran',
@@ -69,7 +68,7 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
   {
     id: 'notif-admin-2',
     title: 'Laporan Kuota Kiosk Bulanan Sedia Dijana',
-    message: 'Kadar sewaan dan pematuhan sewa kiosk bagi jajahan Kota Bharu dan Bachok boleh dijana dalam format PDF.',
+    message: 'Kadar sewaan dan pematuhan sewa kiosk bagi semua jajahan boleh dijana dalam format PDF.',
     category: 'announcement',
     sender: 'Urusetia Kewangan',
     senderRole: 'system',
@@ -96,7 +95,6 @@ export const getStoredNotifications = (): YouthNotification[] => {
 export const saveNotifications = (notifs: YouthNotification[]) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notifs));
-    // Trigger custom window event for instant header sync
     window.dispatchEvent(new CustomEvent('kbelia_notifications_updated', { detail: notifs }));
   } catch (e) {
     console.warn('Could not save notifications', e);
@@ -108,6 +106,7 @@ export interface NotificationPayload {
   message: string;
   senderRole?: 'admin' | 'mentor';
   targetRole?: 'youth' | 'mentor' | 'admin' | 'all';
+  targetUserId?: string;
   sender?: string;
   senderName?: string;
   type?: string;
@@ -124,7 +123,8 @@ export function emitAdminOrMentorNotification(
   let title = '';
   let msg = '';
   let role: 'admin' | 'mentor' = senderRole;
-  let targetRole: 'youth' | 'mentor' | 'admin' | 'all' = 'all';
+  let targetRole: 'youth' | 'mentor' | 'admin' | 'all' = 'youth';
+  let targetUserId: string | undefined = undefined;
   let sender = senderName;
   let targetTab = actionTab;
 
@@ -135,26 +135,35 @@ export function emitAdminOrMentorNotification(
     title = titleOrPayload.title;
     msg = titleOrPayload.message;
     role = titleOrPayload.senderRole || 'admin';
-    targetRole = titleOrPayload.targetRole || (role === 'admin' ? 'youth' : 'mentor');
+    // Fixed: default targetRole for both admin and mentor communications is 'youth' unless explicitly specified
+    targetRole = titleOrPayload.targetRole || 'youth';
+    targetUserId = titleOrPayload.targetUserId;
     sender = titleOrPayload.sender || titleOrPayload.senderName || (role === 'mentor' ? 'Mentor UMK' : 'Pentadbir Urusetia');
     targetTab = titleOrPayload.actionTab || 'home';
   }
 
   const current = getStoredNotifications();
   const newNotif: YouthNotification = {
-    id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+    id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
     title,
     message: msg,
     category: role === 'admin' ? 'announcement' : 'reminder',
     sender,
     senderRole: role,
     targetRole,
+    ...(targetUserId ? { targetUserId } : {}),
     timestamp: 'Baru sahaja',
     isRead: false,
     actionTab: targetTab
   };
 
-  const updated = [newNotif, ...current.slice(0, 24)];
+  const updated = [newNotif, ...current.slice(0, 29)];
   saveNotifications(updated);
+
+  // Sync to Firestore when authenticated with Firebase Auth
+  if (auth.currentUser) {
+    setDoc(doc(db, 'notifications', newNotif.id), newNotif).catch(() => {});
+  }
+
   return newNotif;
 }

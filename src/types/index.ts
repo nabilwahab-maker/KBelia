@@ -106,7 +106,7 @@ export interface CapsuleSlot {
   createdAt?: string;
 }
 
-export type BookingStatus = 'pending' | 'approved' | 'rejected';
+export type BookingStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
 
 export interface CapsuleBooking {
   id: string;
@@ -127,6 +127,9 @@ export interface CapsuleBooking {
   pitchNotes: string;
   status: BookingStatus;
   adminNotes?: string;
+  tenancySigned?: boolean;
+  tenancySignedAt?: string;
+  tenancySignatureName?: string;
   createdAt: string;
 }
 
@@ -169,6 +172,7 @@ export interface GrantApplication {
   applicantPhone: string;
   businessName: string;
   businessCategory: BusinessCategory;
+  district?: string;
   ssmNumber?: string;
   bankName: string;
   bankAccountNumber: string;
@@ -192,6 +196,8 @@ export interface DistrictSummary {
 
 export interface KioskDailySale {
   id: string;
+  ownerId?: string;
+  businessName?: string;
   date: string;
   cashSales: number;
   qrSales: number;
@@ -202,6 +208,7 @@ export interface KioskDailySale {
 
 export interface B2BListing {
   id: string;
+  ownerId?: string;
   authorName: string;
   authorBusiness: string;
   district: KelantanDistrict;
@@ -214,6 +221,7 @@ export interface B2BListing {
 
 export interface MaintenanceTicket {
   id: string;
+  ownerId?: string;
   slotCode: string;
   kioskName: string;
   reporterName: string;
@@ -221,6 +229,7 @@ export interface MaintenanceTicket {
   issueCategory: 'Elektrik & Suis' | 'Paip & Air' | 'Pintu & Kunci' | 'Struktur & Bumbung' | 'Lain-lain';
   description: string;
   status: 'received' | 'in_progress' | 'resolved';
+  adminNotes?: string;
   createdAt: string;
 }
 
@@ -242,6 +251,7 @@ export interface MentorProfile {
 
 export interface MentorshipRegistration {
   id: string;
+  applicantId?: string;
   mentorId: string;
   mentorName: string;
   entrepreneurName: string;
@@ -284,9 +294,21 @@ export interface YouthNotification {
   sender?: string;
   senderRole?: 'admin' | 'mentor' | 'system';
   targetRole?: 'youth' | 'mentor' | 'admin' | 'all';
+  targetUserId?: string;
   timestamp: string;
   isRead: boolean;
   actionTab?: string;
+}
+
+export interface PortalSettings {
+  id: string;
+  adminOfficerName?: string;
+  adminHelpdeskPhone?: string;
+  portalSubsidyRate: number;
+  maxLeaseDurationMonths: number;
+  systemStatus: 'operational' | 'maintenance';
+  portalAnnouncement: string;
+  updatedAt?: string;
 }
 
 export interface CartItem {

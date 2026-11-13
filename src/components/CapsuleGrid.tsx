@@ -24,7 +24,7 @@ import {
   X,
   Lock
 } from 'lucide-react';
-import { CapsuleBooking, CapsuleSlot, KelantanDistrict, SlotStatus } from '../types';
+import { CapsuleBooking, CapsuleSlot, PortalSettings, SlotStatus } from '../types';
 import { BudgetSlider } from './BudgetSlider';
 import { Accordion } from './Accordion';
 import { useLanguage } from '../context/LanguageContext';
@@ -33,6 +33,7 @@ import { useAuth } from '../context/AuthContext';
 interface CapsuleGridProps {
   slots: CapsuleSlot[];
   bookings?: CapsuleBooking[];
+  portalSettings?: PortalSettings;
   onSelectSlot: (slot: CapsuleSlot) => void;
   onViewTenantDetail?: (slot: CapsuleSlot) => void;
   onOpenNewBooking: () => void;
@@ -47,6 +48,7 @@ interface CapsuleGridProps {
 export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   slots,
   bookings = [],
+  portalSettings,
   onSelectSlot,
   onViewTenantDetail,
   onOpenNewBooking,
@@ -57,6 +59,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   onBudgetChange: externalSetBudget,
   isReadOnly = false
 }) => {
+  const subsidyRate = portalSettings?.portalSubsidyRate ?? 50;
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const [internalHub, setInternalHub] = useState<string>('Semua');
@@ -76,7 +79,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
     setInternalBudget(val);
   };
 
-  const hubs = ['Semua', 'Hub UMK Bachok', 'Hub Belia Kota Bharu', 'Hub Komuniti Jeli', 'Hub Kraf Tumpat'];
+  const hubs = ['Semua', 'Hub UMK Bachok', 'Hub Belia Kota Bharu', 'Hub Kraf Tumpat', 'Hub Pasir Mas', 'Hub Komuniti Jeli'];
 
   const isFiltered = selectedHub !== 'Semua' || selectedStatus !== 'Semua' || maxBudget < 500 || searchQuery.trim() !== '';
 
@@ -89,8 +92,16 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
   const filteredSlots = (slots || []).filter((slot) => {
     const hubLoc = (slot.hubLocation || '').toLowerCase();
-    const targetHub = (selectedHub || '').toLowerCase().replace('hub ', '');
-    const matchHub = selectedHub === 'Semua' || hubLoc.includes(targetHub);
+    const dist = (slot.district || '').toLowerCase();
+    const matchHub = selectedHub === 'Semua' || (() => {
+      const h = selectedHub.toLowerCase();
+      if (h.includes('bachok')) return hubLoc.includes('bachok') || hubLoc.includes('umk') || dist === 'bachok';
+      if (h.includes('kota bharu')) return hubLoc.includes('kota bharu') || hubLoc.includes('kb sentral') || dist === 'kota bharu';
+      if (h.includes('tumpat')) return hubLoc.includes('tumpat') || dist === 'tumpat';
+      if (h.includes('pasir mas')) return hubLoc.includes('pasir mas') || dist === 'pasir mas';
+      if (h.includes('jeli')) return hubLoc.includes('jeli') || dist === 'jeli';
+      return hubLoc.includes(h.replace('hub ', ''));
+    })();
     const matchStatus = selectedStatus === 'Semua' || slot.status === selectedStatus;
     const matchBudget = !slot.monthlyRate || slot.monthlyRate <= maxBudget;
     const query = searchQuery.trim().toLowerCase();
@@ -214,7 +225,6 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           {/* Right Controls: Filter Count & Reset */}
           <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
               <strong className="font-bold tabular-nums">{filteredSlots.length}</strong> pod sepadan
             </span>
 
@@ -382,9 +392,9 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                 {/* 1. Gambar Kad Berkadar Tetap (H-48) di Atas - Bersih Tanpa Teks Bertindih */}
                 <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
                   <img
-                    src={slot.imageUrl || '/public/assets/generated/kiosk_modular_kbelia.jpg'}
+                    src={slot.imageUrl || '/assets/generated/kiosk_modular_kbelia.jpg'}
                     alt={slot.name}
-                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   />
                   
                   {/* Top Left: Code Badge */}
@@ -423,7 +433,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white/95 dark:bg-slate-800/95 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 shadow-xs backdrop-blur-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span>Tersedia untuk Belia</span>
                       </span>
                     )}
@@ -461,7 +471,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                       {/* Pricing Block */}
                       <div className="text-right shrink-0">
                         <span className="text-[11px] font-semibold text-sky-700 dark:text-sky-400 block mb-0.5">
-                          Subsidi 50%
+                          Subsidi {subsidyRate}%
                         </span>
                         <div>
                           <span className="text-lg font-bold text-slate-900 dark:text-white tabular-nums">RM{slot.monthlyRate}</span>

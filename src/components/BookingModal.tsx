@@ -17,7 +17,7 @@ import {
   Store,
   Check
 } from 'lucide-react';
-import { CapsuleSlot, BusinessCategory } from '../types';
+import { CapsuleSlot, BusinessCategory, PortalSettings } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { createCapsuleBooking } from '../services/dataService';
 import confetti from 'canvas-confetti';
@@ -35,6 +35,7 @@ interface BookingModalProps {
   slot?: CapsuleSlot | null;
   selectedSlot?: CapsuleSlot | null;
   allSlots: CapsuleSlot[];
+  portalSettings?: PortalSettings;
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
@@ -54,6 +55,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   slot,
   selectedSlot,
   allSlots = [],
+  portalSettings,
   isOpen,
   onClose,
   onSuccess,
@@ -63,6 +65,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const handleSuccess = onBookingSuccess || onSuccess;
   const { user, userProfile, openLoginModal } = useAuth();
   const safeAllSlots = allSlots || [];
+  const subsidyRate = portalSettings?.portalSubsidyRate ?? 50;
+  const maxLeaseDuration = portalSettings?.maxLeaseDurationMonths ?? 12;
+  const isMaintenanceMode = portalSettings?.systemStatus === 'maintenance';
+  const todayISO = new Date().toISOString().split('T')[0];
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedSlotId, setSelectedSlotId] = useState<string>(slot?.id || (safeAllSlots[0]?.id || ''));
@@ -137,6 +143,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
   const currentSlot = safeAllSlots.find(s => s && s.id === selectedSlotId) || activeSlot || safeAllSlots[0];
   const isCurrentSlotAvailable = Boolean(currentSlot && currentSlot.status === 'available' && !currentSlot.currentTenantBusinessName);
+  const monthlyRate = Number(currentSlot?.monthlyRate) || 150;
+  const marketRate = subsidyRate > 0 && subsidyRate < 100
+    ? Math.round(monthlyRate / (1 - subsidyRate / 100))
+    : monthlyRate * 2;
 
   const handleNextStep = () => {
     setError(null);
@@ -185,7 +195,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      setError('Sila log masuk dengan akaun Google terlebih dahulu untuk memohon.');
+      setError('Sila log masuk terlebih dahulu untuk memohon.');
+      return;
+    }
+
+    if (isMaintenanceMode) {
+      setError('Sistem permohonan baharu sedang diselenggara buat sementara waktu. Sila cuba sebentar lagi.');
       return;
     }
 
@@ -207,10 +222,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         applicantName: user.displayName || userProfile?.fullName || 'Usahawan Belia',
         applicantEmail: user.email || '',
         applicantPhone: phone || userProfile?.phone || '+60',
+        applicantMyKad: icNumber.trim() || undefined,
         businessName,
         businessCategory,
         durationMonths,
-        startDate: startDate || new Date().toISOString().split('T')[0],
+        startDate: startDate || todayISO,
+        monthlyRate,
         pitchNotes
       });
 
@@ -368,7 +385,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 Log Masuk Diperlukan untuk Memohon
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto mb-6">
-                Sila log masuk dengan akaun Google anda terlebih dahulu supaya status permohonan dan surat tawaran dapat dipautkan terus ke akaun anda.
+                Sila log masuk ke akaun KBelia anda terlebih dahulu supaya status permohonan dan surat tawaran dapat dipautkan terus ke profil anda.
               </p>
               <button
                 type="button"
@@ -378,7 +395,24 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 }}
                 className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 transition-colors shadow-sm cursor-pointer"
               >
-                Log Masuk dengan Google
+                Log Masuk untuk Memohon
+              </button>
+            </div>
+          ) : isMaintenanceMode ? (
+            <div className="text-center py-8">
+              <AlertCircle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
+              <h4 className="text-base font-bold text-slate-800 dark:text-white mb-2">
+                Permohonan Kapsul Ditutup Sementara
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto mb-6">
+                {portalSettings?.portalAnnouncement || 'Sistem sedang menjalani penyelenggaraan berjadual. Sila cuba sebentar lagi.'}
+              </p>
+              <button
+                type="button"
+                onClick={handleResetAndClose}
+                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+              >
+                Tutup
               </button>
             </div>
           ) : submitted ? (
@@ -455,12 +489,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       <div className="grid grid-cols-2 gap-3 text-xs pt-2.5 border-t border-slate-200 dark:border-slate-700">
                         <div className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                           <span className="text-slate-500 text-[10px] font-medium block">Kadar Pasaran Biasa:</span>
-                          <span className="line-through text-slate-400 font-semibold text-xs">RM 300 / bulan</span>
+                          <span className="line-through text-slate-400 font-semibold text-xs tabular-nums">RM {marketRate} / bulan</span>
                         </div>
                         <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40">
-                          <span className="text-emerald-800 dark:text-emerald-300 text-[10px] font-bold block">Kadar Subsidi Belia (50%):</span>
-                          <span className="text-sm sm:text-base font-black text-emerald-700 dark:text-emerald-400">
-                            RM 150 / bulan
+                          <span className="text-emerald-800 dark:text-emerald-300 text-[10px] font-bold block">Kadar Subsidi Belia ({subsidyRate}%):</span>
+                          <span className="text-sm sm:text-base font-black text-emerald-700 dark:text-emerald-400 tabular-nums">
+                            RM {monthlyRate} / bulan
                           </span>
                         </div>
                       </div>
@@ -482,7 +516,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           months: 3,
                           title: '3 Bulan',
                           subtitle: 'Pakej Permulaan',
-                          total: 'RM 450',
+                          total: `RM ${(monthlyRate * 3).toLocaleString()}`,
                           badge: 'Uji Pasaran',
                           badgeColor: 'bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300'
                         },
@@ -490,7 +524,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           months: 6,
                           title: '6 Bulan',
                           subtitle: 'Pakej Semester UMK',
-                          total: 'RM 900',
+                          total: `RM ${(monthlyRate * 6).toLocaleString()}`,
                           badge: 'Paling Popular',
                           badgeColor: 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 font-bold'
                         },
@@ -498,11 +532,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           months: 12,
                           title: '12 Bulan',
                           subtitle: 'Pakej Tahunan Penuh',
-                          total: 'RM 1,800',
+                          total: `RM ${(monthlyRate * 12).toLocaleString()}`,
                           badge: 'Jimat & Stabil',
                           badgeColor: 'bg-sky-50 text-sky-800 border border-sky-200 dark:bg-sky-950/40 dark:text-sky-300'
                         }
-                      ].map((pkg) => {
+                      ].filter(pkg => pkg.months <= maxLeaseDuration).map((pkg) => {
                         const isSelected = durationMonths === pkg.months;
                         return (
                           <button
@@ -537,7 +571,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                             </div>
                             <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-700 flex items-baseline justify-between">
                               <span className="text-[10px] text-slate-400">Jumlah:</span>
-                              <span className="text-xs font-black text-sky-700 dark:text-sky-400">{pkg.total}</span>
+                              <span className="text-xs font-black text-sky-700 dark:text-sky-400 tabular-nums">{pkg.total}</span>
                             </div>
                           </button>
                         );
@@ -554,6 +588,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       <Calendar className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                       <input
                         type="date"
+                        min={todayISO}
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
                         className="w-full pl-11 pr-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 focus:outline-none transition-all cursor-pointer"
@@ -766,7 +801,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       </div>
                       <div>
                         <span className="text-slate-500 text-xs block font-medium">Kadar Sewa Bersubsidi:</span>
-                        <span className="font-bold text-emerald-700 dark:text-emerald-400 text-base">RM 150 / bulan</span>
+                        <span className="font-bold text-emerald-700 dark:text-emerald-400 text-base tabular-nums">RM {monthlyRate} / bulan</span>
                       </div>
                       <div>
                         <span className="text-slate-500 text-xs block font-medium">Tarikh Mula:</span>
@@ -796,19 +831,19 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2 interactive-press interactive-lift group"
+                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2"
                     >
-                      <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" />
+                      <ArrowLeft className="w-4 h-4" />
                       <span>Kembali</span>
                     </button>
                     <button
                       type="button"
                       disabled={loading || !pdpaConsent}
                       onClick={handleSubmit}
-                      className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-50 transition-all shadow-sm flex items-center gap-2 cursor-pointer interactive-press interactive-lift group"
+                      className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-50 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
                     >
-                      <CheckCircle2 className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
-                      <span>{loading ? 'Menghantar Permohonan...' : 'Hantar Permohonan Sewaan (RM150/bln)'}</span>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>{loading ? 'Menghantar Permohonan...' : `Hantar Permohonan Sewaan (RM${monthlyRate}/bln)`}</span>
                     </button>
                   </div>
                 </div>
