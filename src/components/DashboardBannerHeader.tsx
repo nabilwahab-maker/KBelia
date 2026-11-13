@@ -46,7 +46,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
             dashboardTitle: 'ADMIN DASHBOARD',
             subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
             icon: ShieldCheck,
-            iconBg: 'bg-sky-600'
+            iconBg: 'bg-rose-600'
           };
         }
         if (role === 'mentor') {
@@ -56,7 +56,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
             dashboardTitle: 'MENTOR DASHBOARD',
             subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
             icon: GraduationCap,
-            iconBg: 'bg-sky-600'
+            iconBg: 'bg-teal-600'
           };
         }
         return {
@@ -65,7 +65,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'BELIA DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Store,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-blue-600'
         };
 
       case 'merchant':
@@ -75,7 +75,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'BELIA DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Store,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-teal-600'
         };
 
       case 'mentor':
@@ -85,7 +85,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'MENTOR DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: GraduationCap,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-teal-600'
         };
 
       case 'admin':
@@ -95,7 +95,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'ADMIN DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: ShieldCheck,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-rose-600'
         };
 
       case 'academic':
@@ -105,7 +105,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: isMs ? 'KIOSK & KAPSUL NIAGA' : 'MODULAR KIOSK DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Building2,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-indigo-600'
         };
 
       case 'hepa':
@@ -115,7 +115,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'DIREKTORI USAHAWAN',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Users,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-emerald-600'
         };
 
       case 'ceed':
@@ -125,7 +125,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'GERAN & PEMBIAYAAN BELIA',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Award,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-emerald-600'
         };
 
       case 'events':
@@ -135,7 +135,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'ACARA & EKSPO DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Calendar,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-teal-600'
         };
 
       case 'b2b':
@@ -145,7 +145,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'HAB IKLAN & NIAGA',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Briefcase,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-emerald-600'
         };
 
       case 'calculator':
@@ -155,7 +155,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'KALKULATOR KELAYAKAN',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Coins,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-emerald-600'
         };
 
       case 'news':
@@ -165,7 +165,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'BERITA RASMI KBELIA',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Newspaper,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-indigo-600'
         };
 
       case 'settings':
@@ -175,7 +175,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'TETAPAN AKAUN',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Settings,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-indigo-600'
         };
 
       default:
@@ -185,7 +185,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           dashboardTitle: 'BELIA DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Landmark,
-          iconBg: 'bg-sky-600'
+          iconBg: 'bg-blue-600'
         };
     }
   };
@@ -221,40 +221,40 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
   })();
 
   return (
-    <div className="w-full kbelia-important-header rounded-t-2xl rounded-b-none border border-b border-slate-200/80 dark:border-zinc-800 px-4 sm:px-6 py-3.5 sm:py-4 shadow-sm transition-colors">
+    <div className="w-full kbelia-important-header rounded-t-2xl rounded-b-none border border-b border-slate-200 dark:border-zinc-800 px-4 sm:px-6 py-3.5 sm:py-4 shadow-sm transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         
         {/* Navigation Breadcrumb */}
         <div className="flex items-center gap-2.5 text-xs sm:text-sm flex-wrap">
-          <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 flex items-center justify-center shrink-0 border border-sky-200 dark:border-sky-800">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 dark:bg-blue-600 text-white flex items-center justify-center shrink-0 border border-amber-400/70">
             <IconComponent className="w-4 h-4" />
           </div>
-          <span className="text-slate-900 dark:text-white font-extrabold text-base sm:text-lg tracking-tight">
+          <span className="text-black dark:text-white font-extrabold text-base sm:text-lg tracking-tight">
             {meta.pageLabel}
           </span>
 
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-400 dark:text-slate-400">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-black/70 dark:text-white/75">
             <button
               type="button"
               onClick={onNavigateHome}
-              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer flex items-center gap-1 group"
+              className="hover:text-black dark:text-white dark:hover:text-white hover:underline transition-colors cursor-pointer flex items-center gap-1 group"
             >
               <Home className="w-3.5 h-3.5 inline" />
               <span>{isMs ? 'Utama' : 'Home'}</span>
             </button>
-            <span className="text-slate-300 dark:text-slate-600 font-bold">&bull;</span>
-            <span className="text-slate-600 dark:text-slate-300 font-semibold">
+            <span className="text-black/40 dark:text-white/40 font-bold">&bull;</span>
+            <span className="text-black dark:text-white font-semibold">
               {meta.breadcrumb}
             </span>
           </nav>
         </div>
 
         {/* Today's Date */}
-        <div className="self-start sm:self-auto flex items-center gap-2.5 px-3 py-1.5 bg-slate-50/90 dark:bg-zinc-900/80 border border-slate-200/80 dark:border-zinc-800 rounded-lg text-xs shadow-2xs">
-          <span className="text-slate-500 dark:text-slate-400 font-medium capitalize">
+        <div className="self-start sm:self-auto flex items-center gap-2.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 rounded-lg text-xs shadow-2xs">
+          <span className="text-black/70 dark:text-white/75 font-medium capitalize">
             {isMs ? 'hari ini' : 'today'}
           </span>
-          <span className="text-slate-800 dark:text-slate-200 font-bold tracking-tight tabular-nums">
+          <span className="text-black dark:text-white font-bold tracking-tight tabular-nums">
             {formattedTodayDate}
           </span>
         </div>

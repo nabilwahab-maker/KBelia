@@ -157,26 +157,26 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
         <div className="relative z-10 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-lg text-[11px] font-bold tracking-wide uppercase bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 flex items-center gap-1.5 border border-sky-200/80 dark:border-sky-800/60">
-                <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+              <span className="px-3 py-1 rounded-lg text-[11px] font-bold tracking-wide uppercase bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white flex items-center gap-1.5 border border-amber-200 dark:border-amber-800/70">
+                <Sparkles className="w-3.5 h-3.5 text-black dark:text-white/75" />
                 <span>{t('portal_brand_title')}</span>
               </span>
-              <span className="px-3 py-1 rounded-lg text-[11px] font-semibold bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 border border-slate-200 dark:border-slate-700">
+              <span className="px-3 py-1 rounded-lg text-[11px] font-semibold bg-slate-50 dark:bg-slate-800 text-black dark:text-white flex items-center gap-1.5 border border-slate-200 dark:border-slate-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span>{user ? (isAdmin ? t('badge_admin') : t('badge_merchant')) : t('badge_session')}</span>
               </span>
             </div>
 
-            <div className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+            <div className="text-xs text-black dark:text-white font-medium">
               {t('fiscal_year')}
             </div>
           </div>
 
           <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-slate-800 dark:text-white leading-snug">
-              {t('welcome_greeting')} <span className="text-sky-700 dark:text-sky-400">{displayName}</span>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-black dark:text-white leading-snug">
+              {t('welcome_greeting')} <span className="text-black dark:text-white/75">{displayName}</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-black dark:text-white mt-1 max-w-2xl leading-relaxed">
               {t('home_subtitle')}
             </p>
           </div>
@@ -186,11 +186,11 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       {/* 2. KAUNTER PERKHIDMATAN PANTAS 1-KLIK */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-sky-500"></span>
+          <div className="text-xs font-bold uppercase tracking-wider text-black dark:text-white flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-600"></span>
             <span>{t('quick_desk_title')}</span>
           </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">{t('quick_desk_subtitle')}</span>
+          <span className="text-[11px] text-black/70 dark:text-white/75">{t('quick_desk_subtitle')}</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 w-full min-w-0">
@@ -198,21 +198,21 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 1: Mohon Kiosk */}
           <div
             onClick={onOpenBooking}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-sky-300 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 flex items-center justify-center border border-sky-200/80 dark:border-sky-800 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200 dark:border-blue-800/70 group-hover:scale-105 transition-transform">
                 <Building2 className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200">
                 {availableSlots.length} {t('vacant_badge')}
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400">
+              <h3 className="font-bold text-xs sm:text-sm text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
                 {t('card_kiosk_title')}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
                 {t('card_kiosk_sub')}
               </p>
             </div>
@@ -224,21 +224,21 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               if (onOpenGrantModal) onOpenGrantModal();
               else setActiveTab('ceed');
             }}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-sky-300 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 flex items-center justify-center border border-amber-200 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white flex items-center justify-center border border-amber-200 group-hover:scale-105 transition-transform">
                 <Award className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200/80">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200/80">
                 RM3K - RM5K
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400">
+              <h3 className="font-bold text-xs sm:text-sm text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
                 {t('card_grant_title')}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
                 {t('card_grant_sub')}
               </p>
             </div>
@@ -247,21 +247,21 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 3: Akademi Mikro & Sijil */}
           <div
             onClick={() => onOpenAcademy && onOpenAcademy()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-sky-300 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 flex items-center justify-center border border-sky-200 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200 group-hover:scale-105 transition-transform">
                 <GraduationCap className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200/80">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200">
                 {language === 'en' ? '4 Modules' : '4 Modul'}
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400">
+              <h3 className="font-bold text-xs sm:text-sm text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
                 {t('card_academy_title')}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
                 {t('card_academy_sub')}
               </p>
             </div>
@@ -270,21 +270,21 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 4: Hab Temujanji Mentor */}
           <div
             onClick={() => onOpenMentorship && onOpenMentorship()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-sky-300 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 flex items-center justify-center border border-sky-200 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200 group-hover:scale-105 transition-transform">
                 <Users className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200/80">
                 {language === 'en' ? 'Free 1-on-1' : '1-ke-1 Percuma'}
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400">
+              <h3 className="font-bold text-xs sm:text-sm text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
                 {t('card_mentor_title')}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
                 {t('card_mentor_sub')}
               </p>
             </div>
@@ -293,21 +293,21 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 5: Semakan Status Permohonan & Dokumen Tawaran */}
           <div
             onClick={() => onOpenStatusDocuments && onOpenStatusDocuments()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-sky-300 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 flex items-center justify-center border border-sky-200 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-200 group-hover:scale-105 transition-transform">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200">
                 {language === 'en' ? 'Offer Letter' : 'Surat Tawaran'}
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400">
+              <h3 className="font-bold text-xs sm:text-sm text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
                 {t('card_status_title')}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
                 {t('card_status_sub')}
               </p>
             </div>
@@ -316,21 +316,21 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 6: Buku Tunai & Jualan */}
           <div
             onClick={() => onOpenCashflow && onOpenCashflow()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-sky-300 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 flex items-center justify-center border border-sky-200 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 group-hover:scale-105 transition-transform">
                 <Coins className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200/80">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200">
                 DuitNow QR
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400">
+              <h3 className="font-bold text-xs sm:text-sm text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
                 {t('card_pos_title')}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
                 {t('card_pos_sub')}
               </p>
             </div>
@@ -339,21 +339,21 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 7: Papan Padanan B2B */}
           <div
             onClick={() => onOpenB2B && onOpenB2B()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-sky-300 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 flex items-center justify-center border border-sky-200 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200 group-hover:scale-105 transition-transform">
                 <Network className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200/80">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200">
                 {language === 'en' ? 'B2B Inventory' : 'B2B Stok'}
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400">
+              <h3 className="font-bold text-xs sm:text-sm text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
                 {language === 'en' ? 'B2B Supplier Matching' : 'Padanan Pembekal B2B'}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
                 {language === 'en' ? 'Find & supply business raw materials.' : 'Cari & bekal bahan mentah.'}
               </p>
             </div>
@@ -362,21 +362,21 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 8: Aduan Kerosakan Kiosk */}
           <div
             onClick={() => onOpenMaintenance && onOpenMaintenance()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-sky-300 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-black dark:text-white flex items-center justify-center border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform">
                 <Wrench className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200">
                 {language === 'en' ? 'Facilities' : 'Fasiliti'}
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400">
+              <h3 className="font-bold text-xs sm:text-sm text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
                 {t('card_maintenance_title')}
               </h3>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
                 {t('card_maintenance_sub')}
               </p>
             </div>
@@ -391,29 +391,29 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3.5 border-b border-slate-200 dark:border-slate-700">
             {/* Left: Compact Identity */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/70 flex items-center justify-center shrink-0">
                 <Store className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono font-bold text-xs text-sky-800 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/50 px-2 py-0.5 rounded-md border border-sky-200 dark:border-sky-800">
+                  <span className="font-mono font-bold text-xs text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800/70">
                     {userBooking.slotCode}
                   </span>
-                  <span className="text-xs font-bold text-slate-800 dark:text-white truncate max-w-[200px] sm:max-w-[280px]">
+                  <span className="text-xs font-bold text-black dark:text-white truncate max-w-[200px] sm:max-w-[280px]">
                     {userBooking.slotName}
                   </span>
                   <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                     userBooking.status === 'approved'
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
+                      ? 'bg-emerald-100 text-black dark:bg-emerald-950/80 dark:text-white'
                       : userBooking.status === 'rejected'
-                      ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300'
-                      : 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300'
+                      ? 'bg-rose-100 text-black dark:bg-rose-950/80 dark:text-white'
+                      : 'bg-amber-100 text-black dark:bg-amber-950/80 dark:text-white'
                   }`}>
                     {userBooking.status === 'approved' ? (language === 'en' ? '✓ Approved' : '✓ Diluluskan') : userBooking.status === 'rejected' ? (language === 'en' ? 'Rejected' : 'Ditolak') : (language === 'en' ? '⏳ Under Review' : '⏳ Dalam Semakan')}
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 flex items-center gap-1.5">
-                  <MapPin className="w-3 h-3 text-sky-600 shrink-0" />
+                <div className="text-[11px] text-black dark:text-white/75 mt-0.5 flex items-center gap-1.5">
+                  <MapPin className="w-3 h-3 text-black dark:text-white shrink-0" />
                   <span>{userBooking.hubLocation}</span>
                   <span>•</span>
                   <span>{userBooking.durationMonths} {language === 'en' ? 'Months' : 'Bulan'}</span>
@@ -428,7 +428,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   <button
                     type="button"
                     onClick={() => onViewOfferLetter && onViewOfferLetter(userBooking)}
-                    className="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs dark:bg-indigo-600"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>{language === 'en' ? 'Offer Letter' : 'Surat Tawaran'}</span>
@@ -438,9 +438,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                     <button
                       type="button"
                       onClick={() => onOpenTenancyAgreement(userBooking)}
-                      className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
-                      <PenTool className="w-3.5 h-3.5 text-sky-600" />
+                      <PenTool className="w-3.5 h-3.5 text-black dark:text-white" />
                       <span>{language === 'en' ? 'Agreement' : 'Perjanjian'}</span>
                     </button>
                   )}
@@ -449,7 +449,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                     <button
                       type="button"
                       onClick={() => onOpenVerification(`KBN-${userBooking.slotCode}`)}
-                      className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 text-slate-700 dark:text-slate-300 border border-slate-200 rounded-lg text-xs transition-colors cursor-pointer"
+                      className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white border border-slate-200 rounded-lg text-xs transition-colors cursor-pointer"
                       title={language === 'en' ? 'Verify QR License' : 'Sahkan Lesen QR'}
                     >
                       <QrCode className="w-4 h-4" />
@@ -462,34 +462,34 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 href={`https://wa.me/601120508890?text=${encodeURIComponent(language === 'en' ? `Hello KBelia Secretariat, I would like to inquire about kiosk status ${userBooking.slotCode}.` : `Salam Urusetia KBelia Kelantan, saya ingin membuat pertanyaan status kiosk ${userBooking.slotCode}.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
               >
-                <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                <MessageCircle className="w-3.5 h-3.5 text-black dark:text-white" />
                 <span>{language === 'en' ? 'Hub WhatsApp' : 'WhatsApp Hab'}</span>
               </a>
 
               <button
                 type="button"
                 onClick={() => onOpenMaintenance && onOpenMaintenance()}
-                className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-sky-50 text-slate-700 dark:text-slate-300 border border-slate-200 rounded-lg text-xs transition-colors cursor-pointer"
+                className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white border border-slate-200 rounded-lg text-xs transition-colors cursor-pointer"
                 title={language === 'en' ? 'Facility Maintenance Report' : 'Aduan Kerosakan Fasiliti'}
               >
-                <Wrench className="w-4 h-4 text-sky-600" />
+                <Wrench className="w-4 h-4 text-black dark:text-white" />
               </button>
             </div>
           </div>
 
           {/* Minimalist Stepper Timeline (Zero Clutter) */}
           <div className="pt-3">
-            <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400">
-              <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
+            <div className="flex items-center justify-between text-[11px] font-bold text-black/70 dark:text-white/75">
+              <div className="flex items-center gap-1.5 text-black dark:text-white/75">
                 <span className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px]">1</span>
                 <span>{language === 'en' ? 'Submitted' : 'Dihantar'}</span>
               </div>
               <div className="flex-1 h-0.5 mx-2 bg-emerald-500 rounded" />
               
               <div className={`flex items-center gap-1.5 ${
-                userBooking.status === 'approved' ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+                userBooking.status === 'approved' ? 'text-black dark:text-white/75' : 'text-black dark:text-white/75'
               }`}>
                 <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] text-white ${
                   userBooking.status === 'approved' ? 'bg-emerald-600' : 'bg-amber-500'
@@ -501,7 +501,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               }`} />
 
               <div className={`flex items-center gap-1.5 ${
-                userBooking.status === 'approved' ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-400'
+                userBooking.status === 'approved' ? 'text-black dark:text-white/75' : 'text-black/70'
               }`}>
                 <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] text-white ${
                   userBooking.status === 'approved' ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
@@ -513,7 +513,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               }`} />
 
               <div className={`flex items-center gap-1.5 ${
-                userBooking.status === 'approved' ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-400'
+                userBooking.status === 'approved' ? 'text-black dark:text-white/75' : 'text-black/70'
               }`}>
                 <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] text-white ${
                   userBooking.status === 'approved' ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
@@ -530,20 +530,20 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
         <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 shadow-xs transition-all duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs dark:bg-blue-600">
                 <Award className="w-6 h-6" />
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-extrabold text-slate-800 dark:text-white">
-                    {t('tracker_grant_title')} <span className="text-sky-700 dark:text-sky-400">{userGrant.programTitle}</span>
+                  <span className="text-sm font-extrabold text-black dark:text-white">
+                    {t('tracker_grant_title')} <span className="text-black dark:text-white/75">{userGrant.programTitle}</span>
                   </span>
                   <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg border ${
                     userGrant.status === 'approved'
-                      ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300'
+                      ? 'bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white border-emerald-300'
                       : userGrant.status === 'rejected'
-                      ? 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border-rose-300'
-                      : 'bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 border-amber-300'
+                      ? 'bg-rose-100 dark:bg-rose-950/80 text-black dark:text-white border-rose-300'
+                      : 'bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white border-amber-300'
                   }`}>
                     {userGrant.status === 'approved' 
                       ? (language === 'en' ? '✓ Grant Approved' : '✓ Geran Diluluskan') 
@@ -552,14 +552,14 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                       : (language === 'en' ? '⏳ Panel Reviewing' : '⏳ Sedang Disemak Panel')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-                  {t('grant_value_label')} <strong className="text-sky-700 dark:text-sky-400 font-bold">{userGrant.grantAmount}</strong> · {t('bank_label')} {userGrant.bankName} ({userGrant.bankAccountNumber})
+                <p className="text-xs text-black dark:text-white mt-1">
+                  {t('grant_value_label')} <strong className="text-black dark:text-white/75 font-bold">{userGrant.grantAmount}</strong> · {t('bank_label')} {userGrant.bankName} ({userGrant.bankAccountNumber})
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-              <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+              <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200 dark:border-slate-700">
                 {t('purpose_label')} {userGrant.fundPurpose?.slice(0, 30) || (language === 'en' ? 'Entrepreneur Operations' : 'Operasi Usahawan')}...
               </span>
             </div>
@@ -569,7 +569,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           <div className="pt-4 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
             <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1">
               <div className="h-1.5 w-full bg-emerald-500 rounded-full" />
-              <div className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1 text-[11px]">
+              <div className="font-bold text-black dark:text-white/75 flex items-center gap-1 text-[11px]">
                 <Check className="w-3 h-3" />
                 <span>{t('step_received')}</span>
               </div>
@@ -581,8 +581,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   ? 'bg-emerald-500'
                   : 'bg-amber-400'
               }`} />
-              <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1 text-[11px]">
-                <Clock className="w-3 h-3 text-amber-500" />
+              <div className="font-bold text-black dark:text-white flex items-center gap-1 text-[11px]">
+                <Clock className="w-3 h-3 text-black/70 dark:text-white/75" />
                 <span>{t('step_audit')}</span>
               </div>
             </div>
@@ -591,8 +591,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               <div className={`h-1.5 w-full rounded-full ${
                 userGrant.status === 'approved' ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
               }`} />
-              <div className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 text-[11px]">
-                <Award className="w-3 h-3 text-sky-600" />
+              <div className="font-bold text-black dark:text-white flex items-center gap-1 text-[11px]">
+                <Award className="w-3 h-3 text-black dark:text-white" />
                 <span>{t('step_committee')}</span>
               </div>
             </div>
@@ -601,8 +601,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               <div className={`h-1.5 w-full rounded-full ${
                 userGrant.status === 'approved' ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
               }`} />
-              <div className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 text-[11px]">
-                <ShieldCheck className="w-3 h-3 text-sky-600" />
+              <div className="font-bold text-black dark:text-white flex items-center gap-1 text-[11px]">
+                <ShieldCheck className="w-3 h-3 text-black dark:text-white" />
                 <span>{t('step_disburse')}</span>
               </div>
             </div>
@@ -614,14 +614,14 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       {!userBooking && !userGrant && (
         <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 flex items-center justify-center shrink-0">
               <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-sm font-bold text-slate-800 dark:text-white">
+              <div className="text-sm font-bold text-black dark:text-white">
                 {language === 'en' ? 'No active applications at the moment' : 'Tiada permohonan aktif buat masa ini'}
               </div>
-              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+              <p className="text-xs text-black dark:text-white mt-0.5">
                 {language === 'en' ? 'Rent modular business spaces from RM150/month or apply for RM3,000 Youth Seed Grant.' : 'Sewa ruang niaga modular serendah RM150/bulan atau mohon Geran Benih Belia RM3,000.'}
               </p>
             </div>
@@ -630,7 +630,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
             <button
               type="button"
               onClick={onOpenBooking}
-              className="px-4 py-2 bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer dark:bg-blue-600"
             >
               <span>{language === 'en' ? 'Apply Kiosk' : 'Mohon Kiosk'}</span>
             </button>
@@ -640,7 +640,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 if (onOpenGrantModal) onOpenGrantModal();
                 else setActiveTab('ceed');
               }}
-              className="px-4 py-2 bg-sky-50 hover:bg-sky-100 active:scale-[0.98] text-sky-800 border border-sky-200 rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+              className="px-4 py-2 bg-amber-50 hover:bg-amber-100 active:scale-[0.98] text-black border border-amber-300 rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
             >
               <span>{language === 'en' ? 'Apply Grant' : 'Mohon Geran'}</span>
             </button>
@@ -669,20 +669,20 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xs overflow-hidden transition-colors">
         <div className="bg-white dark:bg-slate-800 p-5 sm:p-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
           <div>
-            <h2 className="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
+            <h2 className="text-base font-extrabold text-black dark:text-white flex items-center gap-2">
               <span>{t('slots_list_heading')}</span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200">
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-200">
                 {filteredSlots.filter(s => s.status === 'available').length} {t('vacant_badge')}
               </span>
             </h2>
-            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+            <p className="text-xs text-black dark:text-white mt-0.5">
               {language === 'en' ? 'Youth modular kiosk availability schedule by hub' : 'Jadual ketersediaan kiosk modular belia mengikut hab tumpuan'}
             </p>
           </div>
           <button
             type="button"
             onClick={() => setActiveTab('academic')}
-            className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-black dark:text-white/75 hover:underline flex items-center gap-1 cursor-pointer"
           >
             <span>{language === 'en' ? 'Open Full Kiosk Module' : 'Buka Modul Kapsul Penuh'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -692,7 +692,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
         <div className="overflow-x-auto w-full min-w-0 scrollbar-thin">
           <table className="w-full text-left border-collapse min-w-[540px]">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+              <tr className="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold text-black dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
                 <th className="py-3 px-4">{language === 'en' ? 'KIOSK CODE' : 'KOD KIOSK'}</th>
                 <th className="py-3 px-4">{language === 'en' ? 'LOCATION & DISTRICT' : 'LOKASI & JAJAHAN'}</th>
                 <th className="py-3 px-4">{language === 'en' ? 'MONTHLY RATE' : 'KADAR BULANAN'}</th>
@@ -705,37 +705,37 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 const isAvail = slot.status === 'available';
                 return (
                   <tr key={slot.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-800 dark:text-white">
+                    <td className="py-3.5 px-4 font-mono font-bold text-black dark:text-white">
                       {slot.code}
-                      <span className="block text-[11px] font-sans font-normal text-slate-500 dark:text-slate-400">
+                      <span className="block text-[11px] font-sans font-normal text-black/70 dark:text-white/75">
                         {slot.name}
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-800 dark:text-slate-200">{slot.hubLocation}</span>
+                        <span className="font-semibold text-black dark:text-white">{slot.hubLocation}</span>
                         <a
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${slot.hubLocation}, ${slot.district}, Kelantan`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-0.5 text-[10px] font-bold text-sky-700 dark:text-sky-400 hover:underline"
+                          className="inline-flex items-center gap-0.5 text-[10px] font-bold text-black dark:text-white/75 hover:underline"
                           title={language === 'en' ? 'Open in Google Maps' : 'Buka lokasi di Google Maps'}
                         >
                           <ExternalLink className="w-2.5 h-2.5" />
                           <span>GPS</span>
                         </a>
                       </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400">{slot.district} · {slot.size}</div>
+                      <div className="text-[11px] text-black/70 dark:text-white/75">{slot.district} · {slot.size}</div>
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-sky-700 dark:text-sky-400">
-                      RM{slot.monthlyRate}<span className="text-[10px] text-slate-500 font-normal">{t('per_month')}</span>
+                    <td className="py-3.5 px-4 font-mono font-bold text-black dark:text-white/75">
+                      RM{slot.monthlyRate}<span className="text-[10px] text-black/70 dark:text-white/75 font-normal">{t('per_month')}</span>
                     </td>
                     <td className="py-3.5 px-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold ${
                         isAvail 
-                          ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200' 
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-200' 
+                          : 'bg-slate-100 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-200'
                       }`}>
                         {isAvail ? t('available') : t('occupied')}
                       </span>
@@ -746,8 +746,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                         onClick={() => onSelectSlot(slot)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           isAvail
-                            ? 'bg-sky-600 hover:bg-sky-700 text-white shadow-2xs'
-                            : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200'
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-2xs dark:bg-blue-600'
+                            : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200'
                         }`}
                       >
                         {isAvail ? (language === 'en' ? 'Apply Kiosk' : 'Mohon Kiosk') : (language === 'en' ? 'View Details' : 'Lihat Maklumat')}
@@ -765,20 +765,20 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 shadow-xs transition-colors w-full min-w-0">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
+            <h2 className="text-base font-extrabold text-black dark:text-white flex items-center gap-2">
               <span>{language === 'en' ? 'Local Youth Entrepreneurs' : 'Usahawan Belia Tempatan'}</span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200 dark:border-slate-700">
                 {filteredBusinesses.length} {language === 'en' ? 'Active' : 'Aktif'}
               </span>
             </h2>
-            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+            <p className="text-xs text-black dark:text-white mt-0.5">
               {language === 'en' ? 'Support products & services produced by Kelantan youth community' : 'Sokong produk & perkhidmatan keluaran komuniti belia Kelantan'}
             </p>
           </div>
           <button
             type="button"
             onClick={() => setActiveTab('hepa')}
-            className="text-xs font-bold text-sky-700 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-black dark:text-white/75 hover:underline flex items-center gap-1 cursor-pointer"
           >
             <span>{language === 'en' ? 'Full Directory' : 'Direktori Penuh'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -796,7 +796,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
             return (
               <div
                 key={biz.id}
-                className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-500/60 transition-all bg-white dark:bg-slate-800 flex flex-col justify-between group shadow-2xs hover:-translate-y-0.5"
+                className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all bg-white dark:bg-slate-800 flex flex-col justify-between group shadow-2xs hover:-translate-y-0.5"
               >
                 <div className="flex items-start gap-3">
                   <img
@@ -807,21 +807,21 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   />
                   <div className="overflow-hidden flex-1">
                     <div className="flex items-center gap-1">
-                      <span className="text-xs font-bold text-slate-800 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors truncate">
+                      <span className="text-xs font-bold text-black dark:text-white group-hover:text-black dark:group-hover:text-white transition-colors truncate">
                         {biz.businessName}
                       </span>
                       <span
                         className="shrink-0 flex items-center"
                         title={language === 'en' ? 'SSM Verified Entrepreneur' : 'Usahawan Disahkan SSM'}
                       >
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white" />
                       </span>
                     </div>
-                    <div className="text-[10px] text-slate-600 dark:text-slate-300 font-semibold truncate mt-0.5">
+                    <div className="text-[10px] text-black dark:text-white font-semibold truncate mt-0.5">
                       {biz.category}
                     </div>
-                    <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate flex items-center gap-1 mt-1">
-                      <MapPin className="w-3 h-3 text-sky-600 dark:text-sky-400 shrink-0" />
+                    <div className="text-[10px] text-black/70 dark:text-white/75 truncate flex items-center gap-1 mt-1">
+                      <MapPin className="w-3 h-3 text-black dark:text-white/75 shrink-0" />
                       <span>{biz.district || 'Kelantan'}</span>
                     </div>
                   </div>
@@ -831,7 +831,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   <button
                     type="button"
                     onClick={() => onSelectBusiness(biz)}
-                    className="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-sky-700 dark:hover:text-white cursor-pointer"
+                    className="text-xs font-bold text-black dark:text-white hover:text-black dark:hover:text-white cursor-pointer"
                   >
                     {language === 'en' ? 'View Profile' : 'Lihat Profil'}
                   </button>

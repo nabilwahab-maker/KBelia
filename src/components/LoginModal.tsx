@@ -134,22 +134,22 @@ export const LoginModal: React.FC = () => {
         className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col transition-colors"
       >
         {/* Header */}
-        <div className="p-4 kbelia-important-header dark:bg-slate-800 text-slate-800 dark:text-slate-100 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+        <div className="p-4 kbelia-important-header dark:bg-slate-800 text-black dark:text-white flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 flex items-center justify-center font-black">
+            <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-rose-600 dark:text-rose-400 flex items-center justify-center font-black">
               {activeRoleTab === 'admin' ? <ShieldCheck className="w-4 h-4" /> : activeRoleTab === 'mentor' ? <GraduationCap className="w-4 h-4" /> : <Store className="w-4 h-4" />}
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-slate-800 dark:text-white">
+              <h3 className="font-extrabold text-sm text-black dark:text-white">
                 {activeRoleTab === 'admin' ? 'Portal Pentadbir' : activeRoleTab === 'mentor' ? 'Portal Mentor' : 'Log Masuk Usahawan'}
               </h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">KBelia Kelantan</p>
+              <p className="text-[10px] text-black/70 dark:text-white/75">KBelia Kelantan</p>
             </div>
           </div>
           <button
             type="button"
             onClick={closeLoginModal}
-            className="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+            className="p-1.5 text-black/70 hover:text-black dark:text-white dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -164,7 +164,7 @@ export const LoginModal: React.FC = () => {
               clearAuthError();
             }}
             className={`py-1.5 px-2 rounded-xl font-bold transition-all cursor-pointer ${
-              activeRoleTab === 'user' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-sky-700 dark:hover:text-white'
+              activeRoleTab === 'user' ? 'bg-rose-600 text-white shadow-xs dark:bg-rose-600' : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             Usahawan
@@ -177,7 +177,7 @@ export const LoginModal: React.FC = () => {
               clearAuthError();
             }}
             className={`py-1.5 px-2 rounded-xl font-bold transition-all cursor-pointer ${
-              activeRoleTab === 'mentor' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-sky-700 dark:hover:text-white'
+              activeRoleTab === 'mentor' ? 'bg-rose-600 text-white shadow-xs dark:bg-rose-600' : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             Mentor
@@ -190,7 +190,7 @@ export const LoginModal: React.FC = () => {
               clearAuthError();
             }}
             className={`py-1.5 px-2 rounded-xl font-bold transition-all cursor-pointer ${
-              activeRoleTab === 'admin' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-sky-700 dark:hover:text-white'
+              activeRoleTab === 'admin' ? 'bg-rose-600 text-white shadow-xs dark:bg-rose-600' : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             Pentadbir
@@ -209,8 +209,8 @@ export const LoginModal: React.FC = () => {
                 }}
                 className={`pb-1 cursor-pointer transition-colors border-b-2 ${
                   userMode === 'login'
-                    ? 'border-sky-600 text-sky-700 dark:text-sky-400'
-                    : 'border-transparent text-slate-500'
+                    ? 'border-blue-600 text-black dark:text-white/75'
+                    : 'border-transparent text-black/70 dark:text-white/75'
                 }`}
               >
                 Log Masuk Sedia Ada
@@ -223,8 +223,8 @@ export const LoginModal: React.FC = () => {
                 }}
                 className={`pb-1 cursor-pointer transition-colors border-b-2 ${
                   userMode === 'register'
-                    ? 'border-sky-600 text-sky-700 dark:text-sky-400'
-                    : 'border-transparent text-slate-500'
+                    ? 'border-blue-600 text-black dark:text-white/75'
+                    : 'border-transparent text-black/70 dark:text-white/75'
                 }`}
               >
                 Daftar Baharu
@@ -233,15 +233,15 @@ export const LoginModal: React.FC = () => {
           )}
 
           {authError && (
-            <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 rounded-xl text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+            <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 rounded-xl text-black dark:text-white text-xs flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-black dark:text-white/75 shrink-0 mt-0.5" />
               <span className="flex-1">{authError}</span>
             </div>
           )}
 
           {successNotice && (
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-black dark:text-white text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
               <span className="font-bold flex-1">{successNotice}</span>
             </div>
           )}
@@ -249,44 +249,44 @@ export const LoginModal: React.FC = () => {
           {userMode === 'login' && (
             <form onSubmit={handleLoginSubmit} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-black dark:text-white mb-1">
                   Emel
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Emel rasmi anda"
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <label className="block text-xs font-bold text-black dark:text-white">
                     {activeRoleTab === 'mentor' ? 'PIN Mentor' : 'Kata Laluan'}
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-sky-700 dark:hover:text-sky-300 cursor-pointer"
+                    className="text-[10px] text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
                   >
                     {showPassword ? 'Sembunyi' : 'Papar'}
                   </button>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={activeRoleTab === 'mentor' ? 'PIN keselamatan' : 'Minimum 6 aksara'}
-                    className="w-full pl-9 pr-10 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    className="w-full pl-9 pr-10 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -294,7 +294,7 @@ export const LoginModal: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-60"
+                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
               >
                 <LogIn className="w-4 h-4" />
                 <span>{isSubmitting ? 'Memproses...' : 'Log Masuk Sekarang'}</span>
@@ -305,7 +305,7 @@ export const LoginModal: React.FC = () => {
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={isSubmitting}
-                  className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60"
+                  className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60"
                 >
                   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.87c2.27-2.09 3.67-5.17 3.67-9.15z" />
@@ -322,7 +322,7 @@ export const LoginModal: React.FC = () => {
           {userMode === 'register' && activeRoleTab === 'user' && (
             <form onSubmit={handleRegisterSubmit} className="space-y-3">
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
                   Nama Penuh *
                 </label>
                 <input
@@ -331,12 +331,12 @@ export const LoginModal: React.FC = () => {
                   value={regName}
                   onChange={(e) => setRegName(e.target.value)}
                   placeholder="Nama Penuh"
-                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
                   Emel *
                 </label>
                 <input
@@ -345,13 +345,13 @@ export const LoginModal: React.FC = () => {
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="Emel"
-                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
                     Telefon *
                   </label>
                   <input
@@ -360,17 +360,17 @@ export const LoginModal: React.FC = () => {
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
                     placeholder="Telefon"
-                    className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
                     Jajahan *
                   </label>
                   <select
                     value={regDistrict}
                     onChange={(e) => setRegDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                    className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   >
                     {DISTRICT_LIST.map(d => (
                       <option key={d} value={d}>{d}</option>
@@ -380,7 +380,7 @@ export const LoginModal: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
                   Kata Laluan *
                 </label>
                 <input
@@ -389,14 +389,14 @@ export const LoginModal: React.FC = () => {
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
                   placeholder="Kata Laluan"
-                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-60"
+                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-60 dark:bg-blue-600"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>{isSubmitting ? 'Mendaftar...' : 'Daftar & Terus Buka Dashboard'}</span>
@@ -406,7 +406,7 @@ export const LoginModal: React.FC = () => {
 
           {/* Isolated Development Demo Mode Buttons */}
           <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2">
-            <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center">
+            <div className="text-[10px] font-bold text-black/70 dark:text-white/75 uppercase tracking-wider text-center">
               Mod Demo Pembangunan (Terasing)
             </div>
             <div className="grid grid-cols-3 gap-2">
@@ -417,13 +417,13 @@ export const LoginModal: React.FC = () => {
                   setSuccessNotice('Log masuk Mod Demo Belia berjaya!');
                   setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-sky-950/30 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
               >
-                <div className="text-[11px] font-bold text-slate-800 dark:text-white flex items-center gap-1">
-                  <Store className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                <div className="text-[11px] font-bold text-black dark:text-white flex items-center gap-1">
+                  <Store className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Belia</span>
                 </div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Ahmad Faizul</div>
+                <div className="text-[10px] text-black/70 dark:text-white/75 truncate">Ahmad Faizul</div>
               </button>
 
               <button
@@ -433,13 +433,13 @@ export const LoginModal: React.FC = () => {
                   setSuccessNotice('Log masuk Mod Demo Mentor berjaya!');
                   setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-sky-950/30 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
               >
-                <div className="text-[11px] font-bold text-slate-800 dark:text-white flex items-center gap-1">
-                  <GraduationCap className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                <div className="text-[11px] font-bold text-black dark:text-white flex items-center gap-1">
+                  <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Mentor</span>
                 </div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Dr. Wan Azhar</div>
+                <div className="text-[10px] text-black/70 dark:text-white/75 truncate">Dr. Wan Azhar</div>
               </button>
 
               <button
@@ -449,13 +449,13 @@ export const LoginModal: React.FC = () => {
                   setSuccessNotice('Log masuk Mod Demo Admin berjaya!');
                   setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-sky-950/30 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
               >
-                <div className="text-[11px] font-bold text-slate-800 dark:text-white flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                <div className="text-[11px] font-bold text-black dark:text-white flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Admin</span>
                 </div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Urusetia</div>
+                <div className="text-[10px] text-black/70 dark:text-white/75 truncate">Urusetia</div>
               </button>
             </div>
           </div>

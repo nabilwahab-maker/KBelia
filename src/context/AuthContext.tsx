@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import {
   signInWithPopup,
   signInWithEmailAndPassword,
@@ -17,6 +17,7 @@ import {
 import { auth, db, googleProvider } from '../lib/firebase';
 import { UserProfile } from '../types';
 import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
+import { showToast } from '../components/ToastNotification';
 
 export interface AuthUser {
   uid: string;
@@ -80,6 +81,10 @@ interface AuthContextType {
   ) => Promise<{ success: boolean; error?: string }>;
   loginAsDemoUser: (type: DemoAccountType, customData?: Partial<UserProfile>) => void;
   logout: () => Promise<void>;
+  isSessionWarningOpen: boolean;
+  sessionCountdownSeconds: number;
+  keepSessionActive: () => void;
+  terminateSessionNow: () => Promise<void>;
   clearAuthError: () => void;
   updateProfileData: (data: Partial<UserProfile>) => Promise<void>;
   changeUserPassword: (
@@ -136,23 +141,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginInitialTab, setLoginInitialTab] = useState<'user' | 'admin' | 'mentor'>('user');
+  const [isSessionWarningOpen, setIsSessionWarningOpen] = useState(false);
+  const [sessionCountdownSeconds, setSessionCountdownSeconds] = useState(60);
 
-  const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
+  const IDLE_WARNING_MS = 15 * 60 * 1000;
+  const WARNING_COUNTDOWN_SEC = 60;
+  const HARD_TIMEOUT_MS = IDLE_WARNING_MS + WARNING_COUNTDOWN_SEC * 1000;
 
-  const saveSession = (authUserObj: AuthUser, profileObj: UserProfile) => {
-    const sessionToken = `kbelia_sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    const sessionPayload = JSON.stringify({ user: authUserObj, profile: profileObj, token: sessionToken });
-    try {
-      sessionStorage.setItem('niagabelia_session_token', sessionToken);
-      sessionStorage.setItem('niagabelia_auth_session', sessionPayload);
-      localStorage.setItem('niagabelia_auth_session', sessionPayload);
-      localStorage.setItem('niagabelia_last_activity', Date.now().toString());
-    } catch (e) {
-      console.warn('Session write error:', e);
-    }
-  };
+  const userRef = useRef<AuthUser | null>(null);
+  const warningOpenRef = useRef(false);
+  const lastActivityRef = useRef<number>(Date.now());
+  const lastStorageSyncRef = useRef<number>(0);
+  const warningDeadlineRef = useRef<number>(0);
 
-  const clearStoredSession = () => {
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  useEffect(() => {
+    warningOpenRef.current = isSessionWarningOpen;
+  }, [isSessionWarningOpen]);
+
+  const clearStoredSession = useCallback(() => {
     try {
       sessionStorage.removeItem('niagabelia_session_token');
       sessionStorage.removeItem('niagabelia_auth_session');
@@ -161,7 +171,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       // ignore
     }
-  };
+  }, []);
+
+  const saveSession = useCallback((authUserObj: AuthUser, profileObj: UserProfile) => {
+    const now = Date.now();
+    lastActivityRef.current = now;
+    lastStorageSyncRef.current = now;
+    warningOpenRef.current = false;
+    setIsSessionWarningOpen(false);
+    setSessionCountdownSeconds(WARNING_COUNTDOWN_SEC);
+
+    const sessionToken = `kbelia_sess_${now}_${Math.random().toString(36).substring(2, 9)}`;
+    const sessionPayload = JSON.stringify({ user: authUserObj, profile: profileObj, token: sessionToken });
+    try {
+      sessionStorage.setItem('niagabelia_session_token', sessionToken);
+      sessionStorage.setItem('niagabelia_auth_session', sessionPayload);
+      localStorage.setItem('niagabelia_auth_session', sessionPayload);
+      localStorage.setItem('niagabelia_last_activity', now.toString());
+    } catch (e) {
+      console.warn('Session write error:', e);
+    }
+  }, []);
+
+  const keepSessionActive = useCallback(() => {
+    const now = Date.now();
+    lastActivityRef.current = now;
+    lastStorageSyncRef.current = now;
+    warningOpenRef.current = false;
+    setIsSessionWarningOpen(false);
+    setSessionCountdownSeconds(WARNING_COUNTDOWN_SEC);
+    try {
+      if (localStorage.getItem('niagabelia_auth_session') || sessionStorage.getItem('niagabelia_auth_session')) {
+        localStorage.setItem('niagabelia_last_activity', now.toString());
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const terminateSessionDueToIdle = useCallback(async (manualSignOut = false) => {
+    warningOpenRef.current = false;
+    setIsSessionWarningOpen(false);
+    setSessionCountdownSeconds(WARNING_COUNTDOWN_SEC);
+    clearStoredSession();
+    try {
+      await fbSignOut(auth);
+    } catch {
+      // ignore
+    }
+    setUser(null);
+    setUserProfile(null);
+    setAuthError(null);
+    if (!manualSignOut) {
+      showToast({
+        type: 'warning',
+        title: 'Sesi Ditamatkan',
+        message: 'Sesi anda telah ditamatkan secara automatik kerana tidak aktif selama 15 minit.'
+      });
+    }
+    window.dispatchEvent(new CustomEvent('kbelia_session_terminated', { detail: { manual: manualSignOut } }));
+  }, [clearStoredSession]);
 
   useEffect(() => {
     let unsubProfileDoc: (() => void) | null = null;
@@ -176,7 +245,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (activeSessionStr && lastActivityStr) {
         const lastActivity = parseInt(lastActivityStr, 10);
-        if (now - lastActivity > SESSION_TIMEOUT_MS) {
+        if (now - lastActivity > HARD_TIMEOUT_MS) {
           clearStoredSession();
           setUser(null);
           setUserProfile(null);
@@ -198,29 +267,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserProfile(null);
     }
 
-    // 2. Activity Tracker for 1-hour auto logout
+    // 2. Activity Tracker for 15-minute idle warning + 60s countdown (for ALL user roles)
     const updateActivity = () => {
-      if (localStorage.getItem('niagabelia_auth_session') || sessionStorage.getItem('niagabelia_auth_session')) {
-        localStorage.setItem('niagabelia_last_activity', Date.now().toString());
+      if (!userRef.current || warningOpenRef.current) return;
+      const now = Date.now();
+      lastActivityRef.current = now;
+      if (now - lastStorageSyncRef.current >= 5000) {
+        lastStorageSyncRef.current = now;
+        try {
+          if (localStorage.getItem('niagabelia_auth_session') || sessionStorage.getItem('niagabelia_auth_session')) {
+            localStorage.setItem('niagabelia_last_activity', now.toString());
+          }
+        } catch {
+          // ignore
+        }
       }
     };
 
-    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
     activityEvents.forEach(evt => window.addEventListener(evt, updateActivity, { passive: true }));
 
     const intervalCheck = setInterval(() => {
-      const currentAuth = localStorage.getItem('niagabelia_auth_session');
-      const lastActivityStr = localStorage.getItem('niagabelia_last_activity');
-      if (currentAuth && lastActivityStr) {
-        const lastActivity = parseInt(lastActivityStr, 10);
-        if (Date.now() - lastActivity > SESSION_TIMEOUT_MS) {
-          clearStoredSession();
-          setUser(null);
-          setUserProfile(null);
-          fbSignOut(auth).catch(() => {});
+      if (!userRef.current) return;
+
+      const now = Date.now();
+      if (!warningOpenRef.current) {
+        const elapsed = now - lastActivityRef.current;
+        if (elapsed >= HARD_TIMEOUT_MS) {
+          terminateSessionDueToIdle(false);
+        } else if (elapsed >= IDLE_WARNING_MS) {
+          const remainingMs = Math.max(0, HARD_TIMEOUT_MS - elapsed);
+          warningDeadlineRef.current = now + remainingMs;
+          warningOpenRef.current = true;
+          setIsSessionWarningOpen(true);
+          setSessionCountdownSeconds(Math.max(1, Math.ceil(remainingMs / 1000)));
+        }
+      } else {
+        const remainingSec = Math.max(0, Math.ceil((warningDeadlineRef.current - now) / 1000));
+        setSessionCountdownSeconds(remainingSec);
+        if (remainingSec <= 0) {
+          terminateSessionDueToIdle(false);
         }
       }
-    }, 60000);
+    }, 1000);
 
     // 3. Real Firebase Auth State Listener with clean nested listener cleanup
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
@@ -231,7 +320,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (currentUser) {
         const lastActivityStr = localStorage.getItem('niagabelia_last_activity');
-        if (lastActivityStr && Date.now() - parseInt(lastActivityStr, 10) > SESSION_TIMEOUT_MS) {
+        if (lastActivityStr && Date.now() - parseInt(lastActivityStr, 10) > HARD_TIMEOUT_MS) {
           clearStoredSession();
           await fbSignOut(auth);
           setUser(null);
@@ -248,7 +337,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isDemo: false
         };
         setUser(authUserObj);
-        localStorage.setItem('niagabelia_last_activity', Date.now().toString());
+        lastActivityRef.current = Date.now();
+        localStorage.setItem('niagabelia_last_activity', lastActivityRef.current.toString());
 
         const userDocRef = doc(db, 'users', currentUser.uid);
         try {
@@ -309,11 +399,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             sessionStorage.getItem('niagabelia_auth_session') ||
             localStorage.getItem('niagabelia_auth_session');
           const lastAct = localStorage.getItem('niagabelia_last_activity');
-          if (saved && lastAct && Date.now() - parseInt(lastAct, 10) <= SESSION_TIMEOUT_MS) {
+          if (saved && lastAct && Date.now() - parseInt(lastAct, 10) <= HARD_TIMEOUT_MS) {
             const parsed = JSON.parse(saved);
             if (parsed.user && parsed.profile && parsed.user.isDemo) {
               setUser(parsed.user);
               setUserProfile(parsed.profile);
+              lastActivityRef.current = parseInt(lastAct, 10);
               setLoading(false);
               return;
             }
@@ -333,7 +424,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       activityEvents.forEach(evt => window.removeEventListener(evt, updateActivity));
       clearInterval(intervalCheck);
     };
-  }, []);
+  }, [clearStoredSession, saveSession, terminateSessionDueToIdle]);
 
   const loginWithGoogle = async (): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -954,6 +1045,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
+    warningOpenRef.current = false;
+    setIsSessionWarningOpen(false);
+    setSessionCountdownSeconds(WARNING_COUNTDOWN_SEC);
     try {
       clearStoredSession();
       await fbSignOut(auth);
@@ -965,6 +1059,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setAuthError(null);
     }
   };
+
+  const terminateSessionNow = useCallback(async () => {
+    await terminateSessionDueToIdle(true);
+  }, [terminateSessionDueToIdle]);
 
   const clearAuthError = () => {
     setAuthError(null);
@@ -1091,6 +1189,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         registerNewUser,
         loginAsDemoUser,
         logout,
+        isSessionWarningOpen,
+        sessionCountdownSeconds,
+        keepSessionActive,
+        terminateSessionNow,
         clearAuthError,
         updateProfileData,
         changeUserPassword

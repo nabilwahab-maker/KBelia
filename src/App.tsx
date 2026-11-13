@@ -8,6 +8,7 @@ import {
 } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ConfirmDeleteProvider } from './context/ConfirmDeleteContext';
 import { useTheme } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { 
@@ -82,6 +83,7 @@ import { MentorshipClinicModal } from './components/MentorshipClinicModal';
 import { KioskMaintenanceModal } from './components/KioskMaintenanceModal';
 import { YouthB2BNetworkModal } from './components/YouthB2BNetworkModal';
 import { YouthEventsCalendarModal } from './components/YouthEventsCalendarModal';
+import { SessionTimeoutModal } from './components/SessionTimeoutModal';
 import { ToastContainer, showToast } from './components/ToastNotification';
 import { TopProgressBar, triggerTopNavigationProgress } from './components/TopProgressBar';
 import { 
@@ -117,6 +119,31 @@ function MainApp() {
   useEffect(() => {
     triggerTopNavigationProgress(400);
   }, [activeTab]);
+
+  // Handle idle session termination: close open modals and redirect to login
+  useEffect(() => {
+    const handleSessionTerminated = () => {
+      setIsBookingModalOpen(false);
+      setIsTenantDetailModalOpen(false);
+      setIsBusinessDetailModalOpen(false);
+      setIsGrantModalOpen(false);
+      setIsOfferLetterOpen(false);
+      setIsTenancyModalOpen(false);
+      setIsVerificationModalOpen(false);
+      setIsStatusDocumentsModalOpen(false);
+      setIsCashflowModalOpen(false);
+      setIsAcademyModalOpen(false);
+      setIsMentorshipModalOpen(false);
+      setIsMaintenanceModalOpen(false);
+      setIsB2BModalOpen(false);
+      setIsEventsModalOpen(false);
+      setIsMobileSidebarOpen(false);
+      setActiveTab((prev) => (prev === 'landing' || prev === 'register' ? prev : 'login'));
+    };
+
+    window.addEventListener('kbelia_session_terminated', handleSessionTerminated);
+    return () => window.removeEventListener('kbelia_session_terminated', handleSessionTerminated);
+  }, []);
 
   // Core States
   const [slots, setSlots] = useState<CapsuleSlot[]>(INITIAL_CAPSULE_SLOTS);
@@ -892,7 +919,7 @@ function MainApp() {
   // 0. STANDALONE LANDING PAGE (Welcoming homepage on initial link load)
   if (activeTab === 'landing') {
     return (
-      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
         <TopProgressBar />
         <LandingPage
           setActiveTab={setActiveTab}
@@ -940,7 +967,7 @@ function MainApp() {
   // 1. STANDALONE LOGIN PAGE (Separated from dashboard)
   if (activeTab === 'login') {
     return (
-      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
         <LoginPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -970,7 +997,7 @@ function MainApp() {
   // 1b. STANDALONE REGISTER PAGE (Dedicated Laman Pendaftaran Usahawan Belia)
   if (activeTab === 'register') {
     return (
-      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
         <RegisterPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -998,7 +1025,7 @@ function MainApp() {
   }
 
   return (
-    <div className="h-screen bg-slate-50/50 dark:bg-zinc-950 flex flex-col text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200 overflow-hidden">
+    <div className="h-screen bg-slate-50/50 dark:bg-zinc-950 flex flex-col text-black dark:text-white font-sans antialiased transition-colors duration-200 overflow-hidden">
       <TopProgressBar />
       {/* 1. TOP HEADER BAR */}
       <UMKHeader
@@ -1058,7 +1085,7 @@ function MainApp() {
           
           {/* Portal Maintenance / Announcement Bar from Admin Settings */}
           {portalSettings.systemStatus === 'maintenance' && !isAdmin && (
-            <div className="mb-3 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3">
+            <div className="mb-3 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-black dark:text-white text-xs flex items-center justify-between gap-3">
               <span className="font-semibold">
                 Mod Penyelenggaraan Sistem Aktif — Sebahagian permohonan baharu ditutup buat sementara waktu. {portalSettings.portalAnnouncement}
               </span>
@@ -1152,19 +1179,19 @@ function MainApp() {
           {activeTab === 'academic' && (
             isMentor ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Modul Kapsul Niaga Disekat</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Kapsul Niaga Disekat</h3>
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Akaun Mentor bertauliah dihadkan kepada portal bimbingan, perakuan geran, dan log jurnal mentee sahaja tanpa capaian modul sewaan kiosk belia.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setActiveTab('mentor')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>Kembali ke Portal Mentor</span>
@@ -1173,14 +1200,14 @@ function MainApp() {
             ) : (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
                 <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200/80 dark:border-zinc-800">
-                  <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
+                  <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
                     <Building2 className="w-4 h-4" />
                     <span>{t('tab_kiosk_title')}</span>
                   </div>
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white">
                     {t('tab_kiosk_heading')}
                   </h1>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
+                  <p className="text-xs sm:text-sm text-black dark:text-white mt-1">
                     {t('tab_kiosk_desc')}
                   </p>
                 </div>
@@ -1206,19 +1233,19 @@ function MainApp() {
           {activeTab === 'hepa' && (
             isMentor ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Direktori Awam Disekat</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Direktori Awam Disekat</h3>
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Untuk keselamatan dan batas peranan, Mentor hanya melihat usahawan mentee di bawah seliaan sendiri di Portal Mentor.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setActiveTab('mentor')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>Kembali ke Portal Mentor</span>
@@ -1227,14 +1254,14 @@ function MainApp() {
             ) : (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
                 <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200/80 dark:border-zinc-800">
-                  <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
+                  <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
                     <Store className="w-4 h-4" />
                     <span>{t('tab_directory_title')}</span>
                   </div>
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white">
                     {t('tab_directory_title')}
                   </h1>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
+                  <p className="text-xs sm:text-sm text-black dark:text-white mt-1">
                     {t('tab_directory_desc')}
                   </p>
                 </div>
@@ -1252,19 +1279,19 @@ function MainApp() {
           {activeTab === 'ceed' && (
             isMentor ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Modul Permohonan Geran Disekat</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Permohonan Geran Disekat</h3>
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Mentor hanya mengurus surat perakuan rasmi melalui tab Perakuan Geran di Portal Mentor.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setActiveTab('mentor')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>Kembali ke Portal Mentor</span>
@@ -1273,14 +1300,14 @@ function MainApp() {
             ) : (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
                 <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200/80 dark:border-zinc-800">
-                  <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
+                  <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
                     <Award className="w-4 h-4" />
                     <span>{t('tab_grants_title')}</span>
                   </div>
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                  <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white">
                     {t('tab_grants_heading')}
                   </h1>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
+                  <p className="text-xs sm:text-sm text-black dark:text-white mt-1">
                     {t('tab_grants_desc')}
                   </p>
                 </div>
@@ -1299,19 +1326,19 @@ function MainApp() {
           {activeTab === 'events' && (
             !isYouth ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Modul Acara Belia Sahaja</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Acara Belia Sahaja</h3>
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Halaman penyertaan acara & karnival ini dikhaskan untuk Usahawan Belia.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
                 </button>
@@ -1327,19 +1354,19 @@ function MainApp() {
           {activeTab === 'b2b' && (
             !isYouth ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Ruang Niaga B2B Usahawan Sahaja</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Ruang Niaga B2B Usahawan Sahaja</h3>
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Pasaran B2B dikhaskan untuk rantaian bekalan dan kerjasama antara usahawan belia.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
                 </button>
@@ -1355,19 +1382,19 @@ function MainApp() {
           {activeTab === 'calculator' && (
             !isYouth ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Kalkulator Geran Usahawan Sahaja</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Kalkulator Geran Usahawan Sahaja</h3>
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Simulasi kelayakan geran ini dikhaskan kepada pemohon Usahawan Belia.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
                 </button>
@@ -1386,14 +1413,14 @@ function MainApp() {
           {activeTab === 'admin' && (
             !isAdmin ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-lg font-bold text-black dark:text-white">
                     {language === 'en' ? 'Administrator Access Only' : 'Akses Khusus Pentadbir Sistem Sahaja'}
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {isMentor 
                       ? 'Akaun anda adalah Mentor Bertauliah. Modul kawalan pentadbir sistem dikhaskan kepada pihak urus setia kerajaan.'
                       : 'Halaman ini dikhaskan kepada Pentadbir Sistem Kerajaan Negeri & UMK.'}
@@ -1402,7 +1429,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab(isMentor ? 'mentor' : 'home')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>{isMentor ? 'Kembali ke Hab Mentor' : 'Kembali ke Laman Utama'}</span>
@@ -1434,14 +1461,14 @@ function MainApp() {
           {activeTab === 'mentor' && (
             !isMentor ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-lg font-bold text-black dark:text-white">
                     {language === 'en' ? 'Certified Mentor Access Only' : 'Akses Khusus Mentor Bertauliah Sahaja'}
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {isAdmin
                       ? 'Akaun Pentadbir menggunakan modul Panel Mentor di Pusat Kawalan Pentadbir untuk melantik serta memantau mentor, manakala ruang bimbingan ini dikhaskan kepada Mentor sahaja.'
                       : 'Hab Bimbingan Mentor dikhaskan kepada panel mentor bertauliah UMK & agensi keusahawanan.'}
@@ -1450,7 +1477,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab(isAdmin ? 'admin' : 'home')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-blue-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Laman Utama'}</span>
@@ -1474,14 +1501,14 @@ function MainApp() {
           {activeTab === 'merchant' && (
             isAdmin ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-lg font-bold text-black dark:text-white">
                     {language === 'en' ? 'Youth Entrepreneur Portal Only' : 'Akses Khusus Usahawan Belia Sahaja'}
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {language === 'en'
                       ? 'You are logged in with an Administrator account. Merchant business operations and kiosk management are reserved for registered youth.'
                       : 'Akaun anda adalah Pentadbir Sistem (Admin). Modul pengurusan bisnes usahawan dikhaskan kepada usahawan belia Kelantan.'}
@@ -1490,7 +1517,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('admin')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>{language === 'en' ? 'Back to Admin Control Panel' : 'Kembali ke Pusat Kawalan Pentadbir'}</span>
@@ -1498,14 +1525,14 @@ function MainApp() {
               </div>
             ) : isMentor ? (
               <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-lg font-bold text-black dark:text-white">
                     {language === 'en' ? 'Youth Entrepreneur Portal Only' : 'Akses Khusus Usahawan Belia Sahaja'}
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {language === 'en'
                       ? 'You are logged in with an Academic Mentor account. Business management is reserved for youth mentees. Please use the Mentor Coaching Hub.'
                       : 'Akaun anda adalah Mentor Bimbingan UMK. Modul pengurusan bisnes dikhaskan kepada usahawan belia. Sila gunakan Hab Mentor untuk menyemak dan membimbing usahawan.'}
@@ -1514,7 +1541,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('mentor')}
-                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>{language === 'en' ? 'Back to Mentor Coaching Hub' : 'Kembali ke Hab Bimbingan Mentor'}</span>
@@ -1722,9 +1749,6 @@ function MainApp() {
 
       <LoginModal />
 
-      {/* Floating System-wide Toast Notification Container */}
-      <ToastContainer />
-
     </div>
   );
 }
@@ -1733,7 +1757,11 @@ export function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <MainApp />
+        <ConfirmDeleteProvider>
+          <MainApp />
+          <SessionTimeoutModal />
+          <ToastContainer />
+        </ConfirmDeleteProvider>
       </LanguageProvider>
     </AuthProvider>
   );

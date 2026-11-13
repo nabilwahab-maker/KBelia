@@ -152,14 +152,14 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
       >
         <div className="flex items-start justify-between gap-4 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-300/40 shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-black dark:text-white/75 flex items-center justify-center border border-amber-300/40 shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-base font-bold text-black dark:text-white">
                 Pengesahan Ketulenan Dokumen Awam
               </h3>
-              <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400">
+              <span className="text-[11px] font-semibold text-black dark:text-white/75">
                 Sistem Semakan Surat Tawaran & Sijil Rasmi
               </span>
             </div>
@@ -167,7 +167,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-1 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -175,18 +175,18 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
 
         {/* Search Ref Bar */}
         <form onSubmit={handleVerify} className="mb-6">
-          <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 block mb-1.5">
+          <label className="text-xs font-semibold text-black dark:text-white/75 block mb-1.5">
             Masukkan No. Rujukan Surat Tawaran / Kod Kapsul / SSM:
           </label>
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-black/70 dark:text-white/75" />
               <input
                 type="text"
                 value={inputRef}
                 onChange={(e) => setInputRef(e.target.value)}
                 placeholder="Contoh: KBN-CAP-KB-01-2026-8819 atau REG-2026-BELIA"
-                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs font-mono font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 uppercase"
+                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs font-mono font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 uppercase"
               />
             </div>
             <button
@@ -201,7 +201,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
         {/* Verification Result Card */}
         {verifiedRecord && verifiedRecord.status === 'valid' && (
           <div className="rounded-2xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/20 p-5 flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+            <div className="flex items-center gap-2 text-black dark:text-white/75">
               <CheckCircle2 className="w-5 h-5 shrink-0" />
               <span className="text-xs font-extrabold uppercase tracking-wider">
                 Dokumen Rasmi Diiktiraf & Sah
@@ -210,33 +210,33 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-emerald-200/60 dark:border-emerald-900/60 text-xs">
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">No. Siri Rujukan:</span>
-                <span className="font-mono font-bold text-slate-900 dark:text-white">{verifiedRecord.refCode}</span>
+                <span className="text-black/70 dark:text-white/75 block text-[11px]">No. Siri Rujukan:</span>
+                <span className="font-mono font-bold text-black dark:text-white">{verifiedRecord.refCode}</span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Penerima Tawaran:</span>
-                <span className="font-bold text-slate-900 dark:text-white">{verifiedRecord.recipient}</span>
+                <span className="text-black/70 dark:text-white/75 block text-[11px]">Penerima Tawaran:</span>
+                <span className="font-bold text-black dark:text-white">{verifiedRecord.recipient}</span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Lokasi / Premis:</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{verifiedRecord.kioskLocation}</span>
+                <span className="text-black/70 dark:text-white/75 block text-[11px]">Lokasi / Premis:</span>
+                <span className="font-semibold text-black dark:text-white">{verifiedRecord.kioskLocation}</span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Butiran Kadar / Status:</span>
-                <span className="font-semibold text-emerald-700 dark:text-emerald-300">{verifiedRecord.rate}</span>
+                <span className="text-black/70 dark:text-white/75 block text-[11px]">Butiran Kadar / Status:</span>
+                <span className="font-semibold text-black dark:text-white">{verifiedRecord.rate}</span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Tempoh Sah:</span>
-                <span className="text-slate-700 dark:text-slate-300">{verifiedRecord.issueDate} hingga {verifiedRecord.expiryDate}</span>
+                <span className="text-black/70 dark:text-white/75 block text-[11px]">Tempoh Sah:</span>
+                <span className="text-black dark:text-white">{verifiedRecord.issueDate} hingga {verifiedRecord.expiryDate}</span>
               </div>
               <div>
-                <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Pihak Berkuasa Pengeluar:</span>
-                <span className="text-slate-700 dark:text-slate-300">{verifiedRecord.issuer}</span>
+                <span className="text-black/70 dark:text-white/75 block text-[11px]">Pihak Berkuasa Pengeluar:</span>
+                <span className="text-black dark:text-white">{verifiedRecord.issuer}</span>
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-2">
-              <Lock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-[11px] text-black/70 dark:text-white/75 flex items-center gap-2 mt-2">
+              <Lock className="w-3.5 h-3.5 text-black dark:text-white shrink-0" />
               <span>Mematuhi Akta Perlindungan Data Peribadi 2010 (PDPA) & Piawaian Keselamatan Kerajaan.</span>
             </div>
           </div>
@@ -244,12 +244,12 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
 
         {verifiedRecord && verifiedRecord.status === 'invalid' && (
           <div className="rounded-2xl border border-rose-300 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-950/30 p-5 flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-black dark:text-white/75 shrink-0 mt-0.5" />
             <div className="text-xs space-y-1">
-              <div className="font-extrabold uppercase tracking-wider text-rose-700 dark:text-rose-300">
+              <div className="font-extrabold uppercase tracking-wider text-black dark:text-white">
                 Rekod Tidak Dijumpai ({verifiedRecord.refCode})
               </div>
-              <p className="text-rose-700/90 dark:text-rose-300/90 leading-relaxed">
+              <p className="text-black dark:text-white leading-relaxed">
                 Nombor rujukan ini tiada dalam senarai kelulusan aktif atau belum disahkan oleh Urusetia UMK. Sila semak semula ejaan nombor rujukan anda.
               </p>
             </div>
@@ -260,7 +260,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             Tutup
           </button>

@@ -119,28 +119,28 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
   // Shared design tokens for uniform 3-category navigation across all 3 roles
   const navBtnBase =
-    'w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40';
+    'w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
   const navBtnActive =
-    'bg-sky-50/90 dark:bg-sky-500/15 text-sky-900 dark:text-sky-200 border-sky-200/90 dark:border-sky-500/30 shadow-xs ring-1 ring-sky-500/10 font-bold';
+    'bg-amber-50/90 dark:bg-[#1E4B85]/15 text-black dark:text-white border-blue-200 dark:border-blue-800/70 shadow-xs ring-1 ring-blue-500/30 font-bold';
   const navBtnIdle =
-    'border-transparent text-slate-700 dark:text-zinc-300 hover:bg-slate-100/70 dark:hover:bg-zinc-800/70 hover:text-sky-700 dark:hover:text-sky-300';
+    'border-transparent text-black dark:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-800/70 hover:text-black dark:hover:text-white';
 
   const subNavBtnBase =
-    'w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40';
-  const subNavBtnActive = 'bg-sky-600 text-white font-bold shadow-xs';
+    'w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
+  const subNavBtnActive = 'bg-blue-600 text-white font-bold shadow-xs dark:bg-blue-600';
   const subNavBtnIdle =
-    'text-slate-600 dark:text-zinc-400 hover:bg-slate-100/70 dark:hover:bg-zinc-800/70 hover:text-sky-700 dark:hover:text-sky-300';
+    'text-black dark:text-white/75 hover:bg-slate-100/70 dark:hover:bg-zinc-800/70 hover:text-black dark:hover:text-white';
 
   const categoryHeaderClass =
-    'text-[11px] font-black tracking-wider text-sky-700 dark:text-sky-400 uppercase px-2 pb-1 whitespace-nowrap truncate';
+    'text-[11px] font-black tracking-wider text-black dark:text-white/75 uppercase px-2 pb-1 whitespace-nowrap truncate';
   const categoryDividerClass = 'pt-3 border-t border-slate-200/70 dark:border-zinc-800 space-y-1';
 
   const miniBtnBase =
-    'p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40';
+    'p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
   const miniBtnActive =
-    'bg-sky-50 dark:bg-sky-500/15 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-500/30 shadow-xs ring-1 ring-sky-500/10 font-bold';
+    'bg-amber-50 dark:bg-[#1E4B85]/15 text-black dark:text-white border-blue-200 dark:border-blue-800/70 shadow-xs ring-1 ring-blue-500/30 font-bold';
   const miniBtnIdle =
-    'border-transparent text-slate-500 dark:text-zinc-400 hover:bg-sky-50/70 dark:hover:bg-zinc-800 hover:text-sky-700 dark:hover:text-sky-300';
+    'border-transparent text-black/70 dark:text-white/75 hover:bg-amber-50/70 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
   const miniDivider = <div className="w-8 h-px bg-slate-200 dark:bg-zinc-800 my-0.5" />;
 
   // =========================================================================
@@ -629,14 +629,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
       <div className="space-y-4">
         {isMobileOpen && onCloseMobile && (
           <div className="md:hidden flex items-center justify-between pb-2 border-b border-slate-200 dark:border-zinc-800">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-zinc-200">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-black dark:text-white">
               {isMs ? 'Navigasi KBelia' : 'KBelia Navigation'}
             </span>
             <button
               type="button"
               onClick={onCloseMobile}
               aria-label={isMs ? 'Tutup menu' : 'Close menu'}
-              className="p-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+              className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -650,31 +650,31 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             placeholder={t('search_sidebar')}
             value={sidebarSearch}
             onChange={(e) => setSidebarSearch(e.target.value)}
-            className="w-full pl-3.5 pr-8 py-2 text-xs bg-slate-50/90 dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 rounded-xl text-slate-800 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all duration-150"
+            className="w-full pl-3.5 pr-8 py-2 text-xs bg-slate-50/90 dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all duration-150 dark:focus:border-blue-500"
           />
           {sidebarSearch ? (
             <button
               type="button"
               onClick={() => setSidebarSearch('')}
               aria-label={isMs ? 'Kosongkan carian' : 'Clear search'}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 cursor-pointer"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           ) : (
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-black/70 dark:text-white/75 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           )}
         </div>
 
         {!hasAnySearchMatch && (
           <div className="py-6 px-3 text-center space-y-2 border border-slate-200/80 dark:border-zinc-800 rounded-xl bg-slate-50/70 dark:bg-zinc-900/50">
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-black/70 dark:text-white/75">
               {isMs ? 'Tiada menu yang sepadan.' : 'No matching menu items.'}
             </p>
             <button
               type="button"
               onClick={() => setSidebarSearch('')}
-              className="text-xs font-semibold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
+              className="text-xs font-semibold text-black dark:text-white/75 hover:underline cursor-pointer"
             >
               {isMs ? 'Set Semula' : 'Reset'}
             </button>
@@ -715,8 +715,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         <ShieldCheck
                           className={`w-4 h-4 shrink-0 ${
                             isAdminAccordionRoute
-                              ? 'text-sky-600 dark:text-sky-400'
-                              : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                              ? 'text-black dark:text-white/75'
+                              : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                           }`}
                         />
                         <span className="truncate whitespace-nowrap">{t('nav_admin_control')}</span>
@@ -726,8 +726,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                           isAdminDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
                         } ${
                           isAdminAccordionRoute
-                            ? 'text-sky-700 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75'
                         }`}
                       />
                     </button>
@@ -753,7 +753,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                                 className={`w-3.5 h-3.5 shrink-0 ${
                                   isSubActive
                                     ? 'text-white'
-                                    : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                                    : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                                 }`}
                               />
                               <span className="truncate whitespace-nowrap">{item.label}</span>
@@ -775,8 +775,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Building2
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'academic'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_kiosk_monitoring')}</span>
@@ -784,8 +784,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'academic'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -810,8 +810,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Award
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'ceed'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_grant_monitoring')}</span>
@@ -819,8 +819,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'ceed'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -843,8 +843,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Network
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'admin' && adminSubTab === 'programs'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
@@ -854,8 +854,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'admin' && adminSubTab === 'programs'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -878,8 +878,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <GraduationCap
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'admin' && adminSubTab === 'mentors'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
@@ -889,8 +889,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'admin' && adminSubTab === 'mentors'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -915,8 +915,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Users
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'hepa'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_audit_ssm')}</span>
@@ -924,8 +924,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'hepa'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -941,8 +941,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Settings
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'settings'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
@@ -952,8 +952,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'settings'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -997,8 +997,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         <GraduationCap
                           className={`w-4 h-4 shrink-0 ${
                             isMentorAccordionRoute
-                              ? 'text-sky-600 dark:text-sky-400'
-                              : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                              ? 'text-black dark:text-white/75'
+                              : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                           }`}
                         />
                         <span className="truncate whitespace-nowrap">{t('nav_mentorship_hub')}</span>
@@ -1008,8 +1008,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                           isMentorDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
                         } ${
                           isMentorAccordionRoute
-                            ? 'text-sky-700 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75'
                         }`}
                       />
                     </button>
@@ -1037,7 +1037,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                                 className={`w-3.5 h-3.5 shrink-0 ${
                                   isSubActive
                                     ? 'text-white'
-                                    : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                                    : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                                 }`}
                               />
                               <span className="truncate whitespace-nowrap">{item.label}</span>
@@ -1077,8 +1077,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Award
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'mentor' && mentorSubTab === 'endorsements'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
@@ -1088,8 +1088,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'mentor' && mentorSubTab === 'endorsements'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -1122,8 +1122,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Sliders
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'mentor' && mentorSubTab === 'profile'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
@@ -1133,8 +1133,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'mentor' && mentorSubTab === 'profile'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -1150,8 +1150,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Settings
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'settings'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
@@ -1161,8 +1161,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'settings'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -1206,8 +1206,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         <LayoutDashboard
                           className={`w-4 h-4 shrink-0 ${
                             isYouthAccordionRoute
-                              ? 'text-sky-600 dark:text-sky-400'
-                              : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                              ? 'text-black dark:text-white/75'
+                              : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                           }`}
                         />
                         <span className="truncate whitespace-nowrap">{t('dashboard')}</span>
@@ -1217,8 +1217,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                           isDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
                         } ${
                           isYouthAccordionRoute
-                            ? 'text-sky-700 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75'
                         }`}
                       />
                     </button>
@@ -1246,7 +1246,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                                 className={`w-3.5 h-3.5 shrink-0 ${
                                   isSubActive
                                     ? 'text-white'
-                                    : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                                    : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                                 }`}
                               />
                               <span className="truncate whitespace-nowrap">{item.label}</span>
@@ -1268,8 +1268,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Building2
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'academic'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_my_kiosk')}</span>
@@ -1277,8 +1277,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'academic'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -1303,8 +1303,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Coins
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'merchant' && merchantSubTab === 'cashflow'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_sales_pos')}</span>
@@ -1312,8 +1312,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'merchant' && merchantSubTab === 'cashflow'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -1338,8 +1338,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Award
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'ceed'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_grant_application')}</span>
@@ -1347,8 +1347,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'ceed'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -1366,10 +1366,10 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     className={`${navBtnBase} ${navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <GraduationCap className="w-4 h-4 shrink-0 text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400" />
+                      <GraduationCap className="w-4 h-4 shrink-0 text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white" />
                       <span className="truncate whitespace-nowrap">{t('nav_mentor_clinic')}</span>
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 shrink-0 text-slate-300 dark:text-slate-600 transition-transform group-hover:translate-x-0.5" />
+                    <ChevronRight className="w-3.5 h-3.5 shrink-0 text-black/35 dark:text-white/35 transition-transform group-hover:translate-x-0.5" />
                   </button>
                 )}
 
@@ -1383,8 +1383,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Network
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'b2b'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
@@ -1394,8 +1394,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'b2b'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -1411,8 +1411,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Calendar
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'events'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
@@ -1422,8 +1422,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'events'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -1448,8 +1448,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Store
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'hepa'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">{t('directory')}</span>
@@ -1457,8 +1457,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'hepa'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>
@@ -1474,8 +1474,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <Settings
                         className={`w-4 h-4 shrink-0 ${
                           activeTab === 'settings'
-                            ? 'text-sky-600 dark:text-sky-400'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
@@ -1485,8 +1485,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     <ChevronRight
                       className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
                         activeTab === 'settings'
-                          ? 'text-sky-700 dark:text-sky-400'
-                          : 'text-slate-300 dark:text-slate-600'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
                       }`}
                     />
                   </button>

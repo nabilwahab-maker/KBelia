@@ -6,13 +6,19 @@
   --kbelia-canvas: #F8FAFC;
   --kbelia-surface: #FFFFFF;
   --kbelia-surface-soft: #F8FAFC;
-  --kbelia-border: #E2E8F0;
-  --kbelia-sky-soft: #F0F9FF;
-  --kbelia-sky-border: #BAE6FD;
-  --kbelia-sky: #0284C7;
-  --kbelia-sky-light: #0EA5E9;
-  --kbelia-ink: #0F172A;
-  --kbelia-ink-muted: #475569;
+  --kbelia-border: #CBD5E1;
+  --kbelia-navy: #1E40AF;
+  --kbelia-navy-hover: #1D4ED8;
+  --kbelia-navy-mid: #2563EB;
+  --kbelia-gold: #F59E0B;
+  --kbelia-gold-bright: #FBBF24;
+  --kbelia-gold-soft: #FEF3C7;
+  --kbelia-emerald: #059669;
+  --kbelia-indigo: #4F46E5;
+  --kbelia-teal: #0D9488;
+  --kbelia-rose: #E11D48;
+  --kbelia-ink: #000000;
+  --kbelia-ink-dark: #FFFFFF;
 }
 
 @layer base {
@@ -27,7 +33,7 @@
     padding: 0;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #F8FAFC;
-    color: #0F172A;
+    color: #000000;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.2s ease, color 0.2s ease;
@@ -36,34 +42,46 @@
   /* Gentle charcoal / zinc dark mode */
   html.dark, html.dark body {
     background-color: #09090B;
-    color: #F8FAFC;
+    color: #FFFFFF;
   }
 
-  /* Form controls defaults with high contrast */
+  /* Form controls defaults with strict black/white contrast */
   input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="range"]),
   select,
   textarea {
-    color: #0F172A;
+    color: #000000;
     background-color: #FFFFFF;
-    border-color: #E2E8F0;
+    border-color: #CBD5E1;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(0, 0, 0, 0.52);
   }
 
   html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="range"]),
   html.dark select,
   html.dark textarea {
-    color: #F8FAFC;
+    color: #FFFFFF;
     background-color: #18181B;
     border-color: #27272A;
   }
 
   html.dark input::placeholder,
   html.dark textarea::placeholder {
-    color: #94A3B8;
+    color: rgba(255, 255, 255, 0.58);
   }
 
   html.dark select option {
     background-color: #18181B;
-    color: #F8FAFC;
+    color: #FFFFFF;
+  }
+
+  /* Crisp typographic contrast (inherits black/white unless explicitly overridden by text-white / text-black) */
+  h1, h2, h3, h4, h5, h6 {
+    color: inherit;
+    text-wrap: balance;
+    letter-spacing: -0.02em;
   }
 }
 
@@ -71,69 +89,58 @@ html.dark {
   color-scheme: dark;
 }
 
-/* Crisp typographic contrast */
-h1, h2, h3, h4, h5, h6 {
-  color: #0F172A;
-  text-wrap: balance;
-  letter-spacing: -0.02em;
-}
-
-html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
-  color: #F8FAFC;
-}
-
 /* Consistent numbers everywhere */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* IMPORTANT HEADERS ONLY: Ultra-soft Sky Blue radial glow anchored strictly at top-left fading into crisp white */
+/* IMPORTANT HEADERS ONLY: Modern Cobalt Blue & Indigo/Emerald soft radial wash */
 .kbelia-important-header,
 .kbelia-corner-glow-tl {
   background-color: #FFFFFF;
-  background-image: radial-gradient(circle at 12% 0%, rgba(14, 165, 233, 0.14) 0%, rgba(56, 189, 248, 0.06) 32%, transparent 62%),
-                    radial-gradient(circle at 88% 10%, rgba(245, 158, 11, 0.07) 0%, transparent 45%);
+  background-image: radial-gradient(circle at 10% 0%, rgba(37, 99, 235, 0.10) 0%, rgba(79, 70, 229, 0.05) 36%, transparent 66%),
+                    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 48%);
 }
 
 html.dark .kbelia-important-header,
 html.dark .kbelia-corner-glow-tl {
   background-color: #09090B;
-  background-image: radial-gradient(circle at 15% 0%, rgba(56, 189, 248, 0.16) 0%, transparent 50%),
-                    radial-gradient(circle at 85% 10%, rgba(245, 158, 11, 0.08) 0%, transparent 45%);
+  background-image: radial-gradient(circle at 12% 0%, rgba(59, 130, 246, 0.18) 0%, transparent 52%),
+                    radial-gradient(circle at 88% 10%, rgba(99, 102, 241, 0.22) 0%, transparent 52%);
 }
 
 /* Modern Subtle SVG Grid & Dot Patterns */
 .bg-grid-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 32V0h32' fill='none' stroke='%230f172a' stroke-opacity='0.045' stroke-width='1'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 32V0h32' fill='none' stroke='%232563eb' stroke-opacity='0.06' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 html.dark .bg-grid-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 32V0h32' fill='none' stroke='%23f8fafc' stroke-opacity='0.05' stroke-width='1'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M0 32V0h32' fill='none' stroke='%23ffffff' stroke-opacity='0.05' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 .bg-dot-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='2' cy='2' r='1' fill='%230284c7' fill-opacity='0.14'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='2' cy='2' r='1' fill='%232563eb' fill-opacity='0.18'/%3E%3C/svg%3E");
 }
 
 html.dark .bg-dot-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='2' cy='2' r='1' fill='%2338bdf8' fill-opacity='0.14'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='2' cy='2' r='1' fill='%2360a5fa' fill-opacity='0.18'/%3E%3C/svg%3E");
 }
 
 /* Glassmorphism Modern Card Token */
 .kbelia-glass-card {
-  background-color: rgba(255, 255, 255, 0.82);
+  background-color: rgba(255, 255, 255, 0.86);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  box-shadow: 0 1px 3px 0 rgba(11, 31, 58, 0.05), 0 8px 24px -12px rgba(11, 31, 58, 0.1);
 }
 
 html.dark .kbelia-glass-card {
-  background-color: rgba(24, 24, 27, 0.72);
+  background-color: rgba(24, 24, 27, 0.78);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(63, 63, 70, 0.65);
-  box-shadow: 0 4px 20px -6px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(63, 63, 70, 0.7);
+  box-shadow: 0 4px 20px -6px rgba(0, 0, 0, 0.5);
 }
 
 /* Regular surfaces & cards: crisp white / zinc dark */
@@ -154,7 +161,7 @@ html.dark .kbelia-cream-corner-glow {
 .kbelia-panel-surface {
   background-color: #FFFFFF;
   border: 1px solid #E2E8F0;
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
+  box-shadow: 0 1px 3px 0 rgba(11, 31, 58, 0.04);
 }
 
 html.dark .kbelia-panel-surface {
@@ -203,7 +210,7 @@ html.dark ::-webkit-scrollbar-thumb {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7DD3FC;
+  background: #2563EB;
 }
 
 /* Subtle, purposeful fade-in */

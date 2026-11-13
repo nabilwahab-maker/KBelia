@@ -177,7 +177,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
   return (
     <div 
       id="kbelia-register-page" 
-      className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-200"
+      className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 text-black dark:text-white transition-colors duration-200"
     >
       <main className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 relative">
         
@@ -191,18 +191,18 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             <button
               type="button"
               onClick={() => setActiveTab('landing')}
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-sky-700 dark:hover:text-sky-400 transition-colors cursor-pointer group"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white transition-colors cursor-pointer group"
             >
-              <ChevronLeft className="w-4 h-4 text-slate-400 group-hover:text-sky-700 dark:group-hover:text-sky-400 group-hover:-translate-x-0.5 transition-transform" />
+              <ChevronLeft className="w-4 h-4 text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white group-hover:-translate-x-0.5 transition-transform" />
               <span>{isEn ? 'Back' : 'Kembali'}</span>
             </button>
 
             {/* Mobile-only brand badge */}
             <div className="lg:hidden flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center font-black text-xs shadow-xs">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-xs dark:bg-blue-600">
                 KB
               </div>
-              <span className="font-extrabold text-xs text-slate-800 dark:text-sky-300 tracking-tight">
+              <span className="font-extrabold text-xs text-black dark:text-white tracking-tight">
                 KBelia
               </span>
             </div>
@@ -213,10 +213,10 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             
             {/* HEADING & SUBTITLE */}
             <div className="mb-6 sm:mb-8 text-left">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white tracking-tight">
                 {isEn ? 'Sign Up' : 'Daftar Akaun'}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 font-normal">
+              <p className="text-xs sm:text-sm text-black/70 dark:text-white/75 mt-1.5 font-normal">
                 {isEn ? 'Enter your email and password to sign up!' : 'Masukkan maklumat dan kata laluan anda untuk mendaftar!'}
               </p>
             </div>
@@ -227,7 +227,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 type="button"
                 onClick={handleGoogleSignup}
                 disabled={isSubmitting}
-                className="flex items-center justify-center gap-2.5 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-sky-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all cursor-pointer disabled:opacity-60"
+                className="flex items-center justify-center gap-2.5 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-amber-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-black dark:text-white text-xs font-semibold transition-all cursor-pointer disabled:opacity-60"
               >
                 <GoogleIcon className="w-4 h-4 shrink-0" />
                 <span className="truncate">{isEn ? 'Sign up with Google' : 'Daftar dengan Google'}</span>
@@ -241,9 +241,9 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                   setEmail('usahawan.belia@gmail.com');
                   setPassword('kbelia123');
                 }}
-                className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-sky-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-amber-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-black dark:text-white text-xs font-semibold transition-all cursor-pointer"
               >
-                <Store className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+                <Store className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
                 <span className="truncate">{isEn ? 'Youth Preset' : 'Isi Automatik'}</span>
               </button>
             </div>
@@ -253,29 +253,29 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
               </div>
-              <span className="relative bg-white dark:bg-slate-900 px-3.5 text-xs text-slate-400 dark:text-slate-500 font-medium">
+              <span className="relative bg-white dark:bg-slate-900 px-3.5 text-xs text-black/70 dark:text-white/75 font-medium">
                 {isEn ? 'Or' : 'Atau'}
               </span>
             </div>
 
             {/* ALERT NOTICES: ERROR & SUCCESS */}
             {errorMessage && (
-              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-fade-slide-up">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-black dark:text-white text-xs flex items-start gap-2.5 animate-fade-slide-up">
+                <AlertCircle className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                 <span className="flex-1 leading-relaxed">{errorMessage}</span>
               </div>
             )}
 
             {authError && (
-              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-fade-slide-up">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-black dark:text-white text-xs flex items-start gap-2.5 animate-fade-slide-up">
+                <AlertCircle className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                 <span className="flex-1 leading-relaxed">{authError}</span>
               </div>
             )}
 
             {successMessage && (
-              <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2.5 animate-fade-slide-up">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl text-black dark:text-white text-xs flex items-center gap-2.5 animate-fade-slide-up">
+                <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0" />
                 <span className="font-bold flex-1 leading-relaxed">{successMessage}</span>
               </div>
             )}
@@ -286,8 +286,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               {/* FIRST NAME & LAST NAME */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                    {isEn ? 'First Name' : 'Nama Pertama'}<span className="text-rose-500">*</span>
+                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                    {isEn ? 'First Name' : 'Nama Pertama'}<span className="text-black/70 dark:text-white/75">*</span>
                   </label>
                   <input
                     type="text"
@@ -295,13 +295,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder={isEn ? 'First Name' : 'Nama Pertama'}
-                    className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
+                    className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                    {isEn ? 'Last Name' : 'Nama Terakhir'}<span className="text-rose-500">*</span>
+                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                    {isEn ? 'Last Name' : 'Nama Terakhir'}<span className="text-black/70 dark:text-white/75">*</span>
                   </label>
                   <input
                     type="text"
@@ -309,15 +309,15 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder={isEn ? 'Last Name' : 'Nama Terakhir'}
-                    className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
+                    className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* EMAIL */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  {isEn ? 'Email' : 'Emel'}<span className="text-rose-500">*</span>
+                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Email' : 'Emel'}<span className="text-black/70 dark:text-white/75">*</span>
                 </label>
                 <input
                   type="email"
@@ -325,14 +325,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={isEn ? 'Email' : 'Emel'}
-                  className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
+                  className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                 />
               </div>
 
               {/* PASSWORD WITH SHOW/HIDE EYE */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  {isEn ? 'Password' : 'Kata Laluan'}<span className="text-rose-500">*</span>
+                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Password' : 'Kata Laluan'}<span className="text-black/70 dark:text-white/75">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -341,12 +341,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={isEn ? 'Password' : 'Kata Laluan'}
-                    className="w-full pl-3.5 pr-11 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
+                    className="w-full pl-3.5 pr-11 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
                     title={showPassword ? 'Sembunyi kata laluan' : 'Papar kata laluan'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -357,13 +357,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               {/* OPTIONAL KELANTAN DISTRICT & PHONE CHIPS */}
               <div className="grid grid-cols-2 gap-3 pt-1">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-black dark:text-white/75 mb-1">
                     {isEn ? 'District (Jajahan)' : 'Jajahan Kelantan'}
                   </label>
                   <select
                     value={district}
                     onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full px-2.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 cursor-pointer"
+                    className="w-full px-2.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer dark:focus:border-blue-500"
                   >
                     {DISTRICT_LIST.map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -372,7 +372,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                  <label className="block text-[11px] font-bold text-black dark:text-white/75 mb-1">
                     {isEn ? 'Phone / WhatsApp' : 'No. Telefon'}
                   </label>
                   <input
@@ -380,20 +380,20 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder={isEn ? 'Phone / WhatsApp' : 'No. Telefon'}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* TERMS & PRIVACY CHECKBOX */}
               <div className="pt-1">
-                <label className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400 cursor-pointer select-none">
+                <label className="flex items-start gap-2.5 text-xs text-black dark:text-white/75 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     required
                     checked={agreeTerms}
                     onChange={(e) => setAgreeTerms(e.target.checked)}
-                    className="w-4 h-4 mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer accent-sky-600 shrink-0"
+                    className="w-4 h-4 mt-0.5 rounded border-slate-300 text-black dark:text-white focus:ring-blue-500/30 cursor-pointer accent-blue-600 shrink-0"
                   />
                   <span className="leading-snug">
                     {isEn ? (
@@ -402,7 +402,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                         <button 
                           type="button" 
                           onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }}
-                          className="font-bold text-slate-800 dark:text-white hover:underline inline"
+                          className="font-bold text-black dark:text-white hover:underline inline"
                         >
                           Terms and Conditions
                         </button>
@@ -410,7 +410,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                         <button 
                           type="button" 
                           onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }}
-                          className="font-bold text-slate-800 dark:text-white hover:underline inline"
+                          className="font-bold text-black dark:text-white hover:underline inline"
                         >
                           Privacy Policy
                         </button>
@@ -421,7 +421,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                         <button 
                           type="button" 
                           onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }}
-                          className="font-bold text-slate-800 dark:text-white hover:underline inline"
+                          className="font-bold text-black dark:text-white hover:underline inline"
                         >
                           Terma dan Syarat
                         </button>
@@ -429,7 +429,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                         <button 
                           type="button" 
                           onClick={(e) => { e.preventDefault(); setShowTermsModal(true); }}
-                          className="font-bold text-slate-800 dark:text-white hover:underline inline"
+                          className="font-bold text-black dark:text-white hover:underline inline"
                         >
                           Dasar Privasi
                         </button>{' '}
@@ -444,19 +444,19 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full mt-2 py-3.5 px-4 bg-sky-600 hover:bg-sky-500 active:scale-[0.99] text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60"
+                className="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-600 active:scale-[0.99] text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
               >
-                <UserPlus className="w-4 h-4 text-sky-100" />
+                <UserPlus className="w-4 h-4 text-white" />
                 <span>{isSubmitting ? (isEn ? 'Processing...' : 'Memproses...') : (isEn ? 'Sign Up' : 'Daftar Sekarang')}</span>
               </button>
 
               {/* BOTTOM TOGGLE TO SIGN IN */}
-              <div className="pt-2 text-center text-xs text-slate-500 dark:text-slate-400">
+              <div className="pt-2 text-center text-xs text-black/70 dark:text-white/75">
                 <span>{isEn ? 'Already have an account? ' : 'Sudah ada akaun? '}</span>
                 <button
                   type="button"
                   onClick={() => setActiveTab('login')}
-                  className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
+                  className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
                 >
                   {isEn ? 'Sign In' : 'Log Masuk'}
                 </button>
@@ -468,22 +468,22 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
 
           {/* BOTTOM QUICK DEMO TESTING FOOTER */}
           <div className="w-full pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            <div className="flex items-center justify-between text-[11px] font-semibold text-black/70 dark:text-white/75">
               <span>{isEn ? 'Quick Testing Demo Accounts:' : 'Akaun Pengujian Pantas (Demo):'}</span>
-              <span className="text-[10px] text-slate-400">1-Klik Terus Masuk</span>
+              <span className="text-[10px] text-black/70 dark:text-white/75">1-Klik Terus Masuk</span>
             </div>
             
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={handleDemoMentor}
-                className="p-2.5 bg-slate-50 hover:bg-sky-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 rounded-xl text-left transition-colors cursor-pointer group"
+                className="p-2.5 bg-slate-50 hover:bg-amber-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-slate-800 dark:text-sky-300">
-                  <GraduationCap className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                <div className="flex items-center gap-1.5 font-bold text-xs text-black dark:text-white">
+                  <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Demo Mentor</span>
                 </div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                <div className="text-[10px] text-black/70 dark:text-white/75 truncate mt-0.5">
                   Dr. Wan Azhar (UMK)
                 </div>
               </button>
@@ -491,19 +491,19 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={handleDemoAdmin}
-                className="p-2.5 bg-slate-50 hover:bg-sky-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 rounded-xl text-left transition-colors cursor-pointer group"
+                className="p-2.5 bg-slate-50 hover:bg-amber-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-slate-800 dark:text-white">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                <div className="flex items-center gap-1.5 font-bold text-xs text-black dark:text-white">
+                  <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Demo Admin</span>
                 </div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                <div className="text-[10px] text-black/70 dark:text-white/75 truncate mt-0.5">
                   Pentadbir Urusetia
                 </div>
               </button>
             </div>
 
-            <div className="text-center text-[10px] text-slate-400 dark:text-slate-500 pt-1">
+            <div className="text-center text-[10px] text-black/70 dark:text-white/75 pt-1">
               Hak Cipta Terpelihara © 2026 Portal KBelia Kelantan
             </div>
           </div>
@@ -525,17 +525,17 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             >
               <defs>
                 <pattern id="register-grid-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
-                  <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(14, 165, 233, 0.14)" strokeWidth="0.75" />
+                  <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(37, 99, 235, 0.18)" strokeWidth="0.75" />
                 </pattern>
               </defs>
               <rect width="100%" height="100%" fill="url(#register-grid-pattern)" />
             </svg>
 
-            {/* Soft Sky & Slate Accent Squares */}
-            <div className="absolute top-[18%] right-[22%] w-[60px] h-[60px] bg-sky-100/50 border border-sky-200/70 rounded-xs"></div>
-            <div className="absolute top-[32%] right-[12%] w-[60px] h-[60px] bg-sky-50/70 border border-sky-200/60 rounded-xs"></div>
-            <div className="absolute bottom-[24%] left-[16%] w-[60px] h-[60px] bg-slate-100/70 border border-slate-200/80 rounded-xs"></div>
-            <div className="absolute bottom-[14%] right-[28%] w-[60px] h-[60px] bg-sky-50/60 border border-sky-200/60 rounded-xs"></div>
+            {/* Soft Standard Accent Squares */}
+            <div className="absolute top-[18%] right-[22%] w-[60px] h-[60px] bg-blue-100/60 border border-blue-300/70 rounded-xs"></div>
+            <div className="absolute top-[32%] right-[12%] w-[60px] h-[60px] bg-indigo-50/70 border border-indigo-200/70 rounded-xs"></div>
+            <div className="absolute bottom-[24%] left-[16%] w-[60px] h-[60px] bg-emerald-50/70 border border-emerald-200/80 rounded-xs"></div>
+            <div className="absolute bottom-[14%] right-[28%] w-[60px] h-[60px] bg-amber-50/70 border border-amber-200/70 rounded-xs"></div>
           </div>
 
           {/* CENTER BRAND EMBLEM & TYPOGRAPHY */}
@@ -543,17 +543,17 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             
             {/* BRAND EMBLEM */}
             <div className="flex items-center gap-3.5 mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-sky-600/20 border border-sky-500">
+              <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-amber-500/20 border border-blue-600 dark:bg-blue-600">
                 <span>K</span>
-                <span className="text-sky-100 text-lg ml-0.5">B</span>
+                <span className="text-white text-lg ml-0.5">B</span>
               </div>
-              <span className="text-3xl xl:text-4xl font-black text-slate-800 dark:text-white tracking-tight">
+              <span className="text-3xl xl:text-4xl font-black text-black dark:text-white tracking-tight">
                 KBelia
               </span>
             </div>
 
             {/* SUBTITLE MOTTO */}
-            <p className="text-sm text-slate-600 dark:text-slate-300 font-normal leading-relaxed max-w-sm mt-1">
+            <p className="text-sm text-black dark:text-white font-normal leading-relaxed max-w-sm mt-1">
               Portal Rasmi Kapsul Niaga & Keusahawanan Belia Kelantan 2026
             </p>
 
@@ -562,12 +562,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               {['Kota Bharu', 'Bachok', 'Pasir Mas', 'Tumpat', 'Kuala Krai'].map((d) => (
                 <span 
                   key={d} 
-                  className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-white/90 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200"
+                  className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-white/90 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 text-black dark:text-white"
                 >
                   {d}
                 </span>
               ))}
-              <span className="px-2 py-1 rounded-full text-[10px] font-bold text-sky-800 bg-sky-50 border border-sky-200">
+              <span className="px-2 py-1 rounded-full text-[10px] font-bold text-black bg-amber-50 border border-amber-300">
                 +5 Jajahan
               </span>
             </div>
@@ -580,12 +580,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             onClick={toggleTheme}
             aria-label="Tukar Mod Cerah/Gelap"
             title={theme === 'dark' ? 'Tukar ke Mod Cerah' : 'Tukar ke Mod Gelap'}
-            className="absolute bottom-6 right-6 w-12 h-12 rounded-full bg-white hover:bg-sky-50 active:scale-95 text-sky-700 border border-slate-200 flex items-center justify-center shadow-sm transition-all cursor-pointer z-30"
+            className="absolute bottom-6 right-6 w-12 h-12 rounded-full bg-white hover:bg-amber-50 active:scale-95 text-black border border-slate-200 flex items-center justify-center shadow-sm transition-all cursor-pointer z-30"
           >
             {theme === 'dark' ? (
-              <Sun className="w-5 h-5 text-amber-500" />
+              <Sun className="w-5 h-5 text-black/70 dark:text-white/75" />
             ) : (
-              <Moon className="w-5 h-5 text-sky-700" />
+              <Moon className="w-5 h-5 text-black dark:text-white" />
             )}
           </button>
 
@@ -598,21 +598,21 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-xs p-4 animate-fade-slide-up">
           <div className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl max-h-[85vh] overflow-y-auto">
             <div className="kbelia-important-header px-6 pt-5 pb-3.5 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
-              <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 font-bold text-sm">
+              <div className="flex items-center gap-2 text-black dark:text-white/75 font-bold text-sm">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Terma & Syarat Pendaftaran KBelia 2026</span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowTermsModal(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg cursor-pointer"
+                className="text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white p-1 rounded-lg cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="p-6 space-y-4">
-              <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <div className="space-y-3 text-xs text-black dark:text-white leading-relaxed">
                 <p>
                   <strong>1. Kelayakan Pemohon:</strong> Terbuka kepada warganegara Malaysia berumur 18 hingga 40 tahun yang bermastautin atau beroperasi di dalam 10 Jajahan Negeri Kelantan.
                 </p>
@@ -630,7 +630,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                   setAgreeTerms(true);
                   setShowTermsModal(false);
                 }}
-                className="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                className="w-full py-2.5 bg-blue-600 hover:bg-blue-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer dark:bg-blue-600"
               >
                 Saya Bersetuju & Tutup
               </button>

@@ -78,14 +78,14 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
         {/* Header */}
         <div className="kbelia-important-header dark:bg-slate-800 px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center border border-sky-200 dark:border-sky-800">
-              <ShieldCheck className="w-6 h-6 text-sky-600 dark:text-sky-400" />
+            <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 flex items-center justify-center border border-rose-200 dark:border-rose-800/70">
+              <ShieldCheck className="w-6 h-6 text-black dark:text-white/75" />
             </div>
             <div>
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-sky-700 dark:text-sky-400">
+              <div className="text-[11px] font-extrabold uppercase tracking-widest text-black dark:text-white/75">
                 Pusat Urusan Rasmi KBelia
               </div>
-              <h3 className="font-black text-base sm:text-lg text-slate-800 dark:text-white">
+              <h3 className="font-black text-base sm:text-lg text-black dark:text-white">
                 Semakan Status Permohonan & Dokumen Tawaran
               </h3>
             </div>
@@ -93,7 +93,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -105,8 +105,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             onClick={() => setActiveTab('status')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'status'
-                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'border-indigo-600 text-black dark:border-amber-400 dark:text-white/75'
+                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             1. Status Permohonan Semasa
@@ -116,8 +116,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             onClick={() => setActiveTab('offerLetter')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'offerLetter'
-                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'border-indigo-600 text-black dark:border-amber-400 dark:text-white/75'
+                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -128,8 +128,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             onClick={() => setActiveTab('tenancy')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'tenancy'
-                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'border-blue-600 text-black dark:border-amber-400 dark:text-white/75'
+                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             <Award className="w-3.5 h-3.5" />
@@ -140,8 +140,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             onClick={() => setActiveTab('verify')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'verify'
-                ? 'border-sky-600 text-sky-700 dark:border-sky-400 dark:text-sky-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'border-indigo-600 text-black dark:border-amber-400 dark:text-white/75'
+                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             <QrCode className="w-3.5 h-3.5" />
@@ -161,30 +161,30 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <div className="p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-xs">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-blue-600 text-black dark:text-white/75 border border-blue-200 dark:border-blue-800/70 flex items-center justify-center shrink-0">
                         <Building2 className="w-5 h-5" />
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-black dark:text-white/75">
                           Skim Kiosk Modular Pintar
                         </span>
-                        <h4 className="font-extrabold text-sm sm:text-base text-slate-800 dark:text-white">
-                          Penempatan Kiosk: <span className="font-mono text-sky-700 dark:text-sky-400">{slotCode}</span>
+                        <h4 className="font-extrabold text-sm sm:text-base text-black dark:text-white">
+                          Penempatan Kiosk: <span className="font-mono text-black dark:text-white/75">{slotCode}</span>
                         </h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400">
-                          Lokasi: {hubLocation} &middot; Sewa Subsidi: <span className="font-bold text-slate-800 dark:text-white tabular-nums">RM{monthlyRate}/bulan</span>
+                        <p className="text-xs text-black dark:text-white/75">
+                          Lokasi: {hubLocation} &middot; Sewa Subsidi: <span className="font-bold text-black dark:text-white tabular-nums">RM{monthlyRate}/bulan</span>
                         </p>
                       </div>
                     </div>
 
                     <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
                       userBooking.status === 'approved'
-                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                        ? 'bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white border-emerald-300 dark:border-emerald-800'
                         : userBooking.status === 'rejected'
-                          ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800'
-                          : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                          ? 'bg-rose-100 dark:bg-rose-950 text-black dark:text-white border-rose-300 dark:border-rose-800'
+                          : 'bg-amber-100 dark:bg-amber-950 text-black dark:text-white border-amber-300 dark:border-amber-800'
                     }`}>
-                      {userBooking.status === 'approved' ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Clock className="w-4 h-4 text-amber-600" />}
+                      {userBooking.status === 'approved' ? <CheckCircle2 className="w-4 h-4 text-black dark:text-white" /> : <Clock className="w-4 h-4 text-black dark:text-white" />}
                       <span>
                         {userBooking.status === 'approved' ? 'Permohonan Diluluskan' : userBooking.status === 'rejected' ? 'Tidak Berjaya' : 'Sedang Disemak'}
                       </span>
@@ -192,15 +192,15 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </div>
 
                   <div className="pt-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-                    <div className="text-slate-600 dark:text-slate-300 text-[11px]">
-                      No. Rujukan Rasmi: <span className="font-mono font-bold text-slate-800 dark:text-white">{bookingRef}</span>
+                    <div className="text-black dark:text-white text-[11px]">
+                      No. Rujukan Rasmi: <span className="font-mono font-bold text-black dark:text-white">{bookingRef}</span>
                     </div>
                     {userBooking.status === 'approved' && (
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => setActiveTab('offerLetter')}
-                          className="px-3.5 py-1.5 rounded-xl font-bold bg-sky-600 hover:bg-sky-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer dark:bg-indigo-600"
                         >
                           <FileText className="w-3.5 h-3.5" />
                           <span>Lihat Surat Tawaran</span>
@@ -208,7 +208,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                         <button
                           type="button"
                           onClick={() => setActiveTab('tenancy')}
-                          className="px-3 py-1.5 rounded-xl font-semibold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                          className="px-3 py-1.5 rounded-xl font-semibold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                         >
                           Perjanjian Sewa
                         </button>
@@ -219,18 +219,18 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
               ) : (
                 <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-black/70 dark:text-white/75 flex items-center justify-center shrink-0">
                       <Building2 className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-slate-800 dark:text-white">Tiada Permohonan Kapsul Aktif</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Anda belum menghantar sebarang permohonan sewaan kapsul modular.</p>
+                      <h4 className="font-bold text-sm text-black dark:text-white">Tiada Permohonan Kapsul Aktif</h4>
+                      <p className="text-xs text-black/70 dark:text-white/75">Anda belum menghantar sebarang permohonan sewaan kapsul modular.</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => { onClose(); onOpenBooking(); }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white transition-colors cursor-pointer shrink-0"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer shrink-0 dark:bg-blue-600"
                   >
                     Mohon Kapsul Sekarang
                   </button>
@@ -242,28 +242,28 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-black dark:text-white/75 border border-amber-200 dark:border-amber-800 flex items-center justify-center shrink-0">
                         <Award className="w-5 h-5" />
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-black/70 dark:text-white/75">
                           Skim Bantuan Modal
                         </span>
-                        <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white">
+                        <h4 className="font-bold text-sm sm:text-base text-black dark:text-white">
                           {userGrant.programTitle}
                         </h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400">
-                          Peruntukan: <span className="font-bold text-slate-800 dark:text-white">{userGrant.grantAmount}</span> &middot; {userGrant.businessName}
+                        <p className="text-xs text-black dark:text-white/75">
+                          Peruntukan: <span className="font-bold text-black dark:text-white">{userGrant.grantAmount}</span> &middot; {userGrant.businessName}
                         </p>
                       </div>
                     </div>
 
                     <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
                       userGrant.status === 'approved'
-                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                        ? 'bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white border-emerald-300 dark:border-emerald-800'
                         : userGrant.status === 'rejected'
-                          ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800'
-                          : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                          ? 'bg-rose-100 dark:bg-rose-950 text-black dark:text-white border-rose-300 dark:border-rose-800'
+                          : 'bg-amber-100 dark:bg-amber-950 text-black dark:text-white border-amber-300 dark:border-amber-800'
                     }`}>
                       <Clock className="w-4 h-4" />
                       <span>
@@ -272,12 +272,12 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </span>
                   </div>
 
-                  <div className="pt-3 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+                  <div className="pt-3 flex items-center justify-between text-xs text-black dark:text-white/75">
                     <span>{userGrant.adminNotes || 'Permohonan geran telah direkodkan oleh Urusetia KBelia.'}</span>
                     <button
                       type="button"
                       onClick={onOpenGrantModal}
-                      className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer shrink-0 ml-2"
+                      className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer shrink-0 ml-2"
                     >
                       Mohon Geran Lain &rarr;
                     </button>
@@ -286,18 +286,18 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
               ) : (
                 <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-black/70 dark:text-white/75 flex items-center justify-center shrink-0">
                       <Award className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-slate-800 dark:text-white">Tiada Permohonan Geran Aktif</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Mohon skim dana permulaan atau transformasi digital untuk bisnes anda.</p>
+                      <h4 className="font-bold text-sm text-black dark:text-white">Tiada Permohonan Geran Aktif</h4>
+                      <p className="text-xs text-black/70 dark:text-white/75">Mohon skim dana permulaan atau transformasi digital untuk bisnes anda.</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => { onClose(); onOpenGrantModal(); }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
                   >
                     Mohon Geran Belia
                   </button>
@@ -309,17 +309,17 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-indigo-600 text-black dark:text-white/75 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center shrink-0">
                         <GraduationCap className="w-5 h-5" />
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-black dark:text-white/75">
                           Bimbingan Mentor UMK
                         </span>
-                        <h4 className="font-bold text-sm sm:text-base text-slate-800 dark:text-white">
-                          Klinik Usahawan bersama: <span className="text-sky-700 dark:text-sky-300">{userMentorship.mentorName}</span>
+                        <h4 className="font-bold text-sm sm:text-base text-black dark:text-white">
+                          Klinik Usahawan bersama: <span className="text-black dark:text-white">{userMentorship.mentorName}</span>
                         </h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400">
+                        <p className="text-xs text-black dark:text-white/75">
                           Topik: {userMentorship.topic}
                         </p>
                       </div>
@@ -327,12 +327,12 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
                     <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
                       userMentorship.status === 'confirmed'
-                        ? 'bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 border-sky-300'
+                        ? 'bg-amber-100 dark:bg-teal-600 text-black dark:text-white border-amber-400'
                         : userMentorship.status === 'completed'
-                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300'
+                        ? 'bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white border-emerald-300'
                         : userMentorship.status === 'cancelled'
-                        ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300'
-                        : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300'
+                        ? 'bg-rose-100 dark:bg-rose-950 text-black dark:text-white border-rose-300'
+                        : 'bg-amber-100 dark:bg-amber-950 text-black dark:text-white border-amber-300'
                     }`}>
                       {userMentorship.status === 'confirmed'
                         ? 'Temujanji Disahkan'
@@ -345,8 +345,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </div>
 
                   <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                    <div className="text-slate-600 dark:text-slate-300 text-[11px] flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                    <div className="text-black dark:text-white text-[11px] flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-black dark:text-white" />
                       <span>{userMentorship.preferredDate} ({userMentorship.preferredTime})</span>
                       <span>&bull; {userMentorship.mode}</span>
                     </div>
@@ -356,7 +356,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                         <button
                           type="button"
                           onClick={() => setIsCancelConfirmOpen(true)}
-                          className="px-3 py-1 rounded-lg text-xs font-bold text-rose-700 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 transition-colors flex items-center gap-1 cursor-pointer"
+                          className="px-3 py-1 rounded-lg text-xs font-bold text-black hover:text-black dark:text-white/75 dark:hover:text-white bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 transition-colors flex items-center gap-1 cursor-pointer"
                         >
                           <XCircle className="w-3.5 h-3.5" />
                           <span>Batal Pendaftaran</span>
@@ -366,7 +366,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                       <button
                         type="button"
                         onClick={onOpenMentorship}
-                        className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
+                        className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
                       >
                         Pilihan Slot & Mentor &rarr;
                       </button>
@@ -376,18 +376,18 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
               ) : (
                 <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-black/70 dark:text-white/75 flex items-center justify-center shrink-0">
                       <GraduationCap className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-slate-800 dark:text-white">Tiada Temujanji Klinik Mentor</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Tempah sesi bimbingan perniagaan 1-ke-1 bersama mentor industri UMK.</p>
+                      <h4 className="font-bold text-sm text-black dark:text-white">Tiada Temujanji Klinik Mentor</h4>
+                      <p className="text-xs text-black/70 dark:text-white/75">Tempah sesi bimbingan perniagaan 1-ke-1 bersama mentor industri UMK.</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => { onClose(); onOpenMentorship(); }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
                   >
                     Tempah Klinik Mentor
                   </button>
@@ -398,14 +398,14 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 {isCancelConfirmOpen && (
                   <div className="mt-3 p-4 rounded-2xl bg-rose-50/90 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 animate-in fade-in duration-200">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 shrink-0">
+                      <div className="p-2 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-black dark:text-white shrink-0">
                         <AlertCircle className="w-4 h-4" />
                       </div>
                       <div className="flex-1 text-xs">
-                        <h5 className="font-bold text-rose-900 dark:text-rose-200 text-sm">
+                        <h5 className="font-bold text-black dark:text-white text-sm">
                           Sahkan Pembatalan Sesi Bimbingan?
                         </h5>
-                        <p className="text-rose-800/90 dark:text-rose-300/90 mt-1 leading-relaxed">
+                        <p className="text-black dark:text-white mt-1 leading-relaxed">
                           Adakah anda pasti ingin membatalkan pendaftaran sesi bimbingan bersama <strong>{userMentorship?.mentorName}</strong>? Slot masa ini akan dibebaskan untuk usahawan lain.
                         </p>
                         <div className="flex items-center gap-2 mt-3">
@@ -429,7 +429,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                           <button
                             type="button"
                             onClick={() => setIsCancelConfirmOpen(false)}
-                            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-black dark:text-white font-bold text-xs border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
                           >
                             Kekalkan Pendaftaran
                           </button>
@@ -446,9 +446,9 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           {activeTab === 'offerLetter' && (
             !userBooking || userBooking.status !== 'approved' ? (
               <div className="py-12 text-center space-y-3">
-                <FileText className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
-                <h4 className="font-bold text-sm text-slate-800 dark:text-white">Surat Tawaran Belum Tersedia</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                <FileText className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto" />
+                <h4 className="font-bold text-sm text-black dark:text-white">Surat Tawaran Belum Tersedia</h4>
+                <p className="text-xs text-black/70 dark:text-white/75 max-w-md mx-auto">
                   Surat tawaran digital akan dijana secara automatik sebaik sahaja permohonan kapsul modular anda diluluskan oleh pihak Urusetia UMK.
                 </p>
               </div>
@@ -456,13 +456,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             <div className="space-y-4 animate-in fade-in duration-200">
               
               <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
-                <span className="text-xs text-slate-600 dark:text-slate-400">
+                <span className="text-xs text-black dark:text-white/75">
                   Surat tawaran rasmi boleh dicetak atau disimpan sebagai rujukan pihak berkuasa tempatan (PBT).
                 </span>
                 <button
                   type="button"
                   onClick={handlePrint}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer dark:bg-indigo-600"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Cetak Dokumen</span>
@@ -470,30 +470,30 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
               </div>
 
               {/* Printable Official Document Container (Crisp White for Print) */}
-              <div className="bg-white text-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-md font-sans space-y-5 print:border-none print:shadow-none">
+              <div className="bg-white text-black p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-md font-sans space-y-5 print:border-none print:shadow-none">
                 
                 {/* Letterhead */}
                 <div className="flex items-center justify-between border-b-2 border-emerald-700 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-700 text-amber-200 flex items-center justify-center font-black text-lg border-2 border-amber-300">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black text-lg border-2 border-amber-300">
                       KB
                     </div>
                     <div>
-                      <h4 className="font-black text-base tracking-tight text-slate-900 uppercase">
+                      <h4 className="font-black text-base tracking-tight text-black uppercase">
                         PUSAT PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)
                       </h4>
-                      <div className="text-[11px] font-semibold text-slate-600">
+                      <div className="text-[11px] font-semibold text-black">
                         Dengan Kerjasama Institut Perusahaan & Keusahawanan Universiti Malaysia Kelantan (UMK)
                       </div>
-                      <div className="text-[10px] text-slate-500">
+                      <div className="text-[10px] text-black/70">
                         Bangunan Pentadbiran UMK Kampus Kota, Pengkalan Chepa, 16100 Kota Bharu, Kelantan
                       </div>
                     </div>
                   </div>
                   <div className="text-right hidden sm:block">
-                    <div className="text-[10px] font-mono text-slate-500">NO. RUJUKAN:</div>
-                    <div className="text-xs font-mono font-bold text-emerald-700">{bookingRef}</div>
-                    <div className="text-[10px] text-slate-500 mt-1">TARIKH: {formatDisplayDate(userBooking.createdAt)}</div>
+                    <div className="text-[10px] font-mono text-black/70">NO. RUJUKAN:</div>
+                    <div className="text-xs font-mono font-bold text-black">{bookingRef}</div>
+                    <div className="text-[10px] text-black/70 mt-1">TARIKH: {formatDisplayDate(userBooking.createdAt)}</div>
                   </div>
                 </div>
 
@@ -501,11 +501,11 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <div className="text-xs space-y-1">
                   <div><strong>Kepada:</strong> {applicantName}</div>
                   <div><strong>Nama Perniagaan:</strong> {businessName}</div>
-                  <div><strong>Status Permohonan:</strong> <span className="text-emerald-700 font-bold uppercase">DILULUSKAN (TAWARAN PENEMPATAN)</span></div>
+                  <div><strong>Status Permohonan:</strong> <span className="text-black font-bold uppercase">DILULUSKAN (TAWARAN PENEMPATAN)</span></div>
                 </div>
 
                 {/* Letter Content */}
-                <div className="text-xs leading-relaxed space-y-3 text-slate-800">
+                <div className="text-xs leading-relaxed space-y-3 text-black">
                   <p className="font-bold underline uppercase">
                     TAWARAN PENEMPATAN & SEWAAN BERSUBSIDI KIOSK MODULAR PINTAR KBelia SESI {new Date(userBooking.createdAt || Date.now()).getFullYear()}
                   </p>
@@ -516,28 +516,28 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   {/* Table of Details */}
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 text-[11px]">
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Kod Kiosk Ditetapkan:</span>
-                      <span className="font-mono font-bold text-emerald-800">{slotCode}</span>
+                      <span className="text-black">Kod Kiosk Ditetapkan:</span>
+                      <span className="font-mono font-bold text-black">{slotCode}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Lokasi Hab Perniagaan:</span>
-                      <span className="font-bold text-slate-900">{hubLocation}</span>
+                      <span className="text-black">Lokasi Hab Perniagaan:</span>
+                      <span className="font-bold text-black">{hubLocation}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Kadar Sewaan Bersubsidi:</span>
-                      <span className="font-bold text-emerald-800 tabular-nums">RM{monthlyRate.toFixed(2)} / Sebulan (Kadar Asal Pasaran: RM{monthlyRate * 2})</span>
+                      <span className="text-black">Kadar Sewaan Bersubsidi:</span>
+                      <span className="font-bold text-black tabular-nums">RM{monthlyRate.toFixed(2)} / Sebulan (Kadar Asal Pasaran: RM{monthlyRate * 2})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Tarikh Mula Operasi:</span>
-                      <span className="font-bold text-slate-900">{formatDisplayDate(userBooking.startDate)}</span>
+                      <span className="text-black">Tarikh Mula Operasi:</span>
+                      <span className="font-bold text-black">{formatDisplayDate(userBooking.startDate)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Tarikh Akhir Beroperasi:</span>
-                      <span className="font-bold text-emerald-800">{calculateOperationEndDate(userBooking.startDate, userBooking.durationMonths)}</span>
+                      <span className="text-black">Tarikh Akhir Beroperasi:</span>
+                      <span className="font-bold text-black">{calculateOperationEndDate(userBooking.startDate, userBooking.durationMonths)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Kemudahan Termasuk:</span>
-                      <span className="text-slate-800">Bekalan Elektrik, Rak Display, Kunci Digital Pintar</span>
+                      <span className="text-black">Kemudahan Termasuk:</span>
+                      <span className="text-black">Bekalan Elektrik, Rak Display, Kunci Digital Pintar</span>
                     </div>
                   </div>
 
@@ -549,15 +549,15 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 {/* Sign-off & Digital Stamp */}
                 <div className="pt-4 border-t border-slate-200 flex items-end justify-between">
                   <div>
-                    <div className="text-[11px] font-bold text-slate-900">Prof. Madya Dr. Wan Azhar</div>
-                    <div className="text-[10px] text-slate-600">Penyelaras Keusahawanan UMK & Urusetia KBelia Kelantan</div>
-                    <div className="text-[9px] text-slate-400 mt-1">Dokumen ditandatangani secara digital mengikut Akta Tandatangan Digital 1997.</div>
+                    <div className="text-[11px] font-bold text-black">Prof. Madya Dr. Wan Azhar</div>
+                    <div className="text-[10px] text-black">Penyelaras Keusahawanan UMK & Urusetia KBelia Kelantan</div>
+                    <div className="text-[9px] text-black/70 mt-1">Dokumen ditandatangani secara digital mengikut Akta Tandatangan Digital 1997.</div>
                   </div>
 
                   <div className="w-20 h-20 rounded-xl border border-emerald-200 bg-emerald-50/80 p-1.5 flex flex-col items-center justify-center text-center shrink-0">
-                    <QrCode className="w-8 h-8 text-emerald-800 mb-0.5" />
-                    <span className="text-[8px] font-mono font-bold text-emerald-800">VERIFIED</span>
-                    <span className="text-[7px] text-slate-500">HASH: {slotCode}</span>
+                    <QrCode className="w-8 h-8 text-black mb-0.5" />
+                    <span className="text-[8px] font-mono font-bold text-black">VERIFIED</span>
+                    <span className="text-[7px] text-black/70">HASH: {slotCode}</span>
                   </div>
                 </div>
 
@@ -571,51 +571,51 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           {activeTab === 'tenancy' && (
             !userBooking || userBooking.status !== 'approved' ? (
               <div className="py-12 text-center space-y-3">
-                <Award className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
-                <h4 className="font-bold text-sm text-slate-800 dark:text-white">Perjanjian Sewaan Belum Tersedia</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                <Award className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto" />
+                <h4 className="font-bold text-sm text-black dark:text-white">Perjanjian Sewaan Belum Tersedia</h4>
+                <p className="text-xs text-black/70 dark:text-white/75 max-w-md mx-auto">
                   Terma perjanjian sewaan rasmi hanya diaktifkan selepas permohonan kapsul anda diluluskan.
                 </p>
               </div>
             ) : (
             <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-4 text-xs leading-relaxed text-black dark:text-white">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
                   <div>
-                    <h4 className="font-bold text-sm text-slate-800 dark:text-white uppercase">
+                    <h4 className="font-bold text-sm text-black dark:text-white uppercase">
                       Ringkasan Terma Perjanjian Sewaan Kiosk Modular
                     </h4>
-                    <span className="text-[11px] text-slate-500">Antara KBelia/PBT dan Penyewa Kiosk {applicantName}</span>
+                    <span className="text-[11px] text-black/70">Antara KBelia/PBT dan Penyewa Kiosk {applicantName}</span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white">
                     {userBooking.tenancySigned ? 'Dimeterai' : 'Menunggu Tandatangan'}
                   </span>
                 </div>
 
                 <div className="space-y-2.5">
                   <div>
-                    <strong className="text-slate-800 dark:text-white block mb-0.5">Klausa 1: Tempoh Sewaan & Pembayaran</strong>
+                    <strong className="text-black dark:text-white block mb-0.5">Klausa 1: Tempoh Sewaan & Pembayaran</strong>
                     <p className="text-[11px]">
                       Sewaan bermula pada {formatDisplayDate(userBooking.startDate)} bagi tempoh {userBooking.durationMonths} bulan. Bayaran subsidi RM{monthlyRate}/bulan hendaklah diselesaikan selewat-lewatnya pada 7hb setiap bulan melalui akaun rasmi UMK/KBelia.
                     </p>
                   </div>
 
                   <div>
-                    <strong className="text-slate-800 dark:text-white block mb-0.5">Klausa 2: Waktu Operasi & Kebersihan</strong>
+                    <strong className="text-black dark:text-white block mb-0.5">Klausa 2: Waktu Operasi & Kebersihan</strong>
                     <p className="text-[11px]">
                       Penyewa dikehendaki membuka kiosk sekurang-kurangnya 5 hari seminggu. Kebersihan perimeter kiosk dalam lingkungan 2 meter adalah tanggungjawab penyewa.
                     </p>
                   </div>
 
                   <div>
-                    <strong className="text-slate-800 dark:text-white block mb-0.5">Klausa 3: Keselamatan & Soket Elektrik</strong>
+                    <strong className="text-black dark:text-white block mb-0.5">Klausa 3: Keselamatan & Soket Elektrik</strong>
                     <p className="text-[11px]">
                       Sebarang penggunaan peralatan berkuasa tinggi melebihi 2000W wajib dilaporkan melalui Kaunter Aduan Fasiliti bagi mengelakkan suis pintas.
                     </p>
                   </div>
 
                   <div>
-                    <strong className="text-slate-800 dark:text-white block mb-0.5">Klausa 4: Penyertaan Klinik Bimbingan Mentor</strong>
+                    <strong className="text-black dark:text-white block mb-0.5">Klausa 4: Penyertaan Klinik Bimbingan Mentor</strong>
                     <p className="text-[11px]">
                       Penyewa disyaratkan menghadiri sekurang-kurangnya 1 sesi bimbingan mentor percuma UMK setiap 3 bulan bagi mengekalkan kelayakan subsidi sewa bulanan.
                     </p>
@@ -623,13 +623,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px]">
-                  <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
+                  <span className="text-black dark:text-white/75 font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-4 h-4" /> {userBooking.tenancySigned ? 'Perjanjian Disahkan Secara Digital' : 'Sedia Untuk Tandatangan Digital'}
                   </span>
                   <button
                     type="button"
                     onClick={handlePrint}
-                    className="font-bold text-sky-700 dark:text-sky-400 hover:underline cursor-pointer"
+                    className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
                   >
                     Cetak Salinan &rarr;
                   </button>
@@ -642,20 +642,20 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           {/* TAB 4: PENGESAHAN KOD DIGITAL (VERIFICATION) */}
           {activeTab === 'verify' && (
             <div className="space-y-4 animate-in fade-in duration-200 text-center py-4">
-              <div className="w-16 h-16 rounded-3xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto border border-sky-200 dark:border-sky-800">
+              <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto border border-indigo-200 dark:border-indigo-800/70">
                 <QrCode className="w-8 h-8" />
               </div>
-              <h4 className="font-bold text-base text-slate-800 dark:text-white">
+              <h4 className="font-bold text-base text-black dark:text-white">
                 Pengesah Ketulenan Dokumen & Kiosk KBelia
               </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+              <p className="text-xs text-black dark:text-white/75 max-w-md mx-auto">
                 Kod rujukan dokumen anda dilindungi dengan jejak digital rasmi untuk mengelakkan pemalsuan lesen atau surat penempatan di pihak berkuasa tempatan.
               </p>
 
               <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 max-w-sm mx-auto font-mono text-xs">
-                <div className="text-[10px] text-slate-500 uppercase font-bold">Kod Hash Rujukan:</div>
-                <div className="font-bold text-sky-700 dark:text-sky-400 text-sm mt-0.5">{bookingRef || 'REG-2026-BELIA'}</div>
-                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center justify-center gap-1">
+                <div className="text-[10px] text-black/70 dark:text-white/75 uppercase font-bold">Kod Hash Rujukan:</div>
+                <div className="font-bold text-black dark:text-white/75 text-sm mt-0.5">{bookingRef || 'REG-2026-BELIA'}</div>
+                <div className="text-[10px] text-black dark:text-white/75 mt-1 flex items-center justify-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" /> SEMAKAN DALAM PANGKALAN DATA NEGERI
                 </div>
               </div>
@@ -667,7 +667,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     onClose();
                     onOpenVerification(bookingRef || 'REG-2026-BELIA');
                   }}
-                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-colors cursor-pointer"
+                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors cursor-pointer dark:bg-indigo-600"
                 >
                   Buka Portal Pengesahan Awam PBT
                 </button>
@@ -679,13 +679,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
         {/* Modal Footer */}
         <div className="p-4 sm:px-7 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
-          <div className="text-[11px] text-slate-500">
-            Perlukan bantuan sokongan? Hubungi Urusetia UMK di <span className="font-bold text-slate-700 dark:text-slate-300">09-771 7000</span>
+          <div className="text-[11px] text-black/70">
+            Perlukan bantuan sokongan? Hubungi Urusetia UMK di <span className="font-bold text-black dark:text-white">09-771 7000</span>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             Tutup
           </button>

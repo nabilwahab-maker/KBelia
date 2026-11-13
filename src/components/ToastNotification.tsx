@@ -99,36 +99,36 @@ const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: () => void }> = ({ t
     switch (toast.type) {
       case 'success':
         return {
-          icon: <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />,
+          icon: <CheckCircle2 className="w-5 h-5 text-black dark:text-white/75 shrink-0" />,
           border: 'border-emerald-200 dark:border-emerald-800/80',
           bg: 'bg-white dark:bg-slate-800',
           bar: 'bg-emerald-500',
-          accent: 'text-emerald-800 dark:text-emerald-300'
+          accent: 'text-black dark:text-white'
         };
       case 'error':
         return {
-          icon: <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />,
+          icon: <AlertCircle className="w-5 h-5 text-black dark:text-white/75 shrink-0" />,
           border: 'border-rose-200 dark:border-rose-800/80',
           bg: 'bg-white dark:bg-slate-800',
           bar: 'bg-rose-500',
-          accent: 'text-rose-800 dark:text-rose-300'
+          accent: 'text-black dark:text-white'
         };
       case 'warning':
         return {
-          icon: <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />,
+          icon: <AlertTriangle className="w-5 h-5 text-black dark:text-white/75 shrink-0" />,
           border: 'border-amber-200 dark:border-amber-800/80',
           bg: 'bg-white dark:bg-slate-800',
           bar: 'bg-amber-500',
-          accent: 'text-amber-800 dark:text-amber-300'
+          accent: 'text-black dark:text-white'
         };
       case 'info':
       default:
         return {
-          icon: <Info className="w-5 h-5 text-sky-600 dark:text-sky-400 shrink-0" />,
-          border: 'border-sky-200 dark:border-sky-800/80',
+          icon: <Info className="w-5 h-5 text-black dark:text-white/75 shrink-0" />,
+          border: 'border-blue-200 dark:border-blue-800/70',
           bg: 'bg-white dark:bg-slate-800',
-          bar: 'bg-sky-500',
-          accent: 'text-sky-800 dark:text-sky-300'
+          bar: 'bg-blue-600 dark:bg-blue-600',
+          accent: 'text-black dark:text-white'
         };
     }
   };
@@ -143,11 +143,11 @@ const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: () => void }> = ({ t
       <div className="p-3.5 flex items-start gap-3">
         <div className="pt-0.5">{theme.icon}</div>
         <div className="flex-1 min-w-0 pr-1">
-          <h5 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+          <h5 className="text-xs font-bold text-black dark:text-white leading-snug">
             {toast.title}
           </h5>
           {toast.message && (
-            <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
+            <p className="text-[11px] text-black dark:text-white mt-0.5 leading-relaxed">
               {toast.message}
             </p>
           )}
@@ -155,7 +155,7 @@ const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: () => void }> = ({ t
         <button
           type="button"
           onClick={onDismiss}
-          className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+          className="p-1 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
           title="Tutup pemberitahuan"
         >
           <X className="w-3.5 h-3.5" />

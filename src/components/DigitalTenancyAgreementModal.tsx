@@ -13,6 +13,7 @@ import { CapsuleBooking, CapsuleSlot } from '../types';
 import { signBookingTenancyAgreement } from '../services/dataService';
 import { showToast } from './ToastNotification';
 import { openAndPrintDocument, downloadHtmlDocument, formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
+import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 
 interface DigitalTenancyAgreementModalProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
   const [isSaving, setIsSaving] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
+  const { confirmDelete } = useConfirmDelete();
 
   useEffect(() => {
     if (isOpen) {
@@ -131,14 +133,14 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
       >
         <div className="kbelia-important-header px-6 sm:px-8 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 flex items-center justify-center border border-sky-200 dark:border-sky-800/60 shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200 dark:border-indigo-800/70 shrink-0">
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-800 dark:text-white">
+              <h3 className="text-base font-bold text-black dark:text-white">
                 Perjanjian Sewa Kiosk Digital Rasmi
               </h3>
-              <span className="text-[11px] font-semibold text-sky-700 dark:text-sky-400">
+              <span className="text-[11px] font-semibold text-black dark:text-white/75">
                 Pusat Keusahawanan Universiti Malaysia Kelantan (UMK) & Kerajaan Negeri Kelantan
               </span>
             </div>
@@ -146,7 +148,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -155,12 +157,12 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
         <div className="p-6 sm:p-8 pt-5 overflow-y-auto flex-1">
 
         {/* Agreement Document Content */}
-        <div ref={agreementRef} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 space-y-4 max-h-64 overflow-y-auto font-serif leading-relaxed">
+        <div ref={agreementRef} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-black dark:text-white space-y-4 max-h-64 overflow-y-auto font-serif leading-relaxed">
           <div className="text-center pb-2 border-b border-slate-200 dark:border-slate-700">
-            <h4 className="font-bold text-sm text-slate-900 dark:text-white uppercase font-sans">
+            <h4 className="font-bold text-sm text-black dark:text-white uppercase font-sans">
               PERJANJIAN PENYEWAAN KIOSK KAPSUL USAHAWAN BELIA
             </h4>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans">
+            <span className="text-[10px] text-black/70 dark:text-white/75 font-sans">
               No. Rujukan Perjanjian: AGR-{booking.slotCode}-{new Date().getFullYear()}
             </span>
           </div>
@@ -183,14 +185,21 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
           {!isSigned ? (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                  <PenTool className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                <label className="text-xs font-bold text-black dark:text-white flex items-center gap-1.5">
+                  <PenTool className="w-3.5 h-3.5 text-black dark:text-white/75" />
                   Tandatangan Digital Penyewa (Gunakan Jari atau Tetikus):
                 </label>
                 <button
                   type="button"
-                  onClick={clearSignature}
-                  className="text-[11px] text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 cursor-pointer"
+                  onClick={() =>
+                    confirmDelete({
+                      itemName: 'Tandatangan Digital Semasa',
+                      itemType: 'Tandatangan Digital',
+                      onConfirm: clearSignature
+                    })
+                  }
+                  disabled={!hasSignature}
+                  className="text-[11px] text-black dark:text-white hover:text-black disabled:opacity-40 font-medium flex items-center gap-1 cursor-pointer dark:hover:text-white"
                 >
                   <RotateCcw className="w-3 h-3" /> Padam Semula
                 </button>
@@ -213,14 +222,14 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
               </div>
 
               <div className="flex items-center justify-between mt-4">
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] text-black/70 dark:text-white/75">
                   Tandatangan di atas mengesahkan persetujuan anda terhadap semua terma.
                 </span>
                 <button
                   type="button"
                   disabled={!hasSignature || isSaving}
                   onClick={handleConfirmSignature}
-                  className="py-2 px-5 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-40 transition-all shadow-sm cursor-pointer"
+                  className="py-2 px-5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-40 transition-all shadow-sm cursor-pointer dark:bg-blue-600"
                 >
                   {isSaving ? 'Menyimpan...' : 'Sahkan & Meterai Perjanjian'}
                 </button>
@@ -228,11 +237,11 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
             </div>
           ) : (
             <div className="rounded-2xl p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-center">
-              <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400 mx-auto mb-2" />
-              <h4 className="text-sm font-bold text-emerald-900 dark:text-emerald-200">
+              <CheckCircle2 className="w-8 h-8 text-black dark:text-white/75 mx-auto mb-2" />
+              <h4 className="text-sm font-bold text-black dark:text-white">
                 Perjanjian Telah Ditandatangani & Dimeterai Secara Rasmi!
               </h4>
-              <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-0.5">
+              <p className="text-xs text-black dark:text-white mt-0.5">
                 Salinan digital telah disahkan dan disimpan di dalam Vault Dokumen Digital anda.
               </p>
               <div className="flex flex-wrap justify-center gap-2.5 mt-4">
@@ -249,10 +258,10 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                       setTimeout(() => setIsDownloaded(false), 2500);
                     }
                   }}
-                  className="py-2 px-3.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="py-2 px-3.5 rounded-xl text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
                   title="Muat turun salinan perjanjian"
                 >
-                  <Download className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                  <Download className="w-3.5 h-3.5 text-black dark:text-white/75" />
                   <span>{isDownloaded ? 'Tersimpan!' : 'Muat Turun Fail'}</span>
                 </button>
 
@@ -271,7 +280,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                     setTimeout(() => setIsPrinting(false), 700);
                   }}
                   disabled={isPrinting}
-                  className="py-2 px-4 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  className="py-2 px-4 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm dark:bg-rose-600"
                   title="Cetak Salinan Rasmi"
                 >
                   <Printer className="w-3.5 h-3.5" />
@@ -281,7 +290,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2 px-4 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  className="py-2 px-4 rounded-xl text-xs font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   Selesai
                 </button>
