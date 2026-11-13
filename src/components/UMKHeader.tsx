@@ -30,13 +30,14 @@ import {
   Sparkles,
   Search,
   ExternalLink,
-  Check
+  Check,
+  Newspaper
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { NotificationDropdown } from './NotificationDropdown';
-import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab } from '../types';
+import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab, MentorSubTab } from '../types';
 
 export type UMKTab = 
   | 'home' 
@@ -52,6 +53,7 @@ export type UMKTab =
   | 'login' 
   | 'register' 
   | 'landing' 
+  | 'news'
   | 'settings';
 
 interface UMKHeaderProps {
@@ -61,6 +63,7 @@ interface UMKHeaderProps {
   setIsSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
   onToggleMobileSidebar?: () => void;
   onSelectMerchantSubTab?: (sub: MerchantSubTab) => void;
+  onSelectMentorSubTab?: (sub: MentorSubTab) => void;
   onOpenBooking?: () => void;
   slots?: CapsuleSlot[];
   businesses?: BusinessListing[];
@@ -77,6 +80,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   setIsSidebarCollapsed,
   onToggleMobileSidebar,
   onSelectMerchantSubTab,
+  onSelectMentorSubTab,
   slots = [],
   businesses = [],
   programs = [],
@@ -84,7 +88,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   onSelectBusiness,
   onOpenGrantModal
 }) => {
-  const { user, userProfile, isAdmin, isDemoSession, logout, loginAsDemoUser } = useAuth();
+  const { user, userProfile, isAdmin, isMentor, isYouth, isDemoSession, logout, loginAsDemoUser } = useAuth();
   const { isDark, setTheme } = useTheme();
   const { t, language } = useLanguage();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -127,6 +131,18 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
     const q = globalSearch.trim().toLowerCase();
     if (!q) return null;
 
+    // Mentors are strictly isolated from Youth Kiosk/Directory/Grant-Application search results
+    if (isMentor) {
+      const mentorQuickLinks = [
+        { id: 'overview' as MentorSubTab, label: 'Ringkasan Papan Pemuka Mentor', desc: 'KPI, carta jajahan & temujanji terdekat' },
+        { id: 'sessions' as MentorSubTab, label: 'Sesi Bimbingan & Mentee', desc: 'Senarai permohonan, jadual & pelan tindakan' },
+        { id: 'endorsements' as MentorSubTab, label: 'Surat Perakuan Geran', desc: 'Keluarkan & semak perakuan geran rasmi' },
+        { id: 'logbook' as MentorSubTab, label: 'Log Jurnal Bimbingan', desc: 'Minit bimbingan & senarai semak tugasan' },
+        { id: 'profile' as MentorSubTab, label: 'Profil & Jadual Kelapangan Mentor', desc: 'Kemaskini biodata & hari bimbingan' }
+      ].filter(item => item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q));
+      return { matchedSlots: [], matchedBiz: [], matchedProg: [], mentorQuickLinks, totalCount: mentorQuickLinks.length };
+    }
+
     const matchedSlots = (slots || []).filter(s =>
       (s.name && s.name.toLowerCase().includes(q)) ||
       (s.code && s.code.toLowerCase().includes(q)) ||
@@ -147,8 +163,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
     ).slice(0, 3);
 
     const totalCount = matchedSlots.length + matchedBiz.length + matchedProg.length;
-    return { matchedSlots, matchedBiz, matchedProg, totalCount };
-  }, [globalSearch, slots, businesses, programs]);
+    return { matchedSlots, matchedBiz, matchedProg, mentorQuickLinks: [], totalCount };
+  }, [globalSearch, slots, businesses, programs, isMentor]);
 
   const displayName = userProfile?.fullName || user?.displayName || (isAdmin ? 'Pentadbir Sistem' : 'Usahawan Belia');
   const avatarSrc = userProfile?.avatarUrl || user?.photoURL || (isAdmin 
@@ -222,7 +238,26 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
         {/* Right Section */}
         <div className="flex-1 min-w-0 px-3 sm:px-4 lg:px-6 flex items-center justify-between h-full gap-3 lg:gap-4">
-          
+          {user ? (
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                id="kbelia-header-news-btn"
+                type="button"
+                onClick={() => setActiveTab('news')}
+                aria-current={activeTab === 'news' ? 'page' : undefined}
+                className={`inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold border transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
+                  activeTab === 'news'
+                    ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                    : 'bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-sky-700 border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:hover:text-sky-300 dark:border-slate-700'
+                }`}
+                title="Berita & Pengumuman Rasmi"
+              >
+                <Newspaper className={`w-4 h-4 shrink-0 ${activeTab === 'news' ? 'text-white' : 'text-sky-600 dark:text-sky-400'}`} />
+                <span>News</span>
+              </button>
+            </div>
+          ) : null}
+
           <div className="flex-1" />
 
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
@@ -249,7 +284,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder={t('search_global_ph') || 'Cari kiosk, usahawan, geran...'}
+                    placeholder={isMentor ? 'Cari modul Portal Mentor (sesi, perakuan, log)...' : (t('search_global_ph') || 'Cari kiosk, usahawan, geran...')}
                     value={globalSearch}
                     onChange={(e) => setGlobalSearch(e.target.value)}
                     className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25 focus:border-sky-500 shadow-2xs"
@@ -278,7 +313,41 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       </div>
                     ) : (
                       <>
-                        {/* Kiosks results */}
+                        {/* Mentor Quick Navigation Results */}
+                        {searchResults.mentorQuickLinks.length > 0 && (
+                          <div>
+                            <div className="text-[10px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-400 px-2 mb-1 flex items-center gap-1.5">
+                              <GraduationCap className="w-3 h-3" />
+                              <span>Modul Portal Mentor</span>
+                            </div>
+                            <div className="space-y-0.5">
+                              {searchResults.mentorQuickLinks.map(item => (
+                                <button
+                                  key={item.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setActiveTab('mentor');
+                                    onSelectMentorSubTab?.(item.id);
+                                    setIsSearchOpen(false);
+                                    setGlobalSearch('');
+                                  }}
+                                  className="w-full p-2 text-left rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between transition-colors cursor-pointer"
+                                >
+                                  <div>
+                                    <span className="font-bold text-xs text-slate-900 dark:text-white block">
+                                      {item.label}
+                                    </span>
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                      {item.desc}
+                                    </span>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Kiosks results (Admin monitoring or Youth booking) */}
                         {searchResults.matchedSlots.length > 0 && (
                           <div>
                             <div className="text-[10px] font-extrabold uppercase tracking-wider text-sky-700 dark:text-sky-400 px-2 mb-1 flex items-center gap-1.5">
@@ -291,7 +360,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                   key={slot.id}
                                   type="button"
                                   onClick={() => {
-                                    if (onSelectSlot) onSelectSlot(slot);
+                                    if (isYouth && onSelectSlot) onSelectSlot(slot);
                                     else setActiveTab('academic');
                                     setIsSearchOpen(false);
                                     setGlobalSearch('');
@@ -356,7 +425,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           </div>
                         )}
 
-                        {/* Programs results */}
+                        {/* Programs results (Youth can open grant modal; Admin views grant monitoring) */}
                         {searchResults.matchedProg.length > 0 && (
                           <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                             <div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400 px-2 mb-1 flex items-center gap-1.5">
@@ -369,7 +438,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                   key={prog.id}
                                   type="button"
                                   onClick={() => {
-                                    if (onOpenGrantModal) onOpenGrantModal(prog.title, prog.grantAmount);
+                                    if (isYouth && onOpenGrantModal) onOpenGrantModal(prog.title, prog.grantAmount);
                                     else setActiveTab('ceed');
                                     setIsSearchOpen(false);
                                     setGlobalSearch('');
@@ -397,7 +466,9 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                   </div>
                 ) : (
                   <div className="py-2.5 px-2 text-[11px] text-slate-500 dark:text-slate-400">
-                    Taip nama kiosk, produk usahawan, atau geran untuk carian pantas.
+                    {isMentor
+                      ? 'Taip modul Portal Mentor seperti sesi, perakuan, log atau profil.'
+                      : 'Taip nama kiosk, produk usahawan, atau geran untuk carian pantas.'}
                   </div>
                 )}
               </div>
@@ -513,6 +584,19 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       <span>{t('nav_portal_main')}</span>
                     </button>
 
+                    <button
+                      type="button"
+                      onClick={() => { setActiveTab('news'); setMobileMenuOpen(false); }}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
+                        activeTab === 'news' 
+                          ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800' 
+                          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      <Newspaper className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                      <span>News</span>
+                    </button>
+
                     {isAdmin && (
                       <>
                         <button
@@ -542,23 +626,39 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       </>
                     )}
 
-                    {!isAdmin && userProfile?.role === 'mentor' && (
+                    {isMentor && (
                       <>
                         <button
                           type="button"
-                          onClick={() => { setActiveTab('mentor'); setMobileMenuOpen(false); }}
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('overview'); setMobileMenuOpen(false); }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <GraduationCap className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-                          <span>{t('nav_mentor_main_hub')}</span>
+                          <LayoutDashboard className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                          <span>Ringkasan Mentor</span>
                         </button>
                         <button
                           type="button"
-                          onClick={() => { setActiveTab('hepa'); setMobileMenuOpen(false); }}
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('sessions'); setMobileMenuOpen(false); }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <Users className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-                          <span>{t('nav_entrepreneurs')}</span>
+                          <Calendar className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                          <span>Sesi Bimbingan</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('endorsements'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Award className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                          <span>Perakuan Geran</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('logbook'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <FileCheck className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                          <span>Log Jurnal</span>
                         </button>
                       </>
                     )}

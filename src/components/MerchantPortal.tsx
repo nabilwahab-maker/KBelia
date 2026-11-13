@@ -64,6 +64,18 @@ import { KioskCashflowTracker } from './KioskCashflowTracker';
 import { UserDocumentsVault } from './UserDocumentsVault';
 import { ImageDropzone } from './ImageDropzone';
 import { showToast } from './ToastNotification';
+import { SaaSKpiCard, SparkPoint } from './SaaSKpiCard';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
 import confetti from 'canvas-confetti';
 
@@ -158,7 +170,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   };
 
   const [salesPeriod, setSalesPeriod] = useState<'weekly' | 'monthly' | 'quarterly'>('weekly');
-  const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null);
+  const [chartMode, setChartMode] = useState<'area' | 'bar'>('area');
   const [selectedStepperIndex, setSelectedStepperIndex] = useState<number>(0);
 
   // Business Form State
@@ -546,25 +558,53 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           });
         }
 
+        // Build Sparkline series from real records for the 4 SaaS KPI Cards
+        const salesSpark: SparkPoint[] = chartBars.map(b => ({ label: b.label, value: b.value }));
+        const kioskSpark: SparkPoint[] = [
+          { label: 'Mohon', value: safeBookings.length },
+          { label: 'Semak', value: safeBookings.filter(b => b.status === 'pending').length },
+          { label: 'Lulus', value: safeBookings.filter(b => b.status === 'approved').length },
+          { label: 'Aktif', value: approvedBooking ? 1 : 0 },
+          { label: 'Slot', value: safeSlots.filter(s => s.status === 'available').length }
+        ];
+        const grantSpark: SparkPoint[] = grantApplications.length > 0
+          ? grantApplications.slice(0, 6).reverse().map((g, idx) => ({
+              label: g.programTitle?.slice(0, 8) || `G${idx + 1}`,
+              value: parseAmount(g.grantAmount || g.amount)
+            }))
+          : [
+              { label: 'M1', value: 0 },
+              { label: 'M2', value: 0 },
+              { label: 'M3', value: 0 },
+              { label: 'M4', value: 0 }
+            ];
+        const mentorSpark: SparkPoint[] = [
+          { label: 'Mohon', value: safeMentorships.filter(m => m.status === 'pending').length },
+          { label: 'Sah', value: safeMentorships.filter(m => m.status === 'confirmed').length },
+          { label: 'Selesai', value: safeMentorships.filter(m => m.status === 'completed').length },
+          { label: 'Jumlah', value: safeMentorships.length }
+        ];
+
         return (
         <div className="mt-6 space-y-6">
           
           {/* Executive Greeting Banner */}
-          <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 sm:p-7 border border-slate-200 dark:border-slate-700 shadow-xs relative overflow-hidden">
+          <div className="relative rounded-2xl bg-white/85 dark:bg-zinc-900/75 backdrop-blur-md p-6 sm:p-7 border border-slate-200/80 dark:border-zinc-800 shadow-sm overflow-hidden">
+            <div className="absolute inset-0 bg-dot-pattern opacity-35 pointer-events-none" aria-hidden="true" />
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 text-xs font-semibold text-sky-700 dark:text-sky-400 tracking-wider uppercase">
                   <Activity className="w-3.5 h-3.5" />
                   <span>Papan Pemuka Usahawan Belia Kelantan</span>
-                  <span className="text-slate-300 dark:text-slate-600">·</span>
-                  <span className="text-slate-600 dark:text-slate-300 font-mono text-[11px]">
+                  <span className="text-slate-300 dark:text-zinc-600">·</span>
+                  <span className="text-slate-600 dark:text-zinc-300 font-mono text-[11px]">
                     {primaryBooking ? `Slot ${primaryBooking.slotCode}` : 'Akaun Berdaftar'}
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black tracking-tight text-slate-800 dark:text-white">
+                <h3 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   {myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Usahawan Belia'}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 max-w-2xl leading-relaxed">
                   Pemilik: <span className="font-semibold text-slate-800 dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span> · {myBusiness?.district || userProfile?.district || 'Kota Bharu'} · SSM: <span className="font-mono text-emerald-700 dark:text-emerald-400 font-semibold">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Belum Didaftarkan'}</span>
                 </p>
               </div>
@@ -573,7 +613,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('cashflow')}
-                  className="py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                  className="py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer interactive-press"
                 >
                   <Coins className="w-4 h-4 text-sky-100" />
                   <span>Rekod Jualan Tunai</span>
@@ -581,7 +621,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('products')}
-                  className="py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2 cursor-pointer"
+                  className="py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 hover:bg-sky-50 dark:hover:bg-zinc-700 transition-all flex items-center gap-2 cursor-pointer interactive-press"
                 >
                   <ShoppingBag className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                   <span>Daftar Produk ({safeProducts.length})</span>
@@ -590,180 +630,165 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           </div>
 
-          {/* 4 Executive KPI Metric Cards */}
+          {/* 4 Graphic SaaS KPI Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            
-            {/* KPI 1: Hasil Jualan Direkodkan */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Hasil Jualan Direkodkan
-                </span>
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-800 dark:text-white">
-                  RM {totalSalesAll.toLocaleString('ms-MY', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                </span>
-                {safeCashflow.length > 0 && (
-                  <span className="inline-flex items-center text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                    {safeCashflow.length} rekod
-                  </span>
-                )}
-              </div>
-              <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-                {safeCashflow.length > 0
-                  ? `Purata RM ${avgDailySales.toLocaleString()} / rekod · ${qrPercentAll}% DuitNow QR`
-                  : 'Belum ada rekod jualan. Mula catat di Buku Tunai.'}
-              </div>
-            </div>
+            <SaaSKpiCard
+              chartId="belia-sales"
+              title="Hasil Jualan Direkodkan"
+              value={`RM ${totalSalesAll.toLocaleString('ms-MY', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
+              subtitle={
+                safeCashflow.length > 0
+                  ? `Purata RM ${avgDailySales.toLocaleString()} · ${qrPercentAll}% QR`
+                  : 'Mula catat di Buku Tunai'
+              }
+              icon={TrendingUp}
+              trendLabel={safeCashflow.length > 0 ? `+${safeCashflow.length} rekod` : '0 rekod'}
+              trendDirection={safeCashflow.length > 0 ? 'up' : 'neutral'}
+              accentColor="emerald"
+              sparkData={salesSpark}
+              onClick={() => setActiveTab('cashflow')}
+            />
 
-            {/* KPI 2: Kiosk & Tapak Aktif */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Status Tapak Kiosk
-                </span>
-                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 flex items-center justify-center">
-                  <Building2 className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white truncate">
-                  {primaryBooking ? primaryBooking.slotCode : 'Belum Memohon'}
-                </span>
-                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                  approvedBooking
-                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
-                    : pendingBooking
-                    ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'
-                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                }`}>
-                  {approvedBooking ? 'Aktif' : pendingBooking ? 'Semakan' : 'Kosong'}
-                </span>
-              </div>
-              <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                {primaryBooking
+            <SaaSKpiCard
+              chartId="belia-kiosk"
+              title="Status Tapak Kiosk"
+              value={primaryBooking ? primaryBooking.slotCode : 'Belum Mohon'}
+              subtitle={
+                primaryBooking
                   ? `${primaryBooking.hubLocation} · ${primaryBooking.durationMonths} bln`
-                  : `${safeSlots.filter(s => s.status === 'available').length} unit kapsul tersedia untuk dimohon`}
-              </div>
-            </div>
+                  : `${safeSlots.filter(s => s.status === 'available').length} unit kapsul tersedia`
+              }
+              icon={Building2}
+              trendLabel={approvedBooking ? 'Aktif' : pendingBooking ? 'Semakan' : 'Kosong'}
+              trendDirection={approvedBooking ? 'up' : 'neutral'}
+              accentColor="amber"
+              sparkData={kioskSpark}
+              onClick={() => setActiveTab('bookings')}
+            />
 
-            {/* KPI 3: Status Geran Belia */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Permohonan Geran Belia
-                </span>
-                <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center">
-                  <FileCheck className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-800 dark:text-white">
-                  RM {totalGrantValue.toLocaleString('ms-MY')}
-                </span>
-              </div>
-              <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                <span className={`w-2 h-2 rounded-full shrink-0 ${
-                  approvedGrants.length > 0 ? 'bg-emerald-500' : latestGrant ? 'bg-amber-500' : 'bg-slate-300'
-                }`} />
-                <span className="truncate">
-                  {latestGrant
-                    ? `${latestGrant.programTitle} (${latestGrant.status === 'approved' ? 'Diluluskan' : latestGrant.status === 'rejected' ? 'Ditolak' : 'Dalam Semakan'})`
-                    : 'Tiada permohonan geran dihantar lagi'}
-                </span>
-              </div>
-            </div>
+            <SaaSKpiCard
+              chartId="belia-grants"
+              title="Permohonan Geran Belia"
+              value={`RM ${totalGrantValue.toLocaleString('ms-MY')}`}
+              subtitle={
+                latestGrant
+                  ? `${latestGrant.programTitle}`
+                  : 'Tiada permohonan geran lagi'
+              }
+              icon={FileCheck}
+              trendLabel={
+                approvedGrants.length > 0
+                  ? `${approvedGrants.length} Diluluskan`
+                  : latestGrant
+                  ? 'Semakan'
+                  : '0 Mohon'
+              }
+              trendDirection={approvedGrants.length > 0 ? 'up' : 'neutral'}
+              accentColor="sky"
+              sparkData={grantSpark}
+              onClick={() => setActiveTab('vault')}
+            />
 
-            {/* KPI 4: Sesi Mentor Terdekat */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-2xs transition-colors">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                  Klinik Mentoring Seterusnya
-                </span>
-                <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 flex items-center justify-center">
-                  <Calendar className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white truncate">
-                {upcomingMentor ? `${upcomingMentor.preferredDate}, ${upcomingMentor.preferredTime}` : 'Tiada Sesi Aktif'}
-              </div>
-              <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                {upcomingMentor
-                  ? `${upcomingMentor.mentorName} · ${upcomingMentor.mode}`
-                  : (
-                    <button
-                      type="button"
-                      onClick={onOpenMentorshipClinic}
-                      className="text-sky-700 dark:text-sky-400 hover:underline font-semibold cursor-pointer"
-                    >
-                      Tempah sesi bimbingan mentor →
-                    </button>
-                  )}
-              </div>
-            </div>
-
+            <SaaSKpiCard
+              chartId="belia-mentor"
+              title="Klinik Mentoring Seterusnya"
+              value={upcomingMentor ? upcomingMentor.preferredDate : 'Tiada Sesi'}
+              subtitle={
+                upcomingMentor
+                  ? `${upcomingMentor.mentorName} · ${upcomingMentor.preferredTime}`
+                  : 'Tempah sesi bimbingan mentor'
+              }
+              icon={Calendar}
+              trendLabel={upcomingMentor ? upcomingMentor.mode.split(' ')[0] : 'Sedia'}
+              trendDirection={upcomingMentor ? 'up' : 'neutral'}
+              accentColor="violet"
+              sparkData={mentorSpark}
+              onClick={onOpenMentorshipClinic}
+            />
           </div>
 
-          {/* 3-Column Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Asymmetric Bento Grid (lg:grid-cols-12) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
             
-            {/* Kolum 1: Carta Analitik Jualan Interaktif & Ringkasan Transaksi */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-2xs overflow-hidden transition-colors flex flex-col">
+            {/* Left Bento Span (7 Cols): Carta Recharts Analitik Jualan Interaktif */}
+            <div className="lg:col-span-7 rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white/85 dark:bg-zinc-900/75 backdrop-blur-md shadow-sm overflow-hidden transition-colors flex flex-col">
               
               {/* Card Header */}
-              <div className="border-b border-slate-200 dark:border-slate-700 py-4.5 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="border-b border-slate-200/80 dark:border-zinc-800 py-4.5 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
                     <BarChart3 className="w-4 h-4 text-sky-700 dark:text-sky-400" />
-                    <h4 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white">
+                    <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                       Analitik Aliran Jualan Kiosk
                     </h4>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
                     Transaksi tunai & DuitNow QR sebenar
                   </p>
                 </div>
 
-                {/* Period Selector Tabs */}
-                <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 self-start sm:self-auto">
-                  <button
-                    type="button"
-                    onClick={() => setSalesPeriod('weekly')}
-                    className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                      salesPeriod === 'weekly'
-                        ? 'bg-sky-600 text-white shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    Mingguan
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSalesPeriod('monthly')}
-                    className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                      salesPeriod === 'monthly'
-                        ? 'bg-sky-600 text-white shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    Bulanan
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSalesPeriod('quarterly')}
-                    className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
-                      salesPeriod === 'quarterly'
-                        ? 'bg-sky-600 text-white shadow-2xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    Suku
-                  </button>
+                {/* Chart Mode + Period Selector Tabs */}
+                <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                  <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-200 dark:border-zinc-800">
+                    <button
+                      type="button"
+                      onClick={() => setChartMode('area')}
+                      className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                        chartMode === 'area'
+                          ? 'bg-slate-800 dark:bg-zinc-700 text-white'
+                          : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Grafik
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setChartMode('bar')}
+                      className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                        chartMode === 'bar'
+                          ? 'bg-slate-800 dark:bg-zinc-700 text-white'
+                          : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Bar
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-200 dark:border-zinc-800">
+                    <button
+                      type="button"
+                      onClick={() => setSalesPeriod('weekly')}
+                      className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                        salesPeriod === 'weekly'
+                          ? 'bg-sky-600 text-white shadow-2xs'
+                          : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Mingguan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSalesPeriod('monthly')}
+                      className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                        salesPeriod === 'monthly'
+                          ? 'bg-sky-600 text-white shadow-2xs'
+                          : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Bulanan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSalesPeriod('quarterly')}
+                      className={`px-2 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                        salesPeriod === 'quarterly'
+                          ? 'bg-sky-600 text-white shadow-2xs'
+                          : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Suku
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -771,85 +796,126 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
                 
                 {/* Metric Strip */}
-                <div className="grid grid-cols-3 gap-2 pb-4 mb-4 border-b border-slate-200 dark:border-slate-700 text-center">
+                <div className="grid grid-cols-3 gap-2 pb-4 mb-4 border-b border-slate-200/80 dark:border-zinc-800 text-center">
                   <div>
-                    <span className="text-[10px] text-slate-500 block font-medium">Terkumpul</span>
-                    <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-800 dark:text-white">
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-medium">Terkumpul</span>
+                    <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                       RM {periodTotal.toLocaleString()}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 block font-medium">Purata/Tempoh</span>
-                    <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-800 dark:text-white">
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-medium">Purata/Tempoh</span>
+                    <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                       RM {periodAvg.toLocaleString()}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 block font-medium">Puncak</span>
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-medium">Puncak</span>
                     <span className="font-mono tabular-nums text-sm sm:text-base font-bold text-emerald-700 dark:text-emerald-400">
                       RM {periodMax.toLocaleString()}
                     </span>
                   </div>
                 </div>
 
-                {/* Interactive Bar Chart */}
+                {/* Interactive Recharts Chart */}
                 <div className="relative pt-2 pb-2">
                   {periodMax === 0 ? (
-                    <div className="h-48 flex flex-col items-center justify-center text-center bg-slate-50/70 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 px-4">
-                      <BarChart3 className="w-7 h-7 text-slate-300 dark:text-slate-600 mb-2" />
-                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">Tiada Rekod Jualan Dalam Tempoh Ini</p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                    <div className="h-60 flex flex-col items-center justify-center text-center bg-slate-50/70 dark:bg-zinc-950/60 rounded-xl border border-dashed border-slate-200 dark:border-zinc-800 px-4">
+                      <BarChart3 className="w-7 h-7 text-slate-300 dark:text-zinc-600 mb-2" />
+                      <p className="text-xs font-semibold text-slate-700 dark:text-zinc-300">Tiada Rekod Jualan Dalam Tempoh Ini</p>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1">
                         Rekod jualan harian di tab Buku Tunai untuk memaparkan graf prestasi sebenar.
                       </p>
                     </div>
                   ) : (
-                    <div className="h-48 w-full flex items-end justify-between gap-1.5 sm:gap-2 px-1">
-                      {chartBars.map((item, idx) => {
-                        const heightPercent = item.value > 0 ? Math.max(8, Math.round((item.value / periodMax) * 100)) : 2;
-                        const isHovered = hoveredBarIndex === idx;
-
-                        return (
-                          <div 
-                            key={item.label}
-                            className="flex-1 flex flex-col items-center gap-1.5 group cursor-pointer relative"
-                            onMouseEnter={() => setHoveredBarIndex(idx)}
-                            onMouseLeave={() => setHoveredBarIndex(null)}
-                          >
-                            {/* Tooltip on Hover */}
-                            {isHovered && (
-                              <div className="absolute -top-12 z-20 px-2.5 py-1 rounded-lg bg-slate-800 text-white text-[10px] font-mono shadow-lg whitespace-nowrap animate-in fade-in duration-150 border border-slate-700 pointer-events-none">
-                                <span className="font-bold text-sky-300">RM {item.value.toLocaleString()}</span>
-                                <span className="block text-[9px] text-slate-300">{item.tx} rekod · {item.qr}% QR</span>
-                              </div>
-                            )}
-
-                            {/* Bar Element */}
-                            <div className="w-full bg-slate-50 dark:bg-slate-900 rounded-t-md h-36 flex items-end overflow-hidden p-0.5 border border-slate-200/80 dark:border-slate-700/60">
-                              <div 
-                                className={`w-full rounded-t-sm transition-all duration-300 ${
-                                  isHovered 
-                                    ? 'bg-sky-500 dark:bg-sky-400 shadow-sm' 
-                                    : 'bg-sky-600/85 dark:bg-sky-600 group-hover:bg-sky-600'
-                                }`}
-                                style={{ height: `${heightPercent}%` }}
-                              />
-                            </div>
-
-                            {/* X-axis Label */}
-                            <span className={`text-[10px] font-medium transition-colors ${
-                              isHovered ? 'text-sky-700 dark:text-sky-400 font-bold' : 'text-slate-500 dark:text-slate-400'
-                            }`}>
-                              {item.label}
-                            </span>
-                          </div>
-                        );
-                      })}
+                    <div className="h-60 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        {chartMode === 'area' ? (
+                          <AreaChart data={chartBars} margin={{ top: 10, right: 12, left: -12, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#0284C7" stopOpacity={0.38} />
+                                <stop offset="100%" stopColor="#0284C7" stopOpacity={0.02} />
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.22)" />
+                            <XAxis
+                              dataKey="label"
+                              tick={{ fontSize: 11, fill: '#64748B' }}
+                              axisLine={false}
+                              tickLine={false}
+                            />
+                            <YAxis
+                              tick={{ fontSize: 10, fill: '#64748B' }}
+                              axisLine={false}
+                              tickLine={false}
+                              tickFormatter={(val) => `RM${val}`}
+                            />
+                            <Tooltip
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  const d = payload[0].payload as { label: string; value: number; tx: number; qr: number };
+                                  return (
+                                    <div className="px-3 py-2 rounded-xl bg-zinc-900/95 text-white text-[11px] font-mono shadow-xl border border-zinc-700">
+                                      <div className="text-zinc-400 text-[10px] mb-0.5">{d.label}</div>
+                                      <div className="font-bold text-sky-300">RM {d.value.toLocaleString()}</div>
+                                      <div className="text-[10px] text-zinc-300 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                            <Area
+                              type="monotone"
+                              dataKey="value"
+                              stroke="#0284C7"
+                              strokeWidth={2.5}
+                              fill="url(#beliaSalesGradient)"
+                              activeDot={{ r: 5, fill: '#0EA5E9', stroke: '#FFFFFF', strokeWidth: 2 }}
+                            />
+                          </AreaChart>
+                        ) : (
+                          <BarChart data={chartBars} margin={{ top: 10, right: 12, left: -12, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.22)" />
+                            <XAxis
+                              dataKey="label"
+                              tick={{ fontSize: 11, fill: '#64748B' }}
+                              axisLine={false}
+                              tickLine={false}
+                            />
+                            <YAxis
+                              tick={{ fontSize: 10, fill: '#64748B' }}
+                              axisLine={false}
+                              tickLine={false}
+                              tickFormatter={(val) => `RM${val}`}
+                            />
+                            <Tooltip
+                              cursor={{ fill: 'rgba(14, 165, 233, 0.08)' }}
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  const d = payload[0].payload as { label: string; value: number; tx: number; qr: number };
+                                  return (
+                                    <div className="px-3 py-2 rounded-xl bg-zinc-900/95 text-white text-[11px] font-mono shadow-xl border border-zinc-700">
+                                      <div className="text-zinc-400 text-[10px] mb-0.5">{d.label}</div>
+                                      <div className="font-bold text-sky-300">RM {d.value.toLocaleString()}</div>
+                                      <div className="text-[10px] text-zinc-300 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                            <Bar dataKey="value" fill="#0284C7" radius={[6, 6, 0, 0]} maxBarSize={38} />
+                          </BarChart>
+                        )}
+                      </ResponsiveContainer>
                     </div>
                   )}
                 </div>
 
                 {/* Footer notes & Cashflow shortcut */}
-                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <div className="pt-3 border-t border-slate-200/80 dark:border-zinc-800 flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400">
                   <span className="text-[11px] truncate">Buku Tunai Transaksi Sah</span>
                   <button
                     type="button"
@@ -865,8 +931,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
             </div>
 
-            {/* Kolum 2: Stepper Penjejak Permohonan Berperingkat */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-2xs overflow-hidden transition-colors flex flex-col">
+            {/* Right Bento Span (5 Cols): Penjejak Permohonan + Ringkasan Aktiviti */}
+            <div className="lg:col-span-5 space-y-5 sm:space-y-6">
+
+            {/* Card A: Stepper Penjejak Permohonan Berperingkat */}
+            <div className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white/85 dark:bg-zinc-900/75 backdrop-blur-md shadow-sm overflow-hidden transition-colors flex flex-col">
               
               {/* Card Header */}
               <div className="border-b border-slate-200 dark:border-slate-700 py-4.5 px-5 sm:px-6 flex items-center justify-between">
@@ -987,8 +1056,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
             </div>
 
-            {/* Kolum 3: Pusat Notifikasi & Tindakan Segera Usahawan */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-2xs overflow-hidden transition-colors flex flex-col">
+            {/* Card B: Pusat Notifikasi & Tindakan Segera Usahawan */}
+            <div className="rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white/85 dark:bg-zinc-900/75 backdrop-blur-md shadow-sm overflow-hidden transition-colors flex flex-col">
               
               {/* Card Header */}
               <div className="border-b border-slate-200 dark:border-slate-700 py-4.5 px-5 sm:px-6 flex items-center justify-between">
@@ -1062,11 +1131,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 </div>
 
                 {/* Quick Action Shortcuts */}
-                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-slate-200/80 dark:border-zinc-800 flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => (onOpenSettingsTab ? onOpenSettingsTab() : setActiveTab('card'))}
-                    className="flex-1 py-2 px-2.5 rounded-lg text-[11px] font-bold bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-slate-700 transition-all text-center cursor-pointer"
+                    className="flex-1 py-2 px-2.5 rounded-lg text-[11px] font-bold bg-slate-50 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 hover:bg-sky-50 dark:hover:bg-zinc-700 transition-all text-center cursor-pointer"
                   >
                     Tetapan Akaun
                   </button>
@@ -1080,6 +1149,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 </div>
 
               </div>
+
+            </div>
 
             </div>
 

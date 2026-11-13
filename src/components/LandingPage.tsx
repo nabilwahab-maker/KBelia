@@ -13,8 +13,6 @@ import {
   ChevronDown, 
   LogIn, 
   Globe, 
-  Play,
-  Pause,
   Clock,
   Star,
   Zap,
@@ -203,10 +201,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const activeSlideData = heroSlides[currentSlide];
 
   return (
-    <div id="kbelia-landing-root" className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-sky-600 selection:text-white transition-colors duration-200">
+    <div id="kbelia-landing-root" className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-slate-800 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-sky-600 selection:text-white transition-colors duration-200">
       
       {/* 2. LANDING NAVBAR */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
+      <header className="sticky top-0 z-40 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-md border-b border-slate-200/80 dark:border-zinc-800 shadow-xs transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
           
           {/* Logo & Identity */}
@@ -314,18 +312,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </header>
 
-      {/* 3. HERO SECTION & CAROUSEL VISUAL (Important Header: Top-Left Soft Sky Glow) */}
-      <section id="hero" className="kbelia-important-header relative overflow-hidden pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 transition-colors">
-        <div className="relative max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 text-center space-y-6">
+      {/* 3. HERO SECTION & CAROUSEL VISUAL (Important Header: Top-Left Soft Sky Glow + Grid & Ambient Orbs) */}
+      <section id="hero" className="kbelia-important-header relative overflow-hidden pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-slate-200/80 dark:border-zinc-800 text-slate-800 dark:text-slate-100 transition-colors">
+        {/* Subtle SVG Grid & Ambient Radial Glow */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-80 pointer-events-none" aria-hidden="true" />
+        <div className="absolute -top-24 left-1/4 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute bottom-12 right-1/4 w-80 h-80 bg-amber-400/10 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+
+        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 text-center space-y-6">
           
           {/* Headline & Subhead */}
           <div className="max-w-4xl mx-auto space-y-4">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-800 dark:text-white leading-[1.15] text-balance">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.12] text-balance">
               {isBM 
                 ? 'Platform Bersepadu Usahawan Belia Kelantan Berniaga & Berkembang'
                 : 'Integrated Platform for Kelantan Youth Entrepreneurs to Trade & Grow'}
             </h1>
-            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 font-normal leading-relaxed max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-600 dark:text-zinc-300 font-normal leading-relaxed max-w-2xl mx-auto">
               {isBM
                 ? 'Sewa kios pintar modular, pameran produk tempatan di Direktori Negeri, dan mohon geran pembiayaan keusahawanan dalam satu gerbang rasmi.'
                 : 'Rent smart modular kiosks across 10 districts, showcase local products in the state digital directory, and access entrepreneur grants in one official portal.'}
@@ -376,20 +379,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     {activeSlideData.location}
                   </span>
                 </div>
-
-                <div className="flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/15">
-                  <button
-                    type="button"
-                    onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                    title={isAutoPlaying ? "Jeda gambar bergerak" : "Mainkan gambar bergerak"}
-                    className="p-1 text-white hover:text-sky-300 transition-colors"
-                  >
-                    {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                  </button>
-                  <span className="text-[10px] text-white/80 font-mono font-bold tabular-nums pr-1">
-                    {currentSlide + 1} / {heroSlides.length}
-                  </span>
-                </div>
               </div>
 
               {/* Prev / Next Arrow Navigation */}
@@ -436,9 +425,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       <span>{activeSlideData.ctaText}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
-                    <span className="text-xs text-white/90 font-medium bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 tabular-nums">
-                      {activeSlideData.stat}
-                    </span>
                   </div>
 
                   {/* Dot / Slide Selectors */}
@@ -477,40 +463,70 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* STATISTIK EKOSISTEM SEMASA (LIVE METRICS) */}
           {/* ========================================================================= */}
           <div className="pt-6 w-full mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-sky-300 dark:hover:border-sky-500/40 cursor-default group">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-200/80 dark:border-sky-800/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                  <MapPin className="w-4 h-4" />
+                </div>
+              </div>
               <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 tabular-nums">10</div>
               <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Jajahan Liputan' : 'Districts'}</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Seluruh Kelantan' : 'Statewide'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">{isBM ? 'Seluruh Kelantan' : 'Statewide'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-sky-300 dark:hover:border-sky-500/40 cursor-default group">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <Building2 className="w-4 h-4" />
+                </div>
+              </div>
               <div className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tabular-nums">{slots.length}</div>
               <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
               <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-bold tabular-nums">{availableSlotsCount} {isBM ? 'slot sedia' : 'slots ready'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-sky-300 dark:hover:border-sky-500/40 cursor-default group">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-200/80 dark:border-sky-800/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                  <Store className="w-4 h-4" />
+                </div>
+              </div>
               <div className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tabular-nums">{businesses.length}</div>
               <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Usahawan Direktori' : 'Listed Merchants'}</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Disahkan SSM' : 'SSM Verified'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">{isBM ? 'Disahkan SSM' : 'SSM Verified'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-amber-300 dark:hover:border-amber-500/40 cursor-default group">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                  <Award className="w-4 h-4" />
+                </div>
+              </div>
               <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 tabular-nums">{programs.length}</div>
               <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Program & Geran' : 'Programs & Grants'}</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Inisiatif aktif' : 'Active initiatives'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">{isBM ? 'Inisiatif aktif' : 'Active initiatives'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-violet-300 dark:hover:border-violet-500/40 cursor-default group">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-950/60 border border-violet-200/80 dark:border-violet-800/60 text-violet-600 dark:text-violet-400 flex items-center justify-center">
+                  <Users className="w-4 h-4" />
+                </div>
+              </div>
               <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums">{INITIAL_MENTOR_PROFILES.length}</div>
               <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Panel Mentor' : 'Industry Mentors'}</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Certified mentors'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Certified mentors'}</div>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left shadow-xs hover:border-sky-300 transition-colors cursor-default">
+            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-emerald-300 dark:hover:border-emerald-500/40 cursor-default group">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+              </div>
               <div className="text-2xl sm:text-3xl font-black text-sky-600 dark:text-sky-400 tabular-nums">50%</div>
               <div className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{isBM ? 'Subsidi Sewaan' : 'Rental Subsidy'}</div>
-              <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{isBM ? 'Serendah RM12/hari' : 'From RM12/day'}</div>
+              <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">{isBM ? 'Serendah RM12/hari' : 'From RM12/day'}</div>
             </div>
           </div>
 
@@ -520,17 +536,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 3B. REEL GAMBAR BERGERAK BERTERUSAN (CONTINUOUS HORIZONTAL MARQUEE TICKER) */}
       {/* ========================================================================= */}
-      <section className="py-6 bg-white dark:bg-slate-900 text-slate-800 dark:text-white overflow-hidden border-b border-slate-200 dark:border-slate-800 transition-colors">
+      <section className="py-6 bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm text-slate-800 dark:text-white overflow-hidden border-b border-slate-200/80 dark:border-zinc-800 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-sky-600 dark:bg-sky-400" />
+            <ShoppingBag className="w-4 h-4 text-sky-600 dark:text-sky-400" />
             <h3 className="text-xs sm:text-sm font-bold tracking-wide uppercase text-slate-800 dark:text-slate-200">
               Galeri Kiosk Kapsul & Produk Usahawan Kelantan
             </h3>
           </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">
-            Sorotan usahawan belia KBelia aktif
-          </span>
         </div>
 
         {/* Marquee Track Container */}
@@ -586,16 +599,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 4. PROBLEM VS SOLUTION (CHECKLIST ITEM 4) */}
       {/* ========================================================================= */}
-      <section id="masalah-solusi" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
-        <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <div className="text-center max-w-3xl mx-auto space-y-2 mb-12">
-            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-              Analisis Cabaran & Transformasi
+      <section id="masalah-solusi" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors">
+        <div className="absolute inset-0 bg-dot-pattern opacity-45 pointer-events-none" aria-hidden="true" />
+        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+              <Layers className="w-3.5 h-3.5" />
+              <span>Analisis Cabaran & Transformasi</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-balance">
               Cabaran Tradisional vs. Penyelesaian Pintar KBelia
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400">
               Menghapuskan halangan utama yang dihadapi anak muda Kelantan untuk memulakan dan mengembangkan perniagaan.
             </p>
           </div>
@@ -603,8 +618,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             
             {/* Column 1: Cabaran Tradisional */}
-            <div className="p-7 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 space-y-5">
-              <div className="flex items-center gap-3 pb-3 border-b border-rose-200 dark:border-rose-900/50">
+            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-7 sm:p-8 rounded-2xl bg-rose-50/50 dark:bg-rose-950/15 border border-rose-200/80 dark:border-rose-900/50 space-y-5">
+              <div className="flex items-center gap-3 pb-3 border-b border-rose-200/80 dark:border-rose-900/50">
                 <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 flex items-center justify-center font-bold">
                   <XCircle className="w-6 h-6" />
                 </div>
@@ -654,8 +669,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Column 2: Solusi Pintar KBelia */}
-            <div className="p-7 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 space-y-5">
-              <div className="flex items-center gap-3 pb-3 border-b border-emerald-200 dark:border-emerald-900/50">
+            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-7 sm:p-8 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/15 border border-emerald-200/80 dark:border-emerald-900/50 space-y-5">
+              <div className="flex items-center gap-3 pb-3 border-b border-emerald-200/80 dark:border-emerald-900/50">
                 <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center font-bold">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
@@ -709,105 +724,160 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* 5. CIRI-CIRI UTAMA (CORE FEATURES - CHECKLIST ITEM 5) */}
+      {/* 5. CIRI-CIRI UTAMA (CORE FEATURES - ASYMMETRIC BENTO GRID) */}
       {/* ========================================================================= */}
-      <section id="ciri-utama" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-colors">
-        <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <div className="text-center max-w-3xl mx-auto space-y-2 mb-12">
-            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-              Modul Pintar Portal
+      <section id="ciri-utama" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-950 transition-colors">
+        <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" aria-hidden="true" />
+        <div className="absolute top-1/3 right-0 w-96 h-96 bg-sky-400/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+
+        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+          <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+              <Zap className="w-3.5 h-3.5" />
+              <span>Modul Pintar Portal</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-balance">
               5 Ciri Utama Memperkasakan Bisnes Belia
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400">
               Teknologi dan infrastruktur sokongan lengkap daripada analisis data hingga kepatuhan rasmi.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             
-            {/* Feature 1: Business Analytics */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 flex items-center justify-center font-bold">
-                <TrendingUp className="w-6 h-6" />
+            {/* Feature 1: Business Analytics (Wide Bento Card - col-span-2) */}
+            <div className="lg:col-span-2 kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-sky-300 dark:hover:border-sky-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
+              <div className="space-y-3 max-w-lg relative z-10">
+                <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white">1. Business Analytics & Reporting</h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
+                  Pantau rekod jualan harian, pengurusan inventori produk, serta jana laporan prestasi ringkas untuk kegunaan pembentangan kepada pelabur atau pembiaya.
+                </p>
+                <div className="pt-1 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Grafik visual & eksport PDF</span>
+                </div>
               </div>
-              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">1. Business Analytics & Reporting</h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Pantau rekod jualan harian, pengurusan inventori produk, serta jana laporan prestasi ringkas untuk kegunaan pembentangan kepada pelabur atau pembiaya.
-              </p>
-              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
-                <span>Grafik visual & eksport PDF</span>
+
+              {/* Subtle Decorative Vector SVG Chart Illustration */}
+              <div className="shrink-0 w-full sm:w-48 h-28 rounded-xl bg-sky-50/70 dark:bg-zinc-900/70 border border-sky-200/60 dark:border-zinc-800 p-3 flex items-end justify-between gap-1.5 pointer-events-none select-none" aria-hidden="true">
+                <svg viewBox="0 0 180 80" className="w-full h-full">
+                  <defs>
+                    <linearGradient id="bentoChartGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#0284C7" stopOpacity="0.35" />
+                      <stop offset="100%" stopColor="#0284C7" stopOpacity="0.02" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M5,68 L35,52 L65,58 L95,34 L125,38 L155,16 L175,20 L175,78 L5,78 Z" fill="url(#bentoChartGrad)" />
+                  <path d="M5,68 L35,52 L65,58 L95,34 L125,38 L155,16 L175,20" fill="none" stroke="#0284C7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="95" cy="34" r="3.5" fill="#0EA5E9" />
+                  <circle cx="155" cy="16" r="4" fill="#10B981" />
+                </svg>
               </div>
             </div>
 
             {/* Feature 2: Funding & Grant Tracker */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/80 flex items-center justify-center font-bold">
+            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-amber-300 dark:hover:border-amber-500/40 space-y-3 group">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">2. Funding & Grant Tracker</h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">2. Funding & Grant Tracker</h3>
+              <p className="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed">
                 Akses senarai skim Dana Benih Negeri, geran pendigitalan MDEC, dan pembiayaan mikro TEKUN/MARA lengkap dengan status semakan permohonan masa nyata.
               </p>
-              <div className="pt-2 text-xs font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1">
+              <div className="pt-2 text-xs font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Semakan kelulusan tanpa birokrasi</span>
               </div>
             </div>
 
             {/* Feature 3: Mentorship & Networking */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 flex items-center justify-center font-bold">
+            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-sky-300 dark:hover:border-sky-500/40 space-y-3 group">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                 <Users className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">3. Mentorship & Networking Hub</h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">3. Mentorship & Networking Hub</h3>
+              <p className="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed">
                 Padankan diri anda dengan mentor perniagaan berpengalaman, adakan sesi perkongsian industri, dan bina hubungan strategik dengan usahawan belia lain.
               </p>
-              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
+              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1.5">
+                <Video className="w-3.5 h-3.5" />
                 <span>Sesi 1-ke-1 & bimbingan kumpulan</span>
               </div>
             </div>
 
-            {/* Feature 4: Upskilling & Academy */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 flex items-center justify-center font-bold">
-                <BookOpen className="w-6 h-6" />
+            {/* Feature 4: Upskilling & Academy (Wide Bento Card - col-span-2) */}
+            <div className="lg:col-span-2 kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-sky-300 dark:hover:border-sky-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
+              <div className="space-y-3 max-w-lg relative z-10">
+                <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white">4. Upskilling & Academy Module</h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
+                  Modul latihan praktikal percuma merangkumi penstriman TikTok Shop Ads, fotografi produk komersil, penjenamaan jenama, dan literasi perakaunan ringkas.
+                </p>
+                <div className="pt-1 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1.5">
+                  <Award className="w-3.5 h-3.5" />
+                  <span>Sijil penyertaan keusahawanan</span>
+                </div>
               </div>
-              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">4. Upskilling & Academy Module</h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Modul latihan praktikal percuma merangkumi penstriman TikTok Shop Ads, fotografi produk komersil, penjenamaan jenama, dan literasi perakaunan ringkas.
-              </p>
-              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
-                <span>Sijil penyertaan keusahawanan</span>
+
+              {/* Subtle Decorative Vector SVG Academy Accent */}
+              <div className="shrink-0 w-full sm:w-44 h-24 rounded-xl bg-slate-50/90 dark:bg-zinc-900/70 border border-slate-200/70 dark:border-zinc-800 p-3 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
+                <svg viewBox="0 0 140 70" className="w-full h-full">
+                  <rect x="8" y="12" width="124" height="46" rx="8" fill="none" stroke="#0EA5E9" strokeOpacity="0.35" strokeWidth="1.5" strokeDasharray="4 3" />
+                  <rect x="18" y="22" width="36" height="26" rx="5" fill="#0284C7" fillOpacity="0.14" />
+                  <polygon points="32,29 32,41 42,35" fill="#0284C7" />
+                  <line x1="64" y1="27" x2="120" y2="27" stroke="#0284C7" strokeOpacity="0.45" strokeWidth="3" strokeLinecap="round" />
+                  <line x1="64" y1="37" x2="108" y2="37" stroke="#94A3B8" strokeOpacity="0.45" strokeWidth="2.5" strokeLinecap="round" />
+                  <line x1="64" y1="45" x2="96" y2="45" stroke="#94A3B8" strokeOpacity="0.35" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
               </div>
             </div>
 
             {/* Feature 5: Compliance & SSM Guide */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 flex items-center justify-center font-bold">
+            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-sky-300 dark:hover:border-sky-500/40 space-y-3 group">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                 <FileText className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">5. Compliance & SSM Guide</h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">5. Compliance & SSM Guide</h3>
+              <p className="text-xs text-slate-600 dark:text-zinc-300 leading-relaxed">
                 Panduan interaktif pendaftaran entiti perniagaan di SSM, panduan pematuhan cukai LHDN, permohonan pensijilan Halal JAKIM, dan lesen pihak berkuasa tempatan (PBT).
               </p>
-              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
+              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Templat dokumen & senarai semak</span>
               </div>
             </div>
 
-            {/* Feature 6: Kiosk Modular IoT Hub */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs hover:border-sky-300 transition-all space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-slate-800 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-slate-700 flex items-center justify-center font-bold">
-                <Building2 className="w-6 h-6" />
+            {/* Feature 6: Kiosk Modular IoT Hub (Wide Bento Card - col-span-2) */}
+            <div className="lg:col-span-2 kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-sky-300 dark:hover:border-sky-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
+              <div className="space-y-3 max-w-lg relative z-10">
+                <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-zinc-800 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-zinc-700 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                  <Building2 className="w-6 h-6" />
+                </div>
+                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white">6. Modular Capsule IoT Hub</h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
+                  Sistem kunci digital pintar, pemantauan status penggunaan kiosk secara atas talian, serta sokongan teknikal bersepadu bagi penyewa kiosk modular 10 jajahan.
+                </p>
+                <div className="pt-1 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1.5">
+                  <Wifi className="w-3.5 h-3.5" />
+                  <span>Pengurusan sewaan automatik</span>
+                </div>
               </div>
-              <h3 className="font-extrabold text-base text-slate-800 dark:text-white">6. Modular Capsule IoT Hub</h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Sistem kunci digital pintar, pemantauan status penggunaan kiosk secara atas talian, serta sokongan teknikal bersepadu bagi penyewa kiosk modular 10 jajahan.
-              </p>
-              <div className="pt-2 text-xs font-bold text-sky-700 dark:text-sky-400 flex items-center gap-1">
-                <span>Pengurusan sewaan automatik</span>
+
+              {/* Subtle Decorative Vector SVG Modular Kiosk Node */}
+              <div className="shrink-0 w-full sm:w-44 h-24 rounded-xl bg-sky-50/70 dark:bg-zinc-900/70 border border-sky-200/60 dark:border-zinc-800 p-3 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
+                <svg viewBox="0 0 140 70" className="w-full h-full">
+                  <rect x="20" y="16" width="38" height="38" rx="6" fill="#0284C7" fillOpacity="0.12" stroke="#0284C7" strokeWidth="1.5" />
+                  <rect x="82" y="16" width="38" height="38" rx="6" fill="#10B981" fillOpacity="0.12" stroke="#10B981" strokeWidth="1.5" />
+                  <line x1="58" y1="35" x2="82" y2="35" stroke="#0EA5E9" strokeWidth="1.8" strokeDasharray="3 3" />
+                  <circle cx="39" cy="35" r="5" fill="#0284C7" />
+                  <circle cx="101" cy="35" r="5" fill="#10B981" />
+                </svg>
               </div>
             </div>
 
@@ -818,16 +888,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 6. LANGKAH BERMULA */}
       {/* ========================================================================= */}
-      <section className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+      <section className="py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <div className="text-center max-w-3xl mx-auto space-y-2 mb-14">
-            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-              Proses Mudah 4-Langkah
+          <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-14">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Proses Mudah 4-Langkah</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-balance">
               Langkah Demi Langkah Mula Berniaga
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400">
               Sertai komuniti KBelia dengan proses pendaftaran pantas tanpa bayaran pendaftaran.
             </p>
           </div>
@@ -835,45 +906,57 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
             
             {/* Step 1 */}
-            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 relative space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
-                1
+            <div className="kbelia-glass-card interactive-card p-6 rounded-2xl relative space-y-3 hover:border-sky-300 dark:hover:border-sky-500/40">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
+                  1
+                </div>
+                <UserCheck className="w-5 h-5 text-sky-500/60" />
               </div>
-              <h4 className="font-extrabold text-base text-slate-800 dark:text-white">Daftar Akaun Belia</h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Daftar Akaun Belia</h4>
+              <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
                 Cipta akaun percuma menggunakan emel atau Google. Akses terbuka kepada semua warganegara belia Kelantan.
               </p>
             </div>
 
             {/* Step 2 */}
-            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 relative space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-sky-500 text-white font-black text-sm flex items-center justify-center shadow-xs">
-                2
+            <div className="kbelia-glass-card interactive-card p-6 rounded-2xl relative space-y-3 hover:border-sky-300 dark:hover:border-sky-500/40">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-sky-500 text-white font-black text-sm flex items-center justify-center shadow-xs">
+                  2
+                </div>
+                <Briefcase className="w-5 h-5 text-sky-500/60" />
               </div>
-              <h4 className="font-extrabold text-base text-slate-800 dark:text-white">Isi Profil Perniagaan</h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Isi Profil Perniagaan</h4>
+              <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
                 Lengkapkan profil bisnes anda, muat naik katalog produk tempatan, logo jenama serta pautan WhatsApp dan media sosial.
               </p>
             </div>
 
             {/* Step 3 */}
-            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 relative space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white font-black text-sm flex items-center justify-center shadow-xs">
-                3
+            <div className="kbelia-glass-card interactive-card p-6 rounded-2xl relative space-y-3 hover:border-amber-300 dark:hover:border-amber-500/40">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-amber-500 text-white font-black text-sm flex items-center justify-center shadow-xs">
+                  3
+                </div>
+                <Building2 className="w-5 h-5 text-amber-500/60" />
               </div>
-              <h4 className="font-extrabold text-base text-slate-800 dark:text-white">Semak Kiosk & Geran</h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Semak Kiosk & Geran</h4>
+              <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
                 Pilih slot kiosk kapsul bersubsidi di jajahan anda atau mohon Skim Dana Benih untuk melengkapkan peralatan bisnes.
               </p>
             </div>
 
             {/* Step 4 */}
-            <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 relative space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
-                4
+            <div className="kbelia-glass-card interactive-card p-6 rounded-2xl relative space-y-3 hover:border-emerald-300 dark:hover:border-emerald-500/40">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
+                  4
+                </div>
+                <TrendingUp className="w-5 h-5 text-emerald-500/70" />
               </div>
-              <h4 className="font-extrabold text-base text-slate-800 dark:text-white">Kembangkan Bisnes</h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Kembangkan Bisnes</h4>
+              <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
                 Terima bimbingan mentor berpengalaman, pantau analitik jualan, dan tingkatkan keterlihatan pasaran di seluruh negeri.
               </p>
             </div>
@@ -885,17 +968,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 7. TIGA INISIATIF TERAS */}
       {/* ========================================================================= */}
-      <section id="inisiatif" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white transition-colors">
-        <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+      <section id="inisiatif" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-950 text-slate-800 dark:text-white transition-colors">
+        <div className="absolute inset-0 bg-dot-pattern opacity-40 pointer-events-none" aria-hidden="true" />
+        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
-          <div className="text-center max-w-2xl mx-auto space-y-2 mb-12">
-            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-              {isBM ? 'Inisiatif Pembangunan Negeri' : 'State Development Pillars'}
+          <div className="text-center max-w-2xl mx-auto space-y-2.5 mb-12">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+              <Shield className="w-3.5 h-3.5" />
+              <span>{isBM ? 'Inisiatif Pembangunan Negeri' : 'State Development Pillars'}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-balance">
               {isBM ? 'Teras Ekosistem Keusahawanan KBelia' : 'KBelia Entrepreneurship Ecosystem Pillars'}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400">
               {isBM 
                 ? 'Direka khas bagi menyelesaikan cabaran modal tapak niaga, keterlihatan pasaran digital dan bimbingan berterusan.'
                 : 'Designed to dismantle retail overhead, elevate digital visibility, and provide mentorship.'}
@@ -905,14 +990,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Pillar 1: Kiosk Modular */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-all duration-300 space-y-4 shadow-2xs interactive-card group">
-              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-slate-900 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-slate-700 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+            <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-sky-300 dark:hover:border-sky-500/40 transition-all duration-300 space-y-4 group">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-zinc-900 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-zinc-700 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Building2 className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-800 dark:text-white transition-colors duration-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">
                 {isBM ? '1. Kiosk Kapsul Modular' : '1. Modular Capsule Kiosks'}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
                 {isBM 
                   ? 'Penyediaan ruang niaga pasang siap di kawasan tumpuan tinggi jajahan. Dilengkapi bekalan elektrik stabil, WiFi 500Mbps dan kawalan keselamatan dengan kadar sewa serendah RM12-RM25/hari.'
                   : 'Turnkey pre-fitted retail pods at high-footfall locations with electricity, 500Mbps WiFi, and security starting at RM12/day.'}
@@ -930,14 +1015,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Pillar 2: Direktori Digital */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-all duration-300 space-y-4 shadow-2xs interactive-card group">
-              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-slate-900 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-slate-700 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+            <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-sky-300 dark:hover:border-sky-500/40 transition-all duration-300 space-y-4 group">
+              <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-zinc-900 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-zinc-700 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Store className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-800 dark:text-white transition-colors duration-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">
                 {isBM ? '2. Direktori Pasaran Digital' : '2. Digital Market Directory'}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
                 {isBM 
                   ? 'Katalog atas talian rasmi mempamerkan produk keluaran anak muda Kelantan seperti makanan tradisi, kraftangan batik, servis teknologi, dan hasil pertanian terus kepada orang ramai.'
                   : 'Official digital catalog showcasing youth-crafted products—from heritage delicacies to contemporary batik and tech services.'}
@@ -955,14 +1040,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Pillar 3: Geran & Bantuan */}
-            <div className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-sky-300 transition-all duration-300 space-y-4 shadow-2xs interactive-card group">
+            <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-amber-300 dark:hover:border-amber-500/40 transition-all duration-300 space-y-4 group">
               <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-800 dark:text-white transition-colors duration-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-200 group-hover:text-sky-700 dark:group-hover:text-sky-300">
                 {isBM ? '3. Geran & Inkubasi Modal' : '3. Grants & Seed Capital'}
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
                 {isBM 
                   ? 'Peluang mendapatkan Dana Benih Belia, geran digitalisasi, serta latihan keusahawanan intensif bersama mentor industri berkaliber bagi memacu pertumbuhan perniagaan.'
                   : 'Fast-tracked youth seed grants, digitalization subsidies, and structured mentorship programs.'}
@@ -987,18 +1072,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 8. PREVIEW KIOSK MODULAR */}
       {/* ========================================================================= */}
-      <section id="kiosk" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+      <section id="kiosk" className="py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-                Lokasi Pilihan Jajahan
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                <Building2 className="w-3.5 h-3.5" />
+                <span>Lokasi Pilihan Jajahan</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mt-1 text-balance">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mt-1 text-balance">
                 Kapsul & Kiosk Niaga Sedia Dimohon
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 mt-1">
                 Pilih tapak perniagaan yang strategik dengan fasiliti elektrik dan internet sedia ada.
               </p>
             </div>
@@ -1015,10 +1101,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div 
                   key={slot.id} 
                   onClick={() => onSelectSlot(slot)}
-                  className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 overflow-hidden hover:border-sky-400 hover:shadow-md transition-all flex flex-col justify-between h-full group cursor-pointer"
+                  className="kbelia-glass-card interactive-card rounded-2xl overflow-hidden hover:border-sky-400 hover:shadow-md transition-all flex flex-col justify-between h-full group cursor-pointer"
                 >
                   <div>
-                    <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-slate-800">
+                    <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-zinc-800">
                       <img 
                         src={slot.imageUrl || '/assets/generated/kiosk_modular_kbelia.jpg'} 
                         alt={slot.name} 
@@ -1037,30 +1123,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                     <div className="p-5 sm:p-6 space-y-3">
                       <div>
-                        <h4 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white leading-snug group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">{slot.name}</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{slot.hubLocation}</p>
+                        <h4 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">{slot.name}</h4>
+                        <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 line-clamp-2">{slot.hubLocation}</p>
                       </div>
 
                       {/* Amenities */}
-                      <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 pt-1 border-t border-slate-200/80 dark:border-slate-700">
-                        <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300">
+                      <div className="text-xs text-slate-500 dark:text-zinc-400 flex items-center gap-2 pt-1 border-t border-slate-200/80 dark:border-zinc-800">
+                        <span className="flex items-center gap-1 text-slate-700 dark:text-zinc-300">
                           <Zap className="w-3 h-3 text-amber-500" /> Elektrik
                         </span>
-                        <span aria-hidden="true" className="text-slate-300 dark:text-slate-600">·</span>
-                        <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300">
+                        <span aria-hidden="true" className="text-slate-300 dark:text-zinc-600">·</span>
+                        <span className="flex items-center gap-1 text-slate-700 dark:text-zinc-300">
                           <Wifi className="w-3 h-3 text-sky-600" /> WiFi 500M
                         </span>
-                        <span aria-hidden="true" className="text-slate-300 dark:text-slate-600">·</span>
-                        <span className="text-slate-500 dark:text-slate-400">{slot.size}</span>
+                        <span aria-hidden="true" className="text-slate-300 dark:text-zinc-600">·</span>
+                        <span className="text-slate-500 dark:text-zinc-400">{slot.size}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 flex items-center justify-between border-t border-slate-200/80 dark:border-slate-700">
+                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 flex items-center justify-between border-t border-slate-200/80 dark:border-zinc-800">
                     <div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Kadar Sewaan Bersubsidi</div>
+                      <div className="text-[10px] text-slate-500 dark:text-zinc-400 uppercase font-semibold">Kadar Sewaan Bersubsidi</div>
                       <div className="text-sm sm:text-base font-extrabold text-sky-700 dark:text-sky-400 tabular-nums">
-                        RM{slot.dailyRate} <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">/ hari</span>
+                        RM{slot.dailyRate} <span className="text-xs text-slate-500 dark:text-zinc-400 font-normal">/ hari</span>
                       </div>
                     </div>
                   </div>
@@ -1076,18 +1162,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 9. PREVIEW DIREKTORI USAHAWAN BELIA */}
       {/* ========================================================================= */}
-      <section id="direktori" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-colors">
-        <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+      <section id="direktori" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-950 transition-colors">
+        <div className="absolute inset-0 bg-grid-pattern opacity-45 pointer-events-none" aria-hidden="true" />
+        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-                Direktori Produk Tempatan
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+                <Store className="w-3.5 h-3.5" />
+                <span>Direktori Produk Tempatan</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mt-1 text-balance">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mt-1 text-balance">
                 Karya & Perniagaan Belia Kelantan
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 mt-1">
                 Sokong produk buatan anak tempatan merentasi pelbagai kategori industri.
               </p>
             </div>
@@ -1098,34 +1186,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div 
                 key={biz.id}
                 onClick={() => onSelectBusiness(biz)}
-                className="rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 hover:border-sky-400 hover:shadow-md transition-all flex flex-col justify-between group cursor-pointer"
+                className="kbelia-glass-card interactive-card rounded-2xl p-5 sm:p-6 hover:border-sky-400 hover:shadow-md transition-all flex flex-col justify-between group cursor-pointer"
               >
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <img
                       src={biz.logoUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${biz.id}`}
                       alt={biz.businessName}
-                      className="w-12 h-12 rounded-lg object-cover bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0"
+                      className="w-12 h-12 rounded-lg object-cover bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shrink-0"
                     />
                     <div className="min-w-0">
                       <div className="text-[10px] text-sky-700 dark:text-sky-400 font-bold uppercase tracking-wide">{biz.category}</div>
-                      <h4 className="text-sm font-bold text-slate-800 dark:text-white truncate group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                         {biz.businessName}
                       </h4>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                      <div className="text-[11px] text-slate-500 dark:text-zinc-400 flex items-center gap-1">
                         <MapPin className="w-3 h-3 text-sky-600" />
                         <span>{biz.district}</span>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2">
+                  <p className="text-xs text-slate-600 dark:text-zinc-300 line-clamp-2">
                     {biz.description || biz.tagline}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-200/80 dark:border-slate-700 mt-3 flex items-center justify-between text-xs">
-                  <span className="text-slate-600 dark:text-slate-400 text-[11px]">{biz.ownerName}</span>
+                <div className="pt-3 border-t border-slate-200/80 dark:border-zinc-800 mt-3 flex items-center justify-between text-xs">
+                  <span className="text-slate-600 dark:text-zinc-400 text-[11px]">{biz.ownerName}</span>
                   <span className="text-[11px] font-semibold text-sky-800 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/40 px-2 py-0.5 rounded border border-sky-200 dark:border-sky-800">
                     {biz.district}
                   </span>
@@ -1140,17 +1228,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 9. SOALAN LAZIM (FAQ) */}
       {/* ========================================================================= */}
-      <section id="faq" className="py-16 sm:py-20 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+      <section id="faq" className="py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-5xl w-full mx-auto px-4 sm:px-8 lg:px-12">
           
-          <div className="text-center space-y-2 mb-10">
-            <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-              Bantuan & Panduan
+          <div className="text-center space-y-2.5 mb-10">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>Bantuan & Panduan</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-balance">
               Soalan Lazim (FAQ)
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400">
               Jawapan kepada pertanyaan lazim berkenaan permohonan kiosk, dana bantuan, mentor, dan direktori KBelia.
             </p>
           </div>
@@ -1161,18 +1250,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               return (
                 <div 
                   key={index}
-                  className="rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors"
+                  className="kbelia-glass-card rounded-2xl overflow-hidden transition-colors hover:border-sky-300/80 dark:hover:border-sky-500/40"
                 >
                   <button
                     type="button"
                     onClick={() => setActiveFaq(isOpen ? null : index)}
-                    className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-slate-800 dark:text-white hover:bg-sky-50/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-slate-900 dark:text-white hover:bg-sky-50/50 dark:hover:bg-zinc-900/60 transition-colors cursor-pointer"
                   >
                     <span>{faq.q}</span>
                     <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-sky-600' : ''}`} />
                   </button>
                   {isOpen && (
-                    <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-200 dark:border-slate-700/60 pt-3 bg-white dark:bg-slate-800">
+                    <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed border-t border-slate-200/80 dark:border-zinc-800 pt-3 bg-white/60 dark:bg-zinc-900/50">
                       {faq.a}
                     </div>
                   )}
@@ -1187,16 +1276,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 10. FINAL CALL TO ACTION */}
       {/* ========================================================================= */}
-      <section className="kbelia-important-header py-16 sm:py-20 text-slate-800 dark:text-white border-b border-slate-200 dark:border-slate-800 transition-colors">
-        <div className="max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
-          <div className="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-            Peluang Terbuka Sepanjang Tahun 2026/2027
+      <section className="kbelia-important-header relative overflow-hidden py-16 sm:py-24 text-slate-800 dark:text-white border-b border-slate-200/80 dark:border-zinc-800 transition-colors">
+        <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" aria-hidden="true" />
+        <div className="absolute -bottom-24 left-1/3 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="relative z-10 max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Peluang Terbuka Sepanjang Tahun 2026/2027</span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-800 dark:text-white text-balance">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white text-balance">
             Mulakan Langkah Keusahawanan Anda Hari Ini
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-xl mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 max-w-xl mx-auto leading-relaxed">
             Sertai ratusan usahawan muda Kelantan yang memanfaatkan fasiliti kiosk modular, bimbingan mentor universiti, dan direktori negeri rasmi.
           </p>
 
@@ -1241,7 +1333,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 11. COMPREHENSIVE INSTITUTIONAL FOOTER */}
       {/* ========================================================================= */}
-      <footer className="bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 text-xs border-t border-slate-200 dark:border-slate-800">
+      <footer className="bg-white dark:bg-zinc-950 text-slate-600 dark:text-zinc-300 text-xs border-t border-slate-200 dark:border-zinc-800">
 
         {/* 4-Column Footer Content */}
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

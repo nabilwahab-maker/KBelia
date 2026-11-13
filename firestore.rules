@@ -12,6 +12,14 @@ service cloud.firestore {
       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
     function isSignedIn() {
       return request.auth != null;
     }
@@ -38,27 +46,446 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'mentor';
     }
 
+    function getMentorId() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.mentorId;
+    }
+
     function validStr(val, maxLen) {
       return val is string && val.size() <= maxLen;
     }
 
-    // 1. Users Collection (PII Protected)
+    function isValidUser(data) {
+      return data.keys().hasAll(['userId', 'fullName', 'email', 'role']) &&
+        data.keys().hasOnly([
+          'userId', 'fullName', 'email', 'phone', 'whatsapp', 'district', 'role', 'mentorId',
+          'avatarUrl', 'logoUrl', 'icNumber', 'businessName', 'category', 'ssmNumber', 'ssmStatus',
+          'businessStage', 'businessHours', 'businessAddress', 'businessStatus', 'facebook',
+          'instagram', 'tiktok', 'bankName', 'bankAccountNumber', 'bankAccountHolder',
+          'notifyWhatsApp', 'notifyEmail', 'hidePhonePublic', 'department', 'expertise',
+          'designation', 'institution', 'createdAt'
+        ]) &&
+        validStr(data.userId, 128) &&
+        validStr(data.fullName, 120) &&
+        validStr(data.email, 120) &&
+        data.role in ['user', 'mentor', 'admin'] &&
+        (!('phone' in data) || validStr(data.phone, 30)) &&
+        (!('whatsapp' in data) || validStr(data.whatsapp, 30)) &&
+        (!('district' in data) || validStr(data.district, 50)) &&
+        (!('mentorId' in data) || validStr(data.mentorId, 128)) &&
+        (!('avatarUrl' in data) || validStr(data.avatarUrl, 900000)) &&
+        (!('logoUrl' in data) || validStr(data.logoUrl, 900000)) &&
+        (!('icNumber' in data) || validStr(data.icNumber, 25)) &&
+        (!('businessName' in data) || validStr(data.businessName, 150)) &&
+        (!('category' in data) || validStr(data.category, 80)) &&
+        (!('ssmNumber' in data) || validStr(data.ssmNumber, 50)) &&
+        (!('ssmStatus' in data) || data.ssmStatus in ['registered', 'in_progress', 'not_registered']) &&
+        (!('businessStage' in data) || data.businessStage in ['idea', 'startup', 'growth']) &&
+        (!('businessHours' in data) || validStr(data.businessHours, 150)) &&
+        (!('businessAddress' in data) || validStr(data.businessAddress, 400)) &&
+        (!('businessStatus' in data) || data.businessStatus in ['active', 'temporary_closed']) &&
+        (!('facebook' in data) || validStr(data.facebook, 200)) &&
+        (!('instagram' in data) || validStr(data.instagram, 100)) &&
+        (!('tiktok' in data) || validStr(data.tiktok, 100)) &&
+        (!('bankName' in data) || validStr(data.bankName, 80)) &&
+        (!('bankAccountNumber' in data) || validStr(data.bankAccountNumber, 40)) &&
+        (!('bankAccountHolder' in data) || validStr(data.bankAccountHolder, 120)) &&
+        (!('notifyWhatsApp' in data) || data.notifyWhatsApp is bool) &&
+        (!('notifyEmail' in data) || data.notifyEmail is bool) &&
+        (!('hidePhonePublic' in data) || data.hidePhonePublic is bool) &&
+        (!('department' in data) || validStr(data.department, 150)) &&
+        (!('expertise' in data) || validStr(data.expertise, 300)) &&
+        (!('designation' in data) || validStr(data.designation, 150)) &&
+        (!('institution' in data) || validStr(data.institution, 150)) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidBusiness(data) {
+      return data.keys().hasAll(['id', 'ownerId', 'businessName', 'category', 'district']) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'ownerName', 'ownerEmail', 'ownerPhone', 'businessName',
+          'tagline', 'category', 'district', 'description', 'ssmNumber', 'whatsapp',
+          'facebook', 'instagram', 'tiktok', 'logoUrl', 'bannerUrl', 'bankName',
+          'bankAccountNumber', 'businessHours', 'businessAddress', 'isApproved',
+          'isFeatured', 'capsuleSlotId', 'rating', 'reviewsCount', 'createdAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.ownerId, 128) &&
+        validStr(data.businessName, 150) &&
+        validStr(data.category, 60) &&
+        validStr(data.district, 50) &&
+        (!('ownerName' in data) || validStr(data.ownerName, 120)) &&
+        (!('ownerEmail' in data) || validStr(data.ownerEmail, 120)) &&
+        (!('ownerPhone' in data) || validStr(data.ownerPhone, 30)) &&
+        (!('tagline' in data) || validStr(data.tagline, 200)) &&
+        (!('description' in data) || validStr(data.description, 2000)) &&
+        (!('ssmNumber' in data) || validStr(data.ssmNumber, 50)) &&
+        (!('whatsapp' in data) || validStr(data.whatsapp, 30)) &&
+        (!('facebook' in data) || validStr(data.facebook, 200)) &&
+        (!('instagram' in data) || validStr(data.instagram, 100)) &&
+        (!('tiktok' in data) || validStr(data.tiktok, 100)) &&
+        (!('logoUrl' in data) || validStr(data.logoUrl, 900000)) &&
+        (!('bannerUrl' in data) || validStr(data.bannerUrl, 900000)) &&
+        (!('bankName' in data) || validStr(data.bankName, 80)) &&
+        (!('bankAccountNumber' in data) || validStr(data.bankAccountNumber, 40)) &&
+        (!('businessHours' in data) || validStr(data.businessHours, 150)) &&
+        (!('businessAddress' in data) || validStr(data.businessAddress, 400)) &&
+        (!('isApproved' in data) || data.isApproved is bool) &&
+        (!('isFeatured' in data) || data.isFeatured is bool) &&
+        (!('capsuleSlotId' in data) || validStr(data.capsuleSlotId, 128)) &&
+        (!('rating' in data) || data.rating is number) &&
+        (!('reviewsCount' in data) || data.reviewsCount is number) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidCapsuleSlot(data) {
+      return data.keys().hasAll(['id', 'code', 'name', 'hubLocation', 'district', 'monthlyRate', 'status']) &&
+        data.keys().hasOnly([
+          'id', 'code', 'name', 'hubLocation', 'district', 'size', 'monthlyRate',
+          'dailyRate', 'status', 'amenities', 'currentTenantBusinessName',
+          'currentTenantId', 'imageUrl', 'createdAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.code, 30) &&
+        validStr(data.name, 100) &&
+        validStr(data.hubLocation, 150) &&
+        validStr(data.district, 50) &&
+        data.monthlyRate is number &&
+        data.status in ['available', 'occupied', 'maintenance', 'reserved'] &&
+        (!('size' in data) || validStr(data.size, 50)) &&
+        (!('dailyRate' in data) || data.dailyRate is number) &&
+        (!('amenities' in data) || (data.amenities is list && data.amenities.size() <= 20 && (data.amenities.size() == 0 || data.amenities[0] is string))) &&
+        (!('currentTenantBusinessName' in data) || validStr(data.currentTenantBusinessName, 150)) &&
+        (!('currentTenantId' in data) || validStr(data.currentTenantId, 128)) &&
+        (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidCapsuleBooking(data) {
+      return data.keys().hasAll(['id', 'slotId', 'applicantId', 'applicantName', 'businessName', 'status']) &&
+        data.keys().hasOnly([
+          'id', 'slotId', 'slotCode', 'slotName', 'hubLocation', 'applicantId',
+          'applicantName', 'applicantEmail', 'applicantPhone', 'applicantMyKad',
+          'businessName', 'businessCategory', 'durationMonths', 'startDate',
+          'monthlyRate', 'pitchNotes', 'status', 'adminNotes', 'tenancySigned',
+          'tenancySignedAt', 'tenancySignatureName', 'createdAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.slotId, 128) &&
+        validStr(data.applicantId, 128) &&
+        validStr(data.applicantName, 120) &&
+        validStr(data.businessName, 150) &&
+        data.status in ['pending', 'approved', 'rejected'] &&
+        (!('slotCode' in data) || validStr(data.slotCode, 50)) &&
+        (!('slotName' in data) || validStr(data.slotName, 120)) &&
+        (!('hubLocation' in data) || validStr(data.hubLocation, 150)) &&
+        (!('applicantEmail' in data) || validStr(data.applicantEmail, 120)) &&
+        (!('applicantPhone' in data) || validStr(data.applicantPhone, 30)) &&
+        (!('applicantMyKad' in data) || validStr(data.applicantMyKad, 25)) &&
+        (!('businessCategory' in data) || validStr(data.businessCategory, 60)) &&
+        (!('durationMonths' in data) || data.durationMonths is number) &&
+        (!('startDate' in data) || validStr(data.startDate, 30)) &&
+        (!('monthlyRate' in data) || data.monthlyRate is number) &&
+        (!('pitchNotes' in data) || validStr(data.pitchNotes, 2000)) &&
+        (!('adminNotes' in data) || validStr(data.adminNotes, 1000)) &&
+        (!('tenancySigned' in data) || data.tenancySigned is bool) &&
+        (!('tenancySignedAt' in data) || validStr(data.tenancySignedAt, 50)) &&
+        (!('tenancySignatureName' in data) || validStr(data.tenancySignatureName, 120)) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidGrantApplication(data) {
+      return data.keys().hasAll(['id', 'programTitle', 'applicantId', 'applicantName', 'businessName', 'status']) &&
+        data.keys().hasOnly([
+          'id', 'programId', 'programTitle', 'grantAmount', 'amount', 'applicantId',
+          'applicantName', 'applicantEmail', 'applicantPhone', 'businessName',
+          'businessCategory', 'district', 'ssmNumber', 'bankName',
+          'bankAccountNumber', 'fundPurpose', 'status', 'adminNotes', 'createdAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.programTitle, 200) &&
+        validStr(data.applicantId, 128) &&
+        validStr(data.applicantName, 120) &&
+        validStr(data.businessName, 150) &&
+        data.status in ['pending', 'approved', 'rejected'] &&
+        (!('programId' in data) || validStr(data.programId, 128)) &&
+        (!('grantAmount' in data) || validStr(data.grantAmount, 100)) &&
+        (!('amount' in data) || validStr(data.amount, 100)) &&
+        (!('applicantEmail' in data) || validStr(data.applicantEmail, 120)) &&
+        (!('applicantPhone' in data) || validStr(data.applicantPhone, 30)) &&
+        (!('businessCategory' in data) || validStr(data.businessCategory, 60)) &&
+        (!('district' in data) || validStr(data.district, 50)) &&
+        (!('ssmNumber' in data) || validStr(data.ssmNumber, 50)) &&
+        (!('bankName' in data) || validStr(data.bankName, 80)) &&
+        (!('bankAccountNumber' in data) || validStr(data.bankAccountNumber, 40)) &&
+        (!('fundPurpose' in data) || validStr(data.fundPurpose, 2000)) &&
+        (!('adminNotes' in data) || validStr(data.adminNotes, 1000)) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['id', 'businessId', 'ownerId', 'name', 'price']) &&
+        data.keys().hasOnly(['id', 'businessId', 'ownerId', 'name', 'price', 'description', 'category', 'imageUrl', 'inStock', 'createdAt']) &&
+        validStr(data.id, 128) &&
+        validStr(data.businessId, 128) &&
+        validStr(data.ownerId, 128) &&
+        validStr(data.name, 150) &&
+        data.price is number &&
+        (!('description' in data) || validStr(data.description, 1000)) &&
+        (!('category' in data) || validStr(data.category, 60)) &&
+        (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
+        (!('inStock' in data) || data.inStock is bool) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidProgram(data) {
+      return data.keys().hasAll(['id', 'title', 'category', 'description']) &&
+        data.keys().hasOnly([
+          'id', 'title', 'category', 'date', 'location', 'description',
+          'organizer', 'grantAmount', 'registrationLink', 'isFeatured', 'createdAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.title, 200) &&
+        validStr(data.category, 60) &&
+        validStr(data.description, 2000) &&
+        (!('date' in data) || validStr(data.date, 100)) &&
+        (!('location' in data) || validStr(data.location, 150)) &&
+        (!('organizer' in data) || validStr(data.organizer, 120)) &&
+        (!('grantAmount' in data) || validStr(data.grantAmount, 100)) &&
+        (!('registrationLink' in data) || validStr(data.registrationLink, 500)) &&
+        (!('isFeatured' in data) || data.isFeatured is bool) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidCashflow(data) {
+      return data.keys().hasAll(['id', 'ownerId', 'date', 'cashSales', 'qrSales', 'expenses']) &&
+        data.keys().hasOnly(['id', 'ownerId', 'businessName', 'date', 'cashSales', 'qrSales', 'expenses', 'notes', 'createdAt']) &&
+        validStr(data.id, 128) &&
+        validStr(data.ownerId, 128) &&
+        validStr(data.date, 30) &&
+        data.cashSales is number &&
+        data.qrSales is number &&
+        data.expenses is number &&
+        (!('businessName' in data) || validStr(data.businessName, 150)) &&
+        (!('notes' in data) || validStr(data.notes, 500)) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidMaintenanceTicket(data) {
+      return data.keys().hasAll(['id', 'ownerId', 'slotCode', 'issueCategory', 'description', 'status']) &&
+        data.keys().hasOnly([
+          'id', 'ownerId', 'slotCode', 'kioskName', 'reporterName',
+          'reporterPhone', 'issueCategory', 'description', 'status', 'adminNotes', 'createdAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.ownerId, 128) &&
+        validStr(data.slotCode, 50) &&
+        validStr(data.issueCategory, 60) &&
+        validStr(data.description, 1500) &&
+        data.status in ['received', 'in_progress', 'resolved'] &&
+        (!('kioskName' in data) || validStr(data.kioskName, 120)) &&
+        (!('reporterName' in data) || validStr(data.reporterName, 120)) &&
+        (!('reporterPhone' in data) || validStr(data.reporterPhone, 30)) &&
+        (!('adminNotes' in data) || validStr(data.adminNotes, 1000)) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidMentorProfile(data) {
+      return data.keys().hasAll(['id', 'name', 'email', 'agency']) &&
+        data.keys().hasOnly([
+          'id', 'name', 'title', 'agency', 'expertise', 'avatarUrl',
+          'email', 'phone', 'bio', 'availableDays', 'activeMenteesCount', 'lastActive'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.name, 120) &&
+        validStr(data.email, 120) &&
+        validStr(data.agency, 150) &&
+        (!('title' in data) || validStr(data.title, 180)) &&
+        (!('expertise' in data) || (data.expertise is list && data.expertise.size() <= 20 && (data.expertise.size() == 0 || data.expertise[0] is string))) &&
+        (!('avatarUrl' in data) || validStr(data.avatarUrl, 900000)) &&
+        (!('phone' in data) || validStr(data.phone, 30)) &&
+        (!('bio' in data) || validStr(data.bio, 1500)) &&
+        (!('availableDays' in data) || validStr(data.availableDays, 200)) &&
+        (!('activeMenteesCount' in data) || data.activeMenteesCount is number) &&
+        (!('lastActive' in data) || validStr(data.lastActive, 50));
+    }
+
+    function isValidMentorSession(data) {
+      return data.keys().hasAll(['id', 'mentorId', 'entrepreneurName', 'businessName', 'status']) &&
+        data.keys().hasOnly([
+          'id', 'applicantId', 'mentorId', 'mentorName', 'entrepreneurName',
+          'entrepreneurPhone', 'entrepreneurEmail', 'businessName', 'district',
+          'businessCategory', 'topic', 'challenges', 'preferredDate', 'preferredTime',
+          'mode', 'status', 'notes', 'mentorActionPlan', 'meetingLink', 'createdAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.mentorId, 128) &&
+        validStr(data.entrepreneurName, 120) &&
+        validStr(data.businessName, 150) &&
+        data.status in ['pending', 'confirmed', 'completed', 'cancelled'] &&
+        (!('applicantId' in data) || validStr(data.applicantId, 128)) &&
+        (!('mentorName' in data) || validStr(data.mentorName, 120)) &&
+        (!('entrepreneurPhone' in data) || validStr(data.entrepreneurPhone, 30)) &&
+        (!('entrepreneurEmail' in data) || validStr(data.entrepreneurEmail, 120)) &&
+        (!('district' in data) || validStr(data.district, 50)) &&
+        (!('businessCategory' in data) || validStr(data.businessCategory, 60)) &&
+        (!('topic' in data) || validStr(data.topic, 200)) &&
+        (!('challenges' in data) || validStr(data.challenges, 2000)) &&
+        (!('preferredDate' in data) || validStr(data.preferredDate, 50)) &&
+        (!('preferredTime' in data) || validStr(data.preferredTime, 50)) &&
+        (!('mode' in data) || validStr(data.mode, 60)) &&
+        (!('notes' in data) || validStr(data.notes, 2000)) &&
+        (!('mentorActionPlan' in data) || validStr(data.mentorActionPlan, 3000)) &&
+        (!('meetingLink' in data) || validStr(data.meetingLink, 500)) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidGrantEndorsement(data) {
+      return data.keys().hasAll(['id', 'endorsementCode', 'mentorId', 'menteeName', 'businessName', 'status']) &&
+        data.keys().hasOnly([
+          'id', 'endorsementCode', 'mentorId', 'mentorName', 'mentorAgency',
+          'mentorDesignation', 'menteeId', 'menteeName', 'menteePhone',
+          'businessName', 'businessCategory', 'district', 'recommendedAmount',
+          'grantProgramTitle', 'justification', 'businessReadinessRemark',
+          'issuedAt', 'status'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.endorsementCode, 80) &&
+        validStr(data.mentorId, 128) &&
+        validStr(data.menteeName, 120) &&
+        validStr(data.businessName, 150) &&
+        data.status in ['active', 'revoked'] &&
+        (!('mentorName' in data) || validStr(data.mentorName, 120)) &&
+        (!('mentorAgency' in data) || validStr(data.mentorAgency, 150)) &&
+        (!('mentorDesignation' in data) || validStr(data.mentorDesignation, 180)) &&
+        (!('menteeId' in data) || validStr(data.menteeId, 128)) &&
+        (!('menteePhone' in data) || validStr(data.menteePhone, 30)) &&
+        (!('businessCategory' in data) || validStr(data.businessCategory, 60)) &&
+        (!('district' in data) || validStr(data.district, 50)) &&
+        (!('recommendedAmount' in data) || validStr(data.recommendedAmount, 40)) &&
+        (!('grantProgramTitle' in data) || validStr(data.grantProgramTitle, 200)) &&
+        (!('justification' in data) || validStr(data.justification, 2000)) &&
+        (!('businessReadinessRemark' in data) || validStr(data.businessReadinessRemark, 1000)) &&
+        (!('issuedAt' in data) || validStr(data.issuedAt, 50));
+    }
+
+    function isValidMentoringLog(data) {
+      return data.keys().hasAll(['id', 'mentorId', 'menteeName', 'topic', 'minutes']) &&
+        data.keys().hasOnly([
+          'id', 'mentorId', 'menteeName', 'businessName', 'sessionDate',
+          'topic', 'minutes', 'actionItems', 'createdAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.mentorId, 128) &&
+        validStr(data.menteeName, 120) &&
+        validStr(data.topic, 200) &&
+        validStr(data.minutes, 3000) &&
+        (!('businessName' in data) || validStr(data.businessName, 150)) &&
+        (!('sessionDate' in data) || validStr(data.sessionDate, 50)) &&
+        (!('actionItems' in data) || (data.actionItems is list && data.actionItems.size() <= 30 && (data.actionItems.size() == 0 || data.actionItems[0] is map))) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50));
+    }
+
+    function isValidB2BListing(data) {
+      return data.keys().hasAll(['id', 'authorName', 'authorBusiness', 'type', 'title']) &&
+        data.keys().hasOnly(['id', 'ownerId', 'authorName', 'authorBusiness', 'district', 'type', 'title', 'description', 'whatsapp', 'date']) &&
+        validStr(data.id, 128) &&
+        validStr(data.authorName, 120) &&
+        validStr(data.authorBusiness, 150) &&
+        data.type in ['supply', 'demand'] &&
+        validStr(data.title, 200) &&
+        (!('ownerId' in data) || validStr(data.ownerId, 128)) &&
+        (!('district' in data) || validStr(data.district, 50)) &&
+        (!('description' in data) || validStr(data.description, 1500)) &&
+        (!('whatsapp' in data) || validStr(data.whatsapp, 30)) &&
+        (!('date' in data) || validStr(data.date, 50));
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['id', 'title', 'message', 'category', 'targetRole']) &&
+        data.keys().hasOnly([
+          'id', 'title', 'message', 'category', 'sender', 'senderRole',
+          'targetRole', 'targetUserId', 'timestamp', 'isRead', 'actionTab'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.title, 180) &&
+        validStr(data.message, 1000) &&
+        data.category in ['status', 'announcement', 'reminder'] &&
+        data.targetRole in ['youth', 'mentor', 'admin', 'all'] &&
+        (!('sender' in data) || validStr(data.sender, 120)) &&
+        (!('senderRole' in data) || data.senderRole in ['admin', 'mentor', 'system']) &&
+        (!('targetUserId' in data) || validStr(data.targetUserId, 128)) &&
+        (!('timestamp' in data) || validStr(data.timestamp, 60)) &&
+        (!('isRead' in data) || data.isRead is bool) &&
+        (!('actionTab' in data) || validStr(data.actionTab, 40));
+    }
+
+    function isValidPortalSettings(data) {
+      return data.keys().hasAll(['id', 'portalSubsidyRate', 'maxLeaseDurationMonths', 'systemStatus']) &&
+        data.keys().hasOnly([
+          'id', 'adminOfficerName', 'adminHelpdeskPhone', 'portalSubsidyRate',
+          'maxLeaseDurationMonths', 'systemStatus', 'portalAnnouncement', 'updatedAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        data.portalSubsidyRate is number &&
+        data.maxLeaseDurationMonths is number &&
+        data.systemStatus in ['operational', 'maintenance'] &&
+        (!('adminOfficerName' in data) || validStr(data.adminOfficerName, 120)) &&
+        (!('adminHelpdeskPhone' in data) || validStr(data.adminHelpdeskPhone, 30)) &&
+        (!('portalAnnouncement' in data) || validStr(data.portalAnnouncement, 1000)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
+    }
+
+    function isValidNewsItem(data) {
+      return data.keys().hasAll([
+          'id', 'title', 'summary', 'content', 'category', 'status',
+          'isPinned', 'authorId', 'authorName', 'updatedAt', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'title', 'summary', 'content', 'category', 'imageUrl',
+          'status', 'isPinned', 'authorId', 'authorName', 'publishedAt',
+          'updatedAt', 'createdAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.summary is string && data.summary.size() >= 1 && data.summary.size() <= 500 &&
+        data.content is string && data.content.size() >= 1 && data.content.size() <= 8000 &&
+        data.category in ['Pengumuman', 'Geran & Dana', 'Program & Acara', 'Kapsul Niaga', 'Info Terkini'] &&
+        data.status in ['published', 'draft'] &&
+        data.isPinned is bool &&
+        validStr(data.authorId, 128) &&
+        validStr(data.authorName, 120) &&
+        validStr(data.updatedAt, 50) &&
+        validStr(data.createdAt, 50) &&
+        (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
+        (!('publishedAt' in data) || validStr(data.publishedAt, 50));
+    }
+
+    // 1. Users Collection (PII & RBAC Protected)
     match /users/{userId} {
-      allow get, list: if isAdmin() || isOwner(userId);
-      allow create: if isSignedIn() && isValidId(userId) && (
+      allow get: if isValidId(userId) && (isAdmin() || isOwner(userId));
+      allow list: if isAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(userId) && isValidUser(incoming()) && (
         isAdmin() || (
           isOwner(userId) &&
-          request.resource.data.userId == request.auth.uid &&
-          request.resource.data.role == 'user' &&
-          validStr(request.resource.data.fullName, 120) &&
-          validStr(request.resource.data.email, 120)
+          incoming().userId == request.auth.uid &&
+          incoming().role == 'user' &&
+          !('mentorId' in incoming())
         )
       );
-      allow update: if isSignedIn() && isValidId(userId) && (
+      allow update: if isSignedIn() && isValidId(userId) && isValidUser(incoming()) && (
         isAdmin() || (
           isOwner(userId) &&
-          request.resource.data.userId == resource.data.userId &&
-          request.resource.data.role == resource.data.role
+          incoming().userId == existing().userId &&
+          incoming().role == existing().role &&
+          !incoming().diff(existing()).affectedKeys().hasAny(['role', 'mentorId', 'userId', 'createdAt']) &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'fullName', 'email', 'phone', 'whatsapp', 'district', 'avatarUrl', 'logoUrl',
+            'icNumber', 'businessName', 'category', 'ssmNumber', 'ssmStatus', 'businessStage',
+            'businessHours', 'businessAddress', 'businessStatus', 'facebook', 'instagram',
+            'tiktok', 'bankName', 'bankAccountNumber', 'bankAccountHolder',
+            'notifyWhatsApp', 'notifyEmail', 'hidePhonePublic', 'department', 'expertise',
+            'designation', 'institution'
+          ])
         )
       );
       allow delete: if isAdmin() && isValidId(userId);
@@ -66,197 +493,345 @@ service cloud.firestore {
 
     // 2. Admins Collection
     match /admins/{adminId} {
-      allow get: if isAdmin() || isOwner(adminId);
+      allow get: if isValidId(adminId) && (isAdmin() || isOwner(adminId));
       allow list: if isAdmin();
-      allow write: if isAdmin() && isValidId(adminId);
+      allow create, update, delete: if isAdmin() && isValidId(adminId);
     }
 
     // 3. Businesses Collection
     match /businesses/{businessId} {
-      allow read: if true;
-      allow create: if isSignedIn() && isValidId(businessId) && (
+      allow get: if isValidId(businessId);
+      allow list: if true;
+      allow create: if isSignedIn() && isValidId(businessId) && isValidBusiness(incoming()) && (
         isAdmin() || (
-          request.resource.data.ownerId == request.auth.uid &&
-          validStr(request.resource.data.businessName, 150) &&
-          validStr(request.resource.data.description, 2000)
+          incoming().ownerId == request.auth.uid &&
+          (!('isFeatured' in incoming()) || incoming().isFeatured == false)
         )
       );
-      allow update: if isSignedIn() && isValidId(businessId) && (
+      allow update: if isSignedIn() && isValidId(businessId) && isValidBusiness(incoming()) && (
         isAdmin() || (
-          resource.data.ownerId == request.auth.uid &&
-          request.resource.data.ownerId == resource.data.ownerId &&
-          request.resource.data.isApproved == resource.data.isApproved &&
-          request.resource.data.isFeatured == resource.data.isFeatured
+          existing().ownerId == request.auth.uid &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().get('isApproved', true) == existing().get('isApproved', true) &&
+          incoming().get('isFeatured', false) == existing().get('isFeatured', false) &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'ownerName', 'ownerEmail', 'ownerPhone', 'businessName', 'tagline',
+            'category', 'district', 'description', 'ssmNumber', 'whatsapp',
+            'facebook', 'instagram', 'tiktok', 'logoUrl', 'bannerUrl',
+            'bankName', 'bankAccountNumber', 'businessHours', 'businessAddress',
+            'capsuleSlotId'
+          ])
         )
       );
       allow delete: if isSignedIn() && isValidId(businessId) && (
-        isAdmin() || resource.data.ownerId == request.auth.uid
+        isAdmin() || existing().ownerId == request.auth.uid
       );
     }
 
     // 4. Capsule Slots Collection
     match /capsule_slots/{slotId} {
-      allow read: if true;
-      allow create, update, delete: if isAdmin() && isValidId(slotId);
+      allow get: if isValidId(slotId);
+      allow list: if true;
+      allow create, update: if isAdmin() && isValidId(slotId) && isValidCapsuleSlot(incoming());
+      allow delete: if isAdmin() && isValidId(slotId);
     }
 
-    // 5. Capsule Bookings Collection
+    // 5. Capsule Bookings Collection (Admin + Youth Applicant ONLY — Zero Mentor Access)
     match /capsule_bookings/{bookingId} {
-      allow get: if isAdmin() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
-      allow list: if isAdmin() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
-      allow create: if isSignedIn() && isValidId(bookingId) && (
+      allow get: if isValidId(bookingId) && (isAdmin() || (isSignedIn() && existing().applicantId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && existing().applicantId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(bookingId) && isValidCapsuleBooking(incoming()) && (
         isAdmin() || (
-          request.resource.data.applicantId == request.auth.uid &&
-          request.resource.data.status == 'pending' &&
-          validStr(request.resource.data.businessName, 150) &&
-          validStr(request.resource.data.pitchNotes, 2000)
+          incoming().applicantId == request.auth.uid &&
+          incoming().status == 'pending'
         )
       );
-      allow update: if isSignedIn() && isValidId(bookingId) && (
+      allow update: if isSignedIn() && isValidId(bookingId) && isValidCapsuleBooking(incoming()) && (
         isAdmin() || (
-          resource.data.applicantId == request.auth.uid &&
-          request.resource.data.applicantId == resource.data.applicantId &&
-          request.resource.data.status == resource.data.status &&
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tenancySigned', 'tenancySignedAt', 'tenancySignatureName', 'pitchNotes', 'applicantPhone'])
+          existing().applicantId == request.auth.uid &&
+          incoming().applicantId == existing().applicantId &&
+          incoming().status == existing().status &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['tenancySigned', 'tenancySignedAt', 'tenancySignatureName', 'pitchNotes', 'applicantPhone'])
         )
       );
       allow delete: if isAdmin() && isValidId(bookingId);
     }
 
-    // 6. Grant Applications Collection
+    // 6. Grant Applications Collection (Admin + Youth Applicant ONLY — Mentors Blocked)
     match /grant_applications/{grantId} {
-      allow get: if isAdmin() || isMentor() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
-      allow list: if isAdmin() || isMentor() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
-      allow create: if isSignedIn() && isValidId(grantId) && (
+      allow get: if isValidId(grantId) && (isAdmin() || (isSignedIn() && existing().applicantId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && existing().applicantId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(grantId) && isValidGrantApplication(incoming()) && (
         isAdmin() || (
-          request.resource.data.applicantId == request.auth.uid &&
-          request.resource.data.status == 'pending' &&
-          validStr(request.resource.data.businessName, 150) &&
-          validStr(request.resource.data.fundPurpose, 2000)
+          incoming().applicantId == request.auth.uid &&
+          incoming().status == 'pending'
         )
       );
-      allow update, delete: if isAdmin() && isValidId(grantId);
+      allow update: if isAdmin() && isValidId(grantId) && isValidGrantApplication(incoming());
+      allow delete: if isAdmin() && isValidId(grantId);
     }
 
     // 7. Products Collection
     match /products/{productId} {
-      allow read: if true;
-      allow create: if isSignedIn() && isValidId(productId) && (
-        isAdmin() || (
-          request.resource.data.ownerId == request.auth.uid &&
-          validStr(request.resource.data.name, 150) &&
-          validStr(request.resource.data.description, 1000)
-        )
+      allow get: if isValidId(productId);
+      allow list: if true;
+      allow create: if isSignedIn() && isValidId(productId) && isValidProduct(incoming()) && (
+        isAdmin() || incoming().ownerId == request.auth.uid
       );
-      allow update: if isSignedIn() && isValidId(productId) && (
+      allow update: if isSignedIn() && isValidId(productId) && isValidProduct(incoming()) && (
         isAdmin() || (
-          resource.data.ownerId == request.auth.uid &&
-          request.resource.data.ownerId == resource.data.ownerId
+          existing().ownerId == request.auth.uid &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'price', 'description', 'category', 'imageUrl', 'inStock'])
         )
       );
       allow delete: if isSignedIn() && isValidId(productId) && (
-        isAdmin() || resource.data.ownerId == request.auth.uid
+        isAdmin() || existing().ownerId == request.auth.uid
       );
     }
 
     // 8. Programs & Announcements Collection
     match /programs/{programId} {
-      allow read: if true;
-      allow create, update, delete: if isAdmin() && isValidId(programId);
+      allow get: if isValidId(programId);
+      allow list: if true;
+      allow create, update: if isAdmin() && isValidId(programId) && isValidProgram(incoming());
+      allow delete: if isAdmin() && isValidId(programId);
     }
 
-    // 9. Cashflow Records Collection
+    // 9. Cashflow Records Collection (Admin + Youth Owner ONLY)
     match /cashflow_records/{recordId} {
-      allow get, list: if isAdmin() || (isSignedIn() && resource.data.ownerId == request.auth.uid);
-      allow create: if isSignedIn() && isValidId(recordId) && (
-        isAdmin() || request.resource.data.ownerId == request.auth.uid
+      allow get: if isValidId(recordId) && (isAdmin() || (isSignedIn() && existing().ownerId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && existing().ownerId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(recordId) && isValidCashflow(incoming()) && (
+        isAdmin() || incoming().ownerId == request.auth.uid
       );
-      allow update, delete: if isSignedIn() && isValidId(recordId) && (
-        isAdmin() || resource.data.ownerId == request.auth.uid
-      );
-    }
-
-    // 10. Maintenance Tickets Collection
-    match /maintenance_tickets/{ticketId} {
-      allow get, list: if isAdmin() || (isSignedIn() && resource.data.ownerId == request.auth.uid);
-      allow create: if isSignedIn() && isValidId(ticketId) && (
+      allow update: if isSignedIn() && isValidId(recordId) && isValidCashflow(incoming()) && (
         isAdmin() || (
-          request.resource.data.ownerId == request.auth.uid &&
-          request.resource.data.status == 'received' &&
-          validStr(request.resource.data.description, 1500)
+          existing().ownerId == request.auth.uid &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['businessName', 'date', 'cashSales', 'qrSales', 'expenses', 'notes'])
         )
       );
-      allow update, delete: if isAdmin() && isValidId(ticketId);
+      allow delete: if isSignedIn() && isValidId(recordId) && (
+        isAdmin() || existing().ownerId == request.auth.uid
+      );
     }
 
-    // 11. Mentor Profiles Collection
+    // 10. Maintenance Tickets Collection (Admin + Youth Owner ONLY)
+    match /maintenance_tickets/{ticketId} {
+      allow get: if isValidId(ticketId) && (isAdmin() || (isSignedIn() && existing().ownerId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && existing().ownerId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(ticketId) && isValidMaintenanceTicket(incoming()) && (
+        isAdmin() || (
+          incoming().ownerId == request.auth.uid &&
+          incoming().status == 'received'
+        )
+      );
+      allow update: if isAdmin() && isValidId(ticketId) && isValidMaintenanceTicket(incoming());
+      allow delete: if isAdmin() && isValidId(ticketId);
+    }
+
+    // 11. Mentor Profiles Collection (Mentor can edit ONLY their own mentorId profile)
     match /mentor_profiles/{mentorId} {
-      allow read: if true;
-      allow create, delete: if isAdmin() && isValidId(mentorId);
-      allow update: if isSignedIn() && isValidId(mentorId) && (isAdmin() || isMentor());
-    }
-
-    // 12. Mentor Sessions Collection
-    match /mentor_sessions/{sessionId} {
-      allow get, list: if isAdmin() || isMentor() || (isSignedIn() && resource.data.applicantId == request.auth.uid);
-      allow create: if isSignedIn() && isValidId(sessionId) && (
-        isAdmin() || isMentor() || (
-          request.resource.data.applicantId == request.auth.uid &&
-          request.resource.data.status == 'pending'
+      allow get: if isValidId(mentorId);
+      allow list: if true;
+      allow create: if isAdmin() && isValidId(mentorId) && isValidMentorProfile(incoming());
+      allow update: if isSignedIn() && isValidId(mentorId) && isValidMentorProfile(incoming()) && (
+        isAdmin() || (
+          isMentor() &&
+          getMentorId() == mentorId &&
+          incoming().id == existing().id &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'name', 'title', 'agency', 'expertise', 'avatarUrl', 'email', 'phone', 'bio', 'availableDays'
+          ])
         )
       );
-      allow update: if isSignedIn() && isValidId(sessionId) && (
-        isAdmin() || isMentor() || (
-          resource.data.applicantId == request.auth.uid &&
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+      allow delete: if isAdmin() && isValidId(mentorId);
+    }
+
+    // 12. Mentor Sessions Collection (Scoped strictly to assigned Mentor OR Youth applicant OR Admin)
+    match /mentor_sessions/{sessionId} {
+      allow get: if isValidId(sessionId) && (
+        isAdmin() ||
+        (isMentor() && existing().mentorId == getMentorId()) ||
+        (isSignedIn() && 'applicantId' in existing() && existing().applicantId == request.auth.uid)
+      );
+      allow list: if isAdmin() ||
+        (isMentor() && existing().mentorId == getMentorId()) ||
+        (isSignedIn() && 'applicantId' in existing() && existing().applicantId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(sessionId) && isValidMentorSession(incoming()) && (
+        isAdmin() || (
+          !isMentor() &&
+          'applicantId' in incoming() &&
+          incoming().applicantId == request.auth.uid &&
+          incoming().status == 'pending'
+        )
+      );
+      allow update: if isSignedIn() && isValidId(sessionId) && isValidMentorSession(incoming()) && (
+        isAdmin() || (
+          isMentor() &&
+          existing().mentorId == getMentorId() &&
+          incoming().mentorId == existing().mentorId &&
+          incoming().get('applicantId', '') == existing().get('applicantId', '') &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'notes', 'mentorActionPlan', 'meetingLink'])
+        ) || (
+          'applicantId' in existing() &&
+          existing().applicantId == request.auth.uid &&
+          incoming().mentorId == existing().mentorId &&
+          incoming().get('applicantId', '') == existing().get('applicantId', '') &&
+          incoming().status == 'cancelled' &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['status'])
         )
       );
       allow delete: if isAdmin() && isValidId(sessionId);
     }
 
-    // 13. Mentor Endorsements Collection
+    // 13. Mentor Endorsements Collection (Scoped strictly to issuing Mentor, target Mentee, OR Admin)
     match /mentor_endorsements/{endorsementId} {
-      allow read: if isSignedIn();
-      allow create, update: if isSignedIn() && isValidId(endorsementId) && (isAdmin() || isMentor());
+      allow get: if isValidId(endorsementId) && (
+        isAdmin() ||
+        (isMentor() && existing().mentorId == getMentorId()) ||
+        (isSignedIn() && 'menteeId' in existing() && existing().menteeId == request.auth.uid)
+      );
+      allow list: if isAdmin() ||
+        (isMentor() && existing().mentorId == getMentorId()) ||
+        (isSignedIn() && 'menteeId' in existing() && existing().menteeId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(endorsementId) && isValidGrantEndorsement(incoming()) && (
+        isAdmin() || (isMentor() && incoming().mentorId == getMentorId())
+      );
+      allow update: if isSignedIn() && isValidId(endorsementId) && isValidGrantEndorsement(incoming()) && (
+        isAdmin() || (
+          isMentor() &&
+          existing().mentorId == getMentorId() &&
+          incoming().mentorId == existing().mentorId &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'status', 'justification', 'businessReadinessRemark', 'recommendedAmount', 'grantProgramTitle'
+          ])
+        )
+      );
       allow delete: if isAdmin() && isValidId(endorsementId);
     }
 
-    // 14. Mentor Logs Collection
+    // 14. Mentor Logs Collection (Scoped strictly to issuing Mentor OR Admin)
     match /mentor_logs/{logId} {
-      allow get, list: if isAdmin() || isMentor();
-      allow create, update: if isSignedIn() && isValidId(logId) && (isAdmin() || isMentor());
+      allow get: if isValidId(logId) && (
+        isAdmin() || (isMentor() && existing().mentorId == getMentorId())
+      );
+      allow list: if isAdmin() || (isMentor() && existing().mentorId == getMentorId());
+      allow create: if isSignedIn() && isValidId(logId) && isValidMentoringLog(incoming()) && (
+        isAdmin() || (isMentor() && incoming().mentorId == getMentorId())
+      );
+      allow update: if isSignedIn() && isValidId(logId) && isValidMentoringLog(incoming()) && (
+        isAdmin() || (
+          isMentor() &&
+          existing().mentorId == getMentorId() &&
+          incoming().mentorId == existing().mentorId &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'menteeName', 'businessName', 'sessionDate', 'topic', 'minutes', 'actionItems'
+          ])
+        )
+      );
       allow delete: if isAdmin() && isValidId(logId);
     }
 
     // 15. B2B Listings Collection
     match /b2b_listings/{listingId} {
-      allow read: if true;
-      allow create: if isSignedIn() && isValidId(listingId) && (
-        isAdmin() || request.resource.data.ownerId == request.auth.uid
+      allow get: if isValidId(listingId);
+      allow list: if true;
+      allow create: if isSignedIn() && isValidId(listingId) && isValidB2BListing(incoming()) && (
+        isAdmin() || ('ownerId' in incoming() && incoming().ownerId == request.auth.uid)
       );
-      allow update, delete: if isSignedIn() && isValidId(listingId) && (
-        isAdmin() || resource.data.ownerId == request.auth.uid
+      allow update: if isSignedIn() && isValidId(listingId) && isValidB2BListing(incoming()) && (
+        isAdmin() || (
+          'ownerId' in existing() &&
+          existing().ownerId == request.auth.uid &&
+          'ownerId' in incoming() &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'authorName', 'authorBusiness', 'district', 'type', 'title', 'description', 'whatsapp', 'date'
+          ])
+        )
+      );
+      allow delete: if isSignedIn() && isValidId(listingId) && (
+        isAdmin() || ('ownerId' in existing() && existing().ownerId == request.auth.uid)
       );
     }
 
-    // 16. Notifications Collection
+    // 16. Notifications Collection (Role & Target User Isolated)
     match /notifications/{notifId} {
-      allow get, list: if isSignedIn();
-      allow create: if isSignedIn() && isValidId(notifId) && (isAdmin() || isMentor());
-      allow update: if isSignedIn() && isValidId(notifId);
+      allow get: if isValidId(notifId) && (
+        isAdmin() || (
+          isSignedIn() && (
+            ('targetUserId' in existing() && existing().targetUserId == request.auth.uid) ||
+            (
+              !('targetUserId' in existing()) && (
+                existing().targetRole == 'all' ||
+                (isMentor() && existing().targetRole == 'mentor') ||
+                (!isMentor() && existing().targetRole == 'youth')
+              )
+            )
+          )
+        )
+      );
+      allow list: if isAdmin() || (
+        isSignedIn() && (
+          ('targetUserId' in existing() && existing().targetUserId == request.auth.uid) ||
+          (
+            !('targetUserId' in existing()) && (
+              existing().targetRole == 'all' ||
+              (isMentor() && existing().targetRole == 'mentor') ||
+              (!isMentor() && existing().targetRole == 'youth')
+            )
+          )
+        )
+      );
+      allow create: if isSignedIn() && isValidId(notifId) && isValidNotification(incoming()) && (
+        isAdmin() || (
+          isMentor() &&
+          'senderRole' in incoming() &&
+          incoming().senderRole == 'mentor' &&
+          incoming().targetRole == 'youth'
+        )
+      );
+      allow update: if isSignedIn() && isValidId(notifId) && isValidNotification(incoming()) && (
+        isAdmin() || (
+          incoming().diff(existing()).affectedKeys().hasOnly(['isRead']) && (
+            ('targetUserId' in existing() && existing().targetUserId == request.auth.uid) ||
+            (
+              !('targetUserId' in existing()) && (
+                existing().targetRole == 'all' ||
+                (isMentor() && existing().targetRole == 'mentor') ||
+                (!isMentor() && existing().targetRole == 'youth')
+              )
+            )
+          )
+        )
+      );
       allow delete: if isAdmin() && isValidId(notifId);
     }
 
     // 17. Portal Settings Collection
     match /portal_settings/{settingId} {
-      allow read: if true;
-      allow create, update, delete: if isAdmin() && isValidId(settingId);
+      allow get: if isValidId(settingId);
+      allow list: if true;
+      allow create, update: if isAdmin() && isValidId(settingId) && isValidPortalSettings(incoming());
+      allow delete: if isAdmin() && isValidId(settingId);
     }
 
-    // 18. Test connection doc (read-only ping)
+    // 18. Portal News Collection (Admin Full Control; Authenticated Users Read Published Only)
+    match /portal_news/{newsId} {
+      allow get: if isValidId(newsId) && (
+        isAdmin() || (isSignedIn() && existing().status == 'published')
+      );
+      allow list: if isAdmin() || (isSignedIn() && existing().status == 'published');
+      allow create, update: if isAdmin() && isValidId(newsId) && isValidNewsItem(incoming());
+      allow delete: if isAdmin() && isValidId(newsId);
+    }
+
+    // 19. Test connection doc (read-only ping)
     match /test/{docId} {
-      allow get: if true;
-      allow write: if isAdmin();
+      allow get: if isValidId(docId);
+      allow write: if isAdmin() && isValidId(docId);
     }
   }
 }

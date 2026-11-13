@@ -27,7 +27,12 @@ import {
   Mail,
   FileText,
   GraduationCap,
-  Eye
+  Eye,
+  BarChart3,
+  Wrench,
+  ChevronRight,
+  Activity,
+  Newspaper
 } from 'lucide-react';
 import { 
   BusinessListing, 
@@ -42,7 +47,8 @@ import {
   AdminSubTab,
   MaintenanceTicket,
   PortalSettings,
-  GrantApplication
+  GrantApplication,
+  PortalNews
 } from '../types';
 import { 
   updateBookingStatus, 
@@ -59,12 +65,26 @@ import {
   loadLocalPortalSettings
 } from '../services/dataService';
 import { AdminApprovalQueue } from './AdminApprovalQueue';
+import { AdminNewsManager } from './AdminNewsManager';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { ImageDropzone } from './ImageDropzone';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
+import { SaaSKpiCard, SparkPoint } from './SaaSKpiCard';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 import confetti from 'canvas-confetti';
 import { showToast } from './ToastNotification';
+import { useAuth } from '../context/AuthContext';
 
 interface AdminDashboardProps {
   slots: CapsuleSlot[];
@@ -76,6 +96,7 @@ interface AdminDashboardProps {
   mentors?: MentorProfile[];
   maintenanceTickets?: MaintenanceTicket[];
   portalSettings?: PortalSettings;
+  newsItems?: PortalNews[];
   onUpdateMentor?: (updatedMentor: MentorProfile) => void;
   onRefresh: () => void;
   activeSubTab?: AdminSubTab;
@@ -114,11 +135,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   mentors = INITIAL_MENTOR_PROFILES,
   maintenanceTickets = [],
   portalSettings,
+  newsItems = [],
   onUpdateMentor,
   onRefresh,
   activeSubTab,
   onSelectSubTab
 }) => {
+  const { user, isAdmin } = useAuth();
   const [internalTab, setInternalTab] = useState<AdminSubTab>('queue');
 
   // Synchronize internal tab state with external activeSubTab prop
@@ -219,6 +242,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Filter states
   const [bookingFilter, setBookingFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [adminChartMode, setAdminChartMode] = useState<'districts' | 'pipeline'>('districts');
   const [reviewNoteInput, setReviewNoteInput] = useState<{ [bookingId: string]: string }>({});
 
   // Slot modal / form state
@@ -272,7 +296,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         message: `Permohonan sewaan kiosk bagi ${booking.businessName} telah diluluskan rasmi oleh Urusetia Pentadbir Negeri.`,
         type: 'kiosk',
         senderRole: 'admin',
-        sender: 'Pentadbir Urusetia KBelia'
+        targetRole: 'youth',
+        targetUserId: booking.applicantId,
+        sender: 'Pentadbir Urusetia KBelia',
+        actionTab: 'merchant'
       });
       onRefresh();
     } catch (err) {
@@ -329,7 +356,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         message: `${slotName} di jajahan ${slotDistrict} kini dibuka untuk permohonan sewaan usahawan (RM${slotMonthlyRate}/bln).`,
         type: 'kiosk',
         senderRole: 'admin',
-        sender: 'Pentadbir Urusetia KBelia'
+        targetRole: 'youth',
+        sender: 'Pentadbir Urusetia KBelia',
+        actionTab: 'academic'
       });
 
       setShowSlotForm(false);
@@ -382,7 +411,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         message: `${progTitle} (${progAmount || 'Percuma'}) kini diterbitkan untuk penyertaan usahawan belia Kelantan.`,
         type: 'grant',
         senderRole: 'admin',
-        sender: 'Pentadbir Urusetia KBelia'
+        targetRole: 'youth',
+        sender: 'Pentadbir Urusetia KBelia',
+        actionTab: 'ceed'
       });
 
       setShowProgramForm(false);
@@ -457,20 +488,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     return b.status === bookingFilter;
   });
 
+  if (!isAdmin) {
+    return (
+      <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 text-center space-y-4 border border-slate-200 dark:border-slate-700">
+        <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 flex items-center justify-center mx-auto">
+          <Shield className="w-6 h-6" />
+        </div>
+        <h3 className="text-base font-bold text-slate-900 dark:text-white">
+          Akses Khusus Pentadbir Sistem Sahaja
+        </h3>
+        <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto">
+          Modul kawalan pentadbiran dan kelulusan permohonan hanya dibenarkan untuk akaun Pentadbir Sistem yang disahkan.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full px-1 sm:px-3 py-4">
       
       {/* Admin Subheader & Quick Action Bar (Important Header Only) */}
-      <div className="kbelia-important-header rounded-2xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 mb-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+      <div className="kbelia-important-header relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-zinc-800 p-5 sm:p-6 mb-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="absolute inset-0 bg-dot-pattern opacity-35 pointer-events-none" aria-hidden="true" />
+        <div className="relative z-10">
           <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
             <Shield className="w-4 h-4" />
             <span>Pusat Kawalan & Pengurusan Pentadbiran</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
             Panel Pengurusan & Kelulusan Hab KBelia
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
             Semak dan luluskan permohonan sewaan kapsul, geran pembiayaan, profil usahawan dan program belia.
           </p>
         </div>
@@ -479,59 +527,348 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           type="button"
           onClick={handleSeedDatabase}
           disabled={loading}
-          className="interactive-press interactive-lift px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs shrink-0 transition-all cursor-pointer self-start sm:self-auto"
+          className="relative z-10 interactive-press interactive-lift px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm shrink-0 transition-all cursor-pointer self-start sm:self-auto"
         >
           <Database className="w-4 h-4 text-sky-100" />
-          <span>{loading ? 'Sedang Memproses...' : 'Sync / Isi Data Permulaan'}</span>
+          <span>{loading ? 'Sync...' : 'Sync'}</span>
         </button>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
-        <div className="interactive-card group bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-1 hover:border-amber-300 dark:hover:border-amber-500/50 cursor-default">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
-            <span className="font-medium">Permohonan Menunggu</span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/40 text-amber-700 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{pendingBookingsCount}</div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400">Menunggu tindakan semakan pegawai</div>
-        </div>
+      {/* 4 Graphic SaaS KPI Cards */}
+      {(() => {
+        const approvedBookingsCount = safeBookings.filter(b => b && b.status === 'approved').length;
+        const rejectedBookingsCount = safeBookings.filter(b => b && b.status === 'rejected').length;
+        const availableSlotsCount = safeSlots.filter(s => s && s.status === 'available').length;
+        const reservedSlotsCount = safeSlots.filter(s => s && s.status === 'reserved').length;
+        const maintenanceSlotsCount = safeSlots.filter(s => s && s.status === 'maintenance').length;
+        const pendingGrantsCount = (grantApplications || []).filter(g => g.status === 'pending').length;
+        const approvedGrantsCount = (grantApplications || []).filter(g => g.status === 'approved').length;
+        const openTicketsCount = (maintenanceTickets || []).filter(t => t.status !== 'resolved').length;
 
-        <div className="interactive-card group bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-1 hover:border-sky-300 dark:hover:border-sky-500/50 cursor-default">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
-            <span className="font-medium">Usahawan Belia Berdaftar</span>
-            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-900/40 text-sky-700 dark:text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <Store className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{businesses.length}</div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400">Direktori komersil belia sah SSM</div>
-        </div>
+        const bookingSpark: SparkPoint[] = [
+          { label: 'Menunggu', value: pendingBookingsCount },
+          { label: 'Diluluskan', value: approvedBookingsCount },
+          { label: 'Ditolak', value: rejectedBookingsCount },
+          { label: 'Jumlah', value: safeBookings.length }
+        ];
 
-        <div className="interactive-card group bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-1 hover:border-sky-300 dark:hover:border-sky-500/50 cursor-default">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
-            <span className="font-medium">Kadar Terisi Kapsul</span>
-            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-900/40 text-sky-700 dark:text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <Building2 className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{occupancyRate}%</div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400">{occupiedSlotsCount} drpd {slots.length} unit beroperasi</div>
-        </div>
+        const businessCategoryCounts = CATEGORIES.slice(0, 5).map(cat => ({
+          label: cat.split(' ')[0],
+          value: safeBusinesses.filter(b => b.category === cat).length
+        }));
 
-        <div className="interactive-card group bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-1 hover:border-sky-300 dark:hover:border-sky-500/50 cursor-default">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
-            <span className="font-medium">Program & Geran Aktif</span>
-            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-900/40 text-sky-700 dark:text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <Award className="w-4 h-4" />
+        const slotSpark: SparkPoint[] = [
+          { label: 'Operasi', value: occupiedSlotsCount },
+          { label: 'Ditempah', value: reservedSlotsCount },
+          { label: 'Kosong', value: availableSlotsCount },
+          { label: 'Selenggara', value: maintenanceSlotsCount }
+        ];
+
+        const programSpark: SparkPoint[] = [
+          { label: 'Program', value: safePrograms.length },
+          { label: 'Mohon Geran', value: (grantApplications || []).length },
+          { label: 'Lulus', value: approvedGrantsCount },
+          { label: 'Menunggu', value: pendingGrantsCount }
+        ];
+
+        // District data for Recharts BarChart
+        const districtChartData = DISTRICTS.slice(0, 7).map(d => {
+          const districtSlots = safeSlots.filter(s => s.district === d);
+          return {
+            district: d === 'Kota Bharu' ? 'K. Bharu' : d === 'Tanah Merah' ? 'T. Merah' : d === 'Pasir Puteh' ? 'P. Puteh' : d === 'Pasir Mas' ? 'P. Mas' : d === 'Kuala Krai' ? 'K. Krai' : d,
+            fullName: d,
+            beroperasi: districtSlots.filter(s => s.status === 'occupied' || s.status === 'reserved').length,
+            tersedia: districtSlots.filter(s => s.status === 'available').length
+          };
+        });
+
+        // Pipeline data for Recharts AreaChart
+        const pipelineChartData = [
+          { label: 'Kapsul Mohon', jumlah: safeBookings.length },
+          { label: 'Kapsul Lulus', jumlah: approvedBookingsCount },
+          { label: 'Geran Mohon', jumlah: (grantApplications || []).length },
+          { label: 'Geran Lulus', jumlah: approvedGrantsCount },
+          { label: 'Sesi Mentor', jumlah: mentorshipRegistrations.length },
+          { label: 'Aduan Aktif', jumlah: openTicketsCount }
+        ];
+
+        return (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <SaaSKpiCard
+                chartId="admin-pending"
+                title="Permohonan Menunggu"
+                value={pendingBookingsCount}
+                subtitle="Menunggu tindakan semakan pegawai"
+                icon={Clock}
+                trendLabel={pendingBookingsCount > 0 ? `${pendingBookingsCount} Segera` : 'Selesai'}
+                trendDirection={pendingBookingsCount > 0 ? 'down' : 'up'}
+                accentColor="amber"
+                sparkData={bookingSpark}
+                onClick={() => setAdminTab('bookings')}
+              />
+
+              <SaaSKpiCard
+                chartId="admin-businesses"
+                title="Usahawan Belia Berdaftar"
+                value={businesses.length}
+                subtitle="Direktori komersil belia sah SSM"
+                icon={Store}
+                trendLabel={`${safeBusinesses.filter(b => b.isFeatured).length} Pilihan`}
+                trendDirection="up"
+                accentColor="sky"
+                sparkData={businessCategoryCounts}
+                onClick={() => setAdminTab('businesses')}
+              />
+
+              <SaaSKpiCard
+                chartId="admin-occupancy"
+                title="Kadar Terisi Kapsul"
+                value={`${occupancyRate}%`}
+                subtitle={`${occupiedSlotsCount} drpd ${slots.length} unit beroperasi`}
+                icon={Building2}
+                trendLabel={`${availableSlotsCount} Kosong`}
+                trendDirection={occupancyRate >= 50 ? 'up' : 'neutral'}
+                accentColor="emerald"
+                sparkData={slotSpark}
+                onClick={() => setAdminTab('slots')}
+              />
+
+              <SaaSKpiCard
+                chartId="admin-programs"
+                title="Program & Geran Aktif"
+                value={programs.length}
+                subtitle="Dana & latihan keusahawanan aktif"
+                icon={Award}
+                trendLabel={`${(grantApplications || []).length} Permohonan`}
+                trendDirection="up"
+                accentColor="violet"
+                sparkData={programSpark}
+                onClick={() => setAdminTab('programs')}
+              />
             </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums group-hover:scale-105 transition-transform duration-300 origin-left">{programs.length}</div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400">Dana & latihan keusahawanan aktif</div>
-        </div>
-      </div>
+
+            {/* Asymmetric Bento Analytics Section inside Queue / Overview */}
+            {adminTab === 'queue' && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 mb-6">
+                
+                {/* Left Bento (7 Cols): Interactive Recharts Analytics */}
+                <div className="lg:col-span-7 rounded-2xl bg-white/85 dark:bg-zinc-900/75 backdrop-blur-md border border-slate-200/80 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col">
+                  <div className="px-5 py-4 border-b border-slate-200/80 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <BarChart3 className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                          Analitik Infrastruktur & Permohonan Negeri
+                        </h3>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                        Statistik langsung hab kapsul jajahan dan aliran kelulusan
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-200 dark:border-zinc-800 self-start sm:self-auto">
+                      <button
+                        type="button"
+                        onClick={() => setAdminChartMode('districts')}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                          adminChartMode === 'districts'
+                            ? 'bg-sky-600 text-white shadow-2xs'
+                            : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        Kapsul Jajahan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAdminChartMode('pipeline')}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                          adminChartMode === 'pipeline'
+                            ? 'bg-sky-600 text-white shadow-2xs'
+                            : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        Aliran Permohonan
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-5 flex-1">
+                    <div className="h-60 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        {adminChartMode === 'districts' ? (
+                          <BarChart data={districtChartData} margin={{ top: 10, right: 10, left: -18, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.22)" />
+                            <XAxis dataKey="district" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                            <Tooltip
+                              cursor={{ fill: 'rgba(14, 165, 233, 0.08)' }}
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  const d = payload[0].payload as { fullName: string; beroperasi: number; tersedia: number };
+                                  return (
+                                    <div className="px-3 py-2 rounded-xl bg-zinc-900/95 text-white text-[11px] font-mono shadow-xl border border-zinc-700">
+                                      <div className="font-bold text-white mb-1">{d.fullName}</div>
+                                      <div className="text-sky-300">Beroperasi / Ditempah: {d.beroperasi}</div>
+                                      <div className="text-emerald-300">Slot Kosong Sedia: {d.tersedia}</div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                            <Bar dataKey="beroperasi" name="Beroperasi" fill="#0284C7" radius={[6, 6, 0, 0]} maxBarSize={26} />
+                            <Bar dataKey="tersedia" name="Tersedia" fill="#10B981" radius={[6, 6, 0, 0]} maxBarSize={26} />
+                          </BarChart>
+                        ) : (
+                          <AreaChart data={pipelineChartData} margin={{ top: 10, right: 10, left: -18, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id="adminPipelineGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#0284C7" stopOpacity={0.35} />
+                                <stop offset="100%" stopColor="#0284C7" stopOpacity={0.02} />
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.22)" />
+                            <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                            <Tooltip
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  const d = payload[0].payload as { label: string; jumlah: number };
+                                  return (
+                                    <div className="px-3 py-2 rounded-xl bg-zinc-900/95 text-white text-[11px] font-mono shadow-xl border border-zinc-700">
+                                      <div className="text-zinc-400 text-[10px]">{d.label}</div>
+                                      <div className="font-bold text-sky-300">{d.jumlah} Rekod</div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                            <Area
+                              type="monotone"
+                              dataKey="jumlah"
+                              stroke="#0284C7"
+                              strokeWidth={2.5}
+                              fill="url(#adminPipelineGrad)"
+                              activeDot={{ r: 5, fill: '#0EA5E9', stroke: '#FFFFFF', strokeWidth: 2 }}
+                            />
+                          </AreaChart>
+                        )}
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Bento (5 Cols): Ringkasan Tindakan & Barisan Semakan */}
+                <div className="lg:col-span-5 rounded-2xl bg-white/85 dark:bg-zinc-900/75 backdrop-blur-md border border-slate-200/80 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col justify-between">
+                  <div className="px-5 py-4 border-b border-slate-200/80 dark:border-zinc-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                        Ringkasan Semakan & Operasi
+                      </h3>
+                    </div>
+                    <span className="text-[11px] font-mono font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 px-2 py-0.5 rounded">
+                      Langsung
+                    </span>
+                  </div>
+
+                  <div className="p-5 space-y-3 flex-1">
+                    <button
+                      type="button"
+                      onClick={() => setAdminTab('bookings')}
+                      className="w-full p-3 rounded-xl bg-slate-50/80 dark:bg-zinc-950/60 hover:bg-sky-50/70 dark:hover:bg-zinc-800 border border-slate-200/80 dark:border-zinc-800 flex items-center justify-between gap-3 transition-colors cursor-pointer text-left"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                          <Clock className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-900 dark:text-white truncate">Permohonan Sewaan Kapsul</div>
+                          <div className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">Menunggu kelulusan rasmi hab</div>
+                        </div>
+                      </div>
+                      <span className="font-mono tabular-nums text-xs font-black px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 shrink-0">
+                        {pendingBookingsCount}
+                      </span>
+                    </button>
+
+                    <div className="w-full p-3 rounded-xl bg-slate-50/80 dark:bg-zinc-950/60 border border-slate-200/80 dark:border-zinc-800 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+                          <Award className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-900 dark:text-white truncate">Permohonan Geran Belia</div>
+                          <div className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">{approvedGrantsCount} telah diluluskan</div>
+                        </div>
+                      </div>
+                      <span className="font-mono tabular-nums text-xs font-black px-2 py-1 rounded-md bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 shrink-0">
+                        {pendingGrantsCount}
+                      </span>
+                    </div>
+
+                    <div className="w-full p-3 rounded-xl bg-slate-50/80 dark:bg-zinc-950/60 border border-slate-200/80 dark:border-zinc-800 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                          <Wrench className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-900 dark:text-white truncate">Tiket Aduan Fasiliti</div>
+                          <div className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">Penyelenggaraan & teknikal kiosk</div>
+                        </div>
+                      </div>
+                      <span className="font-mono tabular-nums text-xs font-black px-2 py-1 rounded-md bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 shrink-0">
+                        {openTicketsCount}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setAdminTab('mentors')}
+                      className="w-full p-3 rounded-xl bg-slate-50/80 dark:bg-zinc-950/60 hover:bg-sky-50/70 dark:hover:bg-zinc-800 border border-slate-200/80 dark:border-zinc-800 flex items-center justify-between gap-3 transition-colors cursor-pointer text-left"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-lg bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                          <GraduationCap className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-900 dark:text-white truncate">Panel & Sesi Bimbingan Mentor</div>
+                          <div className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">{mentors.length} mentor aktif bertauliah</div>
+                        </div>
+                      </div>
+                      <span className="font-mono tabular-nums text-xs font-black px-2 py-1 rounded-md bg-violet-100 dark:bg-violet-950 text-violet-800 dark:text-violet-300 shrink-0">
+                        {mentorshipRegistrations.length}
+                      </span>
+                    </button>
+                  </div>
+
+                  <div className="px-5 py-3 border-t border-slate-200/80 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/30 flex items-center justify-between text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setAdminTab('news')}
+                      className="text-slate-700 dark:text-zinc-300 hover:text-sky-700 dark:hover:text-sky-400 font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Newspaper className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+                      <span>Urus Berita ({newsItems.length})</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAdminTab('slots')}
+                      className="text-sky-700 dark:text-sky-400 font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>Slot Kapsul</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {message && (
         <div className={`mb-5 p-4 rounded-xl text-xs font-medium flex items-center justify-between border ${
@@ -1266,12 +1603,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 Pemantauan sesi temujanji bimbingan usahawan belia bersama mentor UMK dan jurulatih industri.
               </p>
             </div>
-
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/50 text-sky-800 dark:text-sky-300 text-xs font-bold border border-sky-200 dark:border-sky-800">
-                {mentorshipRegistrations.length} Pendaftaran Bimbingan
-              </span>
-            </div>
           </div>
 
           {/* Mentor Management Grid */}
@@ -1412,6 +1743,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       )}
 
+      {/* TAB: PORTAL NEWS MANAGEMENT (ADMIN ONLY) */}
+      {adminTab === 'news' && (
+        <div className="animate-in fade-in duration-200">
+          <AdminNewsManager
+            newsItems={newsItems}
+            onRefresh={onRefresh}
+          />
+        </div>
+      )}
+
       {/* TAB 5: ADMIN & SYSTEM SETTINGS */}
       {adminTab === 'settings' && (
         <div className="space-y-6">
@@ -1494,7 +1835,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <input
                       type="email"
                       disabled
-                      value="nabilwahab03020302@gmail.com"
+                      value={user?.email || 'nabilwahab03020302@gmail.com'}
                       placeholder="Emel"
                       className="w-full pl-9 pr-3 py-2.5 bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400 cursor-not-allowed"
                     />

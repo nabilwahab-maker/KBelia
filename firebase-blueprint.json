@@ -9,15 +9,34 @@
         "fullName": { "type": "string", "maxLength": 120 },
         "email": { "type": "string", "maxLength": 120 },
         "phone": { "type": "string", "maxLength": 30 },
+        "whatsapp": { "type": "string", "maxLength": 30 },
         "district": { "type": "string", "maxLength": 50 },
         "role": { "type": "string", "enum": ["user", "mentor", "admin"] },
         "mentorId": { "type": "string", "maxLength": 128 },
-        "avatarUrl": { "type": "string", "maxLength": 500 },
+        "avatarUrl": { "type": "string", "maxLength": 900000 },
+        "logoUrl": { "type": "string", "maxLength": 900000 },
         "icNumber": { "type": "string", "maxLength": 25 },
         "businessName": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "maxLength": 80 },
         "ssmNumber": { "type": "string", "maxLength": 50 },
+        "ssmStatus": { "type": "string", "enum": ["registered", "in_progress", "not_registered"] },
+        "businessStage": { "type": "string", "enum": ["idea", "startup", "growth"] },
+        "businessHours": { "type": "string", "maxLength": 150 },
+        "businessAddress": { "type": "string", "maxLength": 400 },
+        "businessStatus": { "type": "string", "enum": ["active", "temporary_closed"] },
+        "facebook": { "type": "string", "maxLength": 200 },
+        "instagram": { "type": "string", "maxLength": 100 },
+        "tiktok": { "type": "string", "maxLength": 100 },
         "bankName": { "type": "string", "maxLength": 80 },
         "bankAccountNumber": { "type": "string", "maxLength": 40 },
+        "bankAccountHolder": { "type": "string", "maxLength": 120 },
+        "notifyWhatsApp": { "type": "boolean" },
+        "notifyEmail": { "type": "boolean" },
+        "hidePhonePublic": { "type": "boolean" },
+        "department": { "type": "string", "maxLength": 150 },
+        "expertise": { "type": "string", "maxLength": 300 },
+        "designation": { "type": "string", "maxLength": 150 },
+        "institution": { "type": "string", "maxLength": 150 },
         "createdAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["userId", "fullName", "email", "role"]
@@ -39,13 +58,20 @@
         "description": { "type": "string", "maxLength": 2000 },
         "ssmNumber": { "type": "string", "maxLength": 50 },
         "whatsapp": { "type": "string", "maxLength": 30 },
+        "facebook": { "type": "string", "maxLength": 200 },
         "instagram": { "type": "string", "maxLength": 100 },
         "tiktok": { "type": "string", "maxLength": 100 },
-        "logoUrl": { "type": "string", "maxLength": 500 },
-        "bannerUrl": { "type": "string", "maxLength": 500 },
+        "logoUrl": { "type": "string", "maxLength": 900000 },
+        "bannerUrl": { "type": "string", "maxLength": 900000 },
+        "bankName": { "type": "string", "maxLength": 80 },
+        "bankAccountNumber": { "type": "string", "maxLength": 40 },
+        "businessHours": { "type": "string", "maxLength": 150 },
+        "businessAddress": { "type": "string", "maxLength": 400 },
         "isApproved": { "type": "boolean" },
         "isFeatured": { "type": "boolean" },
         "capsuleSlotId": { "type": "string", "maxLength": 128 },
+        "rating": { "type": "number" },
+        "reviewsCount": { "type": "number" },
         "createdAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "ownerId", "businessName", "category", "district"]
@@ -111,12 +137,14 @@
         "programId": { "type": "string", "maxLength": 128 },
         "programTitle": { "type": "string", "maxLength": 200 },
         "grantAmount": { "type": "string", "maxLength": 100 },
+        "amount": { "type": "string", "maxLength": 100 },
         "applicantId": { "type": "string", "maxLength": 128 },
         "applicantName": { "type": "string", "maxLength": 120 },
         "applicantEmail": { "type": "string", "maxLength": 120 },
         "applicantPhone": { "type": "string", "maxLength": 30 },
         "businessName": { "type": "string", "maxLength": 150 },
         "businessCategory": { "type": "string", "maxLength": 60 },
+        "district": { "type": "string", "maxLength": 50 },
         "ssmNumber": { "type": "string", "maxLength": 50 },
         "bankName": { "type": "string", "maxLength": 80 },
         "bankAccountNumber": { "type": "string", "maxLength": 40 },
@@ -214,7 +242,9 @@
         "email": { "type": "string", "maxLength": 120 },
         "phone": { "type": "string", "maxLength": 30 },
         "bio": { "type": "string", "maxLength": 1500 },
-        "availableDays": { "type": "string", "maxLength": 200 }
+        "availableDays": { "type": "string", "maxLength": 200 },
+        "activeMenteesCount": { "type": "number" },
+        "lastActive": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "name", "email", "agency"]
     },
@@ -231,12 +261,17 @@
         "entrepreneurEmail": { "type": "string", "maxLength": 120 },
         "entrepreneurPhone": { "type": "string", "maxLength": 30 },
         "businessName": { "type": "string", "maxLength": 150 },
+        "businessCategory": { "type": "string", "maxLength": 60 },
         "district": { "type": "string", "maxLength": 50 },
         "topic": { "type": "string", "maxLength": 200 },
+        "challenges": { "type": "string", "maxLength": 2000 },
         "preferredDate": { "type": "string", "maxLength": 50 },
         "preferredTime": { "type": "string", "maxLength": 50 },
         "mode": { "type": "string", "maxLength": 60 },
         "status": { "type": "string", "enum": ["pending", "confirmed", "completed", "cancelled"] },
+        "notes": { "type": "string", "maxLength": 2000 },
+        "mentorActionPlan": { "type": "string", "maxLength": 3000 },
+        "meetingLink": { "type": "string", "maxLength": 500 },
         "createdAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "mentorId", "entrepreneurName", "businessName", "status"]
@@ -250,12 +285,18 @@
         "endorsementCode": { "type": "string", "maxLength": 80 },
         "mentorId": { "type": "string", "maxLength": 128 },
         "mentorName": { "type": "string", "maxLength": 120 },
+        "mentorAgency": { "type": "string", "maxLength": 150 },
+        "mentorDesignation": { "type": "string", "maxLength": 180 },
         "menteeId": { "type": "string", "maxLength": 128 },
         "menteeName": { "type": "string", "maxLength": 120 },
+        "menteePhone": { "type": "string", "maxLength": 30 },
         "businessName": { "type": "string", "maxLength": 150 },
+        "businessCategory": { "type": "string", "maxLength": 60 },
+        "district": { "type": "string", "maxLength": 50 },
         "recommendedAmount": { "type": "string", "maxLength": 40 },
         "grantProgramTitle": { "type": "string", "maxLength": 200 },
         "justification": { "type": "string", "maxLength": 2000 },
+        "businessReadinessRemark": { "type": "string", "maxLength": 1000 },
         "status": { "type": "string", "enum": ["active", "revoked"] },
         "issuedAt": { "type": "string", "maxLength": 50 }
       },
@@ -273,6 +314,7 @@
         "sessionDate": { "type": "string", "maxLength": 50 },
         "topic": { "type": "string", "maxLength": 200 },
         "minutes": { "type": "string", "maxLength": 3000 },
+        "actionItems": { "type": "array" },
         "createdAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "mentorId", "menteeName", "topic", "minutes"]
@@ -308,6 +350,7 @@
         "senderRole": { "type": "string", "enum": ["admin", "mentor", "system"] },
         "targetRole": { "type": "string", "enum": ["youth", "mentor", "admin", "all"] },
         "targetUserId": { "type": "string", "maxLength": 128 },
+        "timestamp": { "type": "string", "maxLength": 60 },
         "isRead": { "type": "boolean" },
         "actionTab": { "type": "string", "maxLength": 40 }
       },
@@ -319,6 +362,8 @@
       "type": "object",
       "properties": {
         "id": { "type": "string", "maxLength": 128 },
+        "adminOfficerName": { "type": "string", "maxLength": 120 },
+        "adminHelpdeskPhone": { "type": "string", "maxLength": 30 },
         "portalSubsidyRate": { "type": "number" },
         "maxLeaseDurationMonths": { "type": "number" },
         "systemStatus": { "type": "string", "enum": ["operational", "maintenance"] },
@@ -326,6 +371,27 @@
         "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "portalSubsidyRate", "maxLeaseDurationMonths", "systemStatus"]
+    },
+    "PortalNews": {
+      "title": "PortalNews",
+      "description": "Berita rasmi dan pengumuman portal yang diurus sepenuhnya oleh Pentadbir",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "content": { "type": "string", "minLength": 1, "maxLength": 8000 },
+        "category": { "type": "string", "enum": ["Pengumuman", "Geran & Dana", "Program & Acara", "Kapsul Niaga", "Info Terkini"] },
+        "imageUrl": { "type": "string", "maxLength": 900000 },
+        "status": { "type": "string", "enum": ["published", "draft"] },
+        "isPinned": { "type": "boolean" },
+        "authorId": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 120 },
+        "publishedAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "title", "summary", "content", "category", "status", "isPinned", "authorId", "authorName", "updatedAt", "createdAt"]
     }
   },
   "firestore": {
@@ -396,6 +462,10 @@
     "/portal_settings/{settingId}": {
       "schema": { "$ref": "#/entities/PortalSettings" },
       "description": "Konfigurasi operasi sistem pentadbir"
+    },
+    "/portal_news/{newsId}": {
+      "schema": { "$ref": "#/entities/PortalNews" },
+      "description": "Berita rasmi dan pengumuman portal kawalan Admin"
     }
   }
 }

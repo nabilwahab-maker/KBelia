@@ -13,7 +13,8 @@ import {
   Users, 
   UserCheck,
   ChevronRight,
-  Home
+  Home,
+  Newspaper
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
 import { useLanguage } from '../context/LanguageContext';
@@ -157,6 +158,16 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           iconBg: 'bg-sky-600'
         };
 
+      case 'news':
+        return {
+          pageLabel: 'News',
+          breadcrumb: isMs ? 'Berita & Pengumuman Rasmi' : 'Official News & Updates',
+          dashboardTitle: 'BERITA RASMI KBELIA',
+          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          icon: Newspaper,
+          iconBg: 'bg-sky-600'
+        };
+
       case 'settings':
         return {
           pageLabel: isMs ? 'Tetapan' : 'Settings',
@@ -210,7 +221,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
   })();
 
   return (
-    <div className="w-full kbelia-important-header rounded-t-2xl rounded-b-none border border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-3.5 sm:py-4 shadow-2xs transition-colors">
+    <div className="w-full kbelia-important-header rounded-t-2xl rounded-b-none border border-b border-slate-200/80 dark:border-zinc-800 px-4 sm:px-6 py-3.5 sm:py-4 shadow-sm transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         
         {/* Navigation Breadcrumb */}
@@ -239,7 +250,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
         </div>
 
         {/* Today's Date */}
-        <div className="self-start sm:self-auto flex items-center gap-2.5 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg text-xs shadow-2xs">
+        <div className="self-start sm:self-auto flex items-center gap-2.5 px-3 py-1.5 bg-slate-50/90 dark:bg-zinc-900/80 border border-slate-200/80 dark:border-zinc-800 rounded-lg text-xs shadow-2xs">
           <span className="text-slate-500 dark:text-slate-400 font-medium capitalize">
             {isMs ? 'hari ini' : 'today'}
           </span>

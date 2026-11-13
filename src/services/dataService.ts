@@ -20,7 +20,8 @@ import {
   GrantEndorsement,
   MentoringLogEntry,
   B2BListing,
-  PortalSettings
+  PortalSettings,
+  PortalNews
 } from '../types';
 import {
   INITIAL_BUSINESSES,
@@ -28,6 +29,7 @@ import {
   INITIAL_PRODUCTS,
   INITIAL_PROGRAMS
 } from '../data/seedData';
+import { INITIAL_PORTAL_NEWS } from '../data/newsData';
 
 const CACHE_KEYS = {
   BUSINESSES: 'kbelia_businesses_cache',
@@ -106,6 +108,9 @@ export async function seedInitialData() {
     }
     for (const prog of INITIAL_PROGRAMS) {
       await setDoc(doc(db, 'programs', prog.id), prog, { merge: true });
+    }
+    for (const newsItem of INITIAL_PORTAL_NEWS) {
+      await setDoc(doc(db, 'portal_news', newsItem.id), newsItem, { merge: true });
     }
     return true;
   } catch (error) {
@@ -669,13 +674,14 @@ export async function updateMaintenanceTicketStatus(
 
 // --- MENTORSHIP, MENTOR PROFILES, ENDORSEMENTS & LOGS ---
 export async function saveMentorProfileRecord(profile: MentorProfile) {
-  if (!isFirebaseAuthenticated()) return profile;
+  const { pin: _pin, ...safeProfile } = profile as MentorProfile & { pin?: string };
+  if (!isFirebaseAuthenticated()) return safeProfile as MentorProfile;
   try {
-    await setDoc(doc(db, 'mentor_profiles', profile.id), profile, { merge: true });
-    return profile;
+    await setDoc(doc(db, 'mentor_profiles', safeProfile.id), safeProfile, { merge: true });
+    return safeProfile as MentorProfile;
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, 'mentor_profiles');
-    return profile;
+    return safeProfile as MentorProfile;
   }
 }
 
@@ -774,4 +780,127 @@ export function loadLocalPortalSettings(): PortalSettings {
     // ignore
   }
   return DEFAULT_PORTAL_SETTINGS;
+}
+
+// --- PORTAL NEWS (Admin Controlled, All Logged-In Users Read Published) ---
+const DEMO_NEWS_STORAGE_KEY = 'kbelia_demo_news_v1';
+
+export function loadLocalDemoNews(): PortalNews[] {
+  try {
+    const raw = localStorage.getItem(DEMO_NEWS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function savePortalNewsRecord(
+  news: Partial<PortalNews> & {
+    title: string;
+    summary: string;
+    content: string;
+    category: PortalNews['category'];
+    status: PortalNews['status'];
+    authorId: string;
+    authorName: string;
+  }
+): Promise<PortalNews> {
+  const id = (news.id || `news-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`)
+    .replace(/[^a-zA-Z0-9_-]/g, '-')
+    .slice(0, 128);
+  const now = new Date().toISOString();
+  const isPublished = news.status === 'published';
+
+  const sanitized: PortalNews = {
+    id,
+    title: news.title.trim().slice(0, 200),
+    summary: news.summary.trim().slice(0, 500),
+    content: news.content.trim().slice(0, 8000),
+    category: news.category,
+    imageUrl: (news.imageUrl || '').slice(0, 900000),
+    status: news.status,
+    isPinned: Boolean(news.isPinned),
+    authorId: (news.authorId || 'admin').slice(0, 128),
+    authorName: (news.authorName || 'Pentadbir KBelia').trim().slice(0, 120),
+    publishedAt: isPublished ? (news.publishedAt || now) : '',
+    updatedAt: now,
+    createdAt: news.createdAt || now
+  };
+
+  // Clear from deleted list if re-saving
+  try {
+    const deleted = getDeletedIds().filter(d => d !== id);
+    localStorage.setItem(CACHE_KEYS.DELETED_IDS, JSON.stringify(deleted));
+  } catch {
+    // ignore
+  }
+
+  if (!isFirebaseAuthenticated()) {
+    try {
+      const existing = loadLocalDemoNews();
+      const updated = [sanitized, ...existing.filter(n => n.id !== id)];
+      localStorage.setItem(DEMO_NEWS_STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('kbelia_demo_news_updated'));
+    } catch {
+      // ignore
+    }
+    return sanitized;
+  }
+
+  try {
+    await setDoc(doc(db, 'portal_news', id), sanitized, { merge: true });
+    return sanitized;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, 'portal_news');
+    throw error;
+  }
+}
+
+export async function deletePortalNewsRecord(newsId: string): Promise<void> {
+  markIdAsDeleted(newsId);
+
+  if (!isFirebaseAuthenticated()) {
+    try {
+      const existing = loadLocalDemoNews();
+      localStorage.setItem(
+        DEMO_NEWS_STORAGE_KEY,
+        JSON.stringify(existing.filter(n => n.id !== newsId))
+      );
+      window.dispatchEvent(new CustomEvent('kbelia_demo_news_updated'));
+    } catch {
+      // ignore
+    }
+    return;
+  }
+
+  try {
+    await deleteDoc(doc(db, 'portal_news', newsId));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, 'portal_news');
+    throw error;
+  }
+}
+
+export async function restoreDefaultDemoNews(): Promise<void> {
+  try {
+    const demoIds = new Set(INITIAL_PORTAL_NEWS.map(n => n.id));
+    const deleted = getDeletedIds().filter(id => !demoIds.has(id));
+    localStorage.setItem(CACHE_KEYS.DELETED_IDS, JSON.stringify(deleted));
+    const customOnly = loadLocalDemoNews().filter(n => !demoIds.has(n.id));
+    localStorage.setItem(DEMO_NEWS_STORAGE_KEY, JSON.stringify(customOnly));
+    window.dispatchEvent(new CustomEvent('kbelia_demo_news_updated'));
+  } catch {
+    // ignore
+  }
+
+  if (isFirebaseAuthenticated()) {
+    try {
+      for (const item of INITIAL_PORTAL_NEWS) {
+        await setDoc(doc(db, 'portal_news', item.id), item, { merge: true });
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'portal_news');
+      throw error;
+    }
+  }
 }

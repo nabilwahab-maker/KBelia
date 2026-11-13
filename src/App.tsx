@@ -23,6 +23,7 @@ import {
   KioskDailySale,
   MaintenanceTicket,
   PortalSettings,
+  PortalNews,
   MerchantSubTab,
   AdminSubTab,
   MentorSubTab
@@ -37,11 +38,13 @@ import {
   INITIAL_MENTOR_PROFILES, 
   INITIAL_MENTORSHIP_REGISTRATIONS 
 } from './data/mentorData';
+import { INITIAL_PORTAL_NEWS } from './data/newsData';
 import { 
   getDeletedIds, 
   seedInitialData, 
   DEFAULT_PORTAL_SETTINGS, 
   loadLocalPortalSettings,
+  loadLocalDemoNews,
   saveMentorshipRegistrationRecord,
   saveMentorProfileRecord
 } from './services/dataService';
@@ -58,6 +61,7 @@ import { GrantCalculatorSection } from './components/GrantCalculatorSection';
 import { MerchantPortal } from './components/MerchantPortal';
 import { MentorPortal } from './components/MentorPortal';
 import { AdminDashboard } from './components/AdminDashboard';
+import { NewsPage } from './components/NewsPage';
 import { DashboardBannerHeader } from './components/DashboardBannerHeader';
 import { SettingsPage } from './components/SettingsPage';
 import { LoginPage } from './components/LoginPage';
@@ -78,20 +82,20 @@ import { MentorshipClinicModal } from './components/MentorshipClinicModal';
 import { KioskMaintenanceModal } from './components/KioskMaintenanceModal';
 import { YouthB2BNetworkModal } from './components/YouthB2BNetworkModal';
 import { YouthEventsCalendarModal } from './components/YouthEventsCalendarModal';
-import { ToastContainer } from './components/ToastNotification';
+import { ToastContainer, showToast } from './components/ToastNotification';
 import { TopProgressBar, triggerTopNavigationProgress } from './components/TopProgressBar';
 import { 
   Building2, 
   Store, 
   Award, 
   GraduationCap,
-  ShieldCheck
+  ShieldCheck,
+  Lock
 } from 'lucide-react';
 
 function MainApp() {
-  const { user, userProfile, isAdmin, isDemoSession } = useAuth();
+  const { user, userProfile, isAdmin, isMentor, isYouth: isAuthenticatedYouth } = useAuth();
   const { t, language } = useLanguage();
-  const isMentor = userProfile?.role === 'mentor';
   const isYouth = !isAdmin && !isMentor;
   const { theme } = useTheme();
 
@@ -124,6 +128,7 @@ function MainApp() {
   const [cashflowRecords, setCashflowRecords] = useState<KioskDailySale[]>([]);
   const [maintenanceTickets, setMaintenanceTickets] = useState<MaintenanceTicket[]>([]);
   const [portalSettings, setPortalSettings] = useState<PortalSettings>(() => loadLocalPortalSettings());
+  const [newsItems, setNewsItems] = useState<PortalNews[]>(INITIAL_PORTAL_NEWS);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Filters for Kapsul Niaga
@@ -213,24 +218,60 @@ function MainApp() {
     }
   }, [mentorshipRegistrations]);
 
-  // Auto-switch to mentor tab when mentor logs in
+  // Strict role-based auto-routing & boundary enforcement
   useEffect(() => {
-    if (userProfile?.role === 'mentor') {
+    if (!user) return;
+    if (activeTab === 'landing' || activeTab === 'login' || activeTab === 'register') return;
+
+    const adminAllowedTabs: UMKTab[] = ['home', 'admin', 'academic', 'ceed', 'hepa', 'news', 'settings'];
+    const mentorAllowedTabs: UMKTab[] = ['home', 'mentor', 'news', 'settings'];
+    const youthAllowedTabs: UMKTab[] = ['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'news', 'settings'];
+
+    if (isAdmin && !adminAllowedTabs.includes(activeTab)) {
+      setActiveTab('admin');
+    } else if (isMentor && !mentorAllowedTabs.includes(activeTab)) {
+      setActiveTab('mentor');
+    } else if (isAuthenticatedYouth && !youthAllowedTabs.includes(activeTab)) {
+      setActiveTab('merchant');
+    }
+  }, [user, isAdmin, isMentor, isAuthenticatedYouth, activeTab]);
+
+  // Snap directly to Mentor Hub upon mentor login
+  useEffect(() => {
+    if (isMentor && (activeTab === 'login' || activeTab === 'register' || activeTab === 'home')) {
       setActiveTab('mentor');
     }
-  }, [userProfile?.role]);
+  }, [isMentor]);
 
   const handleUpdateMentorProfile = (updated: MentorProfile) => {
+    if (!isAdmin && (!isMentor || updated.id !== userProfile?.mentorId)) {
+      return;
+    }
     setMentors(prev => prev.map(m => m.id === updated.id ? updated : m));
     saveMentorProfileRecord(updated).catch(() => {});
   };
 
   const handleUpdateMentorshipRegistration = (updated: MentorshipRegistration) => {
+    // Only assigned Mentor or Admin (or Youth cancelling own booking) may update mentorship sessions
+    if (isMentor && updated.mentorId !== userProfile?.mentorId) {
+      return;
+    }
+    if (isAuthenticatedYouth && updated.applicantId !== user?.uid && updated.status !== 'cancelled') {
+      return;
+    }
     setMentorshipRegistrations(prev => prev.map(r => r.id === updated.id ? updated : r));
     saveMentorshipRegistrationRecord(updated).catch(() => {});
   };
 
   const handleAddMentorshipRegistration = (newReg: MentorshipRegistration) => {
+    if (isAdmin || isMentor) {
+      showToast({
+        type: 'warning',
+        title: 'Akses Terhad Mengikut Peranan',
+        message: 'Tempahan klinik bimbingan hanya dibuka untuk akaun Usahawan Belia.'
+      });
+      return;
+    }
     const withOwner: MentorshipRegistration = {
       ...newReg,
       applicantId: newReg.applicantId || user?.uid
@@ -449,26 +490,104 @@ function MainApp() {
     return () => unsubProg();
   }, [refreshTrigger]);
 
-  // 5. Protected Collections Listeners (Firestore ONLY when Firebase authenticated; Isolated Demo storage otherwise)
+  // 4b. Real-time Portal News Listener (Admin sees all; Belia & Mentor see published only)
+  useEffect(() => {
+    const mergeAndScopeNews = (firestoreNews: PortalNews[]) => {
+      const deleted = getDeletedIds();
+      const demoNews = loadLocalDemoNews();
+      const byId = new Map<string, PortalNews>();
+
+      for (const seed of INITIAL_PORTAL_NEWS) {
+        if (!deleted.includes(seed.id)) {
+          byId.set(seed.id, seed);
+        }
+      }
+      for (const fsItem of firestoreNews) {
+        if (!deleted.includes(fsItem.id)) {
+          byId.set(fsItem.id, fsItem);
+        }
+      }
+      for (const demoItem of demoNews) {
+        if (!deleted.includes(demoItem.id)) {
+          byId.set(demoItem.id, demoItem);
+        }
+      }
+
+      const merged = Array.from(byId.values());
+      setNewsItems(isAdmin ? merged : merged.filter(n => n.status === 'published'));
+    };
+
+    const handleDemoNewsUpdate = () => {
+      mergeAndScopeNews([]);
+    };
+
+    window.addEventListener('kbelia_demo_news_updated', handleDemoNewsUpdate);
+
+    if (!user || user.isDemo || !auth.currentUser) {
+      mergeAndScopeNews([]);
+      return () => {
+        window.removeEventListener('kbelia_demo_news_updated', handleDemoNewsUpdate);
+      };
+    }
+
+    const newsQuery = isAdmin
+      ? collection(db, 'portal_news')
+      : query(collection(db, 'portal_news'), where('status', '==', 'published'));
+
+    const unsubNews = onSnapshot(
+      newsQuery,
+      (snapshot) => {
+        const loaded: PortalNews[] = [];
+        snapshot.forEach((docSnap) => {
+          loaded.push({ id: docSnap.id, ...docSnap.data() } as PortalNews);
+        });
+        mergeAndScopeNews(loaded);
+      },
+      () => {
+        mergeAndScopeNews([]);
+      }
+    );
+
+    return () => {
+      window.removeEventListener('kbelia_demo_news_updated', handleDemoNewsUpdate);
+      unsubNews();
+    };
+  }, [user?.uid, user?.isDemo, isAdmin, refreshTrigger]);
+
+  // 5. Protected Collections Listeners (Strict Role & Ownership Isolation)
   useEffect(() => {
     const loadDemoProtectedState = () => {
       try {
         const deleted = getDeletedIds();
-        const demoBookings: CapsuleBooking[] = JSON.parse(localStorage.getItem('kbelia_demo_bookings') || '[]');
-        setBookings(demoBookings.filter(b => !deleted.includes(b.id)));
-
+        const demoBookings: CapsuleBooking[] = JSON.parse(localStorage.getItem('kbelia_demo_bookings') || '[]')
+          .filter((b: CapsuleBooking) => !deleted.includes(b.id));
         const demoGrants: GrantApplication[] = JSON.parse(localStorage.getItem('kbelia_demo_grants') || '[]');
-        setGrantApplications(demoGrants);
-
         const demoTickets: MaintenanceTicket[] = JSON.parse(localStorage.getItem('kbelia_demo_maintenance_tickets') || '[]');
-        setMaintenanceTickets(demoTickets);
 
-        if (user?.uid) {
-          const cfRaw = localStorage.getItem(`kbelia_cashflow_records_${user.uid}`);
-          setCashflowRecords(cfRaw ? JSON.parse(cfRaw) : []);
-        } else {
+        if (!user || isMentor) {
+          // Mentor & unauthenticated users have ZERO access to kiosk bookings, grant bank details, maintenance tickets, or youth cashflow
+          setBookings([]);
+          setGrantApplications([]);
+          setMaintenanceTickets([]);
           setCashflowRecords([]);
+          return;
         }
+
+        if (isAdmin) {
+          // Admin sees governance queues (bookings, grants, tickets), NEVER personal youth daily cashflow
+          setBookings(demoBookings);
+          setGrantApplications(demoGrants);
+          setMaintenanceTickets(demoTickets);
+          setCashflowRecords([]);
+          return;
+        }
+
+        // Authenticated Youth: strictly scoped to own UID
+        setBookings(demoBookings.filter(b => b.applicantId === user.uid));
+        setGrantApplications(demoGrants.filter(g => g.applicantId === user.uid));
+        setMaintenanceTickets(demoTickets.filter(t => t.ownerId === user.uid));
+        const cfRaw = localStorage.getItem(`kbelia_cashflow_records_${user.uid}`);
+        setCashflowRecords(cfRaw ? JSON.parse(cfRaw) : []);
       } catch {
         // ignore
       }
@@ -491,68 +610,117 @@ function MainApp() {
       };
     }
 
-    const bookingsQuery = (isAdmin || isMentor)
-      ? collection(db, 'capsule_bookings')
-      : query(collection(db, 'capsule_bookings'), where('applicantId', '==', user.uid));
-
-    const unsubBookings = onSnapshot(bookingsQuery, (snapshot) => {
-      const deleted = getDeletedIds();
-      const loadedBookings: CapsuleBooking[] = [];
-      snapshot.forEach((docSnap) => {
-        if (!deleted.includes(docSnap.id)) {
-          loadedBookings.push({ id: docSnap.id, ...docSnap.data() } as CapsuleBooking);
-        }
-      });
-      setBookings(loadedBookings);
-    }, (error) => {
-      console.warn('Bookings listener notice:', error.message);
+    // Mentor has no read subscriptions on capsule_bookings, grant_applications, cashflow_records, or maintenance_tickets
+    let unsubBookings = () => {};
+    if (isAdmin) {
+      unsubBookings = onSnapshot(collection(db, 'capsule_bookings'), (snapshot) => {
+        const deleted = getDeletedIds();
+        const loadedBookings: CapsuleBooking[] = [];
+        snapshot.forEach((docSnap) => {
+          if (!deleted.includes(docSnap.id)) {
+            loadedBookings.push({ id: docSnap.id, ...docSnap.data() } as CapsuleBooking);
+          }
+        });
+        setBookings(loadedBookings);
+      }, () => setBookings([]));
+    } else if (isAuthenticatedYouth) {
+      const myBookingsQ = query(collection(db, 'capsule_bookings'), where('applicantId', '==', user.uid));
+      unsubBookings = onSnapshot(myBookingsQ, (snapshot) => {
+        const deleted = getDeletedIds();
+        const loadedBookings: CapsuleBooking[] = [];
+        snapshot.forEach((docSnap) => {
+          if (!deleted.includes(docSnap.id)) {
+            loadedBookings.push({ id: docSnap.id, ...docSnap.data() } as CapsuleBooking);
+          }
+        });
+        setBookings(loadedBookings);
+      }, () => setBookings([]));
+    } else {
       setBookings([]);
-    });
+    }
 
-    const grantsQuery = (isAdmin || isMentor)
-      ? collection(db, 'grant_applications')
-      : query(collection(db, 'grant_applications'), where('applicantId', '==', user.uid));
-
-    const unsubGrants = onSnapshot(grantsQuery, (snapshot) => {
-      const loaded: GrantApplication[] = [];
-      snapshot.forEach((docSnap) => {
-        loaded.push({ id: docSnap.id, ...docSnap.data() } as GrantApplication);
-      });
-      setGrantApplications(loaded);
-    }, (error) => {
-      console.warn('Grants listener notice:', error.message);
+    let unsubGrants = () => {};
+    if (isAdmin) {
+      unsubGrants = onSnapshot(collection(db, 'grant_applications'), (snapshot) => {
+        const loaded: GrantApplication[] = [];
+        snapshot.forEach((docSnap) => {
+          loaded.push({ id: docSnap.id, ...docSnap.data() } as GrantApplication);
+        });
+        setGrantApplications(loaded);
+      }, () => setGrantApplications([]));
+    } else if (isAuthenticatedYouth) {
+      const myGrantsQ = query(collection(db, 'grant_applications'), where('applicantId', '==', user.uid));
+      unsubGrants = onSnapshot(myGrantsQ, (snapshot) => {
+        const loaded: GrantApplication[] = [];
+        snapshot.forEach((docSnap) => {
+          loaded.push({ id: docSnap.id, ...docSnap.data() } as GrantApplication);
+        });
+        setGrantApplications(loaded);
+      }, () => setGrantApplications([]));
+    } else {
       setGrantApplications([]);
-    });
+    }
 
-    const cashflowQuery = (isAdmin || isMentor)
-      ? collection(db, 'cashflow_records')
-      : query(collection(db, 'cashflow_records'), where('ownerId', '==', user.uid));
-
-    const unsubCashflow = onSnapshot(cashflowQuery, (snapshot) => {
-      const loaded: KioskDailySale[] = [];
-      snapshot.forEach((docSnap) => {
-        loaded.push({ id: docSnap.id, ...docSnap.data() } as KioskDailySale);
-      });
-      setCashflowRecords(loaded);
-    }, (error) => {
-      console.warn('Cashflow listener notice:', error.message);
+    let unsubCashflow = () => {};
+    if (isAuthenticatedYouth) {
+      const myCashflowQ = query(collection(db, 'cashflow_records'), where('ownerId', '==', user.uid));
+      unsubCashflow = onSnapshot(myCashflowQ, (snapshot) => {
+        const loaded: KioskDailySale[] = [];
+        snapshot.forEach((docSnap) => {
+          loaded.push({ id: docSnap.id, ...docSnap.data() } as KioskDailySale);
+        });
+        setCashflowRecords(loaded);
+      }, () => setCashflowRecords([]));
+    } else {
       setCashflowRecords([]);
-    });
+    }
 
-    const ticketsQuery = isAdmin
-      ? collection(db, 'maintenance_tickets')
-      : query(collection(db, 'maintenance_tickets'), where('ownerId', '==', user.uid));
-
-    const unsubTickets = onSnapshot(ticketsQuery, (snapshot) => {
-      const loaded: MaintenanceTicket[] = [];
-      snapshot.forEach((docSnap) => {
-        loaded.push({ id: docSnap.id, ...docSnap.data() } as MaintenanceTicket);
-      });
-      setMaintenanceTickets(loaded);
-    }, (error) => {
-      console.warn('Tickets listener notice:', error.message);
+    let unsubTickets = () => {};
+    if (isAdmin) {
+      unsubTickets = onSnapshot(collection(db, 'maintenance_tickets'), (snapshot) => {
+        const loaded: MaintenanceTicket[] = [];
+        snapshot.forEach((docSnap) => {
+          loaded.push({ id: docSnap.id, ...docSnap.data() } as MaintenanceTicket);
+        });
+        setMaintenanceTickets(loaded);
+      }, () => setMaintenanceTickets([]));
+    } else if (isAuthenticatedYouth) {
+      const myTicketsQ = query(collection(db, 'maintenance_tickets'), where('ownerId', '==', user.uid));
+      unsubTickets = onSnapshot(myTicketsQ, (snapshot) => {
+        const loaded: MaintenanceTicket[] = [];
+        snapshot.forEach((docSnap) => {
+          loaded.push({ id: docSnap.id, ...docSnap.data() } as MaintenanceTicket);
+        });
+        setMaintenanceTickets(loaded);
+      }, () => setMaintenanceTickets([]));
+    } else {
       setMaintenanceTickets([]);
-    });
+    }
+
+    let unsubMentorSessions = () => {};
+    if (isAdmin) {
+      unsubMentorSessions = onSnapshot(collection(db, 'mentor_sessions'), (snapshot) => {
+        if (!snapshot.empty) {
+          const loaded: MentorshipRegistration[] = [];
+          snapshot.forEach((docSnap) => loaded.push({ id: docSnap.id, ...docSnap.data() } as MentorshipRegistration));
+          setMentorshipRegistrations(loaded);
+        }
+      }, () => {});
+    } else if (isMentor && userProfile?.mentorId) {
+      const mentorSessQ = query(collection(db, 'mentor_sessions'), where('mentorId', '==', userProfile.mentorId));
+      unsubMentorSessions = onSnapshot(mentorSessQ, (snapshot) => {
+        const loaded: MentorshipRegistration[] = [];
+        snapshot.forEach((docSnap) => loaded.push({ id: docSnap.id, ...docSnap.data() } as MentorshipRegistration));
+        if (loaded.length > 0) setMentorshipRegistrations(loaded);
+      }, () => {});
+    } else if (isAuthenticatedYouth) {
+      const youthSessQ = query(collection(db, 'mentor_sessions'), where('applicantId', '==', user.uid));
+      unsubMentorSessions = onSnapshot(youthSessQ, (snapshot) => {
+        const loaded: MentorshipRegistration[] = [];
+        snapshot.forEach((docSnap) => loaded.push({ id: docSnap.id, ...docSnap.data() } as MentorshipRegistration));
+        if (loaded.length > 0) setMentorshipRegistrations(loaded);
+      }, () => {});
+    }
 
     return () => {
       window.removeEventListener('kbelia_demo_data_updated', handleDemoUpdate);
@@ -561,8 +729,9 @@ function MainApp() {
       unsubGrants();
       unsubCashflow();
       unsubTickets();
+      unsubMentorSessions();
     };
-  }, [user?.uid, user?.isDemo, isAdmin, isMentor, refreshTrigger]);
+  }, [user?.uid, user?.isDemo, isAdmin, isMentor, isAuthenticatedYouth, userProfile?.mentorId, refreshTrigger]);
 
   // Auto-seed catalog once only when authenticated as Firebase Admin
   useEffect(() => {
@@ -622,7 +791,7 @@ function MainApp() {
   }, [slots, bookings]);
 
   const handleOpenBookingForSlot = (slot: CapsuleSlot) => {
-    // If slot is occupied, reserved, or has an active tenant, display the Tenant & Capsule details dossier!
+    // If slot is occupied, reserved, or has an active tenant, display the Tenant & Capsule details dossier
     const isOccupied = slot.status !== 'available' || Boolean(slot.currentTenantBusinessName);
     if (isOccupied) {
       setSelectedSlotForTenantDetail(slot);
@@ -630,9 +799,15 @@ function MainApp() {
       return;
     }
 
-    // Admin cannot apply for capsule booking; booking is strictly for youth
-    if (isAdmin) {
-      setActiveTab('admin');
+    // Strict role guard: Only Youth Entrepreneurs can apply for capsule bookings
+    if (isAdmin || isMentor) {
+      showToast({
+        type: 'warning',
+        title: 'Batas Peranan Sistem',
+        message: isAdmin
+          ? 'Pentadbir hanya mengurus kelulusan slot dan tidak dibenarkan memohon tapak kiosk.'
+          : 'Mentor bimbingan tidak dibenarkan membuat permohonan sewaan kiosk usahawan.'
+      });
       return;
     }
     setSelectedSlotForBooking(slot);
@@ -645,8 +820,12 @@ function MainApp() {
   };
 
   const handleOpenNewBooking = () => {
-    if (isAdmin) {
-      setActiveTab('admin');
+    if (isAdmin || isMentor) {
+      showToast({
+        type: 'warning',
+        title: 'Batas Peranan Sistem',
+        message: 'Borang permohonan tapak kiosk dikhaskan untuk Usahawan Belia sahaja.'
+      });
       return;
     }
     const firstAvailable = enrichedSlots.find(s => s.status === 'available' && !s.currentTenantBusinessName);
@@ -655,12 +834,35 @@ function MainApp() {
   };
 
   const handleOpenGrantModal = (programTitle?: string, amount?: string) => {
+    if (isAdmin || isMentor) {
+      showToast({
+        type: 'warning',
+        title: 'Batas Peranan Sistem',
+        message: isMentor
+          ? 'Mentor menggunakan modul Perakuan Geran di Portal Mentor dan tidak memohon geran sebagai belia.'
+          : 'Pentadbir hanya mengurus kelulusan geran dan tidak membuat permohonan dana.'
+      });
+      return;
+    }
     if (programTitle) setSelectedGrantTitle(programTitle);
     if (amount) setSelectedGrantAmount(amount);
     setIsGrantModalOpen(true);
   };
 
+  const handleOpenMentorshipClinicGuarded = () => {
+    if (isAdmin || isMentor) {
+      showToast({
+        type: 'warning',
+        title: 'Batas Peranan Sistem',
+        message: 'Tempahan klinik bimbingan hanya dibuka untuk akaun Usahawan Belia.'
+      });
+      return;
+    }
+    setIsMentorshipModalOpen(true);
+  };
+
   const handleViewOfferLetter = (booking: CapsuleBooking) => {
+    if (isMentor) return;
     setSelectedBookingForOffer(booking);
     setIsOfferLetterOpen(true);
   };
@@ -674,15 +876,23 @@ function MainApp() {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  // User-specific data
-  const myBusiness = businesses.find(b => b.ownerId === user?.uid) || null;
-  const myProducts = products.filter(p => p.ownerId === user?.uid || (myBusiness && p.businessId === myBusiness.id));
-  const myBookings = bookings.filter(b => b.applicantId === user?.uid);
+  // Strictly role-scoped derived collections
+  const myBusiness = isYouth ? (businesses.find(b => b.ownerId === user?.uid) || null) : null;
+  const myProducts = isYouth ? products.filter(p => p.ownerId === user?.uid || (myBusiness && p.businessId === myBusiness.id)) : [];
+  const myBookings = isYouth ? bookings.filter(b => b.applicantId === user?.uid) : [];
+  const myYouthGrants = isYouth
+    ? grantApplications.filter(g => g.applicantId === user?.uid || (user?.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase()))
+    : [];
+  const scopedMentorRegistrations = isMentor
+    ? mentorshipRegistrations.filter(r => r.mentorId === (userProfile?.mentorId || ''))
+    : isYouth
+    ? mentorshipRegistrations.filter(r => r.applicantId === user?.uid || (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))
+    : mentorshipRegistrations;
 
   // 0. STANDALONE LANDING PAGE (Welcoming homepage on initial link load)
   if (activeTab === 'landing') {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
         <TopProgressBar />
         <LandingPage
           setActiveTab={setActiveTab}
@@ -730,7 +940,7 @@ function MainApp() {
   // 1. STANDALONE LOGIN PAGE (Separated from dashboard)
   if (activeTab === 'login') {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
         <LoginPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -760,7 +970,7 @@ function MainApp() {
   // 1b. STANDALONE REGISTER PAGE (Dedicated Laman Pendaftaran Usahawan Belia)
   if (activeTab === 'register') {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
         <RegisterPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -788,7 +998,7 @@ function MainApp() {
   }
 
   return (
-    <div className="h-screen bg-slate-50 dark:bg-slate-900 flex flex-col text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200 overflow-hidden">
+    <div className="h-screen bg-slate-50/50 dark:bg-zinc-950 flex flex-col text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-200 overflow-hidden">
       <TopProgressBar />
       {/* 1. TOP HEADER BAR */}
       <UMKHeader
@@ -800,6 +1010,10 @@ function MainApp() {
         onSelectMerchantSubTab={(sub) => {
           setActiveTab('merchant');
           setMerchantSubTab(sub);
+        }}
+        onSelectMentorSubTab={(sub) => {
+          setActiveTab('mentor');
+          setMentorSubTab(sub);
         }}
         onOpenBooking={handleOpenNewBooking}
         slots={enrichedSlots}
@@ -821,7 +1035,7 @@ function MainApp() {
           isMobileOpen={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
           onOpenBooking={handleOpenNewBooking}
-          onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
+          onOpenMentorshipClinic={handleOpenMentorshipClinicGuarded}
           merchantSubTab={merchantSubTab}
           onSelectMerchantSubTab={(sub) => {
             setActiveTab('merchant');
@@ -840,7 +1054,7 @@ function MainApp() {
         />
 
         {/* Center/Right Dynamic Body */}
-        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3.5 lg:p-4 w-full max-w-none min-w-0 scroll-smooth bg-slate-50 dark:bg-slate-900">
+        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3.5 lg:p-4 w-full max-w-none min-w-0 scroll-smooth bg-slate-50/50 dark:bg-zinc-950 bg-grid-pattern">
           
           {/* Portal Maintenance / Announcement Bar from Admin Settings */}
           {portalSettings.systemStatus === 'maintenance' && !isAdmin && (
@@ -865,7 +1079,7 @@ function MainApp() {
             <>
               {/* 1. ADMIN DASHBOARD VIEW */}
               {isAdmin && (
-                <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+                <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
                   <AdminDashboard
                     slots={enrichedSlots}
                     businesses={businesses}
@@ -876,6 +1090,7 @@ function MainApp() {
                     mentors={mentors}
                     maintenanceTickets={maintenanceTickets}
                     portalSettings={portalSettings}
+                    newsItems={newsItems}
                     onUpdateMentor={handleUpdateMentorProfile}
                     onRefresh={triggerRefresh}
                     activeSubTab={adminSubTab}
@@ -886,16 +1101,12 @@ function MainApp() {
 
               {/* 2. MENTOR DASHBOARD VIEW */}
               {isMentor && (
-                <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+                <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
                   <MentorPortal
                     mentors={mentors}
-                    registrations={mentorshipRegistrations}
+                    registrations={scopedMentorRegistrations}
                     onUpdateRegistration={handleUpdateMentorshipRegistration}
                     onUpdateMentor={handleUpdateMentorProfile}
-                    onAddRegistration={handleAddMentorshipRegistration}
-                    onBackToHome={() => setActiveTab('hepa')}
-                    onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
-                    onOpenAdminDashboard={() => setActiveTab('admin')}
                     activeSubTab={mentorSubTab}
                     onSelectSubTab={setMentorSubTab}
                   />
@@ -904,16 +1115,16 @@ function MainApp() {
 
               {/* 3. YOUTH ENTREPRENEUR DASHBOARD VIEW */}
               {isYouth && (
-                <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+                <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
                   <MerchantPortal
                     myBusiness={myBusiness}
                     myProducts={myProducts}
                     myBookings={myBookings}
                     slots={enrichedSlots}
-                    grantApplications={grantApplications.filter(g => g.applicantId === user?.uid || (user?.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase()))}
+                    grantApplications={myYouthGrants}
                     cashflowRecords={cashflowRecords}
                     maintenanceTickets={maintenanceTickets}
-                    mentorshipRegistrations={mentorshipRegistrations.filter(r => r.applicantId === user?.uid || (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))}
+                    mentorshipRegistrations={scopedMentorRegistrations}
                     onViewOfferLetter={handleViewOfferLetter}
                     onOpenTenancyAgreement={(booking) => {
                       setSelectedBookingForTenancy(booking);
@@ -926,7 +1137,7 @@ function MainApp() {
                     onOpenBookingModal={handleOpenNewBooking}
                     onOpenBookingTab={() => setActiveTab('academic')}
                     onOpenSettingsTab={() => setActiveTab('settings')}
-                    onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
+                    onOpenMentorshipClinic={handleOpenMentorshipClinicGuarded}
                     onOpenMaintenanceModal={() => setIsMaintenanceModalOpen(true)}
                     onRefresh={triggerRefresh}
                     activeSubTab={merchantSubTab}
@@ -937,115 +1148,244 @@ function MainApp() {
             </>
           )}
 
-          {/* KAPSUL NIAGA VIEW */}
+          {/* KAPSUL NIAGA VIEW (Strictly Belia / Admin Monitoring Only - Blocked for Mentor) */}
           {activeTab === 'academic' && (
-            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
-              <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
-                  <Building2 className="w-4 h-4" />
-                  <span>{t('tab_kiosk_title')}</span>
+            isMentor ? (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                  <Lock className="w-7 h-7" />
                 </div>
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  {t('tab_kiosk_heading')}
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
-                  {t('tab_kiosk_desc')}
-                </p>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Modul Kapsul Niaga Disekat</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                    Akaun Mentor bertauliah dihadkan kepada portal bimbingan, perakuan geran, dan log jurnal mentee sahaja tanpa capaian modul sewaan kiosk belia.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('mentor')}
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Kembali ke Portal Mentor</span>
+                </button>
               </div>
+            ) : (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200/80 dark:border-zinc-800">
+                  <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
+                    <Building2 className="w-4 h-4" />
+                    <span>{t('tab_kiosk_title')}</span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                    {t('tab_kiosk_heading')}
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
+                    {t('tab_kiosk_desc')}
+                  </p>
+                </div>
 
-              <CapsuleGrid
-                slots={enrichedSlots}
-                bookings={bookings}
-                onSelectSlot={handleOpenBookingForSlot}
-                onViewTenantDetail={handleOpenTenantDetail}
-                onOpenNewBooking={handleOpenNewBooking}
-                onAddSlot={() => setActiveTab('admin')}
-                selectedHub={selectedHubFilter}
-                onSelectHub={setSelectedHubFilter}
-                maxBudget={maxBudgetFilter}
-                onBudgetChange={setMaxBudgetFilter}
-                isReadOnly={isAdmin}
-              />
-            </div>
+                <CapsuleGrid
+                  slots={enrichedSlots}
+                  bookings={bookings}
+                  onSelectSlot={handleOpenBookingForSlot}
+                  onViewTenantDetail={handleOpenTenantDetail}
+                  onOpenNewBooking={handleOpenNewBooking}
+                  onAddSlot={isAdmin ? () => { setActiveTab('admin'); setAdminSubTab('slots'); } : undefined}
+                  selectedHub={selectedHubFilter}
+                  onSelectHub={setSelectedHubFilter}
+                  maxBudget={maxBudgetFilter}
+                  onBudgetChange={setMaxBudgetFilter}
+                  isReadOnly={isAdmin}
+                />
+              </div>
+            )
           )}
 
-          {/* DIREKTORI USAHAWAN KELANTAN */}
+          {/* DIREKTORI USAHAWAN KELANTAN (Belia / Admin Audit Only - Blocked for Mentor) */}
           {activeTab === 'hepa' && (
-            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
-              <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
-                  <Store className="w-4 h-4" />
-                  <span>{t('tab_directory_title')}</span>
+            isMentor ? (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                  <Lock className="w-7 h-7" />
                 </div>
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  {t('tab_directory_title')}
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
-                  {t('tab_directory_desc')}
-                </p>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Direktori Awam Disekat</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                    Untuk keselamatan dan batas peranan, Mentor hanya melihat usahawan mentee di bawah seliaan sendiri di Portal Mentor.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('mentor')}
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Kembali ke Portal Mentor</span>
+                </button>
               </div>
+            ) : (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200/80 dark:border-zinc-800">
+                  <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
+                    <Store className="w-4 h-4" />
+                    <span>{t('tab_directory_title')}</span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                    {t('tab_directory_title')}
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
+                    {t('tab_directory_desc')}
+                  </p>
+                </div>
 
-              <DirectorySection
-                businesses={businesses}
-                onSelectBusiness={handleOpenBusinessDetail}
-                onRegisterBusiness={() => setActiveTab('merchant')}
-              />
-            </div>
+                <DirectorySection
+                  businesses={businesses}
+                  onSelectBusiness={handleOpenBusinessDetail}
+                  onRegisterBusiness={isYouth ? () => setActiveTab('merchant') : undefined}
+                />
+              </div>
+            )
           )}
 
-          {/* GERAN & DANA BELIA */}
+          {/* GERAN & DANA BELIA (Belia / Admin Monitoring Only - Blocked for Mentor) */}
           {activeTab === 'ceed' && (
-            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
-              <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
-                  <Award className="w-4 h-4" />
-                  <span>{t('tab_grants_title')}</span>
+            isMentor ? (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                  <Lock className="w-7 h-7" />
                 </div>
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                  {t('tab_grants_heading')}
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
-                  {t('tab_grants_desc')}
-                </p>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Modul Permohonan Geran Disekat</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                    Mentor hanya mengurus surat perakuan rasmi melalui tab Perakuan Geran di Portal Mentor.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('mentor')}
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Kembali ke Portal Mentor</span>
+                </button>
               </div>
+            ) : (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200/80 dark:border-zinc-800">
+                  <div className="flex items-center gap-2 text-sky-700 dark:text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">
+                    <Award className="w-4 h-4" />
+                    <span>{t('tab_grants_title')}</span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                    {t('tab_grants_heading')}
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
+                    {t('tab_grants_desc')}
+                  </p>
+                </div>
 
-              <ProgramsSection 
-                programs={programs} 
-                onOpenGrantModal={handleOpenGrantModal}
-                onAddProgram={() => setActiveTab('admin')}
-                isReadOnly={isAdmin}
-              />
-            </div>
+                <ProgramsSection 
+                  programs={programs} 
+                  onOpenGrantModal={isYouth ? handleOpenGrantModal : undefined}
+                  onAddProgram={isAdmin ? () => { setActiveTab('admin'); setAdminSubTab('programs'); } : undefined}
+                  isReadOnly={isAdmin}
+                />
+              </div>
+            )
           )}
 
-          {/* JADUAL ACARA & KARNIVAL BELIA */}
+          {/* JADUAL ACARA & KARNIVAL BELIA (Strictly Youth Portal Only) */}
           {activeTab === 'events' && (
-            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
-              <EventsSection />
-            </div>
+            !isYouth ? (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                  <Lock className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Modul Acara Belia Sahaja</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                    Halaman penyertaan acara & karnival ini dikhaskan untuk Usahawan Belia.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                >
+                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+                <EventsSection />
+              </div>
+            )
           )}
 
-          {/* RUANG IKLAN & PELUANG NIAGA BELIA */}
+          {/* RUANG IKLAN & PELUANG NIAGA BELIA (Strictly Youth Portal Only) */}
           {activeTab === 'b2b' && (
-            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
-              <B2BMarketSection />
-            </div>
+            !isYouth ? (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                  <Lock className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Ruang Niaga B2B Usahawan Sahaja</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                    Pasaran B2B dikhaskan untuk rantaian bekalan dan kerjasama antara usahawan belia.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                >
+                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+                <B2BMarketSection />
+              </div>
+            )
           )}
 
-          {/* KALKULATOR KELAYAKAN GERAN & PEMBIAYAAN */}
+          {/* KALKULATOR KELAYAKAN GERAN & PEMBIAYAAN (Strictly Youth Portal Only) */}
           {activeTab === 'calculator' && (
-            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
-              <GrantCalculatorSection 
-                onOpenGrantModal={handleOpenGrantModal}
-                onOpenMentorship={() => setIsMentorshipModalOpen(true)}
-              />
-            </div>
+            !isYouth ? (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
+                  <Lock className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Kalkulator Geran Usahawan Sahaja</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
+                    Simulasi kelayakan geran ini dikhaskan kepada pemohon Usahawan Belia.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
+                  className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                >
+                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+                <GrantCalculatorSection 
+                  onOpenGrantModal={handleOpenGrantModal}
+                  onOpenMentorship={handleOpenMentorshipClinicGuarded}
+                />
+              </div>
+            )
           )}
 
-          {/* PENTADBIRAN (ADMIN) */}
+          {/* PENTADBIRAN (ADMIN - STRICTLY ADMIN ROLE ONLY) */}
           {activeTab === 'admin' && (
             !isAdmin ? (
-              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-8 text-center space-y-4 shadow-2xs">
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
@@ -1069,7 +1409,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
                 <AdminDashboard
                   slots={enrichedSlots}
                   businesses={businesses}
@@ -1080,6 +1420,7 @@ function MainApp() {
                   mentors={mentors}
                   maintenanceTickets={maintenanceTickets}
                   portalSettings={portalSettings}
+                  newsItems={newsItems}
                   onUpdateMentor={handleUpdateMentorProfile}
                   onRefresh={triggerRefresh}
                   activeSubTab={adminSubTab}
@@ -1089,10 +1430,10 @@ function MainApp() {
             )
           )}
 
-          {/* PORTAL MENTOR: HAB BIMBINGAN (STRICT ROLE GUARD) */}
+          {/* PORTAL MENTOR: HAB BIMBINGAN (STRICT ROLE GUARD - MENTOR ONLY) */}
           {activeTab === 'mentor' && (
-            !isMentor && !isAdmin ? (
-              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-8 text-center space-y-4 shadow-2xs">
+            !isMentor ? (
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
@@ -1101,31 +1442,27 @@ function MainApp() {
                     {language === 'en' ? 'Certified Mentor Access Only' : 'Akses Khusus Mentor Bertauliah Sahaja'}
                   </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
-                    {language === 'en'
-                      ? 'The Mentor Coaching Hub is reserved for certified UMK & INSKEN academic mentors.'
+                    {isAdmin
+                      ? 'Akaun Pentadbir menggunakan modul Panel Mentor di Pusat Kawalan Pentadbir untuk melantik serta memantau mentor, manakala ruang bimbingan ini dikhaskan kepada Mentor sahaja.'
                       : 'Hab Bimbingan Mentor dikhaskan kepada panel mentor bertauliah UMK & agensi keusahawanan.'}
                   </p>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('home')}
+                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'home')}
                   className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{language === 'en' ? 'Back to Dashboard' : 'Kembali ke Laman Utama'}</span>
+                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Laman Utama'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
                 <MentorPortal
                   mentors={mentors}
-                  registrations={mentorshipRegistrations}
+                  registrations={scopedMentorRegistrations}
                   onUpdateRegistration={handleUpdateMentorshipRegistration}
                   onUpdateMentor={handleUpdateMentorProfile}
-                  onAddRegistration={handleAddMentorshipRegistration}
-                  onBackToHome={() => setActiveTab('hepa')}
-                  onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
-                  onOpenAdminDashboard={() => setActiveTab('admin')}
                   activeSubTab={mentorSubTab}
                   onSelectSubTab={setMentorSubTab}
                 />
@@ -1136,7 +1473,7 @@ function MainApp() {
           {/* MERCHANT PORTAL: BISNES SAYA (KHUSUS BELIA) */}
           {activeTab === 'merchant' && (
             isAdmin ? (
-              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-8 text-center space-y-4 shadow-2xs">
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
@@ -1160,7 +1497,7 @@ function MainApp() {
                 </button>
               </div>
             ) : isMentor ? (
-              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-8 text-center space-y-4 shadow-2xs">
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
@@ -1184,16 +1521,16 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
                 <MerchantPortal
                   myBusiness={myBusiness}
                   myProducts={myProducts}
                   myBookings={myBookings}
                   slots={enrichedSlots}
-                  grantApplications={grantApplications.filter(g => g.applicantId === user?.uid || (user?.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase()))}
+                  grantApplications={myYouthGrants}
                   cashflowRecords={cashflowRecords}
                   maintenanceTickets={maintenanceTickets}
-                  mentorshipRegistrations={mentorshipRegistrations.filter(r => r.applicantId === user?.uid || (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))}
+                  mentorshipRegistrations={scopedMentorRegistrations}
                   onViewOfferLetter={handleViewOfferLetter}
                   onOpenTenancyAgreement={(booking) => {
                     setSelectedBookingForTenancy(booking);
@@ -1206,8 +1543,8 @@ function MainApp() {
                   onOpenBookingModal={handleOpenNewBooking}
                   onOpenBookingTab={() => setActiveTab('academic')}
                   onOpenSettingsTab={() => setActiveTab('settings')}
-                  onOpenMentorshipClinic={() => setIsMentorshipModalOpen(true)}
-                  onOpenMaintenanceModal={() => setIsMaintenanceModalOpen(true)}
+                  onOpenMentorshipClinic={handleOpenMentorshipClinicGuarded}
+                  onOpenMaintenanceModal={() => { if (isYouth) setIsMaintenanceModalOpen(true); }}
                   onRefresh={triggerRefresh}
                   activeSubTab={merchantSubTab}
                   onSelectSubTab={setMerchantSubTab}
@@ -1216,9 +1553,27 @@ function MainApp() {
             )
           )}
 
+          {/* DEDICATED NEWS PAGE (Accessible to All Logged-In Roles, Controlled by Admin) */}
+          {activeTab === 'news' && (
+            <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+              <NewsPage
+                newsItems={newsItems}
+                onRefresh={triggerRefresh}
+                onOpenAdminNewsTab={
+                  isAdmin
+                    ? () => {
+                        setActiveTab('admin');
+                        setAdminSubTab('news');
+                      }
+                    : undefined
+                }
+              />
+            </div>
+          )}
+
           {/* TETAPAN AKAUN & PROFIL */}
           {activeTab === 'settings' && (
-            <div className="bg-white dark:bg-slate-800 rounded-b-2xl rounded-t-none border border-t-0 border-slate-200 dark:border-slate-700 p-4 sm:p-6 shadow-2xs transition-colors">
+            <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
               <SettingsPage
                 myBusiness={myBusiness}
                 onRefresh={triggerRefresh}
@@ -1310,7 +1665,7 @@ function MainApp() {
         mentorshipRegistrations={mentorshipRegistrations.filter(r => r.applicantId === user?.uid || (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))}
         onOpenBooking={handleOpenNewBooking}
         onOpenGrantModal={handleOpenGrantModal}
-        onOpenMentorship={() => setIsMentorshipModalOpen(true)}
+        onOpenMentorship={() => { if (isYouth) setIsMentorshipModalOpen(true); }}
         onOpenVerification={(refCode) => {
           setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');
           setIsVerificationModalOpen(true);

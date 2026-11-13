@@ -40,17 +40,27 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     };
   }, []);
 
-  // Filter strictly according to current active account type
+  // Filter strictly according to current active account type & specific user ID
   const filteredNotifications = notifications.filter(n => {
+    if (n.targetUserId && user?.uid && n.targetUserId !== user.uid) {
+      return false;
+    }
     if (isAdmin) {
       return n.targetRole === 'admin' || n.targetRole === 'all';
     }
     if (isMentor) {
       return n.targetRole === 'mentor' || n.targetRole === 'all';
     }
-    // Youth entrepreneur
+    // Youth entrepreneur (exclude items addressed to specific other users or admin/mentor only)
+    if (n.targetUserId && !user?.uid) return false;
     return n.targetRole === 'youth' || n.targetRole === 'all' || (!n.targetRole && n.senderRole !== 'admin');
   });
+
+  const allowedTabsForRole = isAdmin
+    ? new Set(['home', 'admin', 'academic', 'ceed', 'hepa', 'news', 'settings'])
+    : isMentor
+    ? new Set(['home', 'mentor', 'news', 'settings'])
+    : new Set(['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'news', 'settings']);
 
   const unreadCount = filteredNotifications.filter(n => !n.isRead).length;
 
@@ -66,7 +76,14 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     setNotifications(updated);
     saveNotifications(updated);
     if (tab && onNavigateTab) {
-      onNavigateTab(tab);
+      const safeTab = allowedTabsForRole.has(tab)
+        ? tab
+        : isAdmin
+        ? 'admin'
+        : isMentor
+        ? 'mentor'
+        : 'merchant';
+      onNavigateTab(safeTab);
       setIsOpen(false);
     }
   };

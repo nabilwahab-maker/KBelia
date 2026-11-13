@@ -334,6 +334,7 @@ export type AdminSubTab =
   | 'slots'       // Pengurusan Kapsul
   | 'programs'    // Geran & Inisiatif
   | 'mentors'     // Bimbingan Mentor
+  | 'news'        // Pengurusan Berita Rasmi
   | 'sync'        // Segerak Pangkalan Data
   | 'settings';   // Tetapan Operasi
 
@@ -343,6 +344,31 @@ export type MentorSubTab =
   | 'endorsements'   // Perakuan Rasmi Geran Belia
   | 'logbook'        // Log Jurnal Minit & Pelan Tindakan
   | 'profile';       // Profil & Waktu Bimbingan
+
+export type NewsCategory =
+  | 'Pengumuman'
+  | 'Geran & Dana'
+  | 'Program & Acara'
+  | 'Kapsul Niaga'
+  | 'Info Terkini';
+
+export type NewsStatus = 'published' | 'draft';
+
+export interface PortalNews {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  category: NewsCategory;
+  imageUrl?: string;
+  status: NewsStatus;
+  isPinned: boolean;
+  authorId: string;
+  authorName: string;
+  publishedAt?: string;
+  updatedAt: string;
+  createdAt: string;
+}
 
 export interface GrantEndorsementLetter {
   id: string;

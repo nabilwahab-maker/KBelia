@@ -54,6 +54,9 @@ interface AuthContextType {
   user: AuthUser | null;
   userProfile: UserProfile | null;
   isAdmin: boolean;
+  isMentor: boolean;
+  isYouth: boolean;
+  userRole: 'admin' | 'mentor' | 'user' | 'guest';
   isDemoSession: boolean;
   loading: boolean;
   authError: string | null;
@@ -969,11 +972,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateProfileData = async (data: Partial<UserProfile>) => {
     if (!user) return;
-    // Prevent self-escalation of role via client profile updates
+    // Strictly forbid self-escalation or tampering with RBAC/identity fields from client
     const safeData = { ...data };
-    if (userProfile?.role && safeData.role && safeData.role !== userProfile.role) {
-      delete safeData.role;
-    }
+    delete safeData.role;
+    delete safeData.mentorId;
+    delete safeData.userId;
     const updated = { ...(userProfile || {}), ...safeData } as UserProfile;
     setUserProfile(updated);
     saveSession(user, updated);
@@ -1051,6 +1054,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (!isDemoSession && checkIsAdminEmail(user.email))
     )
   );
+  const isMentor = Boolean(user && !isAdmin && userProfile?.role === 'mentor');
+  const isYouth = Boolean(user && !isAdmin && !isMentor);
+  const userRole: 'admin' | 'mentor' | 'user' | 'guest' = !user
+    ? 'guest'
+    : isAdmin
+    ? 'admin'
+    : isMentor
+    ? 'mentor'
+    : 'user';
 
   return (
     <AuthContext.Provider
@@ -1058,6 +1070,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         userProfile,
         isAdmin,
+        isMentor,
+        isYouth,
+        userRole,
         isDemoSession,
         loading,
         authError,

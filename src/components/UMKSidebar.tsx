@@ -23,7 +23,8 @@ import {
   Sliders,
   FileText,
   Users,
-  X
+  X,
+  Newspaper
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
 import { useAuth } from '../context/AuthContext';
@@ -120,27 +121,27 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const navBtnBase =
     'w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40';
   const navBtnActive =
-    'bg-sky-50 dark:bg-sky-950/60 text-sky-900 dark:text-sky-200 border-sky-200 dark:border-sky-800 shadow-2xs font-bold';
+    'bg-sky-50/90 dark:bg-sky-500/15 text-sky-900 dark:text-sky-200 border-sky-200/90 dark:border-sky-500/30 shadow-xs ring-1 ring-sky-500/10 font-bold';
   const navBtnIdle =
-    'border-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:text-sky-700 dark:hover:text-sky-300';
+    'border-transparent text-slate-700 dark:text-zinc-300 hover:bg-slate-100/70 dark:hover:bg-zinc-800/70 hover:text-sky-700 dark:hover:text-sky-300';
 
   const subNavBtnBase =
     'w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40';
-  const subNavBtnActive = 'bg-sky-600 text-white font-bold shadow-2xs';
+  const subNavBtnActive = 'bg-sky-600 text-white font-bold shadow-xs';
   const subNavBtnIdle =
-    'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:text-sky-700 dark:hover:text-sky-300';
+    'text-slate-600 dark:text-zinc-400 hover:bg-slate-100/70 dark:hover:bg-zinc-800/70 hover:text-sky-700 dark:hover:text-sky-300';
 
   const categoryHeaderClass =
     'text-[11px] font-black tracking-wider text-sky-700 dark:text-sky-400 uppercase px-2 pb-1 whitespace-nowrap truncate';
-  const categoryDividerClass = 'pt-3 border-t border-slate-200/70 dark:border-slate-800 space-y-1';
+  const categoryDividerClass = 'pt-3 border-t border-slate-200/70 dark:border-zinc-800 space-y-1';
 
   const miniBtnBase =
     'p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40';
   const miniBtnActive =
-    'bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800 shadow-xs font-bold';
+    'bg-sky-50 dark:bg-sky-500/15 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-500/30 shadow-xs ring-1 ring-sky-500/10 font-bold';
   const miniBtnIdle =
-    'border-transparent text-slate-500 dark:text-slate-400 hover:bg-sky-50/70 dark:hover:bg-slate-800 hover:text-sky-700 dark:hover:text-sky-300';
-  const miniDivider = <div className="w-8 h-px bg-slate-200 dark:bg-slate-800 my-0.5" />;
+    'border-transparent text-slate-500 dark:text-zinc-400 hover:bg-sky-50/70 dark:hover:bg-zinc-800 hover:text-sky-700 dark:hover:text-sky-300';
+  const miniDivider = <div className="w-8 h-px bg-slate-200 dark:bg-zinc-800 my-0.5" />;
 
   // =========================================================================
   // 1. COLLAPSED SIDEBAR VIEW (Desktop Mini Icon Rail - 3 Aligned Groups)
@@ -149,7 +150,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     return (
       <aside
         id="kbelia-left-sidebar"
-        className="hidden md:flex w-18 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 py-4 flex-col shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0"
+        className="hidden md:flex w-18 h-full bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-r border-slate-200/80 dark:border-zinc-800 py-4 flex-col shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0"
       >
         <div className="flex flex-col items-center gap-2 w-full px-2 pt-1">
           {/* ROLE A MINI: PENTADBIR URUSETIA */}
@@ -228,6 +229,20 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
               <button
                 type="button"
+                onClick={() => {
+                  setActiveTab('admin');
+                  if (onSelectAdminSubTab) onSelectAdminSubTab('news');
+                }}
+                title={isMs ? 'Pengurusan Berita' : 'News Manager'}
+                className={`${miniBtnBase} ${
+                  activeTab === 'admin' && adminSubTab === 'news' ? miniBtnActive : miniBtnIdle
+                }`}
+              >
+                <Newspaper className="w-5 h-5" />
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setActiveTab('settings')}
                 title={t('nav_settings')}
                 className={`${miniBtnBase} ${activeTab === 'settings' ? miniBtnActive : miniBtnIdle}`}
@@ -299,17 +314,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Award className="w-5 h-5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (onOpenMentorshipClinic) onOpenMentorshipClinic();
-                }}
-                title={isMs ? 'Klinik Bimbingan' : 'Mentorship Clinic'}
-                className={`${miniBtnBase} ${miniBtnIdle}`}
-              >
-                <GraduationCap className="w-5 h-5" />
               </button>
 
               {miniDivider}
@@ -480,6 +484,12 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
       icon: Building2
     },
     {
+      id: 'news',
+      label: isMs ? 'Pengurusan Berita' : 'News Manager',
+      keywords: 'berita pengumuman warta news manager admin',
+      icon: Newspaper
+    },
+    {
       id: 'sync',
       label: isMs ? 'Penyegerakan' : 'Data Sync',
       keywords: 'penyegerakan pangkalan data sync database',
@@ -586,8 +596,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const mentorCat1HasMatches =
     matchesSearch('portal mentor hab bimbingan mentor hub') || filteredMentorAccordion.length > 0;
   const mentorCat2HasMatches =
-    matchesSearch('perakuan geran dana sokongan surat kelulusan benih pemangkin endorsements') ||
-    matchesSearch('klinik bimbingan mentor sesi konsultasi temujanji clinic');
+    matchesSearch('perakuan geran dana sokongan surat kelulusan benih pemangkin endorsements');
   const mentorCat3HasMatches =
     matchesSearch('profil jadual kelapangan mentor waktu bimbingan profile schedule') ||
     matchesSearch('tetapan akaun kata laluan paparan settings');
@@ -615,19 +624,19 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const sidebarBody = (
     <aside
       id="kbelia-left-sidebar"
-      className="w-64 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 p-4 flex flex-col shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30"
+      className="w-64 h-full bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-r border-slate-200/80 dark:border-zinc-800 p-4 flex flex-col shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30"
     >
       <div className="space-y-4">
         {isMobileOpen && onCloseMobile && (
-          <div className="md:hidden flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+          <div className="md:hidden flex items-center justify-between pb-2 border-b border-slate-200 dark:border-zinc-800">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-zinc-200">
               {isMs ? 'Navigasi KBelia' : 'KBelia Navigation'}
             </span>
             <button
               type="button"
               onClick={onCloseMobile}
               aria-label={isMs ? 'Tutup menu' : 'Close menu'}
-              className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -641,14 +650,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             placeholder={t('search_sidebar')}
             value={sidebarSearch}
             onChange={(e) => setSidebarSearch(e.target.value)}
-            className="w-full pl-3.5 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all duration-150"
+            className="w-full pl-3.5 pr-8 py-2 text-xs bg-slate-50/90 dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 rounded-xl text-slate-800 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all duration-150"
           />
           {sidebarSearch ? (
             <button
               type="button"
               onClick={() => setSidebarSearch('')}
               aria-label={isMs ? 'Kosongkan carian' : 'Clear search'}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -658,7 +667,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
         </div>
 
         {!hasAnySearchMatch && (
-          <div className="py-6 px-3 text-center space-y-2 border border-slate-200/80 dark:border-slate-800 rounded-xl bg-slate-50/70 dark:bg-slate-800/40">
+          <div className="py-6 px-3 text-center space-y-2 border border-slate-200/80 dark:border-zinc-800 rounded-xl bg-slate-50/70 dark:bg-zinc-900/50">
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {isMs ? 'Tiada menu yang sepadan.' : 'No matching menu items.'}
             </p>
@@ -724,7 +733,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     </button>
 
                     {(isAdminDashboardAccordionOpen || (Boolean(query) && filteredAdminAccordion.length > 0)) && (
-                      <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-slate-700 space-y-1 pt-0.5 pb-1">
+                      <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-zinc-800 space-y-1 pt-0.5 pb-1">
                         {(query ? filteredAdminAccordion : adminAccordionItems).map((item) => {
                           const Icon = item.icon;
                           const isSubActive = activeTab === 'admin' && adminSubTab === item.id;
@@ -1006,7 +1015,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     </button>
 
                     {(isMentorDashboardAccordionOpen || (Boolean(query) && filteredMentorAccordion.length > 0)) && (
-                      <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-slate-700 space-y-1 pt-0.5 pb-1">
+                      <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-zinc-800 space-y-1 pt-0.5 pb-1">
                         {(query ? filteredMentorAccordion : mentorAccordionItems).map((item) => {
                           const Icon = item.icon;
                           const isSubActive =
@@ -1086,25 +1095,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   </button>
                 )}
 
-                {matchesSearch('klinik bimbingan mentor sesi konsultasi temujanji clinic') && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      navigateAndClose(() => {
-                        if (onOpenMentorshipClinic) onOpenMentorshipClinic();
-                      })
-                    }
-                    className={`${navBtnBase} ${navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Users className="w-4 h-4 shrink-0 text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400" />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Klinik Bimbingan' : 'Mentorship Clinic'}
-                      </span>
-                    </div>
-                    <ChevronRight className="w-3.5 h-3.5 shrink-0 text-slate-300 dark:text-slate-600 transition-transform group-hover:translate-x-0.5" />
-                  </button>
-                )}
               </div>
             )}
 
@@ -1234,7 +1224,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     </button>
 
                     {(isDashboardAccordionOpen || (Boolean(query) && filteredYouthAccordion.length > 0)) && (
-                      <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-slate-700 space-y-1 pt-0.5 pb-1">
+                      <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-zinc-800 space-y-1 pt-0.5 pb-1">
                         {(query ? filteredYouthAccordion : youthAccordionItems).map((item) => {
                           const Icon = item.icon;
                           const isSubActive =

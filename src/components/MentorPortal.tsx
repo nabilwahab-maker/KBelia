@@ -34,7 +34,8 @@ import {
   Plus,
   ArrowRight,
   Sliders,
-  FileCheck
+  FileCheck,
+  BarChart3
 } from 'lucide-react';
 import { 
   MentorProfile, 
@@ -44,7 +45,7 @@ import {
   GrantEndorsementLetter, 
   MentoringLogEntry 
 } from '../types';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import { saveGrantEndorsementRecord, saveMentoringLogRecord } from '../services/dataService';
 import { useAuth } from '../context/AuthContext';
@@ -52,16 +53,22 @@ import { useLanguage } from '../context/LanguageContext';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast as triggerToast } from './ToastNotification';
+import { SaaSKpiCard, SparkPoint } from './SaaSKpiCard';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 
 interface MentorPortalProps {
   mentors: MentorProfile[];
   registrations: MentorshipRegistration[];
   onUpdateRegistration: (updated: MentorshipRegistration) => void;
   onUpdateMentor?: (updatedMentor: MentorProfile) => void;
-  onAddRegistration?: (newReg: MentorshipRegistration) => void;
-  onBackToHome?: () => void;
-  onOpenMentorshipClinic?: () => void;
-  onOpenAdminDashboard?: () => void;
   activeSubTab?: MentorSubTab;
   onSelectSubTab?: (subTab: MentorSubTab) => void;
 }
@@ -180,17 +187,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   registrations,
   onUpdateRegistration,
   onUpdateMentor,
-  onAddRegistration,
-  onBackToHome,
-  onOpenMentorshipClinic,
-  onOpenAdminDashboard,
   activeSubTab = 'overview',
   onSelectSubTab
 }) => {
-  const { user, userProfile, isAdmin, isDemoSession, openLoginModal } = useAuth();
+  const { user, userProfile, isMentor, isDemoSession, openLoginModal } = useAuth();
   const { language } = useLanguage();
   const isEn = language === 'en';
-  const isMentorUser = userProfile?.role === 'mentor';
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   // Sub-Tab State synchronized with parent UMKSidebar
@@ -207,13 +209,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     onSelectSubTab?.(tab);
   };
 
-  // Selected Mentor ID
-  const [selectedMentorId, setSelectedMentorId] = useState<string>(() => {
-    if (userProfile?.role === 'mentor' && userProfile.mentorId) {
-      return userProfile.mentorId;
-    }
-    return mentors[0]?.id || 'mentor-1';
-  });
+  // Locked Mentor Identity (bound strictly to userProfile.mentorId)
+  const lockedMentorId = userProfile?.mentorId || mentors[0]?.id || 'mentor-1';
+  const currentMentor = mentors.find(m => m.id === lockedMentorId) || mentors[0];
 
   // Endorsements State (Local + Firestore persistent)
   const [endorsements, setEndorsements] = useState<GrantEndorsementLetter[]>(() => {
@@ -261,30 +259,26 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     }
   };
 
-  // Real-time Firestore sync for non-demo authenticated Mentor/Admin users
+  // Real-time Firestore sync scoped strictly to currentMentor.id
   useEffect(() => {
-    if (!user || isDemoSession || user.isDemo || !auth.currentUser) return;
+    if (!user || isDemoSession || user.isDemo || !auth.currentUser || !isMentor || !currentMentor?.id) return;
 
     const unsubEndorsements = onSnapshot(
-      collection(db, 'mentor_endorsements'),
+      query(collection(db, 'mentor_endorsements'), where('mentorId', '==', currentMentor.id)),
       (snap) => {
-        if (!snap.empty) {
-          const items = snap.docs.map(d => d.data() as GrantEndorsementLetter);
-          items.sort((a, b) => (b.issuedAt || '').localeCompare(a.issuedAt || ''));
-          setEndorsements(items);
-        }
+        const items = snap.docs.map(d => d.data() as GrantEndorsementLetter);
+        items.sort((a, b) => (b.issuedAt || '').localeCompare(a.issuedAt || ''));
+        setEndorsements(items);
       },
       (err) => console.warn('Mentor endorsements listener notice:', err)
     );
 
     const unsubLogs = onSnapshot(
-      collection(db, 'mentor_logs'),
+      query(collection(db, 'mentor_logs'), where('mentorId', '==', currentMentor.id)),
       (snap) => {
-        if (!snap.empty) {
-          const items = snap.docs.map(d => d.data() as MentoringLogEntry);
-          items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-          setLogEntries(items);
-        }
+        const items = snap.docs.map(d => d.data() as MentoringLogEntry);
+        items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+        setLogEntries(items);
       },
       (err) => console.warn('Mentor logs listener notice:', err)
     );
@@ -293,7 +287,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       unsubEndorsements();
       unsubLogs();
     };
-  }, [user, isDemoSession]);
+  }, [user, isDemoSession, isMentor, currentMentor?.id]);
 
   // Filters for Sessions Tab
   const [searchQuery, setSearchQuery] = useState('');
@@ -336,17 +330,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const [newLogTask2, setNewLogTask2] = useState('');
   const [newLogDueDate2, setNewLogDueDate2] = useState('');
 
-  // Auto-sync selected mentor with logged in mentor account
-  useEffect(() => {
-    if (isMentorUser && userProfile?.mentorId) {
-      setSelectedMentorId(userProfile.mentorId);
-    }
-  }, [isMentorUser, userProfile?.mentorId]);
-
-  const currentMentor = mentors.find(m => m.id === selectedMentorId) || mentors[0];
-
-  // Filter registrations for the selected mentor
+  // Strictly scoped registrations, endorsements & logs for the authenticated mentor ONLY
   const mentorRegistrations = registrations.filter(r => r.mentorId === currentMentor.id);
+  const mentorEndorsements = endorsements.filter(e => e.mentorId === currentMentor.id);
+  const mentorLogs = logEntries.filter(l => l.mentorId === currentMentor.id);
 
   const filteredRegistrations = mentorRegistrations.filter(r => {
     const matchesSearch = 
@@ -366,8 +353,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const pendingCount = mentorRegistrations.filter(r => r.status === 'pending').length;
   const confirmedCount = mentorRegistrations.filter(r => r.status === 'confirmed').length;
   const completedCount = mentorRegistrations.filter(r => r.status === 'completed').length;
-  const totalEndorsementsCount = endorsements.length;
-  const totalLogbookCount = logEntries.length;
+  const totalEndorsementsCount = mentorEndorsements.length;
+  const totalLogbookCount = mentorLogs.length;
 
   const showToast = (msg: string) => {
     setIsSuccessToast(msg);
@@ -399,7 +386,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       message: `${currentMentor.name} telah menghantar nota bimbingan & pelan tindakan baharu (${selectedMenteeForNotes.topic}).`,
       type: 'mentorship',
       senderRole: 'mentor',
-      sender: currentMentor.name
+      targetRole: 'youth',
+      targetUserId: selectedMenteeForNotes.applicantId,
+      sender: currentMentor.name,
+      actionTab: 'merchant'
     });
     setSelectedMenteeForNotes(null);
     showToast('Nota bimbingan & pelan tindakan berjaya dihantar kepada usahawan!');
@@ -416,7 +406,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       message: `${currentMentor.name} telah mengemas kini status sesi bimbingan kepada ${newStatus === 'confirmed' ? 'Disahkan' : 'Selesai'}.`,
       type: 'mentorship',
       senderRole: 'mentor',
-      sender: currentMentor.name
+      targetRole: 'youth',
+      targetUserId: mentee.applicantId,
+      sender: currentMentor.name,
+      actionTab: 'merchant'
     });
     showToast(`Status temujanji ${mentee.entrepreneurName} dikemas kini kepada: ${newStatus === 'confirmed' ? 'Disahkan' : newStatus === 'completed' ? 'Selesai' : 'Dibatalkan'}`);
   };
@@ -425,7 +418,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const handleToggleLogTask = (logId: string, taskId: string) => {
     let targetUpdatedLog: MentoringLogEntry | null = null;
     const updated = logEntries.map(log => {
-      if (log.id !== logId) return log;
+      if (log.id !== logId || log.mentorId !== currentMentor.id) return log;
       targetUpdatedLog = {
         ...log,
         actionItems: log.actionItems.map(task => {
@@ -454,6 +447,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       return;
     }
 
+    const matchedMentee = mentorRegistrations.find(
+      r => r.entrepreneurName.toLowerCase() === newEndorsementMenteeName.trim().toLowerCase() ||
+           r.businessName.toLowerCase() === newEndorsementBusinessName.trim().toLowerCase()
+    );
+
     const uniqueCode = `PERAKUAN-UMK-2026-${Math.floor(1000 + Math.random() * 9000)}`;
     const programTitle = newEndorsementGrantType === 'RM3,000' 
       ? 'Dana Benih Usahawan Belia Kelantan (RM3,000)'
@@ -468,7 +466,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       mentorName: currentMentor.name,
       mentorAgency: currentMentor.agency,
       mentorDesignation: currentMentor.title,
-      menteeId: `user-${Date.now()}`,
+      menteeId: matchedMentee?.applicantId || `mentee-${Date.now()}`,
       menteeName: newEndorsementMenteeName,
       businessName: newEndorsementBusinessName,
       businessCategory: newEndorsementCategory,
@@ -483,6 +481,18 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
     saveEndorsements([newEndorsement, ...endorsements]);
     void saveGrantEndorsementRecord(newEndorsement).catch(console.error);
+    if (matchedMentee?.applicantId) {
+      emitAdminOrMentorNotification({
+        title: `Perakuan Geran Mentor Dikeluarkan (${newEndorsementGrantType})`,
+        message: `${currentMentor.name} telah mengeluarkan Surat Perakuan Rasmi (${uniqueCode}) untuk ${newEndorsementBusinessName}.`,
+        type: 'grant',
+        senderRole: 'mentor',
+        targetRole: 'youth',
+        targetUserId: matchedMentee.applicantId,
+        sender: currentMentor.name,
+        actionTab: 'merchant'
+      });
+    }
     setIsNewEndorsementModalOpen(false);
     setSelectedEndorsementForView(newEndorsement);
     showToast(`Surat Perakuan Rasmi ${uniqueCode} berjaya dikeluarkan!`);
@@ -549,8 +559,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     setNewLogDueDate2('');
   };
 
-  // Security Barrier: Only Admin or Mentor can enter
-  if (!isAdmin && !isMentorUser) {
+  // Security Barrier: Strictly Certified Mentor ONLY (Zero Cross-Portal Access)
+  if (!isMentor) {
     return (
       <div className="py-8 px-2 sm:px-4 w-full animate-in fade-in duration-300">
         <div className="bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden text-center space-y-6">
@@ -567,11 +577,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               Pusat Pengurusan Mentor Bertauliah
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              Bahagian ini dikhaskan untuk <strong>Mentor Bertauliah (UMK, INSKEN & SME Corp)</strong> sahaja bagi menguruskan sesi bimbingan, mengeluarkan <strong>Surat Perakuan Rasmi Geran Belia</strong>, dan mencatat log jurnal tindakan. Modul ini diasingkan sepenuhnya daripada fungsi usahawan mahupun pentadbir sistem demi memelihara integriti bimbingan.
+              Bahagian ini dikhaskan untuk <strong>Mentor Bertauliah (UMK, INSKEN & SME Corp)</strong> sahaja bagi menguruskan sesi bimbingan mentee seliaan sendiri, mengeluarkan <strong>Surat Perakuan Rasmi Geran Belia</strong>, dan mencatat log jurnal tindakan. Modul ini diasingkan sepenuhnya daripada fungsi usahawan mahupun pentadbir sistem.
             </p>
           </div>
 
-          {/* Action buttons */}
+          {/* Action button */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <button
               type="button"
@@ -581,16 +591,6 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <GraduationCap className="w-4 h-4 text-sky-100" />
               <span>Log Masuk Sebagai Mentor</span>
             </button>
-
-            {onBackToHome && (
-              <button
-                type="button"
-                onClick={onBackToHome}
-                className="w-full sm:w-auto px-6 py-3 bg-slate-50 hover:bg-sky-50 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <span>Kembali ke Laman Utama</span>
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -632,136 +632,190 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
             {currentMentor.title} &middot; <span className="text-sky-700 dark:text-sky-400 font-semibold">{currentMentor.agency}</span>
           </p>
-
-          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300 pt-1">
-            <span className="flex items-center gap-1.5 bg-white/90 dark:bg-slate-900/60 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
-              <Phone className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-              <span>+{currentMentor.phone}</span>
-            </span>
-            <span className="flex items-center gap-1.5 bg-white/90 dark:bg-slate-900/60 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
-              <Clock className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-              <span>{currentMentor.availableDays}</span>
-            </span>
-            <span className="flex items-center gap-1.5 bg-white/90 dark:bg-slate-900/60 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
-              <Mail className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-              <span>{currentMentor.email}</span>
-            </span>
-          </div>
         </div>
       </div>
 
-      {/* 3. METRIC CARDS (4 EXECUTIVE COUNTERS) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        
-        {/* Metric 1: Total Mentees */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-2xs">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Jumlah Usahawan Mentee
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 flex items-center justify-center">
-              <Users className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tabular-nums tracking-tight">
-            {totalMentees}
-          </div>
-          <span className="text-[11px] text-sky-700 dark:text-sky-400 block mt-1 font-semibold">
-            {pendingCount} Menunggu Tindakan
-          </span>
-        </div>
-
-        {/* Metric 2: Active / Confirmed Sessions */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-2xs">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Sesi Bimbingan Disahkan
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 flex items-center justify-center">
-              <Calendar className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums tracking-tight">
-            {confirmedCount}
-          </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-1">
-            Kampus & Google Meet Maya
-          </span>
-        </div>
-
-        {/* Metric 3: Official Grant Endorsements */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-amber-900/50 shadow-2xs">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-amber-800 dark:text-amber-300">
-              Perakuan Geran Dikeluarkan
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center">
-              <Award className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 tabular-nums tracking-tight">
-            {totalEndorsementsCount}
-          </div>
-          <span className="text-[11px] text-amber-700 dark:text-amber-400 block mt-1 font-semibold">
-            Sah Untuk Semakan Urus Setia
-          </span>
-        </div>
-
-        {/* Metric 4: Logbook Records */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-2xs">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Minit & Log Tindakan
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 flex items-center justify-center">
-              <FileText className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-400 tabular-nums tracking-tight">
-            {totalLogbookCount}
-          </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-1">
-            Garis Masa Pelan Mentee
-          </span>
-        </div>
-
-      </div>
-
       {/* ===================================================================== */}
-      {/* TAB 0: RINGKASAN EKSEKUTIF (EXECUTIVE COMMAND CENTER)                */}
+      {/* TAB 0: RINGKASAN EKSEKUTIF (BENTO SAAS COMMAND CENTER)                */}
       {/* ===================================================================== */}
-      {currentSubTab === 'overview' && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs overflow-hidden animate-in fade-in duration-200">
+      {currentSubTab === 'overview' && (() => {
+        // Real Sparkline series for the 4 Mentor KPI cards
+        const menteeSpark: SparkPoint[] = [
+          { label: 'Menunggu', value: pendingCount },
+          { label: 'Disahkan', value: confirmedCount },
+          { label: 'Selesai', value: completedCount },
+          { label: 'Jumlah', value: totalMentees }
+        ];
+        const sessionSpark: SparkPoint[] = [
+          { label: 'Kampus', value: mentorRegistrations.filter(r => r.mode !== 'Google Meet Maya').length },
+          { label: 'Maya', value: mentorRegistrations.filter(r => r.mode === 'Google Meet Maya').length },
+          { label: 'Disahkan', value: confirmedCount },
+          { label: 'Selesai', value: completedCount }
+        ];
+        const endorseSpark: SparkPoint[] = mentorEndorsements.length > 0
+          ? mentorEndorsements.slice(0, 5).reverse().map((e, idx) => ({
+              label: e.district?.slice(0, 6) || `P${idx + 1}`,
+              value: Number((e.recommendedAmount || '3000').replace(/[^0-9]/g, '')) || 3000
+            }))
+          : [{ label: 'Tiada', value: 0 }];
+        const logSpark: SparkPoint[] = mentorLogs.length > 0
+          ? mentorLogs.slice(0, 5).reverse().map((l, idx) => ({
+              label: l.sessionDate?.slice(5) || `L${idx + 1}`,
+              value: l.actionItems?.length || 1
+            }))
+          : [{ label: 'Tiada', value: 0 }];
+
+        // District breakdown for Recharts BarChart
+        const districtMap = new Map<string, { district: string; sesi: number; perakuan: number }>();
+        mentorRegistrations.forEach(r => {
+          const key = r.district || 'Lain-lain';
+          const curr = districtMap.get(key) || { district: key, sesi: 0, perakuan: 0 };
+          curr.sesi += 1;
+          districtMap.set(key, curr);
+        });
+        mentorEndorsements.forEach(e => {
+          const key = e.district || 'Lain-lain';
+          const curr = districtMap.get(key) || { district: key, sesi: 0, perakuan: 0 };
+          curr.perakuan += 1;
+          districtMap.set(key, curr);
+        });
+        const mentorChartData = Array.from(districtMap.values()).slice(0, 7);
+
+        return (
+        <div className="space-y-6 animate-in fade-in duration-200">
+
+          {/* 4 Graphic SaaS KPI Cards inside Overview Bento */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <SaaSKpiCard
+              chartId="mentor-mentees"
+              title="Jumlah Usahawan Mentee"
+              value={totalMentees}
+              subtitle={`${pendingCount} Menunggu Tindakan`}
+              icon={Users}
+              trendLabel={pendingCount > 0 ? `${pendingCount} Baharu` : 'Terkawal'}
+              trendDirection={pendingCount > 0 ? 'up' : 'neutral'}
+              accentColor="sky"
+              sparkData={menteeSpark}
+              onClick={() => handleSubTabChange('sessions')}
+            />
+
+            <SaaSKpiCard
+              chartId="mentor-sessions"
+              title="Sesi Bimbingan Disahkan"
+              value={confirmedCount}
+              subtitle="Kampus & Google Meet Maya"
+              icon={Calendar}
+              trendLabel={`${completedCount} Selesai`}
+              trendDirection={confirmedCount > 0 ? 'up' : 'neutral'}
+              accentColor="emerald"
+              sparkData={sessionSpark}
+              onClick={() => handleSubTabChange('sessions')}
+            />
+
+            <SaaSKpiCard
+              chartId="mentor-endorsements"
+              title="Perakuan Geran Dikeluarkan"
+              value={totalEndorsementsCount}
+              subtitle="Sah Untuk Semakan Urus Setia"
+              icon={Award}
+              trendLabel="Aktif"
+              trendDirection={totalEndorsementsCount > 0 ? 'up' : 'neutral'}
+              accentColor="amber"
+              sparkData={endorseSpark}
+              onClick={() => handleSubTabChange('endorsements')}
+            />
+
+            <SaaSKpiCard
+              chartId="mentor-logbook"
+              title="Minit & Log Tindakan"
+              value={totalLogbookCount}
+              subtitle="Garis Masa Pelan Mentee"
+              icon={FileText}
+              trendLabel={`${mentorLogs.reduce((acc, l) => acc + (l.actionItems?.filter(a => a.completed).length || 0), 0)} Selesai`}
+              trendDirection={totalLogbookCount > 0 ? 'up' : 'neutral'}
+              accentColor="violet"
+              sparkData={logSpark}
+              onClick={() => handleSubTabChange('logbook')}
+            />
+          </div>
+
+          <div className="bg-white/85 dark:bg-zinc-900/75 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-zinc-800 shadow-sm overflow-hidden">
           
           {/* Header Bersepadu: Pusat Kawalan & Pemantauan Usahawan Belia */}
-          <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="px-5 py-4 border-b border-slate-200/80 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-950/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold shrink-0">
                 <LayoutDashboard className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-slate-800 dark:text-white">
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
                   Pusat Kawalan & Pemantauan Usahawan Belia
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500 dark:text-zinc-400">
                   {currentMentor.agency} &middot; Kelantan
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 self-start sm:self-auto">
-              <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1 rounded-lg">
-                {totalMentees} Mentee &middot; {endorsements.length} Perakuan
+              <span className="text-[11px] font-semibold text-slate-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 px-3 py-1 rounded-lg tabular-nums">
+                {totalMentees} Mentee &middot; {mentorEndorsements.length} Perakuan
               </span>
             </div>
           </div>
 
           <div className="p-5 space-y-5">
-            {/* 2-Column Command Hub: Temujanji Terdekat & Status Geran */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+            {/* Asymmetric Bento Grid (lg:grid-cols-12): Left Analytics + Temujanji, Right Perakuan Geran */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
               
-              {/* Lajur 1: Temujanji Terdekat & Tindakan Segera */}
-              <div className="bg-slate-50/60 dark:bg-slate-900/40 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700 flex flex-col justify-between h-full">
+              {/* Left Span (7 Cols): Interactive Recharts Analytics + Temujanji Terdekat */}
+              <div className="lg:col-span-7 space-y-5">
+
+                {/* Interactive Recharts District & Endorsement Distribution */}
+                <div className="bg-slate-50/60 dark:bg-zinc-950/50 rounded-xl p-4 sm:p-5 border border-slate-200/80 dark:border-zinc-800">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-zinc-800 mb-4">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                      <h3 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">
+                        Taburan Sesi & Perakuan Mengikut Jajahan
+                      </h3>
+                    </div>
+                    <span className="text-[11px] font-mono text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 px-2 py-0.5 rounded">
+                      {mentorChartData.length} Jajahan
+                    </span>
+                  </div>
+
+                  <div className="h-52 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={mentorChartData} margin={{ top: 6, right: 8, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.22)" />
+                        <XAxis dataKey="district" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                        <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false} />
+                        <Tooltip
+                          cursor={{ fill: 'rgba(14, 165, 233, 0.08)' }}
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const d = payload[0].payload as { district: string; sesi: number; perakuan: number };
+                              return (
+                                <div className="px-3 py-2 rounded-xl bg-zinc-900/95 text-white text-[11px] font-mono shadow-xl border border-zinc-700">
+                                  <div className="font-bold text-white mb-1">{d.district}</div>
+                                  <div className="text-sky-300">Sesi Bimbingan: {d.sesi}</div>
+                                  <div className="text-amber-300">Perakuan Geran: {d.perakuan}</div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Bar dataKey="sesi" name="Sesi Bimbingan" fill="#0284C7" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                        <Bar dataKey="perakuan" name="Perakuan Geran" fill="#F59E0B" radius={[6, 6, 0, 0]} maxBarSize={28} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Temujanji Terdekat & Tindakan Segera */}
+                <div className="bg-slate-50/60 dark:bg-zinc-950/50 rounded-xl p-4 sm:p-5 border border-slate-200/80 dark:border-zinc-800 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700 mb-4">
                     <div className="flex items-center gap-2">
@@ -860,10 +914,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
+                </div>
+
               </div>
 
-              {/* Lajur 2: Status Perakuan Geran & Dana Benih */}
-              <div className="bg-slate-50/60 dark:bg-slate-900/40 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700 flex flex-col justify-between h-full">
+              {/* Right Span (5 Cols): Status Perakuan Geran & Dana Benih */}
+              <div className="lg:col-span-5 bg-slate-50/60 dark:bg-zinc-950/50 rounded-xl p-4 sm:p-5 border border-slate-200/80 dark:border-zinc-800 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700 mb-4">
                     <div className="flex items-center gap-2">
@@ -873,12 +929,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       </h3>
                     </div>
                     <span className="text-[11px] font-mono text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded">
-                      {endorsements.length} Diluluskan
+                      {mentorEndorsements.length} Diluluskan
                     </span>
                   </div>
 
                   <div className="space-y-3">
-                    {endorsements.slice(0, 3).map((end) => (
+                    {mentorEndorsements.slice(0, 3).map((end) => (
                       <div 
                         key={end.id}
                         className="p-3.5 rounded-xl bg-white dark:bg-amber-950/20 border border-slate-200 dark:border-amber-900/40 flex items-center justify-between gap-3"
@@ -915,7 +971,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       </div>
                     ))}
 
-                    {endorsements.length === 0 && (
+                    {mentorEndorsements.length === 0 && (
                       <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
                         Belum ada surat perakuan geran dikeluarkan.
                       </div>
@@ -984,7 +1040,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                     {filteredRegistrations.map((mentee) => {
-                      const hasEndorsement = endorsements.some(e => e.menteeName.toLowerCase() === mentee.entrepreneurName.toLowerCase());
+                      const hasEndorsement = mentorEndorsements.some(e => e.menteeName.toLowerCase() === mentee.entrepreneurName.toLowerCase());
                       return (
                         <tr 
                           key={mentee.id}
@@ -1049,7 +1105,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           </div>
 
         </div>
-      )}
+        </div>
+        );
+      })()}
 
       {/* ===================================================================== */}
       {/* TAB 1: SESI BIMBINGAN (LAYOUT KEBAWAH PENUH & MESRA BACAAN MESEJ)     */}
@@ -1541,7 +1599,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <div className="flex items-center gap-2">
                 <FileCheck className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                 <h4 className="text-sm font-bold text-slate-800 dark:text-white">
-                  Senarai Surat Perakuan Geran yang Telah Dikeluarkan ({endorsements.length})
+                  Senarai Surat Perakuan Geran yang Telah Dikeluarkan ({mentorEndorsements.length})
                 </h4>
               </div>
               <span className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -1549,8 +1607,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </span>
             </div>
 
+            {mentorEndorsements.length === 0 ? (
+              <div className="py-10 text-center text-xs text-slate-500 dark:text-slate-400 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl">
+                Tiada surat perakuan geran dikeluarkan di bawah seliaan anda buat masa ini.
+              </div>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {endorsements.map((item) => (
+              {mentorEndorsements.map((item) => (
                 <div
                   key={item.id}
                   className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-4 space-y-3 hover:border-sky-300 dark:hover:border-sky-600 transition-all shadow-2xs flex flex-col justify-between"
@@ -1606,6 +1669,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
               ))}
             </div>
+            )}
           </div>
 
         </div>
@@ -1641,7 +1705,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           </div>
 
           <div className="space-y-4">
-            {logEntries.map((log) => (
+            {mentorLogs.length === 0 ? (
+              <div className="py-10 text-center text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                Belum ada catatan log jurnal bimbingan direkodkan untuk mentee seliaan anda.
+              </div>
+            ) : mentorLogs.map((log) => (
               <div
                 key={log.id}
                 className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-2xs space-y-4"
@@ -2511,7 +2579,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         isOpen={isEditProfileOpen}
         onClose={() => setIsEditProfileOpen(false)}
         mentor={currentMentor}
-        isAdminEditing={isAdmin && !isMentorUser}
+        isAdminEditing={false}
         onSave={(updated) => {
           onUpdateMentor?.(updated);
           showToast('Profil mentor berjaya dikemas kini!');
