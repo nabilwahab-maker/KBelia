@@ -9,7 +9,12 @@ import {
   Inbox
 } from 'lucide-react';
 import { YouthNotification } from '../types';
-import { getStoredNotifications, saveNotifications } from '../services/notificationStore';
+import {
+  getStoredNotifications,
+  markAllNotificationsReadStatus,
+  markNotificationReadStatus,
+  subscribeNotifications
+} from '../services/notificationStore';
 import { useAuth } from '../context/AuthContext';
 
 interface NotificationDropdownProps {
@@ -19,26 +24,26 @@ interface NotificationDropdownProps {
 export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   onNavigateTab
 }) => {
-  const { user, userProfile, isAdmin } = useAuth();
+  const { user, userProfile, isAdmin, isDemoSession } = useAuth();
   const isMentor = userProfile?.role === 'mentor';
-  const isYouth = !isAdmin && !isMentor;
 
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<YouthNotification[]>(getStoredNotifications);
 
   useEffect(() => {
-    const handleUpdate = (e: any) => {
-      if (e.detail) {
-        setNotifications(e.detail);
-      } else {
-        setNotifications(getStoredNotifications());
+    const unsub = subscribeNotifications(
+      {
+        uid: user?.uid,
+        isAdmin,
+        isMentor,
+        isDemoSession
+      },
+      (updatedList) => {
+        setNotifications(updatedList);
       }
-    };
-    window.addEventListener('kbelia_notifications_updated', handleUpdate);
-    return () => {
-      window.removeEventListener('kbelia_notifications_updated', handleUpdate);
-    };
-  }, []);
+    );
+    return () => unsub();
+  }, [user?.uid, isAdmin, isMentor, isDemoSession]);
 
   // Filter strictly according to current active account type & specific user ID
   const filteredNotifications = notifications.filter(n => {
@@ -66,15 +71,15 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   const markAllAsRead = () => {
     const activeIds = new Set(filteredNotifications.map(n => n.id));
-    const updated = notifications.map(n => activeIds.has(n.id) ? { ...n, isRead: true } : n);
-    setNotifications(updated);
-    saveNotifications(updated);
+    void markAllNotificationsReadStatus(activeIds, notifications).then((updated) => {
+      setNotifications(updated);
+    });
   };
 
   const markAsRead = (id: string, tab?: string) => {
-    const updated = notifications.map(n => n.id === id ? { ...n, isRead: true } : n);
-    setNotifications(updated);
-    saveNotifications(updated);
+    void markNotificationReadStatus(id, notifications).then((updated) => {
+      setNotifications(updated);
+    });
     if (tab && onNavigateTab) {
       const safeTab = allowedTabsForRole.has(tab)
         ? tab

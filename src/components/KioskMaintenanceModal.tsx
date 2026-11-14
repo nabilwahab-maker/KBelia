@@ -14,6 +14,7 @@ import { MaintenanceTicket } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { createMaintenanceTicket } from '../services/dataService';
+import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast } from './ToastNotification';
 
 interface KioskMaintenanceModalProps {
@@ -81,6 +82,16 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
       });
       setTicketId(created.id);
       setSubmitted(true);
+      emitAdminOrMentorNotification({
+        title: `Tiket Penyelenggaraan Baharu: ${defaultSlotCode}`,
+        message: `${reporterName.trim()} melaporkan isu "${category}" di ${defaultKioskName}.`,
+        senderRole: 'user',
+        targetRole: 'admin',
+        targetUserId: '',
+        sender: reporterName.trim() || 'Usahawan Belia',
+        type: 'kiosk',
+        actionTab: 'admin'
+      });
       showToast({
         type: 'success',
         title: language === 'en' ? 'Maintenance Ticket Submitted' : 'Tiket Aduan Diterima',

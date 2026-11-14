@@ -47,7 +47,12 @@ import {
 } from '../types';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
-import { saveGrantEndorsementRecord, saveMentoringLogRecord } from '../services/dataService';
+import { isProductionAuthenticated, saveGrantEndorsementRecord, saveMentoringLogRecord } from '../services/dataService';
+import {
+  mergeUniqueById,
+  subscribeCrossTabSync,
+  subscribeDemoSyncCollection
+} from '../services/realtimeSync';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
@@ -110,7 +115,7 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     recommendedAmount: 'RM5,000',
     grantProgramTitle: 'Geran Pemangkin Usahawan Belia Kelantan (RM5,000)',
     justification: 'Inovasi sistem POS dan inventori awan yang dibangunkan telah diuji oleh 5 peniaga kapsul niaga UMK dengan maklum balas positif. Geran disyorkan bagi menaik taraf server awan dan perlesenan keselamatan.',
-    businessReadinessRemark: 'Model perniagaan B2B yang mampan dengan unjuran pulangan modal dalam tempoh 4 bulan.',
+    businessReadinessRemark: 'Model Ruang Niaga yang mampan dengan unjuran pulangan modal dalam tempoh 4 bulan.',
     issuedAt: '2026-04-02',
     status: 'active'
   },
@@ -259,35 +264,95 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     }
   };
 
-  // Real-time Firestore sync scoped strictly to currentMentor.id
+  // Real-time Firestore + DemoSync + Cross-Tab sync scoped strictly to currentMentor.id
   useEffect(() => {
-    if (!user || isDemoSession || user.isDemo || !auth.currentUser || !isMentor || !currentMentor?.id) return;
+    if (!user || !isMentor || !currentMentor?.id) return;
 
-    const unsubEndorsements = onSnapshot(
-      query(collection(db, 'mentor_endorsements'), where('mentorId', '==', currentMentor.id)),
-      (snap) => {
-        const items = snap.docs.map(d => d.data() as GrantEndorsementLetter);
-        items.sort((a, b) => (b.issuedAt || '').localeCompare(a.issuedAt || ''));
-        setEndorsements(items);
-      },
-      (err) => console.warn('Mentor endorsements listener notice:', err)
-    );
+    const prodAuth = isProductionAuthenticated();
+    const readLocalList = <T,>(key: string, fallback: T[]): T[] => {
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch {
+        // ignore
+      }
+      return fallback;
+    };
 
-    const unsubLogs = onSnapshot(
-      query(collection(db, 'mentor_logs'), where('mentorId', '==', currentMentor.id)),
-      (snap) => {
-        const items = snap.docs.map(d => d.data() as MentoringLogEntry);
-        items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-        setLogEntries(items);
-      },
-      (err) => console.warn('Mentor logs listener notice:', err)
-    );
+    let prodEndorsements: GrantEndorsementLetter[] = [];
+    let demoSyncEndorsements: GrantEndorsementLetter[] = [];
+    let prodLogs: MentoringLogEntry[] = [];
+    let demoSyncLogs: MentoringLogEntry[] = [];
+
+    const recomputeMentorData = () => {
+      const localEnds = readLocalList<GrantEndorsementLetter>('kbelia_mentor_endorsements_v1', INITIAL_ENDORSEMENTS);
+      const localLogs = readLocalList<MentoringLogEntry>('kbelia_mentor_logs_v1', INITIAL_LOGS);
+
+      const mergedEnds = prodAuth
+        ? mergeUniqueById<GrantEndorsementLetter>([prodEndorsements, demoSyncEndorsements])
+        : mergeUniqueById<GrantEndorsementLetter>([demoSyncEndorsements, localEnds, INITIAL_ENDORSEMENTS]);
+      mergedEnds.sort((a, b) => (b.issuedAt || '').localeCompare(a.issuedAt || ''));
+      setEndorsements(mergedEnds.filter(e => e.mentorId === currentMentor.id));
+
+      const mergedLogs = prodAuth
+        ? mergeUniqueById<MentoringLogEntry>([prodLogs, demoSyncLogs])
+        : mergeUniqueById<MentoringLogEntry>([demoSyncLogs, localLogs, INITIAL_LOGS]);
+      mergedLogs.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+      setLogEntries(mergedLogs.filter(l => l.mentorId === currentMentor.id));
+    };
+
+    recomputeMentorData();
+
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (['all', 'endorsement', 'log'].includes(entity)) {
+        recomputeMentorData();
+      }
+    });
+
+    let unsubEndorsements = () => {};
+    let unsubLogs = () => {};
+
+    if (prodAuth && auth.currentUser) {
+      unsubEndorsements = onSnapshot(
+        query(collection(db, 'mentor_endorsements'), where('mentorId', '==', currentMentor.id)),
+        (snap) => {
+          prodEndorsements = snap.docs.map(d => ({ id: d.id, ...d.data() } as GrantEndorsementLetter));
+          recomputeMentorData();
+        },
+        (err) => console.warn('Mentor endorsements listener notice:', err)
+      );
+
+      unsubLogs = onSnapshot(
+        query(collection(db, 'mentor_logs'), where('mentorId', '==', currentMentor.id)),
+        (snap) => {
+          prodLogs = snap.docs.map(d => ({ id: d.id, ...d.data() } as MentoringLogEntry));
+          recomputeMentorData();
+        },
+        (err) => console.warn('Mentor logs listener notice:', err)
+      );
+    }
+
+    const unsubDemoEnds = subscribeDemoSyncCollection<GrantEndorsementLetter>('endorsement', (items) => {
+      demoSyncEndorsements = items;
+      recomputeMentorData();
+    });
+
+    const unsubDemoLogs = subscribeDemoSyncCollection<MentoringLogEntry>('log', (items) => {
+      demoSyncLogs = items;
+      recomputeMentorData();
+    });
 
     return () => {
+      unsubCrossTab();
       unsubEndorsements();
       unsubLogs();
+      unsubDemoEnds();
+      unsubDemoLogs();
     };
-  }, [user, isDemoSession, isMentor, currentMentor?.id]);
+  }, [user?.uid, isDemoSession, isMentor, currentMentor?.id]);
 
   // Filters for Sessions Tab
   const [searchQuery, setSearchQuery] = useState('');

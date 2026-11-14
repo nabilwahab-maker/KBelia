@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Building2, 
   Store, 
@@ -72,6 +72,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
   const { theme, toggleTheme } = useTheme();
   const { language } = useLanguage();
   const isEn = language === 'en';
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
 
   // Form Fields matching screenshot
   const [firstName, setFirstName] = useState('');
@@ -179,18 +185,21 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
       id="kbelia-register-page" 
       className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 text-black dark:text-white transition-colors duration-200"
     >
-      <main className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-2 relative">
+      <main className="min-h-screen w-full grid grid-cols-1 lg:grid-cols-12 relative">
         
         {/* ======================================================== */}
-        {/* LEFT 50% COLUMN: SIGN UP FORM                            */}
+        {/* RIGHT COLUMN (DESKTOP): EXPANDED SIGN UP FORM            */}
         {/* ======================================================== */}
-        <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 w-full max-w-xl mx-auto lg:max-w-none min-h-screen z-10 bg-white dark:bg-slate-900">
+        <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-14 xl:p-16 w-full min-h-screen z-10 lg:col-span-7 xl:col-span-8 order-1 lg:order-2 bg-white dark:bg-slate-900">
           
           {/* TOP BAR: BACK TO DASHBOARD */}
           <div className="w-full flex items-center justify-between pt-2 pb-6">
             <button
               type="button"
-              onClick={() => setActiveTab('landing')}
+              onClick={() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                setActiveTab('landing');
+              }}
               className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white transition-colors cursor-pointer group"
             >
               <ChevronLeft className="w-4 h-4 text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white group-hover:-translate-x-0.5 transition-transform" />
@@ -209,14 +218,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
           </div>
 
           {/* CENTER FORM CONTAINER */}
-          <div className="w-full max-w-[440px] mx-auto my-auto py-4">
+          <div className="w-full max-w-[500px] lg:max-w-[540px] xl:max-w-[560px] mx-auto my-auto py-6">
             
             {/* HEADING & SUBTITLE */}
             <div className="mb-6 sm:mb-8 text-left">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-black dark:text-white tracking-tight">
                 {isEn ? 'Sign Up' : 'Daftar Akaun'}
               </h1>
-              <p className="text-xs sm:text-sm text-black/70 dark:text-white/75 mt-1.5 font-normal">
+              <p className="text-xs sm:text-sm lg:text-base text-black/70 dark:text-white/75 mt-2 font-normal leading-relaxed">
                 {isEn ? 'Enter your email and password to sign up!' : 'Masukkan maklumat dan kata laluan anda untuk mendaftar!'}
               </p>
             </div>
@@ -455,7 +464,10 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 <span>{isEn ? 'Already have an account? ' : 'Sudah ada akaun? '}</span>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('login')}
+                  onClick={() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                    setActiveTab('login');
+                  }}
                   className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
                 >
                   {isEn ? 'Sign In' : 'Log Masuk'}
@@ -511,12 +523,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
         </div>
 
         {/* ======================================================== */}
-        {/* RIGHT 50% COLUMN: CRISP WHITE + TOP-LEFT SKY GLOW        */}
+        {/* LEFT COLUMN (DESKTOP): CRISP WHITE + TOP-LEFT SKY GLOW   */}
         {/* ======================================================== */}
-        <div className="hidden lg:flex flex-col items-center justify-center p-12 relative overflow-hidden kbelia-important-header dark:bg-slate-800 select-none border-l border-slate-200 dark:border-slate-700">
+        <div className="hidden lg:flex flex-col items-center justify-center p-8 xl:p-12 relative overflow-hidden kbelia-important-header dark:bg-slate-800 select-none lg:col-span-5 xl:col-span-4 order-2 lg:order-1 border-r border-slate-200 dark:border-slate-700">
           
-          {/* SOFT GEOMETRIC BLUEPRINT GRID PATTERN */}
-          <div className="absolute inset-0 pointer-events-none">
+          {/* SOFT GEOMETRIC ACCENT PATTERN */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <svg 
               className="w-full h-full opacity-35" 
               xmlns="http://www.w3.org/2000/svg"
@@ -525,62 +537,55 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             >
               <defs>
                 <pattern id="register-grid-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
-                  <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(37, 99, 235, 0.18)" strokeWidth="0.75" />
+                  <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(14, 165, 233, 0.14)" strokeWidth="0.75" />
                 </pattern>
               </defs>
               <rect width="100%" height="100%" fill="url(#register-grid-pattern)" />
             </svg>
 
-            {/* Soft Standard Accent Squares */}
-            <div className="absolute top-[18%] right-[22%] w-[60px] h-[60px] bg-blue-100/60 border border-blue-300/70 rounded-xs"></div>
-            <div className="absolute top-[32%] right-[12%] w-[60px] h-[60px] bg-indigo-50/70 border border-indigo-200/70 rounded-xs"></div>
-            <div className="absolute bottom-[24%] left-[16%] w-[60px] h-[60px] bg-emerald-50/70 border border-emerald-200/80 rounded-xs"></div>
-            <div className="absolute bottom-[14%] right-[28%] w-[60px] h-[60px] bg-amber-50/70 border border-amber-200/70 rounded-xs"></div>
+            {/* Moving Animated Soft Sky & Slate Accent Squares */}
+            <div className="absolute top-[18%] right-[20%] w-[52px] h-[52px] bg-amber-100/50 border border-amber-300/70 rounded-lg animate-hero-float-slow"></div>
+            <div className="absolute top-[34%] right-[10%] w-[48px] h-[48px] bg-amber-50/70 border border-amber-300/60 rounded-lg animate-hero-float-reverse"></div>
+            <div className="absolute bottom-[26%] left-[14%] w-[54px] h-[54px] bg-slate-100/70 border border-slate-200/80 rounded-lg animate-hero-float-fast"></div>
+            <div className="absolute bottom-[12%] right-[24%] w-[46px] h-[46px] bg-amber-50/60 border border-amber-300/60 rounded-lg animate-hero-float-slow"></div>
           </div>
 
           {/* CENTER BRAND EMBLEM & TYPOGRAPHY */}
-          <div className="relative z-10 flex flex-col items-center text-center max-w-md mx-auto">
+          <div className="relative z-10 flex flex-col items-center text-center max-w-xs xl:max-w-sm mx-auto">
             
             {/* BRAND EMBLEM */}
-            <div className="flex items-center gap-3.5 mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-2xl shadow-md shadow-amber-500/20 border border-blue-600 dark:bg-blue-600">
-                <span>K</span>
-                <span className="text-white text-lg ml-0.5">B</span>
+            <div className="animate-hero-float-slow">
+              <div className="flex items-center gap-3 mb-3.5">
+                <div className="w-13 h-13 xl:w-15 xl:h-15 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-xl xl:text-2xl shadow-md shadow-amber-500/20 border border-blue-600 dark:bg-blue-600">
+                  <span>K</span>
+                  <span className="text-white text-base xl:text-lg ml-0.5">B</span>
+                </div>
+                <span className="text-2xl xl:text-3xl font-black text-black dark:text-white tracking-tight">
+                  KBelia
+                </span>
               </div>
-              <span className="text-3xl xl:text-4xl font-black text-black dark:text-white tracking-tight">
-                KBelia
-              </span>
             </div>
 
             {/* SUBTITLE MOTTO */}
-            <p className="text-sm text-black dark:text-white font-normal leading-relaxed max-w-sm mt-1">
+            <p className="text-xs xl:text-sm text-black dark:text-white font-normal leading-relaxed max-w-xs mt-1">
               Portal Rasmi Kapsul Niaga & Keusahawanan Belia Kelantan 2026
             </p>
 
-            {/* JAJAHAN PILL CHIPS */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-1.5 max-w-xs">
-              {['Kota Bharu', 'Bachok', 'Pasir Mas', 'Tumpat', 'Kuala Krai'].map((d) => (
-                <span 
-                  key={d} 
-                  className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-white/90 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-600 text-black dark:text-white"
-                >
-                  {d}
-                </span>
-              ))}
-              <span className="px-2 py-1 rounded-full text-[10px] font-bold text-black bg-amber-50 border border-amber-300">
-                +5 Jajahan
-              </span>
+            {/* WELCOME BADGE */}
+            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-amber-50 border border-amber-300 text-black shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-black" />
+              <span>Selamat Datang ke KBelia</span>
             </div>
 
           </div>
 
-          {/* FLOATING DARK / LIGHT THEME TOGGLE (BOTTOM RIGHT CORNER) */}
+          {/* FLOATING DARK / LIGHT THEME TOGGLE (BOTTOM LEFT CORNER) */}
           <button
             type="button"
             onClick={toggleTheme}
             aria-label="Tukar Mod Cerah/Gelap"
             title={theme === 'dark' ? 'Tukar ke Mod Cerah' : 'Tukar ke Mod Gelap'}
-            className="absolute bottom-6 right-6 w-12 h-12 rounded-full bg-white hover:bg-amber-50 active:scale-95 text-black border border-slate-200 flex items-center justify-center shadow-sm transition-all cursor-pointer z-30"
+            className="absolute bottom-6 left-6 w-11 h-11 rounded-full bg-white hover:bg-amber-50 active:scale-95 text-black border border-slate-200 flex items-center justify-center shadow-sm transition-all cursor-pointer z-30 interactive-lift"
           >
             {theme === 'dark' ? (
               <Sun className="w-5 h-5 text-black/70 dark:text-white/75" />
@@ -614,7 +619,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             <div className="p-6 space-y-4">
               <div className="space-y-3 text-xs text-black dark:text-white leading-relaxed">
                 <p>
-                  <strong>1. Kelayakan Pemohon:</strong> Terbuka kepada warganegara Malaysia berumur 18 hingga 40 tahun yang bermastautin atau beroperasi di dalam 10 Jajahan Negeri Kelantan.
+                  <strong>1. Kelayakan Pemohon:</strong> Terbuka kepada warganegara Malaysia berumur 18 hingga 40 tahun yang bermastautin atau beroperasi di seluruh Negeri Kelantan.
                 </p>
                 <p>
                   <strong>2. Penggunaan Kapsul & Geran:</strong> Setiap pendaftaran melayakkan pemohon untuk memohon sewaan Kapsul Niaga Modular bersubsidi serta permohonan Dana Benih Belia tertakluk kepada semakan jawatankuasa urusetia negeri.

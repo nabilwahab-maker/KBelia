@@ -30,6 +30,8 @@ import {
   INITIAL_PROGRAMS
 } from '../data/seedData';
 import { INITIAL_PORTAL_NEWS } from '../data/newsData';
+import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
+import { broadcastSyncUpdate, publishDemoSyncRecord } from './realtimeSync';
 
 const CACHE_KEYS = {
   BUSINESSES: 'kbelia_businesses_cache',
@@ -64,6 +66,7 @@ export function markIdAsDeleted(id: string) {
       ids.push(id);
       localStorage.setItem(CACHE_KEYS.DELETED_IDS, JSON.stringify(ids));
     }
+    broadcastSyncUpdate('deleted');
   } catch (e) {
     console.warn('Failed to save deleted ID to local storage:', e);
   }
@@ -89,11 +92,23 @@ export function upgradeLocalImageCache() {
 }
 upgradeLocalImageCache();
 
-const isFirebaseAuthenticated = () => Boolean(auth.currentUser);
+export const isProductionAuthenticated = () => {
+  if (!auth.currentUser || auth.currentUser.isAnonymous) return false;
+  try {
+    const raw = sessionStorage.getItem('niagabelia_auth_session') || localStorage.getItem('niagabelia_auth_session');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.user?.isDemo) return false;
+    }
+  } catch {
+    // ignore
+  }
+  return true;
+};
 
 // --- SEED INITIAL DATA ---
 export async function seedInitialData() {
-  if (!isFirebaseAuthenticated()) return false;
+  if (!isProductionAuthenticated()) return false;
   try {
     localStorage.removeItem(CACHE_KEYS.DELETED_IDS);
 
@@ -111,6 +126,9 @@ export async function seedInitialData() {
     }
     for (const newsItem of INITIAL_PORTAL_NEWS) {
       await setDoc(doc(db, 'portal_news', newsItem.id), newsItem, { merge: true });
+    }
+    for (const mentor of INITIAL_MENTOR_PROFILES) {
+      await setDoc(doc(db, 'mentor_profiles', mentor.id), mentor, { merge: true });
     }
     return true;
   } catch (error) {
@@ -132,16 +150,15 @@ export async function createCapsuleBooking(
     createdAt: new Date().toISOString()
   };
 
-  if (!isFirebaseAuthenticated()) {
-    // Demo isolation storage
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_bookings';
       const existing: CapsuleBooking[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(key, JSON.stringify([bookingData, ...existing]));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('booking', id, bookingData);
     return bookingData;
   }
 
@@ -169,17 +186,36 @@ export async function updateBookingStatus(
       ? 'Permohonan diluluskan. Sila hadir ke pejabat pentadbiran untuk penyerahan kunci.'
       : 'Permohonan ditolak.');
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
+    let targetBooking: CapsuleBooking | undefined;
     try {
       const key = 'kbelia_demo_bookings';
       const existing: CapsuleBooking[] = JSON.parse(localStorage.getItem(key) || '[]');
-      const updated = existing.map(b =>
-        b.id === bookingId ? { ...b, status, adminNotes: notes } : b
-      );
+      const updated = existing.map(b => {
+        if (b.id === bookingId) {
+          targetBooking = { ...b, status, adminNotes: notes };
+          return targetBooking;
+        }
+        return b;
+      });
       localStorage.setItem(key, JSON.stringify(updated));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
+    }
+    await publishDemoSyncRecord('booking', bookingId, targetBooking || { id: bookingId, status, adminNotes: notes, slotId, businessName, applicantId });
+    if (status === 'approved' && slotId) {
+      const slotList: CapsuleSlot[] = JSON.parse(localStorage.getItem('kbelia_demo_slots') || '[]');
+      const existingSlot = slotList.find(s => s.id === slotId) || INITIAL_CAPSULE_SLOTS.find(s => s.id === slotId);
+      if (existingSlot) {
+        const updatedSlot: CapsuleSlot = {
+          ...existingSlot,
+          status: 'occupied',
+          currentTenantBusinessName: businessName || 'Usahawan Belia',
+          currentTenantId: applicantId || ''
+        };
+        localStorage.setItem('kbelia_demo_slots', JSON.stringify([updatedSlot, ...slotList.filter(s => s.id !== slotId)]));
+        await publishDemoSyncRecord('slot', slotId, updatedSlot);
+      }
     }
     return;
   }
@@ -213,16 +249,23 @@ export async function signBookingTenancyAgreement(
     tenancySignatureName: signatureName
   };
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
+    let targetBooking: CapsuleBooking | undefined;
     try {
       const key = 'kbelia_demo_bookings';
       const existing: CapsuleBooking[] = JSON.parse(localStorage.getItem(key) || '[]');
-      const updated = existing.map(b => (b.id === bookingId ? { ...b, ...payload } : b));
+      const updated = existing.map(b => {
+        if (b.id === bookingId) {
+          targetBooking = { ...b, ...payload };
+          return targetBooking;
+        }
+        return b;
+      });
       localStorage.setItem(key, JSON.stringify(updated));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('booking', bookingId, targetBooking || { id: bookingId, ...payload });
     return;
   }
 
@@ -265,16 +308,16 @@ export async function saveBusinessListing(
     createdAt: business.createdAt || new Date().toISOString()
   };
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_businesses';
       const existing: BusinessListing[] = JSON.parse(localStorage.getItem(key) || '[]');
       const next = [fullData, ...existing.filter(b => b.id !== id)];
       localStorage.setItem(key, JSON.stringify(next));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('business', id, fullData);
     return fullData;
   }
 
@@ -289,15 +332,15 @@ export async function saveBusinessListing(
 
 export async function deleteBusinessListing(businessId: string) {
   markIdAsDeleted(businessId);
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_businesses';
       const existing: BusinessListing[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(key, JSON.stringify(existing.filter(b => b.id !== businessId)));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('business', businessId, { id: businessId }, true);
     return;
   }
   try {
@@ -326,15 +369,15 @@ export async function saveProduct(
     createdAt: product.createdAt || new Date().toISOString()
   };
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_products';
       const existing: ProductItem[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(key, JSON.stringify([fullProduct, ...existing.filter(p => p.id !== id)]));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('product', id, fullProduct);
     return fullProduct;
   }
 
@@ -349,15 +392,15 @@ export async function saveProduct(
 
 export async function deleteProduct(productId: string) {
   markIdAsDeleted(productId);
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_products';
       const existing: ProductItem[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(key, JSON.stringify(existing.filter(p => p.id !== productId)));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('product', productId, { id: productId }, true);
     return;
   }
   try {
@@ -388,15 +431,15 @@ export async function saveCapsuleSlot(slot: Partial<CapsuleSlot> & { code: strin
     createdAt: slot.createdAt || new Date().toISOString()
   };
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_slots';
       const existing: CapsuleSlot[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(key, JSON.stringify([fullSlot, ...existing.filter(s => s.id !== id)]));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('slot', id, fullSlot);
     return fullSlot;
   }
 
@@ -411,15 +454,15 @@ export async function saveCapsuleSlot(slot: Partial<CapsuleSlot> & { code: strin
 
 export async function deleteCapsuleSlot(slotId: string) {
   markIdAsDeleted(slotId);
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_slots';
       const existing: CapsuleSlot[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(key, JSON.stringify(existing.filter(s => s.id !== slotId)));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('slot', slotId, { id: slotId }, true);
     return;
   }
   try {
@@ -449,15 +492,15 @@ export async function saveProgram(
     createdAt: program.createdAt || new Date().toISOString()
   };
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_programs';
       const existing: YouthProgram[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(key, JSON.stringify([fullProgram, ...existing.filter(p => p.id !== id)]));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('program', id, fullProgram);
     return fullProgram;
   }
 
@@ -472,15 +515,15 @@ export async function saveProgram(
 
 export async function deleteProgram(programId: string) {
   markIdAsDeleted(programId);
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_programs';
       const existing: YouthProgram[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(key, JSON.stringify(existing.filter(p => p.id !== programId)));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('program', programId, { id: programId }, true);
     return;
   }
   try {
@@ -503,15 +546,15 @@ export async function createGrantApplication(
     createdAt: new Date().toISOString()
   };
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const key = 'kbelia_demo_grants';
       const existing: GrantApplication[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(key, JSON.stringify([grantData, ...existing.filter(g => g.id !== id)]));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('grant', id, grantData);
     return grantData;
   }
 
@@ -525,7 +568,7 @@ export async function createGrantApplication(
 }
 
 export async function fetchGrantApplications(): Promise<GrantApplication[]> {
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       return JSON.parse(localStorage.getItem('kbelia_demo_grants') || '[]');
     } catch {
@@ -551,18 +594,27 @@ export async function updateGrantApplicationStatus(
     adminNotes ||
     (status === 'approved' ? 'Permohonan geran diluluskan oleh Urusetia KBelia.' : 'Permohonan ditolak.');
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
+    let updatedGrant: GrantApplication | undefined;
     try {
       const key = 'kbelia_demo_grants';
       const existing: GrantApplication[] = JSON.parse(localStorage.getItem(key) || '[]');
       localStorage.setItem(
         key,
-        JSON.stringify(existing.map(g => (g.id === grantId ? { ...g, status, adminNotes: notes } : g)))
+        JSON.stringify(
+          existing.map(g => {
+            if (g.id === grantId) {
+              updatedGrant = { ...g, status, adminNotes: notes };
+              return updatedGrant;
+            }
+            return g;
+          })
+        )
       );
-      window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('grant', grantId, updatedGrant || { id: grantId, status, adminNotes: notes });
     return;
   }
 
@@ -579,11 +631,11 @@ export async function saveCashflowRecord(record: KioskDailySale & { ownerId: str
   const id = record.id || `cf-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
   const full: KioskDailySale = { ...record, id };
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     const key = `kbelia_cashflow_records_${record.ownerId}`;
     const existing: KioskDailySale[] = JSON.parse(localStorage.getItem(key) || '[]');
     localStorage.setItem(key, JSON.stringify([full, ...existing.filter(r => r.id !== id)]));
-    window.dispatchEvent(new CustomEvent('kbelia_cashflow_updated', { detail: { ownerId: record.ownerId } }));
+    await publishDemoSyncRecord('cashflow', id, { ...full, ownerId: record.ownerId });
     return full;
   }
 
@@ -597,11 +649,11 @@ export async function saveCashflowRecord(record: KioskDailySale & { ownerId: str
 }
 
 export async function deleteCashflowRecord(recordId: string, ownerId: string) {
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     const key = `kbelia_cashflow_records_${ownerId}`;
     const existing: KioskDailySale[] = JSON.parse(localStorage.getItem(key) || '[]');
     localStorage.setItem(key, JSON.stringify(existing.filter(r => r.id !== recordId)));
-    window.dispatchEvent(new CustomEvent('kbelia_cashflow_updated', { detail: { ownerId } }));
+    await publishDemoSyncRecord('cashflow', recordId, { id: recordId, ownerId }, true);
     return;
   }
 
@@ -625,11 +677,11 @@ export async function createMaintenanceTicket(
     createdAt: new Date().toISOString()
   };
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     const key = 'kbelia_demo_maintenance_tickets';
     const existing: MaintenanceTicket[] = JSON.parse(localStorage.getItem(key) || '[]');
     localStorage.setItem(key, JSON.stringify([full, ...existing]));
-    window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
+    await publishDemoSyncRecord('ticket', id, full);
     return full;
   }
 
@@ -647,16 +699,23 @@ export async function updateMaintenanceTicketStatus(
   status: MaintenanceTicket['status'],
   adminNotes?: string
 ) {
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
+    let updatedTicket: MaintenanceTicket | undefined;
     const key = 'kbelia_demo_maintenance_tickets';
     const existing: MaintenanceTicket[] = JSON.parse(localStorage.getItem(key) || '[]');
     localStorage.setItem(
       key,
       JSON.stringify(
-        existing.map(t => (t.id === ticketId ? { ...t, status, adminNotes: adminNotes || t.adminNotes } : t))
+        existing.map(t => {
+          if (t.id === ticketId) {
+            updatedTicket = { ...t, status, adminNotes: adminNotes || t.adminNotes };
+            return updatedTicket;
+          }
+          return t;
+        })
       )
     );
-    window.dispatchEvent(new CustomEvent('kbelia_demo_data_updated'));
+    await publishDemoSyncRecord('ticket', ticketId, updatedTicket || { id: ticketId, status, adminNotes: adminNotes || '' });
     return;
   }
 
@@ -675,7 +734,19 @@ export async function updateMaintenanceTicketStatus(
 // --- MENTORSHIP, MENTOR PROFILES, ENDORSEMENTS & LOGS ---
 export async function saveMentorProfileRecord(profile: MentorProfile) {
   const { pin: _pin, ...safeProfile } = profile as MentorProfile & { pin?: string };
-  if (!isFirebaseAuthenticated()) return safeProfile as MentorProfile;
+  if (!isProductionAuthenticated()) {
+    try {
+      const existing: MentorProfile[] = JSON.parse(localStorage.getItem('kbelia_mentor_profiles') || '[]');
+      const next = existing.some(m => m.id === safeProfile.id)
+        ? existing.map(m => (m.id === safeProfile.id ? (safeProfile as MentorProfile) : m))
+        : [safeProfile as MentorProfile, ...existing];
+      localStorage.setItem('kbelia_mentor_profiles', JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('mentor', safeProfile.id, safeProfile);
+    return safeProfile as MentorProfile;
+  }
   try {
     await setDoc(doc(db, 'mentor_profiles', safeProfile.id), safeProfile, { merge: true });
     return safeProfile as MentorProfile;
@@ -686,7 +757,17 @@ export async function saveMentorProfileRecord(profile: MentorProfile) {
 }
 
 export async function saveMentorshipRegistrationRecord(reg: MentorshipRegistration) {
-  if (!isFirebaseAuthenticated()) return reg;
+  if (!isProductionAuthenticated()) {
+    try {
+      const existing: MentorshipRegistration[] = JSON.parse(localStorage.getItem('kbelia_mentorship_registrations') || '[]');
+      const next = [reg, ...existing.filter(r => r.id !== reg.id)];
+      localStorage.setItem('kbelia_mentorship_registrations', JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('session', reg.id, reg);
+    return reg;
+  }
   try {
     await setDoc(doc(db, 'mentor_sessions', reg.id), reg, { merge: true });
     return reg;
@@ -697,10 +778,11 @@ export async function saveMentorshipRegistrationRecord(reg: MentorshipRegistrati
 }
 
 export async function saveGrantEndorsementRecord(endorsement: GrantEndorsement) {
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     const key = 'kbelia_mentor_endorsements_v1';
     const existing: GrantEndorsement[] = JSON.parse(localStorage.getItem(key) || '[]');
     localStorage.setItem(key, JSON.stringify([endorsement, ...existing.filter(e => e.id !== endorsement.id)]));
+    await publishDemoSyncRecord('endorsement', endorsement.id, endorsement);
     return endorsement;
   }
   try {
@@ -713,10 +795,11 @@ export async function saveGrantEndorsementRecord(endorsement: GrantEndorsement) 
 }
 
 export async function saveMentoringLogRecord(logEntry: MentoringLogEntry) {
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     const key = 'kbelia_mentor_logs_v1';
     const existing: MentoringLogEntry[] = JSON.parse(localStorage.getItem(key) || '[]');
     localStorage.setItem(key, JSON.stringify([logEntry, ...existing.filter(l => l.id !== logEntry.id)]));
+    await publishDemoSyncRecord('log', logEntry.id, logEntry);
     return logEntry;
   }
   try {
@@ -728,11 +811,12 @@ export async function saveMentoringLogRecord(logEntry: MentoringLogEntry) {
   }
 }
 
-// --- B2B LISTINGS ---
+// --- B2B / RUANG NIAGA LISTINGS ---
 export async function saveB2BListingRecord(item: B2BListing) {
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     const existing: B2BListing[] = JSON.parse(localStorage.getItem('kbelia_b2b_listings') || '[]');
     localStorage.setItem('kbelia_b2b_listings', JSON.stringify([item, ...existing.filter(x => x.id !== item.id)]));
+    await publishDemoSyncRecord('b2b', item.id, item);
     return item;
   }
   try {
@@ -759,7 +843,10 @@ export async function savePortalSettingsRecord(settings: PortalSettings) {
     // ignore
   }
 
-  if (!isFirebaseAuthenticated()) return payload;
+  if (!isProductionAuthenticated()) {
+    await publishDemoSyncRecord('settings', 'global', payload);
+    return payload;
+  }
 
   try {
     await setDoc(doc(db, 'portal_settings', 'global'), payload, { merge: true });
@@ -782,7 +869,7 @@ export function loadLocalPortalSettings(): PortalSettings {
   return DEFAULT_PORTAL_SETTINGS;
 }
 
-// --- PORTAL NEWS (Admin Controlled, All Logged-In Users Read Published) ---
+// --- PORTAL NEWS (Admin Controlled, All Users Read Published) ---
 const DEMO_NEWS_STORAGE_KEY = 'kbelia_demo_news_v1';
 
 export function loadLocalDemoNews(): PortalNews[] {
@@ -827,7 +914,6 @@ export async function savePortalNewsRecord(
     createdAt: news.createdAt || now
   };
 
-  // Clear from deleted list if re-saving
   try {
     const deleted = getDeletedIds().filter(d => d !== id);
     localStorage.setItem(CACHE_KEYS.DELETED_IDS, JSON.stringify(deleted));
@@ -835,15 +921,15 @@ export async function savePortalNewsRecord(
     // ignore
   }
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const existing = loadLocalDemoNews();
       const updated = [sanitized, ...existing.filter(n => n.id !== id)];
       localStorage.setItem(DEMO_NEWS_STORAGE_KEY, JSON.stringify(updated));
-      window.dispatchEvent(new CustomEvent('kbelia_demo_news_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('news', id, sanitized);
     return sanitized;
   }
 
@@ -859,17 +945,17 @@ export async function savePortalNewsRecord(
 export async function deletePortalNewsRecord(newsId: string): Promise<void> {
   markIdAsDeleted(newsId);
 
-  if (!isFirebaseAuthenticated()) {
+  if (!isProductionAuthenticated()) {
     try {
       const existing = loadLocalDemoNews();
       localStorage.setItem(
         DEMO_NEWS_STORAGE_KEY,
         JSON.stringify(existing.filter(n => n.id !== newsId))
       );
-      window.dispatchEvent(new CustomEvent('kbelia_demo_news_updated'));
     } catch {
       // ignore
     }
+    await publishDemoSyncRecord('news', newsId, { id: newsId }, true);
     return;
   }
 
@@ -888,12 +974,12 @@ export async function restoreDefaultDemoNews(): Promise<void> {
     localStorage.setItem(CACHE_KEYS.DELETED_IDS, JSON.stringify(deleted));
     const customOnly = loadLocalDemoNews().filter(n => !demoIds.has(n.id));
     localStorage.setItem(DEMO_NEWS_STORAGE_KEY, JSON.stringify(customOnly));
-    window.dispatchEvent(new CustomEvent('kbelia_demo_news_updated'));
+    broadcastSyncUpdate('news');
   } catch {
     // ignore
   }
 
-  if (isFirebaseAuthenticated()) {
+  if (isProductionAuthenticated()) {
     try {
       for (const item of INITIAL_PORTAL_NEWS) {
         await setDoc(doc(db, 'portal_news', item.id), item, { merge: true });
@@ -901,6 +987,10 @@ export async function restoreDefaultDemoNews(): Promise<void> {
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'portal_news');
       throw error;
+    }
+  } else {
+    for (const item of INITIAL_PORTAL_NEWS) {
+      await publishDemoSyncRecord('news', item.id, item, false);
     }
   }
 }

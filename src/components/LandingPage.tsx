@@ -78,6 +78,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   const availableSlotsCount = slots.filter(s => s.status === 'available').length;
 
+  const navigateToPage = (tab: UMKTab) => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    setActiveTab(tab);
+  };
+
   // 5 Rich Visual Slides for the Automatic Moving Carousel (Maintained as original)
   const heroSlides = [
     {
@@ -90,7 +97,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
       stat: `${slots.length} Kapsul Strategik`,
       ctaText: 'Mohon Sewa Kapsul',
-      onAction: () => setActiveTab('login')
+      onAction: () => navigateToPage('login')
     },
     {
       id: 'slide-2',
@@ -102,7 +109,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
       stat: 'Penilaian 4.8 / 5.0',
       ctaText: 'Teroka Direktori Usahawan',
-      onAction: () => setActiveTab('login')
+      onAction: () => navigateToPage('login')
     },
     {
       id: 'slide-3',
@@ -114,7 +121,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
       stat: '42 Ulasan Pelanggan',
       ctaText: 'Lihat Produk & Menu',
-      onAction: () => setActiveTab('login')
+      onAction: () => navigateToPage('login')
     }
   ];
 
@@ -194,7 +201,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     },
     {
       q: 'Adakah platform ini membantu pendaftaran SSM dan pematuhan lesen?',
-      a: 'Benar. Kami menyediakan panduan pematuhan (Compliance & SSM Guide) lengkap dengan pautan integrasi SSM, panduan sijil Halal JAKIM, dan permohonan lesen PBT 10 jajahan.'
+      a: 'Benar. Kami menyediakan panduan pematuhan (Compliance & SSM Guide) lengkap dengan pautan integrasi SSM, panduan sijil Halal JAKIM, dan permohonan lesen PBT di seluruh Kelantan.'
     }
   ];
 
@@ -290,7 +297,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button
               type="button"
               id="landing-register-nav-btn"
-              onClick={() => setActiveTab('register')}
+              onClick={() => navigateToPage('register')}
               className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer interactive-press interactive-lift group"
             >
               <Users className="w-3.5 h-3.5 text-black dark:text-white/75 transition-transform duration-200 group-hover:scale-110" />
@@ -301,7 +308,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button
               type="button"
               id="landing-login-btn"
-              onClick={() => setActiveTab('login')}
+              onClick={() => navigateToPage('login')}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer interactive-press interactive-lift group dark:bg-blue-600"
             >
               <LogIn className="w-3.5 h-3.5 text-white transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -331,7 +338,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <p className="text-base sm:text-lg text-black dark:text-white font-normal leading-relaxed max-w-2xl mx-auto">
               {isBM
                 ? 'Sewa kios pintar modular, pameran produk tempatan di Direktori Negeri, dan mohon geran pembiayaan keusahawanan dalam satu gerbang rasmi.'
-                : 'Rent smart modular kiosks across 10 districts, showcase local products in the state digital directory, and access entrepreneur grants in one official portal.'}
+                : 'Rent smart modular kiosks across Kelantan, showcase local products in the state digital directory, and access entrepreneur grants in one official portal.'}
             </p>
           </div>
 
@@ -469,9 +476,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <MapPin className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">10</div>
-              <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Jajahan Liputan' : 'Districts'}</div>
-              <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Seluruh Kelantan' : 'Statewide'}</div>
+              <div className="text-lg sm:text-xl font-black text-black dark:text-white leading-tight">{isBM ? 'Seluruh Kelantan' : 'Across Kelantan'}</div>
+              <div className="text-xs font-bold text-black dark:text-white mt-1">{isBM ? 'Liputan Negeri' : 'State Coverage'}</div>
+              <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Rangkaian Hab & Kiosk' : 'Hub & Kiosk Network'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-blue-400/70 dark:hover:border-blue-400/70 cursor-default group">
@@ -685,7 +692,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Kiosk Kapsul Modular Bersubsidi</span>
-                    <span className="text-black dark:text-white text-xs">Sewa serendah RM12-RM25/hari di zon strategik 10 jajahan lengkap elektrik 13A & WiFi.</span>
+                    <span className="text-black dark:text-white text-xs">Sewa serendah RM12-RM25/hari di zon strategik seluruh Kelantan lengkap elektrik 13A & WiFi.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
@@ -861,7 +868,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <h3 className="font-extrabold text-lg text-black dark:text-white">6. Modular Capsule IoT Hub</h3>
                 <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
-                  Sistem kunci digital pintar, pemantauan status penggunaan kiosk secara atas talian, serta sokongan teknikal bersepadu bagi penyewa kiosk modular 10 jajahan.
+                  Sistem kunci digital pintar, pemantauan status penggunaan kiosk secara atas talian, serta sokongan teknikal bersepadu bagi penyewa kiosk modular seluruh Kelantan.
                 </p>
                 <div className="pt-1 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                   <Wifi className="w-3.5 h-3.5" />
@@ -1005,7 +1012,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => setActiveTab('login')}
+                  onClick={() => navigateToPage('login')}
                   className="text-xs font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
                   <span>{isBM ? 'Log Masuk & Semak Lokasi' : 'Log In to Check Locations'}</span>
@@ -1030,7 +1037,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => setActiveTab('login')}
+                  onClick={() => navigateToPage('login')}
                   className="text-xs font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
                   <span>{isBM ? 'Log Masuk & Lihat Usahawan' : 'Log In to Browse Directory'}</span>
@@ -1055,7 +1062,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => setActiveTab('login')}
+                  onClick={() => navigateToPage('login')}
                   className="text-xs font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
                   <span>{isBM ? 'Log Masuk & Maklumat Skim' : 'Log In to View Schemes'}</span>
@@ -1295,7 +1302,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <button
               type="button"
-              onClick={() => setActiveTab('register')}
+              id="landing-cta-register-btn"
+              onClick={() => navigateToPage('register')}
               className="px-6 py-3 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm transition-colors flex items-center gap-2 cursor-pointer active:scale-98 dark:bg-teal-600"
             >
               <Users className="w-4 h-4" />
@@ -1303,7 +1311,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('login')}
+              onClick={() => navigateToPage('login')}
               className="px-6 py-3 rounded-lg bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white font-bold text-sm border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
             >
               <LogIn className="w-4 h-4 text-black dark:text-white/75" />
@@ -1362,10 +1370,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <a href="#hero" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Laman Utama</a>
               </li>
               <li>
-                <button type="button" onClick={() => setActiveTab('register')} className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer">Daftar Akaun Usahawan</button>
+                <button type="button" onClick={() => navigateToPage('register')} className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer">Daftar Akaun Usahawan</button>
               </li>
               <li>
-                <button type="button" onClick={() => setActiveTab('login')} className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer">Log Masuk Sistem</button>
+                <button type="button" onClick={() => navigateToPage('login')} className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer">Log Masuk Sistem</button>
               </li>
               <li>
                 <a href="#kiosk" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Kiosk Kapsul Modular</a>

@@ -108,6 +108,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
   const [showForgotModal, setShowForgotModal] = useState(false);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
+  useEffect(() => {
     if (loginInitialTab) {
       setActiveRole(loginInitialTab);
     }
@@ -470,9 +476,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                     <button
                       type="button"
                       onClick={() => {
-                        setAuthMode('register');
-                        setActiveRole('user');
+                        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
                         clearAuthError();
+                        setActiveTab('register');
                       }}
                       className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
                     >

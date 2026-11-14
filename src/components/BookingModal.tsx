@@ -20,6 +20,7 @@ import {
 import { CapsuleSlot, BusinessCategory, PortalSettings } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { createCapsuleBooking } from '../services/dataService';
+import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import confetti from 'canvas-confetti';
 import { showToast } from './ToastNotification';
 import { 
@@ -219,7 +220,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         slotName: currentSlot.name,
         hubLocation: currentSlot.hubLocation,
         applicantId: user.uid,
-        applicantName: user.displayName || userProfile?.fullName || 'Usahawan Belia',
+        applicantName: userProfile?.fullName || user.displayName || 'Usahawan Belia',
         applicantEmail: user.email || '',
         applicantPhone: phone || userProfile?.phone || '+60',
         applicantMyKad: icNumber.trim() || undefined,
@@ -234,6 +235,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       confetti({ particleCount: 70, spread: 60 });
       clearFormDraft('kiosk_booking');
       setSubmitted(true);
+      emitAdminOrMentorNotification({
+        title: `Permohonan Kiosk Baharu: ${currentSlot.code}`,
+        message: `${businessName} (${userProfile?.fullName || user.displayName || 'Usahawan Belia'}) telah memohon unit ${currentSlot.name}.`,
+        senderRole: 'user',
+        targetRole: 'admin',
+        targetUserId: '',
+        sender: userProfile?.fullName || user.displayName || 'Usahawan Belia',
+        type: 'kiosk',
+        actionTab: 'admin'
+      });
       showToast({
         type: 'success',
         title: 'Permohonan Kiosk Berjaya Dihantar!',

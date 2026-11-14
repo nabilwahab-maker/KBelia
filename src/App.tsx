@@ -25,6 +25,7 @@ import {
   MaintenanceTicket,
   PortalSettings,
   PortalNews,
+  GrantEndorsement,
   MerchantSubTab,
   AdminSubTab,
   MentorSubTab
@@ -42,6 +43,7 @@ import {
 import { INITIAL_PORTAL_NEWS } from './data/newsData';
 import { 
   getDeletedIds, 
+  isProductionAuthenticated,
   seedInitialData, 
   DEFAULT_PORTAL_SETTINGS, 
   loadLocalPortalSettings,
@@ -49,6 +51,12 @@ import {
   saveMentorshipRegistrationRecord,
   saveMentorProfileRecord
 } from './services/dataService';
+import { emitAdminOrMentorNotification } from './services/notificationStore';
+import {
+  mergeUniqueById,
+  subscribeCrossTabSync,
+  subscribeDemoSyncCollection
+} from './services/realtimeSync';
 import { UMKHeader, UMKTab } from './components/UMKHeader';
 import { UMKSidebar } from './components/UMKSidebar';
 import { UMKHomeFeed } from './components/UMKHomeFeed';
@@ -115,9 +123,12 @@ function MainApp() {
     }
   }, [theme]);
 
-  // Trigger top progress bar whenever navigating tabs
+  // Trigger top progress bar and reset scroll position whenever navigating tabs
   useEffect(() => {
     triggerTopNavigationProgress(400);
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, [activeTab]);
 
   // Handle idle session termination: close open modals and redirect to login
@@ -156,6 +167,7 @@ function MainApp() {
   const [maintenanceTickets, setMaintenanceTickets] = useState<MaintenanceTicket[]>([]);
   const [portalSettings, setPortalSettings] = useState<PortalSettings>(() => loadLocalPortalSettings());
   const [newsItems, setNewsItems] = useState<PortalNews[]>(INITIAL_PORTAL_NEWS);
+  const [grantEndorsements, setGrantEndorsements] = useState<GrantEndorsement[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Filters for Kapsul Niaga
@@ -229,22 +241,6 @@ function MainApp() {
     }
   });
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('kbelia_mentor_profiles', JSON.stringify(mentors));
-    } catch (e) {
-      console.warn(e);
-    }
-  }, [mentors]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('kbelia_mentorship_registrations', JSON.stringify(mentorshipRegistrations));
-    } catch (e) {
-      console.warn(e);
-    }
-  }, [mentorshipRegistrations]);
-
   // Strict role-based auto-routing & boundary enforcement
   useEffect(() => {
     if (!user) return;
@@ -303,8 +299,18 @@ function MainApp() {
       ...newReg,
       applicantId: newReg.applicantId || user?.uid
     };
-    setMentorshipRegistrations(prev => [withOwner, ...prev]);
+    setMentorshipRegistrations(prev => [withOwner, ...prev.filter(r => r.id !== withOwner.id)]);
     saveMentorshipRegistrationRecord(withOwner).catch(() => {});
+    emitAdminOrMentorNotification({
+      title: `Tempahan Sesi Mentor Baharu: ${withOwner.businessName}`,
+      message: `${withOwner.entrepreneurName} memohon sesi bimbingan (${withOwner.topic}) pada ${withOwner.preferredDate} (${withOwner.preferredTime}).`,
+      senderRole: 'user',
+      targetRole: 'mentor',
+      targetUserId: '',
+      sender: withOwner.entrepreneurName || 'Usahawan Belia',
+      type: 'mentorship',
+      actionTab: 'mentor'
+    });
   };
 
   // Helper to normalize legacy /public/assets paths into /assets
@@ -313,35 +319,62 @@ function MainApp() {
     return url.replace('/public/assets/generated', '/assets/generated');
   };
 
-  // 0. Portal Global Settings Listener
+  // 0. Portal Global Settings Listener (Firestore + DemoSync + Cross-Tab)
   useEffect(() => {
+    let remoteSettings: PortalSettings | null = null;
+    let demoSyncSettings: PortalSettings | null = null;
+
+    const recomputeSettings = () => {
+      if (isProductionAuthenticated() && remoteSettings) {
+        setPortalSettings({ ...DEFAULT_PORTAL_SETTINGS, ...remoteSettings });
+      } else if (demoSyncSettings) {
+        setPortalSettings({ ...DEFAULT_PORTAL_SETTINGS, ...demoSyncSettings });
+      } else {
+        setPortalSettings(loadLocalPortalSettings());
+      }
+    };
+
     const handleLocalSettings = (e: Event) => {
       const custom = e as CustomEvent<PortalSettings>;
       if (custom.detail) setPortalSettings(custom.detail);
     };
     window.addEventListener('kbelia_portal_settings_updated', handleLocalSettings);
 
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'settings') {
+        recomputeSettings();
+      }
+    });
+
     const unsubSettings = onSnapshot(
       doc(db, 'portal_settings', 'global'),
       (snap) => {
         if (snap.exists()) {
-          setPortalSettings({ ...DEFAULT_PORTAL_SETTINGS, ...snap.data() } as PortalSettings);
+          remoteSettings = { ...DEFAULT_PORTAL_SETTINGS, ...snap.data() } as PortalSettings;
+          recomputeSettings();
         }
       },
       () => {
-        setPortalSettings(loadLocalPortalSettings());
+        recomputeSettings();
       }
     );
 
+    const unsubDemoSettings = subscribeDemoSyncCollection<PortalSettings>('settings', (items) => {
+      const found = items.find((item) => item.id === 'global') || items[0] || null;
+      demoSyncSettings = found;
+      recomputeSettings();
+    });
+
     return () => {
       window.removeEventListener('kbelia_portal_settings_updated', handleLocalSettings);
+      unsubCrossTab();
       unsubSettings();
+      unsubDemoSettings();
     };
-  }, [refreshTrigger]);
+  }, [user?.uid, user?.isDemo, refreshTrigger]);
 
-  // 1. Public Catalog Listeners (Slots, Businesses, Products, Programs) + Demo localStorage merge
+  // 1. Public Catalog Listeners (Slots, Businesses, Products, Programs) + DemoSync + Cross-Tab merge
   useEffect(() => {
-    const deletedIds = getDeletedIds();
     const loadDemoSlots = (): CapsuleSlot[] => {
       try {
         return JSON.parse(localStorage.getItem('kbelia_demo_slots') || '[]');
@@ -350,49 +383,70 @@ function MainApp() {
       }
     };
 
-    const unsubSlots = onSnapshot(collection(db, 'capsule_slots'), (snapshot) => {
-      const deleted = getDeletedIds();
-      const loadedSlots: CapsuleSlot[] = [];
-      snapshot.forEach((docSnap) => {
-        if (!deleted.includes(docSnap.id)) {
+    let firestoreSlots: CapsuleSlot[] = [];
+    let demoSyncSlots: CapsuleSlot[] = [];
+    let demoSyncDeleted: string[] = [];
+
+    const recomputeSlots = () => {
+      const deleted = [...getDeletedIds(), ...demoSyncDeleted];
+      const demoExtra = loadDemoSlots();
+      const prodAuth = isProductionAuthenticated();
+      const priorityLists = prodAuth
+        ? [firestoreSlots, demoSyncSlots, demoExtra, INITIAL_CAPSULE_SLOTS]
+        : [demoSyncSlots, demoExtra, firestoreSlots, INITIAL_CAPSULE_SLOTS];
+      setSlots(mergeUniqueById<CapsuleSlot>(priorityLists, deleted));
+    };
+
+    recomputeSlots();
+
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'slot' || entity === 'booking' || entity === 'deleted') {
+        recomputeSlots();
+      }
+    });
+
+    const unsubSlots = onSnapshot(
+      collection(db, 'capsule_slots'),
+      (snapshot) => {
+        const loaded: CapsuleSlot[] = [];
+        snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           const seedSlot = INITIAL_CAPSULE_SLOTS.find(s => s.id === docSnap.id);
           const rawImg = normalizeAsset(data.imageUrl);
           const imageUrl = (!rawImg || rawImg.includes('kiosk_modular_kbelia'))
             ? (seedSlot?.imageUrl || rawImg || '/assets/generated/kiosk_modular_kbelia.jpg')
             : rawImg;
-          loadedSlots.push({
+          loaded.push({
             id: docSnap.id,
             ...data,
             imageUrl,
             amenities: Array.isArray(data.amenities) ? data.amenities : ['Palam Elektrik', 'WiFi 500Mbps', 'Rak Display']
           } as CapsuleSlot);
-        }
-      });
+        });
+        firestoreSlots = loaded;
+        recomputeSlots();
+      },
+      (err) => {
+        console.debug('Slots listener notice:', err?.message || err);
+        recomputeSlots();
+      }
+    );
 
-      const demoExtra = loadDemoSlots();
-      const seen = new Set(loadedSlots.map(s => s.id));
-      const merged = [
-        ...demoExtra.filter(d => !deleted.includes(d.id) && !seen.has(d.id)),
-        ...loadedSlots,
-        ...INITIAL_CAPSULE_SLOTS.filter(s => !seen.has(s.id) && !demoExtra.some(d => d.id === s.id) && !deleted.includes(s.id))
-      ];
-      setSlots(merged);
-    }, () => {
-      const demoExtra = loadDemoSlots();
-      const seen = new Set(demoExtra.map(s => s.id));
-      setSlots([
-        ...demoExtra.filter(d => !deletedIds.includes(d.id)),
-        ...INITIAL_CAPSULE_SLOTS.filter(s => !seen.has(s.id) && !deletedIds.includes(s.id))
-      ]);
+    const unsubDemoSlots = subscribeDemoSyncCollection<CapsuleSlot>('slot', (items, delIds) => {
+      demoSyncSlots = items;
+      demoSyncDeleted = delIds;
+      recomputeSlots();
     });
 
-    return () => unsubSlots();
-  }, [refreshTrigger]);
+    return () => {
+      unsubCrossTab();
+      unsubSlots();
+      unsubDemoSlots();
+    };
+  }, [user?.uid, user?.isDemo, refreshTrigger]);
 
   // 2. Real-time Businesses Listener
   useEffect(() => {
-    const deletedIds = getDeletedIds();
     const loadDemoBiz = (): BusinessListing[] => {
       try {
         return JSON.parse(localStorage.getItem('kbelia_demo_businesses') || '[]');
@@ -401,43 +455,66 @@ function MainApp() {
       }
     };
 
-    const unsubBiz = onSnapshot(collection(db, 'businesses'), (snapshot) => {
-      const deleted = getDeletedIds();
-      const loadedBiz: BusinessListing[] = [];
-      snapshot.forEach((docSnap) => {
-        if (!deleted.includes(docSnap.id)) {
+    let firestoreBiz: BusinessListing[] = [];
+    let demoSyncBiz: BusinessListing[] = [];
+    let demoSyncDeleted: string[] = [];
+
+    const recomputeBiz = () => {
+      const deleted = [...getDeletedIds(), ...demoSyncDeleted];
+      const demoExtra = loadDemoBiz();
+      const prodAuth = isProductionAuthenticated();
+      const priorityLists = prodAuth
+        ? [firestoreBiz, demoSyncBiz, demoExtra, INITIAL_BUSINESSES]
+        : [demoSyncBiz, demoExtra, firestoreBiz, INITIAL_BUSINESSES];
+      setBusinesses(mergeUniqueById<BusinessListing>(priorityLists, deleted));
+    };
+
+    recomputeBiz();
+
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'business' || entity === 'deleted') {
+        recomputeBiz();
+      }
+    });
+
+    const unsubBiz = onSnapshot(
+      collection(db, 'businesses'),
+      (snapshot) => {
+        const loaded: BusinessListing[] = [];
+        snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           const seedBiz = INITIAL_BUSINESSES.find(b => b.id === docSnap.id);
-          loadedBiz.push({
+          loaded.push({
             id: docSnap.id,
             ...data,
             bannerUrl: normalizeAsset(data.bannerUrl, seedBiz?.bannerUrl || '/assets/generated/banner_kelantan_landmark_1793924253242.jpg'),
             logoUrl: normalizeAsset(data.logoUrl, seedBiz?.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg')
           } as BusinessListing);
-        }
-      });
-      const demoExtra = loadDemoBiz();
-      const seen = new Set([...demoExtra.map(d => d.id), ...loadedBiz.map(b => b.id)]);
-      setBusinesses([
-        ...demoExtra.filter(d => !deleted.includes(d.id)),
-        ...loadedBiz.filter(b => !demoExtra.some(d => d.id === b.id)),
-        ...INITIAL_BUSINESSES.filter(b => !seen.has(b.id) && !deleted.includes(b.id))
-      ]);
-    }, () => {
-      const demoExtra = loadDemoBiz();
-      const seen = new Set(demoExtra.map(d => d.id));
-      setBusinesses([
-        ...demoExtra.filter(d => !deletedIds.includes(d.id)),
-        ...INITIAL_BUSINESSES.filter(b => !seen.has(b.id) && !deletedIds.includes(b.id))
-      ]);
+        });
+        firestoreBiz = loaded;
+        recomputeBiz();
+      },
+      (err) => {
+        console.debug('Businesses listener notice:', err?.message || err);
+        recomputeBiz();
+      }
+    );
+
+    const unsubDemoBiz = subscribeDemoSyncCollection<BusinessListing>('business', (items, delIds) => {
+      demoSyncBiz = items;
+      demoSyncDeleted = delIds;
+      recomputeBiz();
     });
 
-    return () => unsubBiz();
-  }, [refreshTrigger]);
+    return () => {
+      unsubCrossTab();
+      unsubBiz();
+      unsubDemoBiz();
+    };
+  }, [user?.uid, user?.isDemo, refreshTrigger]);
 
   // 3. Real-time Products Listener
   useEffect(() => {
-    const deletedIds = getDeletedIds();
     const loadDemoProd = (): ProductItem[] => {
       try {
         return JSON.parse(localStorage.getItem('kbelia_demo_products') || '[]');
@@ -446,42 +523,65 @@ function MainApp() {
       }
     };
 
-    const unsubProd = onSnapshot(collection(db, 'products'), (snapshot) => {
-      const deleted = getDeletedIds();
-      const loadedProd: ProductItem[] = [];
-      snapshot.forEach((docSnap) => {
-        if (!deleted.includes(docSnap.id)) {
+    let firestoreProd: ProductItem[] = [];
+    let demoSyncProd: ProductItem[] = [];
+    let demoSyncDeleted: string[] = [];
+
+    const recomputeProd = () => {
+      const deleted = [...getDeletedIds(), ...demoSyncDeleted];
+      const demoExtra = loadDemoProd();
+      const prodAuth = isProductionAuthenticated();
+      const priorityLists = prodAuth
+        ? [firestoreProd, demoSyncProd, demoExtra, INITIAL_PRODUCTS]
+        : [demoSyncProd, demoExtra, firestoreProd, INITIAL_PRODUCTS];
+      setProducts(mergeUniqueById<ProductItem>(priorityLists, deleted));
+    };
+
+    recomputeProd();
+
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'product' || entity === 'deleted') {
+        recomputeProd();
+      }
+    });
+
+    const unsubProd = onSnapshot(
+      collection(db, 'products'),
+      (snapshot) => {
+        const loaded: ProductItem[] = [];
+        snapshot.forEach((docSnap) => {
           const data = docSnap.data();
           const seedProd = INITIAL_PRODUCTS.find(p => p.id === docSnap.id);
-          loadedProd.push({
+          loaded.push({
             id: docSnap.id,
             ...data,
             imageUrl: normalizeAsset(data.imageUrl, seedProd?.imageUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg')
           } as ProductItem);
-        }
-      });
-      const demoExtra = loadDemoProd();
-      const seen = new Set([...demoExtra.map(d => d.id), ...loadedProd.map(p => p.id)]);
-      setProducts([
-        ...demoExtra.filter(d => !deleted.includes(d.id)),
-        ...loadedProd.filter(p => !demoExtra.some(d => d.id === p.id)),
-        ...INITIAL_PRODUCTS.filter(p => !seen.has(p.id) && !deleted.includes(p.id))
-      ]);
-    }, () => {
-      const demoExtra = loadDemoProd();
-      const seen = new Set(demoExtra.map(d => d.id));
-      setProducts([
-        ...demoExtra.filter(d => !deletedIds.includes(d.id)),
-        ...INITIAL_PRODUCTS.filter(p => !seen.has(p.id) && !deletedIds.includes(p.id))
-      ]);
+        });
+        firestoreProd = loaded;
+        recomputeProd();
+      },
+      (err) => {
+        console.debug('Products listener notice:', err?.message || err);
+        recomputeProd();
+      }
+    );
+
+    const unsubDemoProd = subscribeDemoSyncCollection<ProductItem>('product', (items, delIds) => {
+      demoSyncProd = items;
+      demoSyncDeleted = delIds;
+      recomputeProd();
     });
 
-    return () => unsubProd();
-  }, [refreshTrigger]);
+    return () => {
+      unsubCrossTab();
+      unsubProd();
+      unsubDemoProd();
+    };
+  }, [user?.uid, user?.isDemo, refreshTrigger]);
 
   // 4. Real-time Programs Listener
   useEffect(() => {
-    const deletedIds = getDeletedIds();
     const loadDemoProg = (): YouthProgram[] => {
       try {
         return JSON.parse(localStorage.getItem('kbelia_demo_programs') || '[]');
@@ -490,74 +590,86 @@ function MainApp() {
       }
     };
 
-    const unsubProg = onSnapshot(collection(db, 'programs'), (snapshot) => {
-      const deleted = getDeletedIds();
-      const loadedProg: YouthProgram[] = [];
-      snapshot.forEach((docSnap) => {
-        if (!deleted.includes(docSnap.id)) {
-          loadedProg.push({ id: docSnap.id, ...docSnap.data() } as YouthProgram);
-        }
-      });
+    let firestoreProg: YouthProgram[] = [];
+    let demoSyncProg: YouthProgram[] = [];
+    let demoSyncDeleted: string[] = [];
+
+    const recomputeProg = () => {
+      const deleted = [...getDeletedIds(), ...demoSyncDeleted];
       const demoExtra = loadDemoProg();
-      const seen = new Set([...demoExtra.map(d => d.id), ...loadedProg.map(p => p.id)]);
-      setPrograms([
-        ...demoExtra.filter(d => !deleted.includes(d.id)),
-        ...loadedProg.filter(p => !demoExtra.some(d => d.id === p.id)),
-        ...INITIAL_PROGRAMS.filter(p => !seen.has(p.id) && !deleted.includes(p.id))
-      ]);
-    }, () => {
-      const demoExtra = loadDemoProg();
-      const seen = new Set(demoExtra.map(d => d.id));
-      setPrograms([
-        ...demoExtra.filter(d => !deletedIds.includes(d.id)),
-        ...INITIAL_PROGRAMS.filter(p => !seen.has(p.id) && !deletedIds.includes(p.id))
-      ]);
+      const prodAuth = isProductionAuthenticated();
+      const priorityLists = prodAuth
+        ? [firestoreProg, demoSyncProg, demoExtra, INITIAL_PROGRAMS]
+        : [demoSyncProg, demoExtra, firestoreProg, INITIAL_PROGRAMS];
+      setPrograms(mergeUniqueById<YouthProgram>(priorityLists, deleted));
+    };
+
+    recomputeProg();
+
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'program' || entity === 'deleted') {
+        recomputeProg();
+      }
     });
 
-    return () => unsubProg();
-  }, [refreshTrigger]);
+    const unsubProg = onSnapshot(
+      collection(db, 'programs'),
+      (snapshot) => {
+        const loaded: YouthProgram[] = [];
+        snapshot.forEach((docSnap) => {
+          loaded.push({ id: docSnap.id, ...docSnap.data() } as YouthProgram);
+        });
+        firestoreProg = loaded;
+        recomputeProg();
+      },
+      (err) => {
+        console.debug('Programs listener notice:', err?.message || err);
+        recomputeProg();
+      }
+    );
 
-  // 4b. Real-time Portal News Listener (Admin sees all; Belia & Mentor see published only)
+    const unsubDemoProg = subscribeDemoSyncCollection<YouthProgram>('program', (items, delIds) => {
+      demoSyncProg = items;
+      demoSyncDeleted = delIds;
+      recomputeProg();
+    });
+
+    return () => {
+      unsubCrossTab();
+      unsubProg();
+      unsubDemoProg();
+    };
+  }, [user?.uid, user?.isDemo, refreshTrigger]);
+
+  // 4b. Real-time Portal News Listener (Published visible to all users; Admin sees drafts too)
   useEffect(() => {
-    const mergeAndScopeNews = (firestoreNews: PortalNews[]) => {
-      const deleted = getDeletedIds();
+    let firestoreNews: PortalNews[] = [];
+    let demoSyncNews: PortalNews[] = [];
+    let demoSyncDeleted: string[] = [];
+
+    const recomputeNews = () => {
+      const deleted = [...getDeletedIds(), ...demoSyncDeleted];
       const demoNews = loadLocalDemoNews();
-      const byId = new Map<string, PortalNews>();
-
-      for (const seed of INITIAL_PORTAL_NEWS) {
-        if (!deleted.includes(seed.id)) {
-          byId.set(seed.id, seed);
-        }
-      }
-      for (const fsItem of firestoreNews) {
-        if (!deleted.includes(fsItem.id)) {
-          byId.set(fsItem.id, fsItem);
-        }
-      }
-      for (const demoItem of demoNews) {
-        if (!deleted.includes(demoItem.id)) {
-          byId.set(demoItem.id, demoItem);
-        }
-      }
-
-      const merged = Array.from(byId.values());
+      const prodAuth = isProductionAuthenticated();
+      const priorityLists = prodAuth
+        ? [firestoreNews, demoSyncNews, demoNews, INITIAL_PORTAL_NEWS]
+        : [demoSyncNews, demoNews, firestoreNews, INITIAL_PORTAL_NEWS];
+      const merged = mergeUniqueById<PortalNews>(priorityLists, deleted);
       setNewsItems(isAdmin ? merged : merged.filter(n => n.status === 'published'));
     };
 
-    const handleDemoNewsUpdate = () => {
-      mergeAndScopeNews([]);
-    };
+    recomputeNews();
 
+    const handleDemoNewsUpdate = () => recomputeNews();
     window.addEventListener('kbelia_demo_news_updated', handleDemoNewsUpdate);
 
-    if (!user || user.isDemo || !auth.currentUser) {
-      mergeAndScopeNews([]);
-      return () => {
-        window.removeEventListener('kbelia_demo_news_updated', handleDemoNewsUpdate);
-      };
-    }
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'news' || entity === 'deleted') {
+        recomputeNews();
+      }
+    });
 
-    const newsQuery = isAdmin
+    const newsQuery = (isAdmin && isProductionAuthenticated())
       ? collection(db, 'portal_news')
       : query(collection(db, 'portal_news'), where('status', '==', 'published'));
 
@@ -568,201 +680,407 @@ function MainApp() {
         snapshot.forEach((docSnap) => {
           loaded.push({ id: docSnap.id, ...docSnap.data() } as PortalNews);
         });
-        mergeAndScopeNews(loaded);
+        firestoreNews = loaded;
+        recomputeNews();
       },
-      () => {
-        mergeAndScopeNews([]);
+      (err) => {
+        console.debug('News listener notice:', err?.message || err);
+        recomputeNews();
       }
     );
 
+    const unsubDemoNews = subscribeDemoSyncCollection<PortalNews>('news', (items, delIds) => {
+      demoSyncNews = items;
+      demoSyncDeleted = delIds;
+      recomputeNews();
+    });
+
     return () => {
       window.removeEventListener('kbelia_demo_news_updated', handleDemoNewsUpdate);
+      unsubCrossTab();
       unsubNews();
+      unsubDemoNews();
     };
   }, [user?.uid, user?.isDemo, isAdmin, refreshTrigger]);
 
-  // 5. Protected Collections Listeners (Strict Role & Ownership Isolation)
+  // 4c. Real-time Mentor Profiles Listener
   useEffect(() => {
-    const loadDemoProtectedState = () => {
+    const loadLocalMentors = (): MentorProfile[] => {
       try {
-        const deleted = getDeletedIds();
-        const demoBookings: CapsuleBooking[] = JSON.parse(localStorage.getItem('kbelia_demo_bookings') || '[]')
-          .filter((b: CapsuleBooking) => !deleted.includes(b.id));
-        const demoGrants: GrantApplication[] = JSON.parse(localStorage.getItem('kbelia_demo_grants') || '[]');
-        const demoTickets: MaintenanceTicket[] = JSON.parse(localStorage.getItem('kbelia_demo_maintenance_tickets') || '[]');
-
-        if (!user || isMentor) {
-          // Mentor & unauthenticated users have ZERO access to kiosk bookings, grant bank details, maintenance tickets, or youth cashflow
-          setBookings([]);
-          setGrantApplications([]);
-          setMaintenanceTickets([]);
-          setCashflowRecords([]);
-          return;
-        }
-
-        if (isAdmin) {
-          // Admin sees governance queues (bookings, grants, tickets), NEVER personal youth daily cashflow
-          setBookings(demoBookings);
-          setGrantApplications(demoGrants);
-          setMaintenanceTickets(demoTickets);
-          setCashflowRecords([]);
-          return;
-        }
-
-        // Authenticated Youth: strictly scoped to own UID
-        setBookings(demoBookings.filter(b => b.applicantId === user.uid));
-        setGrantApplications(demoGrants.filter(g => g.applicantId === user.uid));
-        setMaintenanceTickets(demoTickets.filter(t => t.ownerId === user.uid));
-        const cfRaw = localStorage.getItem(`kbelia_cashflow_records_${user.uid}`);
-        setCashflowRecords(cfRaw ? JSON.parse(cfRaw) : []);
+        const raw = localStorage.getItem('kbelia_mentor_profiles');
+        return raw ? JSON.parse(raw) : [];
       } catch {
-        // ignore
+        return [];
       }
     };
 
-    const handleDemoUpdate = () => {
-      loadDemoProtectedState();
-      setRefreshTrigger(prev => prev + 1);
+    let firestoreMentors: MentorProfile[] = [];
+    let demoSyncMentors: MentorProfile[] = [];
+
+    const recomputeMentors = () => {
+      const localMentors = loadLocalMentors();
+      const prodAuth = isProductionAuthenticated();
+      const priorityLists = prodAuth
+        ? [firestoreMentors, demoSyncMentors, localMentors, INITIAL_MENTOR_PROFILES]
+        : [demoSyncMentors, localMentors, firestoreMentors, INITIAL_MENTOR_PROFILES];
+      setMentors(mergeUniqueById<MentorProfile>(priorityLists));
     };
 
-    window.addEventListener('kbelia_demo_data_updated', handleDemoUpdate);
-    window.addEventListener('kbelia_cashflow_updated', handleDemoUpdate);
+    recomputeMentors();
 
-    // If unauthenticated or in Demo session, never attach protected Firestore snapshot listeners
-    if (!user || user.isDemo || !auth.currentUser) {
-      loadDemoProtectedState();
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'mentor') {
+        recomputeMentors();
+      }
+    });
+
+    const unsubMentors = onSnapshot(
+      collection(db, 'mentor_profiles'),
+      (snapshot) => {
+        const loaded: MentorProfile[] = [];
+        snapshot.forEach((docSnap) => {
+          loaded.push({ id: docSnap.id, ...docSnap.data() } as MentorProfile);
+        });
+        firestoreMentors = loaded;
+        recomputeMentors();
+      },
+      (err) => {
+        console.debug('Mentor profiles listener notice:', err?.message || err);
+        recomputeMentors();
+      }
+    );
+
+    const unsubDemoMentors = subscribeDemoSyncCollection<MentorProfile>('mentor', (items) => {
+      demoSyncMentors = items;
+      recomputeMentors();
+    });
+
+    return () => {
+      unsubCrossTab();
+      unsubMentors();
+      unsubDemoMentors();
+    };
+  }, [user?.uid, user?.isDemo, refreshTrigger]);
+
+  // 5. Protected Collections Listeners (Real-Time Firestore + DemoSync + Cross-Tab)
+  useEffect(() => {
+    const prodAuth = isProductionAuthenticated();
+
+    let prodBookings: CapsuleBooking[] = [];
+    let demoSyncBookings: CapsuleBooking[] = [];
+    let prodGrants: GrantApplication[] = [];
+    let demoSyncGrants: GrantApplication[] = [];
+    let prodTickets: MaintenanceTicket[] = [];
+    let demoSyncTickets: MaintenanceTicket[] = [];
+    let prodCashflow: KioskDailySale[] = [];
+    let demoSyncCashflow: KioskDailySale[] = [];
+    let prodSessions: MentorshipRegistration[] = [];
+    let demoSyncSessions: MentorshipRegistration[] = [];
+    let prodEndorsements: GrantEndorsement[] = [];
+    let demoSyncEndorsements: GrantEndorsement[] = [];
+
+    const readLocalArray = <T,>(key: string, fallback: T[] = []): T[] => {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    };
+
+    const recomputeProtectedState = () => {
+      const deleted = getDeletedIds();
+      const demoBookingsLocal = readLocalArray<CapsuleBooking>('kbelia_demo_bookings');
+      const demoGrantsLocal = readLocalArray<GrantApplication>('kbelia_demo_grants');
+      const demoTicketsLocal = readLocalArray<MaintenanceTicket>('kbelia_demo_maintenance_tickets');
+      const demoSessionsLocal = readLocalArray<MentorshipRegistration>('kbelia_mentorship_registrations', INITIAL_MENTORSHIP_REGISTRATIONS);
+      const demoEndorsementsLocal = readLocalArray<GrantEndorsement>('kbelia_mentor_endorsements_v1');
+
+      if (!user) {
+        setBookings([]);
+        setGrantApplications([]);
+        setMaintenanceTickets([]);
+        setCashflowRecords([]);
+        setMentorshipRegistrations([]);
+        setGrantEndorsements([]);
+        return;
+      }
+
+      if (isMentor) {
+        // Mentors never see bookings, grants, tickets, or cashflow
+        setBookings([]);
+        setGrantApplications([]);
+        setMaintenanceTickets([]);
+        setCashflowRecords([]);
+        const mentorSessionSource = prodAuth
+          ? mergeUniqueById<MentorshipRegistration>([prodSessions, demoSyncSessions], deleted)
+          : mergeUniqueById<MentorshipRegistration>([demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS], deleted);
+        setMentorshipRegistrations(mentorSessionSource);
+        const mentorEndSource = prodAuth
+          ? mergeUniqueById<GrantEndorsement>([prodEndorsements, demoSyncEndorsements], deleted)
+          : mergeUniqueById<GrantEndorsement>([demoSyncEndorsements, demoEndorsementsLocal], deleted);
+        setGrantEndorsements(mentorEndSource);
+        return;
+      }
+
+      if (isAdmin) {
+        // Admin sees governance queues across BOTH production & Demo/sandbox real-time streams
+        setBookings(mergeUniqueById<CapsuleBooking>([prodBookings, demoSyncBookings, demoBookingsLocal], deleted));
+        setGrantApplications(mergeUniqueById<GrantApplication>([prodGrants, demoSyncGrants, demoGrantsLocal], deleted));
+        setMaintenanceTickets(mergeUniqueById<MaintenanceTicket>([prodTickets, demoSyncTickets, demoTicketsLocal], deleted));
+        setCashflowRecords([]); // Privacy isolation: personal daily cashflow belongs strictly to owner
+        setMentorshipRegistrations(
+          mergeUniqueById<MentorshipRegistration>(
+            [prodSessions, demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS],
+            deleted
+          )
+        );
+        setGrantEndorsements(
+          mergeUniqueById<GrantEndorsement>([prodEndorsements, demoSyncEndorsements, demoEndorsementsLocal], deleted)
+        );
+        return;
+      }
+
+      // Youth Entrepreneur: strictly scoped to own UID
+      const allDemoBookings = mergeUniqueById<CapsuleBooking>([demoSyncBookings, demoBookingsLocal], deleted)
+        .filter(b => b.applicantId === user.uid);
+      setBookings(prodAuth ? mergeUniqueById<CapsuleBooking>([prodBookings, allDemoBookings], deleted) : allDemoBookings);
+
+      const allDemoGrants = mergeUniqueById<GrantApplication>([demoSyncGrants, demoGrantsLocal], deleted)
+        .filter(g => g.applicantId === user.uid || (user.email && g.applicantEmail?.toLowerCase() === user.email.toLowerCase()));
+      setGrantApplications(prodAuth ? mergeUniqueById<GrantApplication>([prodGrants, allDemoGrants], deleted) : allDemoGrants);
+
+      const allDemoTickets = mergeUniqueById<MaintenanceTicket>([demoSyncTickets, demoTicketsLocal], deleted)
+        .filter(t => t.ownerId === user.uid);
+      setMaintenanceTickets(prodAuth ? mergeUniqueById<MaintenanceTicket>([prodTickets, allDemoTickets], deleted) : allDemoTickets);
+
+      const cfLocal = readLocalArray<KioskDailySale>(`kbelia_cashflow_records_${user.uid}`);
+      const scopedDemoCashflow = mergeUniqueById<KioskDailySale>([demoSyncCashflow, cfLocal], deleted)
+        .filter(r => !r.ownerId || r.ownerId === user.uid);
+      setCashflowRecords(prodAuth ? prodCashflow : scopedDemoCashflow);
+
+      const youthSessionsSource = prodAuth
+        ? mergeUniqueById<MentorshipRegistration>([prodSessions, demoSyncSessions], deleted)
+        : mergeUniqueById<MentorshipRegistration>([demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS], deleted)
+            .filter(r => r.applicantId === user.uid || (user.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()));
+      setMentorshipRegistrations(youthSessionsSource);
+
+      const youthEndSource = prodAuth
+        ? mergeUniqueById<GrantEndorsement>([prodEndorsements, demoSyncEndorsements], deleted)
+        : mergeUniqueById<GrantEndorsement>([demoSyncEndorsements, demoEndorsementsLocal], deleted)
+            .filter(e => e.menteeId === user.uid);
+      setGrantEndorsements(youthEndSource);
+    };
+
+    recomputeProtectedState();
+
+    const handleLocalDemoUpdate = () => recomputeProtectedState();
+    window.addEventListener('kbelia_demo_data_updated', handleLocalDemoUpdate);
+    window.addEventListener('kbelia_cashflow_updated', handleLocalDemoUpdate);
+
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (['all', 'booking', 'grant', 'ticket', 'cashflow', 'session', 'endorsement', 'deleted'].includes(entity)) {
+        recomputeProtectedState();
+      }
+    });
+
+    if (!user) {
       return () => {
-        window.removeEventListener('kbelia_demo_data_updated', handleDemoUpdate);
-        window.removeEventListener('kbelia_cashflow_updated', handleDemoUpdate);
+        window.removeEventListener('kbelia_demo_data_updated', handleLocalDemoUpdate);
+        window.removeEventListener('kbelia_cashflow_updated', handleLocalDemoUpdate);
+        unsubCrossTab();
       };
     }
 
-    // Mentor has no read subscriptions on capsule_bookings, grant_applications, cashflow_records, or maintenance_tickets
     let unsubBookings = () => {};
-    if (isAdmin) {
-      unsubBookings = onSnapshot(collection(db, 'capsule_bookings'), (snapshot) => {
-        const deleted = getDeletedIds();
-        const loadedBookings: CapsuleBooking[] = [];
-        snapshot.forEach((docSnap) => {
-          if (!deleted.includes(docSnap.id)) {
-            loadedBookings.push({ id: docSnap.id, ...docSnap.data() } as CapsuleBooking);
-          }
-        });
-        setBookings(loadedBookings);
-      }, () => setBookings([]));
-    } else if (isAuthenticatedYouth) {
-      const myBookingsQ = query(collection(db, 'capsule_bookings'), where('applicantId', '==', user.uid));
-      unsubBookings = onSnapshot(myBookingsQ, (snapshot) => {
-        const deleted = getDeletedIds();
-        const loadedBookings: CapsuleBooking[] = [];
-        snapshot.forEach((docSnap) => {
-          if (!deleted.includes(docSnap.id)) {
-            loadedBookings.push({ id: docSnap.id, ...docSnap.data() } as CapsuleBooking);
-          }
-        });
-        setBookings(loadedBookings);
-      }, () => setBookings([]));
-    } else {
-      setBookings([]);
-    }
-
     let unsubGrants = () => {};
-    if (isAdmin) {
-      unsubGrants = onSnapshot(collection(db, 'grant_applications'), (snapshot) => {
-        const loaded: GrantApplication[] = [];
-        snapshot.forEach((docSnap) => {
-          loaded.push({ id: docSnap.id, ...docSnap.data() } as GrantApplication);
-        });
-        setGrantApplications(loaded);
-      }, () => setGrantApplications([]));
-    } else if (isAuthenticatedYouth) {
-      const myGrantsQ = query(collection(db, 'grant_applications'), where('applicantId', '==', user.uid));
-      unsubGrants = onSnapshot(myGrantsQ, (snapshot) => {
-        const loaded: GrantApplication[] = [];
-        snapshot.forEach((docSnap) => {
-          loaded.push({ id: docSnap.id, ...docSnap.data() } as GrantApplication);
-        });
-        setGrantApplications(loaded);
-      }, () => setGrantApplications([]));
-    } else {
-      setGrantApplications([]);
-    }
-
     let unsubCashflow = () => {};
-    if (isAuthenticatedYouth) {
-      const myCashflowQ = query(collection(db, 'cashflow_records'), where('ownerId', '==', user.uid));
-      unsubCashflow = onSnapshot(myCashflowQ, (snapshot) => {
-        const loaded: KioskDailySale[] = [];
-        snapshot.forEach((docSnap) => {
-          loaded.push({ id: docSnap.id, ...docSnap.data() } as KioskDailySale);
-        });
-        setCashflowRecords(loaded);
-      }, () => setCashflowRecords([]));
-    } else {
-      setCashflowRecords([]);
-    }
-
     let unsubTickets = () => {};
-    if (isAdmin) {
-      unsubTickets = onSnapshot(collection(db, 'maintenance_tickets'), (snapshot) => {
-        const loaded: MaintenanceTicket[] = [];
-        snapshot.forEach((docSnap) => {
-          loaded.push({ id: docSnap.id, ...docSnap.data() } as MaintenanceTicket);
-        });
-        setMaintenanceTickets(loaded);
-      }, () => setMaintenanceTickets([]));
-    } else if (isAuthenticatedYouth) {
-      const myTicketsQ = query(collection(db, 'maintenance_tickets'), where('ownerId', '==', user.uid));
-      unsubTickets = onSnapshot(myTicketsQ, (snapshot) => {
-        const loaded: MaintenanceTicket[] = [];
-        snapshot.forEach((docSnap) => {
-          loaded.push({ id: docSnap.id, ...docSnap.data() } as MaintenanceTicket);
-        });
-        setMaintenanceTickets(loaded);
-      }, () => setMaintenanceTickets([]));
-    } else {
-      setMaintenanceTickets([]);
+    let unsubMentorSessions = () => {};
+    let unsubEndorsements = () => {};
+
+    if (prodAuth && auth.currentUser) {
+      if (isAdmin) {
+        unsubBookings = onSnapshot(
+          collection(db, 'capsule_bookings'),
+          (snap) => {
+            prodBookings = snap.docs.map(d => ({ id: d.id, ...d.data() } as CapsuleBooking));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Bookings admin listener error:', err)
+        );
+
+        unsubGrants = onSnapshot(
+          collection(db, 'grant_applications'),
+          (snap) => {
+            prodGrants = snap.docs.map(d => ({ id: d.id, ...d.data() } as GrantApplication));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Grants admin listener error:', err)
+        );
+
+        unsubTickets = onSnapshot(
+          collection(db, 'maintenance_tickets'),
+          (snap) => {
+            prodTickets = snap.docs.map(d => ({ id: d.id, ...d.data() } as MaintenanceTicket));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Tickets admin listener error:', err)
+        );
+
+        unsubMentorSessions = onSnapshot(
+          collection(db, 'mentor_sessions'),
+          (snap) => {
+            prodSessions = snap.docs.map(d => ({ id: d.id, ...d.data() } as MentorshipRegistration));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Mentor sessions admin listener error:', err)
+        );
+
+        unsubEndorsements = onSnapshot(
+          collection(db, 'mentor_endorsements'),
+          (snap) => {
+            prodEndorsements = snap.docs.map(d => ({ id: d.id, ...d.data() } as GrantEndorsement));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Mentor endorsements admin listener error:', err)
+        );
+      } else if (isMentor && userProfile?.mentorId) {
+        unsubMentorSessions = onSnapshot(
+          query(collection(db, 'mentor_sessions'), where('mentorId', '==', userProfile.mentorId)),
+          (snap) => {
+            prodSessions = snap.docs.map(d => ({ id: d.id, ...d.data() } as MentorshipRegistration));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Mentor sessions listener error:', err)
+        );
+
+        unsubEndorsements = onSnapshot(
+          query(collection(db, 'mentor_endorsements'), where('mentorId', '==', userProfile.mentorId)),
+          (snap) => {
+            prodEndorsements = snap.docs.map(d => ({ id: d.id, ...d.data() } as GrantEndorsement));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Mentor endorsements listener error:', err)
+        );
+      } else if (isAuthenticatedYouth) {
+        unsubBookings = onSnapshot(
+          query(collection(db, 'capsule_bookings'), where('applicantId', '==', user.uid)),
+          (snap) => {
+            prodBookings = snap.docs.map(d => ({ id: d.id, ...d.data() } as CapsuleBooking));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Youth bookings listener error:', err)
+        );
+
+        unsubGrants = onSnapshot(
+          query(collection(db, 'grant_applications'), where('applicantId', '==', user.uid)),
+          (snap) => {
+            prodGrants = snap.docs.map(d => ({ id: d.id, ...d.data() } as GrantApplication));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Youth grants listener error:', err)
+        );
+
+        unsubCashflow = onSnapshot(
+          query(collection(db, 'cashflow_records'), where('ownerId', '==', user.uid)),
+          (snap) => {
+            prodCashflow = snap.docs.map(d => ({ id: d.id, ...d.data() } as KioskDailySale));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Youth cashflow listener error:', err)
+        );
+
+        unsubTickets = onSnapshot(
+          query(collection(db, 'maintenance_tickets'), where('ownerId', '==', user.uid)),
+          (snap) => {
+            prodTickets = snap.docs.map(d => ({ id: d.id, ...d.data() } as MaintenanceTicket));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Youth tickets listener error:', err)
+        );
+
+        unsubMentorSessions = onSnapshot(
+          query(collection(db, 'mentor_sessions'), where('applicantId', '==', user.uid)),
+          (snap) => {
+            prodSessions = snap.docs.map(d => ({ id: d.id, ...d.data() } as MentorshipRegistration));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Youth sessions listener error:', err)
+        );
+
+        unsubEndorsements = onSnapshot(
+          query(collection(db, 'mentor_endorsements'), where('menteeId', '==', user.uid)),
+          (snap) => {
+            prodEndorsements = snap.docs.map(d => ({ id: d.id, ...d.data() } as GrantEndorsement));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Youth endorsements listener error:', err)
+        );
+      }
     }
 
-    let unsubMentorSessions = () => {};
-    if (isAdmin) {
-      unsubMentorSessions = onSnapshot(collection(db, 'mentor_sessions'), (snapshot) => {
-        if (!snapshot.empty) {
-          const loaded: MentorshipRegistration[] = [];
-          snapshot.forEach((docSnap) => loaded.push({ id: docSnap.id, ...docSnap.data() } as MentorshipRegistration));
-          setMentorshipRegistrations(loaded);
+    // Real-time DemoSync listeners for Demo sessions and Admin monitoring
+    let unsubDemoBookings = () => {};
+    let unsubDemoGrants = () => {};
+    let unsubDemoTickets = () => {};
+    let unsubDemoCashflow = () => {};
+    let unsubDemoSessions = () => {};
+    let unsubDemoEndorsements = () => {};
+
+    if (!prodAuth || isAdmin) {
+      if (!isMentor) {
+        unsubDemoBookings = subscribeDemoSyncCollection<CapsuleBooking>('booking', (items) => {
+          demoSyncBookings = items;
+          recomputeProtectedState();
+        });
+        unsubDemoGrants = subscribeDemoSyncCollection<GrantApplication>('grant', (items) => {
+          demoSyncGrants = items;
+          recomputeProtectedState();
+        });
+        unsubDemoTickets = subscribeDemoSyncCollection<MaintenanceTicket>('ticket', (items) => {
+          demoSyncTickets = items;
+          recomputeProtectedState();
+        });
+        if (!isAdmin) {
+          unsubDemoCashflow = subscribeDemoSyncCollection<KioskDailySale>('cashflow', (items) => {
+            demoSyncCashflow = items;
+            recomputeProtectedState();
+          });
         }
-      }, () => {});
-    } else if (isMentor && userProfile?.mentorId) {
-      const mentorSessQ = query(collection(db, 'mentor_sessions'), where('mentorId', '==', userProfile.mentorId));
-      unsubMentorSessions = onSnapshot(mentorSessQ, (snapshot) => {
-        const loaded: MentorshipRegistration[] = [];
-        snapshot.forEach((docSnap) => loaded.push({ id: docSnap.id, ...docSnap.data() } as MentorshipRegistration));
-        if (loaded.length > 0) setMentorshipRegistrations(loaded);
-      }, () => {});
-    } else if (isAuthenticatedYouth) {
-      const youthSessQ = query(collection(db, 'mentor_sessions'), where('applicantId', '==', user.uid));
-      unsubMentorSessions = onSnapshot(youthSessQ, (snapshot) => {
-        const loaded: MentorshipRegistration[] = [];
-        snapshot.forEach((docSnap) => loaded.push({ id: docSnap.id, ...docSnap.data() } as MentorshipRegistration));
-        if (loaded.length > 0) setMentorshipRegistrations(loaded);
-      }, () => {});
+      }
+      unsubDemoSessions = subscribeDemoSyncCollection<MentorshipRegistration>('session', (items) => {
+        demoSyncSessions = items;
+        recomputeProtectedState();
+      });
+      unsubDemoEndorsements = subscribeDemoSyncCollection<GrantEndorsement>('endorsement', (items) => {
+        demoSyncEndorsements = items;
+        recomputeProtectedState();
+      });
     }
 
     return () => {
-      window.removeEventListener('kbelia_demo_data_updated', handleDemoUpdate);
-      window.removeEventListener('kbelia_cashflow_updated', handleDemoUpdate);
+      window.removeEventListener('kbelia_demo_data_updated', handleLocalDemoUpdate);
+      window.removeEventListener('kbelia_cashflow_updated', handleLocalDemoUpdate);
+      unsubCrossTab();
       unsubBookings();
       unsubGrants();
       unsubCashflow();
       unsubTickets();
       unsubMentorSessions();
+      unsubEndorsements();
+      unsubDemoBookings();
+      unsubDemoGrants();
+      unsubDemoTickets();
+      unsubDemoCashflow();
+      unsubDemoSessions();
+      unsubDemoEndorsements();
     };
-  }, [user?.uid, user?.isDemo, isAdmin, isMentor, isAuthenticatedYouth, userProfile?.mentorId, refreshTrigger]);
+  }, [user?.uid, user?.isDemo, user?.email, isAdmin, isMentor, isAuthenticatedYouth, userProfile?.mentorId, refreshTrigger]);
 
-  // Auto-seed catalog once only when authenticated as Firebase Admin
+  // Auto-seed catalog once only when authenticated as Firebase Production Admin
   useEffect(() => {
-    if (!user || user.isDemo || !auth.currentUser || !isAdmin) return;
+    if (!user || !isProductionAuthenticated() || !isAdmin) return;
     try {
       const seeded = localStorage.getItem('kbelia_seeded_v30');
       if (!seeded) {
@@ -1358,9 +1676,9 @@ function MainApp() {
                   <Lock className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Ruang Niaga B2B Usahawan Sahaja</h3>
+                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Ruang Niaga Usahawan Sahaja</h3>
                   <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
-                    Pasaran B2B dikhaskan untuk rantaian bekalan dan kerjasama antara usahawan belia.
+                    Ruang Niaga dikhaskan untuk rantaian bekalan dan kerjasama antara usahawan belia.
                   </p>
                 </div>
                 <button

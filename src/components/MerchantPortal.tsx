@@ -61,9 +61,11 @@ import {
   updateBookingStatus,
   createMaintenanceTicket
 } from '../services/dataService';
+import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { KioskCashflowTracker } from './KioskCashflowTracker';
 import { UserDocumentsVault } from './UserDocumentsVault';
 import { ImageDropzone } from './ImageDropzone';
+import { EditProductModal } from './EditProductModal';
 import { showToast } from './ToastNotification';
 import { SaaSKpiCard, SparkPoint } from './SaaSKpiCard';
 import {
@@ -79,6 +81,34 @@ import {
 } from 'recharts';
 import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
 import confetti from 'canvas-confetti';
+
+const DEFAULT_PRODUCT_IMAGE = '/assets/generated/product_kelantan_delights_1793924253401.jpg';
+
+const ProductRowThumbnail: React.FC<{ src?: string; alt: string }> = ({ src, alt }) => {
+  const [hasError, setHasError] = useState(false);
+
+  React.useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
+  if (!src || hasError) {
+    return (
+      <div className="w-20 h-20 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 text-black/40 dark:text-white/40">
+        <ShoppingBag className="w-6 h-6" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      referrerPolicy="no-referrer"
+      onError={() => setHasError(true)}
+      className="w-20 h-20 rounded-xl object-cover bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shrink-0"
+    />
+  );
+};
 
 interface MerchantPortalProps {
   myBusiness: BusinessListing | null;
@@ -211,7 +241,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const [prodPrice, setProdPrice] = useState('');
   const [prodDesc, setProdDesc] = useState('');
   const [prodCategory, setProdCategory] = useState('Menu Utama');
-  const [prodImageUrl, setProdImageUrl] = useState('/assets/generated/product_kelantan_delights_1793924253401.jpg');
+  const [prodImageUrl, setProdImageUrl] = useState(DEFAULT_PRODUCT_IMAGE);
+  const [prodInStock, setProdInStock] = useState(true);
+  const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
 
   // Booking action states
   const [selectedReceiptBooking, setSelectedReceiptBooking] = useState<CapsuleBooking | null>(null);
@@ -264,7 +296,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       await saveBusinessListing({
         id: myBusiness?.id,
         ownerId: user.uid,
-        ownerName: user.displayName || userProfile?.fullName || 'Usahawan Belia',
+        ownerName: userProfile?.fullName || user.displayName || 'Usahawan Belia',
         ownerEmail: user.email || '',
         ownerPhone: whatsapp,
         businessName,
@@ -312,21 +344,26 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         ownerId: user.uid,
         name: prodName.trim(),
         price: parsedPrice,
-        description: prodDesc,
-        category: prodCategory,
-        imageUrl: prodImageUrl,
-        inStock: true
+        description: prodDesc.trim(),
+        category: prodCategory.trim() || 'Umum',
+        imageUrl: prodImageUrl || DEFAULT_PRODUCT_IMAGE,
+        inStock: prodInStock
       });
 
       setProdName('');
       setProdPrice('');
       setProdDesc('');
+      setProdCategory('Menu Utama');
+      setProdImageUrl(DEFAULT_PRODUCT_IMAGE);
+      setProdInStock(true);
       setShowAddProduct(false);
       setMessage({ type: 'success', text: 'Produk baharu berjaya ditambah ke katalog!' });
+      showToast('Produk baharu berjaya ditambah ke katalog!', 'success');
       onRefresh();
     } catch (err) {
       console.error(err);
       setMessage({ type: 'error', text: 'Gagal menambah produk.' });
+      showToast('Gagal menambah produk.', 'error');
     } finally {
       setLoading(false);
     }
@@ -336,9 +373,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     try {
       await deleteProduct(id);
       setMessage({ type: 'success', text: 'Produk telah dipadam dari katalog.' });
+      showToast('Produk telah dipadam dari katalog.', 'success');
       onRefresh();
     } catch (err) {
       console.error(err);
+      setMessage({ type: 'error', text: 'Gagal memadam produk. Sila cuba lagi.' });
+      showToast('Gagal memadam produk. Sila cuba lagi.', 'error');
     }
   };
 
@@ -358,7 +398,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           Urus Bisnes & Kapsul Saya
         </h2>
         <p className="text-xs text-black dark:text-white/75 mt-0.5">
-          Selamat kembali, <span className="font-semibold text-black dark:text-white">{user.displayName || 'Usahawan Belia'}</span> ({user.email})
+          Selamat kembali, <span className="font-semibold text-black dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span>
         </p>
       </div>
 
@@ -1362,19 +1402,26 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       )}
 
       {/* Tab 2: Products */}
-      {activeTab === 'products' && (
+      {activeTab === 'products' && (() => {
+        const inStockCount = safeProducts.filter((p) => p.inStock !== false).length;
+        return (
         <div className="mt-6 space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-base font-bold text-black dark:text-white">Katalog Menu & Produk Anda</h3>
-              <p className="text-xs text-black dark:text-white/75">Pelanggan boleh membuat pesanan terus melalui WhatsApp.</p>
+              <p className="text-xs text-black/75 dark:text-white/75 mt-0.5">
+                {safeProducts.length > 0
+                  ? `${safeProducts.length} produk disenaraikan · ${inStockCount} stok tersedia`
+                  : 'Pelanggan boleh membuat pesanan terus melalui WhatsApp.'}
+              </p>
             </div>
 
             <button
+              type="button"
               onClick={() => setShowAddProduct(!showAddProduct)}
-              className="py-2.5 px-5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm cursor-pointer transition-all dark:bg-blue-600"
+              className="min-h-[40px] py-2.5 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap shrink-0 shadow-sm cursor-pointer transition-all"
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-4 h-4 shrink-0" />
               <span>Daftar Produk Baharu</span>
             </button>
           </div>
@@ -1390,7 +1437,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAddProduct(false)}
-                  className="p-1 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
+                  aria-label="Tutup borang tambah produk"
+                  className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1400,20 +1448,21 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Nama Produk: <span className="text-black/70 dark:text-white/75">*</span>
+                      Nama Produk: <span className="text-rose-600 dark:text-rose-400">*</span>
                     </label>
                     <input
                       type="text"
                       required
+                      maxLength={150}
                       placeholder="Nama produk anda"
                       value={prodName}
                       onChange={(e) => setProdName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all font-medium dark:focus:border-blue-500"
+                      className="w-full px-4 py-3 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium"
                     />
                   </div>
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Harga Jualan (RM): <span className="text-black/70 dark:text-white/75">*</span>
+                      Harga Jualan (RM): <span className="text-rose-600 dark:text-rose-400">*</span>
                     </label>
                     <input
                       type="number"
@@ -1423,7 +1472,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       placeholder="0.00"
                       value={prodPrice}
                       onChange={(e) => setProdPrice(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                      className="w-full px-4 py-3 rounded-xl text-xs sm:text-sm font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
                     />
                   </div>
                   <div>
@@ -1432,25 +1481,61 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </label>
                     <input
                       type="text"
+                      maxLength={60}
                       placeholder="Kategori produk"
                       value={prodCategory}
                       onChange={(e) => setProdCategory(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                      className="w-full px-4 py-3 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
                     />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
+                    Status Ketersediaan Stok:
+                  </label>
+                  <div className="grid grid-cols-2 gap-3 sm:max-w-md">
+                    <button
+                      type="button"
+                      aria-pressed={prodInStock}
+                      onClick={() => setProdInStock(true)}
+                      className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+                        prodInStock
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 dark:border-emerald-600 text-emerald-800 dark:text-emerald-300 shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      <span>Stok Tersedia</span>
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={!prodInStock}
+                      onClick={() => setProdInStock(false)}
+                      className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+                        !prodInStock
+                          ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 dark:border-rose-600 text-rose-800 dark:text-rose-300 shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <XCircle className="w-4 h-4 shrink-0" />
+                      <span>Kehabisan Stok</span>
+                    </button>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Penerangan Produk & Keistimewaan:
+                      Penerangan Produk &amp; Keistimewaan:
                     </label>
                     <textarea
-                      rows={3}
+                      rows={4}
+                      maxLength={1000}
                       placeholder="Penerangan ringkas produk..."
                       value={prodDesc}
                       onChange={(e) => setProdDesc(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                      className="w-full px-4 py-3 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
                     />
                   </div>
                   <div>
@@ -1471,16 +1556,16 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowAddProduct(false)}
-                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                    className="min-h-[40px] py-2.5 px-5 rounded-xl text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 whitespace-nowrap transition-all cursor-pointer"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-[0.98] disabled:opacity-50 dark:bg-blue-600"
+                    className="min-h-[40px] py-2.5 px-6 rounded-xl text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer active:scale-[0.98] disabled:opacity-50"
                   >
-                    <Save className="w-4 h-4" />
+                    <Save className="w-4 h-4 shrink-0" />
                     <span>{loading ? 'Menyimpan...' : `Simpan Produk Ini (RM${prodPrice ? Number(prodPrice).toFixed(2) : '0.00'})`}</span>
                   </button>
                 </div>
@@ -1496,44 +1581,94 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <p className="text-xs text-black/70 dark:text-white/75 mt-0.5">Tekan butang di atas untuk memasukkan produk pertama anda.</p>
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {safeProducts.map((prod) => (
-                <div
-                  key={prod.id}
-                  className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs flex gap-3 items-center justify-between transition-colors"
-                >
-                  <img
-                    src={prod.imageUrl}
-                    alt={prod.name}
-                    className="w-16 h-16 rounded-xl object-cover bg-slate-50 dark:bg-slate-900 shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h5 className="font-bold text-xs text-black dark:text-white truncate">{prod.name}</h5>
-                    <p className="text-[11px] text-black/70 dark:text-white/75 truncate">{prod.category}</p>
-                    <div className="text-xs font-extrabold text-black dark:text-white/75 mt-1">
-                      RM{prod.price.toFixed(2)}
+            <div className="space-y-3">
+              {safeProducts.map((prod) => {
+                const isAvailable = prod.inStock !== false;
+                const formattedPrice = `RM${Number(prod.price || 0).toFixed(2)}`;
+                return (
+                  <div
+                    key={prod.id}
+                    className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 shadow-2xs flex flex-col sm:flex-row sm:items-center gap-4 transition-colors"
+                  >
+                    {/* Left: Image & Product Info */}
+                    <div className="flex items-start sm:items-center gap-4 flex-1 min-w-0">
+                      <ProductRowThumbnail src={prod.imageUrl} alt={prod.name} />
+
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <h5 className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
+                          {prod.name}
+                        </h5>
+
+                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs">
+                          <span className="font-medium text-black/75 dark:text-white/75">
+                            {prod.category || 'Umum'}
+                          </span>
+                          <span className="text-black/35 dark:text-white/35" aria-hidden="true">·</span>
+                          {isAvailable ? (
+                            <span className="inline-flex items-center gap-1 font-semibold text-emerald-700 dark:text-emerald-400">
+                              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                              <span>Stok Tersedia</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 font-semibold text-rose-700 dark:text-rose-400">
+                              <XCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>Kehabisan Stok</span>
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-xs text-black/70 dark:text-white/75 line-clamp-2 leading-relaxed">
+                          {prod.description?.trim() ? prod.description : 'Tiada penerangan produk ditambah.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right: Price & Action Buttons */}
+                    <div className="flex flex-row sm:flex-col lg:flex-row items-center sm:items-end lg:items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-200/80 dark:border-slate-700/80">
+                      <div className="text-base sm:text-lg font-extrabold font-mono tabular-nums text-black dark:text-white whitespace-nowrap">
+                        {formattedPrice}
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setEditingProduct(prod)}
+                          title={`Sunting ${prod.name}`}
+                          className="min-h-[40px] px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 dark:bg-slate-900 dark:hover:bg-blue-950/60 border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 text-black dark:text-white text-xs font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer"
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                          <span>Edit</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            confirmDelete({
+                              title: 'Adakah Anda Ingin Padam?',
+                              itemName: prod.name,
+                              itemType: 'Produk Katalog',
+                              description: `Produk berharga ${formattedPrice} (${prod.category || 'Umum'}) akan dipadam secara kekal daripada katalog anda.`,
+                              confirmLabel: 'Ya, Padam',
+                              cancelLabel: 'Tidak',
+                              onConfirm: () => handleDeleteProd(prod.id)
+                            })
+                          }
+                          title={`Padam ${prod.name}`}
+                          className="min-h-[40px] px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-950/70 border border-rose-200 dark:border-rose-800/70 text-rose-700 dark:text-rose-300 text-xs font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                          <span>Padam</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      confirmDelete({
-                        itemName: prod.name,
-                        itemType: 'Produk Katalog',
-                        onConfirm: () => handleDeleteProd(prod.id)
-                      })
-                    }
-                    title={`Padam ${prod.name}`}
-                    className="p-2 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
 
       {/* Tab 3: Capsule Bookings */}
       {activeTab === 'bookings' && (
@@ -2010,6 +2145,16 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             description: `[${complaintType}] ${complaintNotes.trim()}`
                           });
                           setComplaintSuccess(`Tiket aduan ${created.id} didaftarkan bagi kategori "${complaintType}".`);
+                          emitAdminOrMentorNotification({
+                            title: `Tiket Aduan Fasiliti: ${maintenanceComplaintBooking.slotCode}`,
+                            message: `${userProfile?.fullName || user.displayName || maintenanceComplaintBooking.applicantName} melaporkan isu "${complaintType}" di ${maintenanceComplaintBooking.slotName}.`,
+                            senderRole: 'user',
+                            targetRole: 'admin',
+                            targetUserId: '',
+                            sender: userProfile?.fullName || user.displayName || 'Usahawan Belia',
+                            type: 'kiosk',
+                            actionTab: 'admin'
+                          });
                           showToast({
                             type: 'success',
                             title: 'Aduan Fasiliti Diterima',
@@ -2141,6 +2286,18 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         </div>
       )}
 
+      {/* Edit Product Modal */}
+      <EditProductModal
+        isOpen={Boolean(editingProduct)}
+        product={editingProduct}
+        onClose={() => setEditingProduct(null)}
+        onSaved={(updated) => {
+          setEditingProduct(null);
+          setMessage({ type: 'success', text: `Maklumat produk "${updated.name}" berjaya dikemaskini.` });
+          showToast(`Produk "${updated.name}" berjaya dikemaskini.`, 'success');
+          onRefresh();
+        }}
+      />
     </div>
   );
 };

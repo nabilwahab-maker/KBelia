@@ -155,8 +155,8 @@ export const EventsSection: React.FC = () => {
           </h1>
           <p className="text-xs sm:text-sm text-black dark:text-white mt-2 leading-relaxed">
             {isEn
-              ? 'Book popup stalls, attend halal certification workshops, and meet investors across 10 Kelantan districts.'
-              : 'Tempah tapak jualan gerai karnival, sertai bengkel pensijilan halal, dan temui rakan niaga di seluruh 10 jajahan.'}
+              ? 'Book popup stalls, attend halal certification workshops, and meet investors across Kelantan.'
+              : 'Tempah tapak jualan gerai karnival, sertai bengkel pensijilan halal, dan temui rakan niaga di seluruh Kelantan.'}
           </p>
         </div>
       </div>
@@ -194,7 +194,7 @@ export const EventsSection: React.FC = () => {
             onChange={(e) => setSelectedDistrict(e.target.value)}
             className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
           >
-            <option value="all">{isEn ? 'All 10 Districts' : 'Semua Jajahan'}</option>
+            <option value="all">{isEn ? 'Across Kelantan' : 'Seluruh Kelantan'}</option>
             <option value="Kota Bharu">Kota Bharu</option>
             <option value="Bachok">Bachok</option>
             <option value="Pasir Mas">Pasir Mas</option>

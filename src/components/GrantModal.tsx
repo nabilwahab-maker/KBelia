@@ -16,6 +16,7 @@ import {
 import { BusinessCategory, GrantApplication, PortalSettings } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { createGrantApplication } from '../services/dataService';
+import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import confetti from 'canvas-confetti';
 import { Accordion } from './Accordion';
 import { showToast } from './ToastNotification';
@@ -134,6 +135,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
         applicantPhone: userProfile?.phone || '-',
         businessName: businessName.trim(),
         businessCategory,
+        district,
         ssmNumber: ssmNumber.trim() || 'Dalam Proses / Tiada',
         bankName,
         bankAccountNumber: bankAccountNumber.replace(/[\s-]/g, ''),
@@ -142,6 +144,16 @@ export const GrantModal: React.FC<GrantModalProps> = ({
 
       confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
       setSubmitted(true);
+      emitAdminOrMentorNotification({
+        title: `Permohonan Geran Baharu: ${grantAmount}`,
+        message: `${businessName.trim()} memohon ${programTitle} bagi jajahan ${district}.`,
+        senderRole: 'user',
+        targetRole: 'admin',
+        targetUserId: '',
+        sender: userProfile?.fullName || user.displayName || 'Usahawan Belia',
+        type: 'grant',
+        actionTab: 'admin'
+      });
       showToast({
         type: 'success',
         title: 'Permohonan Geran Berjaya Dihantar!',
@@ -230,7 +242,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               </div>
               <h4 className="text-xl font-bold text-black dark:text-white">Permohonan Geran Diterima!</h4>
               <p className="text-sm text-black dark:text-white max-w-md mx-auto leading-relaxed">
-                Terima kasih, <strong>{user?.displayName || 'Usahawan Belia'}</strong>. Permohonan anda bagi <strong>{programTitle}</strong> bernilai <strong>{grantAmount}</strong> telah direkodkan. Urusetia akan menghubungi anda melalui WhatsApp untuk pengesahan dokumen.
+                Terima kasih, <strong>{userProfile?.fullName || user?.displayName || 'Usahawan Belia'}</strong>. Permohonan anda bagi <strong>{programTitle}</strong> bernilai <strong>{grantAmount}</strong> telah direkodkan. Urusetia akan menghubungi anda melalui WhatsApp untuk pengesahan dokumen.
               </p>
               <div className="pt-3">
                 <button
@@ -517,7 +529,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
 
               {/* Auto-filled Identity Chip */}
               <div className="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs text-black dark:text-white/75">
-                <span>Pemohon Berdaftar: <strong className="text-black dark:text-white">{user?.displayName || userProfile?.fullName || 'Usahawan Belia'}</strong></span>
+                <span>Pemohon Berdaftar: <strong className="text-black dark:text-white">{userProfile?.fullName || user?.displayName || 'Usahawan Belia'}</strong></span>
                 <span>Emel Urusetia: <strong className="text-black dark:text-white">{user?.email || 'N/A'}</strong></span>
               </div>
 

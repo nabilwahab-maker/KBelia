@@ -347,7 +347,7 @@
         "message": { "type": "string", "maxLength": 1000 },
         "category": { "type": "string", "enum": ["status", "announcement", "reminder"] },
         "sender": { "type": "string", "maxLength": 120 },
-        "senderRole": { "type": "string", "enum": ["admin", "mentor", "system"] },
+        "senderRole": { "type": "string", "enum": ["admin", "mentor", "user", "system"] },
         "targetRole": { "type": "string", "enum": ["youth", "mentor", "admin", "all"] },
         "targetUserId": { "type": "string", "maxLength": 128 },
         "timestamp": { "type": "string", "maxLength": 60 },
@@ -392,6 +392,24 @@
         "createdAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "title", "summary", "content", "category", "status", "isPinned", "authorId", "authorName", "updatedAt", "createdAt"]
+    },
+    "DemoSyncRecord": {
+      "title": "DemoSyncRecord",
+      "description": "Rekod penyelarasan masa nyata sandbox mod demo tanpa PII sensitif",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "entityType": {
+          "type": "string",
+          "enum": ["booking", "grant", "ticket", "session", "endorsement", "log", "cashflow", "notification", "business", "product", "slot", "program", "b2b", "news", "mentor", "settings", "deleted"]
+        },
+        "actorId": { "type": "string", "maxLength": 128 },
+        "scope": { "type": "string", "enum": ["demo"] },
+        "payload": { "type": "object" },
+        "deleted": { "type": "boolean" },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "entityType", "actorId", "scope", "payload", "updatedAt"]
     }
   },
   "firestore": {
@@ -453,7 +471,7 @@
     },
     "/b2b_listings/{listingId}": {
       "schema": { "$ref": "#/entities/B2BListing" },
-      "description": "Papan iklan rangkaian bekalan dan permintaan B2B"
+      "description": "Papan iklan rangkaian bekalan dan permintaan Ruang Niaga"
     },
     "/notifications/{notifId}": {
       "schema": { "$ref": "#/entities/YouthNotification" },
@@ -466,6 +484,10 @@
     "/portal_news/{newsId}": {
       "schema": { "$ref": "#/entities/PortalNews" },
       "description": "Berita rasmi dan pengumuman portal kawalan Admin"
+    },
+    "/demo_sync/{syncId}": {
+      "schema": { "$ref": "#/entities/DemoSyncRecord" },
+      "description": "Saluran penyelarasan masa nyata sandbox mod demo tanpa PII sensitif"
     }
   }
 }

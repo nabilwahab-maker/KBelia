@@ -230,7 +230,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
             </span>
             <span className="text-black/35 dark:text-white/35">•</span>
             <span className="text-xs text-black/70 dark:text-white/75 font-medium">
-              10 Jajahan Kelantan
+              Seluruh Kelantan
             </span>
           </div>
 
@@ -324,7 +324,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                   : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-blue-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700'
               }`}
             >
-              Semua 10 Jajahan
+              Seluruh Kelantan
             </button>
           </div>
         </div>

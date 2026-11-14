@@ -41,7 +41,7 @@ export const INITIAL_PORTAL_NEWS: PortalNews[] = [
     summary:
       'Usahawan belia yang telah menjalani sekurang-kurangnya satu sesi klinik bimbingan mentor layak memohon geran peralatan dan bahan mentah pusingan pertama.',
     content:
-      'Skim Geran Benih Belia Kelantan (RM3,000) dan Dana Pemangkin Skala Niaga (RM10,000) kini dibuka kepada semua usahawan belia aktif yang beroperasi di sepuluh jajahan Kelantan.\n\nKeutamaan diberikan kepada perniagaan sektor Makanan & Minuman, Kraf & Batik kontemporari, Agrotek serta servis digital yang mempunyai rekod jualan konsisten dan surat perakuan rasmi daripada Mentor bertauliah.\n\nCalon boleh menyemak kelayakan awal menggunakan Kalkulator Kelayakan Geran dan menghantar permohonan terus melalui tab Geran & Pembiayaan Belia.\n\nSemua permohonan akan melalui penilaian telus oleh Jawatankuasa Penilai Negeri dan keputusan akan dimaklumkan melalui pusat notifikasi akaun masing-masing.',
+      'Skim Geran Benih Belia Kelantan (RM3,000) dan Dana Pemangkin Skala Niaga (RM10,000) kini dibuka kepada semua usahawan belia aktif yang beroperasi di seluruh Kelantan.\n\nKeutamaan diberikan kepada perniagaan sektor Makanan & Minuman, Kraf & Batik kontemporari, Agrotek serta servis digital yang mempunyai rekod jualan konsisten dan surat perakuan rasmi daripada Mentor bertauliah.\n\nCalon boleh menyemak kelayakan awal menggunakan Kalkulator Kelayakan Geran dan menghantar permohonan terus melalui tab Geran & Pembiayaan Belia.\n\nSemua permohonan akan melalui penilaian telus oleh Jawatankuasa Penilai Negeri dan keputusan akan dimaklumkan melalui pusat notifikasi akaun masing-masing.',
     category: 'Geran & Dana',
     imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
     status: 'published',
@@ -56,9 +56,9 @@ export const INITIAL_PORTAL_NEWS: PortalNews[] = [
     id: 'news-demo-03',
     title: 'Karnival Usahawan Muda Kelantan & Sesi Pitching Produk Lokal 2026 di KB Sentral',
     summary:
-      'Lebih 40 reruai usahawan belia, sesi padanan pembekal B2B dan pertandingan pitching dana perniagaan bakal menghimpunkan komuniti niaga muda Pantai Timur.',
+      'Lebih 40 reruai usahawan belia, sesi padanan pembekal Ruang Niaga dan pertandingan pitching dana perniagaan bakal menghimpunkan komuniti niaga muda Pantai Timur.',
     content:
-      'Karnival Usahawan Muda Kelantan edisi tahun ini bakal berlangsung selama tiga hari di perkarangan KB Sentral, Kota Bharu dengan sasaran penyertaan lebih 40 jenama belia tempatan.\n\nAntara pengisian utama termasuk Pavilion Produk F&B dan Batik Belia, klinik semakan penjenamaan oleh pensyarah keusahawanan UMK, serta sesi padanan rangkaian pembekal B2B.\n\nPenyewa kapsul niaga sedia ada digalakkan mendaftar slot pameran melalui menu Acara & Karnival bagi mempromosikan produk masing-masing kepada pelawat dan pelabur tempatan.',
+      'Karnival Usahawan Muda Kelantan edisi tahun ini bakal berlangsung selama tiga hari di perkarangan KB Sentral, Kota Bharu dengan sasaran penyertaan lebih 40 jenama belia tempatan.\n\nAntara pengisian utama termasuk Pavilion Produk F&B dan Batik Belia, klinik semakan penjenamaan oleh pensyarah keusahawanan UMK, serta sesi padanan rangkaian pembekal Ruang Niaga.\n\nPenyewa kapsul niaga sedia ada digalakkan mendaftar slot pameran melalui menu Acara & Karnival bagi mempromosikan produk masing-masing kepada pelawat dan pelabur tempatan.',
     category: 'Program & Acara',
     imageUrl: '/assets/generated/banner_kelantan_landmark_1793924253242.jpg',
     status: 'published',

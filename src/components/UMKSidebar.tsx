@@ -407,7 +407,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('b2b')}
-                title={isMs ? 'Ruang Niaga B2B' : 'B2B Marketplace'}
+                title={isMs ? 'Ruang Niaga' : 'Ruang Niaga Marketplace'}
                 className={`${miniBtnBase} ${activeTab === 'b2b' ? miniBtnActive : miniBtnIdle}`}
               >
                 <Network className="w-5 h-5" />
@@ -609,7 +609,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const youthCat2HasMatches =
     matchesSearch('permohonan geran benih pembiayaan modal grant') ||
     matchesSearch('sesi bimbingan mentor konsultasi mentoring clinic') ||
-    matchesSearch('ruang iklan b2b peluang niaga pembekal market') ||
+    matchesSearch('ruang niaga iklan peluang pembekal market trade') ||
     matchesSearch('acara karnival ekspo bengkel jadual events');
   const youthCat3HasMatches =
     matchesSearch('direktori usahawan kelantan bisnes produk kedai servis ssm directory') ||
@@ -1373,7 +1373,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   </button>
                 )}
 
-                {matchesSearch('ruang iklan b2b peluang niaga pembekal market') && (
+                {matchesSearch('ruang niaga iklan peluang pembekal market trade') && (
                   <button
                     type="button"
                     onClick={() => navigateAndClose(() => setActiveTab('b2b'))}
@@ -1388,7 +1388,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Ruang Niaga B2B' : 'B2B Marketplace'}
+                        {isMs ? 'Ruang Niaga' : 'Ruang Niaga Marketplace'}
                       </span>
                     </div>
                     <ChevronRight

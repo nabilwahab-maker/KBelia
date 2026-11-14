@@ -336,7 +336,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
             </div>
           </div>
 
-          {/* Card 7: Papan Padanan B2B */}
+          {/* Card 7: Papan Padanan Ruang Niaga */}
           <div
             onClick={() => onOpenB2B && onOpenB2B()}
             className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
@@ -346,12 +346,12 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 <Network className="w-5 h-5" />
               </div>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200">
-                {language === 'en' ? 'B2B Inventory' : 'B2B Stok'}
+                {language === 'en' ? 'Ruang Niaga Stock' : 'Stok Ruang Niaga'}
               </span>
             </div>
             <div>
               <h3 className="font-bold text-xs sm:text-sm text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
-                {language === 'en' ? 'B2B Supplier Matching' : 'Padanan Pembekal B2B'}
+                {language === 'en' ? 'Ruang Niaga Supplier Matching' : 'Padanan Pembekal Ruang Niaga'}
               </h3>
               <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
                 {language === 'en' ? 'Find & supply business raw materials.' : 'Cari & bekal bahan mentah.'}

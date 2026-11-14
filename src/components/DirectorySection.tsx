@@ -152,7 +152,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             >
               {DISTRICTS.map((d) => (
                 <option key={d} value={d}>
-                  {d === 'Semua Jajahan' ? (language === 'en' ? 'All Districts' : 'Semua Jajahan') : d}
+                  {d === 'Semua Jajahan' ? (language === 'en' ? 'Across Kelantan' : 'Seluruh Kelantan') : d}
                 </option>
               ))}
             </select>

@@ -3,19 +3,24 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInAnonymously,
   updateProfile,
   signOut as fbSignOut,
   onAuthStateChanged,
   updatePassword
 } from 'firebase/auth';
 import {
+  collection,
   doc,
   getDoc,
+  getDocs,
+  query,
   setDoc,
+  where,
   onSnapshot
 } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../lib/firebase';
-import { UserProfile } from '../types';
+import { MentorProfile, UserProfile } from '../types';
 import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import { showToast } from '../components/ToastNotification';
 
@@ -103,11 +108,40 @@ const checkIsAdminEmail = (email?: string | null): boolean => {
   const cleanEmail = email.trim().toLowerCase();
   return (
     cleanEmail === ADMIN_EMAIL.trim().toLowerCase() ||
+    cleanEmail === 'wahabnabil35@gmail.com' ||
     cleanEmail === 's24b0382@siswa.umk.edu.my' ||
     cleanEmail === 'admin@kbelia.gov.my' ||
     cleanEmail === 'urusetia@kbelia.kelantan.gov.my'
   );
 };
+
+async function findMentorByEmail(email?: string | null): Promise<MentorProfile | null> {
+  if (!email) return null;
+  const cleanEmail = email.trim().toLowerCase();
+  const initialMatch = INITIAL_MENTOR_PROFILES.find(m => m.email.toLowerCase() === cleanEmail);
+  try {
+    const snap = await getDocs(query(collection(db, 'mentor_profiles'), where('email', '==', cleanEmail)));
+    if (!snap.empty) {
+      return snap.docs[0].data() as MentorProfile;
+    }
+  } catch {
+    // ignore and fall back to initial list
+  }
+  return initialMatch || null;
+}
+
+let anonymousAuthDisabled = false;
+async function ensureDemoFirebaseAuth(): Promise<void> {
+  if (anonymousAuthDisabled || auth.currentUser) return;
+  try {
+    await signInAnonymously(auth);
+  } catch (err: any) {
+    const code = err?.code || '';
+    if (code === 'auth/operation-not-allowed' || code === 'auth/admin-restricted-operation') {
+      anonymousAuthDisabled = true;
+    }
+  }
+}
 
 async function hashSecret(raw: string): Promise<string> {
   const salted = `kbelia_2026_salt::${raw}`;
@@ -252,9 +286,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           const parsed = JSON.parse(activeSessionStr);
           if (parsed.user && parsed.profile) {
-            setUser(parsed.user);
+            const normalizedUser =
+              parsed.user.uid?.startsWith('demo-tenant-') && parsed.profile.fullName
+                ? { ...parsed.user, displayName: parsed.profile.fullName }
+                : parsed.user;
+            setUser(normalizedUser);
             setUserProfile(parsed.profile);
-            saveSession(parsed.user, parsed.profile);
+            saveSession(normalizedUser, parsed.profile);
           }
         }
       } else {
@@ -319,6 +357,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (currentUser) {
+        if (currentUser.isAnonymous) {
+          // Preserve active Demo/Sandbox persona while keeping Firebase Anonymous transport alive
+          try {
+            const saved =
+              sessionStorage.getItem('niagabelia_auth_session') ||
+              localStorage.getItem('niagabelia_auth_session');
+            const lastAct = localStorage.getItem('niagabelia_last_activity');
+            if (saved && lastAct && Date.now() - parseInt(lastAct, 10) <= HARD_TIMEOUT_MS) {
+              const parsed = JSON.parse(saved);
+              if (parsed.user && parsed.profile && parsed.user.isDemo) {
+                setUser(parsed.user);
+                setUserProfile(parsed.profile);
+                lastActivityRef.current = parseInt(lastAct, 10);
+                setLoading(false);
+                return;
+              }
+            }
+          } catch {
+            // ignore
+          }
+          setLoading(false);
+          return;
+        }
+
         const lastActivityStr = localStorage.getItem('niagabelia_last_activity');
         if (lastActivityStr && Date.now() - parseInt(lastActivityStr, 10) > HARD_TIMEOUT_MS) {
           clearStoredSession();
@@ -349,12 +411,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             saveSession(authUserObj, prof);
           } else {
             const isUserAdmin = checkIsAdminEmail(currentUser.email);
+            const matchedMentor = !isUserAdmin && currentUser.emailVerified
+              ? await findMentorByEmail(currentUser.email)
+              : null;
             const newProfile: UserProfile = {
               userId: currentUser.uid,
-              fullName: currentUser.displayName || 'Belia Kelantan',
+              fullName: matchedMentor?.name || currentUser.displayName || 'Belia Kelantan',
               email: currentUser.email || '',
-              role: isUserAdmin ? 'admin' : 'user',
-              avatarUrl: currentUser.photoURL || '/assets/generated/avatar_youth_male_1793924250192.jpg',
+              role: isUserAdmin ? 'admin' : matchedMentor ? 'mentor' : 'user',
+              ...(matchedMentor ? { mentorId: matchedMentor.id, phone: matchedMentor.phone } : {}),
+              avatarUrl: matchedMentor?.avatarUrl || currentUser.photoURL || '/assets/generated/avatar_youth_male_1793924250192.jpg',
               district: 'Kota Bharu',
               createdAt: new Date().toISOString()
             };
@@ -406,6 +472,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setUserProfile(parsed.profile);
               lastActivityRef.current = parseInt(lastAct, 10);
               setLoading(false);
+              void ensureDemoFirebaseAuth();
               return;
             }
           }
@@ -442,12 +509,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(authUserData);
 
       const isUserAdmin = checkIsAdminEmail(loggedUser.email);
+      const matchedMentor = !isUserAdmin && loggedUser.emailVerified
+        ? await findMentorByEmail(loggedUser.email)
+        : null;
       let profile: UserProfile = {
         userId: loggedUser.uid,
-        fullName: loggedUser.displayName || 'Belia Kelantan',
+        fullName: matchedMentor?.name || loggedUser.displayName || 'Belia Kelantan',
         email: loggedUser.email || '',
-        role: isUserAdmin ? 'admin' : 'user',
-        avatarUrl: loggedUser.photoURL || '/assets/generated/avatar_youth_male_1793924250192.jpg',
+        role: isUserAdmin ? 'admin' : matchedMentor ? 'mentor' : 'user',
+        ...(matchedMentor ? { mentorId: matchedMentor.id, phone: matchedMentor.phone } : {}),
+        avatarUrl: matchedMentor?.avatarUrl || loggedUser.photoURL || '/assets/generated/avatar_youth_male_1793924250192.jpg',
         district: 'Kota Bharu',
         createdAt: new Date().toISOString()
       };
@@ -556,6 +627,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserProfile(userProf);
         saveSession(authUserData, userProf);
         setIsLoginModalOpen(false);
+        void ensureDemoFirebaseAuth();
         return { success: true };
       }
 
@@ -688,6 +760,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserProfile(userProf);
         saveSession(authUserData, userProf);
         setIsLoginModalOpen(false);
+        void ensureDemoFirebaseAuth();
         return { success: true };
       }
     } catch (e: any) {
@@ -816,6 +889,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUserProfile(userProf);
         saveSession(authUserData, userProf);
         setIsLoginModalOpen(false);
+        void ensureDemoFirebaseAuth();
         return { success: true };
       }
     } catch (e: any) {
@@ -873,7 +947,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else if (type === 'merchant_faizul') {
       authUser = {
         uid: 'demo-tenant-1',
-        displayName: "Ahmad Faizul (D'Kelate Coffee)",
+        displayName: 'Ahmad Faizul Bin Razak',
         email: 'faizul.artisan@gmail.com',
         photoURL: '/assets/generated/avatar_youth_male_1793924250192.jpg',
         isDemo: true
@@ -895,7 +969,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Fixed UID alignment: demo-tenant-2 matches biz-02 (Batik Belia Kontemporari)
       authUser = {
         uid: 'demo-tenant-2',
-        displayName: 'Nur Syafiqah (Batik Belia)',
+        displayName: 'Nur Syafiqah Binti Zakaria',
         email: 'syafiqah.batik@gmail.com',
         photoURL: '/assets/generated/avatar_youth_female_1793924250745.jpg',
         isDemo: true
@@ -917,7 +991,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Fixed UID alignment: demo-tenant-3 matches biz-03 (Studio Belia Multimedia KB)
       authUser = {
         uid: 'demo-tenant-3',
-        displayName: 'Muhammad Harith (Studio Belia)',
+        displayName: 'Muhammad Harith Bin Yusoff',
         email: 'harith.multimedia@gmail.com',
         photoURL: '/assets/generated/avatar_youth_male_1793924250192.jpg',
         isDemo: true
@@ -1042,6 +1116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserProfile(profile);
     setAuthError(null);
     setIsLoginModalOpen(false);
+    void ensureDemoFirebaseAuth();
   };
 
   const logout = async () => {

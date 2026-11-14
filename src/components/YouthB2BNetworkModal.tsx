@@ -104,7 +104,7 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-black dark:text-white">
-                {language === 'en' ? 'Youth B2B Supplier & Matchmaking Board' : 'Papan Rangkaian Pembekal & Padanan B2B Belia'}
+                {language === 'en' ? 'Youth Ruang Niaga Supplier & Matchmaking Board' : 'Papan Rangkaian Pembekal & Padanan Ruang Niaga Belia'}
               </h3>
               <span className="text-[11px] font-semibold text-black dark:text-white/75">
                 {language === 'en' ? 'Circular Economy Among Kelantan Entrepreneurs' : 'Ekonomi Pusingan Sesama Usahawan Kelantan'}
@@ -287,8 +287,8 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
                 <a
                   href={`https://wa.me/${item.whatsapp}?text=${encodeURIComponent(
                     language === 'en'
-                      ? `Hi ${item.authorName}, I saw your B2B matchmaking post "${item.title}" on the Kelantan Youth Business Portal.`
-                      : `Salam ${item.authorName}, saya melihat siaran padanan B2B anda "${item.title}" di Portal Niaga Belia Kelantan.`
+                      ? `Hi ${item.authorName}, I saw your Ruang Niaga matchmaking post "${item.title}" on the Kelantan Youth Business Portal.`
+                      : `Salam ${item.authorName}, saya melihat siaran padanan Ruang Niaga anda "${item.title}" di Portal Niaga Belia Kelantan.`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

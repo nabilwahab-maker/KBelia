@@ -314,11 +314,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Handle Booking Rejection
   const handleRejectBooking = async (booking: CapsuleBooking) => {
-    const reason = reviewNoteInput[booking.id] || 'Maaf, permohonan tidak dapat diluluskan kerana kekosongan slot tidak mencukupi atau kriteria perniagaan belum lengkap.';
+    const reason = reviewNoteInput[booking.id] || booking.adminNotes || 'Maaf, permohonan tidak dapat diluluskan kerana kekosongan slot tidak mencukupi atau kriteria perniagaan belum lengkap.';
     try {
       setLoading(true);
       await updateBookingStatus(booking.id, 'rejected', reason);
       setMessage({ type: 'success', text: `Permohonan ${booking.businessName} ditolak.` });
+      emitAdminOrMentorNotification({
+        title: `Status Permohonan Kiosk: ${booking.slotCode}`,
+        message: `Permohonan sewaan kiosk bagi ${booking.businessName} tidak diluluskan. Catatan: ${reason}`,
+        type: 'kiosk',
+        senderRole: 'admin',
+        targetRole: 'youth',
+        targetUserId: booking.applicantId,
+        sender: 'Pentadbir Urusetia KBelia',
+        actionTab: 'merchant'
+      });
       onRefresh();
     } catch (err) {
       console.error(err);
@@ -912,12 +922,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             if (b) await handleRejectBooking({ ...b, adminNotes: notes });
           }}
           onApproveGrant={async (gId, notes) => {
+            const targetGrant = (grantApplications || []).find(g => g.id === gId);
             await updateGrantApplicationStatus(gId, 'approved', notes);
+            if (targetGrant) {
+              emitAdminOrMentorNotification({
+                title: `Geran Belia Diluluskan: ${targetGrant.grantAmount}`,
+                message: `Tahniah! Permohonan ${targetGrant.programTitle} bagi ${targetGrant.businessName} telah diluluskan rasmi.`,
+                type: 'grant',
+                senderRole: 'admin',
+                targetRole: 'youth',
+                targetUserId: targetGrant.applicantId,
+                sender: 'Pentadbir Urusetia KBelia',
+                actionTab: 'merchant'
+              });
+            }
             confetti({ particleCount: 50 });
             onRefresh();
           }}
           onRejectGrant={async (gId, notes) => {
+            const targetGrant = (grantApplications || []).find(g => g.id === gId);
             await updateGrantApplicationStatus(gId, 'rejected', notes);
+            if (targetGrant) {
+              emitAdminOrMentorNotification({
+                title: `Status Permohonan Geran: ${targetGrant.businessName}`,
+                message: `Permohonan ${targetGrant.programTitle} tidak dapat diluluskan. Catatan: ${notes || 'Dokumen sokongan tidak lengkap.'}`,
+                type: 'grant',
+                senderRole: 'admin',
+                targetRole: 'youth',
+                targetUserId: targetGrant.applicantId,
+                sender: 'Pentadbir Urusetia KBelia',
+                actionTab: 'merchant'
+              });
+            }
             onRefresh();
           }}
           onUpdateSlotStatus={async (sId, newStatus) => {
@@ -928,7 +964,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }
           }}
           onUpdateTicketStatus={async (ticketId, status, adminNotes) => {
+            const targetTicket = (maintenanceTickets || []).find(t => t.id === ticketId);
             await updateMaintenanceTicketStatus(ticketId, status, adminNotes);
+            if (targetTicket?.ownerId) {
+              const statusText = status === 'resolved' ? 'Diselesaikan' : status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima';
+              emitAdminOrMentorNotification({
+                title: `Kemas Kini Aduan ${targetTicket.slotCode}: ${statusText}`,
+                message: `Tiket aduan fasiliti anda bagi ${targetTicket.kioskName} kini berstatus ${statusText}.`,
+                type: 'kiosk',
+                senderRole: 'admin',
+                targetRole: 'youth',
+                targetUserId: targetTicket.ownerId,
+                sender: 'Unit Teknikal & Fasiliti KBelia',
+                actionTab: 'merchant'
+              });
+            }
             showToast('Status aduan fasiliti dikemaskini!', 'success');
             onRefresh();
           }}
@@ -1690,7 +1740,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <h4 className="text-sm font-bold text-black dark:text-white">
                 Senarai Usahawan Berdaftar Mengikut Mentor
               </h4>
-              <span className="text-xs text-black/70 dark:text-white/75">10 Jajahan Kelantan</span>
+              <span className="text-xs text-black/70 dark:text-white/75">Seluruh Kelantan</span>
             </div>
 
             <div className="overflow-x-auto">

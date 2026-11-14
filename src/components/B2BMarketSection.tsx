@@ -11,7 +11,12 @@ import { B2BListing, KelantanDistrict } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { auth, db } from '../lib/firebase';
-import { saveB2BListingRecord } from '../services/dataService';
+import { isProductionAuthenticated, saveB2BListingRecord } from '../services/dataService';
+import {
+  mergeUniqueById,
+  subscribeCrossTabSync,
+  subscribeDemoSyncCollection
+} from '../services/realtimeSync';
 import { showToast } from './ToastNotification';
 
 const INITIAL_B2B_LISTINGS: B2BListing[] = [
@@ -69,39 +74,60 @@ export const B2BMarketSection: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!user || isDemoSession || !auth.currentUser) {
+    const loadLocalB2B = (): B2BListing[] => {
       try {
         const saved = localStorage.getItem('kbelia_b2b_listings');
-        if (saved) setListings(JSON.parse(saved));
-        else setListings(INITIAL_B2B_LISTINGS);
+        return saved ? JSON.parse(saved) : [];
       } catch {
-        setListings(INITIAL_B2B_LISTINGS);
+        return [];
       }
-      return;
-    }
+    };
+
+    let firestoreItems: B2BListing[] = [];
+    let demoSyncItems: B2BListing[] = [];
+
+    const recomputeListings = () => {
+      const localItems = loadLocalB2B();
+      const prodAuth = isProductionAuthenticated();
+      const lists = prodAuth
+        ? [firestoreItems, demoSyncItems, localItems, INITIAL_B2B_LISTINGS]
+        : [demoSyncItems, localItems, firestoreItems, INITIAL_B2B_LISTINGS];
+      setListings(mergeUniqueById<B2BListing>(lists));
+    };
+
+    recomputeListings();
+
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'b2b') {
+        recomputeListings();
+      }
+    });
 
     const unsubscribe = onSnapshot(
       collection(db, 'b2b_listings'),
       (snap) => {
         const remote: B2BListing[] = [];
-        snap.forEach((docSnap) => remote.push(docSnap.data() as B2BListing));
-        if (remote.length > 0) {
-          const merged = [
-            ...remote,
-            ...INITIAL_B2B_LISTINGS.filter((init) => !remote.some((r) => r.id === init.id))
-          ];
-          setListings(merged);
-        } else {
-          setListings(INITIAL_B2B_LISTINGS);
-        }
+        snap.forEach((docSnap) => remote.push({ id: docSnap.id, ...docSnap.data() } as B2BListing));
+        firestoreItems = remote;
+        recomputeListings();
       },
-      () => {
-        // Silent fallback to defaults if collection empty or rules restrict
+      (err) => {
+        console.debug('Ruang Niaga listener notice:', err?.message || err);
+        recomputeListings();
       }
     );
 
-    return () => unsubscribe();
-  }, [user, isDemoSession]);
+    const unsubDemoSync = subscribeDemoSyncCollection<B2BListing>('b2b', (items) => {
+      demoSyncItems = items;
+      recomputeListings();
+    });
+
+    return () => {
+      unsubCrossTab();
+      unsubscribe();
+      unsubDemoSync();
+    };
+  }, [user?.uid, isDemoSession]);
 
   const [filterType, setFilterType] = useState<'all' | 'supply' | 'demand'>('all');
   const [filterDistrict, setFilterDistrict] = useState<string>('all');
@@ -203,15 +229,15 @@ export const B2BMarketSection: React.FC = () => {
       <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-xs">
         <div className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-wider text-black dark:text-white/75 mb-1.5">
-            {isEn ? 'Youth B2B Ads & Commercial Opportunities' : 'Ruang Iklan B2B & Peluang Niaga Belia'}
+            {isEn ? 'Youth Ruang Niaga & Commercial Opportunities' : 'Ruang Niaga & Peluang Belia'}
           </p>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black dark:text-white">
-            {isEn ? 'Youth Commercial Ads & Supply Network' : 'Rangkaian Bekalan & Iklan Niaga Belia'}
+            {isEn ? 'Youth Commercial Ads & Supply Network' : 'Rangkaian Bekalan & Iklan Ruang Niaga Belia'}
           </h1>
           <p className="text-xs sm:text-sm text-black dark:text-white mt-2 leading-relaxed">
             {isEn
-              ? 'A dedicated platform for youth entrepreneurs to advertise commercial offers, find local business supplies, and explore trade partnerships across 10 Kelantan districts.'
-              : 'Platform khas untuk usahawan belia menyiarkan iklan perniagaan, tawaran bekalan borong, mencari bahan mentah tempatan, dan memupuk kerjasama niaga di seluruh 10 jajahan Kelantan.'}
+              ? 'A dedicated platform for youth entrepreneurs to advertise commercial offers, find local business supplies, and explore trade partnerships across Kelantan.'
+              : 'Platform khas untuk usahawan belia menyiarkan iklan perniagaan, tawaran bekalan borong, mencari bahan mentah tempatan, dan memupuk kerjasama niaga di seluruh Kelantan.'}
           </p>
         </div>
       </div>
@@ -273,7 +299,7 @@ export const B2BMarketSection: React.FC = () => {
             onChange={(e) => setFilterDistrict(e.target.value)}
             className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-black dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
           >
-            <option value="all">{isEn ? 'All Districts' : 'Semua Jajahan'}</option>
+            <option value="all">{isEn ? 'Across Kelantan' : 'Seluruh Kelantan'}</option>
             <option value="Kota Bharu">Kota Bharu</option>
             <option value="Bachok">Bachok</option>
             <option value="Pasir Mas">Pasir Mas</option>
@@ -303,7 +329,7 @@ export const B2BMarketSection: React.FC = () => {
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 py-14 text-center">
           <Megaphone className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <p className="text-sm font-bold text-black dark:text-white">
-            {isEn ? 'No B2B listings match your filter' : 'Tiada iklan B2B sepadan dengan carian anda'}
+            {isEn ? 'No Ruang Niaga listings match your filter' : 'Tiada iklan Ruang Niaga sepadan dengan carian anda'}
           </p>
         </div>
       ) : (
@@ -355,7 +381,7 @@ export const B2BMarketSection: React.FC = () => {
               {/* Direct WhatsApp Call to Action */}
               <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
                 <a
-                  href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20B2B%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
+                  href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20Ruang%20Niaga%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 dark:bg-teal-600"

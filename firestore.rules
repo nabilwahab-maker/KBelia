@@ -32,6 +32,7 @@ service cloud.firestore {
       return isSignedIn() && (
         (
           request.auth.token.email_verified == true && (
+            request.auth.token.email == 'wahabnabil35@gmail.com' ||
             request.auth.token.email == 'nabilwahab03020302@gmail.com' ||
             request.auth.token.email == 's24b0382@siswa.umk.edu.my'
           )
@@ -412,7 +413,7 @@ service cloud.firestore {
         data.category in ['status', 'announcement', 'reminder'] &&
         data.targetRole in ['youth', 'mentor', 'admin', 'all'] &&
         (!('sender' in data) || validStr(data.sender, 120)) &&
-        (!('senderRole' in data) || data.senderRole in ['admin', 'mentor', 'system']) &&
+        (!('senderRole' in data) || data.senderRole in ['admin', 'mentor', 'user', 'system']) &&
         (!('targetUserId' in data) || validStr(data.targetUserId, 128)) &&
         (!('timestamp' in data) || validStr(data.timestamp, 60)) &&
         (!('isRead' in data) || data.isRead is bool) &&
@@ -460,6 +461,23 @@ service cloud.firestore {
         (!('publishedAt' in data) || validStr(data.publishedAt, 50));
     }
 
+    function isValidDemoSync(data) {
+      return data.keys().hasAll(['id', 'entityType', 'actorId', 'scope', 'payload', 'updatedAt']) &&
+        data.keys().hasOnly(['id', 'entityType', 'actorId', 'scope', 'payload', 'deleted', 'updatedAt']) &&
+        validStr(data.id, 128) &&
+        data.entityType in [
+          'booking', 'grant', 'ticket', 'session', 'endorsement', 'log', 'cashflow',
+          'notification', 'business', 'product', 'slot', 'program', 'b2b', 'news',
+          'mentor', 'settings', 'deleted'
+        ] &&
+        validStr(data.actorId, 128) &&
+        data.scope == 'demo' &&
+        data.payload is map &&
+        data.payload.keys().size() <= 40 &&
+        validStr(data.updatedAt, 50) &&
+        (!('deleted' in data) || data.deleted is bool);
+    }
+
     // 1. Users Collection (PII & RBAC Protected)
     match /users/{userId} {
       allow get: if isValidId(userId) && (isAdmin() || isOwner(userId));
@@ -467,9 +485,18 @@ service cloud.firestore {
       allow create: if isSignedIn() && isValidId(userId) && isValidUser(incoming()) && (
         isAdmin() || (
           isOwner(userId) &&
-          incoming().userId == request.auth.uid &&
-          incoming().role == 'user' &&
-          !('mentorId' in incoming())
+          incoming().userId == request.auth.uid && (
+            (
+              incoming().role == 'user' &&
+              !('mentorId' in incoming())
+            ) || (
+              incoming().role == 'mentor' &&
+              'mentorId' in incoming() &&
+              request.auth.token.email_verified == true &&
+              exists(/databases/$(database)/documents/mentor_profiles/$(incoming().mentorId)) &&
+              get(/databases/$(database)/documents/mentor_profiles/$(incoming().mentorId)).data.email == request.auth.token.email
+            )
+          )
         )
       );
       allow update: if isSignedIn() && isValidId(userId) && isValidUser(incoming()) && (
@@ -757,31 +784,25 @@ service cloud.firestore {
       );
     }
 
-    // 16. Notifications Collection (Role & Target User Isolated)
+    // 16. Notifications Collection (Role & Target User Isolated + Query Enforced)
     match /notifications/{notifId} {
       allow get: if isValidId(notifId) && (
         isAdmin() || (
           isSignedIn() && (
-            ('targetUserId' in existing() && existing().targetUserId == request.auth.uid) ||
+            existing().get('targetUserId', '') == request.auth.uid ||
             (
-              !('targetUserId' in existing()) && (
-                existing().targetRole == 'all' ||
-                (isMentor() && existing().targetRole == 'mentor') ||
-                (!isMentor() && existing().targetRole == 'youth')
-              )
+              existing().get('targetUserId', '') == '' &&
+              existing().targetRole in ['all', 'youth', 'mentor']
             )
           )
         )
       );
       allow list: if isAdmin() || (
         isSignedIn() && (
-          ('targetUserId' in existing() && existing().targetUserId == request.auth.uid) ||
+          existing().targetUserId == request.auth.uid ||
           (
-            !('targetUserId' in existing()) && (
-              existing().targetRole == 'all' ||
-              (isMentor() && existing().targetRole == 'mentor') ||
-              (!isMentor() && existing().targetRole == 'youth')
-            )
+            existing().targetUserId == '' &&
+            existing().targetRole in ['all', 'youth', 'mentor']
           )
         )
       );
@@ -790,19 +811,21 @@ service cloud.firestore {
           isMentor() &&
           'senderRole' in incoming() &&
           incoming().senderRole == 'mentor' &&
-          incoming().targetRole == 'youth'
+          incoming().targetRole in ['youth', 'admin']
+        ) || (
+          !isMentor() &&
+          'senderRole' in incoming() &&
+          incoming().senderRole == 'user' &&
+          incoming().targetRole in ['admin', 'mentor']
         )
       );
       allow update: if isSignedIn() && isValidId(notifId) && isValidNotification(incoming()) && (
         isAdmin() || (
           incoming().diff(existing()).affectedKeys().hasOnly(['isRead']) && (
-            ('targetUserId' in existing() && existing().targetUserId == request.auth.uid) ||
+            existing().get('targetUserId', '') == request.auth.uid ||
             (
-              !('targetUserId' in existing()) && (
-                existing().targetRole == 'all' ||
-                (isMentor() && existing().targetRole == 'mentor') ||
-                (!isMentor() && existing().targetRole == 'youth')
-              )
+              existing().get('targetUserId', '') == '' &&
+              existing().targetRole in ['all', 'youth', 'mentor']
             )
           )
         )
@@ -818,17 +841,31 @@ service cloud.firestore {
       allow delete: if isAdmin() && isValidId(settingId);
     }
 
-    // 18. Portal News Collection (Admin Full Control; Authenticated Users Read Published Only)
+    // 18. Portal News Collection (Admin Full Control; Published News Readable for Real-Time Portal Display)
     match /portal_news/{newsId} {
       allow get: if isValidId(newsId) && (
-        isAdmin() || (isSignedIn() && existing().status == 'published')
+        isAdmin() || existing().status == 'published'
       );
-      allow list: if isAdmin() || (isSignedIn() && existing().status == 'published');
+      allow list: if isAdmin() || existing().status == 'published';
       allow create, update: if isAdmin() && isValidId(newsId) && isValidNewsItem(incoming());
       allow delete: if isAdmin() && isValidId(newsId);
     }
 
-    // 19. Test connection doc (read-only ping)
+    // 19. Demo Sandbox Sync Collection (Non-PII Real-Time Sync for Demo Sessions)
+    match /demo_sync/{syncId} {
+      allow get: if isValidId(syncId) && (isAdmin() || (isSignedIn() && existing().scope == 'demo'));
+      allow list: if isAdmin() || (isSignedIn() && existing().scope == 'demo');
+      allow create: if isSignedIn() && isValidId(syncId) && isValidDemoSync(incoming()) &&
+        incoming().scope == 'demo' && incoming().actorId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(syncId) && isValidDemoSync(incoming()) &&
+        incoming().scope == 'demo' &&
+        existing().scope == 'demo' &&
+        incoming().id == existing().id &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['payload', 'updatedAt', 'deleted', 'actorId']);
+      allow delete: if isSignedIn() && isValidId(syncId) && (isAdmin() || existing().actorId == request.auth.uid);
+    }
+
+    // 20. Test connection doc (read-only ping)
     match /test/{docId} {
       allow get: if isValidId(docId);
       allow write: if isAdmin() && isValidId(docId);

@@ -7,7 +7,8 @@ import {
 import { KioskDailySale } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
-import { saveCashflowRecord, deleteCashflowRecord } from '../services/dataService';
+import { isProductionAuthenticated, saveCashflowRecord, deleteCashflowRecord } from '../services/dataService';
+import { mergeUniqueById, subscribeCrossTabSync, subscribeDemoSyncCollection } from '../services/realtimeSync';
 import { showToast } from './ToastNotification';
 
 interface KioskCashflowTrackerProps {
@@ -39,37 +40,54 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const loadLocalRecords = () => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        setSalesRecords(JSON.parse(saved));
-      } else if (isDemoSession) {
-        localStorage.setItem(storageKey, JSON.stringify(DEMO_SAMPLE_SALES));
-        setSalesRecords(DEMO_SAMPLE_SALES);
-      } else {
-        setSalesRecords([]);
-      }
-    } catch {
-      setSalesRecords([]);
-    }
-  };
-
   useEffect(() => {
-    if (externalRecords && !isDemoSession) {
+    const prodAuth = isProductionAuthenticated();
+    if (externalRecords && prodAuth && !isDemoSession) {
       setSalesRecords(externalRecords);
       return;
     }
-    loadLocalRecords();
 
-    const handleSync = () => {
-      if (!externalRecords || isDemoSession) {
-        loadLocalRecords();
+    let demoSyncItems: KioskDailySale[] = [];
+    let demoDeletedIds: string[] = [];
+
+    const loadAndMergeLocal = () => {
+      try {
+        const savedRaw = localStorage.getItem(storageKey);
+        let localItems: KioskDailySale[] = [];
+        if (savedRaw) {
+          localItems = JSON.parse(savedRaw);
+        } else if (isDemoSession) {
+          localStorage.setItem(storageKey, JSON.stringify(DEMO_SAMPLE_SALES));
+          localItems = DEMO_SAMPLE_SALES;
+        }
+        const scopedDemoSync = demoSyncItems.filter(r => !r.ownerId || r.ownerId === ownerId);
+        setSalesRecords(mergeUniqueById<KioskDailySale>([scopedDemoSync, localItems], demoDeletedIds));
+      } catch {
+        setSalesRecords([]);
       }
     };
+
+    loadAndMergeLocal();
+
+    const handleSync = () => loadAndMergeLocal();
     window.addEventListener('kbelia_cashflow_updated', handleSync);
-    return () => window.removeEventListener('kbelia_cashflow_updated', handleSync);
-  }, [ownerId, isDemoSession, externalRecords]);
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'cashflow') {
+        loadAndMergeLocal();
+      }
+    });
+    const unsubDemoSync = subscribeDemoSyncCollection<KioskDailySale>('cashflow', (items, delIds) => {
+      demoSyncItems = items;
+      demoDeletedIds = delIds;
+      loadAndMergeLocal();
+    });
+
+    return () => {
+      window.removeEventListener('kbelia_cashflow_updated', handleSync);
+      unsubCrossTab();
+      unsubDemoSync();
+    };
+  }, [ownerId, isDemoSession, externalRecords, storageKey]);
 
   const handleAddRecord = async (e: React.FormEvent) => {
     e.preventDefault();

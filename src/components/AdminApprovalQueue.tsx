@@ -72,13 +72,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
     slotOrProgram?: string;
   } | null>(null);
 
-  // List of dismissed/rejected item IDs to immediately disappear from active view
-  const [dismissedBookingIds, setDismissedBookingIds] = useState<string[]>([]);
-  const [dismissedGrantIds, setDismissedGrantIds] = useState<string[]>([]);
-
-  // Filter Bookings - hides dismissed/rejected items so they disappear from list when rejected
+  // Filter Bookings directly by statusFilter so real-time updates reflect consistently across tabs
   const filteredBookings = bookings.filter((b) => {
-    if (dismissedBookingIds.includes(b.id)) return false;
     const matchStatus = statusFilter === 'all' 
       ? b.status !== 'rejected' 
       : b.status === statusFilter;
@@ -89,9 +84,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
     return matchStatus && matchSearch;
   });
 
-  // Filter Grants
+  // Filter Grants directly by statusFilter
   const filteredGrants = grantApplications.filter((g) => {
-    if (dismissedGrantIds.includes(g.id)) return false;
     const matchStatus = statusFilter === 'all' 
       ? g.status !== 'rejected' 
       : g.status === statusFilter;
@@ -144,10 +138,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
     setRejectModalData(null);
 
     if (target.type === 'kiosk') {
-      setDismissedBookingIds(prev => [...prev, target.id]);
       await handleRejectBooking(target.id);
     } else {
-      setDismissedGrantIds(prev => [...prev, target.id]);
       await handleRejectGrant(target.id);
     }
   };

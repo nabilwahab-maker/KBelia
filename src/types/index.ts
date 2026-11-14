@@ -292,7 +292,7 @@ export interface YouthNotification {
   message: string;
   category: 'status' | 'announcement' | 'reminder';
   sender?: string;
-  senderRole?: 'admin' | 'mentor' | 'system';
+  senderRole?: 'admin' | 'mentor' | 'user' | 'system';
   targetRole?: 'youth' | 'mentor' | 'admin' | 'all';
   targetUserId?: string;
   timestamp: string;
