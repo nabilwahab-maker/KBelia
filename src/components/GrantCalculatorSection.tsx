@@ -223,7 +223,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
             {/* Tempoh Pengalaman */}
             <div>
               <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                {isEn ? 'Operating Duration' : 'Tempoh Berniaga'} ({isEn ? 'Type manually' : 'Taip secara manual'})
+                {isEn ? 'Operating Duration (Months)' : 'Tempoh Operasi (Bulan)'}
               </label>
               <div className="relative">
                 <input 

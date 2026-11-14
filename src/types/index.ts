@@ -217,6 +217,7 @@ export interface B2BListing {
   title: string;
   description: string;
   whatsapp: string;
+  imageUrl?: string;
   date: string;
 }
 
@@ -336,6 +337,7 @@ export type AdminSubTab =
   | 'programs'    // Geran & Inisiatif
   | 'mentors'     // Bimbingan Mentor
   | 'news'        // Pengurusan Berita Rasmi
+  | 'b2b'         // Ruang Niaga & Iklan Bergambar
   | 'sync'        // Segerak Pangkalan Data
   | 'settings';   // Tetapan Operasi
 

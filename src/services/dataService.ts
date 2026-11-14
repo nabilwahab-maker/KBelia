@@ -812,18 +812,72 @@ export async function saveMentoringLogRecord(logEntry: MentoringLogEntry) {
 }
 
 // --- B2B / RUANG NIAGA LISTINGS ---
-export async function saveB2BListingRecord(item: B2BListing) {
+export async function saveB2BListingRecord(item: B2BListing): Promise<B2BListing> {
+  const cleanId = (item.id || `b2b-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`)
+    .replace(/[^a-zA-Z0-9_-]/g, '-')
+    .slice(0, 128);
+
+  const sanitized: B2BListing = {
+    id: cleanId,
+    ownerId: (item.ownerId || 'guest').slice(0, 128),
+    authorName: (item.authorName || 'Usahawan Belia').trim().slice(0, 120),
+    authorBusiness: (item.authorBusiness || 'Perniagaan Belia').trim().slice(0, 150),
+    district: item.district || 'Kota Bharu',
+    type: item.type === 'supply' ? 'supply' : 'demand',
+    title: item.title.trim().slice(0, 200),
+    description: (item.description || '').trim().slice(0, 1500),
+    whatsapp: (item.whatsapp || '').trim().slice(0, 30),
+    imageUrl: (item.imageUrl || '').slice(0, 900000),
+    date: (item.date || 'Hari ini').slice(0, 50)
+  };
+
+  try {
+    const deleted = getDeletedIds().filter(d => d !== cleanId);
+    localStorage.setItem(CACHE_KEYS.DELETED_IDS, JSON.stringify(deleted));
+  } catch {
+    // ignore
+  }
+
   if (!isProductionAuthenticated()) {
     const existing: B2BListing[] = JSON.parse(localStorage.getItem('kbelia_b2b_listings') || '[]');
-    localStorage.setItem('kbelia_b2b_listings', JSON.stringify([item, ...existing.filter(x => x.id !== item.id)]));
-    await publishDemoSyncRecord('b2b', item.id, item);
-    return item;
+    localStorage.setItem(
+      'kbelia_b2b_listings',
+      JSON.stringify([sanitized, ...existing.filter(x => x.id !== cleanId)])
+    );
+    await publishDemoSyncRecord('b2b', cleanId, sanitized);
+    return sanitized;
   }
+
   try {
-    await setDoc(doc(db, 'b2b_listings', item.id), item, { merge: true });
-    return item;
+    await setDoc(doc(db, 'b2b_listings', cleanId), sanitized, { merge: true });
+    return sanitized;
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, 'b2b_listings');
+    throw error;
+  }
+}
+
+export async function deleteB2BListingRecord(listingId: string): Promise<void> {
+  markIdAsDeleted(listingId);
+
+  if (!isProductionAuthenticated()) {
+    try {
+      const existing: B2BListing[] = JSON.parse(localStorage.getItem('kbelia_b2b_listings') || '[]');
+      localStorage.setItem(
+        'kbelia_b2b_listings',
+        JSON.stringify(existing.filter(x => x.id !== listingId))
+      );
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('b2b', listingId, { id: listingId }, true);
+    return;
+  }
+
+  try {
+    await deleteDoc(doc(db, 'b2b_listings', listingId));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, 'b2b_listings');
     throw error;
   }
 }

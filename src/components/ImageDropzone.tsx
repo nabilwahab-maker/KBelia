@@ -22,13 +22,61 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { confirmDelete } = useConfirmDelete();
 
+  const MAX_DATA_URL_LENGTH = 780000;
+
+  const compressDataUrlIfNeeded = (dataUrl: string, onDone: (compressed: string) => void) => {
+    if (dataUrl.length <= MAX_DATA_URL_LENGTH) {
+      onDone(dataUrl);
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = 1200;
+      let width = img.naturalWidth || 1200;
+      let height = img.naturalHeight || 900;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        onDone(dataUrl);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+
+      let quality = 0.82;
+      let output = canvas.toDataURL('image/jpeg', quality);
+      while (output.length > MAX_DATA_URL_LENGTH && quality > 0.45) {
+        quality -= 0.1;
+        output = canvas.toDataURL('image/jpeg', quality);
+      }
+
+      if (output.length > MAX_DATA_URL_LENGTH) {
+        setError('Imej terlalu kompleks. Sila pilih fail imej bersaiz lebih kecil.');
+        return;
+      }
+      onDone(output);
+    };
+    img.onerror = () => {
+      setError('Gagal memproses fail imej.');
+    };
+    img.src = dataUrl;
+  };
+
   const processFile = (file: File) => {
     setError(null);
     if (!file.type.startsWith('image/')) {
       setError('Sila pilih fail imej yang sah (JPG, PNG, WebP).');
       return;
     }
-    // Limit to 5MB
+    // Limit to 5MB raw upload
     if (file.size > 5 * 1024 * 1024) {
       setError('Saiz imej terlalu besar. Maksimum 5MB.');
       return;
@@ -38,7 +86,7 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({
     reader.onload = (e) => {
       const result = e.target?.result as string;
       if (result) {
-        onChange(result);
+        compressDataUrlIfNeeded(result, onChange);
       }
     };
     reader.onerror = () => {

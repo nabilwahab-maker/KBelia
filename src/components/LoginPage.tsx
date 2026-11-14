@@ -742,77 +742,134 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
         </div>
 
         {/* ======================================================== */}
-        {/* LEFT COLUMN (DESKTOP): CRISP WHITE + TOP-LEFT SKY GLOW   */}
+        {/* LEFT COLUMN (DESKTOP): MODERN DARK SLATE + BESPOKE MOTION */}
         {/* ======================================================== */}
-        <div className="hidden lg:flex flex-col items-center justify-center p-8 xl:p-12 relative overflow-hidden kbelia-important-header dark:bg-slate-800 select-none lg:col-span-5 xl:col-span-4 order-2 lg:order-1 border-r border-slate-300 dark:border-slate-600">
-          
-          {/* SOFT GEOMETRIC ACCENT PATTERN */}
+        <div
+          className="hidden lg:flex flex-col items-center justify-center p-8 xl:p-12 relative overflow-hidden bg-slate-950 text-white select-none lg:col-span-5 xl:col-span-4 order-2 lg:order-1 border-r border-slate-800/90"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 18% 16%, rgba(56, 189, 248, 0.18) 0%, transparent 48%), radial-gradient(circle at 84% 84%, rgba(37, 99, 235, 0.18) 0%, transparent 52%), linear-gradient(160deg, #070D1A 0%, #0F172A 55%, #091122 100%)'
+          }}
+        >
+          {/* ANIMATED ARCHITECTURAL GRID, SWEEP BEAM & FLOATING GEOMETRY */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <svg 
-              className="w-full h-full opacity-35" 
-              xmlns="http://www.w3.org/2000/svg"
-              width="100%" 
-              height="100%"
-            >
-              <defs>
-                <pattern id="login-grid-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
-                  <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(14, 165, 233, 0.14)" strokeWidth="0.75" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#login-grid-pattern)" />
-            </svg>
+            {/* Drifting Architectural Blueprint Grid */}
+            <div className="absolute -inset-[60px] animate-login-grid-drift opacity-75">
+              <svg
+                className="w-full h-full"
+                xmlns="http://www.w3.org/2000/svg"
+                width="100%"
+                height="100%"
+              >
+                <defs>
+                  <pattern id="login-dark-grid-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
+                    <path
+                      d="M 60 0 L 0 0 0 60"
+                      fill="none"
+                      stroke="rgba(56, 189, 248, 0.11)"
+                      strokeWidth="1"
+                    />
+                    <circle cx="60" cy="60" r="1.4" fill="rgba(125, 211, 252, 0.28)" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#login-dark-grid-pattern)" />
+              </svg>
+            </div>
 
-            {/* Moving Animated Soft Sky & Slate Accent Squares */}
-            <div className="absolute top-[18%] right-[20%] w-[52px] h-[52px] bg-amber-100/50 border border-amber-300/70 rounded-lg animate-hero-float-slow"></div>
-            <div className="absolute top-[34%] right-[10%] w-[48px] h-[48px] bg-amber-50/70 border border-amber-300/60 rounded-lg animate-hero-float-reverse"></div>
-            <div className="absolute bottom-[26%] left-[14%] w-[54px] h-[54px] bg-slate-100 border border-slate-300 rounded-lg animate-hero-float-fast"></div>
-            <div className="absolute bottom-[12%] right-[24%] w-[46px] h-[46px] bg-amber-50/60 border border-amber-300/60 rounded-lg animate-hero-float-slow"></div>
+            {/* Sweeping Luminous Light Beam */}
+            <div
+              className="absolute -top-1/2 -left-1/2 w-[140%] h-32 animate-login-beam-sweep"
+              style={{
+                background:
+                  'linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.08) 35%, rgba(125, 211, 252, 0.2) 50%, rgba(56, 189, 248, 0.08) 65%, transparent 100%)',
+                filter: 'blur(18px)'
+              }}
+            />
+
+            {/* Floating Translucent Dark-Glass Geometric Shapes & Wireframes */}
+            <div className="absolute top-[14%] left-[12%] w-16 h-16 rounded-2xl bg-slate-900/55 backdrop-blur-md border border-sky-400/30 shadow-[0_0_28px_rgba(56,189,248,0.12)] animate-login-float-a flex items-center justify-center">
+              <div className="w-6 h-6 rounded-md border border-sky-300/35 rotate-12" />
+            </div>
+
+            <div className="absolute top-[22%] right-[11%] w-12 h-20 rounded-2xl bg-sky-500/10 backdrop-blur-sm border border-sky-400/25 shadow-[0_0_24px_rgba(37,99,235,0.14)] animate-login-float-b" />
+
+            <div className="absolute bottom-[22%] left-[14%] w-20 h-12 rounded-2xl bg-slate-900/60 backdrop-blur-md border border-blue-400/25 shadow-[0_0_24px_rgba(56,189,248,0.1)] animate-login-float-c flex items-center justify-around px-2.5">
+              <span className="w-2 h-2 rounded-xs bg-sky-400/70 animate-login-node-glow" />
+              <span className="w-7 h-1 rounded-full bg-sky-400/35" />
+            </div>
+
+            <div className="absolute bottom-[15%] right-[14%] w-14 h-14 rounded-xl bg-slate-900/45 backdrop-blur-md border border-sky-300/25 animate-login-float-a" style={{ animationDelay: '-2.2s' }}>
+              <div className="w-full h-full rounded-xl border border-dashed border-sky-400/25 scale-75" />
+            </div>
+
+            {/* Glowing Architectural Intersection Crosshairs */}
+            <div
+              className="absolute top-[36%] left-[26%] w-2.5 h-2.5 rotate-45 border border-sky-400/70 bg-sky-400/25 animate-login-node-glow"
+              style={{ animationDelay: '-0.8s' }}
+            />
+            <div
+              className="absolute bottom-[35%] right-[24%] w-2.5 h-2.5 rotate-45 border border-blue-400/70 bg-blue-400/25 animate-login-node-glow"
+              style={{ animationDelay: '-2.1s' }}
+            />
           </div>
 
-          {/* CENTER BRAND EMBLEM & TYPOGRAPHY */}
+          {/* CENTER BRAND EMBLEM, ORBIT RINGS, MOTTO & MODERN BADGE */}
           <div className="relative z-10 flex flex-col items-center text-center max-w-xs xl:max-w-sm mx-auto">
-            
-            {/* BRAND EMBLEM */}
-            <div className="animate-hero-float-slow">
-              <div className="flex items-center gap-3 mb-3.5">
-                <div className="w-13 h-13 xl:w-15 xl:h-15 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-xl xl:text-2xl shadow-md shadow-amber-500/20 border border-blue-600 dark:bg-blue-600">
+            {/* Orbital Rings + Breathing Halo + KB Emblem */}
+            <div className="relative flex items-center justify-center mb-6">
+              {/* Soft Breathing Radial Glow */}
+              <div className="absolute w-36 h-36 rounded-full bg-sky-500/20 blur-2xl animate-login-halo-breathe pointer-events-none" />
+
+              {/* Outer Dashed Rotating Orbit Ring */}
+              <div className="absolute w-28 h-28 rounded-full border border-dashed border-sky-400/35 animate-login-orbit-spin pointer-events-none">
+                <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.9)]" />
+              </div>
+
+              {/* Inner Counter-Rotating Arc Ring */}
+              <div className="absolute w-22 h-22 rounded-full border border-sky-300/20 border-t-sky-400/75 animate-login-orbit-reverse pointer-events-none" />
+
+              {/* Brand Mark Lockup */}
+              <div className="relative flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-900/70 backdrop-blur-md border border-slate-700/80 shadow-xl shadow-slate-950/60">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-sky-500/30 border border-sky-400/40">
                   <span>K</span>
-                  <span className="text-white text-base xl:text-lg ml-0.5">B</span>
+                  <span className="text-sky-100 text-base ml-0.5">B</span>
                 </div>
-                <span className="text-2xl xl:text-3xl font-black text-black dark:text-white tracking-tight">
+                <span className="text-2xl xl:text-3xl font-black text-white tracking-tight">
                   KBelia
                 </span>
               </div>
             </div>
 
             {/* SUBTITLE MOTTO */}
-            <p className="text-xs xl:text-sm text-black dark:text-white font-normal leading-relaxed max-w-xs mt-1">
-              Portal Rasmi Kiosk & Keusahawanan Belia Kelantan 2026
+            <p className="text-xs xl:text-sm text-slate-300 font-normal leading-relaxed max-w-xs">
+              {isEn
+                ? 'Official Kelantan Youth Kiosk & Entrepreneurship Portal 2026'
+                : 'Portal Rasmi Kiosk & Keusahawanan Belia Kelantan 2026'}
             </p>
 
-            {/* WELCOME BADGE */}
-            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-amber-50 border border-amber-300 text-black shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-black dark:text-white" />
-              <span>Selamat Datang ke KBelia</span>
+            {/* MODERN GLASS STATUS BADGE */}
+            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900/80 backdrop-blur-md border border-sky-400/25 text-sky-100 shadow-lg shadow-slate-950/50 whitespace-nowrap">
+              <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+              <span>{isEn ? 'Welcome to KBelia' : 'Selamat Datang ke KBelia'}</span>
+              <span aria-hidden="true" className="text-sky-400/60">&middot;</span>
+              <span className="text-sky-300 font-bold tabular-nums">2026</span>
             </div>
-
           </div>
 
           {/* FLOATING DARK / LIGHT THEME TOGGLE (BOTTOM LEFT CORNER) */}
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label="Tukar Mod Cerah/Gelap"
-            title={theme === 'dark' ? 'Tukar ke Mod Cerah' : 'Tukar ke Mod Gelap'}
-            className="absolute bottom-6 left-6 w-11 h-11 rounded-full bg-white hover:bg-amber-50 active:scale-95 text-black border border-slate-300 flex items-center justify-center shadow-sm transition-all cursor-pointer z-30 interactive-lift"
+            aria-label={isEn ? 'Toggle Light/Dark Mode' : 'Tukar Mod Cerah/Gelap'}
+            title={theme === 'dark' ? (isEn ? 'Switch to Light Mode' : 'Tukar ke Mod Cerah') : (isEn ? 'Switch to Dark Mode' : 'Tukar ke Mod Gelap')}
+            className="absolute bottom-6 left-6 w-11 h-11 rounded-full bg-slate-900/85 hover:bg-slate-800 active:scale-95 text-slate-200 border border-slate-700/80 hover:border-sky-400/50 flex items-center justify-center shadow-lg shadow-slate-950/50 backdrop-blur-md transition-all cursor-pointer z-30"
           >
             {theme === 'dark' ? (
-              <Sun className="w-5 h-5 text-black/70 dark:text-white/75" />
+              <Sun className="w-5 h-5 text-amber-300" />
             ) : (
-              <Moon className="w-5 h-5 text-black dark:text-white" />
+              <Moon className="w-5 h-5 text-sky-300" />
             )}
           </button>
-
         </div>
 
       </main>

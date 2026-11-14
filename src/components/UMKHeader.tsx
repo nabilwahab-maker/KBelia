@@ -50,6 +50,7 @@ export type UMKTab =
   | 'admin' 
   | 'merchant' 
   | 'mentor' 
+  | 'mentorship'
   | 'login' 
   | 'register' 
   | 'landing' 

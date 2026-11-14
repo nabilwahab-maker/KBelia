@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Building2, Calendar, Award, Store } from 'lucide-react';
+import { Building2, Calendar, Award, Store, Megaphone, User } from 'lucide-react';
 
 interface PortalImageProps {
   src?: string;
   alt: string;
   className?: string;
-  fallbackType?: 'kiosk' | 'program' | 'event' | 'business';
+  fallbackType?: 'kiosk' | 'program' | 'event' | 'business' | 'b2b' | 'avatar';
   fallbackLabel?: string;
 }
 
@@ -30,15 +30,19 @@ export const PortalImage: React.FC<PortalImageProps> = ({
           ? Calendar
           : fallbackType === 'business'
             ? Store
-            : Building2;
+            : fallbackType === 'b2b'
+              ? Megaphone
+              : fallbackType === 'avatar'
+                ? User
+                : Building2;
 
     return (
       <div
-        className={`bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 p-3 text-center select-none ${className}`}
+        className={`bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 p-2 text-center select-none ${className}`}
         role="img"
         aria-label={alt}
       >
-        <Icon className="w-6 h-6 opacity-70 mb-1 shrink-0" />
+        <Icon className="w-5 h-5 opacity-70 shrink-0" />
         {fallbackLabel && (
           <span className="text-[10px] font-semibold leading-tight line-clamp-2 opacity-80">
             {fallbackLabel}

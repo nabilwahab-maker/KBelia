@@ -19,7 +19,9 @@ import {
   Printer,
   Check,
   LayoutDashboard,
-  Award
+  Award,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { CapsuleBooking, GrantApplication, CapsuleSlot, KelantanDistrict, YouthProgram, MaintenanceTicket } from '../types';
 import { maskMyKad } from '../utils/securityUtils';
@@ -31,6 +33,7 @@ import { ImageDropzone } from './ImageDropzone';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveBookingKioskImage, resolveSlotImage } from '../utils/visualAssets';
+import { PaginationBar, usePagination } from './PaginationBar';
 
 interface AdminApprovalQueueProps {
   bookings: CapsuleBooking[];
@@ -74,6 +77,17 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
     slotOrProgram?: string;
   } | null>(null);
 
+  const [expandedKioskIds, setExpandedKioskIds] = useState<string[]>([]);
+  const [expandedGrantIds, setExpandedGrantIds] = useState<string[]>([]);
+  const [expandedTicketIds, setExpandedTicketIds] = useState<string[]>([]);
+
+  const toggleExpandedId = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    id: string
+  ) => {
+    setter((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+  };
+
   // Filter Bookings directly by statusFilter so real-time updates reflect consistently across tabs
   const filteredBookings = bookings.filter((b) => {
     const matchStatus = statusFilter === 'all' 
@@ -96,6 +110,31 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         (g.programTitle || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchStatus && matchSearch;
   });
+
+  const statusOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2 };
+  const sortedBookings = [...filteredBookings].sort(
+    (a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3)
+  );
+  const sortedGrants = [...filteredGrants].sort(
+    (a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3)
+  );
+  const ticketOrder: Record<string, number> = { received: 0, in_progress: 1, resolved: 2 };
+  const sortedTickets = [...maintenanceTickets].sort(
+    (a, b) => (ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3)
+  );
+
+  const bookingsPagination = usePagination(sortedBookings, 5, [
+    statusFilter,
+    searchQuery,
+    sortedBookings.length
+  ]);
+  const grantsPagination = usePagination(sortedGrants, 5, [
+    statusFilter,
+    searchQuery,
+    sortedGrants.length
+  ]);
+  const facilitySlotsPagination = usePagination(slots, 5, [slots.length]);
+  const ticketsPagination = usePagination(sortedTickets, 5, [sortedTickets.length]);
 
   const handleApproveBooking = async (id: string) => {
     setActionLoading(id);
@@ -663,52 +702,52 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* TAB 1: KIOSK BOOKINGS */}
       {activeTab === 'kiosks' && (
-        <div className="flex flex-col gap-4">
-          {filteredBookings.length === 0 ? (
-            <div className="text-center py-12 text-black/70 dark:text-white/75 text-xs">
+        <div className="space-y-3">
+          {sortedBookings.length === 0 ? (
+            <div className="text-center py-12 text-black/70 dark:text-white/75 text-xs bg-slate-50 dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
               Tiada rekod permohonan kiosk sepadan dengan tapisan semasa.
             </div>
           ) : (
-            filteredBookings.map((booking) => {
-              const isActioning = actionLoading === booking.id;
-              return (
-                <div 
-                  key={booking.id}
-                  className="rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-500 transition-all"
-                >
-                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-stretch">
-                    <div className="w-full sm:w-44 shrink-0 aspect-[4/3] sm:aspect-auto sm:min-h-[140px] rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
-                      <PortalImage
-                        src={resolveBookingKioskImage(booking, slots)}
-                        alt={`Reka bentuk kiosk ${booking.slotName}`}
-                        fallbackType="kiosk"
-                        fallbackLabel={booking.slotCode}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="flex-1 min-w-0 flex flex-col gap-3.5 justify-between">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2 mb-1">
-                            <span className="font-mono text-xs font-bold text-black dark:text-white/75">
-                              {booking.slotCode}
-                            </span>
-                            <span className="text-black/35 dark:text-white/35">·</span>
-                            <span className="text-xs font-semibold text-black dark:text-white">
-                              {booking.hubLocation}
-                            </span>
+            <>
+              <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+                {bookingsPagination.paginatedItems.map((booking) => {
+                  const isActioning = actionLoading === booking.id;
+                  const isExpanded = expandedKioskIds.includes(booking.id);
+                  return (
+                    <div key={booking.id} className="p-3.5 sm:p-4 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                          <div className="w-16 h-12 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                            <PortalImage
+                              src={resolveBookingKioskImage(booking, slots)}
+                              alt={`Reka bentuk kiosk ${booking.slotName}`}
+                              fallbackType="kiosk"
+                              fallbackLabel={booking.slotCode}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
-                          <h4 className="text-base font-bold text-black dark:text-white">
-                            {booking.businessName} — {booking.applicantName}
-                          </h4>
-                          <p className="text-xs text-black/70 dark:text-white/75 mt-0.5">
-                            Kategori: {booking.businessCategory} · Tempoh: {booking.durationMonths} Bulan (Mula: <strong>{formatDisplayDate(booking.startDate)}</strong> · Akhir: <strong className="text-black dark:text-white/75">{calculateOperationEndDate(booking.startDate, booking.durationMonths)}</strong>)
-                          </p>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                              <span className="font-mono font-bold text-black dark:text-white/85">
+                                {booking.slotCode}
+                              </span>
+                              <span className="text-black/35 dark:text-white/35">·</span>
+                              <span className="font-semibold text-black/75 dark:text-white/75 truncate">
+                                {booking.hubLocation}
+                              </span>
+                            </div>
+                            <h4 className="text-sm font-bold text-black dark:text-white truncate mt-0.5">
+                              {booking.businessName} — {booking.applicantName}
+                            </h4>
+                            <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 truncate tabular-nums">
+                              {booking.businessCategory} · {booking.durationMonths} bln · Mula {formatDisplayDate(booking.startDate)}
+                            </p>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+                        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider whitespace-nowrap ${
                             booking.status === 'approved'
                               ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
                               : booking.status === 'rejected'
@@ -717,254 +756,321 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           }`}>
                             {booking.status === 'approved' ? 'Diluluskan' : booking.status === 'rejected' ? 'Ditolak' : 'Menunggu Semakan'}
                           </span>
+
+                          <button
+                            type="button"
+                            onClick={() => toggleExpandedId(setExpandedKioskIds, booking.id)}
+                            aria-expanded={isExpanded}
+                            className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                          >
+                            <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
+                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                          </button>
                         </div>
                       </div>
 
-                  {booking.pitchNotes && (
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-xs text-black dark:text-white">
-                      <span className="font-semibold block mb-0.5 text-black dark:text-white">
-                        Penerangan Perniagaan & Cadangan Jualan:
-                      </span>
-                      {booking.pitchNotes}
-                    </div>
-                  )}
+                      {isExpanded && (
+                        <div className="mt-3.5 pt-3.5 border-t border-slate-200 dark:border-slate-700 space-y-3 animate-in fade-in duration-150">
+                          <div className="text-xs text-black/75 dark:text-white/80 tabular-nums">
+                            Tempoh Operasi: <strong className="text-black dark:text-white">{booking.durationMonths} Bulan</strong> · Mula: <strong className="text-black dark:text-white">{formatDisplayDate(booking.startDate)}</strong> · Akhir: <strong className="text-black dark:text-white">{calculateOperationEndDate(booking.startDate, booking.durationMonths)}</strong>
+                          </div>
 
-                  {/* Admin Notes & Action Bar */}
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-slate-300 dark:border-slate-600">
-                    <div className="relative flex-1">
-                      <input
-                        type="text"
-                        placeholder="Tulis ulasan pegawai sebelum meluluskan..."
-                        value={adminNoteInput[booking.id] ?? (booking.adminNotes || '')}
-                        onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [booking.id]: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
-                      />
-                    </div>
+                          {booking.pitchNotes && (
+                            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-xs text-black dark:text-white">
+                              <span className="font-semibold block mb-0.5 text-black dark:text-white">
+                                Penerangan Perniagaan & Cadangan Jualan:
+                              </span>
+                              {booking.pitchNotes}
+                            </div>
+                          )}
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        disabled={isActioning}
-                        onClick={() => handleApproveBooking(booking.id)}
-                        className="py-1.5 px-3 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center gap-1 cursor-pointer"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Luluskan & Jana Tawaran
-                      </button>
+                          {/* Admin Notes & Action Bar */}
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                            <div className="relative flex-1">
+                              <input
+                                type="text"
+                                placeholder="Tulis ulasan pegawai sebelum meluluskan..."
+                                value={adminNoteInput[booking.id] ?? (booking.adminNotes || '')}
+                                onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [booking.id]: e.target.value })}
+                                className="w-full px-3 py-1.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                              />
+                            </div>
 
-                      <button
-                        type="button"
-                        disabled={isActioning}
-                        onClick={() => {
-                          setRejectModalData({
-                            type: 'kiosk',
-                            id: booking.id,
-                            name: booking.applicantName,
-                            business: booking.businessName,
-                            slotOrProgram: `${booking.slotCode} (${booking.hubLocation})`
-                          });
-                        }}
-                        className="py-1.5 px-3 rounded-xl text-xs font-bold text-black dark:text-white bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 border border-rose-200 dark:border-rose-900 transition-colors cursor-pointer"
-                      >
-                        Tolak
-                      </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                disabled={isActioning}
+                                onClick={() => handleApproveBooking(booking.id)}
+                                className="py-1.5 px-3 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center gap-1 cursor-pointer"
+                              >
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                Luluskan & Jana Tawaran
+                              </button>
+
+                              <button
+                                type="button"
+                                disabled={isActioning}
+                                onClick={() => {
+                                  setRejectModalData({
+                                    type: 'kiosk',
+                                    id: booking.id,
+                                    name: booking.applicantName,
+                                    business: booking.businessName,
+                                    slotOrProgram: `${booking.slotCode} (${booking.hubLocation})`
+                                  });
+                                }}
+                                className="py-1.5 px-3 rounded-xl text-xs font-bold text-black dark:text-white bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 border border-rose-200 dark:border-rose-900 transition-colors cursor-pointer"
+                              >
+                                Tolak
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
+                  );
+                })}
+              </div>
+
+              <PaginationBar
+                currentPage={bookingsPagination.currentPage}
+                totalItems={bookingsPagination.totalItems}
+                itemsPerPage={5}
+                onPageChange={bookingsPagination.setCurrentPage}
+                itemLabel="permohonan kiosk"
+                accent="rose"
+              />
+            </>
           )}
         </div>
       )}
 
       {/* TAB 2: GRANT APPLICATIONS */}
       {activeTab === 'grants' && (
-        <div className="flex flex-col gap-4">
-          {filteredGrants.length === 0 ? (
-            <div className="text-center py-12 text-black/70 dark:text-white/75 text-xs">
+        <div className="space-y-3">
+          {sortedGrants.length === 0 ? (
+            <div className="text-center py-12 text-black/70 dark:text-white/75 text-xs bg-slate-50 dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
               Tiada rekod permohonan dana geran sepadan dengan tapisan semasa.
             </div>
           ) : (
-            filteredGrants.map((grant) => {
-              const isActioning = actionLoading === grant.id;
-              return (
-                <div 
-                  key={grant.id}
-                  className="rounded-2xl p-5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-500 transition-all flex flex-col gap-4"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold text-black dark:text-white/75">
-                          {grant.grantAmount}
-                        </span>
-                        <span className="text-black/35 dark:text-white/35">·</span>
-                        <span className="text-xs font-semibold text-black dark:text-white">
-                          {grant.programTitle}
-                        </span>
+            <>
+              <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+                {grantsPagination.paginatedItems.map((grant) => {
+                  const isActioning = actionLoading === grant.id;
+                  const isExpanded = expandedGrantIds.includes(grant.id);
+                  return (
+                    <div key={grant.id} className="p-3.5 sm:p-4 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-1.5 text-xs mb-0.5">
+                            <span className="font-bold text-black dark:text-white/85 tabular-nums">
+                              {grant.grantAmount}
+                            </span>
+                            <span className="text-black/35 dark:text-white/35">·</span>
+                            <span className="font-semibold text-black/80 dark:text-white/80 truncate">
+                              {grant.programTitle}
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-bold text-black dark:text-white truncate">
+                            {grant.businessName} — {grant.applicantName}
+                          </h4>
+                          <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 truncate">
+                            {grant.businessCategory} · SSM: {grant.ssmNumber || 'Dikecualikan'}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider whitespace-nowrap ${
+                            grant.status === 'approved'
+                              ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
+                              : grant.status === 'rejected'
+                                ? 'bg-rose-100 text-black dark:bg-rose-950/60 dark:text-white'
+                                : 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
+                          }`}>
+                            {grant.status === 'approved' ? 'Diluluskan' : grant.status === 'rejected' ? 'Ditolak' : 'Menunggu Semakan'}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => toggleExpandedId(setExpandedGrantIds, grant.id)}
+                            aria-expanded={isExpanded}
+                            className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                          >
+                            <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
+                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
                       </div>
-                      <h4 className="text-base font-bold text-black dark:text-white">
-                        {grant.businessName} — {grant.applicantName}
-                      </h4>
-                      <p className="text-xs text-black/70 dark:text-white/75 mt-0.5">
-                        Kategori: {grant.businessCategory} · SSM: {grant.ssmNumber || 'Dikecualikan'} · Bank: {grant.bankName} ({grant.bankAccountNumber})
-                      </p>
+
+                      {isExpanded && (
+                        <div className="mt-3.5 pt-3.5 border-t border-slate-200 dark:border-slate-700 space-y-3 animate-in fade-in duration-150">
+                          <div className="text-xs text-black/75 dark:text-white/80">
+                            Akaun Bank: <strong className="text-black dark:text-white">{grant.bankName}</strong> ({grant.bankAccountNumber})
+                          </div>
+
+                          {grant.fundPurpose && (
+                            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-xs text-black dark:text-white">
+                              <span className="font-semibold block mb-0.5 text-black dark:text-white">
+                                Cadangan Penggunaan Dana:
+                              </span>
+                              {grant.fundPurpose}
+                            </div>
+                          )}
+
+                          {/* Admin Notes & Action Bar */}
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                            <div className="relative flex-1">
+                              <input
+                                type="text"
+                                placeholder="Tulis catatan pegawai sebelum meluluskan..."
+                                value={adminNoteInput[grant.id] ?? (grant.adminNotes || '')}
+                                onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [grant.id]: e.target.value })}
+                                className="w-full px-3 py-1.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                              />
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                disabled={isActioning}
+                                onClick={() => handleApproveGrant(grant.id)}
+                                className="py-1.5 px-3 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center gap-1 cursor-pointer"
+                              >
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                Luluskan Dana Geran
+                              </button>
+
+                              <button
+                                type="button"
+                                disabled={isActioning}
+                                onClick={() => {
+                                  setRejectModalData({
+                                    type: 'grant',
+                                    id: grant.id,
+                                    name: grant.applicantName,
+                                    business: grant.businessName,
+                                    slotOrProgram: `${grant.programTitle} (${grant.grantAmount})`
+                                  });
+                                }}
+                                className="py-1.5 px-3 rounded-xl text-xs font-bold text-black dark:text-white bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 border border-rose-200 dark:border-rose-900 transition-colors cursor-pointer"
+                              >
+                                Tolak
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
+                  );
+                })}
+              </div>
 
-                    <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider self-start sm:self-auto ${
-                      grant.status === 'approved'
-                        ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
-                        : grant.status === 'rejected'
-                          ? 'bg-rose-100 text-black dark:bg-rose-950/60 dark:text-white'
-                          : 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
-                    }`}>
-                      {grant.status === 'approved' ? 'Diluluskan' : grant.status === 'rejected' ? 'Ditolak' : 'Menunggu Semakan'}
-                    </span>
-                  </div>
-
-                  {grant.fundPurpose && (
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-xs text-black dark:text-white">
-                      <span className="font-semibold block mb-0.5 text-black dark:text-white">
-                        Cadangan Penggunaan Dana:
-                      </span>
-                      {grant.fundPurpose}
-                    </div>
-                  )}
-
-                  {/* Admin Notes & Action Bar */}
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2 border-t border-slate-300 dark:border-slate-600">
-                    <div className="relative flex-1">
-                      <input
-                        type="text"
-                        placeholder="Tulis catatan pegawai sebelum meluluskan..."
-                        value={adminNoteInput[grant.id] ?? (grant.adminNotes || '')}
-                        onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [grant.id]: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        disabled={isActioning}
-                        onClick={() => handleApproveGrant(grant.id)}
-                        className="py-1.5 px-3 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center gap-1 cursor-pointer"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Luluskan Dana Geran
-                      </button>
-
-                      <button
-                        type="button"
-                        disabled={isActioning}
-                        onClick={() => {
-                          setRejectModalData({
-                            type: 'grant',
-                            id: grant.id,
-                            name: grant.applicantName,
-                            business: grant.businessName,
-                            slotOrProgram: `${grant.programTitle} (${grant.grantAmount})`
-                          });
-                        }}
-                        className="py-1.5 px-3 rounded-xl text-xs font-bold text-black dark:text-white bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 border border-rose-200 dark:border-rose-900 transition-colors cursor-pointer"
-                      >
-                        Tolak
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
+              <PaginationBar
+                currentPage={grantsPagination.currentPage}
+                totalItems={grantsPagination.totalItems}
+                itemsPerPage={5}
+                onPageChange={grantsPagination.setCurrentPage}
+                itemLabel="permohonan geran"
+                accent="rose"
+              />
+            </>
           )}
         </div>
       )}
 
       {/* TAB 3: FACILITY & KIOSK MAINTENANCE CONTROL */}
-      {/* TAB 3: FACILITY & KIOSK MAINTENANCE CONTROL */}
       {activeTab === 'facility' && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {slots.map((slot) => (
-              <div 
-                key={slot.id}
-                className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 overflow-hidden flex flex-col justify-between"
-              >
-                <div>
-                  <div className="h-32 w-full overflow-hidden bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600">
-                    <PortalImage
-                      src={resolveSlotImage(slot)}
-                      alt={slot.name}
-                      fallbackType="kiosk"
-                      fallbackLabel={slot.code}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-mono text-xs font-bold text-black dark:text-white/75">
-                        {slot.code}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
-                        slot.status === 'available'
-                          ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
-                          : slot.status === 'maintenance'
-                            ? 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
-                            : 'bg-slate-100 text-black border border-slate-300 dark:bg-slate-700 dark:text-white dark:border-slate-600'
-                      }`}>
-                        {slot.status === 'available' ? 'Tersedia' : slot.status === 'maintenance' ? 'Dalam Pembaikan' : 'Diduduki'}
-                      </span>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {facilitySlotsPagination.paginatedItems.map((slot) => (
+                <div 
+                  key={slot.id}
+                  className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 overflow-hidden flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="h-32 w-full overflow-hidden bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600">
+                      <PortalImage
+                        src={resolveSlotImage(slot)}
+                        alt={slot.name}
+                        fallbackType="kiosk"
+                        fallbackLabel={slot.code}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <h4 className="text-sm font-bold text-black dark:text-white mb-1">
-                      {slot.name}
-                    </h4>
-                    <p className="text-xs text-black/70 dark:text-white/75 tabular-nums">
-                      {slot.hubLocation} ({slot.district}) · RM{slot.monthlyRate}/bln
-                    </p>
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-mono text-xs font-bold text-black dark:text-white/75">
+                          {slot.code}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                          slot.status === 'available'
+                            ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
+                            : slot.status === 'maintenance'
+                              ? 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
+                              : 'bg-slate-100 text-black border border-slate-300 dark:bg-slate-700 dark:text-white dark:border-slate-600'
+                        }`}>
+                          {slot.status === 'available' ? 'Tersedia' : slot.status === 'maintenance' ? 'Dalam Pembaikan' : 'Diduduki'}
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-bold text-black dark:text-white mb-1">
+                        {slot.name}
+                      </h4>
+                      <p className="text-xs text-black/70 dark:text-white/75 tabular-nums">
+                        {slot.hubLocation} ({slot.district}) · RM{slot.monthlyRate}/bln
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                {/* Status Toggle Controls */}
-                {onUpdateSlotStatus && (
-                  <div className="px-4 pb-4 pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => onUpdateSlotStatus(slot.id, 'available')}
-                      className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
-                        slot.status === 'available'
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-emerald-50 border border-slate-300 dark:border-slate-600'
-                      }`}
-                    >
-                      Buka
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onUpdateSlotStatus(slot.id, 'maintenance')}
-                      className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
-                        slot.status === 'maintenance'
-                          ? 'bg-amber-600 text-white'
-                          : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
-                      }`}
-                    >
-                      Baiki
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onUpdateSlotStatus(slot.id, 'occupied')}
-                      className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
-                        slot.status === 'occupied'
-                          ? 'bg-slate-700 text-white'
-                          : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
-                      }`}
-                    >
-                      Isi
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
+                  {/* Status Toggle Controls */}
+                  {onUpdateSlotStatus && (
+                    <div className="px-4 pb-4 pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => onUpdateSlotStatus(slot.id, 'available')}
+                        className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                          slot.status === 'available'
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-emerald-50 border border-slate-300 dark:border-slate-600'
+                        }`}
+                      >
+                        Buka
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onUpdateSlotStatus(slot.id, 'maintenance')}
+                        className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                          slot.status === 'maintenance'
+                            ? 'bg-amber-600 text-white'
+                            : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
+                        }`}
+                      >
+                        Baiki
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onUpdateSlotStatus(slot.id, 'occupied')}
+                        className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                          slot.status === 'occupied'
+                            ? 'bg-slate-700 text-white'
+                            : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
+                        }`}
+                      >
+                        Isi
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <PaginationBar
+              currentPage={facilitySlotsPagination.currentPage}
+              totalItems={facilitySlotsPagination.totalItems}
+              itemsPerPage={5}
+              onPageChange={facilitySlotsPagination.setCurrentPage}
+              itemLabel="unit kiosk"
+              accent="rose"
+            />
           </div>
 
           {/* Aduan & Tiket Penyelenggaraan Penyewa */}
@@ -973,7 +1079,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               <div>
                 <h4 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
                   <Wrench className="w-4 h-4 text-black dark:text-white/75" />
-                  <span>Tiket Aduan Penyelenggaraan Penyewa ({maintenanceTickets.length})</span>
+                  <span>Tiket Aduan Penyelenggaraan Penyewa ({sortedTickets.length})</span>
                 </h4>
                 <p className="text-xs text-black/70 dark:text-white/75">
                   Kemas kini status baik pulih aduan kerosakan teknikal daripada usahawan kapsul.
@@ -981,63 +1087,93 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               </div>
             </div>
 
-            {maintenanceTickets.length === 0 ? (
+            {sortedTickets.length === 0 ? (
               <div className="p-6 text-center rounded-xl border border-dashed border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-xs text-black/70 dark:text-white/75">
                 Tiada aduan kerosakan aktif diterima daripada penyewa buat masa ini.
               </div>
             ) : (
               <div className="space-y-3">
-                {maintenanceTickets.map((ticket) => (
-                  <div
-                    key={ticket.id}
-                    className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-[11px] font-bold text-black dark:text-white/75">{ticket.slotCode}</span>
-                        <span className="text-xs font-bold text-black dark:text-white">{ticket.kioskName}</span>
-                        <span className="text-[11px] text-black/70 dark:text-white/75">· {ticket.issueCategory}</span>
-                      </div>
-                      <p className="text-xs text-black dark:text-white">{ticket.description}</p>
-                      <p className="text-[11px] text-black/70 dark:text-white/75">
-                        Pelapor: {ticket.reporterName} ({ticket.reporterPhone})
-                      </p>
-                    </div>
+                <div className="rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+                  {ticketsPagination.paginatedItems.map((ticket) => {
+                    const isExpanded = expandedTicketIds.includes(ticket.id);
+                    return (
+                      <div key={ticket.id} className="p-3.5 sm:p-4 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-mono text-[11px] font-bold text-black dark:text-white/75">{ticket.slotCode}</span>
+                              <span className="text-xs font-bold text-black dark:text-white">{ticket.kioskName}</span>
+                              <span className="text-[11px] text-black/70 dark:text-white/75">· {ticket.issueCategory}</span>
+                            </div>
+                            <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 truncate">
+                              Pelapor: {ticket.reporterName} · {ticket.description}
+                            </p>
+                          </div>
 
-                    <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-                      <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${
-                        ticket.status === 'resolved'
-                          ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
-                          : ticket.status === 'in_progress'
-                            ? 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
-                            : 'bg-amber-100 text-black dark:bg-indigo-600 dark:text-white'
-                      }`}>
-                        {ticket.status === 'resolved' ? 'Selesai' : ticket.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
-                      </span>
+                          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase whitespace-nowrap ${
+                              ticket.status === 'resolved'
+                                ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
+                                : ticket.status === 'in_progress'
+                                  ? 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
+                                  : 'bg-amber-100 text-black dark:bg-indigo-600 dark:text-white'
+                            }`}>
+                              {ticket.status === 'resolved' ? 'Selesai' : ticket.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
+                            </span>
 
-                      {onUpdateTicketStatus && ticket.status !== 'resolved' && (
-                        <>
-                          {ticket.status === 'received' && (
                             <button
                               type="button"
-                              onClick={() => onUpdateTicketStatus(ticket.id, 'in_progress', 'Juruteknik telah ditugaskan untuk pemeriksaan.')}
-                              className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+                              onClick={() => toggleExpandedId(setExpandedTicketIds, ticket.id)}
+                              aria-expanded={isExpanded}
+                              className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
                             >
-                              Tugaskan
+                              <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
+                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                             </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => onUpdateTicketStatus(ticket.id, 'resolved', 'Kerja baik pulih selesai dan disahkan.')}
-                            className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
-                          >
-                            Selesai
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                          </div>
+                        </div>
+
+                        {isExpanded && (
+                          <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2.5 animate-in fade-in duration-150">
+                            <p className="text-xs text-black dark:text-white leading-relaxed">{ticket.description}</p>
+                            <p className="text-[11px] text-black/70 dark:text-white/75">
+                              Pelapor: <strong className="text-black dark:text-white">{ticket.reporterName}</strong> ({ticket.reporterPhone})
+                            </p>
+
+                            {onUpdateTicketStatus && ticket.status !== 'resolved' && (
+                              <div className="flex flex-wrap items-center gap-2 pt-1">
+                                {ticket.status === 'received' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => onUpdateTicketStatus(ticket.id, 'in_progress', 'Juruteknik telah ditugaskan untuk pemeriksaan.')}
+                                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+                                  >
+                                    Tugaskan Juruteknik
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => onUpdateTicketStatus(ticket.id, 'resolved', 'Kerja baik pulih selesai dan disahkan.')}
+                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                                >
+                                  Tandakan Selesai
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <PaginationBar
+                  currentPage={ticketsPagination.currentPage}
+                  totalItems={ticketsPagination.totalItems}
+                  itemsPerPage={5}
+                  onPageChange={ticketsPagination.setCurrentPage}
+                  itemLabel="tiket aduan"
+                  accent="rose"
+                />
               </div>
             )}
           </div>

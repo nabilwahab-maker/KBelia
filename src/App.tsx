@@ -28,7 +28,8 @@ import {
   GrantEndorsement,
   MerchantSubTab,
   AdminSubTab,
-  MentorSubTab
+  MentorSubTab,
+  KelantanDistrict
 } from './types';
 import { 
   INITIAL_BUSINESSES, 
@@ -87,7 +88,7 @@ import { PublicVerificationModal } from './components/PublicVerificationModal';
 import { ApplicationStatusDocumentsModal } from './components/ApplicationStatusDocumentsModal';
 import { KioskCashflowModal } from './components/KioskCashflowModal';
 import { MicroLearningAcademyModal } from './components/MicroLearningAcademyModal';
-import { MentorshipClinicModal } from './components/MentorshipClinicModal';
+import { MentorshipPage } from './components/MentorshipPage';
 import { KioskMaintenanceModal } from './components/KioskMaintenanceModal';
 import { YouthB2BNetworkModal } from './components/YouthB2BNetworkModal';
 import { YouthEventsCalendarModal } from './components/YouthEventsCalendarModal';
@@ -144,7 +145,6 @@ function MainApp() {
       setIsStatusDocumentsModalOpen(false);
       setIsCashflowModalOpen(false);
       setIsAcademyModalOpen(false);
-      setIsMentorshipModalOpen(false);
       setIsMaintenanceModalOpen(false);
       setIsB2BModalOpen(false);
       setIsEventsModalOpen(false);
@@ -206,7 +206,6 @@ function MainApp() {
   const [isStatusDocumentsModalOpen, setIsStatusDocumentsModalOpen] = useState(false);
   const [isCashflowModalOpen, setIsCashflowModalOpen] = useState(false);
   const [isAcademyModalOpen, setIsAcademyModalOpen] = useState(false);
-  const [isMentorshipModalOpen, setIsMentorshipModalOpen] = useState(false);
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
   const [isB2BModalOpen, setIsB2BModalOpen] = useState(false);
   const [isEventsModalOpen, setIsEventsModalOpen] = useState(false);
@@ -248,7 +247,7 @@ function MainApp() {
 
     const adminAllowedTabs: UMKTab[] = ['home', 'admin', 'academic', 'ceed', 'hepa', 'news', 'settings'];
     const mentorAllowedTabs: UMKTab[] = ['home', 'mentor', 'news', 'settings'];
-    const youthAllowedTabs: UMKTab[] = ['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'news', 'settings'];
+    const youthAllowedTabs: UMKTab[] = ['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'mentorship', 'news', 'settings'];
 
     if (isAdmin && !adminAllowedTabs.includes(activeTab)) {
       setActiveTab('admin');
@@ -284,23 +283,50 @@ function MainApp() {
     }
     setMentorshipRegistrations(prev => prev.map(r => r.id === updated.id ? updated : r));
     saveMentorshipRegistrationRecord(updated).catch(() => {});
+    if (updated.status === 'cancelled' && isYouth) {
+      showToast({
+        type: 'info',
+        title: 'Temu Janji Dibatalkan',
+        message: 'Temu janji bimbingan anda telah dibatalkan. Anda kini boleh memilih mentor lain.'
+      });
+    }
   };
 
-  const handleAddMentorshipRegistration = (newReg: MentorshipRegistration) => {
+  const handleAddMentorshipRegistration = (newReg: MentorshipRegistration): boolean => {
     if (isAdmin || isMentor) {
       showToast({
         type: 'warning',
         title: 'Akses Terhad Mengikut Peranan',
         message: 'Tempahan klinik bimbingan hanya dibuka untuk akaun Usahawan Belia.'
       });
-      return;
+      return false;
+    }
+    const existingActive = mentorshipRegistrations.find(
+      (r) =>
+        (r.status === 'pending' || r.status === 'confirmed') &&
+        (r.applicantId === user?.uid ||
+          (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))
+    );
+    if (existingActive) {
+      showToast({
+        type: 'warning',
+        title: 'Had Satu Temu Janji Aktif',
+        message: 'Anda sudah mempunyai satu temu janji aktif. Sila batalkan temu janji sedia ada terlebih dahulu.'
+      });
+      return false;
     }
     const withOwner: MentorshipRegistration = {
       ...newReg,
-      applicantId: newReg.applicantId || user?.uid
+      applicantId: newReg.applicantId || user?.uid,
+      entrepreneurEmail: newReg.entrepreneurEmail || user?.email || userProfile?.email || 'usahawan@kbelia.my'
     };
     setMentorshipRegistrations(prev => [withOwner, ...prev.filter(r => r.id !== withOwner.id)]);
     saveMentorshipRegistrationRecord(withOwner).catch(() => {});
+    showToast({
+      type: 'success',
+      title: 'Temu Janji Dihantar',
+      message: `Permohonan sesi bersama ${withOwner.mentorName} telah direkodkan.`
+    });
     emitAdminOrMentorNotification({
       title: `Tempahan Sesi Mentor Baharu: ${withOwner.businessName}`,
       message: `${withOwner.entrepreneurName} memohon sesi bimbingan (${withOwner.topic}) pada ${withOwner.preferredDate} (${withOwner.preferredTime}).`,
@@ -311,6 +337,7 @@ function MainApp() {
       type: 'mentorship',
       actionTab: 'mentor'
     });
+    return true;
   };
 
   // Helper to normalize legacy /public/assets paths into /assets
@@ -1211,11 +1238,11 @@ function MainApp() {
       showToast({
         type: 'warning',
         title: 'Batas Peranan Sistem',
-        message: 'Tempahan klinik bimbingan hanya dibuka untuk akaun Usahawan Belia.'
+        message: 'Halaman bimbingan mentor hanya dibuka untuk akaun Usahawan Belia.'
       });
       return;
     }
-    setIsMentorshipModalOpen(true);
+    setActiveTab('mentorship');
   };
 
   const handleViewOfferLetter = (booking: CapsuleBooking) => {
@@ -1462,6 +1489,7 @@ function MainApp() {
                   <MentorPortal
                     mentors={mentors}
                     registrations={scopedMentorRegistrations}
+                    businesses={businesses}
                     onUpdateRegistration={handleUpdateMentorshipRegistration}
                     onUpdateMentor={handleUpdateMentorProfile}
                     activeSubTab={mentorSubTab}
@@ -1818,6 +1846,7 @@ function MainApp() {
                 <MentorPortal
                   mentors={mentors}
                   registrations={scopedMentorRegistrations}
+                  businesses={businesses}
                   onUpdateRegistration={handleUpdateMentorshipRegistration}
                   onUpdateMentor={handleUpdateMentorProfile}
                   activeSubTab={mentorSubTab}
@@ -1905,6 +1934,49 @@ function MainApp() {
                   onRefresh={triggerRefresh}
                   activeSubTab={merchantSubTab}
                   onSelectSubTab={setMerchantSubTab}
+                />
+              </div>
+            )
+          )}
+
+          {/* HALAMAN BIMBINGAN BEBAS (STRICTLY YOUTH ROLE ONLY) */}
+          {activeTab === 'mentorship' && (
+            !isYouth ? (
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
+                  <GraduationCap className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-black dark:text-white">
+                    {language === 'en' ? 'Youth Entrepreneur Access Only' : 'Akses Khusus Usahawan Belia Sahaja'}
+                  </h3>
+                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                    {language === 'en'
+                      ? 'Mentor appointment booking is reserved for Youth Entrepreneur accounts.'
+                      : 'Halaman tempahan dan pengurusan temu janji mentor dikhaskan kepada akaun Usahawan Belia.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+                <MentorshipPage
+                  mentors={mentors}
+                  registrations={scopedMentorRegistrations}
+                  onBookMentorship={handleAddMentorshipRegistration}
+                  onCancelMentorship={handleUpdateMentorshipRegistration}
+                  defaultEntrepreneurName={userProfile?.fullName || user?.displayName || 'Usahawan Belia'}
+                  defaultEntrepreneurEmail={user?.email || userProfile?.email || 'usahawan@kbelia.my'}
+                  defaultBusinessName={myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Anda'}
+                  defaultPhone={userProfile?.phone || userProfile?.whatsapp || ''}
+                  defaultDistrict={(userProfile?.district as KelantanDistrict) || 'Kota Bharu'}
                 />
               </div>
             )
@@ -2022,7 +2094,10 @@ function MainApp() {
         mentorshipRegistrations={mentorshipRegistrations.filter(r => r.applicantId === user?.uid || (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))}
         onOpenBooking={handleOpenNewBooking}
         onOpenGrantModal={handleOpenGrantModal}
-        onOpenMentorship={() => { if (isYouth) setIsMentorshipModalOpen(true); }}
+        onOpenMentorship={() => {
+          setIsStatusDocumentsModalOpen(false);
+          if (isYouth) setActiveTab('mentorship');
+        }}
         onOpenVerification={(refCode) => {
           setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');
           setIsVerificationModalOpen(true);
@@ -2045,16 +2120,6 @@ function MainApp() {
       <MicroLearningAcademyModal
         isOpen={isAcademyModalOpen}
         onClose={() => setIsAcademyModalOpen(false)}
-      />
-
-      {/* 9. Mentorship Clinic Modal */}
-      <MentorshipClinicModal
-        isOpen={isMentorshipModalOpen}
-        onClose={() => setIsMentorshipModalOpen(false)}
-        mentors={mentors}
-        onBookMentorship={handleAddMentorshipRegistration}
-        defaultEntrepreneurName={userProfile?.fullName || user?.displayName || 'Usahawan Belia'}
-        defaultBusinessName={myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Anda'}
       />
 
       {/* 10. Kiosk Maintenance Modal */}

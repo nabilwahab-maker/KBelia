@@ -614,7 +614,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   {/* Start Date */}
                   <div>
                     <label className="text-xs sm:text-sm font-medium text-black dark:text-white block mb-2">
-                      Tarikh Dijangka Mula Berniaga: <span className="text-black dark:text-white">*</span>
+                      Tarikh Dijangka Mula Operasi: <span className="text-black dark:text-white">*</span>
                     </label>
                     <div className="relative">
                       <Calendar className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-4 top-1/2 -translate-y-1/2" />

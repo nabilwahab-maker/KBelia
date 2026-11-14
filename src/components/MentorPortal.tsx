@@ -35,7 +35,9 @@ import {
   ArrowRight,
   Sliders,
   FileCheck,
-  BarChart3
+  BarChart3,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { 
   MentorProfile, 
@@ -43,7 +45,8 @@ import {
   KelantanDistrict, 
   MentorSubTab, 
   GrantEndorsementLetter, 
-  MentoringLogEntry 
+  MentoringLogEntry,
+  BusinessListing
 } from '../types';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
@@ -59,6 +62,9 @@ import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast as triggerToast } from './ToastNotification';
 import { SaaSKpiCard } from './SaaSKpiCard';
+import { PortalImage } from './PortalImage';
+import { PaginationBar, usePagination } from './PaginationBar';
+import { resolveMenteeVisuals } from '../utils/visualAssets';
 import {
   BarChart,
   Bar,
@@ -72,6 +78,7 @@ import {
 interface MentorPortalProps {
   mentors: MentorProfile[];
   registrations: MentorshipRegistration[];
+  businesses?: BusinessListing[];
   onUpdateRegistration: (updated: MentorshipRegistration) => void;
   onUpdateMentor?: (updatedMentor: MentorProfile) => void;
   activeSubTab?: MentorSubTab;
@@ -190,6 +197,7 @@ const INITIAL_LOGS: MentoringLogEntry[] = [
 export const MentorPortal: React.FC<MentorPortalProps> = ({
   mentors,
   registrations,
+  businesses = [],
   onUpdateRegistration,
   onUpdateMentor,
   activeSubTab = 'overview',
@@ -395,31 +403,76 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const [newLogTask2, setNewLogTask2] = useState('');
   const [newLogDueDate2, setNewLogDueDate2] = useState('');
 
+  // Expandable compact list states
+  const [expandedApplicationIds, setExpandedApplicationIds] = useState<Record<string, boolean>>({});
+  const [expandedScheduleIds, setExpandedScheduleIds] = useState<Record<string, boolean>>({});
+  const [expandedActionPlanIds, setExpandedActionPlanIds] = useState<Record<string, boolean>>({});
+  const [expandedLogIds, setExpandedLogIds] = useState<Record<string, boolean>>({});
+
   // Strictly scoped registrations, endorsements & logs for the authenticated mentor ONLY
   const mentorRegistrations = registrations.filter(r => r.mentorId === currentMentor.id);
   const mentorEndorsements = endorsements.filter(e => e.mentorId === currentMentor.id);
   const mentorLogs = logEntries.filter(l => l.mentorId === currentMentor.id);
 
-  const filteredRegistrations = mentorRegistrations.filter(r => {
-    const matchesSearch = 
-      r.entrepreneurName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.district.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || r.status === statusFilter;
-    const matchesMode = modeFilter === 'all' || r.mode === modeFilter;
+  const statusOrderWeight = (status: MentorshipRegistration['status']) => {
+    if (status === 'pending') return 0;
+    if (status === 'confirmed') return 1;
+    if (status === 'completed') return 2;
+    return 3;
+  };
 
-    return matchesSearch && matchesStatus && matchesMode;
-  });
+  // Overview table: matches search across all statuses, sorted active-first
+  const overviewRegistrations = mentorRegistrations
+    .filter(r => {
+      const q = searchQuery.toLowerCase();
+      return (
+        r.entrepreneurName.toLowerCase().includes(q) ||
+        r.businessName.toLowerCase().includes(q) ||
+        r.topic.toLowerCase().includes(q) ||
+        r.district.toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => statusOrderWeight(a.status) - statusOrderWeight(b.status));
+
+  // Permohonan Bimbingan: 'all' tab ONLY shows active (pending + confirmed); 'completed' is separated into 'Selesai' tab
+  const filteredRegistrations = mentorRegistrations
+    .filter(r => {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        r.entrepreneurName.toLowerCase().includes(q) ||
+        r.businessName.toLowerCase().includes(q) ||
+        r.topic.toLowerCase().includes(q) ||
+        r.district.toLowerCase().includes(q);
+
+      const matchesStatus =
+        statusFilter === 'all'
+          ? r.status === 'pending' || r.status === 'confirmed'
+          : r.status === statusFilter;
+      const matchesMode = modeFilter === 'all' || r.mode === modeFilter;
+
+      return matchesSearch && matchesStatus && matchesMode;
+    })
+    .sort((a, b) => statusOrderWeight(a.status) - statusOrderWeight(b.status));
+
+  const confirmedScheduleSessions = mentorRegistrations.filter(m => m.status === 'confirmed');
+  const actionPlanMentees = mentorRegistrations.filter(m => Boolean(m.mentorActionPlan));
 
   // Calculate statistics for this mentor
   const totalMentees = mentorRegistrations.length;
+  const activeCount = mentorRegistrations.filter(r => r.status === 'pending' || r.status === 'confirmed').length;
   const pendingCount = mentorRegistrations.filter(r => r.status === 'pending').length;
-  const confirmedCount = mentorRegistrations.filter(r => r.status === 'confirmed').length;
+  const confirmedCount = confirmedScheduleSessions.length;
   const completedCount = mentorRegistrations.filter(r => r.status === 'completed').length;
   const totalEndorsementsCount = mentorEndorsements.length;
   const totalLogbookCount = mentorLogs.length;
+
+  // Unconditional 5-item pagination hooks across MentorPortal lists
+  const overviewPagination = usePagination(overviewRegistrations, 5, [searchQuery, currentMentor.id]);
+  const applicationsPagination = usePagination(filteredRegistrations, 5, [searchQuery, statusFilter, modeFilter, currentMentor.id]);
+  const schedulePagination = usePagination(confirmedScheduleSessions, 5, [currentMentor.id, confirmedScheduleSessions.length]);
+  const actionPlansPagination = usePagination(actionPlanMentees, 5, [currentMentor.id, actionPlanMentees.length]);
+  const endorsementsPagination = usePagination(mentorEndorsements, 5, [currentMentor.id, mentorEndorsements.length]);
+  const logsPagination = usePagination(mentorLogs, 5, [currentMentor.id, mentorLogs.length]);
 
   const showToast = (msg: string) => {
     setIsSuccessToast(msg);
@@ -861,11 +914,41 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </div>
 
                   <div className="space-y-3">
-                    {mentorRegistrations.slice(0, 3).map((reg) => (
+                    {mentorRegistrations.slice(0, 3).map((reg) => {
+                      const visuals = resolveMenteeVisuals(
+                        {
+                          applicantId: reg.applicantId,
+                          entrepreneurName: reg.entrepreneurName,
+                          businessName: reg.businessName,
+                          category: reg.businessCategory
+                        },
+                        businesses
+                      );
+                      return (
                       <div 
                         key={reg.id}
                         className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <div className="relative w-12 h-10 shrink-0 mt-0.5">
+                            <div className="w-full h-full rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
+                              <PortalImage
+                                src={visuals.businessUrl}
+                                alt={reg.businessName}
+                                fallbackType="business"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-xs absolute -bottom-1 -right-1 bg-white dark:bg-slate-900">
+                              <PortalImage
+                                src={visuals.avatarUrl}
+                                alt={reg.entrepreneurName}
+                                fallbackType="avatar"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+
                         <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs font-bold text-black dark:text-white leading-snug break-words">
@@ -890,6 +973,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <span>&middot;</span>
                             <span>{reg.mode === 'Google Meet Maya' ? 'Google Meet Maya' : 'Bersemuka Kampus'}</span>
                           </div>
+                        </div>
                         </div>
 
                         <div className="shrink-0">
@@ -922,7 +1006,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           )}
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
 
                     {mentorRegistrations.length === 0 && (
                       <div className="py-8 text-center text-xs text-black/70 dark:text-white/75">
@@ -1070,16 +1155,47 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-300 dark:divide-slate-600">
-                    {filteredRegistrations.map((mentee) => {
+                    {overviewPagination.paginatedItems.map((mentee) => {
                       const hasEndorsement = mentorEndorsements.some(e => e.menteeName.toLowerCase() === mentee.entrepreneurName.toLowerCase());
+                      const visuals = resolveMenteeVisuals(
+                        {
+                          applicantId: mentee.applicantId,
+                          entrepreneurName: mentee.entrepreneurName,
+                          businessName: mentee.businessName,
+                          category: mentee.businessCategory
+                        },
+                        businesses
+                      );
                       return (
                         <tr 
                           key={mentee.id}
                           className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
                         >
                           <td className="py-3 px-4">
-                            <div className="font-bold text-black dark:text-white">{mentee.entrepreneurName}</div>
-                            <div className="text-[11px] text-black/70 dark:text-white/75">{mentee.businessName}</div>
+                            <div className="flex items-center gap-3">
+                              <div className="relative w-12 h-10 shrink-0">
+                                <div className="w-full h-full rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
+                                  <PortalImage
+                                    src={visuals.businessUrl}
+                                    alt={mentee.businessName}
+                                    fallbackType="business"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-white dark:border-slate-900 shadow-xs absolute -bottom-1 -right-1 bg-white dark:bg-slate-800">
+                                  <PortalImage
+                                    src={visuals.avatarUrl}
+                                    alt={mentee.entrepreneurName}
+                                    fallbackType="avatar"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-bold text-black dark:text-white">{mentee.entrepreneurName}</div>
+                                <div className="text-[11px] text-black/70 dark:text-white/75">{mentee.businessName}</div>
+                              </div>
+                            </div>
                           </td>
                           <td className="py-3 px-4 text-black dark:text-white font-medium">
                             {mentee.district}
@@ -1122,7 +1238,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         </tr>
                       );
                     })}
-                    {filteredRegistrations.length === 0 && (
+                    {overviewRegistrations.length === 0 && (
                       <tr>
                         <td colSpan={6} className="py-8 text-center text-xs text-black/70 dark:text-white/75">
                           Tiada rekod usahawan mentee dijumpai.
@@ -1132,6 +1248,18 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </tbody>
                 </table>
               </div>
+              {overviewRegistrations.length > 5 && (
+                <div className="px-4 pb-4">
+                  <PaginationBar
+                    currentPage={overviewPagination.currentPage}
+                    totalItems={overviewPagination.totalItems}
+                    itemsPerPage={5}
+                    onPageChange={overviewPagination.setCurrentPage}
+                    itemLabel="usahawan"
+                    accent="teal"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -1161,13 +1289,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </h3>
                 </div>
                 <p className="text-xs text-black dark:text-white/75 mt-1">
-                  Senarai permohonan bimbingan usahawan belia dengan mesej cabaran, perincian bisnes dan tindakan bimbingan segera.
+                  Senarai padat permohonan aktif (rekod selesai diasingkan di tab Selesai). Klik baris untuk melihat mesej penuh &amp; tindakan.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
-                  {filteredRegistrations.length} Usahawan
+                <span className="text-xs font-mono font-bold tabular-nums px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
+                  {filteredRegistrations.length} {statusFilter === 'completed' ? 'Selesai' : 'Aktif'}
                 </span>
               </div>
             </div>
@@ -1185,201 +1313,266 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 />
               </div>
 
-              {/* Status Tabs Filter */}
+              {/* Status Tabs Filter: Semua (Aktif) | Menunggu | Disahkan | Selesai */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                 {(['all', 'pending', 'confirmed', 'completed'] as const).map(tab => (
                   <button
                     key={tab}
                     type="button"
                     onClick={() => setStatusFilter(tab)}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all whitespace-nowrap cursor-pointer ${
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all whitespace-nowrap cursor-pointer tabular-nums ${
                       statusFilter === tab
                         ? 'bg-teal-600 text-white shadow-xs font-bold dark:bg-teal-600'
                         : 'text-black dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
                     }`}
                   >
-                    {tab === 'all' ? `Semua (${mentorRegistrations.length})` : tab === 'pending' ? `Menunggu (${pendingCount})` : tab === 'confirmed' ? `Disahkan (${confirmedCount})` : `Selesai (${completedCount})`}
+                    {tab === 'all'
+                      ? `Semua Aktif (${activeCount})`
+                      : tab === 'pending'
+                      ? `Menunggu (${pendingCount})`
+                      : tab === 'confirmed'
+                      ? `Disahkan (${confirmedCount})`
+                      : `Selesai (${completedCount})`}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Mentee Applications Full-Width Stacked Cards */}
-            <div className="space-y-4 pt-1">
+            {/* Mentee Applications Compact Expandable List */}
+            <div className="pt-1">
               {filteredRegistrations.length === 0 ? (
                 <div className="text-center py-12 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900">
                   <GraduationCap className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm font-bold text-black dark:text-white">Tiada rekod padanan permohonan bimbingan.</p>
-                  <p className="text-xs text-black/70 dark:text-white/75 mt-1">Cuba tukar kata kunci carian atau pilih tab status lain di atas.</p>
+                  <p className="text-sm font-bold text-black dark:text-white">
+                    {statusFilter === 'completed'
+                      ? 'Tiada rekod bimbingan yang telah selesai buat masa ini.'
+                      : 'Tiada permohonan bimbingan aktif buat masa ini.'}
+                  </p>
+                  <p className="text-xs text-black/70 dark:text-white/75 mt-1">
+                    {statusFilter !== 'completed' && completedCount > 0
+                      ? 'Permohonan yang telah selesai dibimbing dipaparkan secara berasingan di tab Selesai.'
+                      : 'Cuba tukar kata kunci carian atau pilih tab status lain di atas.'}
+                  </p>
                 </div>
               ) : (
-                filteredRegistrations.map(mentee => {
-                  const isPending = mentee.status === 'pending';
-                  const isConfirmed = mentee.status === 'confirmed';
-                  const isCompleted = mentee.status === 'completed';
+                <>
+                  <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+                    {applicationsPagination.paginatedItems.map(mentee => {
+                      const isPending = mentee.status === 'pending';
+                      const isConfirmed = mentee.status === 'confirmed';
+                      const isCompleted = mentee.status === 'completed';
+                      const isExpanded = Boolean(expandedApplicationIds[mentee.id]);
 
-                  const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
-                  const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
+                      const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
+                      const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
+                      const visuals = resolveMenteeVisuals(
+                        {
+                          applicantId: mentee.applicantId,
+                          entrepreneurName: mentee.entrepreneurName,
+                          businessName: mentee.businessName,
+                          category: mentee.businessCategory
+                        },
+                        businesses
+                      );
 
-                  return (
-                    <div
-                      key={mentee.id}
-                      className="p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all space-y-4 shadow-2xs"
-                    >
-                      {/* Top Row: Mentee Info & Status Badge */}
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h4 className="text-base sm:text-lg font-bold text-black dark:text-white">
-                              {mentee.entrepreneurName}
-                            </h4>
-                            <span className="text-xs font-semibold text-black dark:text-white bg-teal-50 dark:bg-teal-950/60 px-2.5 py-0.5 rounded-md border border-teal-200 dark:border-teal-800/70">
-                              {mentee.businessName}
-                            </span>
+                      return (
+                        <div key={mentee.id} className="transition-colors">
+                          {/* Compact Summary Row */}
+                          <div
+                            onClick={() =>
+                              setExpandedApplicationIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
+                            }
+                            className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          >
+                            <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                              <div className="relative w-14 h-11 sm:w-16 sm:h-12 shrink-0">
+                                <div className="w-full h-full rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
+                                  <PortalImage
+                                    src={visuals.businessUrl}
+                                    alt={mentee.businessName}
+                                    fallbackType="business"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border-2 border-white dark:border-slate-900 shadow-sm absolute -bottom-1.5 -right-1.5 bg-white dark:bg-slate-800">
+                                  <PortalImage
+                                    src={visuals.avatarUrl}
+                                    alt={mentee.entrepreneurName}
+                                    fallbackType="avatar"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="min-w-0 flex-1 space-y-0.5">
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                  <h4 className="text-sm font-bold text-black dark:text-white leading-snug">
+                                    {mentee.entrepreneurName}
+                                  </h4>
+                                  <span className="text-black/35 dark:text-white/35 text-xs">&middot;</span>
+                                  <span className="text-xs font-semibold text-teal-700 dark:text-teal-400">
+                                    {mentee.businessName}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-black/70 dark:text-white/75 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 leading-relaxed">
+                                  <span>{mentee.district || 'Kelantan'}</span>
+                                  <span>&middot;</span>
+                                  <span>{mentee.businessCategory || 'Perniagaan Belia'}</span>
+                                  <span>&middot;</span>
+                                  <span className="font-medium text-black dark:text-white">{mentee.topic}</span>
+                                  {mentee.preferredDate && (
+                                    <>
+                                      <span>&middot;</span>
+                                      <span className="tabular-nums">{mentee.preferredDate} ({mentee.preferredTime || '10:00 AM'})</span>
+                                    </>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pl-17 sm:pl-0">
+                              <span
+                                className={`inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-lg border whitespace-nowrap ${
+                                  isCompleted
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/70 text-black dark:text-white border-emerald-200 dark:border-emerald-800'
+                                    : isConfirmed
+                                    ? 'bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border-teal-200 dark:border-teal-800/70'
+                                    : isPending
+                                    ? 'bg-amber-50 dark:bg-amber-950/70 text-black dark:text-white border-amber-200 dark:border-amber-800'
+                                    : 'bg-rose-50 dark:bg-rose-950/70 text-black dark:text-white border-rose-200 dark:border-rose-800'
+                                }`}
+                              >
+                                {isCompleted ? 'Selesai' : isConfirmed ? 'Disahkan' : isPending ? 'Menunggu' : 'Dibatalkan'}
+                              </span>
+
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedApplicationIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }));
+                                }}
+                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                              >
+                                <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
+                                {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                              </button>
+                            </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-black dark:text-white/75">
-                            <span className="flex items-center gap-1 font-medium text-black dark:text-white">
-                              <MapPin className="w-3.5 h-3.5 text-black dark:text-white" />
-                              <span>{mentee.district || 'Kelantan'}</span>
-                            </span>
-                            <span>&middot;</span>
-                            <span>Kategori: <strong className="text-black dark:text-white font-semibold">{mentee.businessCategory || 'Perniagaan Belia'}</strong></span>
-                            <span>&middot;</span>
-                            <span>Fokus Bimbingan: <strong className="text-black dark:text-white/75 font-semibold">{mentee.topic}</strong></span>
-                            {mentee.preferredDate && (
-                              <>
-                                <span>&middot;</span>
-                                <span className="flex items-center gap-1 text-black dark:text-white/75 font-medium">
-                                  <Clock className="w-3 h-3" />
-                                  <span>Cadangan: {mentee.preferredDate} ({mentee.preferredTime || '10:00 AM'})</span>
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </div>
+                          {/* Expandable Details Drawer */}
+                          {isExpanded && (
+                            <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 space-y-3 animate-in fade-in duration-150">
+                              <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                                <div className="flex items-center gap-2 text-xs font-bold text-black dark:text-white">
+                                  <MessageSquare className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
+                                  <span>Mesej Permohonan &amp; Cabaran Usahawan:</span>
+                                </div>
+                                <p className="text-xs sm:text-sm leading-relaxed text-black dark:text-white whitespace-pre-line">
+                                  {mentee.challenges ? (
+                                    `"${mentee.challenges}"`
+                                  ) : (
+                                    <span className="italic text-black/70 dark:text-white/75">
+                                      "Usahawan memohon sesi bimbingan khusus bagi strategi pemasaran, pengurusan kos operasi, dan persediaan dokumentasi permohonan geran belia UMK."
+                                    </span>
+                                  )}
+                                </p>
+                              </div>
 
-                        {/* Status Label */}
-                        <div className="shrink-0 self-start">
-                          <span className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-lg ${
-                            isCompleted
-                              ? 'bg-emerald-50 dark:bg-emerald-950/70 text-black dark:text-white border border-emerald-200 dark:border-emerald-800'
-                              : isConfirmed
-                              ? 'bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70'
-                              : isPending
-                              ? 'bg-amber-50 dark:bg-amber-950/70 text-black dark:text-white border border-amber-200 dark:border-amber-800'
-                              : 'bg-rose-50 dark:bg-rose-950/70 text-black dark:text-white border border-rose-200 dark:border-rose-800'
-                          }`}>
-                            {isCompleted ? 'Selesai Dibimbing' : isConfirmed ? 'Sesi Disahkan' : isPending ? 'Menunggu Tindakan' : 'Dibatalkan'}
-                          </span>
-                        </div>
-                      </div>
+                              {mentee.mentorActionPlan && (
+                                <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800/70 space-y-1">
+                                  <div className="flex items-center justify-between text-xs font-bold text-black dark:text-white">
+                                    <span className="flex items-center gap-1.5">
+                                      <FileText className="w-3.5 h-3.5" />
+                                      <span>Nota Bimbingan Mentor Tersimpan:</span>
+                                    </span>
+                                    <span className="text-[11px] font-normal opacity-75">Telah dihantar</span>
+                                  </div>
+                                  <p className="text-xs text-black dark:text-white whitespace-pre-line leading-relaxed">
+                                    {mentee.mentorActionPlan}
+                                  </p>
+                                </div>
+                              )}
 
-                      {/* Prominent Mentee Message & Challenges Box (Generous space & large readable font) */}
-                      <div className="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 space-y-2">
-                        <div className="flex items-center gap-2 text-xs font-bold text-black dark:text-white">
-                          <MessageSquare className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>Mesej Permohonan & Cabaran Dihadapi Usahawan:</span>
-                        </div>
-                        <p className="text-sm sm:text-base leading-relaxed text-black dark:text-white font-normal whitespace-pre-line">
-                          {mentee.challenges ? (
-                            `"${mentee.challenges}"`
-                          ) : (
-                            <span className="italic text-black/70 dark:text-white/75">
-                              "Usahawan memohon sesi bimbingan khusus bagi strategi pemasaran, pengurusan kos operasi, dan persediaan dokumentasi permohonan geran belia UMK."
-                            </span>
+                              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                                <a
+                                  href={cleanPhone ? `https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20saya%20mentor%20anda%20dari%20KBelia%20UMK.` : '#'}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-black dark:text-white bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
+                                >
+                                  <Phone className="w-3.5 h-3.5" />
+                                  <span>WhatsApp Usahawan</span>
+                                </a>
+
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {isPending && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleStatusChange(mentee, 'confirmed')}
+                                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-teal-600"
+                                    >
+                                      <Calendar className="w-3.5 h-3.5" />
+                                      <span>Sahkan Sesi Bimbingan</span>
+                                    </button>
+                                  )}
+
+                                  {isConfirmed && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleStatusChange(mentee, 'completed')}
+                                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                                    >
+                                      <CheckCircle2 className="w-3.5 h-3.5" />
+                                      <span>Tandakan Selesai Sesi</span>
+                                    </button>
+                                  )}
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenNotesModal(mentee)}
+                                    className="px-3 py-1.5 rounded-xl text-xs font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                                  >
+                                    <FileText className="w-3.5 h-3.5" />
+                                    <span>{mentee.mentorActionPlan ? 'Kemaskini Nota Bimbingan' : '+ Tambah Nota Bimbingan'}</span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setNewEndorsementMenteeName(mentee.entrepreneurName);
+                                      setNewEndorsementBusinessName(mentee.businessName);
+                                      setNewEndorsementDistrict(mentee.district);
+                                      setIsNewEndorsementModalOpen(true);
+                                    }}
+                                    className="px-3 py-1.5 rounded-xl text-xs font-bold text-black dark:text-white bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
+                                  >
+                                    <Award className="w-3.5 h-3.5" />
+                                    <span>Perakuan Geran</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           )}
-                        </p>
-                      </div>
-
-                      {/* Existing Mentor Action Plan Preview if any */}
-                      {mentee.mentorActionPlan && (
-                        <div className="p-3.5 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 space-y-1">
-                          <div className="flex items-center justify-between text-xs font-bold text-black dark:text-white">
-                            <span className="flex items-center gap-1.5">
-                              <FileText className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                              <span>Nota Bimbingan Mentor Tersimpan:</span>
-                            </span>
-                            <span className="text-[11px] font-normal text-black dark:text-white/75">Telah dihantar</span>
-                          </div>
-                          <p className="text-xs text-black dark:text-white line-clamp-2 leading-relaxed">
-                            {mentee.mentorActionPlan}
-                          </p>
                         </div>
-                      )}
+                      );
+                    })}
+                  </div>
 
-                      {/* Action Buttons Row */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-300 dark:border-slate-600">
-                        {/* Left: Contact */}
-                        <div className="flex items-center gap-2">
-                          <a
-                            href={cleanPhone ? `https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20saya%20mentor%20anda%20dari%20KBelia%20UMK.` : '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3.5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
-                          >
-                            <Phone className="w-3.5 h-3.5" />
-                            <span>WhatsApp Usahawan</span>
-                          </a>
-                        </div>
-
-                        {/* Right: Actions */}
-                        <div className="flex flex-wrap items-center gap-2">
-                          {isPending && (
-                            <button
-                              type="button"
-                              onClick={() => handleStatusChange(mentee, 'confirmed')}
-                              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-teal-600"
-                            >
-                              <Calendar className="w-3.5 h-3.5" />
-                              <span>Sahkan Sesi Bimbingan</span>
-                            </button>
-                          )}
-
-                          {isConfirmed && (
-                            <button
-                              type="button"
-                              onClick={() => handleStatusChange(mentee, 'completed')}
-                              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                            >
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              <span>Tandakan Selesai Sesi</span>
-                            </button>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => handleOpenNotesModal(mentee)}
-                            className="px-3.5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
-                          >
-                            <FileText className="w-3.5 h-3.5" />
-                            <span>{mentee.mentorActionPlan ? 'Kemaskini Nota Bimbingan' : '+ Tambah Nota Bimbingan'}</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setNewEndorsementMenteeName(mentee.entrepreneurName);
-                              setNewEndorsementBusinessName(mentee.businessName);
-                              setNewEndorsementDistrict(mentee.district);
-                              setIsNewEndorsementModalOpen(true);
-                            }}
-                            className="px-3.5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
-                          >
-                            <Award className="w-3.5 h-3.5" />
-                            <span>Perakuan Geran</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
+                  <PaginationBar
+                    currentPage={applicationsPagination.currentPage}
+                    totalItems={applicationsPagination.totalItems}
+                    itemsPerPage={5}
+                    onPageChange={applicationsPagination.setCurrentPage}
+                    itemLabel="permohonan"
+                    accent="teal"
+                  />
+                </>
               )}
             </div>
           </section>
 
           {/* =================================================================== */}
-          {/* SEKSYEN 2: JADUAL (FULL-WIDTH STACKED CARD)                         */}
+          {/* SEKSYEN 2: JADUAL (COMPACT EXPANDABLE LIST + PAGINATION)            */}
           {/* =================================================================== */}
           <section id="mentor-schedule-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-300 dark:border-slate-600 gap-3">
@@ -1407,111 +1600,176 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </button>
             </div>
 
-            {/* Confirmed Sessions List */}
-            <div className="space-y-4">
-              {mentorRegistrations.filter(m => m.status === 'confirmed').length === 0 ? (
+            {/* Confirmed Sessions Compact Expandable List */}
+            <div>
+              {confirmedScheduleSessions.length === 0 ? (
                 <div className="text-center py-12 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900">
                   <Clock className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto mb-2 opacity-50" />
                   <p className="text-sm font-bold text-black dark:text-white">Tiada sesi bimbingan aktif ditetapkan dalam jadual.</p>
                   <p className="text-xs text-black/70 dark:text-white/75 mt-1">Sahkan permohonan bimbingan di bahagian atas untuk menjadualkan tarikh dan slot.</p>
                 </div>
               ) : (
-                mentorRegistrations.filter(m => m.status === 'confirmed').map((mentee) => {
-                  const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
-                  const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
+                <>
+                  <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+                    {schedulePagination.paginatedItems.map((mentee) => {
+                      const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
+                      const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
+                      const isExpanded = Boolean(expandedScheduleIds[mentee.id]);
+                      const visuals = resolveMenteeVisuals(
+                        {
+                          applicantId: mentee.applicantId,
+                          entrepreneurName: mentee.entrepreneurName,
+                          businessName: mentee.businessName,
+                          category: mentee.businessCategory
+                        },
+                        businesses
+                      );
 
-                  return (
-                    <div
-                      key={mentee.id}
-                      className="p-5 sm:p-6 rounded-2xl border border-teal-200 dark:border-teal-800/70 bg-teal-50 dark:bg-teal-950/60 space-y-4"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-xs font-bold text-black dark:text-white bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-800/70 px-3 py-1 rounded-lg uppercase tracking-wider flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                            <span>{mentee.preferredDate || 'Akan Ditetapkan'} &middot; {mentee.preferredTime || '10:00 AM'}</span>
-                          </span>
-                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-amber-100 dark:bg-teal-600 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
-                            Sesi Disahkan
-                          </span>
-                        </div>
+                      return (
+                        <div key={mentee.id}>
+                          <div
+                            onClick={() =>
+                              setExpandedScheduleIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
+                            }
+                            className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          >
+                            <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                              <div className="relative w-14 h-11 shrink-0">
+                                <div className="w-full h-full rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
+                                  <PortalImage
+                                    src={visuals.businessUrl}
+                                    alt={mentee.businessName}
+                                    fallbackType="business"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="w-7 h-7 rounded-full overflow-hidden border-2 border-white dark:border-slate-900 shadow-sm absolute -bottom-1.5 -right-1.5 bg-white dark:bg-slate-800">
+                                  <PortalImage
+                                    src={visuals.avatarUrl}
+                                    alt={mentee.entrepreneurName}
+                                    fallbackType="avatar"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              </div>
 
-                        <div className="flex items-center gap-2">
-                          {mentee.meetingLink ? (
-                            <a
-                              href={mentee.meetingLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors shadow-xs dark:bg-teal-600"
-                            >
-                              <Video className="w-3.5 h-3.5" />
-                              <span>Sertai Google Meet</span>
-                              <ExternalLink className="w-3 h-3 ml-0.5" />
-                            </a>
-                          ) : (
-                            <span className="text-xs text-black dark:text-white flex items-center gap-1 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-600 font-medium">
-                              <MapPin className="w-3.5 h-3.5 text-black dark:text-white" />
-                              <span>Bilik Bimbingan UMK CEED</span>
-                            </span>
+                              <div className="min-w-0 flex-1 space-y-0.5">
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                  <h4 className="text-sm font-bold text-black dark:text-white">
+                                    {mentee.entrepreneurName}
+                                  </h4>
+                                  <span className="text-black/35 dark:text-white/35 text-xs">&middot;</span>
+                                  <span className="text-xs font-semibold text-teal-700 dark:text-teal-400">
+                                    {mentee.businessName}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-black/70 dark:text-white/75 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 tabular-nums">
+                                  <span className="font-semibold text-black dark:text-white">
+                                    {mentee.preferredDate || 'Akan Ditetapkan'} &middot; {mentee.preferredTime || '10:00 AM'}
+                                  </span>
+                                  <span>&middot;</span>
+                                  <span>{mentee.meetingLink ? 'Google Meet Maya' : 'Bilik Bimbingan UMK CEED'}</span>
+                                  <span>&middot;</span>
+                                  <span>{mentee.district || 'Kelantan'}</span>
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pl-17 sm:pl-0">
+                              {mentee.meetingLink && (
+                                <a
+                                  href={mentee.meetingLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors whitespace-nowrap"
+                                >
+                                  <Video className="w-3 h-3" />
+                                  <span>Google Meet</span>
+                                </a>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedScheduleIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }));
+                                }}
+                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                              >
+                                <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
+                                {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                              </button>
+                            </div>
+                          </div>
+
+                          {isExpanded && (
+                            <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200 dark:border-slate-700 bg-teal-50/40 dark:bg-teal-950/20 space-y-3 animate-in fade-in duration-150">
+                              <div className="text-xs text-black dark:text-white space-y-1">
+                                <p>
+                                  Topik Perbincangan: <strong className="font-semibold">{mentee.topic}</strong>
+                                </p>
+                                {mentee.challenges && (
+                                  <p className="text-black/75 dark:text-white/75 italic">
+                                    Nota usahawan: &quot;{mentee.challenges}&quot;
+                                  </p>
+                                )}
+                              </div>
+
+                              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                                {cleanPhone ? (
+                                  <a
+                                    href={`https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20peringatan%20sesi%20bimbingan%20kita%20pada%20${encodeURIComponent(mentee.preferredDate || 'tarikh dijadualkan')}.`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs text-black dark:text-white/75 font-bold hover:underline flex items-center gap-1"
+                                  >
+                                    <Phone className="w-3.5 h-3.5" />
+                                    <span>Hantar Peringatan WhatsApp</span>
+                                  </a>
+                                ) : <span />}
+
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenNotesModal(mentee)}
+                                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                                  >
+                                    Nota Bimbingan
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleStatusChange(mentee, 'completed')}
+                                    className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+                                  >
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                    <span>Selesai Sesi</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           )}
                         </div>
-                      </div>
+                      );
+                    })}
+                  </div>
 
-                      <div className="space-y-1">
-                        <h4 className="text-base font-bold text-black dark:text-white">
-                          {mentee.entrepreneurName} &middot; <span className="text-black dark:text-white/75">{mentee.businessName}</span>
-                        </h4>
-                        <p className="text-xs text-black dark:text-white">
-                          Topik Perbincangan: <strong className="text-black dark:text-white font-semibold">{mentee.topic}</strong> &middot; Daerah: {mentee.district || 'Kelantan'}
-                        </p>
-                        {mentee.challenges && (
-                          <p className="text-xs text-black/70 dark:text-white/75 pt-1 line-clamp-1 italic">
-                            Nota usahawan: "{mentee.challenges}"
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-teal-200 dark:border-teal-800/70">
-                        {cleanPhone ? (
-                          <a
-                            href={`https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20peringatan%20sesi%20bimbingan%20kita%20pada%20${encodeURIComponent(mentee.preferredDate || 'tarikh dijadualkan')}.`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-black dark:text-white/75 font-bold hover:underline flex items-center gap-1"
-                          >
-                            <Phone className="w-3.5 h-3.5" />
-                            <span>Hantar Peringatan WhatsApp</span>
-                          </a>
-                        ) : <span />}
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenNotesModal(mentee)}
-                            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                          >
-                            Nota Bimbingan
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleStatusChange(mentee, 'completed')}
-                            className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Selesai Sesi</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
+                  <PaginationBar
+                    currentPage={schedulePagination.currentPage}
+                    totalItems={schedulePagination.totalItems}
+                    itemsPerPage={5}
+                    onPageChange={schedulePagination.setCurrentPage}
+                    itemLabel="sesi disahkan"
+                    accent="teal"
+                  />
+                </>
               )}
             </div>
           </section>
 
           {/* =================================================================== */}
-          {/* SEKSYEN 3: PELAN TINDAKAN (FULL-WIDTH STACKED CARD)                 */}
+          {/* SEKSYEN 3: PELAN TINDAKAN (COMPACT EXPANDABLE LIST + PAGINATION)    */}
           {/* =================================================================== */}
           <section id="mentor-action-plans-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-300 dark:border-slate-600 gap-3">
@@ -1525,68 +1783,138 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </h3>
                 </div>
                 <p className="text-xs text-black dark:text-white/75 mt-1">
-                  Panduan bimbingan, sasaran jualan, dan langkah susulan untuk bantu usahawan belia berkembang.
+                  Panduan bimbingan, sasaran jualan, dan pelan susulan usahawan.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
-                  {mentorRegistrations.filter(m => m.mentorActionPlan).length} Nota Disediakan
+                <span className="text-xs font-mono font-bold tabular-nums px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
+                  {actionPlanMentees.length} Nota Disediakan
                 </span>
               </div>
             </div>
 
-            {/* Action Plans Feed in Full Width */}
-            <div className="space-y-4">
-              {mentorRegistrations.filter(m => m.mentorActionPlan).length === 0 ? (
+            <div>
+              {actionPlanMentees.length === 0 ? (
                 <div className="text-center py-12 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900 space-y-2">
                   <MessageSquare className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto opacity-50" />
                   <p className="text-sm font-bold text-black dark:text-white">Belum ada nota bimbingan lagi.</p>
-                  <p className="text-xs text-black/70 dark:text-white/75">Tekan "+ Tambah Nota Bimbingan" pada senarai sesi di atas untuk rekodkan panduan bisnes usahawan.</p>
+                  <p className="text-xs text-black/70 dark:text-white/75">Tekan &quot;+ Tambah Nota Bimbingan&quot; pada senarai sesi di atas untuk rekodkan panduan bisnes usahawan.</p>
                 </div>
               ) : (
-                mentorRegistrations.filter(m => m.mentorActionPlan).map((mentee) => (
-                  <div
-                    key={mentee.id}
-                    className="p-5 sm:p-6 rounded-2xl border border-teal-200 dark:border-teal-800/70 bg-teal-50 dark:bg-teal-950/60 space-y-3"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div>
-                        <h4 className="text-base font-bold text-black dark:text-white">
-                          {mentee.entrepreneurName} &middot; <span className="text-black dark:text-white/75">{mentee.businessName}</span>
-                        </h4>
-                        <p className="text-xs text-black dark:text-white/75">
-                          Topik: <span className="font-semibold text-black dark:text-white">{mentee.topic}</span> &middot; Daerah: {mentee.district || 'Kelantan'}
-                        </p>
-                      </div>
+                <>
+                  <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+                    {actionPlansPagination.paginatedItems.map((mentee) => {
+                      const isExpanded = Boolean(expandedActionPlanIds[mentee.id]);
+                      const visuals = resolveMenteeVisuals(
+                        {
+                          applicantId: mentee.applicantId,
+                          entrepreneurName: mentee.entrepreneurName,
+                          businessName: mentee.businessName,
+                          category: mentee.businessCategory
+                        },
+                        businesses
+                      );
+                      return (
+                        <div key={mentee.id}>
+                          <div
+                            onClick={() =>
+                              setExpandedActionPlanIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
+                            }
+                            className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          >
+                            <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                              <div className="relative w-14 h-11 shrink-0">
+                                <div className="w-full h-full rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
+                                  <PortalImage
+                                    src={visuals.businessUrl}
+                                    alt={mentee.businessName}
+                                    fallbackType="business"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="w-7 h-7 rounded-full overflow-hidden border-2 border-white dark:border-slate-900 shadow-sm absolute -bottom-1.5 -right-1.5 bg-white dark:bg-slate-800">
+                                  <PortalImage
+                                    src={visuals.avatarUrl}
+                                    alt={mentee.entrepreneurName}
+                                    fallbackType="avatar"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              </div>
 
-                      <button
-                        type="button"
-                        onClick={() => handleOpenNotesModal(mentee)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-bold text-black dark:text-white bg-amber-100 dark:bg-teal-600 hover:bg-amber-200 dark:hover:bg-teal-600 transition-colors cursor-pointer self-start sm:self-auto"
-                      >
-                        Kemaskini Nota Bimbingan
-                      </button>
-                    </div>
+                              <div className="min-w-0 flex-1 space-y-0.5">
+                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                  <h4 className="text-sm font-bold text-black dark:text-white">
+                                    {mentee.entrepreneurName}
+                                  </h4>
+                                  <span className="text-black/35 dark:text-white/35 text-xs">&middot;</span>
+                                  <span className="text-xs font-semibold text-teal-700 dark:text-teal-400">
+                                    {mentee.businessName}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-black/70 dark:text-white/75 flex flex-wrap items-center gap-x-1.5">
+                                  <span>{mentee.topic}</span>
+                                  <span>&middot;</span>
+                                  <span>{mentee.district || 'Kelantan'}</span>
+                                  <span>&middot;</span>
+                                  <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Tersimpan</span>
+                                </p>
+                              </div>
+                            </div>
 
-                    <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-800/70 space-y-1.5">
-                      <span className="text-xs font-bold text-black dark:text-white block">
-                        Garis Panduan & Sasaran Tindakan Mentor:
-                      </span>
-                      <p className="text-xs sm:text-sm text-black dark:text-white whitespace-pre-line leading-relaxed font-sans">
-                        {mentee.mentorActionPlan}
-                      </p>
-                    </div>
+                            <div className="flex items-center justify-end gap-2 shrink-0 pl-17 sm:pl-0">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedActionPlanIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }));
+                                }}
+                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                              >
+                                <span>{isExpanded ? 'Tutup' : 'Lihat Nota'}</span>
+                                {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                              </button>
+                            </div>
+                          </div>
 
-                    <div className="flex items-center justify-between text-xs text-black/70 dark:text-white/75 pt-1">
-                      <span>Penyeliaan berterusan di bawah inisiatif keusahawanan UMK CEED</span>
-                      <span className="text-black dark:text-white/75 font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Tersimpan & Sah</span>
-                      </span>
-                    </div>
+                          {isExpanded && (
+                            <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200 dark:border-slate-700 bg-teal-50/40 dark:bg-teal-950/20 space-y-3 animate-in fade-in duration-150">
+                              <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-800/70 space-y-1.5">
+                                <span className="text-xs font-bold text-black dark:text-white block">
+                                  Garis Panduan &amp; Sasaran Tindakan Mentor:
+                                </span>
+                                <p className="text-xs sm:text-sm text-black dark:text-white whitespace-pre-line leading-relaxed font-sans">
+                                  {mentee.mentorActionPlan}
+                                </p>
+                              </div>
+
+                              <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-black/70 dark:text-white/75">
+                                <span>Penyeliaan berterusan di bawah inisiatif keusahawanan UMK CEED</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenNotesModal(mentee)}
+                                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-black dark:text-white bg-amber-100 dark:bg-teal-600 hover:bg-amber-200 transition-colors cursor-pointer"
+                                >
+                                  Kemaskini Nota Bimbingan
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                ))
+
+                  <PaginationBar
+                    currentPage={actionPlansPagination.currentPage}
+                    totalItems={actionPlansPagination.totalItems}
+                    itemsPerPage={5}
+                    onPageChange={actionPlansPagination.setCurrentPage}
+                    itemLabel="nota bimbingan"
+                    accent="teal"
+                  />
+                </>
               )}
             </div>
           </section>
@@ -1643,8 +1971,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 Tiada surat perakuan geran dikeluarkan di bawah seliaan anda buat masa ini.
               </div>
             ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mentorEndorsements.map((item) => (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {endorsementsPagination.paginatedItems.map((item) => (
                 <div
                   key={item.id}
                   className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-4 space-y-3 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all shadow-2xs flex flex-col justify-between"
@@ -1698,8 +2027,17 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     </button>
                   </div>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              <PaginationBar
+                currentPage={endorsementsPagination.currentPage}
+                totalItems={endorsementsPagination.totalItems}
+                itemsPerPage={5}
+                onPageChange={endorsementsPagination.setCurrentPage}
+                itemLabel="surat perakuan"
+                accent="teal"
+              />
+            </>
             )}
           </div>
 
@@ -1735,80 +2073,167 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </button>
           </div>
 
-          <div className="space-y-4">
+          <div>
             {mentorLogs.length === 0 ? (
               <div className="py-10 text-center text-xs text-black/70 dark:text-white/75 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
                 Belum ada rekod sesi bimbingan untuk usahawan seliaan anda.
               </div>
-            ) : mentorLogs.map((log) => (
-              <div
-                key={log.id}
-                className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 shadow-2xs space-y-4"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-slate-600">
-                  <div>
-                    <span className="text-[10px] font-bold text-black dark:text-white/75 uppercase tracking-wider block">
-                      Tarikh Sesi: {log.sessionDate}
-                    </span>
-                    <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                      {log.menteeName} &middot; <span className="text-black dark:text-white/75">{log.businessName}</span>
-                    </h4>
-                  </div>
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70 w-fit">
-                    Topik: {log.topic}
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-xs font-bold text-black dark:text-white">
-                    Ringkasan Minit Bimbingan Mentor:
-                  </div>
-                  <p className="text-xs text-black dark:text-white bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-300 dark:border-slate-600 leading-relaxed font-sans">
-                    {log.minutes}
-                  </p>
-                </div>
-
-                {log.actionItems && log.actionItems.length > 0 && (
-                  <div className="space-y-2 pt-1">
-                    <div className="text-xs font-bold text-black dark:text-white flex items-center justify-between">
-                      <span>Senarai Semak Tugasan Wajib Mentee:</span>
-                      <span className="text-[11px] text-black/70 dark:text-white/75 font-normal">Tekan kotak untuk tandakan status selesai</span>
-                    </div>
-
-                    <div className="space-y-2">
-                      {log.actionItems.map((task) => (
+            ) : (
+              <>
+                <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-2xs">
+                  {logsPagination.paginatedItems.map((log) => {
+                    const isExpanded = Boolean(expandedLogIds[log.id]);
+                    const totalTasks = log.actionItems?.length || 0;
+                    const doneTasks = log.actionItems?.filter(a => a.completed).length || 0;
+                    const visuals = resolveMenteeVisuals(
+                      {
+                        entrepreneurName: log.menteeName,
+                        businessName: log.businessName
+                      },
+                      businesses
+                    );
+                    return (
+                      <div key={log.id}>
                         <div
-                          key={task.id}
-                          onClick={() => handleToggleLogTask(log.id, task.id)}
-                          className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
-                            task.completed
-                              ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-black/70 dark:text-white/75 line-through'
-                              : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 hover:border-blue-400/70 dark:hover:border-blue-400/70 text-black dark:text-white'
-                          }`}
+                          onClick={() =>
+                            setExpandedLogIds(prev => ({ ...prev, [log.id]: !prev[log.id] }))
+                          }
+                          className="p-4 sm:p-5 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
-                          <div className="flex items-center gap-2.5">
-                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
-                              task.completed
-                                ? 'bg-emerald-600 border-emerald-600 text-white'
-                                : 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800'
-                            }`}>
-                              {task.completed && <Check className="w-3.5 h-3.5" />}
+                          <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                            <div className="relative w-14 h-11 sm:w-16 sm:h-12 shrink-0">
+                              <div className="w-full h-full rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
+                                <PortalImage
+                                  src={visuals.businessUrl}
+                                  alt={log.businessName}
+                                  fallbackType="business"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-sm absolute -bottom-1.5 -right-1.5 bg-white dark:bg-slate-900">
+                                <PortalImage
+                                  src={visuals.avatarUrl}
+                                  alt={log.menteeName}
+                                  fallbackType="avatar"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
                             </div>
-                            <span className="text-xs font-medium">{task.task}</span>
+
+                            <div className="min-w-0 flex-1 space-y-0.5">
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                <h4 className="text-sm font-bold text-black dark:text-white">
+                                  {log.menteeName}
+                                </h4>
+                                <span className="text-black/35 dark:text-white/35 text-xs">&middot;</span>
+                                <span className="text-xs font-semibold text-teal-700 dark:text-teal-400">
+                                  {log.businessName}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-black/70 dark:text-white/75 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                                <span className="font-mono tabular-nums">{log.sessionDate}</span>
+                                <span>&middot;</span>
+                                <span className="font-medium text-black dark:text-white">{log.topic}</span>
+                              </p>
+                            </div>
                           </div>
 
-                          <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${
-                            task.completed ? 'bg-emerald-100 text-black' : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600'
-                          }`}>
-                            Sasaran: {task.dueDate}
-                          </span>
+                          <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pl-17 sm:pl-0">
+                            {totalTasks > 0 && (
+                              <span
+                                className={`text-[11px] font-bold tabular-nums px-2.5 py-1 rounded-lg border whitespace-nowrap ${
+                                  doneTasks === totalTasks
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
+                                    : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70 text-black dark:text-white'
+                                }`}
+                              >
+                                {doneTasks}/{totalTasks} Tugasan
+                              </span>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedLogIds(prev => ({ ...prev, [log.id]: !prev[log.id] }));
+                              }}
+                              className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                            >
+                              <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
+                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+
+                        {isExpanded && (
+                          <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 space-y-3.5 animate-in fade-in duration-150">
+                            <div className="space-y-1.5">
+                              <div className="text-xs font-bold text-black dark:text-white">
+                                Ringkasan Minit Bimbingan Mentor:
+                              </div>
+                              <p className="text-xs text-black dark:text-white bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 leading-relaxed font-sans">
+                                {log.minutes}
+                              </p>
+                            </div>
+
+                            {log.actionItems && log.actionItems.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="text-xs font-bold text-black dark:text-white flex items-center justify-between gap-2 flex-wrap">
+                                  <span>Senarai Semak Tugasan Wajib Mentee:</span>
+                                  <span className="text-[11px] text-black/70 dark:text-white/75 font-normal">
+                                    Tekan kotak untuk tandakan status selesai
+                                  </span>
+                                </div>
+
+                                <div className="space-y-2">
+                                  {log.actionItems.map((task) => (
+                                    <div
+                                      key={task.id}
+                                      onClick={() => handleToggleLogTask(log.id, task.id)}
+                                      className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
+                                        task.completed
+                                          ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-black/70 dark:text-white/75 line-through'
+                                          : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 hover:border-blue-400/70 dark:hover:border-blue-400/70 text-black dark:text-white'
+                                      }`}
+                                    >
+                                      <div className="flex items-center gap-2.5">
+                                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
+                                          task.completed
+                                            ? 'bg-emerald-600 border-emerald-600 text-white'
+                                            : 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800'
+                                        }`}>
+                                          {task.completed && <Check className="w-3.5 h-3.5" />}
+                                        </div>
+                                        <span className="text-xs font-medium">{task.task}</span>
+                                      </div>
+
+                                      <span className={`text-[10px] font-mono tabular-nums px-2 py-0.5 rounded shrink-0 ${
+                                        task.completed ? 'bg-emerald-100 text-black' : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600'
+                                      }`}>
+                                        Sasaran: {task.dueDate}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <PaginationBar
+                  currentPage={logsPagination.currentPage}
+                  totalItems={logsPagination.totalItems}
+                  itemsPerPage={5}
+                  onPageChange={logsPagination.setCurrentPage}
+                  itemLabel="rekod sesi"
+                  accent="teal"
+                />
+              </>
+            )}
           </div>
 
         </div>
@@ -2074,7 +2499,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   rows={3}
                   value={newEndorsementJustification}
                   onChange={(e) => setNewEndorsementJustification(e.target.value)}
-                  placeholder="Terangkan komitmen usahawan, prestasi jualan, potensi produk, dan impak penggunaan dana geran terhadap perkembangan perniagaan..."
+                  placeholder="Terangkan komitmen usahawan, prestasi jualan, potensi produk, dan kesan penggunaan dana geran terhadap operasi..."
                   className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 leading-relaxed font-sans dark:focus:border-blue-500"
                 />
               </div>

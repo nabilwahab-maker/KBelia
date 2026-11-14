@@ -91,36 +91,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       id: 'slide-1',
       title: 'Kiosk Belia Modular Pintar 2026',
       subtitle: 'Hab Kiosk Usahawan UMK Bachok & Kota Bharu',
-      description: 'Kiosk pasang-siap moden lengkap dengan soket elektrik 13A, Wi-Fi 500Mbps dan kawalan keselamatan pada kadar sewa subsidi serendah RM15/hari.',
-      badge: 'Kekosongan Sedia Dimohon',
+      description: 'Kiosk pasang-siap lengkap soket 13A, Wi-Fi 500Mbps, dan kawalan keselamatan serendah RM15/hari.',
+      badge: 'Kekosongan Sedia',
       location: 'Hub UMK Bachok & KB Sentral',
       imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
       stat: `${slots.length} Kiosk Strategik`,
-      ctaText: 'Mohon Sewa Kiosk',
+      ctaText: 'Mohon Kiosk',
       onAction: () => navigateToPage('login')
     },
     {
       id: 'slide-2',
       title: 'Batik Belia Kontemporari & Streetwear',
       subtitle: 'Koleksi Fesyen Graduan Muda — Nur Syafiqah (Kota Bharu)',
-      description: 'Inovasi kraftangan canting batik tempatan berwajah segar dengan motif flora moden pada kemeja cuban dan totebag kanvas yang menembusi pasaran eksport.',
+      description: 'Batik canting kontemporari dengan motif flora moden pada kemeja cuban dan beg kanvas untuk pasaran eksport.',
       badge: 'Usahawan Kraf Bimbingan UMK',
       location: 'Kota Bharu',
       imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
       stat: 'Penilaian 4.8 / 5.0',
-      ctaText: 'Teroka Direktori Usahawan',
+      ctaText: 'Lihat Direktori',
       onAction: () => navigateToPage('login')
     },
     {
       id: 'slide-3',
       title: 'Kafe Artisan & Masakan Warisan Moden',
       subtitle: "D'Kelate Artisan Coffee & Akok Tart — Ahmad Faizul",
-      description: 'Kombinasi kopi barista espresso dengan pencuci mulut tradisi seperti Akok Tart dan Kopi Nissem Melaka yang kini beroperasi aktif di kiosk inkubator belia.',
+      description: 'Gabungan kopi barista espresso serta kuih tradisi Akok Tart dan Kopi Nissem Melaka di kiosk inkubator belia.',
       badge: 'Inkubasi F&B Berjaya',
       location: 'Hub UMK Bachok',
       imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
       stat: '42 Ulasan Pelanggan',
-      ctaText: 'Lihat Produk & Menu',
+      ctaText: 'Lihat Menu',
       onAction: () => navigateToPage('login')
     }
   ];
@@ -176,32 +176,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   // All FAQs including checklist additions
   const faqs = [
     {
-      q: 'Siapakah yang layak menyewa Kiosk Belia KBelia?',
-      a: 'Warganegara Malaysia berumur 18 hingga 40 tahun yang menetap atau berniaga di Kelantan layak memohon. Keutamaan diberikan kepada usahawan belia baharu yang perlukan tapak permulaan berniaga.'
+      q: 'Siapakah yang layak menyewa Kiosk KBelia?',
+      a: 'Warganegara Malaysia berumur 18 hingga 40 tahun di Kelantan layak memohon, dengan keutamaan kepada usahawan belia baharu.'
     },
     {
       q: 'Berapakah kadar sewaan harian dan tempoh minimum?',
-      a: 'Kadar sewa berpatutan bermula dari RM12 hingga RM25 sehari mengikut lokasi daerah dan jenis kiosk. Tempoh sewaan fleksibel boleh dimohon dari 3 hari, mingguan hingga 3 bulan lengkap dengan elektrik dan Wi-Fi.'
+      a: 'Kadar sewa bermula RM12 hingga RM25 sehari mengikut daerah dan jenis kiosk, dengan tempoh fleksibel dari 3 hari hingga 3 bulan.'
     },
     {
-      q: 'Bagaimanakah cara mendaftarkan produk dalam Direktori Usahawan?',
-      a: 'Daftar akaun percuma melalui pautan "Log Masuk / Daftar Usahawan", kemudian lengkapkan profil bisnes anda di Portal Usahawan untuk mula pamerkan produk kepada pelanggan.'
+      q: 'Bagaimanakah cara mendaftar produk dalam Direktori Usahawan?',
+      a: 'Daftar akaun percuma dan lengkapkan profil di Portal Usahawan untuk memaparkan katalog produk anda.'
     },
     {
       q: 'Adakah pemohon geran perlu mempunyai kedai tetap?',
-      a: 'Tidak semestinya. Skim Geran Permulaan dan Bimbingan Belia terbuka kepada peniaga dari rumah, kiosk bergerak, serta bisnes online selagi mempunyai perancangan perniagaan yang jelas.'
+      a: 'Tidak semestinya. Geran ini terbuka kepada usahawan dari rumah, kiosk bergerak, dan jualan dalam talian yang mempunyai pelan perniagaan.'
     },
     {
-      q: 'Bagaimanakah proses semakan dan kelulusan Geran Permulaan KBelia?',
-      a: 'Permohonan geran disemak secara digital. Selepas borang dihantar, pihak pentadbir akan membuat penilaian dalam tempoh 7–14 hari bekerja dan anda boleh pantau status terus dalam dashboard.'
+      q: 'Bagaimanakah proses semakan Geran Permulaan KBelia?',
+      a: 'Permohonan disemak secara digital dalam tempoh 7–14 hari bekerja dan status boleh dipantau terus dalam papan pemuka.'
     },
     {
       q: 'Bolehkah saya mendapatkan bimbingan mentor secara percuma?',
-      a: 'Ya, semua usahawan belia berdaftar di portal KBelia layak menyertai sesi bimbingan mentor dan bengkel keusahawanan secara percuma tanpa sebarang caj tersembunyi.'
+      a: 'Ya, semua usahawan berdaftar layak menyertai sesi bimbingan mentor dan bengkel keusahawanan secara percuma.'
     },
     {
-      q: 'Adakah platform ini membantu pendaftaran SSM dan lesen perniagaan?',
-      a: 'Ya. Kami sediakan panduan lengkap daftar SSM, panduan sijil Halal JAKIM, dan permohonan lesen PBT di seluruh Kelantan.'
+      q: 'Adakah portal ini membantu pendaftaran SSM dan lesen?',
+      a: 'Ya. Panduan daftar SSM, pensijilan Halal JAKIM, dan permohonan lesen PBT seluruh Kelantan tersedia di dalam portal.'
     }
   ];
 
@@ -332,13 +332,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="max-w-4xl mx-auto space-y-4">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-black dark:text-white leading-[1.12] text-balance">
               {isBM 
-                ? 'Platform Bersepadu Usahawan Belia Kelantan Berniaga & Berkembang'
-                : 'Integrated Platform for Kelantan Youth Entrepreneurs to Trade & Grow'}
+                ? 'Platform Bersepadu Usahawan Belia Kelantan'
+                : 'Integrated Kelantan Youth Entrepreneurship Platform'}
             </h1>
             <p className="text-base sm:text-lg text-black dark:text-white font-normal leading-relaxed max-w-2xl mx-auto">
               {isBM
-                ? 'Sewa kios pintar modular, pameran produk tempatan di Direktori Negeri, dan mohon geran pembiayaan keusahawanan dalam satu gerbang rasmi.'
-                : 'Rent smart modular kiosks across Kelantan, showcase local products in the state digital directory, and access entrepreneur grants in one official portal.'}
+                ? 'Sewa kiosk modular, pamerkan produk di direktori negeri, dan mohon geran dalam satu portal rasmi.'
+                : 'Rent modular kiosks across Kelantan, list products in the state directory, and apply for grants in one portal.'}
             </p>
           </div>
 
@@ -548,7 +548,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-4 h-4 text-black dark:text-white/75" />
             <h3 className="text-xs sm:text-sm font-bold tracking-wide uppercase text-black dark:text-white">
-              Galeri Kiosk Belia & Produk Usahawan Kelantan
+              Galeri Kiosk & Produk Tempatan
             </h3>
           </div>
         </div>
@@ -612,13 +612,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
               <Layers className="w-3.5 h-3.5" />
-              <span>Analisis Cabaran & Transformasi</span>
+              <span>Cabaran & Penyelesaian</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-              Cabaran Tradisional vs. Penyelesaian Pintar KBelia
+              Cabaran Lazim vs. Solusi KBelia
             </h2>
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
-              Menghapuskan halangan utama yang dihadapi anak muda Kelantan untuk memulakan dan mengembangkan perniagaan.
+              Menangani halangan utama usahawan muda Kelantan memulakan operasi perniagaan.
             </p>
           </div>
 
@@ -632,7 +632,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div>
                   <h3 className="font-extrabold text-base text-black dark:text-white">Cabaran Lazim Belia</h3>
-                  <p className="text-xs text-black dark:text-white/75 font-medium">Kekangan memulakan bisnes tradisional</p>
+                  <p className="text-xs text-black dark:text-white/75 font-medium">Kekangan memulakan operasi tradisional</p>
                 </div>
               </div>
 
@@ -640,36 +640,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Sewa Premis Kedai Terlalu Tinggi</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Deposit 3+1 bulan dan kos sewa ribuan ringgit membebankan modal pusingan awal.</span>
+                    <span className="font-bold text-black dark:text-white block">Sewa Premis Tinggi</span>
+                    <span className="text-black/70 dark:text-white/75 text-xs">Deposit 3+1 bulan dan sewa ribuan ringgit membebankan modal awal.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Kekeliruan Pematuhan SSM & Lesen PBT</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Ketiadaan panduan berpusat menyukarkan pendaftaran syarikat dan kelulusan lesen.</span>
+                    <span className="font-bold text-black dark:text-white block">Prosedur SSM & Lesen PBT</span>
+                    <span className="text-black/70 dark:text-white/75 text-xs">Ketiadaan panduan berpusat melambatkan pendaftaran syarikat dan lesen.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Pasaran Terhad & Ketiadaan Direktori</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Sukar memperkenalkan produk tempatan ke luar jajahan tanpa sokongan platform pemasaran.</span>
+                    <span className="font-bold text-black dark:text-white block">Capaian Pasaran Terhad</span>
+                    <span className="text-black/70 dark:text-white/75 text-xs">Sukar menembusi pasaran luar jajahan tanpa direktori rasmi.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Tiada Mentor & Bimbingan Berterusan</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Berniaga secara sendirian tanpa nasihat usahawan berpengalaman berisiko tinggi gagal.</span>
+                    <span className="font-bold text-black dark:text-white block">Kekurangan Bimbingan Mentor</span>
+                    <span className="text-black/70 dark:text-white/75 text-xs">Beroperasi tanpa nasihat mentor berpengalaman meningkatkan risiko kegagalan.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Birokrasi & Info Geran Tersebar</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Sukar mencari maklumat geran permulaan dan semakan status pula memakan masa lama.</span>
+                    <span className="font-bold text-black dark:text-white block">Maklumat Geran Tersebar</span>
+                    <span className="text-black/70 dark:text-white/75 text-xs">Info geran sukar dicapai dan semakan status memakan masa lama.</span>
                   </div>
                 </li>
               </ul>
@@ -682,8 +682,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-base text-black dark:text-white">Penyelesaian Bersepadu KBelia</h3>
-                  <p className="text-xs text-black dark:text-white/75 font-medium">Inovasi ekosistem keusahawanan negeri</p>
+                  <h3 className="font-extrabold text-base text-black dark:text-white">Solusi Bersepadu KBelia</h3>
+                  <p className="text-xs text-black dark:text-white/75 font-medium">Ekosistem keusahawanan negeri</p>
                 </div>
               </div>
 
@@ -692,35 +692,35 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Kiosk Modular Bersubsidi</span>
-                    <span className="text-black dark:text-white text-xs">Sewa serendah RM12-RM25/hari di zon strategik seluruh Kelantan lengkap elektrik 13A & WiFi.</span>
+                    <span className="text-black dark:text-white text-xs">Sewa RM12–RM25/hari di zon strategik lengkap elektrik 13A dan Wi-Fi.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Panduan SSM & Lesen Perniagaan</span>
-                    <span className="text-black dark:text-white text-xs">Panduan langkah demi langkah mendaftar SSM, sijil Halal, dan lesen PBT.</span>
+                    <span className="font-bold text-black dark:text-white block">Panduan SSM & Lesen</span>
+                    <span className="text-black dark:text-white text-xs">Rujukan tersusun bagi pendaftaran SSM, sijil Halal, dan lesen PBT.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Direktori Pasaran Digital Terbuka</span>
-                    <span className="text-black dark:text-white text-xs">Pamerkan katalog produk terus kepada orang ramai merentasi seluruh negeri dan pelanggan luar.</span>
+                    <span className="font-bold text-black dark:text-white block">Direktori Pasaran Digital</span>
+                    <span className="text-black dark:text-white text-xs">Pamerkan katalog produk kepada pelanggan di seluruh negeri.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Hab Mentor & Akademi Kemahiran</span>
-                    <span className="text-black dark:text-white text-xs">Padanan mentor industri serta bengkel video TikTok Ads, fotografi, dan pengurusan kewangan.</span>
+                    <span className="font-bold text-black dark:text-white block">Hab Mentor & Kemahiran</span>
+                    <span className="text-black dark:text-white text-xs">Padanan mentor industri serta latihan pemasaran digital dan kewangan.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Semakan Geran & Pembiayaan Terus</span>
-                    <span className="text-black dark:text-white text-xs">Semak status kelulusan Geran Permulaan Belia secara langsung dalam dashboard.</span>
+                    <span className="font-bold text-black dark:text-white block">Penjejak Status Geran</span>
+                    <span className="text-black dark:text-white text-xs">Pantau kelulusan Geran Permulaan terus di papan pemuka.</span>
                   </div>
                 </li>
               </ul>
@@ -741,13 +741,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
               <Zap className="w-3.5 h-3.5" />
-              <span>Modul Pintar Portal</span>
+              <span>Modul Utama</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-              5 Ciri Utama Memperkasakan Bisnes Belia
+              5 Ciri Utama Portal KBelia
             </h2>
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
-              Teknologi dan infrastruktur sokongan lengkap daripada analisis data hingga kepatuhan rasmi.
+              Infrastruktur digital lengkap daripada analitik jualan hingga pematuhan rasmi.
             </p>
           </div>
 
@@ -759,13 +759,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                   <TrendingUp className="w-6 h-6" />
                 </div>
-                <h3 className="font-extrabold text-lg text-black dark:text-white">Business Analytics & Reporting</h3>
+                <h3 className="font-extrabold text-lg text-black dark:text-white">
+                  {isBM ? 'Analitik & Laporan Jualan' : 'Business Analytics & Reporting'}
+                </h3>
                 <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
-                  Pantau rekod jualan harian, pengurusan inventori produk, serta jana laporan prestasi ringkas untuk kegunaan pembentangan kepada pelabur atau pembiaya.
+                  {isBM
+                    ? 'Pantau jualan harian, urus inventori produk, dan jana laporan prestasi ringkas untuk semakan pembiaya.'
+                    : 'Track daily sales, manage product inventory, and export concise performance reports.'}
                 </p>
                 <div className="pt-1 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Grafik visual & eksport PDF</span>
+                  <span>{isBM ? 'Graf visual & eksport PDF' : 'Visual charts & PDF export'}</span>
                 </div>
               </div>
 
@@ -791,13 +795,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-black dark:text-white">Funding & Grant Tracker</h3>
+              <h3 className="font-extrabold text-base text-black dark:text-white">
+                {isBM ? 'Penjejak Geran & Dana' : 'Funding & Grant Tracker'}
+              </h3>
               <p className="text-xs text-black dark:text-white leading-relaxed">
-                Akses senarai skim Geran Permulaan Negeri, geran digital MDEC, dan pembiayaan mikro TEKUN/MARA lengkap dengan status semakan permohonan semasa.
+                {isBM
+                  ? 'Akses Geran Permulaan Negeri, geran digital MDEC, serta pembiayaan mikro TEKUN dan MARA.'
+                  : 'Access state seed grants, MDEC digital grants, and TEKUN/MARA micro-financing schemes.'}
               </p>
               <div className="pt-2 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Semakan kelulusan tanpa birokrasi</span>
+                <span>{isBM ? 'Semakan status terus' : 'Direct status tracking'}</span>
               </div>
             </div>
 
@@ -806,13 +814,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                 <Users className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-black dark:text-white">Mentorship & Networking Hub</h3>
+              <h3 className="font-extrabold text-base text-black dark:text-white">
+                {isBM ? 'Hab Mentor & Rangkaian' : 'Mentorship & Networking Hub'}
+              </h3>
               <p className="text-xs text-black dark:text-white leading-relaxed">
-                Padankan diri anda dengan mentor perniagaan berpengalaman, adakan sesi perkongsian industri, dan bina rangkaian dengan usahawan belia lain.
+                {isBM
+                  ? 'Padanan bersama mentor industri dan rangkaian kerjasama dengan usahawan belia Kelantan.'
+                  : 'Connect with experienced mentors and build networks across Kelantan youth entrepreneurs.'}
               </p>
               <div className="pt-2 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <Video className="w-3.5 h-3.5" />
-                <span>Sesi 1-ke-1 & bimbingan kumpulan</span>
+                <span>{isBM ? 'Sesi 1-ke-1 & berkumpulan' : '1-on-1 & group coaching'}</span>
               </div>
             </div>
 
@@ -822,13 +834,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                   <BookOpen className="w-6 h-6" />
                 </div>
-                <h3 className="font-extrabold text-lg text-black dark:text-white">Upskilling & Academy Module</h3>
+                <h3 className="font-extrabold text-lg text-black dark:text-white">
+                  {isBM ? 'Akademi Kemahiran Belia' : 'Upskilling & Academy Module'}
+                </h3>
                 <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
-                  Modul latihan praktikal percuma merangkumi live TikTok Shop Ads, fotografi produk komersial, penjenamaan, dan asas perakaunan ringkas.
+                  {isBM
+                    ? 'Latihan praktikal TikTok Shop Ads, fotografi produk, penjenamaan, dan asas perakaunan.'
+                    : 'Practical workshops covering TikTok Shop Ads, product photography, branding, and bookkeeping.'}
                 </p>
                 <div className="pt-1 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5" />
-                  <span>Sijil penyertaan keusahawanan</span>
+                  <span>{isBM ? 'Sijil penyertaan rasmi' : 'Official completion certificate'}</span>
                 </div>
               </div>
 
@@ -850,13 +866,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                 <FileText className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-black dark:text-white">Compliance & SSM Guide</h3>
+              <h3 className="font-extrabold text-base text-black dark:text-white">
+                {isBM ? 'Panduan SSM & Lesen' : 'Compliance & SSM Guide'}
+              </h3>
               <p className="text-xs text-black dark:text-white leading-relaxed">
-                Panduan interaktif pendaftaran entiti perniagaan di SSM, panduan pematuhan cukai LHDN, permohonan pensijilan Halal JAKIM, dan lesen pihak berkuasa tempatan (PBT).
+                {isBM
+                  ? 'Panduan pendaftaran SSM, pematuhan cukai LHDN, pensijilan Halal JAKIM, dan lesen PBT.'
+                  : 'Interactive guidance for SSM registration, LHDN tax compliance, Halal JAKIM, and PBT permits.'}
               </p>
               <div className="pt-2 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Templat dokumen & senarai semak</span>
+                <span>{isBM ? 'Templat & senarai semak' : 'Templates & checklists'}</span>
               </div>
             </div>
 
@@ -866,13 +886,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                   <Building2 className="w-6 h-6" />
                 </div>
-                <h3 className="font-extrabold text-lg text-black dark:text-white">Modular Capsule IoT Hub</h3>
+                <h3 className="font-extrabold text-lg text-black dark:text-white">
+                  {isBM ? 'Hab Kiosk Modular Pintar' : 'Modular Capsule IoT Hub'}
+                </h3>
                 <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
-                  Sistem kunci digital pintar, pemantauan status penggunaan kiosk secara atas talian, serta sokongan teknikal bersepadu bagi penyewa kiosk modular seluruh Kelantan.
+                  {isBM
+                    ? 'Kunci digital pintar, pemantauan status kiosk dalam talian, dan sokongan teknikal berpusat.'
+                    : 'Smart digital access, live kiosk occupancy tracking, and centralized technical support.'}
                 </p>
                 <div className="pt-1 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                   <Wifi className="w-3.5 h-3.5" />
-                  <span>Pengurusan sewaan automatik</span>
+                  <span>{isBM ? 'Pengurusan sewaan automatik' : 'Automated lease management'}</span>
                 </div>
               </div>
 
@@ -900,13 +924,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-14">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Proses Mudah 4-Langkah</span>
+              <span>4 Langkah Mudah</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-              Langkah Demi Langkah Mula Berniaga
+              Langkah Mula Beroperasi
             </h2>
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
-              Sertai komuniti KBelia dengan proses pendaftaran pantas tanpa bayaran pendaftaran.
+              Pendaftaran pantas dan percuma untuk semua usahawan belia Kelantan.
             </p>
           </div>
 
@@ -920,9 +944,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <UserCheck className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
-              <h4 className="font-extrabold text-base text-black dark:text-white">Daftar Akaun Belia</h4>
+              <h4 className="font-extrabold text-base text-black dark:text-white">Daftar Akaun</h4>
               <p className="text-xs text-black dark:text-white/75 leading-relaxed">
-                Cipta akaun percuma menggunakan emel atau Google. Akses terbuka kepada semua warganegara belia Kelantan.
+                Cipta akaun percuma dengan emel atau Google untuk akses portal belia Kelantan.
               </p>
             </div>
 
@@ -934,9 +958,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <Briefcase className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
-              <h4 className="font-extrabold text-base text-black dark:text-white">Isi Profil Perniagaan</h4>
+              <h4 className="font-extrabold text-base text-black dark:text-white">Lengkapkan Profil</h4>
               <p className="text-xs text-black dark:text-white/75 leading-relaxed">
-                Lengkapkan profil bisnes anda, muat naik katalog produk tempatan, logo jenama serta pautan WhatsApp dan media sosial.
+                Isi maklumat kedai, muat naik katalog produk, logo jenama, dan pautan WhatsApp.
               </p>
             </div>
 
@@ -948,9 +972,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <Building2 className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
-              <h4 className="font-extrabold text-base text-black dark:text-white">Semak Kiosk & Geran</h4>
+              <h4 className="font-extrabold text-base text-black dark:text-white">Pilih Kiosk & Geran</h4>
               <p className="text-xs text-black dark:text-white/75 leading-relaxed">
-                Pilih slot kiosk bersubsidi di daerah anda atau mohon Geran Permulaan untuk melengkapkan peralatan bisnes.
+                Tempah slot kiosk bersubsidi di daerah anda atau mohon Geran Permulaan.
               </p>
             </div>
 
@@ -962,9 +986,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <TrendingUp className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
-              <h4 className="font-extrabold text-base text-black dark:text-white">Kembangkan Bisnes</h4>
+              <h4 className="font-extrabold text-base text-black dark:text-white">Tingkatkan Prestasi</h4>
               <p className="text-xs text-black dark:text-white/75 leading-relaxed">
-                Terima bimbingan mentor berpengalaman, pantau analitik jualan, dan tingkatkan jualan anda di seluruh negeri.
+                Terima bimbingan mentor, pantau jualan harian, dan luaskan capaian pelanggan.
               </p>
             </div>
 
@@ -982,15 +1006,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="text-center max-w-2xl mx-auto space-y-2.5 mb-12">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
               <Shield className="w-3.5 h-3.5" />
-              <span>{isBM ? 'Inisiatif Pembangunan Negeri' : 'State Development Pillars'}</span>
+              <span>{isBM ? 'Inisiatif Negeri' : 'State Pillars'}</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-              {isBM ? 'Teras Ekosistem Keusahawanan KBelia' : 'KBelia Entrepreneurship Ecosystem Pillars'}
+              {isBM ? 'Teras Ekosistem KBelia' : 'KBelia Ecosystem Pillars'}
             </h2>
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
               {isBM 
-                ? 'Direka khas bagi menyelesaikan masalah modal tapak niaga, pemasaran digital dan bimbingan berterusan.'
-                : 'Designed to dismantle retail overhead, elevate digital visibility, and provide mentorship.'}
+                ? 'Menangani keperluan tapak operasi, pemasaran digital, dan bimbingan.'
+                : 'Designed to lower retail overhead, boost digital reach, and provide mentorship.'}
             </p>
           </div>
 
@@ -1006,8 +1030,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </h3>
               <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
                 {isBM 
-                  ? 'Penyediaan ruang niaga pasang siap di kawasan tumpuan tinggi daerah. Dilengkapi bekalan elektrik stabil, WiFi 500Mbps dan kawalan keselamatan pada kadar sewa serendah RM12-RM25/hari.'
-                  : 'Turnkey pre-fitted retail pods at high-footfall locations with electricity, 500Mbps WiFi, and security starting at RM12/day.'}
+                  ? 'Ruang pasang-siap di lokasi tumpuan lengkap elektrik, Wi-Fi 500Mbps, dan keselamatan serendah RM12–RM25/hari.'
+                  : 'Turnkey retail pods at high-footfall hubs with power, 500Mbps Wi-Fi, and security from RM12/day.'}
               </p>
               <div className="pt-2">
                 <button
@@ -1015,7 +1039,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={() => navigateToPage('login')}
                   className="text-xs font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
-                  <span>{isBM ? 'Log Masuk & Semak Lokasi' : 'Log In to Check Locations'}</span>
+                  <span>{isBM ? 'Semak Lokasi' : 'View Locations'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </button>
               </div>
@@ -1031,8 +1055,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </h3>
               <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
                 {isBM 
-                  ? 'Katalog atas talian rasmi mempamerkan produk keluaran anak muda Kelantan seperti makanan tradisi, kraftangan batik, servis teknologi, dan hasil pertanian terus kepada orang ramai.'
-                  : 'Official digital catalog showcasing youth-crafted products—from heritage delicacies to contemporary batik and tech services.'}
+                  ? 'Katalog rasmi yang memaparkan produk makanan, kraftangan batik, servis digital, dan hasil pertanian belia Kelantan.'
+                  : 'Official catalog showcasing youth-crafted products from heritage delicacies to batik and digital services.'}
               </p>
               <div className="pt-2">
                 <button
@@ -1040,7 +1064,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={() => navigateToPage('login')}
                   className="text-xs font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
-                  <span>{isBM ? 'Log Masuk & Lihat Usahawan' : 'Log In to Browse Directory'}</span>
+                  <span>{isBM ? 'Lihat Usahawan' : 'Browse Directory'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </button>
               </div>
@@ -1056,7 +1080,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </h3>
               <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
                 {isBM 
-                  ? 'Peluang mendapatkan Geran Permulaan Belia, geran digitalisasi, serta latihan keusahawanan intensif bersama mentor industri bagi membantu perniagaan anda berkembang.'
+                  ? 'Akses Geran Permulaan Belia, geran digitalisasi, serta latihan intensif bersama mentor industri bagi memperkukuh operasi anda.'
                   : 'Fast-tracked youth seed grants, digitalization subsidies, and structured mentorship programs.'}
               </p>
               <div className="pt-2">
@@ -1065,7 +1089,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={() => navigateToPage('login')}
                   className="text-xs font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
-                  <span>{isBM ? 'Log Masuk & Maklumat Skim' : 'Log In to View Schemes'}</span>
+                  <span>{isBM ? 'Maklumat Skim' : 'View Schemes'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </button>
               </div>
@@ -1086,13 +1110,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
                 <Building2 className="w-3.5 h-3.5" />
-                <span>Lokasi Pilihan Daerah</span>
+                <span>Lokasi Pilihan</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance">
-                Kiosk Niaga Belia Sedia Dimohon
+                Kiosk Belia Sedia Dimohon
               </h2>
               <p className="text-xs sm:text-sm text-black dark:text-white/75 mt-1">
-                Pilih tapak perniagaan yang strategik lengkap dengan elektrik dan internet sedia ada.
+                Tapak strategik lengkap dengan elektrik dan internet.
               </p>
             </div>
           </div>
@@ -1180,10 +1204,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <span>Direktori Produk Tempatan</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance">
-                Karya & Perniagaan Belia Kelantan
+                Karya & Produk Belia Kelantan
               </h2>
               <p className="text-xs sm:text-sm text-black dark:text-white/75 mt-1">
-                Sokong produk buatan anak tempatan merentasi pelbagai kategori industri.
+                Sokong produk usahawan muda merentasi pelbagai sektor.
               </p>
             </div>
           </div>
@@ -1244,10 +1268,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span>Bantuan & Panduan</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-              Soalan Lazim (FAQ)
+              Soalan Lazim
             </h2>
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
-              Jawapan kepada pertanyaan lazim berkenaan permohonan kiosk, dana bantuan, mentor, dan direktori KBelia.
+              Jawapan pantas mengenai permohonan kiosk, geran, mentor, dan direktori.
             </p>
           </div>
 
@@ -1289,14 +1313,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="relative z-10 max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Peluang Terbuka Sepanjang Tahun 2026/2027</span>
+            <span>Permohonan 2026/2027 Dibuka</span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-            Mulakan Langkah Keusahawanan Anda Hari Ini
+            Mulakan Langkah Anda Hari Ini
           </h2>
           <p className="text-xs sm:text-sm text-black dark:text-white max-w-xl mx-auto leading-relaxed">
-            Sertai ratusan usahawan muda Kelantan yang memanfaatkan fasiliti kiosk modular, bimbingan mentor universiti, dan direktori negeri rasmi.
+            Sertai usahawan muda Kelantan yang menggunakan fasiliti kiosk modular, bimbingan mentor, dan direktori negeri.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -1307,7 +1331,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               className="px-6 py-3 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm transition-colors flex items-center gap-2 cursor-pointer active:scale-98 dark:bg-teal-600"
             >
               <Users className="w-4 h-4" />
-              <span>{isBM ? 'Daftar Akaun Percuma' : 'Register Free Account'}</span>
+              <span>{isBM ? 'Daftar Percuma' : 'Register Free'}</span>
             </button>
             <button
               type="button"
@@ -1315,14 +1339,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               className="px-6 py-3 rounded-lg bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white font-bold text-sm border border-slate-300 dark:border-slate-600 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
             >
               <LogIn className="w-4 h-4 text-black dark:text-white/75" />
-              <span>{isBM ? 'Log Masuk Sistem' : 'Log In System'}</span>
+              <span>{isBM ? 'Log Masuk' : 'Log In'}</span>
             </button>
           </div>
 
           <div className="pt-2 text-xs text-black dark:text-white/75 flex items-center justify-center gap-4">
             <span className="flex items-center gap-1">
               <Check className="w-3.5 h-3.5 text-black dark:text-white/75" />
-              <span>100% Inisiatif Kerajaan Negeri</span>
+              <span>Inisiatif Kerajaan Negeri</span>
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
@@ -1332,7 +1356,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <span>•</span>
             <span className="flex items-center gap-1">
               <Check className="w-3.5 h-3.5 text-black dark:text-white/75" />
-              <span>Kelulusan Digital Pantas</span>
+              <span>Semakan Digital Pantas</span>
             </span>
           </div>
         </div>
@@ -1355,7 +1379,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span className="text-base font-black text-black dark:text-white tracking-tight">KBelia Kelantan</span>
             </div>
             <p className="text-xs text-black dark:text-white/75 leading-relaxed">
-              Portal Rasmi Pembangunan & Pemerkasaan Usahawan Belia Negeri Kelantan. Menyediakan kiosk pintar modular, pasaran direktori, serta bantuan geran permulaan.
+              Portal rasmi kiosk modular, direktori pasaran, dan geran usahawan belia Negeri Kelantan.
             </p>
             <div className="pt-2 text-[11px] text-black/70 dark:text-white/75">
               Kompleks Kota Darulnaim, 15503 Kota Bharu, Kelantan Darul Naim.
@@ -1392,7 +1416,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Col 3: Legal & Policy */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-black dark:text-white">Pautan Perundangan</h4>
+            <h4 className="font-extrabold text-sm text-black dark:text-white">Perundangan</h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <button
@@ -1400,7 +1424,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={() => setLegalModalType('privacy')}
                   className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Dasar Privasi (Privacy Policy)
+                  Dasar Privasi
                 </button>
               </li>
               <li>
@@ -1409,7 +1433,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={() => setLegalModalType('terms')}
                   className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Terma & Syarat Perkhidmatan
+                  Terma & Syarat
                 </button>
               </li>
               <li>
@@ -1418,7 +1442,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={() => setLegalModalType('privacy')}
                   className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Polisi Keselamatan Siber & Data
+                  Keselamatan Data
                 </button>
               </li>
               <li>
@@ -1427,7 +1451,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={() => setLegalModalType('terms')}
                   className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Penafian Liabiliti Rasmi
+                  Penafian Rasmi
                 </button>
               </li>
             </ul>
@@ -1501,7 +1525,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="border-t border-slate-300 dark:border-slate-600 py-6 text-center text-[11px] text-black/70 dark:text-white/75">
           <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p>
-              Hak Cipta Terpelihara © {new Date().getFullYear()} Kerajaan Negeri Kelantan. Diselaraskan di bawah Inisiatif Pembangunan Ekonomi Belia.
+              Hak Cipta Terpelihara © {new Date().getFullYear()} Kerajaan Negeri Kelantan · Inisiatif Ekonomi Belia.
             </p>
             <div className="flex items-center gap-3">
               <span className="text-black dark:text-white/75">Versi 2.4.0</span>

@@ -65,7 +65,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     ? new Set(['home', 'admin', 'academic', 'ceed', 'hepa', 'news', 'settings'])
     : isMentor
     ? new Set(['home', 'mentor', 'news', 'settings'])
-    : new Set(['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'news', 'settings']);
+    : new Set(['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'mentorship', 'news', 'settings']);
 
   const unreadCount = filteredNotifications.filter(n => !n.isRead).length;
 

@@ -88,6 +88,16 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           iconBg: 'bg-teal-600'
         };
 
+      case 'mentorship':
+        return {
+          pageLabel: isMs ? 'Bimbingan' : 'Mentoring',
+          breadcrumb: isMs ? 'Temu Janji & Senarai Mentor' : 'Mentor Advisory & Appointments',
+          dashboardTitle: isMs ? 'BIMBINGAN MENTOR' : 'MENTOR ADVISORY',
+          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          icon: GraduationCap,
+          iconBg: 'bg-teal-600'
+        };
+
       case 'admin':
         return {
           pageLabel: 'Admin',

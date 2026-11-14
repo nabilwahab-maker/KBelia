@@ -140,12 +140,12 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white tracking-tight">
-            {isEn ? 'Youth Entrepreneurship Grants & Programs' : 'Geran & Program Keusahawanan Belia'}
+            {isEn ? 'Youth Grants & Programs' : 'Geran & Program Belia'}
           </h2>
           <p className="text-black dark:text-white/75 text-sm mt-1 max-w-2xl leading-relaxed">
             {isEn
-              ? 'Join specialized incubation programs, digital skill workshops, TEKUN/MARA/UMK funding matching, and kiosk lease subsidy grants to accelerate your business.'
-              : 'Sertai program inkubasi khas, bengkel kemahiran digital, padanan pembiayaan TEKUN/MARA/UMK, dan geran subsidi sewa kapsul niaga untuk memacu perniagaan anda.'}
+              ? 'Join incubation programs, digital workshops, TEKUN/MARA/UMK matching, and kiosk subsidy grants.'
+              : 'Sertai program inkubasi, bengkel digital, padanan TEKUN/MARA/UMK, dan subsidi sewa kapsul niaga.'}
           </p>
         </div>
 

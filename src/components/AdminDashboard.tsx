@@ -32,7 +32,9 @@ import {
   Wrench,
   ChevronRight,
   Activity,
-  Newspaper
+  Newspaper,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { 
   BusinessListing, 
@@ -65,6 +67,7 @@ import {
 } from '../services/dataService';
 import { AdminApprovalQueue } from './AdminApprovalQueue';
 import { AdminNewsManager } from './AdminNewsManager';
+import { AdminB2BManager } from './AdminB2BManager';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { EditBusinessModal } from './EditBusinessModal';
 import { EditSlotModal } from './EditSlotModal';
@@ -90,6 +93,7 @@ import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { PortalImage } from './PortalImage';
 import { resolveBookingKioskImage, resolveSlotImage, resolveProgramImage } from '../utils/visualAssets';
+import { PaginationBar, usePagination } from './PaginationBar';
 
 interface AdminDashboardProps {
   slots: CapsuleSlot[];
@@ -492,11 +496,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  const [expandedAdminBookingIds, setExpandedAdminBookingIds] = useState<string[]>([]);
+  const toggleAdminBookingExpand = (id: string) => {
+    setExpandedAdminBookingIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
   const filteredBookings = safeBookings.filter(b => {
     if (!b) return false;
     if (bookingFilter === 'all') return true;
     return b.status === bookingFilter;
   });
+
+  const adminBookingOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2 };
+  const sortedBookings = [...filteredBookings].sort(
+    (a, b) => (adminBookingOrder[a.status] ?? 3) - (adminBookingOrder[b.status] ?? 3)
+  );
+  const mentorStatusOrder: Record<string, number> = { pending: 0, confirmed: 1, completed: 2 };
+  const sortedMentorships = [...mentorshipRegistrations].sort(
+    (a, b) => (mentorStatusOrder[a.status] ?? 3) - (mentorStatusOrder[b.status] ?? 3)
+  );
+
+  const adminBookingsPagination = usePagination(sortedBookings, 5, [
+    bookingFilter,
+    sortedBookings.length
+  ]);
+  const businessesPagination = usePagination(safeBusinesses, 5, [safeBusinesses.length]);
+  const slotsPagination = usePagination(safeSlots, 5, [safeSlots.length]);
+  const programsPagination = usePagination(safePrograms, 5, [safePrograms.length]);
+  const adminMentorshipsPagination = usePagination(sortedMentorships, 5, [sortedMentorships.length]);
 
   if (!isAdmin) {
     return (
@@ -817,15 +846,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </button>
                   </div>
 
-                  <div className="px-5 py-3 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex items-center justify-between text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setAdminTab('news')}
-                      className="text-black dark:text-white hover:text-black dark:hover:text-white font-bold inline-flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Newspaper className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                      <span>Urus Berita ({newsItems.length})</span>
-                    </button>
+                  <div className="px-5 py-3 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setAdminTab('news')}
+                        className="text-black dark:text-white hover:text-black dark:hover:text-white font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Newspaper className="w-3.5 h-3.5 text-black dark:text-white/75" />
+                        <span>Urus Berita ({newsItems.length})</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAdminTab('b2b')}
+                        className="text-teal-700 dark:text-teal-400 font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>Ruang Niaga</span>
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={() => setAdminTab('slots')}
@@ -974,132 +1012,157 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </div>
 
-          {filteredBookings.length === 0 ? (
+          {sortedBookings.length === 0 ? (
             <div className="p-12 text-center bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600">
               <Clock className="w-12 h-12 text-black/35 dark:text-white/35 mx-auto mb-2" />
               <h4 className="font-bold text-black dark:text-white text-sm">Tiada Permohonan Dalam Kategori Ini</h4>
             </div>
           ) : (
-            <div className="space-y-4">
-              {filteredBookings.map((b) => (
-                <div
-                  key={b.id}
-                  className="bg-white dark:bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs transition-colors"
-                >
-                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-stretch">
-                    <div className="w-full sm:w-44 shrink-0 aspect-[4/3] sm:aspect-auto sm:min-h-[140px] rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
-                      <PortalImage
-                        src={resolveBookingKioskImage(b, slots)}
-                        alt={`Reka bentuk kiosk ${b.slotName}`}
-                        fallbackType="kiosk"
-                        fallbackLabel={b.slotCode}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="flex-1 min-w-0 space-y-4">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 font-mono text-xs font-bold">
-                              {b.slotCode}
-                            </span>
-                            <h4 className="text-base font-extrabold text-black dark:text-white">{b.businessName}</h4>
-                            <span className="text-xs text-black dark:text-white/75 font-semibold">({b.businessCategory})</span>
+            <div className="space-y-3">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-xs transition-colors">
+                {adminBookingsPagination.paginatedItems.map((b) => {
+                  const isExpanded = expandedAdminBookingIds.includes(b.id);
+                  return (
+                    <div key={b.id} className="p-3.5 sm:p-4 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                          <div className="w-16 h-12 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                            <PortalImage
+                              src={resolveBookingKioskImage(b, safeSlots)}
+                              alt={`Reka bentuk kiosk ${b.slotName}`}
+                              fallbackType="kiosk"
+                              fallbackLabel={b.slotCode}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
-                          <p className="text-xs text-black/70 dark:text-white/75 mt-1">
-                            Kapsul Dipohon: <strong className="text-black dark:text-white">{b.slotName}</strong> ({b.hubLocation})
-                          </p>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 font-mono text-[11px] font-bold">
+                                {b.slotCode}
+                              </span>
+                              <h4 className="text-sm font-extrabold text-black dark:text-white truncate">{b.businessName}</h4>
+                              <span className="text-xs text-black/70 dark:text-white/75 font-semibold">({b.businessCategory})</span>
+                            </div>
+                            <p className="text-xs text-black/70 dark:text-white/75 mt-1 truncate tabular-nums">
+                              {b.applicantName} · {b.slotName} ({b.hubLocation}) · {b.durationMonths} bln
+                            </p>
+                          </div>
                         </div>
 
-                        <div className="shrink-0">
+                        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
                           {b.status === 'pending' && (
-                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white border border-amber-300 dark:border-amber-800">
+                            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white border border-amber-300 dark:border-amber-800 whitespace-nowrap">
                               Menunggu Kelulusan
                             </span>
                           )}
                           {b.status === 'approved' && (
-                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-300 dark:border-emerald-800">
+                            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-300 dark:border-emerald-800 whitespace-nowrap">
                               Diluluskan
                             </span>
                           )}
                           {b.status === 'rejected' && (
-                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-100 dark:bg-rose-950/80 text-black dark:text-white border border-rose-300 dark:border-rose-800">
+                            <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 dark:bg-rose-950/80 text-black dark:text-white border border-rose-300 dark:border-rose-800 whitespace-nowrap">
                               Ditolak
                             </span>
                           )}
+
+                          <button
+                            type="button"
+                            onClick={() => toggleAdminBookingExpand(b.id)}
+                            aria-expanded={isExpanded}
+                            className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-xs font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                          >
+                            <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
+                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                          </button>
                         </div>
                       </div>
 
-                  {/* Applicant Details */}
-                  <div className="grid sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-900 p-3.5 rounded-xl text-xs text-black dark:text-white/75 border border-slate-300 dark:border-slate-600">
-                    <div>
-                      <span className="text-black/70 dark:text-white/75 block text-[10px]">Pemohon:</span>
-                      <strong className="text-black dark:text-white">{b.applicantName}</strong>
-                    </div>
-                    <div>
-                      <span className="text-black/70 dark:text-white/75 block text-[10px]">E-mel / Telefon:</span>
-                      <span className="font-mono text-black dark:text-white">{b.applicantEmail} • {b.applicantPhone}</span>
-                    </div>
-                    <div>
-                      <span className="text-black/70 dark:text-white/75 block text-[10px]">Tempoh & Tarikh Mula:</span>
-                      <span className="text-black dark:text-white">{b.durationMonths} Bulan (Mulai {b.startDate})</span>
-                    </div>
-                  </div>
+                      {isExpanded && (
+                        <div className="mt-3.5 pt-3.5 border-t border-slate-200 dark:border-slate-700 space-y-3 animate-in fade-in duration-150">
+                          {/* Applicant Details */}
+                          <div className="grid sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-900 p-3.5 rounded-xl text-xs text-black dark:text-white/75 border border-slate-300 dark:border-slate-600">
+                            <div>
+                              <span className="text-black/70 dark:text-white/75 block text-[10px]">Pemohon:</span>
+                              <strong className="text-black dark:text-white">{b.applicantName}</strong>
+                            </div>
+                            <div>
+                              <span className="text-black/70 dark:text-white/75 block text-[10px]">E-mel / Telefon:</span>
+                              <span className="font-mono text-black dark:text-white">{b.applicantEmail} • {b.applicantPhone}</span>
+                            </div>
+                            <div>
+                              <span className="text-black/70 dark:text-white/75 block text-[10px]">Tempoh & Tarikh Mula:</span>
+                              <span className="text-black dark:text-white tabular-nums">{b.durationMonths} Bulan (Mulai {b.startDate})</span>
+                            </div>
+                          </div>
 
-                  {/* Pitch Notes */}
-                  {b.pitchNotes && (
-                    <div className="text-xs text-black dark:text-white bg-indigo-50 dark:bg-indigo-950/60 p-3 rounded-xl border border-indigo-200 dark:border-indigo-800/70">
-                      <span className="font-bold text-black dark:text-white block mb-0.5">Cadangan Pitching Usahawan:</span>
-                      <p>{b.pitchNotes}</p>
-                    </div>
-                  )}
+                          {/* Pitch Notes */}
+                          {b.pitchNotes && (
+                            <div className="text-xs text-black dark:text-white bg-indigo-50 dark:bg-indigo-950/60 p-3 rounded-xl border border-indigo-200 dark:border-indigo-800/70">
+                              <span className="font-bold text-black dark:text-white block mb-0.5">Cadangan Pitching Usahawan:</span>
+                              <p>{b.pitchNotes}</p>
+                            </div>
+                          )}
 
-                  {/* Admin Notes & Actions */}
-                  {b.status === 'pending' && (
-                    <div className="pt-2 space-y-3">
-                      <div>
-                        <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
-                          Catatan Pentadbir / Arahan Lanjut:
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="cth. Diluluskan. Sila hadir ke Pejabat Hab UMK Bachok pada hari Isnin untuk serah kunci."
-                          value={reviewNoteInput[b.id] || ''}
-                          onChange={(e) => setReviewNoteInput({ ...reviewNoteInput, [b.id]: e.target.value })}
-                          className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 focus:outline-none dark:focus:border-blue-500"
-                        />
-                      </div>
+                          {/* Admin Notes & Actions */}
+                          {b.status === 'pending' && (
+                            <div className="pt-1 space-y-3">
+                              <div>
+                                <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
+                                  Catatan Pentadbir / Arahan Lanjut:
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="cth. Diluluskan. Sila hadir ke Pejabat Hab UMK Bachok pada hari Isnin untuk serah kunci."
+                                  value={reviewNoteInput[b.id] || ''}
+                                  onChange={(e) => setReviewNoteInput({ ...reviewNoteInput, [b.id]: e.target.value })}
+                                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 focus:outline-none dark:focus:border-blue-500"
+                                />
+                              </div>
 
-                      <div className="flex items-center justify-end gap-3">
-                        <button
-                          onClick={() => handleRejectBooking(b)}
-                          disabled={loading}
-                          className="px-4 py-2 bg-rose-50 dark:bg-rose-950/80 hover:bg-rose-100 dark:hover:bg-rose-900 text-black dark:text-white border border-rose-200 dark:border-rose-800 font-bold text-xs rounded-xl transition-colors cursor-pointer"
-                        >
-                          Tolak Permohonan
-                        </button>
-                        <button
-                          onClick={() => handleApproveBooking(b)}
-                          disabled={loading}
-                          className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <CheckCircle2 className="w-4 h-4" />
-                          <span>Luluskan Permohonan</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                              <div className="flex items-center justify-end gap-3">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRejectBooking(b)}
+                                  disabled={loading}
+                                  className="px-4 py-2 bg-rose-50 dark:bg-rose-950/80 hover:bg-rose-100 dark:hover:bg-rose-900 text-black dark:text-white border border-rose-200 dark:border-rose-800 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                                >
+                                  Tolak Permohonan
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleApproveBooking(b)}
+                                  disabled={loading}
+                                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                                >
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  <span>Luluskan Permohonan</span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
 
-                  {b.adminNotes && b.status !== 'pending' && (
-                    <div className="text-xs text-black dark:text-white bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-300 dark:border-slate-600">
-                      <strong className="text-black dark:text-white">Catatan Pentadbir:</strong> {b.adminNotes}
+                          {b.adminNotes && b.status !== 'pending' && (
+                            <div className="text-xs text-black dark:text-white bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-300 dark:border-slate-600">
+                              <strong className="text-black dark:text-white">Catatan Pentadbir:</strong> {b.adminNotes}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
+
+              <PaginationBar
+                currentPage={adminBookingsPagination.currentPage}
+                totalItems={adminBookingsPagination.totalItems}
+                itemsPerPage={5}
+                onPageChange={adminBookingsPagination.setCurrentPage}
+                itemLabel="permohonan sewaan"
+                accent="rose"
+              />
             </div>
           )}
         </div>
@@ -1128,7 +1191,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300 dark:divide-slate-600">
-                  {businesses.map((biz) => (
+                  {businessesPagination.paginatedItems.map((biz) => (
                     <tr key={biz.id} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -1205,6 +1268,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="px-4 pb-3">
+              <PaginationBar
+                currentPage={businessesPagination.currentPage}
+                totalItems={businessesPagination.totalItems}
+                itemsPerPage={5}
+                onPageChange={businessesPagination.setCurrentPage}
+                itemLabel="perniagaan"
+                accent="rose"
+              />
             </div>
           </div>
         </div>
@@ -1393,7 +1466,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300 dark:divide-slate-600">
-                  {slots.map((s) => (
+                  {slotsPagination.paginatedItems.map((s) => (
                     <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -1471,6 +1544,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="px-4 pb-3">
+              <PaginationBar
+                currentPage={slotsPagination.currentPage}
+                totalItems={slotsPagination.totalItems}
+                itemsPerPage={5}
+                onPageChange={slotsPagination.setCurrentPage}
+                itemLabel="slot kapsul"
+                accent="rose"
+              />
             </div>
           </div>
         </div>
@@ -1629,8 +1712,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           )}
 
+          <div className="space-y-3">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {safePrograms.map((p) => (
+            {programsPagination.paginatedItems.map((p) => (
               <div
                 key={p.id}
                 className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs overflow-hidden flex flex-col justify-between transition-colors"
@@ -1692,6 +1776,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
             ))}
+          </div>
+          <PaginationBar
+            currentPage={programsPagination.currentPage}
+            totalItems={programsPagination.totalItems}
+            itemsPerPage={5}
+            onPageChange={programsPagination.setCurrentPage}
+            itemLabel="program"
+            accent="rose"
+          />
           </div>
         </div>
       )}
@@ -1799,14 +1892,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300 dark:divide-slate-600 text-black dark:text-white">
-                  {mentorshipRegistrations.length === 0 ? (
+                  {sortedMentorships.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center py-8 text-black/70 dark:text-white/75">
                         Tiada pendaftaran bimbingan ditemui.
                       </td>
                     </tr>
                   ) : (
-                    mentorshipRegistrations.map((m) => (
+                    adminMentorshipsPagination.paginatedItems.map((m) => (
                       <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
                         <td className="py-3 px-4">
                           <div className="font-bold text-black dark:text-white">{m.entrepreneurName}</div>
@@ -1846,6 +1939,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </tbody>
               </table>
             </div>
+            <div className="px-4 pb-3">
+              <PaginationBar
+                currentPage={adminMentorshipsPagination.currentPage}
+                totalItems={adminMentorshipsPagination.totalItems}
+                itemsPerPage={5}
+                onPageChange={adminMentorshipsPagination.setCurrentPage}
+                itemLabel="pendaftaran bimbingan"
+                accent="rose"
+              />
+            </div>
           </div>
         </div>
       )}
@@ -1857,6 +1960,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             newsItems={newsItems}
             onRefresh={onRefresh}
           />
+        </div>
+      )}
+
+      {/* TAB: RUANG NIAGA VISUAL AD MANAGEMENT (ADMIN ONLY) */}
+      {adminTab === 'b2b' && (
+        <div className="animate-in fade-in duration-200">
+          <AdminB2BManager />
         </div>
       )}
 

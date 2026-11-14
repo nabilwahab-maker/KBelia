@@ -619,13 +619,13 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             <div className="p-6 space-y-4">
               <div className="space-y-3 text-xs text-black dark:text-white leading-relaxed">
                 <p>
-                  <strong>1. Kelayakan Pemohon:</strong> Terbuka kepada warganegara Malaysia berumur 18 hingga 40 tahun yang menetap atau berniaga di seluruh Negeri Kelantan.
+                  <strong>1. Kelayakan Pemohon:</strong> Terbuka kepada warganegara Malaysia berumur 18 hingga 40 tahun yang menetap atau beroperasi di Negeri Kelantan.
                 </p>
                 <p>
-                  <strong>2. Penggunaan Kiosk & Geran:</strong> Setiap pendaftaran melayakkan pemohon memohon sewaan Kiosk Belia bersubsidi serta Geran Permulaan tertakluk kepada semakan pihak pentadbir.
+                  <strong>2. Penggunaan Kiosk & Geran:</strong> Pemohon berdaftar layak memohon Kiosk Belia bersubsidi serta Geran Permulaan tertakluk kepada semakan pentadbir.
                 </p>
                 <p>
-                  <strong>3. Dasar Privasi (PDPA 2010):</strong> Maklumat peribadi dan butiran perniagaan yang dikemukakan adalah sulit dan hanya digunakan bagi tujuan pengurusan program pemerkasaan keusahawanan belia negeri.
+                  <strong>3. Dasar Privasi (PDPA 2010):</strong> Maklumat yang dikemukakan adalah sulit dan hanya digunakan bagi pengurusan program belia negeri.
                 </p>
               </div>
 

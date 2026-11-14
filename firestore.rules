@@ -388,7 +388,7 @@ service cloud.firestore {
 
     function isValidB2BListing(data) {
       return data.keys().hasAll(['id', 'authorName', 'authorBusiness', 'type', 'title']) &&
-        data.keys().hasOnly(['id', 'ownerId', 'authorName', 'authorBusiness', 'district', 'type', 'title', 'description', 'whatsapp', 'date']) &&
+        data.keys().hasOnly(['id', 'ownerId', 'authorName', 'authorBusiness', 'district', 'type', 'title', 'description', 'whatsapp', 'imageUrl', 'date']) &&
         validStr(data.id, 128) &&
         validStr(data.authorName, 120) &&
         validStr(data.authorBusiness, 150) &&
@@ -398,6 +398,7 @@ service cloud.firestore {
         (!('district' in data) || validStr(data.district, 50)) &&
         (!('description' in data) || validStr(data.description, 1500)) &&
         (!('whatsapp' in data) || validStr(data.whatsapp, 30)) &&
+        (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
         (!('date' in data) || validStr(data.date, 50));
     }
 
@@ -761,27 +762,13 @@ service cloud.firestore {
       allow delete: if isAdmin() && isValidId(logId);
     }
 
-    // 15. B2B Listings Collection
+    // 15. B2B Listings Collection (Admin Publish & Image Control Only)
     match /b2b_listings/{listingId} {
       allow get: if isValidId(listingId);
       allow list: if true;
-      allow create: if isSignedIn() && isValidId(listingId) && isValidB2BListing(incoming()) && (
-        isAdmin() || ('ownerId' in incoming() && incoming().ownerId == request.auth.uid)
-      );
-      allow update: if isSignedIn() && isValidId(listingId) && isValidB2BListing(incoming()) && (
-        isAdmin() || (
-          'ownerId' in existing() &&
-          existing().ownerId == request.auth.uid &&
-          'ownerId' in incoming() &&
-          incoming().ownerId == existing().ownerId &&
-          incoming().diff(existing()).affectedKeys().hasOnly([
-            'authorName', 'authorBusiness', 'district', 'type', 'title', 'description', 'whatsapp', 'date'
-          ])
-        )
-      );
-      allow delete: if isSignedIn() && isValidId(listingId) && (
-        isAdmin() || ('ownerId' in existing() && existing().ownerId == request.auth.uid)
-      );
+      allow create: if isAdmin() && isValidId(listingId) && isValidB2BListing(incoming());
+      allow update: if isAdmin() && isValidId(listingId) && isValidB2BListing(incoming());
+      allow delete: if isAdmin() && isValidId(listingId);
     }
 
     // 16. Notifications Collection (Role & Target User Isolated + Query Enforced)

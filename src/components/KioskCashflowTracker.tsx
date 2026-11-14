@@ -12,6 +12,7 @@ import { isProductionAuthenticated, saveCashflowRecord, deleteCashflowRecord } f
 import { mergeUniqueById, subscribeCrossTabSync, subscribeDemoSyncCollection } from '../services/realtimeSync';
 import { showToast } from './ToastNotification';
 import { EditCashflowModal } from './EditCashflowModal';
+import { PaginationBar, usePagination } from './PaginationBar';
 
 interface KioskCashflowTrackerProps {
   kioskName?: string;
@@ -42,6 +43,8 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [editingRecord, setEditingRecord] = useState<KioskDailySale | null>(null);
+
+  const salesPagination = usePagination(salesRecords, 5, [salesRecords.length]);
 
   useEffect(() => {
     const prodAuth = isProductionAuthenticated();
@@ -322,7 +325,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-300 dark:divide-slate-600 text-black dark:text-white">
-              {salesRecords.map((r) => {
+              {salesPagination.paginatedItems.map((r) => {
                 const dailyNet = (r.cashSales + r.qrSales) - r.expenses;
                 return (
                   <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
@@ -371,6 +374,16 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               })}
             </tbody>
           </table>
+          <div className="px-3 pb-3">
+            <PaginationBar
+              currentPage={salesPagination.currentPage}
+              totalItems={salesPagination.totalItems}
+              itemsPerPage={5}
+              onPageChange={salesPagination.setCurrentPage}
+              itemLabel="rekod jualan"
+              accent="blue"
+            />
+          </div>
         </div>
       )}
 

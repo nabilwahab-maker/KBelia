@@ -24,7 +24,8 @@ import {
   FileText,
   Users,
   X,
-  Newspaper
+  Newspaper,
+  Megaphone
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
 import { useAuth } from '../context/AuthContext';
@@ -243,6 +244,20 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
               <button
                 type="button"
+                onClick={() => {
+                  setActiveTab('admin');
+                  if (onSelectAdminSubTab) onSelectAdminSubTab('b2b');
+                }}
+                title={isMs ? 'Ruang Niaga' : 'Ruang Niaga Ads'}
+                className={`${miniBtnBase} ${
+                  activeTab === 'admin' && adminSubTab === 'b2b' ? miniBtnActive : miniBtnIdle
+                }`}
+              >
+                <Megaphone className="w-5 h-5" />
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setActiveTab('settings')}
                 title={t('nav_settings')}
                 className={`${miniBtnBase} ${activeTab === 'settings' ? miniBtnActive : miniBtnIdle}`}
@@ -394,12 +409,9 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
               <button
                 type="button"
-                onClick={() => {
-                  if (onOpenMentorshipClinic) onOpenMentorshipClinic();
-                  else setActiveTab('events');
-                }}
+                onClick={() => setActiveTab('mentorship')}
                 title={t('nav_mentor_clinic')}
-                className={`${miniBtnBase} ${miniBtnIdle}`}
+                className={`${miniBtnBase} ${activeTab === 'mentorship' ? miniBtnActive : miniBtnIdle}`}
               >
                 <GraduationCap className="w-5 h-5" />
               </button>
@@ -488,6 +500,12 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
       label: isMs ? 'Pengurusan Berita' : 'News Manager',
       keywords: 'berita pengumuman warta news manager admin',
       icon: Newspaper
+    },
+    {
+      id: 'b2b',
+      label: isMs ? 'Ruang Niaga' : 'Ruang Niaga',
+      keywords: 'ruang niaga iklan pembekal gambar b2b ads admin',
+      icon: Megaphone
     },
     {
       id: 'sync',
@@ -1357,19 +1375,26 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 {matchesSearch('sesi bimbingan mentor konsultasi mentoring clinic') && (
                   <button
                     type="button"
-                    onClick={() =>
-                      navigateAndClose(() => {
-                        if (onOpenMentorshipClinic) onOpenMentorshipClinic();
-                        else setActiveTab('events');
-                      })
-                    }
-                    className={`${navBtnBase} ${navBtnIdle}`}
+                    onClick={() => navigateAndClose(() => setActiveTab('mentorship'))}
+                    className={`${navBtnBase} ${activeTab === 'mentorship' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <GraduationCap className="w-4 h-4 shrink-0 text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white" />
+                      <GraduationCap
+                        className={`w-4 h-4 shrink-0 ${
+                          activeTab === 'mentorship'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
+                        }`}
+                      />
                       <span className="truncate whitespace-nowrap">{t('nav_mentor_clinic')}</span>
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 shrink-0 text-black/35 dark:text-white/35 transition-transform group-hover:translate-x-0.5" />
+                    <ChevronRight
+                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
+                        activeTab === 'mentorship'
+                          ? 'text-black dark:text-white/75'
+                          : 'text-black/35 dark:text-white/35'
+                      }`}
+                    />
                   </button>
                 )}
 

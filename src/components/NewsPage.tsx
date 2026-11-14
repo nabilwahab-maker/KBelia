@@ -156,7 +156,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
             Berita Terkini Ekosistem KBelia Kelantan
           </h1>
           <p className="text-xs sm:text-sm text-black dark:text-white max-w-2xl leading-relaxed">
-            Ikuti hebahan rasmi geran perniagaan, pembukaan kapsul niaga, jadual karnival dan perkembangan terkini yang diterbitkan oleh pihak Pentadbir.
+            Ikuti hebahan rasmi geran, pembukaan kapsul niaga, jadual karnival, dan pengumuman terkini Pentadbir.
           </p>
         </div>
 

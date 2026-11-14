@@ -333,6 +333,7 @@
         "title": { "type": "string", "maxLength": 200 },
         "description": { "type": "string", "maxLength": 1500 },
         "whatsapp": { "type": "string", "maxLength": 30 },
+        "imageUrl": { "type": "string", "maxLength": 900000 },
         "date": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "authorName", "authorBusiness", "type", "title"]
