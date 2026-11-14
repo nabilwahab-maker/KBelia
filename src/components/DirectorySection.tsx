@@ -104,7 +104,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             type="button"
             onClick={handleRegister}
             className="interactive-press interactive-lift inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all shrink-0 cursor-pointer dark:bg-blue-600"
-            title={language === 'en' ? 'Open Merchant Business Management' : 'Buka Papan Pemuka Pengurusan Bisnes Usahawan'}
+            title={language === 'en' ? 'Open Merchant Business Management' : 'Buka Dashboard Pengurusan Bisnes Usahawan'}
           >
             <Store className="w-4 h-4" />
             <span>{t('manage_business_btn')}</span>
@@ -113,7 +113,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
       </div>
 
       {/* Search & Filter Controls */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs mb-8 space-y-4 transition-colors">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs mb-8 space-y-4 transition-colors">
         <div className="grid md:grid-cols-12 gap-3">
           
           {/* Search input */}
@@ -124,7 +124,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
               placeholder={t('search_business_ph')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 transition-colors dark:focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 transition-colors dark:focus:border-blue-500"
             />
           </div>
 
@@ -133,7 +133,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
+              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
             >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
@@ -148,7 +148,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value as KelantanDistrict)}
-              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
+              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
             >
               {DISTRICTS.map((d) => (
                 <option key={d} value={d}>
@@ -161,7 +161,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
         </div>
 
         {/* Quick category pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs pt-1 border-t border-slate-200/80 dark:border-slate-700">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs pt-1 border-t border-slate-300 dark:border-slate-600">
           <span className="text-[11px] font-bold text-black/70 dark:text-white/75 shrink-0">{t('popular_categories_label')}</span>
           {CATEGORIES.slice(1, 5).map((cat) => (
             <button
@@ -170,7 +170,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
               className={`interactive-press px-2.5 py-1 rounded-lg text-[11px] font-medium shrink-0 transition-colors cursor-pointer ${
                 selectedCategory === cat
                   ? 'bg-amber-100 dark:bg-indigo-600 text-black dark:text-white font-bold border border-indigo-200 dark:border-indigo-800/70'
-                  : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700 dark:hover:text-white border border-slate-200 dark:border-slate-700'
+                  : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700 dark:hover:text-white border border-slate-300 dark:border-slate-600'
               }`}
             >
               {cat}
@@ -181,7 +181,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
 
       {/* Businesses Grid */}
       {filteredBusinesses.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
+        <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600">
           <Store className="w-12 h-12 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <h3 className="text-base font-bold text-black dark:text-white">{t('no_businesses_found')}</h3>
           <p className="text-xs text-black/70 dark:text-white/75 mt-1">{t('no_businesses_desc')}</p>
@@ -200,7 +200,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
               <div
                 key={biz.id}
                 id={`business-card-${biz.id}`}
-                className="interactive-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-blue-400/70 dark:hover:border-blue-400/70 overflow-hidden shadow-xs flex flex-col justify-between group cursor-pointer"
+                className="interactive-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 hover:border-blue-400/70 dark:hover:border-blue-400/70 overflow-hidden shadow-xs flex flex-col justify-between group cursor-pointer"
               >
                 {/* Banner & Logo */}
                 <div>
@@ -220,7 +220,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                     {/* Verified SSM mark */}
                     <div className="absolute top-3 right-3 flex items-center gap-1">
                       {biz.ssmNumber && (
-                        <div className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white/90 text-black shadow-xs flex items-center gap-1">
+                        <div className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-black shadow-xs flex items-center gap-1">
                           <ShieldCheck className="w-3 h-3 text-black dark:text-white" />
                           <span>SSM Sah</span>
                         </div>
@@ -231,7 +231,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                     <img
                       src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                       alt={biz.businessName}
-                      className="absolute -bottom-3 left-4 w-12 h-12 rounded-lg border-2 border-white dark:border-slate-800 shadow-sm object-cover bg-white dark:bg-slate-900"
+                      className="absolute -bottom-3 left-4 w-12 h-12 rounded-lg border-2 border-white dark:border-slate-600 shadow-sm object-cover bg-white dark:bg-slate-900"
                     />
                   </div>
 
@@ -265,7 +265,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="p-4 bg-slate-50 dark:bg-slate-900/70 border-t border-slate-200/80 dark:border-slate-700 flex items-center gap-2">
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600 flex items-center gap-2">
                   <button
                     onClick={() => onSelectBusiness(biz)}
                     className="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs dark:bg-indigo-600"

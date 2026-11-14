@@ -115,7 +115,7 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({
       />
 
       {value ? (
-        <div className={`relative w-full ${aspectClass} rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-900 group shadow-xs`}>
+        <div className={`relative w-full ${aspectClass} rounded-2xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-900 group shadow-xs`}>
           <img
             src={value}
             alt="Pratonton Imej"
@@ -148,10 +148,10 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({
           className={`w-full p-6 rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center text-center cursor-pointer select-none ${
             isDragging
               ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white scale-[0.99]'
-              : 'border-slate-200 dark:border-slate-700 hover:border-blue-600 dark:hover:border-blue-400/70 bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white/75'
+              : 'border-slate-300 dark:border-slate-600 hover:border-blue-600 dark:hover:border-blue-400/70 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white/75'
           }`}
         >
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-2xs border border-slate-200 dark:border-slate-700 flex items-center justify-center mb-2.5 text-black dark:text-white/75">
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-2xs border border-slate-300 dark:border-slate-600 flex items-center justify-center mb-2.5 text-black dark:text-white/75">
             <Upload className="w-5 h-5" />
           </div>
           <div className="text-xs font-bold text-black dark:text-white">

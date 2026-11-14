@@ -928,14 +928,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else if (type === 'admin_sec') {
       authUser = {
         uid: 'admin-urusetia-02',
-        displayName: 'Urusetia KBelia Kelantan (Demo)',
+        displayName: 'Admin KBelia Kelantan (Demo)',
         email: 'urusetia@kbelia.kelantan.gov.my',
         photoURL: '/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
         isDemo: true
       };
       profile = {
         userId: 'admin-urusetia-02',
-        fullName: 'Pegawai Urusetia KBelia Kelantan',
+        fullName: 'Pegawai Admin KBelia Kelantan',
         email: 'urusetia@kbelia.kelantan.gov.my',
         role: 'admin',
         phone: '+6097481000',

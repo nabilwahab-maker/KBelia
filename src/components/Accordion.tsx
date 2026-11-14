@@ -46,7 +46,7 @@ export const Accordion: React.FC<AccordionProps> = ({
             className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
               isOpen
                 ? 'border-amber-400 dark:border-amber-400/60 bg-white dark:bg-slate-800 shadow-xs'
-                : 'border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 hover:border-amber-300 dark:hover:border-slate-600'
+                : 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 hover:border-amber-300 dark:hover:border-slate-500'
             }`}
           >
             {/* Header Button with min 44px tap target */}
@@ -96,7 +96,7 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             {/* Collapsible Content */}
             {isOpen && (
-              <div className="px-4 pb-4 pt-1 text-xs text-black dark:text-white leading-relaxed border-t border-slate-200/80 dark:border-slate-700/80 animate-in fade-in duration-150">
+              <div className="px-4 pb-4 pt-1 text-xs text-black dark:text-white leading-relaxed border-t border-slate-300 dark:border-slate-600 animate-in fade-in duration-150">
                 {item.content}
               </div>
             )}

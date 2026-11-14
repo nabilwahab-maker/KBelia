@@ -131,10 +131,10 @@ export const LoginModal: React.FC = () => {
     >
       <div 
         id="kbelia-login-card"
-        className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col transition-colors"
+        className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden flex flex-col transition-colors"
       >
         {/* Header */}
-        <div className="p-4 kbelia-important-header dark:bg-slate-800 text-black dark:text-white flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+        <div className="p-4 kbelia-important-header dark:bg-slate-800 text-black dark:text-white flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-rose-600 dark:text-rose-400 flex items-center justify-center font-black">
               {activeRoleTab === 'admin' ? <ShieldCheck className="w-4 h-4" /> : activeRoleTab === 'mentor' ? <GraduationCap className="w-4 h-4" /> : <Store className="w-4 h-4" />}
@@ -156,7 +156,7 @@ export const LoginModal: React.FC = () => {
         </div>
 
         {/* Role Tabs */}
-        <div className="p-1.5 bg-slate-50 dark:bg-slate-900 grid grid-cols-3 gap-1 border-b border-slate-200 dark:border-slate-700 text-xs">
+        <div className="p-1.5 bg-slate-50 dark:bg-slate-900 grid grid-cols-3 gap-1 border-b border-slate-300 dark:border-slate-600 text-xs">
           <button
             type="button"
             onClick={() => {
@@ -200,7 +200,7 @@ export const LoginModal: React.FC = () => {
         {/* Body */}
         <div className="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
           {activeRoleTab === 'user' && (
-            <div className="flex border-b border-slate-200 dark:border-slate-700 pb-2 gap-4 text-xs font-bold">
+            <div className="flex border-b border-slate-300 dark:border-slate-600 pb-2 gap-4 text-xs font-bold">
               <button
                 type="button"
                 onClick={() => {
@@ -260,7 +260,7 @@ export const LoginModal: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Emel rasmi anda"
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -286,7 +286,7 @@ export const LoginModal: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={activeRoleTab === 'mentor' ? 'PIN keselamatan' : 'Minimum 6 aksara'}
-                    className="w-full pl-9 pr-10 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-10 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -305,7 +305,7 @@ export const LoginModal: React.FC = () => {
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={isSubmitting}
-                  className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60"
+                  className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60"
                 >
                   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.87c2.27-2.09 3.67-5.17 3.67-9.15z" />
@@ -331,7 +331,7 @@ export const LoginModal: React.FC = () => {
                   value={regName}
                   onChange={(e) => setRegName(e.target.value)}
                   placeholder="Nama Penuh"
-                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -345,7 +345,7 @@ export const LoginModal: React.FC = () => {
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="Emel"
-                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -360,7 +360,7 @@ export const LoginModal: React.FC = () => {
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
                     placeholder="Telefon"
-                    className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -370,7 +370,7 @@ export const LoginModal: React.FC = () => {
                   <select
                     value={regDistrict}
                     onChange={(e) => setRegDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                    className="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   >
                     {DISTRICT_LIST.map(d => (
                       <option key={d} value={d}>{d}</option>
@@ -389,7 +389,7 @@ export const LoginModal: React.FC = () => {
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
                   placeholder="Kata Laluan"
-                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -405,7 +405,7 @@ export const LoginModal: React.FC = () => {
           )}
 
           {/* Isolated Development Demo Mode Buttons */}
-          <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-2">
+          <div className="pt-3 border-t border-slate-300 dark:border-slate-600 space-y-2">
             <div className="text-[10px] font-bold text-black/70 dark:text-white/75 uppercase tracking-wider text-center">
               Mod Demo Pembangunan (Terasing)
             </div>
@@ -417,7 +417,7 @@ export const LoginModal: React.FC = () => {
                   setSuccessNotice('Log masuk Mod Demo Belia berjaya!');
                   setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-300 dark:border-slate-600 rounded-xl text-left cursor-pointer transition-colors"
               >
                 <div className="text-[11px] font-bold text-black dark:text-white flex items-center gap-1">
                   <Store className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
@@ -433,7 +433,7 @@ export const LoginModal: React.FC = () => {
                   setSuccessNotice('Log masuk Mod Demo Mentor berjaya!');
                   setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-300 dark:border-slate-600 rounded-xl text-left cursor-pointer transition-colors"
               >
                 <div className="text-[11px] font-bold text-black dark:text-white flex items-center gap-1">
                   <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
@@ -449,13 +449,13 @@ export const LoginModal: React.FC = () => {
                   setSuccessNotice('Log masuk Mod Demo Admin berjaya!');
                   setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-200 dark:border-slate-700 rounded-xl text-left cursor-pointer transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-300 dark:border-slate-600 rounded-xl text-left cursor-pointer transition-colors"
               >
                 <div className="text-[11px] font-bold text-black dark:text-white flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Admin</span>
                 </div>
-                <div className="text-[10px] text-black/70 dark:text-white/75 truncate">Urusetia</div>
+                <div className="text-[10px] text-black/70 dark:text-white/75 truncate">Admin KBelia</div>
               </button>
             </div>
           </div>

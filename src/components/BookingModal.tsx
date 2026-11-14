@@ -23,6 +23,8 @@ import { createCapsuleBooking } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import confetti from 'canvas-confetti';
 import { showToast } from './ToastNotification';
+import { PortalImage } from './PortalImage';
+import { resolveSlotImage } from '../utils/visualAssets';
 import { 
   validateMyKad, 
   validateMalaysianPhone, 
@@ -159,7 +161,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         return;
       }
       if (!isCurrentSlotAvailable) {
-        setError(`Kapsul ${currentSlot.code} (${currentSlot.name}) telah berdaftar / sedang beroperasi. Permohonan baharu tidak dibuka bagi unit ini. Sila pilih unit berstatus Tersedia.`);
+        setError(`Kiosk ${currentSlot.code} (${currentSlot.name}) telah disewa / sedang beroperasi. Sila pilih kiosk yang masih kosong.`);
         return;
       }
       setStep(2);
@@ -248,7 +250,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       showToast({
         type: 'success',
         title: 'Permohonan Kiosk Berjaya Dihantar!',
-        message: `Permohonan kiosk ${currentSlot?.name || 'Kapsul Niaga'} telah direkodkan. Pegawai penyelaras UMK akan menyemak profil anda.`
+        message: `Permohonan kiosk ${currentSlot?.name || 'Kiosk Belia'} telah direkodkan. Pegawai penyelaras akan menyemak profil anda.`
       });
       if (handleSuccess) handleSuccess();
     } catch (err: any) {
@@ -269,20 +271,20 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[90vh] flex flex-col overflow-hidden my-auto"
+        className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-300 dark:border-slate-600 scale-100 transition-all max-h-[90vh] flex flex-col overflow-hidden my-auto"
         role="dialog"
         aria-modal="true"
       >
         
         {/* Header - STICKY & SHRINK-0 */}
-        <div className="border-b border-slate-200 dark:border-slate-700 py-4 px-6 sm:px-7 flex items-center justify-between kbelia-important-header dark:bg-slate-800 shrink-0 sticky top-0 z-10">
+        <div className="border-b border-slate-300 dark:border-slate-600 py-4 px-6 sm:px-7 flex items-center justify-between kbelia-important-header dark:bg-slate-800 shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <Store className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white tracking-tight">
-                Permohonan Kapsul Niaga Modular
+                Permohonan Sewa Kiosk Belia
               </h3>
               <p className="text-xs text-black dark:text-white">
                 Universiti Malaysia Kelantan (UMK) & Kerajaan Negeri Kelantan
@@ -292,7 +294,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           <button
             type="button"
             onClick={handleResetAndClose}
-            className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700 transition-all cursor-pointer interactive-press hover:rotate-90 duration-200"
+            className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer interactive-press hover:rotate-90 duration-200"
             title="Tutup"
           >
             <X className="w-5 h-5" />
@@ -301,7 +303,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
         {/* Interactive Stepper */}
         {!submitted && (
-          <div className="bg-slate-50 dark:bg-slate-900 px-6 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
+          <div className="bg-slate-50 dark:bg-slate-900 px-6 py-4 border-b border-slate-300 dark:border-slate-600 shrink-0">
             <div className="flex items-center justify-between max-w-md mx-auto">
               
               {/* Step 1 Node */}
@@ -413,7 +415,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             <div className="text-center py-8">
               <AlertCircle className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto mb-3" />
               <h4 className="text-base font-bold text-black dark:text-white mb-2">
-                Permohonan Kapsul Ditutup Sementara
+                Permohonan Kiosk Ditutup Sementara
               </h4>
               <p className="text-xs text-black dark:text-white/75 max-w-sm mx-auto mb-6">
                 {portalSettings?.portalAnnouncement || 'Sistem sedang menjalani penyelenggaraan berjadual. Sila cuba sebentar lagi.'}
@@ -433,7 +435,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 Permohonan Kiosk Berjaya Dihantar!
               </h4>
               <p className="text-xs text-black dark:text-white/75 max-w-md mx-auto leading-relaxed mb-4">
-                Pegawai penyelaras UMK sedang menyemak butiran anda. Sila pantau kad penjejak di papan pemuka anda. Sebaik diluluskan, Surat Tawaran Digital rasmi berkod QR akan dijana secara automatik.
+                Pegawai kami sedang menyemak permohonan anda. Sila semak status terkini di Dashboard anda. Sebaik diluluskan, Surat Tawaran Rasmi berkod QR akan terus tersedia.
               </p>
               <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-black dark:text-white mb-6 max-w-sm mx-auto">
                 No. Rujukan Anda: <strong>KBN-{currentSlot?.code}-{new Date().getFullYear()}</strong>
@@ -448,17 +450,17 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             </div>
           ) : (
             <div>
-              {/* STEP 1: LOKASI & PILIHAN PAKEJ KAPSUL */}
+              {/* STEP 1: LOKASI & PILIHAN PAKEJ KIOSK */}
               {step === 1 && (
                 <div className="space-y-5">
                   <div>
                     <label className="text-xs sm:text-sm font-medium text-black dark:text-white block mb-2">
-                      Pilih Hub Kiosk Kapsul: <span className="text-black dark:text-white">*</span>
+                      Pilih Lokasi Kiosk: <span className="text-black dark:text-white">*</span>
                     </label>
                     <select
                       value={selectedSlotId}
                       onChange={(e) => setSelectedSlotId(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 focus:outline-none transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 focus:outline-none transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       {safeAllSlots.map((s) => {
                         const isFree = s.status === 'available' && !s.currentTenantBusinessName;
@@ -472,46 +474,65 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </div>
 
                   {currentSlot && (
-                    <div className="p-4.5 rounded-xl bg-slate-50/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex flex-col gap-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="font-mono text-xs font-bold text-black dark:text-white/75">
-                            {currentSlot.code}
-                          </span>
-                          <h4 className="text-sm font-bold text-black dark:text-white mt-0.5">
-                            {currentSlot.name}
-                          </h4>
-                          <p className="text-xs text-black dark:text-white/75 flex items-center gap-1 mt-0.5">
-                            <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                            {currentSlot.hubLocation} ({currentSlot.district})
-                          </p>
-                        </div>
-                        {isCurrentSlotAvailable ? (
-                          <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-black dark:bg-emerald-950 dark:text-white border border-emerald-200 dark:border-emerald-800">
-                            Tersedia untuk Belia
-                          </span>
-                        ) : (
-                          <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-black dark:bg-rose-950 dark:text-white border border-rose-200 dark:border-rose-800">
-                            Unit Telah Berdaftar / Penuh
-                          </span>
-                        )}
+                    <div className="p-4 sm:p-4.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row gap-4 items-stretch">
+                      <div className="w-full sm:w-44 shrink-0 aspect-[4/3] sm:aspect-auto sm:min-h-[148px] rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">
+                        <PortalImage
+                          src={resolveSlotImage(currentSlot)}
+                          alt={`Reka bentuk kiosk ${currentSlot.name}`}
+                          fallbackType="kiosk"
+                          fallbackLabel={currentSlot.code}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3 text-xs pt-2.5 border-t border-slate-200 dark:border-slate-700">
-                        <div className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                          <span className="text-black/70 dark:text-white/75 text-[10px] font-medium block">Kadar Pasaran Biasa:</span>
-                          <span className="line-through text-black/70 dark:text-white/75 font-semibold text-xs tabular-nums">RM {marketRate} / bulan</span>
+                      <div className="flex-1 min-w-0 flex flex-col gap-3 justify-between">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-bold text-black dark:text-white/75">
+                                {currentSlot.code}
+                              </span>
+                              {currentSlot.size && (
+                                <span className="text-[11px] text-black/70 dark:text-white/75">
+                                  · {currentSlot.size}
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="text-sm font-bold text-black dark:text-white mt-0.5">
+                              {currentSlot.name}
+                            </h4>
+                            <p className="text-xs text-black dark:text-white/75 flex items-center gap-1 mt-0.5">
+                              <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                              <span className="truncate">{currentSlot.hubLocation} ({currentSlot.district})</span>
+                            </p>
+                          </div>
+                          {isCurrentSlotAvailable ? (
+                            <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-black dark:bg-emerald-950 dark:text-white border border-emerald-200 dark:border-emerald-800 shrink-0">
+                              Tersedia untuk Belia
+                            </span>
+                          ) : (
+                            <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-black dark:bg-rose-950 dark:text-white border border-rose-200 dark:border-rose-800 shrink-0">
+                              Unit Telah Berdaftar / Penuh
+                            </span>
+                          )}
                         </div>
-                        <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40">
-                          <span className="text-black dark:text-white text-[10px] font-bold block">Kadar Subsidi Belia ({subsidyRate}%):</span>
-                          <span className="text-sm sm:text-base font-black text-black dark:text-white/75 tabular-nums">
-                            RM {monthlyRate} / bulan
-                          </span>
-                        </div>
-                      </div>
 
-                      <div className="text-[11px] text-black dark:text-white/75">
-                        <strong className="text-black dark:text-white">Kemudahan Termasuk:</strong> {currentSlot.amenities?.join(', ') || 'Elektrik, Wi-Fi Jalur Lebar & Kawalan Keselamatan'}
+                        <div className="grid grid-cols-2 gap-3 text-xs pt-2.5 border-t border-slate-300 dark:border-slate-600">
+                          <div className="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
+                            <span className="text-black/70 dark:text-white/75 text-[10px] font-medium block">Kadar Pasaran Biasa:</span>
+                            <span className="line-through text-black/70 dark:text-white/75 font-semibold text-xs tabular-nums">RM {marketRate} / bulan</span>
+                          </div>
+                          <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40">
+                            <span className="text-black dark:text-white text-[10px] font-bold block">Kadar Subsidi Belia ({subsidyRate}%):</span>
+                            <span className="text-sm sm:text-base font-black text-black dark:text-white/75 tabular-nums">
+                              RM {monthlyRate} / bulan
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="text-[11px] text-black dark:text-white/75">
+                          <strong className="text-black dark:text-white">Kemudahan Termasuk:</strong> {currentSlot.amenities?.join(', ') || 'Elektrik, Wi-Fi Jalur Lebar & Kawalan Keselamatan'}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -529,7 +550,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           subtitle: 'Pakej Permulaan',
                           total: `RM ${(monthlyRate * 3).toLocaleString()}`,
                           badge: 'Uji Pasaran',
-                          badgeColor: 'bg-slate-100 text-black border border-slate-200 dark:bg-slate-800 dark:text-white'
+                          badgeColor: 'bg-slate-100 text-black border border-slate-300 dark:bg-slate-800 dark:text-white'
                         },
                         {
                           months: 6,
@@ -557,7 +578,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                             className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer relative flex flex-col justify-between ${
                               isSelected
                                 ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/60 ring-1 ring-blue-500/30 shadow-xs'
-                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-600'
+                                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-500'
                             }`}
                           >
                             <div className="flex items-center justify-between gap-1 mb-2">
@@ -580,7 +601,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                                 {pkg.subtitle}
                               </div>
                             </div>
-                            <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-700 flex items-baseline justify-between">
+                            <div className="mt-2.5 pt-2 border-t border-slate-300 dark:border-slate-600 flex items-baseline justify-between">
                               <span className="text-[10px] text-black/70 dark:text-white/75">Jumlah:</span>
                               <span className="text-xs font-black text-black dark:text-white/75 tabular-nums">{pkg.total}</span>
                             </div>
@@ -602,17 +623,17 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         min={todayISO}
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full pl-11 pr-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 focus:outline-none transition-all cursor-pointer dark:focus:border-blue-500"
+                        className="w-full pl-11 pr-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 focus:outline-none transition-all cursor-pointer dark:focus:border-blue-500"
                       />
                     </div>
                   </div>
 
                   {/* Action Buttons Footer */}
-                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
+                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
                     <button
                       type="button"
                       onClick={handleResetAndClose}
-                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                     >
                       Batal
                     </button>
@@ -650,7 +671,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border ${
                           fieldErrors.businessName 
                             ? 'border-rose-500 focus:ring-rose-500' 
-                            : 'border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
+                            : 'border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
                         } text-black dark:text-white font-medium focus:outline-none focus:ring-2 transition-all`}
                       />
                       {fieldErrors.businessName && (
@@ -668,7 +689,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       <select
                         value={businessCategory}
                         onChange={(e) => setBusinessCategory(e.target.value as BusinessCategory)}
-                        className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                        className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer dark:focus:border-blue-500"
                       >
                         {CATEGORIES.map((c) => (
                           <option key={c} value={c} className="dark:bg-slate-900">{c}</option>
@@ -695,7 +716,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border ${
                           fieldErrors.phone 
                             ? 'border-rose-500 focus:ring-rose-500' 
-                            : 'border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
+                            : 'border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
                         } text-black dark:text-white focus:outline-none focus:ring-2 transition-all`}
                       />
                       {fieldErrors.phone && (
@@ -725,7 +746,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border ${
                           fieldErrors.icNumber 
                             ? 'border-rose-500 focus:ring-rose-500' 
-                            : 'border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
+                            : 'border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
                         } text-black dark:text-white focus:outline-none focus:ring-2 transition-all`}
                       />
                       {fieldErrors.icNumber ? (
@@ -751,16 +772,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       placeholder="Penerangan ringkas produk dan operasi kiosk..."
                       value={pitchNotes}
                       onChange={(e) => setPitchNotes(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/30 focus:outline-none transition-all dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/30 focus:outline-none transition-all dark:focus:border-blue-500"
                     />
                   </div>
 
                   {/* Action Buttons Footer */}
-                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
+                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2"
+                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       <span>Kembali</span>
@@ -780,8 +801,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               {/* STEP 3: PRAPAPAR RINGKASAN & PERSETUJUAN PDPA */}
               {step === 3 && (
                 <div className="space-y-5">
-                  <div className="p-5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-4">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+                  <div className="p-5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
                       <div>
                         <h4 className="text-xs sm:text-sm font-bold text-black dark:text-white">
                           Ringkasan Pakej Permohonan Kiosk
@@ -822,7 +843,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </div>
 
                   {/* Checkbox */}
-                  <label className="flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 cursor-pointer hover:border-amber-400 transition-all select-none">
+                  <label className="flex items-start gap-3 p-4 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 cursor-pointer hover:border-amber-400 transition-all select-none">
                     <input
                       type="checkbox"
                       checked={pdpaConsent}
@@ -838,11 +859,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </label>
 
                   {/* Action Buttons Footer */}
-                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
+                  <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2"
+                      className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       <span>Kembali</span>

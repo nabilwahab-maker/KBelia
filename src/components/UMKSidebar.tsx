@@ -123,17 +123,17 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const navBtnActive =
     'bg-amber-50/90 dark:bg-[#1E4B85]/15 text-black dark:text-white border-blue-200 dark:border-blue-800/70 shadow-xs ring-1 ring-blue-500/30 font-bold';
   const navBtnIdle =
-    'border-transparent text-black dark:text-white hover:bg-slate-100/70 dark:hover:bg-zinc-800/70 hover:text-black dark:hover:text-white';
+    'border-transparent text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
 
   const subNavBtnBase =
     'w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
   const subNavBtnActive = 'bg-blue-600 text-white font-bold shadow-xs dark:bg-blue-600';
   const subNavBtnIdle =
-    'text-black dark:text-white/75 hover:bg-slate-100/70 dark:hover:bg-zinc-800/70 hover:text-black dark:hover:text-white';
+    'text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
 
   const categoryHeaderClass =
     'text-[11px] font-black tracking-wider text-black dark:text-white/75 uppercase px-2 pb-1 whitespace-nowrap truncate';
-  const categoryDividerClass = 'pt-3 border-t border-slate-200/70 dark:border-zinc-800 space-y-1';
+  const categoryDividerClass = 'pt-3 border-t border-slate-300 dark:border-zinc-600 space-y-1';
 
   const miniBtnBase =
     'p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
@@ -141,7 +141,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     'bg-amber-50 dark:bg-[#1E4B85]/15 text-black dark:text-white border-blue-200 dark:border-blue-800/70 shadow-xs ring-1 ring-blue-500/30 font-bold';
   const miniBtnIdle =
     'border-transparent text-black/70 dark:text-white/75 hover:bg-amber-50/70 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
-  const miniDivider = <div className="w-8 h-px bg-slate-200 dark:bg-zinc-800 my-0.5" />;
+  const miniDivider = <div className="w-8 h-px bg-slate-300 dark:bg-zinc-600 my-0.5" />;
 
   // =========================================================================
   // 1. COLLAPSED SIDEBAR VIEW (Desktop Mini Icon Rail - 3 Aligned Groups)
@@ -150,7 +150,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     return (
       <aside
         id="kbelia-left-sidebar"
-        className="hidden md:flex w-18 h-full bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-r border-slate-200/80 dark:border-zinc-800 py-4 flex-col shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0"
+        className="hidden md:flex w-18 h-full bg-white dark:bg-zinc-950 border-r border-slate-300 dark:border-zinc-600 py-4 flex-col shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0"
       >
         <div className="flex flex-col items-center gap-2 w-full px-2 pt-1">
           {/* ROLE A MINI: PENTADBIR URUSETIA */}
@@ -292,7 +292,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   setActiveTab('mentor');
                   if (onSelectMentorSubTab) onSelectMentorSubTab('logbook');
                 }}
-                title={isMs ? 'Log Jurnal' : 'Logbook'}
+                title={isMs ? 'Rekod Sesi' : 'Logbook'}
                 className={`${miniBtnBase} ${
                   activeTab === 'mentor' && mentorSubTab === 'logbook' ? miniBtnActive : miniBtnIdle
                 }`}
@@ -467,13 +467,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     },
     {
       id: 'bookings',
-      label: isMs ? 'Kapsul' : 'Bookings',
-      keywords: 'kapsul tempahan sewa bookings',
+      label: isMs ? 'Tempahan Kiosk' : 'Bookings',
+      keywords: 'kapsul kiosk tempahan sewa bookings',
       icon: Clock
     },
     {
       id: 'businesses',
-      label: isMs ? 'Direktori Usahawan' : 'Businesses',
+      label: isMs ? 'Senarai Usahawan' : 'Businesses',
       keywords: 'direktori usahawan perniagaan ssm businesses',
       icon: Store
     },
@@ -491,8 +491,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     },
     {
       id: 'sync',
-      label: isMs ? 'Penyegerakan' : 'Data Sync',
-      keywords: 'penyegerakan pangkalan data sync database',
+      label: isMs ? 'Muat Semula Data' : 'Data Sync',
+      keywords: 'penyegerakan muat semula pangkalan data sync database',
       icon: Database
     },
     {
@@ -524,8 +524,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     },
     {
       id: 'logbook',
-      label: isMs ? 'Log Jurnal' : 'Logbook',
-      keywords: 'log jurnal minit bimbingan kpi kemajuan tugasan logbook',
+      label: isMs ? 'Rekod Sesi' : 'Logbook',
+      keywords: 'rekod sesi log jurnal nota bimbingan kpi kemajuan tugasan logbook',
       icon: FileText
     }
   ];
@@ -540,13 +540,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     {
       id: 'overview',
       label: isMs ? 'Ringkasan' : 'Overview',
-      keywords: 'ringkasan eksekutif papan pemuka overview',
+      keywords: 'ringkasan dashboard overview',
       icon: BarChart3
     },
     {
       id: 'profile',
-      label: isMs ? 'Profil Bisnes' : 'Business Profile',
-      keywords: 'profil perniagaan bisnes ssm business profile',
+      label: isMs ? 'Profil Kedai' : 'Business Profile',
+      keywords: 'profil perniagaan bisnes kedai ssm business profile',
       icon: Store
     },
     {
@@ -557,14 +557,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     },
     {
       id: 'bookings',
-      label: isMs ? 'Kapsul Niaga' : 'My Capsules',
-      keywords: 'kapsul niaga tempahan sewa bookings',
+      label: isMs ? 'Kiosk Saya' : 'My Capsules',
+      keywords: 'kiosk kapsul niaga tempahan sewa bookings',
       icon: Building2
     },
     {
       id: 'vault',
-      label: isMs ? 'Dokumen Sah' : 'Legal Docs',
-      keywords: 'dokumen sah surat tawaran perjanjian vault documents',
+      label: isMs ? 'Dokumen Saya' : 'Legal Docs',
+      keywords: 'dokumen saya surat tawaran perjanjian vault documents',
       icon: FileCheck
     },
     {
@@ -624,11 +624,11 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const sidebarBody = (
     <aside
       id="kbelia-left-sidebar"
-      className="w-64 h-full bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-r border-slate-200/80 dark:border-zinc-800 p-4 flex flex-col shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30"
+      className="w-64 h-full bg-white dark:bg-zinc-950 border-r border-slate-300 dark:border-zinc-600 p-4 flex flex-col shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30"
     >
       <div className="space-y-4">
         {isMobileOpen && onCloseMobile && (
-          <div className="md:hidden flex items-center justify-between pb-2 border-b border-slate-200 dark:border-zinc-800">
+          <div className="md:hidden flex items-center justify-between pb-2 border-b border-slate-300 dark:border-zinc-600">
             <span className="text-xs font-extrabold uppercase tracking-wider text-black dark:text-white">
               {isMs ? 'Navigasi KBelia' : 'KBelia Navigation'}
             </span>
@@ -650,7 +650,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             placeholder={t('search_sidebar')}
             value={sidebarSearch}
             onChange={(e) => setSidebarSearch(e.target.value)}
-            className="w-full pl-3.5 pr-8 py-2 text-xs bg-slate-50/90 dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all duration-150 dark:focus:border-blue-500"
+            className="w-full pl-3.5 pr-8 py-2 text-xs bg-slate-50 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all duration-150 dark:focus:border-blue-500"
           />
           {sidebarSearch ? (
             <button
@@ -667,7 +667,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
         </div>
 
         {!hasAnySearchMatch && (
-          <div className="py-6 px-3 text-center space-y-2 border border-slate-200/80 dark:border-zinc-800 rounded-xl bg-slate-50/70 dark:bg-zinc-900/50">
+          <div className="py-6 px-3 text-center space-y-2 border border-slate-300 dark:border-zinc-600 rounded-xl bg-slate-50 dark:bg-zinc-900">
             <p className="text-xs text-black/70 dark:text-white/75">
               {isMs ? 'Tiada menu yang sepadan.' : 'No matching menu items.'}
             </p>
@@ -733,7 +733,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     </button>
 
                     {(isAdminDashboardAccordionOpen || (Boolean(query) && filteredAdminAccordion.length > 0)) && (
-                      <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-zinc-800 space-y-1 pt-0.5 pb-1">
+                      <div className="ml-3 pl-2.5 border-l border-slate-300 dark:border-zinc-600 space-y-1 pt-0.5 pb-1">
                         {(query ? filteredAdminAccordion : adminAccordionItems).map((item) => {
                           const Icon = item.icon;
                           const isSubActive = activeTab === 'admin' && adminSubTab === item.id;
@@ -1015,7 +1015,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     </button>
 
                     {(isMentorDashboardAccordionOpen || (Boolean(query) && filteredMentorAccordion.length > 0)) && (
-                      <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-zinc-800 space-y-1 pt-0.5 pb-1">
+                      <div className="ml-3 pl-2.5 border-l border-slate-300 dark:border-zinc-600 space-y-1 pt-0.5 pb-1">
                         {(query ? filteredMentorAccordion : mentorAccordionItems).map((item) => {
                           const Icon = item.icon;
                           const isSubActive =
@@ -1082,7 +1082,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Perakuan Geran' : 'Grant Endorsements'}
+                        {isMs ? 'Sokongan Geran' : 'Grant Endorsements'}
                       </span>
                     </div>
                     <ChevronRight
@@ -1224,7 +1224,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     </button>
 
                     {(isDashboardAccordionOpen || (Boolean(query) && filteredYouthAccordion.length > 0)) && (
-                      <div className="ml-3 pl-2.5 border-l border-slate-200 dark:border-zinc-800 space-y-1 pt-0.5 pb-1">
+                      <div className="ml-3 pl-2.5 border-l border-slate-300 dark:border-zinc-600 space-y-1 pt-0.5 pb-1">
                         {(query ? filteredYouthAccordion : youthAccordionItems).map((item) => {
                           const Icon = item.icon;
                           const isSubActive =

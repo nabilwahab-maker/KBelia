@@ -146,7 +146,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
   return (
     <div className="space-y-6">
       {/* Page Intro & Admin Controls */}
-      <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-zinc-800 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
             <Newspaper className="w-4 h-4" />
@@ -175,7 +175,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
               <button
                 type="button"
                 onClick={onOpenAdminNewsTab}
-                className="px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
                 <span>Buka di Panel Admin</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -186,7 +186,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
       </div>
 
       {/* Filter & Search Toolbar */}
-      <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-slate-200/80 dark:border-zinc-800 space-y-3.5">
+      <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-slate-300 dark:border-zinc-600 space-y-3.5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Live Search Input */}
           <div className="relative flex-1 max-w-lg">
@@ -196,7 +196,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari tajuk berita, geran, kapsul atau nama penulis..."
-              className="w-full pl-10 pr-8 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all dark:focus:border-blue-500"
+              className="w-full pl-10 pr-8 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all dark:focus:border-blue-500"
             />
             {searchQuery && (
               <button
@@ -213,7 +213,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
           <div className="flex flex-wrap items-center gap-3">
             {/* Admin-only Status View Filter */}
             {isAdmin && (
-              <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-zinc-950 rounded-lg border border-slate-200/80 dark:border-zinc-800">
+              <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
                 {([
                   { id: 'all', label: 'Semua' },
                   { id: 'published', label: 'Siar' },
@@ -253,7 +253,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 border ${
                   active
                     ? 'bg-blue-600 text-white border-blue-600 shadow-2xs dark:bg-blue-600'
-                    : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-800 hover:bg-amber-50 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white'
+                    : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white'
                 }`}
               >
                 {cat}
@@ -265,7 +265,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
 
       {/* Empty State */}
       {filteredNews.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 space-y-3">
+        <div className="p-12 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 space-y-3">
           <Newspaper className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto" />
           <h3 className="text-base font-bold text-black dark:text-white">
             Tiada berita yang sepadan ditemui
@@ -296,7 +296,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
           {featuredArticle && (
             <article
               onClick={() => setSelectedArticle(featuredArticle)}
-              className="group rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 overflow-hidden shadow-xs hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-colors cursor-pointer grid grid-cols-1 lg:grid-cols-12 items-stretch"
+              className="group rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-xs hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-colors cursor-pointer grid grid-cols-1 lg:grid-cols-12 items-stretch"
             >
               <div className="lg:col-span-6 relative aspect-16/10 lg:aspect-auto lg:min-h-[300px] bg-slate-100 dark:bg-zinc-800 overflow-hidden">
                 <NewsImage
@@ -335,7 +335,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200/80 dark:border-zinc-800">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-300 dark:border-zinc-600">
                   <span className="inline-flex items-center gap-2 text-xs font-bold text-black dark:text-white/75 group-hover:translate-x-0.5 transition-transform">
                     <span>Baca Artikel Penuh</span>
                     <ArrowRight className="w-4 h-4" />
@@ -354,7 +354,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                       <button
                         type="button"
                         onClick={(e) => handleAdminQuickStatusToggle(e, featuredArticle)}
-                        className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-950 text-black dark:text-white text-[11px] font-semibold inline-flex items-center gap-1 cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 text-black dark:text-white text-[11px] font-semibold inline-flex items-center gap-1 cursor-pointer"
                       >
                         {featuredArticle.status === 'published' ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
                         <span>{featuredArticle.status === 'published' ? 'Siar' : 'Draf'}</span>
@@ -373,7 +373,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                 <article
                   key={article.id}
                   onClick={() => setSelectedArticle(article)}
-                  className="group rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 overflow-hidden flex flex-col justify-between hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-colors cursor-pointer"
+                  className="group rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 overflow-hidden flex flex-col justify-between hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-colors cursor-pointer"
                 >
                   <div>
                     <div className="aspect-16/9 bg-slate-100 dark:bg-zinc-800 overflow-hidden relative">
@@ -407,7 +407,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                     </div>
                   </div>
 
-                  <div className="px-5 py-3.5 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs">
+                  <div className="px-5 py-3.5 border-t border-slate-300 dark:border-zinc-600 flex items-center justify-between gap-2 text-xs">
                     <span className="text-black/70 dark:text-white/75 truncate">
                       {article.authorName}
                     </span>
@@ -418,7 +418,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                           <button
                             type="button"
                             onClick={(e) => handleAdminQuickPinToggle(e, article)}
-                            className="p-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
+                            className="p-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
                             title={article.isPinned ? 'Nyahpin Berita' : 'Pin Berita Utama'}
                           >
                             <Pin className="w-3.5 h-3.5" />
@@ -426,7 +426,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                           <button
                             type="button"
                             onClick={(e) => handleAdminQuickStatusToggle(e, article)}
-                            className="p-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
+                            className="p-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
                             title={article.status === 'published' ? 'Tukar kepada Draf' : 'Siarkan Berita'}
                           >
                             {article.status === 'published' ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
@@ -453,10 +453,10 @@ export const NewsPage: React.FC<NewsPageProps> = ({
           onClick={() => setSelectedArticle(null)}
         >
           <div
-            className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xl"
+            className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 z-10 px-5 sm:px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between gap-4">
+            <div className="sticky top-0 z-10 px-5 sm:px-6 py-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-2 text-xs text-black/70 dark:text-white/75 tabular-nums min-w-0">
                 <span className="font-bold text-black dark:text-white/75">{selectedArticle.category}</span>
                 <span aria-hidden="true">·</span>
@@ -472,7 +472,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedArticle(null)}
-                className="p-2 rounded-xl border border-slate-200 dark:border-zinc-700 text-black/70 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer shrink-0"
+                className="p-2 rounded-xl border border-slate-300 dark:border-zinc-600 text-black/70 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer shrink-0"
                 aria-label="Tutup artikel"
               >
                 <X className="w-4 h-4" />
@@ -489,11 +489,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                 </p>
               </div>
 
-              <div className="aspect-16/9 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-800">
+              <div className="aspect-16/9 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600">
                 <NewsImage src={selectedArticle.imageUrl} alt={selectedArticle.title} />
               </div>
 
-              <p className="text-sm sm:text-base font-semibold text-black dark:text-white leading-relaxed border-b border-slate-200 dark:border-zinc-800 pb-5">
+              <p className="text-sm sm:text-base font-semibold text-black dark:text-white leading-relaxed border-b border-slate-300 dark:border-zinc-600 pb-5">
                 {selectedArticle.summary}
               </p>
 
@@ -506,7 +506,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
               </div>
             </div>
 
-            <div className="px-5 sm:px-8 py-4 border-t border-slate-200 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-950/60 flex flex-wrap items-center justify-between gap-3">
+            <div className="px-5 sm:px-8 py-4 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex flex-wrap items-center justify-between gap-3">
               {isAdmin ? (
                 <button
                   type="button"
@@ -520,7 +520,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                 </button>
               ) : (
                 <span className="text-xs text-black/70 dark:text-white/75">
-                  Hebahan rasmi Portal KBelia Negeri Kelantan
+                  Pengumuman rasmi Portal KBelia Negeri Kelantan
                 </span>
               )}
 
@@ -543,7 +543,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
           onClick={() => setShowAdminManagerModal(false)}
         >
           <div
-            className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-2xl p-4 sm:p-6"
+            className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 shadow-2xl p-4 sm:p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -553,7 +553,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAdminManagerModal(false)}
-                className="p-2 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                className="p-2 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
                 aria-label="Tutup pengurusan berita"
               >
                 <X className="w-4 h-4" />

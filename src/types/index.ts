@@ -156,6 +156,7 @@ export interface YouthProgram {
   organizer: string;
   grantAmount?: string;
   registrationLink?: string;
+  imageUrl?: string;
   isFeatured?: boolean;
   createdAt: string;
 }

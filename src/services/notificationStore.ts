@@ -25,7 +25,7 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     title: 'Pengambilan Kiosk Modular Sesi 2026',
     message: 'Permohonan terbuka di Hab Kota Bharu, Bachok, Tumpat, dan Pasir Mas dengan subsidi sewa sehingga 50% untuk belia Kelantan.',
     category: 'announcement',
-    sender: 'Urusetia Pentadbir Belia',
+    sender: 'Admin KBelia',
     senderRole: 'admin',
     targetRole: 'youth',
     targetUserId: '',
@@ -35,10 +35,10 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
   },
   {
     id: 'notif-youth-2',
-    title: 'Dana Benih Belia RM3,000 Dibuka',
-    message: 'Skim bantuan modal permulaan tanpa faedah kini sedia untuk dipohon oleh usahawan berdaftar.',
+    title: 'Geran Permulaan Belia RM3,000 Dibuka',
+    message: 'Skim bantuan modal permulaan tanpa faedah kini dibuka untuk usahawan yang berdaftar.',
     category: 'announcement',
-    sender: 'Unit Pembangunan Keusahawanan',
+    sender: 'Unit Keusahawanan Belia',
     senderRole: 'admin',
     targetRole: 'youth',
     targetUserId: '',
@@ -90,7 +90,7 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     title: 'Laporan Kuota Kiosk Bulanan Sedia Dijana',
     message: 'Kadar sewaan dan pematuhan sewa kiosk bagi semua jajahan boleh dijana dalam format PDF.',
     category: 'announcement',
-    sender: 'Urusetia Kewangan',
+    sender: 'Bahagian Kewangan KBelia',
     senderRole: 'system',
     targetRole: 'admin',
     targetUserId: '',
@@ -167,7 +167,7 @@ export function emitAdminOrMentorNotification(
         ? 'Mentor UMK'
         : role === 'user'
         ? 'Usahawan Belia'
-        : 'Pentadbir Urusetia');
+        : 'Admin KBelia');
     targetTab = titleOrPayload.actionTab || 'home';
     if (titleOrPayload.type === 'kiosk' || titleOrPayload.type === 'grant' || role === 'user') {
       category = 'status';

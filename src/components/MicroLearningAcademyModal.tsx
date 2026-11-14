@@ -95,7 +95,7 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
         aria-modal="true"
       >
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-start justify-between gap-4 mb-4 pb-4 border-b border-slate-300 dark:border-slate-600">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-black dark:text-white/75 flex items-center justify-center border border-amber-300/40 shrink-0">
               <GraduationCap className="w-5 h-5" />
@@ -147,7 +147,7 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
                   className={`p-3 rounded-2xl border cursor-pointer transition-all flex items-start justify-between gap-2 ${
                     isSelected
                       ? 'bg-amber-100/70 dark:bg-amber-950/60 border-amber-400 dark:border-amber-600 shadow-sm'
-                      : 'bg-slate-50/70 dark:bg-slate-800/50 border-slate-200/60 dark:border-slate-800 hover:bg-slate-100'
+                      : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-100'
                   }`}
                 >
                   <div>
@@ -167,7 +167,7 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
           </div>
 
           {/* Right Active Course Viewer */}
-          <div className="md:col-span-7 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 p-5 flex flex-col justify-between">
+          <div className="md:col-span-7 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-200/80 dark:bg-amber-900/60 text-black dark:text-white">
@@ -198,7 +198,7 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between">
+            <div className="pt-4 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between">
               <span className="text-[11px] font-semibold text-black dark:text-white/75 flex items-center gap-1">
                 <Award className="w-3.5 h-3.5" />
                 {activeCourse.badge}

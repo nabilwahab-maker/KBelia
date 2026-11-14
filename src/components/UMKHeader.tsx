@@ -134,11 +134,11 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
     // Mentors are strictly isolated from Youth Kiosk/Directory/Grant-Application search results
     if (isMentor) {
       const mentorQuickLinks = [
-        { id: 'overview' as MentorSubTab, label: 'Ringkasan Papan Pemuka Mentor', desc: 'KPI, carta jajahan & temujanji terdekat' },
-        { id: 'sessions' as MentorSubTab, label: 'Sesi Bimbingan & Mentee', desc: 'Senarai permohonan, jadual & pelan tindakan' },
-        { id: 'endorsements' as MentorSubTab, label: 'Surat Perakuan Geran', desc: 'Keluarkan & semak perakuan geran rasmi' },
-        { id: 'logbook' as MentorSubTab, label: 'Log Jurnal Bimbingan', desc: 'Minit bimbingan & senarai semak tugasan' },
-        { id: 'profile' as MentorSubTab, label: 'Profil & Jadual Kelapangan Mentor', desc: 'Kemaskini biodata & hari bimbingan' }
+        { id: 'overview' as MentorSubTab, label: 'Ringkasan Dashboard Mentor', desc: 'KPI, carta daerah & temujanji terdekat' },
+        { id: 'sessions' as MentorSubTab, label: 'Sesi Bimbingan & Mentee', desc: 'Senarai permohonan, jadual & pelan bimbingan' },
+        { id: 'endorsements' as MentorSubTab, label: 'Surat Sokongan Geran', desc: 'Keluarkan & semak sokongan geran rasmi' },
+        { id: 'logbook' as MentorSubTab, label: 'Rekod Sesi Bimbingan', desc: 'Nota bimbingan & senarai semak tugasan' },
+        { id: 'profile' as MentorSubTab, label: 'Profil & Jadual Masa Mentor', desc: 'Kemas kini profil & hari bimbingan' }
       ].filter(item => item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q));
       return { matchedSlots: [], matchedBiz: [], matchedProg: [], mentorQuickLinks, totalCount: mentorQuickLinks.length };
     }
@@ -174,12 +174,12 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
       : '/assets/generated/avatar_youth_male_1793924250192.jpg');
 
   return (
-    <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40 transition-colors duration-200 shadow-2xs w-full shrink-0">
+    <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-300 dark:border-slate-600 sticky top-0 z-40 transition-colors duration-200 shadow-2xs w-full shrink-0">
       {/* Top Main Navigation Row */}
       <div className="w-full flex items-stretch h-15 sm:h-16">
         
         {/* Left Column: Aligned with Sidebar below */}
-        <div className={`${isSidebarCollapsed ? 'md:w-18 px-3 md:px-2 md:justify-center gap-1.5' : 'md:w-64 px-3 sm:px-4 justify-between'} shrink-0 h-full md:border-r border-slate-200 dark:border-slate-700 flex items-center transition-all duration-200 kbelia-important-header`}>
+        <div className={`${isSidebarCollapsed ? 'md:w-18 px-3 md:px-2 md:justify-center gap-1.5' : 'md:w-64 px-3 sm:px-4 justify-between'} shrink-0 h-full md:border-r border-slate-300 dark:border-slate-600 flex items-center transition-all duration-200 kbelia-important-header`}>
           
           {/* Mobile Drawer Hamburger */}
           {onToggleMobileSidebar && (
@@ -248,7 +248,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 className={`inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold border transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
                   activeTab === 'news'
                     ? 'bg-blue-600 text-white border-blue-600 shadow-xs dark:bg-blue-600'
-                    : 'bg-slate-50 hover:bg-slate-100 text-black hover:text-black border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:hover:text-white dark:border-slate-700'
+                    : 'bg-slate-50 hover:bg-slate-100 text-black hover:text-black border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:hover:text-white dark:border-slate-600'
                 }`}
                 title="Berita & Pengumuman Rasmi"
               >
@@ -270,7 +270,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center border transition-all duration-200 cursor-pointer shadow-2xs focus:outline-none ${
                 isSearchOpen
                   ? 'bg-amber-50 text-black border-amber-300 dark:bg-slate-800 dark:text-white/75 dark:border-amber-400'
-                  : 'bg-slate-50 hover:bg-slate-100 text-black border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:border-slate-700'
+                  : 'bg-slate-50 hover:bg-slate-100 text-black border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:border-slate-600'
               }`}
               title="Carian Sistem"
               aria-label="Buka carian"
@@ -279,7 +279,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
             </button>
 
             {isSearchOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
                 <div className="relative flex items-center mb-2">
                   <input
                     ref={searchInputRef}
@@ -287,7 +287,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     placeholder={isMentor ? 'Cari modul Portal Mentor (sesi, perakuan, log)...' : (t('search_global_ph') || 'Cari kiosk, usahawan, geran...')}
                     value={globalSearch}
                     onChange={(e) => setGlobalSearch(e.target.value)}
-                    className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 shadow-2xs dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 shadow-2xs dark:focus:border-blue-500"
                   />
                   <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 pointer-events-none" />
                   {globalSearch && (
@@ -390,7 +390,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
                         {/* Merchants results */}
                         {searchResults.matchedBiz.length > 0 && (
-                          <div className="pt-2 border-t border-slate-100 dark:border-slate-700">
+                          <div className="pt-2 border-t border-slate-300 dark:border-slate-600">
                             <div className="text-[10px] font-extrabold uppercase tracking-wider text-black dark:text-white/75 px-2 mb-1 flex items-center gap-1.5">
                               <Store className="w-3 h-3" />
                               <span>{t('search_results_merchants')}</span>
@@ -427,7 +427,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
                         {/* Programs results (Youth can open grant modal; Admin views grant monitoring) */}
                         {searchResults.matchedProg.length > 0 && (
-                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                          <div className="pt-2 border-t border-slate-300 dark:border-slate-600">
                             <div className="text-[10px] font-extrabold uppercase tracking-wider text-black dark:text-white/75 px-2 mb-1 flex items-center gap-1.5">
                               <Award className="w-3 h-3" />
                               <span>{t('search_results_grants')}</span>
@@ -484,7 +484,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center border transition-all duration-200 cursor-pointer shadow-2xs group focus:outline-none interactive-press hover:scale-105 active:scale-95 ${
                 themeDropdownOpen
                   ? 'bg-amber-50 text-black border-amber-300 dark:bg-slate-700 dark:text-white dark:border-amber-500/50'
-                  : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white/75 border-slate-200 dark:border-slate-700'
+                  : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white/75 border-slate-300 dark:border-slate-600'
               }`}
               title="Pilih Mod Tema (Cerah / Malam)"
               aria-label="Pilih mod tema"
@@ -498,7 +498,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
             {/* Dropdown Menu below Theme Button */}
             {themeDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
                 <div className="text-[10px] font-extrabold text-black/70 dark:text-white/75 uppercase tracking-wider px-2.5 py-1 mb-1">
                   Pilihan Tema
                 </div>
@@ -557,7 +557,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                   mobileMenuOpen 
                     ? 'bg-amber-50 text-black border-amber-300 dark:bg-slate-800 dark:text-white/75 dark:border-amber-400' 
-                    : 'text-black dark:text-white hover:text-black hover:bg-amber-50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 dark:hover:text-white'
+                    : 'text-black dark:text-white hover:text-black hover:bg-amber-50 dark:hover:bg-slate-800 border-slate-300 dark:border-slate-600 dark:hover:text-white'
                 }`}
                 title="Pilihan Navigasi Lanjut"
                 aria-label="Menu navigasi skrin kecil"
@@ -566,7 +566,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               </button>
 
               {mobileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
                   <div className="text-[10px] font-extrabold text-black/70 dark:text-white/75 uppercase tracking-wider px-2.5 py-1 mb-1">
                     {t('nav_quick_nav')}
                   </div>
@@ -658,7 +658,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <FileCheck className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>Log Jurnal</span>
+                          <span>Rekod Sesi</span>
                         </button>
                       </>
                     )}
@@ -711,7 +711,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 id="kbelia-user-profile-btn"
                 type="button"
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center gap-2.5 pl-3 sm:pl-4 pr-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-50/70 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 hover:border-amber-300 cursor-pointer shadow-2xs group"
+                className="flex items-center gap-2.5 pl-3 sm:pl-4 pr-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-50/70 dark:hover:bg-slate-700 transition-colors border border-slate-300 dark:border-slate-600 hover:border-amber-300 cursor-pointer shadow-2xs group"
                 title={`${displayName} - ${isAdmin ? 'Pentadbiran' : userProfile?.role === 'mentor' ? 'Mentor' : 'Usahawan'}`}
               >
                 <div className="text-right hidden sm:block">
@@ -735,8 +735,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
               {/* Profile Dropdown Menu */}
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2 border border-slate-200 dark:border-slate-700">
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2 border border-slate-300 dark:border-slate-600">
                     <div className="text-xs font-bold text-black dark:text-white truncate">{displayName}</div>
                     <div className="text-[11px] text-black/70 dark:text-white/75 truncate">{user.email}</div>
                     <div className="mt-1 flex items-center gap-1 text-[10px] text-black dark:text-white/75 font-medium">
@@ -764,7 +764,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
                     {/* QUICK ROLE SWITCHER STRICTLY RESTRICTED TO ISOLATED DEMO SESSIONS */}
                     {isDemoSession && (
-                      <div className="pt-2 border-t border-slate-200 dark:border-slate-700 mt-1.5">
+                      <div className="pt-2 border-t border-slate-300 dark:border-slate-600 mt-1.5">
                         <div className="text-[10px] font-bold uppercase tracking-wider text-black/70 dark:text-white/75 px-3 mb-1.5 flex items-center gap-1">
                           <Sparkles className="w-3 h-3 text-black/70 dark:text-white/75" />
                           <span>Mod Demo Ujian</span>
@@ -819,7 +819,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       </div>
                     )}
 
-                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700 mt-1.5 space-y-1">
+                    <div className="pt-2 border-t border-slate-300 dark:border-slate-600 mt-1.5 space-y-1">
                       <button
                         id="kbelia-dropdown-logout-btn"
                         type="button"
@@ -864,7 +864,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
           className="fixed inset-0" 
           onClick={() => setShowLogoutConfirm(false)}
         />
-        <div className="relative bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-700 shadow-2xl text-center space-y-4 z-10">
+        <div className="relative bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 border border-slate-300 dark:border-slate-600 shadow-2xl text-center space-y-4 z-10">
           <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 mx-auto flex items-center justify-center">
             <LogOut className="w-6 h-6" />
           </div>
@@ -881,7 +881,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               type="button"
               id="btn-logout-confirm-no"
               onClick={() => setShowLogoutConfirm(false)}
-              className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+              className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
             >
               {t('cancel')}
             </button>

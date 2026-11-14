@@ -65,27 +65,27 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="kbelia-important-header dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+      <div className="kbelia-important-header dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-300 dark:border-slate-600 shadow-sm relative overflow-hidden">
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white text-xs font-bold mb-3 border border-emerald-200 dark:border-emerald-800/70">
             <Calculator className="w-3.5 h-3.5" />
             <span>{isEn ? 'Smart Simulation Tool' : 'Alat Simulasi Pintar Belia'}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-black dark:text-white">
-            {isEn ? 'Grant & Micro-Finance Eligibility Calculator' : 'Kalkulator Kelayakan Geran & Pembiayaan Belia'}
+            {isEn ? 'Grant & Micro-Finance Eligibility Calculator' : 'Semak Kelayakan Geran & Bantuan Modal'}
           </h1>
           <p className="text-xs sm:text-sm text-black dark:text-white mt-2 leading-relaxed">
             {isEn
-              ? 'Calculate your match score across Kelantan state grant schemes (TEKUN, YBK, MARA & Dana Benih RM3,000) based on your business stage and district.'
-              : 'Semak skor kelayakan bantuan modal, dana permulaan (seed grant), dan skim pembiayaan mikro kerajaan negeri Kelantan dalam masa 30 saat.'}
+              ? 'Calculate your match score across Kelantan state grant schemes (TEKUN, YBK, MARA & RM3,000 Starter Grant) based on your business stage and district.'
+              : 'Semak kelayakan bantuan modal, geran permulaan dan pinjaman mikro kerajaan negeri Kelantan dalam masa 30 saat.'}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Form Input Parameters (7 cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-slate-800 rounded-3xl p-5 sm:p-7 border border-slate-200 dark:border-slate-700 shadow-xs space-y-5">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+        <div className="lg:col-span-7 bg-white dark:bg-slate-800 rounded-3xl p-5 sm:p-7 border border-slate-300 dark:border-slate-600 shadow-xs space-y-5">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
             <h2 className="text-base font-extrabold text-black dark:text-white flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-black dark:text-white/75" />
               <span>{isEn ? 'Business Profile Parameters' : 'Parameter Profil Perniagaan Anda'}</span>
@@ -111,7 +111,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     const val = Number(e.target.value);
                     setAge(val > 0 ? val : 18);
                   }}
-                  className="w-full pl-3.5 pr-14 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-mono dark:focus:border-blue-500"
+                  className="w-full pl-3.5 pr-14 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-mono dark:focus:border-blue-500"
                   placeholder="24"
                 />
                 <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-black/70 dark:text-white/75 pointer-events-none">
@@ -127,7 +127,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer shrink-0 ${
                       age === presetAge
                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
                     }`}
                   >
                     {presetAge} {isEn ? 'yrs' : 'thn'}
@@ -144,7 +144,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               <select
                 value={district}
                 onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
               >
                 <option value="Kota Bharu">Kota Bharu</option>
                 <option value="Bachok">Bachok</option>
@@ -167,7 +167,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as BusinessCategory)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
               >
                 <option value="Makanan & Minuman (F&B)">Makanan & Minuman (F&B)</option>
                 <option value="Fesyen, Batik & Kraf Kelantan">Fesyen, Batik & Kraf Kelantan</option>
@@ -190,7 +190,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                   className={`py-2 px-2 text-[11px] font-bold rounded-xl border text-center transition-all cursor-pointer ${
                     ssmStatus === 'registered'
                       ? 'bg-emerald-50 text-black border-emerald-300 dark:bg-emerald-950/40 dark:text-white dark:border-emerald-800'
-                      : 'bg-slate-50 text-black border-slate-200 dark:bg-slate-900 dark:text-white/75 dark:border-slate-700'
+                      : 'bg-slate-50 text-black border-slate-300 dark:bg-slate-900 dark:text-white/75 dark:border-slate-600'
                   }`}
                 >
                   {isEn ? 'Registered' : 'Ada SSM'}
@@ -201,7 +201,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                   className={`py-2 px-2 text-[11px] font-bold rounded-xl border text-center transition-all cursor-pointer ${
                     ssmStatus === 'in_progress'
                       ? 'bg-amber-50 text-black border-amber-300 dark:bg-amber-950/40 dark:text-white dark:border-amber-800'
-                      : 'bg-slate-50 text-black border-slate-200 dark:bg-slate-900 dark:text-white/75 dark:border-slate-700'
+                      : 'bg-slate-50 text-black border-slate-300 dark:bg-slate-900 dark:text-white/75 dark:border-slate-600'
                   }`}
                 >
                   {isEn ? 'In Progress' : 'Proses'}
@@ -212,7 +212,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                   className={`py-2 px-2 text-[11px] font-bold rounded-xl border text-center transition-all cursor-pointer ${
                     ssmStatus === 'none'
                       ? 'bg-slate-200 text-black border-slate-400 dark:bg-slate-700 dark:text-white'
-                      : 'bg-slate-50 text-black border-slate-200 dark:bg-slate-900 dark:text-white/75 dark:border-slate-700'
+                      : 'bg-slate-50 text-black border-slate-300 dark:bg-slate-900 dark:text-white/75 dark:border-slate-600'
                   }`}
                 >
                   {isEn ? 'None Yet' : 'Belum Ada'}
@@ -235,7 +235,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     const val = Number(e.target.value);
                     setExperienceMonths(val >= 0 ? val : 0);
                   }}
-                  className="w-full pl-3.5 pr-14 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-mono dark:focus:border-blue-500"
+                  className="w-full pl-3.5 pr-14 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-mono dark:focus:border-blue-500"
                   placeholder="12"
                 />
                 <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-black/70 dark:text-white/75 pointer-events-none">
@@ -251,7 +251,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer shrink-0 ${
                       experienceMonths === m
                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
                     }`}
                   >
                     {m} {isEn ? 'mo' : 'bln'}
@@ -278,7 +278,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     const val = Number(e.target.value);
                     setMonthlySales(val >= 0 ? val : 0);
                   }}
-                  className="w-full pl-11 pr-3.5 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all font-mono dark:focus:border-blue-500"
+                  className="w-full pl-11 pr-3.5 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all font-mono dark:focus:border-blue-500"
                   placeholder="4500"
                 />
               </div>
@@ -291,7 +291,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
                       monthlySales === sales
                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
                     }`}
                   >
                     RM {sales >= 1000 ? `${sales / 1000}k` : sales}
@@ -318,7 +318,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     const val = Number(e.target.value);
                     setFundingNeed(val >= 0 ? val : 1000);
                   }}
-                  className="w-full pl-11 pr-3.5 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all font-mono dark:focus:border-blue-500"
+                  className="w-full pl-11 pr-3.5 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all font-mono dark:focus:border-blue-500"
                   placeholder="5000"
                 />
               </div>
@@ -331,7 +331,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
                       fundingNeed === need
                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
                     }`}
                   >
                     RM {need >= 1000 ? `${need / 1000}k` : need}
@@ -356,13 +356,13 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
         {/* Results & Recommended Grants (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           {/* Score Badge Card */}
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-xs text-center space-y-3">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-300 dark:border-slate-600 shadow-xs text-center space-y-3">
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-black/70 dark:text-white/75">
               {isEn ? 'Overall Match Rating' : 'Skor Kebarangkalian Lulus'}
             </span>
 
             <div className="relative inline-flex items-center justify-center">
-              <div className="w-28 h-28 rounded-full border-8 border-amber-200 dark:border-slate-700 flex items-center justify-center bg-amber-50/40 dark:bg-slate-900">
+              <div className="w-28 h-28 rounded-full border-8 border-amber-200 dark:border-slate-600 flex items-center justify-center bg-amber-50/40 dark:bg-slate-900">
                 <div className="text-3xl font-black text-black dark:text-white/75">
                   {score}%
                 </div>
@@ -387,7 +387,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
           </div>
 
           {/* Matched Schemes List */}
-          <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-200 dark:border-slate-700 shadow-xs space-y-3">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-300 dark:border-slate-600 shadow-xs space-y-3">
             <div className="text-xs font-extrabold text-black dark:text-white uppercase tracking-wider flex items-center justify-between">
               <span>{isEn ? 'Recommended Schemes' : 'Skim Paling Sesuai'}</span>
               <span className="text-black dark:text-white/75 text-[10px] font-bold">
@@ -396,11 +396,11 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
             </div>
 
             {/* Scheme 1 */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-2">
               <div className="flex items-start justify-between">
                 <div>
                   <h4 className="text-xs font-bold text-black dark:text-white">
-                    Dana Benih Usahawan Belia (UMK)
+                    Geran Permulaan Usahawan Belia (UMK)
                   </h4>
                   <div className="text-[11px] font-extrabold text-black dark:text-white/75">
                     Geran Percuma RM3,000
@@ -415,7 +415,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               </p>
               <button
                 type="button"
-                onClick={() => onOpenGrantModal('Dana Benih Usahawan Belia (UMK)', 'RM 3,000')}
+                onClick={() => onOpenGrantModal('Geran Permulaan Usahawan Belia (UMK)', 'RM 3,000')}
                 className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer dark:bg-emerald-600"
               >
                 <span>{isEn ? 'Apply Grant Now' : 'Mohon Geran Ini'}</span>
@@ -424,11 +424,11 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
             </div>
 
             {/* Scheme 2 */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-2">
               <div className="flex items-start justify-between">
                 <div>
                   <h4 className="text-xs font-bold text-black dark:text-white">
-                    Tabung Usahawan Kapsul Kelantan (TEKUN)
+                    Tabung Usahawan Kiosk Kelantan (TEKUN)
                   </h4>
                   <div className="text-[11px] font-extrabold text-black dark:text-white/75">
                     Mikro Pembiayaan RM5,000 - RM20,000
@@ -444,7 +444,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               <button
                 type="button"
                 onClick={onOpenMentorship}
-                className="w-full py-2 px-3 bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 dark:border-slate-600 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2 px-3 bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span>{isEn ? 'Book Mentor Consultation' : 'Minta Panduan Mentor'}</span>
                 <ChevronRight className="w-3.5 h-3.5" />

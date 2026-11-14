@@ -108,20 +108,20 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[92vh] transition-colors my-6">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 overflow-hidden flex flex-col max-h-[92vh] transition-colors my-6">
         
         {/* Header */}
-        <div className="kbelia-important-header border-b border-slate-200 dark:border-slate-700 py-4.5 px-6 sm:px-7 flex items-center justify-between shrink-0">
+        <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-4.5 px-6 sm:px-7 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
               <GraduationCap className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white tracking-tight">
-                {isAdminEditing ? 'Urus & Kemas Kini Profil Mentor' : 'Sunting Profil Saya (Mentor)'}
+                {isAdminEditing ? 'Edit Profil Mentor' : 'Edit Profil Saya (Mentor)'}
               </h3>
               <p className="text-xs text-black/70 dark:text-white/75">
-                Maklumat bimbingan, waktu temu janji dan saluran perhubungan rasmi Universiti Malaysia Kelantan (UMK)
+                Info bimbingan, waktu temu janji dan maklumat perhubungan rasmi UMK
               </p>
             </div>
           </div>
@@ -168,7 +168,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
               />
             </div>
 
@@ -181,7 +181,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 required
                 value={agency}
                 onChange={(e) => setAgency(e.target.value)}
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
               />
             </div>
 
@@ -211,7 +211,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="No. Telefon / WhatsApp"
-                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
               />
             </div>
           </div>
@@ -227,7 +227,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Emel rasmi UMK / agensi"
-              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
             />
           </div>
 
@@ -241,7 +241,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
               value={availableDays}
               onChange={(e) => setAvailableDays(e.target.value)}
               placeholder="Contoh: Setiap Isnin & Rabu (10:00 AM - 1:00 PM)"
-              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
             />
           </div>
 
@@ -283,7 +283,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 value={newExpertiseInput}
                 onChange={(e) => setNewExpertiseInput(e.target.value)}
                 placeholder="Taip bidang pengkhususan baharu..."
-                className="flex-1 px-4.5 py-2.5 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className="flex-1 px-4.5 py-2.5 text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
               />
               <button
                 type="button"
@@ -306,16 +306,16 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Pengalaman industri, anugerah, atau fokus bimbingan anda..."
-              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+              className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
             />
           </div>
 
           {/* Action Buttons Footer */}
-          <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
             <button
               type="button"
               onClick={onClose}
-              className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
             >
               Batal
             </button>

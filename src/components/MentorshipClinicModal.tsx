@@ -103,12 +103,12 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[92vh] flex flex-col overflow-hidden my-6"
+        className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 scale-100 transition-all max-h-[92vh] flex flex-col overflow-hidden my-6"
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-slate-700 py-4.5 px-6 sm:px-7 flex items-center justify-between kbelia-important-header shrink-0">
+        <div className="border-b border-slate-300 dark:border-slate-600 py-4.5 px-6 sm:px-7 flex items-center justify-between kbelia-important-header shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
               <Users className="w-5 h-5" />
@@ -149,7 +149,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 </p>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-900 p-4.5 rounded-xl border border-slate-200 dark:border-slate-700 max-w-md mx-auto text-left text-xs sm:text-sm space-y-2">
+              <div className="bg-slate-50 dark:bg-slate-900 p-4.5 rounded-xl border border-slate-300 dark:border-slate-600 max-w-md mx-auto text-left text-xs sm:text-sm space-y-2">
                 <div className="flex justify-between">
                   <span className="text-black/70 dark:text-white/75 font-medium">Mentor:</span>
                   <span className="font-bold text-black dark:text-white">{selectedMentor?.name}</span>
@@ -175,7 +175,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     setSelectedMentor(null);
                     setIsSubmitted(false);
                   }}
-                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                 >
                   Pilih Mentor Lain
                 </button>
@@ -191,7 +191,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
           ) : selectedMentor ? (
             /* View 2: Booking Form for Selected Mentor */
             <div className="space-y-5 animate-in fade-in duration-200">
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
                     <GraduationCap className="w-5 h-5" />
@@ -228,7 +228,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       required
                       value={entrepreneurName}
                       onChange={(e) => setEntrepreneurName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
 
@@ -242,7 +242,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       value={entrepreneurPhone}
                       onChange={(e) => setEntrepreneurPhone(e.target.value)}
                       placeholder="Nombor telefon"
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       required
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
 
@@ -269,7 +269,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     <select
                       value={district}
                       onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       <option value="Kota Bharu" className="dark:bg-slate-900">Kota Bharu</option>
                       <option value="Bachok" className="dark:bg-slate-900">Bachok</option>
@@ -293,7 +293,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                   <select
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
                   >
                     <option value="Strategi Pemasaran Digital & TikTok Shop" className="dark:bg-slate-900">Strategi Pemasaran Digital & TikTok Shop</option>
                     <option value="Pengurusan Aliran Tunai & Penyata Kewangan Kiosk" className="dark:bg-slate-900">Pengurusan Aliran Tunai & Penyata Kewangan Kiosk</option>
@@ -314,7 +314,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     value={challenges}
                     onChange={(e) => setChallenges(e.target.value)}
                     placeholder="Nyatakan soalan atau cabaran anda secara ringkas..."
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
 
@@ -327,7 +327,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     <select
                       value={preferredDate}
                       onChange={(e) => setPreferredDate(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       <option value="28 Mac 2026 (Sabtu)" className="dark:bg-slate-900">28 Mac 2026 (Sabtu) - 10:00 AM</option>
                       <option value="30 Mac 2026 (Isnin)" className="dark:bg-slate-900">30 Mac 2026 (Isnin) - 11:30 AM</option>
@@ -343,7 +343,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     <select
                       value={mode}
                       onChange={(e) => setMode(e.target.value as any)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       <option value="Bersemuka di Kampus" className="dark:bg-slate-900">Bersemuka di Kampus UMK</option>
                       <option value="Google Meet Maya" className="dark:bg-slate-900">Google Meet Maya (Atas Talian)</option>
@@ -352,11 +352,11 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 </div>
 
                 {/* Action Buttons Footer */}
-                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
                   <button
                     type="button"
                     onClick={() => setSelectedMentor(null)}
-                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                   >
                     Kembali
                   </button>
@@ -381,7 +381,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 {mentors.map((mentor) => (
                   <div
                     key={mentor.id}
-                    className="p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-teal-600 transition-all shadow-xs"
+                    className="p-4 sm:p-5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-teal-600 transition-all shadow-xs"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
                       <div className="space-y-1">
@@ -411,9 +411,9 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     </div>
 
                     {/* Expertise Tags */}
-                    <div className="flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-200 dark:border-slate-700">
+                    <div className="flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-300 dark:border-slate-600">
                       {mentor.expertise.map((exp, idx) => (
-                        <span key={idx} className="text-[10px] font-medium bg-slate-50 dark:bg-slate-900 text-black dark:text-white px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+                        <span key={idx} className="text-[10px] font-medium bg-slate-50 dark:bg-slate-900 text-black dark:text-white px-2 py-0.5 rounded-md border border-slate-300 dark:border-slate-600">
                           {exp}
                         </span>
                       ))}

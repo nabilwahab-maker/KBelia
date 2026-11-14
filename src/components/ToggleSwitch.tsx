@@ -24,10 +24,10 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
       onClick={() => !disabled && onChange(!checked)}
       className={`min-h-[44px] flex items-center justify-between gap-3 p-3 rounded-2xl border transition-all cursor-pointer select-none ${
         disabled 
-          ? 'opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800' 
+          ? 'opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600' 
           : checked
             ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70'
-            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400/70 dark:hover:border-blue-400/70'
+            : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:border-blue-400/70 dark:hover:border-blue-400/70'
       }`}
     >
       {(label || description) && (

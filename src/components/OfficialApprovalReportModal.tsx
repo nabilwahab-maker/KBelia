@@ -132,9 +132,9 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
 
   return (
     <div className="fixed inset-0 z-[9999] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-5 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-4xl w-full border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-4xl w-full border border-slate-300 dark:border-slate-600 shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         {/* Modal Header */}
-        <div className="kbelia-important-header px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0">
+        <div className="kbelia-important-header px-5 py-4 border-b border-slate-300 dark:border-slate-600 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
               <FileText className="w-5 h-5" />
@@ -189,7 +189,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
 
               {/* Sub-menu Dropdown */}
               {showMenu && (
-                <div className="absolute right-0 top-full mt-2 w-60 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-1.5 z-50 animate-in fade-in">
+                <div className="absolute right-0 top-full mt-2 w-60 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-300 dark:border-slate-600 py-1.5 z-50 animate-in fade-in">
                   <button
                     type="button"
                     onClick={handleSavePdf}
@@ -204,7 +204,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                   <button
                     type="button"
                     onClick={handlePrint}
-                    className="w-full text-left px-3.5 py-2.5 text-xs font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 transition-colors cursor-pointer"
+                    className="w-full text-left px-3.5 py-2.5 text-xs font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 border-t border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
                   >
                     <Printer className="w-4 h-4 text-black dark:text-white" />
                     <div>
@@ -227,7 +227,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
         </div>
 
         {/* Modal Printable Document Body with Professional Royal Border */}
-        <div className="p-3 sm:p-6 overflow-y-auto flex-1 bg-slate-100 dark:bg-slate-900/60 flex justify-center">
+        <div className="p-3 sm:p-6 overflow-y-auto flex-1 bg-slate-100 dark:bg-slate-900 flex justify-center">
           {/* Framed Official Document Sheet with Royal Kelantan Double Border & Gold Inset */}
           <div 
             ref={printAreaRef}
@@ -267,7 +267,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                     Program Inisiatif Kapsul Niaga Modular & Geran Pemula Usahawan Muda Kelantan
                   </p>
                 </div>
-                <div className="text-left sm:text-right text-[11px] text-black font-mono bg-slate-50 p-3 rounded-lg border border-slate-200 shrink-0">
+                <div className="text-left sm:text-right text-[11px] text-black font-mono bg-slate-50 p-3 rounded-lg border border-slate-300 shrink-0">
                   <div><strong className="text-black font-sans text-[10px]">No. Rujukan:</strong> <span className="font-bold text-black">{reportRef}</span></div>
                   <div className="mt-1"><strong className="text-black font-sans text-[10px]">Tarikh Jana:</strong> {reportDate}</div>
                   <div className="mt-1">
@@ -280,19 +280,19 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
 
               {/* Metric Overview KPI Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-300">
                   <span className="text-[10px] font-bold text-black/70 uppercase block">Kiosk Diluluskan</span>
                   <span className="text-base sm:text-lg font-black text-black tabular-nums">{approvedBookings.length} Unit</span>
                 </div>
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-300">
                   <span className="text-[10px] font-bold text-black/70 uppercase block">Jumlah Sewaan Kiosk</span>
                   <span className="text-base sm:text-lg font-black text-black tabular-nums">RM{totalKioskSubsidy.toLocaleString()}/bln</span>
                 </div>
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-300">
                   <span className="text-[10px] font-bold text-black/70 uppercase block">Geran Diluluskan</span>
                   <span className="text-base sm:text-lg font-black text-black tabular-nums">{approvedGrants.length} Penerima</span>
                 </div>
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-300">
                   <span className="text-[10px] font-bold text-black/70 uppercase block">Peruntukan Geran</span>
                   <span className="text-base sm:text-lg font-black text-black tabular-nums">RM{totalGrantAmount.toLocaleString()}</span>
                 </div>
@@ -307,14 +307,14 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                   </h2>
                 </div>
                 {approvedBookings.length === 0 ? (
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-black/70 text-center">
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-300 text-xs text-black/70 text-center">
                     Tiada rekod kelulusan kiosk aktif buat masa ini.
                   </div>
                 ) : (
-                  <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                  <div className="overflow-x-auto border border-slate-300 rounded-lg">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-slate-100 text-black font-bold border-b border-slate-200">
+                        <tr className="bg-slate-100 text-black font-bold border-b border-slate-300">
                           <th className="p-2 text-center w-8">Bil</th>
                           <th className="p-2">Nama Pemohon & Perniagaan</th>
                           <th className="p-2">No. Kad Pengenalan</th>
@@ -323,9 +323,9 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                           <th className="p-2">Catatan Pentadbiran</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200 font-normal">
+                      <tbody className="divide-y divide-slate-300 font-normal">
                         {approvedBookings.map((b, idx) => (
-                          <tr key={b.id || idx} className="hover:bg-slate-50/80">
+                          <tr key={b.id || idx} className="hover:bg-slate-50">
                             <td className="p-2 text-black/70 font-mono text-center">{idx + 1}</td>
                             <td className="p-2">
                               <div className="font-bold text-black">{b.applicantName}</div>
@@ -359,14 +359,14 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                   </h2>
                 </div>
                 {approvedGrants.length === 0 ? (
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-black/70 text-center">
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-300 text-xs text-black/70 text-center">
                     Tiada rekod kelulusan geran aktif buat masa ini.
                   </div>
                 ) : (
-                  <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                  <div className="overflow-x-auto border border-slate-300 rounded-lg">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="bg-slate-100 text-black font-bold border-b border-slate-200">
+                        <tr className="bg-slate-100 text-black font-bold border-b border-slate-300">
                           <th className="p-2 text-center w-8">Bil</th>
                           <th className="p-2">Nama Pemohon & Perniagaan</th>
                           <th className="p-2">Kategori</th>
@@ -375,9 +375,9 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                           <th className="p-2 text-center">Status Pengesahan</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200 font-normal">
+                      <tbody className="divide-y divide-slate-300 font-normal">
                         {approvedGrants.map((g, idx) => (
-                          <tr key={g.id || idx} className="hover:bg-slate-50/80">
+                          <tr key={g.id || idx} className="hover:bg-slate-50">
                             <td className="p-2 text-black/70 font-mono text-center">{idx + 1}</td>
                             <td className="p-2">
                               <div className="font-bold text-black">{g.applicantName}</div>
@@ -405,7 +405,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
               </div>
 
               {/* Verification Footer & Official Digital Seal */}
-              <div className="pt-4 border-t-2 border-slate-200 flex flex-col sm:flex-row sm:items-end justify-between gap-5 text-xs text-black">
+              <div className="pt-4 border-t-2 border-slate-300 flex flex-col sm:flex-row sm:items-end justify-between gap-5 text-xs text-black">
                 <div className="flex-1">
                   <div className="font-bold text-black">Urusetia Pentadbiran Keusahawanan Belia</div>
                   <div className="text-[11px] text-black/70">Hab Pembangunan Belia Negeri Kelantan bersama UMK</div>
@@ -420,7 +420,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                     <div>NEGERI KELANTAN</div>
                   </div>
 
-                  <div className="text-left sm:text-right border-t sm:border-t-0 sm:border-l sm:pl-4 border-slate-200 pt-2 sm:pt-0">
+                  <div className="text-left sm:text-right border-t sm:border-t-0 sm:border-l sm:pl-4 border-slate-300 pt-2 sm:pt-0">
                     <div className="text-[10px] text-black/70 uppercase tracking-wider font-semibold">Tandatangan Pegawai Audit</div>
                     <div className="font-serif italic text-base text-black font-bold my-0.5">
                       Pentadbir Urusetia Belia
@@ -433,7 +433,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
               </div>
 
               {/* Legal disclaimer bottom strip */}
-              <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[9px] text-black/70 font-mono">
+              <div className="mt-3 pt-2 border-t border-slate-300 flex items-center justify-between text-[9px] text-black/70 font-mono">
                 <span>DOKUMEN RASMI KERAJAAN NEGERI KELANTAN · SALINAN SAH DIPERAKUI</span>
                 <span>KOD PENGESAHAN: KBN-AUDIT-LULUS-2026</span>
               </div>

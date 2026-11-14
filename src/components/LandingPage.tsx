@@ -89,14 +89,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const heroSlides = [
     {
       id: 'slide-1',
-      title: 'Kapsul Niaga Modular Pintar 2026',
-      subtitle: 'Hab Kapsul Keusahawanan UMK Bachok & Kota Bharu',
-      description: 'Kiosk pasang-siap moden dilengkapi kemudahan palam elektrik 13A, Wi-Fi 500Mbps dan sistem kawalan keselamatan berpusat dengan kadar sewa subsidi serendah RM15/hari.',
+      title: 'Kiosk Belia Modular Pintar 2026',
+      subtitle: 'Hab Kiosk Usahawan UMK Bachok & Kota Bharu',
+      description: 'Kiosk pasang-siap moden lengkap dengan soket elektrik 13A, Wi-Fi 500Mbps dan kawalan keselamatan pada kadar sewa subsidi serendah RM15/hari.',
       badge: 'Kekosongan Sedia Dimohon',
       location: 'Hub UMK Bachok & KB Sentral',
       imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
-      stat: `${slots.length} Kapsul Strategik`,
-      ctaText: 'Mohon Sewa Kapsul',
+      stat: `${slots.length} Kiosk Strategik`,
+      ctaText: 'Mohon Sewa Kiosk',
       onAction: () => navigateToPage('login')
     },
     {
@@ -146,12 +146,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const movingPhotoCards = [
     {
       img: '/assets/generated/kiosk_modular_kbelia.jpg',
-      title: 'Kapsul Niaga KB Sentral B1',
-      subtitle: 'Ruang Komersil Smart Pod',
+      title: 'Kiosk Belia KB Sentral B1',
+      subtitle: 'Ruang Komersial Smart Pod',
       tag: 'RM20/hari',
       tagColor: 'bg-blue-600 text-white border-amber-400/40',
       location: 'Kota Bharu',
-      type: 'Kiosk Komersil'
+      type: 'Kiosk Komersial'
     },
     {
       img: '/assets/generated/batik_canting_kelantan.jpg',
@@ -164,7 +164,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     },
     {
       img: '/assets/generated/kopi_nissem_melaka.jpg',
-      title: "Kapsul F&B A1 · Kopi Nissem",
+      title: "Kiosk F&B A1 · Kopi Nissem",
       subtitle: "D'Kelate Artisan Coffee",
       tag: 'RM15/hari',
       tagColor: 'bg-blue-600 text-white border-amber-400/40',
@@ -176,42 +176,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   // All FAQs including checklist additions
   const faqs = [
     {
-      q: 'Siapakah yang layak menyewa Kapsul Niaga KBelia?',
-      a: 'Warganegara Malaysia berumur 18 hingga 40 tahun yang bermastautin atau menjalankan perniagaan di negeri Kelantan layak memohon. Keutamaan diberikan kepada usahawan belia baharu yang memerlukan tapak permulaan berniaga.'
+      q: 'Siapakah yang layak menyewa Kiosk Belia KBelia?',
+      a: 'Warganegara Malaysia berumur 18 hingga 40 tahun yang menetap atau berniaga di Kelantan layak memohon. Keutamaan diberikan kepada usahawan belia baharu yang perlukan tapak permulaan berniaga.'
     },
     {
       q: 'Berapakah kadar sewaan harian dan tempoh minimum?',
-      a: 'Kadar sewaan berpatutan bermula dari RM12 hingga RM25 sehari bergantung kepada lokasi jajahan dan jenis kiosk. Tempoh sewaan fleksibel boleh dimohon dari 3 hari, mingguan sehingga 3 bulan dengan kemudahan elektrik dan Wi-Fi sedia ada.'
+      a: 'Kadar sewa berpatutan bermula dari RM12 hingga RM25 sehari mengikut lokasi daerah dan jenis kiosk. Tempoh sewaan fleksibel boleh dimohon dari 3 hari, mingguan hingga 3 bulan lengkap dengan elektrik dan Wi-Fi.'
     },
     {
       q: 'Bagaimanakah cara mendaftarkan produk dalam Direktori Usahawan?',
-      a: 'Daftar akaun percuma melalui pautan "Log Masuk / Daftar Usahawan", kemudian lengkapkan profil perniagaan anda di Portal Usahawan untuk mula mempamerkan produk terus kepada umum.'
+      a: 'Daftar akaun percuma melalui pautan "Log Masuk / Daftar Usahawan", kemudian lengkapkan profil bisnes anda di Portal Usahawan untuk mula pamerkan produk kepada pelanggan.'
     },
     {
-      q: 'Adakah pemohon geran dan bantuan perlu mempunyai premis tetap?',
-      a: 'Tidak semestinya. Skim Dana Benih dan Inkubasi Belia terbuka kepada perniagaan dari rumah, kiosk bergerak, serta perniagaan digital asalkan mempunyai perancangan perniagaan yang jelas.'
+      q: 'Adakah pemohon geran perlu mempunyai kedai tetap?',
+      a: 'Tidak semestinya. Skim Geran Permulaan dan Bimbingan Belia terbuka kepada peniaga dari rumah, kiosk bergerak, serta bisnes online selagi mempunyai perancangan perniagaan yang jelas.'
     },
     {
-      q: 'Bagaimanakah proses semakan dan kelulusan Geran Dana Benih KBelia?',
-      a: 'Permohonan geran disemak secara digital melalui sistem penjejak (Grant Tracker). Selepas permohonan dihantar, panel urusetia negeri akan membuat penilaian dalam tempoh 7-14 hari bekerja dan pemohon boleh memantau status secara langsung dalam papan pemuka.'
+      q: 'Bagaimanakah proses semakan dan kelulusan Geran Permulaan KBelia?',
+      a: 'Permohonan geran disemak secara digital. Selepas borang dihantar, pihak pentadbir akan membuat penilaian dalam tempoh 7–14 hari bekerja dan anda boleh pantau status terus dalam dashboard.'
     },
     {
-      q: 'Bolehkah saya mendapatkan bimbingan mentor industri secara percuma?',
-      a: 'Ya, semua usahawan belia berdaftar di portal KBelia layak menyertai sesi padanan mentor perniagaan (Mentorship Hub) dan bengkel akademi keusahawanan secara percuma tanpa sebarang caj tersembunyi.'
+      q: 'Bolehkah saya mendapatkan bimbingan mentor secara percuma?',
+      a: 'Ya, semua usahawan belia berdaftar di portal KBelia layak menyertai sesi bimbingan mentor dan bengkel keusahawanan secara percuma tanpa sebarang caj tersembunyi.'
     },
     {
-      q: 'Adakah platform ini membantu pendaftaran SSM dan pematuhan lesen?',
-      a: 'Benar. Kami menyediakan panduan pematuhan (Compliance & SSM Guide) lengkap dengan pautan integrasi SSM, panduan sijil Halal JAKIM, dan permohonan lesen PBT di seluruh Kelantan.'
+      q: 'Adakah platform ini membantu pendaftaran SSM dan lesen perniagaan?',
+      a: 'Ya. Kami sediakan panduan lengkap daftar SSM, panduan sijil Halal JAKIM, dan permohonan lesen PBT di seluruh Kelantan.'
     }
   ];
 
   const activeSlideData = heroSlides[currentSlide];
 
   return (
-    <div id="kbelia-landing-root" className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-black dark:text-white flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white transition-colors duration-200">
+    <div id="kbelia-landing-root" className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-black dark:text-white flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white transition-colors duration-200">
       
       {/* 2. LANDING NAVBAR */}
-      <header className="sticky top-0 z-40 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-md border-b border-slate-200/80 dark:border-zinc-800 shadow-xs transition-colors">
+      <header className="sticky top-0 z-40 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-md border-b border-slate-300 dark:border-zinc-600 shadow-xs transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
           
           {/* Logo & Identity */}
@@ -224,7 +224,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="text-base font-extrabold tracking-tight text-black dark:text-white">KBelia</span>
               </div>
               <p className="text-[11px] text-black/70 dark:text-white/75 font-normal hidden sm:block">
-                {isBM ? 'Portal Keusahawanan & Kapsul Niaga Belia Kelantan' : 'Kelantan Youth Entrepreneurship & Capsule Kiosks'}
+                {isBM ? 'Portal Usahawan & Kiosk Belia Kelantan' : 'Kelantan Youth Entrepreneurship & Capsule Kiosks'}
               </p>
             </div>
           </div>
@@ -246,7 +246,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               id="landing-darkmode-toggle"
               type="button"
               onClick={toggleTheme}
-              className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white/75 border border-slate-200 dark:border-slate-700 transition-all duration-300 cursor-pointer shadow-2xs group focus:outline-none interactive-press hover:scale-105 active:scale-95"
+              className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 transition-all duration-300 cursor-pointer shadow-2xs group focus:outline-none interactive-press hover:scale-105 active:scale-95"
               title={isDark ? (isBM ? "Tukar ke Mod Cerah" : "Switch to Light Mode") : (isBM ? "Tukar ke Mod Gelap" : "Switch to Dark Mode")}
               aria-label="Tukar tema sistem"
             >
@@ -270,7 +270,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
 
             {/* Penukar Bahasa Global */}
-            <div className="flex items-center bg-slate-50 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-bold">
+            <div className="flex items-center bg-slate-50 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-300 dark:border-slate-600 text-[10px] font-bold">
               <button
                 type="button"
                 onClick={() => setLanguage('ms')}
@@ -298,7 +298,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               type="button"
               id="landing-register-nav-btn"
               onClick={() => navigateToPage('register')}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer interactive-press interactive-lift group"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-xs font-bold transition-all cursor-pointer interactive-press interactive-lift group"
             >
               <Users className="w-3.5 h-3.5 text-black dark:text-white/75 transition-transform duration-200 group-hover:scale-110" />
               <span>{isBM ? 'Daftar' : 'Register'}</span>
@@ -320,7 +320,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </header>
 
       {/* 3. HERO SECTION & CAROUSEL VISUAL (Important Header: Top-Left Soft Sky Glow + Grid & Ambient Orbs) */}
-      <section id="hero" className="kbelia-important-header relative overflow-hidden pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-slate-200/80 dark:border-zinc-800 text-black dark:text-white transition-colors">
+      <section id="hero" className="kbelia-important-header relative overflow-hidden pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-slate-300 dark:border-zinc-600 text-black dark:text-white transition-colors">
         {/* Subtle SVG Grid & Ambient Radial Glow */}
         <div className="absolute inset-0 bg-grid-pattern opacity-80 pointer-events-none" aria-hidden="true" />
         <div className="absolute -top-24 left-1/4 w-96 h-96 bg-blue-500/12 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
@@ -352,7 +352,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             className="pt-4 w-full mx-auto text-left relative"
           >
             {/* Carousel Frame Card */}
-            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800 bg-slate-950 text-white group">
+            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-300 dark:border-slate-600 bg-slate-950 text-white group">
               
               {/* Background Slide Image with Fade Animation */}
               <div className="relative h-[420px] sm:h-[520px] lg:h-[560px] w-full overflow-hidden">
@@ -376,7 +376,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
               {/* Top Controls Bar within Slide */}
               <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-auto">
-                <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/15 text-xs">
+                <div className="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-white/15 text-xs">
                   <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-blue-600 text-white border border-blue-400/40">
                     {activeSlideData.badge}
                   </span>
@@ -444,7 +444,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         className={`transition-all duration-300 h-2 rounded-full cursor-pointer hover:scale-105 active:scale-95 ${
                           i === currentSlide 
                             ? 'w-8 bg-amber-400 shadow-xs' 
-                            : 'w-2 bg-white/40 hover:bg-white/70'
+                            : 'w-2 bg-white/40 hover:bg-white'
                         }`}
                         title={`Slide ${i + 1}: ${slide.title}`}
                       />
@@ -543,12 +543,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 3B. REEL GAMBAR BERGERAK BERTERUSAN (CONTINUOUS HORIZONTAL MARQUEE TICKER) */}
       {/* ========================================================================= */}
-      <section className="py-6 bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm text-black dark:text-white overflow-hidden border-b border-slate-200/80 dark:border-zinc-800 transition-colors">
+      <section className="py-6 bg-white dark:bg-zinc-900 text-black dark:text-white overflow-hidden border-b border-slate-300 dark:border-zinc-600 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-4 h-4 text-black dark:text-white/75" />
             <h3 className="text-xs sm:text-sm font-bold tracking-wide uppercase text-black dark:text-white">
-              Galeri Kiosk Kapsul & Produk Usahawan Kelantan
+              Galeri Kiosk Belia & Produk Usahawan Kelantan
             </h3>
           </div>
         </div>
@@ -561,13 +561,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div
                 key={`marquee-${idx}`}
                 onClick={() => {
-                  if (card.title.includes('Kapsul')) {
+                  if (card.title.includes('Kiosk') || card.title.includes('Kapsul')) {
                     setActiveTab('academic');
                   } else {
                     setActiveTab('hepa');
                   }
                 }}
-                className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-400/70 rounded-xl overflow-hidden transition-colors cursor-pointer shadow-2xs group"
+                className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-blue-400/70 rounded-xl overflow-hidden transition-colors cursor-pointer shadow-2xs group"
               >
                 <div className="relative h-36 overflow-hidden">
                   <img
@@ -606,7 +606,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 4. PROBLEM VS SOLUTION (CHECKLIST ITEM 4) */}
       {/* ========================================================================= */}
-      <section id="masalah-solusi" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors">
+      <section id="masalah-solusi" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
         <div className="absolute inset-0 bg-dot-pattern opacity-45 pointer-events-none" aria-hidden="true" />
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
@@ -668,8 +668,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Birokrasi & Maklumat Geran Terpencar</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Sukar mengetahui skim dana benih dan semakan status pembiayaan memakan masa lama.</span>
+                    <span className="font-bold text-black dark:text-white block">Birokrasi & Info Geran Tersebar</span>
+                    <span className="text-black/70 dark:text-white/75 text-xs">Sukar mencari maklumat geran permulaan dan semakan status pula memakan masa lama.</span>
                   </div>
                 </li>
               </ul>
@@ -691,22 +691,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Kiosk Kapsul Modular Bersubsidi</span>
+                    <span className="font-bold text-black dark:text-white block">Kiosk Modular Bersubsidi</span>
                     <span className="text-black dark:text-white text-xs">Sewa serendah RM12-RM25/hari di zon strategik seluruh Kelantan lengkap elektrik 13A & WiFi.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Panduan Kepatuhan & SSM Bersepadu</span>
-                    <span className="text-black dark:text-white text-xs">Modul panduan langkah demi langkah mendaftar SSM, pensijilan halal, dan lesen perbandaran.</span>
+                    <span className="font-bold text-black dark:text-white block">Panduan SSM & Lesen Perniagaan</span>
+                    <span className="text-black dark:text-white text-xs">Panduan langkah demi langkah mendaftar SSM, sijil Halal, dan lesen PBT.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Direktori Pasaran Digital Terbuka</span>
-                    <span className="text-black dark:text-white text-xs">Pamerkan katalog produk terus kepada umum merentasi seluruh negeri dan pelanggan luar.</span>
+                    <span className="text-black dark:text-white text-xs">Pamerkan katalog produk terus kepada orang ramai merentasi seluruh negeri dan pelanggan luar.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
@@ -719,8 +719,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Sistem Penjejak Geran & Pembiayaan</span>
-                    <span className="text-black dark:text-white text-xs">Semak status kelulusan Dana Benih Belia secara langsung dalam papan pemuka masa nyata.</span>
+                    <span className="font-bold text-black dark:text-white block">Semakan Geran & Pembiayaan Terus</span>
+                    <span className="text-black dark:text-white text-xs">Semak status kelulusan Geran Permulaan Belia secara langsung dalam dashboard.</span>
                   </div>
                 </li>
               </ul>
@@ -733,7 +733,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 5. CIRI-CIRI UTAMA (CORE FEATURES - ASYMMETRIC BENTO GRID) */}
       {/* ========================================================================= */}
-      <section id="ciri-utama" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-950 transition-colors">
+      <section id="ciri-utama" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 transition-colors">
         <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" aria-hidden="true" />
         <div className="absolute top-1/3 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
 
@@ -759,7 +759,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                   <TrendingUp className="w-6 h-6" />
                 </div>
-                <h3 className="font-extrabold text-lg text-black dark:text-white">1. Business Analytics & Reporting</h3>
+                <h3 className="font-extrabold text-lg text-black dark:text-white">Business Analytics & Reporting</h3>
                 <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
                   Pantau rekod jualan harian, pengurusan inventori produk, serta jana laporan prestasi ringkas untuk kegunaan pembentangan kepada pelabur atau pembiaya.
                 </p>
@@ -770,7 +770,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Subtle Decorative Vector SVG Chart Illustration */}
-              <div className="shrink-0 w-full sm:w-48 h-28 rounded-xl bg-blue-50/70 dark:bg-zinc-900/70 border border-blue-200/70 dark:border-zinc-800 p-3 flex items-end justify-between gap-1.5 pointer-events-none select-none" aria-hidden="true">
+              <div className="shrink-0 w-full sm:w-48 h-28 rounded-xl bg-blue-50/70 dark:bg-zinc-900 border border-blue-200/70 dark:border-zinc-600 p-3 flex items-end justify-between gap-1.5 pointer-events-none select-none" aria-hidden="true">
                 <svg viewBox="0 0 180 80" className="w-full h-full">
                   <defs>
                     <linearGradient id="bentoChartGrad" x1="0" y1="0" x2="0" y2="1">
@@ -791,9 +791,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-black dark:text-white">2. Funding & Grant Tracker</h3>
+              <h3 className="font-extrabold text-base text-black dark:text-white">Funding & Grant Tracker</h3>
               <p className="text-xs text-black dark:text-white leading-relaxed">
-                Akses senarai skim Dana Benih Negeri, geran pendigitalan MDEC, dan pembiayaan mikro TEKUN/MARA lengkap dengan status semakan permohonan masa nyata.
+                Akses senarai skim Geran Permulaan Negeri, geran digital MDEC, dan pembiayaan mikro TEKUN/MARA lengkap dengan status semakan permohonan semasa.
               </p>
               <div className="pt-2 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -806,9 +806,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                 <Users className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-black dark:text-white">3. Mentorship & Networking Hub</h3>
+              <h3 className="font-extrabold text-base text-black dark:text-white">Mentorship & Networking Hub</h3>
               <p className="text-xs text-black dark:text-white leading-relaxed">
-                Padankan diri anda dengan mentor perniagaan berpengalaman, adakan sesi perkongsian industri, dan bina hubungan strategik dengan usahawan belia lain.
+                Padankan diri anda dengan mentor perniagaan berpengalaman, adakan sesi perkongsian industri, dan bina rangkaian dengan usahawan belia lain.
               </p>
               <div className="pt-2 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <Video className="w-3.5 h-3.5" />
@@ -822,9 +822,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                   <BookOpen className="w-6 h-6" />
                 </div>
-                <h3 className="font-extrabold text-lg text-black dark:text-white">4. Upskilling & Academy Module</h3>
+                <h3 className="font-extrabold text-lg text-black dark:text-white">Upskilling & Academy Module</h3>
                 <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
-                  Modul latihan praktikal percuma merangkumi penstriman TikTok Shop Ads, fotografi produk komersil, penjenamaan jenama, dan literasi perakaunan ringkas.
+                  Modul latihan praktikal percuma merangkumi live TikTok Shop Ads, fotografi produk komersial, penjenamaan, dan asas perakaunan ringkas.
                 </p>
                 <div className="pt-1 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5" />
@@ -833,7 +833,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Subtle Decorative Vector SVG Academy Accent */}
-              <div className="shrink-0 w-full sm:w-44 h-24 rounded-xl bg-indigo-50/80 dark:bg-zinc-900/70 border border-indigo-200/70 dark:border-zinc-800 p-3 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
+              <div className="shrink-0 w-full sm:w-44 h-24 rounded-xl bg-indigo-50/80 dark:bg-zinc-900 border border-indigo-200/70 dark:border-zinc-600 p-3 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
                 <svg viewBox="0 0 140 70" className="w-full h-full">
                   <rect x="8" y="12" width="124" height="46" rx="8" fill="none" stroke="#4F46E5" strokeOpacity="0.4" strokeWidth="1.5" strokeDasharray="4 3" />
                   <rect x="18" y="22" width="36" height="26" rx="5" fill="#4F46E5" fillOpacity="0.16" />
@@ -850,7 +850,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                 <FileText className="w-6 h-6" />
               </div>
-              <h3 className="font-extrabold text-base text-black dark:text-white">5. Compliance & SSM Guide</h3>
+              <h3 className="font-extrabold text-base text-black dark:text-white">Compliance & SSM Guide</h3>
               <p className="text-xs text-black dark:text-white leading-relaxed">
                 Panduan interaktif pendaftaran entiti perniagaan di SSM, panduan pematuhan cukai LHDN, permohonan pensijilan Halal JAKIM, dan lesen pihak berkuasa tempatan (PBT).
               </p>
@@ -866,7 +866,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
                   <Building2 className="w-6 h-6" />
                 </div>
-                <h3 className="font-extrabold text-lg text-black dark:text-white">6. Modular Capsule IoT Hub</h3>
+                <h3 className="font-extrabold text-lg text-black dark:text-white">Modular Capsule IoT Hub</h3>
                 <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
                   Sistem kunci digital pintar, pemantauan status penggunaan kiosk secara atas talian, serta sokongan teknikal bersepadu bagi penyewa kiosk modular seluruh Kelantan.
                 </p>
@@ -877,7 +877,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               {/* Subtle Decorative Vector SVG Modular Kiosk Node */}
-              <div className="shrink-0 w-full sm:w-44 h-24 rounded-xl bg-emerald-50/70 dark:bg-zinc-900/70 border border-emerald-200/70 dark:border-zinc-800 p-3 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
+              <div className="shrink-0 w-full sm:w-44 h-24 rounded-xl bg-emerald-50/70 dark:bg-zinc-900 border border-emerald-200/70 dark:border-zinc-600 p-3 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
                 <svg viewBox="0 0 140 70" className="w-full h-full">
                   <rect x="20" y="16" width="38" height="38" rx="6" fill="#2563EB" fillOpacity="0.14" stroke="#2563EB" strokeWidth="1.5" />
                   <rect x="82" y="16" width="38" height="38" rx="6" fill="#10B981" fillOpacity="0.14" stroke="#10B981" strokeWidth="1.5" />
@@ -895,7 +895,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 6. LANGKAH BERMULA */}
       {/* ========================================================================= */}
-      <section className="py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors">
+      <section className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-14">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
@@ -950,7 +950,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <h4 className="font-extrabold text-base text-black dark:text-white">Semak Kiosk & Geran</h4>
               <p className="text-xs text-black dark:text-white/75 leading-relaxed">
-                Pilih slot kiosk kapsul bersubsidi di jajahan anda atau mohon Skim Dana Benih untuk melengkapkan peralatan bisnes.
+                Pilih slot kiosk bersubsidi di daerah anda atau mohon Geran Permulaan untuk melengkapkan peralatan bisnes.
               </p>
             </div>
 
@@ -964,7 +964,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <h4 className="font-extrabold text-base text-black dark:text-white">Kembangkan Bisnes</h4>
               <p className="text-xs text-black dark:text-white/75 leading-relaxed">
-                Terima bimbingan mentor berpengalaman, pantau analitik jualan, dan tingkatkan keterlihatan pasaran di seluruh negeri.
+                Terima bimbingan mentor berpengalaman, pantau analitik jualan, dan tingkatkan jualan anda di seluruh negeri.
               </p>
             </div>
 
@@ -975,7 +975,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 7. TIGA INISIATIF TERAS */}
       {/* ========================================================================= */}
-      <section id="inisiatif" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-950 text-black dark:text-white transition-colors">
+      <section id="inisiatif" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 text-black dark:text-white transition-colors">
         <div className="absolute inset-0 bg-dot-pattern opacity-40 pointer-events-none" aria-hidden="true" />
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
@@ -989,7 +989,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </h2>
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
               {isBM 
-                ? 'Direka khas bagi menyelesaikan cabaran modal tapak niaga, keterlihatan pasaran digital dan bimbingan berterusan.'
+                ? 'Direka khas bagi menyelesaikan masalah modal tapak niaga, pemasaran digital dan bimbingan berterusan.'
                 : 'Designed to dismantle retail overhead, elevate digital visibility, and provide mentorship.'}
             </p>
           </div>
@@ -998,15 +998,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             
             {/* Pillar 1: Kiosk Modular */}
             <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all duration-300 space-y-4 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-700 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Building2 className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
-                {isBM ? '1. Kiosk Kapsul Modular' : '1. Modular Capsule Kiosks'}
+                {isBM ? 'Kiosk Belia Modular' : 'Modular Capsule Kiosks'}
               </h3>
               <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
                 {isBM 
-                  ? 'Penyediaan ruang niaga pasang siap di kawasan tumpuan tinggi jajahan. Dilengkapi bekalan elektrik stabil, WiFi 500Mbps dan kawalan keselamatan dengan kadar sewa serendah RM12-RM25/hari.'
+                  ? 'Penyediaan ruang niaga pasang siap di kawasan tumpuan tinggi daerah. Dilengkapi bekalan elektrik stabil, WiFi 500Mbps dan kawalan keselamatan pada kadar sewa serendah RM12-RM25/hari.'
                   : 'Turnkey pre-fitted retail pods at high-footfall locations with electricity, 500Mbps WiFi, and security starting at RM12/day.'}
               </p>
               <div className="pt-2">
@@ -1023,11 +1023,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Pillar 2: Direktori Digital */}
             <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all duration-300 space-y-4 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-700 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
                 <Store className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
-                {isBM ? '2. Direktori Pasaran Digital' : '2. Digital Market Directory'}
+                {isBM ? 'Direktori Pasaran Digital' : 'Digital Market Directory'}
               </h3>
               <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
                 {isBM 
@@ -1052,11 +1052,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <Award className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
-                {isBM ? '3. Geran & Inkubasi Modal' : '3. Grants & Seed Capital'}
+                {isBM ? 'Geran & Modal Permulaan' : 'Grants & Seed Capital'}
               </h3>
               <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
                 {isBM 
-                  ? 'Peluang mendapatkan Dana Benih Belia, geran digitalisasi, serta latihan keusahawanan intensif bersama mentor industri berkaliber bagi memacu pertumbuhan perniagaan.'
+                  ? 'Peluang mendapatkan Geran Permulaan Belia, geran digitalisasi, serta latihan keusahawanan intensif bersama mentor industri bagi membantu perniagaan anda berkembang.'
                   : 'Fast-tracked youth seed grants, digitalization subsidies, and structured mentorship programs.'}
               </p>
               <div className="pt-2">
@@ -1079,20 +1079,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 8. PREVIEW KIOSK MODULAR */}
       {/* ========================================================================= */}
-      <section id="kiosk" className="py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors">
+      <section id="kiosk" className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
                 <Building2 className="w-3.5 h-3.5" />
-                <span>Lokasi Pilihan Jajahan</span>
+                <span>Lokasi Pilihan Daerah</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance">
-                Kapsul & Kiosk Niaga Sedia Dimohon
+                Kiosk Niaga Belia Sedia Dimohon
               </h2>
               <p className="text-xs sm:text-sm text-black dark:text-white/75 mt-1">
-                Pilih tapak perniagaan yang strategik dengan fasiliti elektrik dan internet sedia ada.
+                Pilih tapak perniagaan yang strategik lengkap dengan elektrik dan internet sedia ada.
               </p>
             </div>
           </div>
@@ -1135,7 +1135,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       </div>
 
                       {/* Amenities */}
-                      <div className="text-xs text-black/70 dark:text-white/75 flex items-center gap-2 pt-1 border-t border-slate-200/80 dark:border-zinc-800">
+                      <div className="text-xs text-black/70 dark:text-white/75 flex items-center gap-2 pt-1 border-t border-slate-300 dark:border-zinc-600">
                         <span className="flex items-center gap-1 text-black dark:text-white">
                           <Zap className="w-3 h-3 text-black/70 dark:text-white/75" /> Elektrik
                         </span>
@@ -1149,7 +1149,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                   </div>
 
-                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 flex items-center justify-between border-t border-slate-200/80 dark:border-zinc-800">
+                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 flex items-center justify-between border-t border-slate-300 dark:border-zinc-600">
                     <div>
                       <div className="text-[10px] text-black/70 dark:text-white/75 uppercase font-semibold">Kadar Sewaan Bersubsidi</div>
                       <div className="text-sm sm:text-base font-extrabold text-black dark:text-white/75 tabular-nums">
@@ -1169,7 +1169,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 9. PREVIEW DIREKTORI USAHAWAN BELIA */}
       {/* ========================================================================= */}
-      <section id="direktori" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-950 transition-colors">
+      <section id="direktori" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 transition-colors">
         <div className="absolute inset-0 bg-grid-pattern opacity-45 pointer-events-none" aria-hidden="true" />
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
@@ -1200,7 +1200,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <img
                       src={biz.logoUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${biz.id}`}
                       alt={biz.businessName}
-                      className="w-12 h-12 rounded-lg object-cover bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shrink-0"
+                      className="w-12 h-12 rounded-lg object-cover bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 shrink-0"
                     />
                     <div className="min-w-0">
                       <div className="text-[10px] text-black dark:text-white/75 font-bold uppercase tracking-wide">{biz.category}</div>
@@ -1219,7 +1219,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-200/80 dark:border-zinc-800 mt-3 flex items-center justify-between text-xs">
+                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 mt-3 flex items-center justify-between text-xs">
                   <span className="text-black dark:text-white/75 text-[11px]">{biz.ownerName}</span>
                   <span className="text-[11px] font-semibold text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/70">
                     {biz.district}
@@ -1235,7 +1235,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 9. SOALAN LAZIM (FAQ) */}
       {/* ========================================================================= */}
-      <section id="faq" className="py-16 sm:py-24 border-b border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 transition-colors">
+      <section id="faq" className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-5xl w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <div className="text-center space-y-2.5 mb-10">
@@ -1268,7 +1268,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <ChevronDown className={`w-4 h-4 text-black/70 dark:text-white/75 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-black dark:text-white' : ''}`} />
                   </button>
                   {isOpen && (
-                    <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-xs sm:text-sm text-black dark:text-white leading-relaxed border-t border-slate-200/80 dark:border-zinc-800 pt-3 bg-white/60 dark:bg-zinc-900/50">
+                    <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-xs sm:text-sm text-black dark:text-white leading-relaxed border-t border-slate-300 dark:border-zinc-600 pt-3 bg-white dark:bg-zinc-900">
                       {faq.a}
                     </div>
                   )}
@@ -1283,7 +1283,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 10. FINAL CALL TO ACTION */}
       {/* ========================================================================= */}
-      <section className="kbelia-important-header relative overflow-hidden py-16 sm:py-24 text-black dark:text-white border-b border-slate-200/80 dark:border-zinc-800 transition-colors">
+      <section className="kbelia-important-header relative overflow-hidden py-16 sm:py-24 text-black dark:text-white border-b border-slate-300 dark:border-zinc-600 transition-colors">
         <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" aria-hidden="true" />
         <div className="absolute -bottom-24 left-1/3 w-96 h-96 bg-blue-500/12 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
         <div className="relative z-10 max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
@@ -1312,7 +1312,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button
               type="button"
               onClick={() => navigateToPage('login')}
-              className="px-6 py-3 rounded-lg bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white font-bold text-sm border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
+              className="px-6 py-3 rounded-lg bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white font-bold text-sm border border-slate-300 dark:border-slate-600 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
             >
               <LogIn className="w-4 h-4 text-black dark:text-white/75" />
               <span>{isBM ? 'Log Masuk Sistem' : 'Log In System'}</span>
@@ -1341,7 +1341,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 11. COMPREHENSIVE INSTITUTIONAL FOOTER */}
       {/* ========================================================================= */}
-      <footer className="bg-white dark:bg-zinc-950 text-black dark:text-white text-xs border-t border-slate-200 dark:border-zinc-800">
+      <footer className="bg-white dark:bg-zinc-950 text-black dark:text-white text-xs border-t border-slate-300 dark:border-zinc-600">
 
         {/* 4-Column Footer Content */}
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -1355,7 +1355,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span className="text-base font-black text-black dark:text-white tracking-tight">KBelia Kelantan</span>
             </div>
             <p className="text-xs text-black dark:text-white/75 leading-relaxed">
-              Portal Rasmi Pembangunan & Pemerkasaan Usahawan Belia Negeri Kelantan. Menyediakan kiosk pintar modular, pasaran direktori, serta inkubasi dana benih.
+              Portal Rasmi Pembangunan & Pemerkasaan Usahawan Belia Negeri Kelantan. Menyediakan kiosk pintar modular, pasaran direktori, serta bantuan geran permulaan.
             </p>
             <div className="pt-2 text-[11px] text-black/70 dark:text-white/75">
               Kompleks Kota Darulnaim, 15503 Kota Bharu, Kelantan Darul Naim.
@@ -1376,7 +1376,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button type="button" onClick={() => navigateToPage('login')} className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer">Log Masuk Sistem</button>
               </li>
               <li>
-                <a href="#kiosk" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Kiosk Kapsul Modular</a>
+                <a href="#kiosk" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Kiosk Belia Modular</a>
               </li>
               <li>
                 <a href="#direktori" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Direktori Usahawan</a>
@@ -1435,7 +1435,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Col 4: Contact & Socials */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-black dark:text-white">Hubungi Urusetia</h4>
+            <h4 className="font-extrabold text-sm text-black dark:text-white">Hubungi Pentadbir</h4>
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-2 text-black dark:text-white">
                 <Phone className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
@@ -1459,7 +1459,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://facebook.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
                   title="Facebook KBelia"
                 >
                   <Globe className="w-4 h-4" />
@@ -1468,7 +1468,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://instagram.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
                   title="Instagram KBelia"
                 >
                   <Sparkles className="w-4 h-4" />
@@ -1477,7 +1477,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://tiktok.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
                   title="TikTok KBelia"
                 >
                   <Video className="w-4 h-4" />
@@ -1486,7 +1486,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="https://wa.me/601123456789"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
                   title="WhatsApp Khidmat Bantuan"
                 >
                   <Phone className="w-4 h-4" />
@@ -1498,7 +1498,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* Bottom Bar: Copyright */}
-        <div className="border-t border-slate-200 dark:border-slate-800 py-6 text-center text-[11px] text-black/70 dark:text-white/75">
+        <div className="border-t border-slate-300 dark:border-slate-600 py-6 text-center text-[11px] text-black/70 dark:text-white/75">
           <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p>
               Hak Cipta Terpelihara © {new Date().getFullYear()} Kerajaan Negeri Kelantan. Diselaraskan di bawah Inisiatif Pembangunan Ekonomi Belia.
@@ -1530,17 +1530,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           onClick={() => setLegalModalType(null)}
         >
           <div
-            className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden my-8"
+            className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden my-8"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-5 kbelia-important-header dark:bg-slate-800/80 text-black dark:text-white flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+            <div className="p-5 kbelia-important-header dark:bg-slate-800 text-black dark:text-white flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
               <h3 className="font-extrabold text-base text-black dark:text-white">
                 {legalModalType === 'privacy' ? 'Dasar Privasi & Perlindungan Data' : 'Terma & Syarat Perkhidmatan'}
               </h3>
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}
-                className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-600 text-black dark:text-white hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-600 text-black dark:text-white hover:text-black dark:hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1553,7 +1553,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     1. Pengenalan & Komitmen Privasi
                   </p>
                   <p>
-                    Portal KBelia diuruskan oleh Urusetia Pembangunan Belia Negeri Kelantan. Kami komited untuk melindungi data peribadi anda mengikut Akta Perlindungan Data Peribadi 2010 (PDPA) Malaysia.
+                    Portal KBelia diuruskan oleh Pentadbir KBelia Negeri Kelantan. Kami komited untuk melindungi data peribadi anda mengikut Akta Perlindungan Data Peribadi 2010 (PDPA) Malaysia.
                   </p>
                   <p className="font-bold text-black dark:text-white">
                     2. Pengumpulan Data Peribadi
@@ -1574,7 +1574,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     1. Syarat Kelayakan Pengguna
                   </p>
                   <p>
-                    Pengguna mestilah warganegara Malaysia berumur antara 18 hingga 40 tahun yang beroperasi atau bermastautin di negeri Kelantan Darul Naim.
+                    Pengguna mestilah warganegara Malaysia berumur antara 18 hingga 40 tahun yang beroperasi atau menetap di negeri Kelantan Darul Naim.
                   </p>
                   <p className="font-bold text-black dark:text-white">
                     2. Tanggungjawab Penyewa Kiosk
@@ -1586,13 +1586,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     3. Integriti Permohonan Geran
                   </p>
                   <p>
-                    Sebarang maklumat palsu dalam permohonan Dana Benih boleh mengakibatkan pembatalan geran serta-merta dan tindakan undang-undang di bawah peraturan pentadbiran negeri.
+                    Sebarang maklumat palsu dalam permohonan Geran Permulaan boleh mengakibatkan pembatalan geran serta-merta dan tindakan undang-undang di bawah peraturan pentadbiran negeri.
                   </p>
                 </>
               )}
             </div>
 
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700 text-right">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-300 dark:border-slate-600 text-right">
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}

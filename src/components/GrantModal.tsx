@@ -54,7 +54,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
-  initialProgramTitle = 'Dana Benih Usahawan Belia Kelantan (RM3,000)',
+  initialProgramTitle = 'Geran Permulaan Usahawan Belia Kelantan (RM3,000)',
   initialGrantAmount = 'RM3,000',
   portalSettings
 }) => {
@@ -157,7 +157,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
       showToast({
         type: 'success',
         title: 'Permohonan Geran Berjaya Dihantar!',
-        message: `Permohonan bagi ${programTitle} telah direkodkan. Semakan urusetia mengambil masa 3 hari bekerja.`
+        message: `Permohonan bagi ${programTitle} telah direkodkan. Semakan mengambil masa 3 hari bekerja.`
       });
       if (onSuccess) onSuccess(grantData);
     } catch (err: any) {
@@ -178,7 +178,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
 
   const GRANT_PACKAGES = [
     {
-      title: 'Dana Benih Usahawan Belia Kelantan (RM3,000)',
+      title: 'Geran Permulaan Usahawan Belia Kelantan (RM3,000)',
       amount: 'RM3,000',
       badge: 'Modal Permulaan',
       badgeColor: 'bg-amber-100 text-black dark:bg-amber-950 dark:text-white',
@@ -203,23 +203,23 @@ export const GrantModal: React.FC<GrantModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[90vh] flex flex-col overflow-hidden my-auto"
+        className="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-300 dark:border-slate-600 scale-100 transition-all max-h-[90vh] flex flex-col overflow-hidden my-auto"
         role="dialog"
         aria-modal="true"
       >
         
         {/* Header - STICKY and SHRINK-0 */}
-        <div className="border-b border-slate-200 dark:border-slate-700 py-4 px-6 sm:px-7 flex items-center justify-between kbelia-important-header shrink-0 sticky top-0 z-10">
+        <div className="border-b border-slate-300 dark:border-slate-600 py-4 px-6 sm:px-7 flex items-center justify-between kbelia-important-header shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <Award className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white tracking-tight">
-                Permohonan Geran & Dana Benih Belia
+                Permohonan Geran &amp; Bantuan Modal
               </h3>
               <p className="text-xs text-black dark:text-white">
-                Skim Pemerkasaan Modal Perniagaan Negeri Kelantan & Universiti Malaysia Kelantan (UMK)
+                Skim Bantuan Modal Perniagaan Negeri Kelantan &amp; UMK
               </p>
             </div>
           </div>
@@ -242,7 +242,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               </div>
               <h4 className="text-xl font-bold text-black dark:text-white">Permohonan Geran Diterima!</h4>
               <p className="text-sm text-black dark:text-white max-w-md mx-auto leading-relaxed">
-                Terima kasih, <strong>{userProfile?.fullName || user?.displayName || 'Usahawan Belia'}</strong>. Permohonan anda bagi <strong>{programTitle}</strong> bernilai <strong>{grantAmount}</strong> telah direkodkan. Urusetia akan menghubungi anda melalui WhatsApp untuk pengesahan dokumen.
+                Terima kasih, <strong>{userProfile?.fullName || user?.displayName || 'Usahawan Belia'}</strong>. Permohonan anda bagi <strong>{programTitle}</strong> bernilai <strong>{grantAmount}</strong> telah direkodkan. Pihak pentadbir akan menghubungi anda melalui WhatsApp untuk pengesahan dokumen.
               </p>
               <div className="pt-3">
                 <button
@@ -304,7 +304,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                         className={`p-4 rounded-xl text-left border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                           isSelected
                             ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 ring-1 ring-blue-500/30 shadow-xs'
-                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-600'
+                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-500'
                         }`}
                       >
                         <div className="space-y-1">
@@ -321,7 +321,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                           </p>
                         </div>
 
-                        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200 dark:border-slate-700">
+                        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-300 dark:border-slate-600">
                           <span className="text-base sm:text-lg font-black text-black dark:text-white/75 tabular-nums">
                             {pkg.amount}
                           </span>
@@ -340,7 +340,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               </div>
 
               {/* Accordion: Syarat Kelayakan & Senarai Semak */}
-              <div className="bg-slate-50 dark:bg-slate-900 p-4.5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div className="bg-slate-50 dark:bg-slate-900 p-4.5 rounded-xl border border-slate-300 dark:border-slate-600">
                 <div className="flex items-center gap-2 mb-3">
                   <HelpCircle className="w-4 h-4 text-black dark:text-white/75" />
                   <span className="text-xs sm:text-sm font-semibold text-black dark:text-white">
@@ -393,7 +393,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                         if (fieldErrors.businessName) setFieldErrors(prev => ({ ...prev, businessName: '' }));
                       }}
                       className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border ${
-                        fieldErrors.businessName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-200 dark:border-slate-700 focus:bg-white focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
+                        fieldErrors.businessName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:bg-white focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
                       } text-black dark:text-white font-medium focus:outline-none focus:ring-2 transition-all`}
                     />
                     {fieldErrors.businessName && (
@@ -411,7 +411,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                     <select
                       value={businessCategory}
                       onChange={(e) => setBusinessCategory(e.target.value as BusinessCategory)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       {CATEGORIES.map((c) => (
                         <option key={c} value={c} className="dark:bg-slate-900">{c}</option>
@@ -428,7 +428,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                     <select
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       <option value="Kota Bharu" className="dark:bg-slate-900">Kota Bharu</option>
                       <option value="Bachok" className="dark:bg-slate-900">Bachok</option>
@@ -452,7 +452,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                       placeholder="Cth: 202403123456 (TR0294811-M)"
                       value={ssmNumber}
                       onChange={(e) => setSsmNumber(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -466,7 +466,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                     <select
                       value={bankName}
                       onChange={(e) => setBankName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       {BANKS.map((bank) => (
                         <option key={bank} value={bank} className="dark:bg-slate-900">{bank}</option>
@@ -488,7 +488,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                         if (fieldErrors.bankAccountNumber) setFieldErrors(prev => ({ ...prev, bankAccountNumber: '' }));
                       }}
                       className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border ${
-                        fieldErrors.bankAccountNumber ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
+                        fieldErrors.bankAccountNumber ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
                       } text-black dark:text-white focus:outline-none focus:ring-2 transition-all`}
                     />
                     {fieldErrors.bankAccountNumber && (
@@ -516,7 +516,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                     if (fieldErrors.fundPurpose) setFieldErrors(prev => ({ ...prev, fundPurpose: '' }));
                   }}
                   className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border ${
-                    fieldErrors.fundPurpose ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-200 dark:border-slate-700 focus:bg-white focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
+                    fieldErrors.fundPurpose ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:bg-white focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
                   } text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 transition-all`}
                 />
                 {fieldErrors.fundPurpose && (
@@ -528,17 +528,17 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               </div>
 
               {/* Auto-filled Identity Chip */}
-              <div className="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs text-black dark:text-white/75">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-300 dark:border-slate-600 flex items-center justify-between text-xs text-black dark:text-white/75">
                 <span>Pemohon Berdaftar: <strong className="text-black dark:text-white">{userProfile?.fullName || user?.displayName || 'Usahawan Belia'}</strong></span>
-                <span>Emel Urusetia: <strong className="text-black dark:text-white">{user?.email || 'N/A'}</strong></span>
+                <span>Emel Akaun: <strong className="text-black dark:text-white">{user?.email || 'N/A'}</strong></span>
               </div>
 
               {/* Action Buttons Footer */}
-              <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                 >
                   Batal
                 </button>

@@ -60,7 +60,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
-      <div className="relative w-full max-w-3xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col transition-colors">
+      <div className="relative w-full max-w-3xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col transition-colors">
         
         {/* Banner with close button */}
         <div className="relative h-40 sm:h-48 bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden">
@@ -84,7 +84,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             <span className="px-3 py-1 rounded text-xs font-bold bg-amber-100 text-black border border-amber-200 shadow-xs">
               {business.category}
             </span>
-            <span className="px-3 py-1 rounded text-xs font-semibold bg-white/95 text-black border border-slate-200 shadow-xs">
+            <span className="px-3 py-1 rounded text-xs font-semibold bg-white text-black border border-slate-300 shadow-xs">
               Jajahan {business.district}
             </span>
           </div>
@@ -93,7 +93,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
           <button
             type="button"
             onClick={handleShare}
-            className="absolute bottom-3 right-4 p-2 rounded-xl bg-white/90 hover:bg-white text-black border border-slate-200 shadow-xs transition-colors flex items-center gap-1.5 text-xs font-semibold z-20 cursor-pointer"
+            className="absolute bottom-3 right-4 p-2 rounded-xl bg-white hover:bg-white text-black border border-slate-300 shadow-xs transition-colors flex items-center gap-1.5 text-xs font-semibold z-20 cursor-pointer"
           >
             <Share2 className="w-4 h-4 text-black dark:text-white" />
             <span>Kongsi</span>
@@ -104,13 +104,13 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
           
           {/* Header info with logo - Clean non-overlapping layout */}
-          <div className="relative pb-5 border-b border-slate-200 dark:border-slate-700 space-y-3">
+          <div className="relative pb-5 border-b border-slate-300 dark:border-slate-600 space-y-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
                 <img
                   src={business.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                   alt={business.businessName}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs object-cover bg-white dark:bg-slate-900 shrink-0"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs object-cover bg-white dark:bg-slate-900 shrink-0"
                 />
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight leading-tight">
@@ -158,7 +158,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             <h4 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider mb-2">
               Tentang Perniagaan & Produk:
             </h4>
-            <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+            <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-300 dark:border-slate-600">
               {business.description}
             </p>
           </div>
@@ -180,7 +180,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                 href={`https://instagram.com/${business.instagram.replace('@', '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 py-3 px-4 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white text-xs font-semibold transition-colors border border-slate-200 dark:border-slate-700"
+                className="flex items-center gap-1.5 py-3 px-4 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white text-xs font-semibold transition-colors border border-slate-300 dark:border-slate-600"
               >
                 <Instagram className="w-4 h-4 text-black dark:text-white/75" />
                 <span>{business.instagram}</span>
@@ -192,7 +192,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                 href={`https://tiktok.com/@${business.tiktok.replace('@', '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 py-3 px-4 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white text-xs font-semibold transition-colors border border-slate-200 dark:border-slate-700"
+                className="flex items-center gap-1.5 py-3 px-4 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white text-xs font-semibold transition-colors border border-slate-300 dark:border-slate-600"
               >
                 <span>TikTok: {business.tiktok}</span>
               </a>
@@ -209,7 +209,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             </div>
 
             {businessProducts.length === 0 ? (
-              <div className="p-6 text-center bg-slate-50 dark:bg-slate-900 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 text-xs text-black/70 dark:text-white/75">
+              <div className="p-6 text-center bg-slate-50 dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-xs text-black/70 dark:text-white/75">
                 Usahawan belum menyenaraikan item produk berasingan. Anda boleh terus hubungi via WhatsApp di atas.
               </div>
             ) : (
@@ -217,7 +217,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                 {businessProducts.map((prod) => (
                   <div
                     key={prod.id}
-                    className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xs hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all flex gap-3"
+                    className="p-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl shadow-2xs hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all flex gap-3"
                   >
                     <img
                       src={prod.imageUrl}

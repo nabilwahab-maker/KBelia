@@ -63,7 +63,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
       }}
     >
       <div
-        className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-amber-400/50 dark:border-zinc-700 shadow-2xl p-6 sm:p-7 text-center transition-colors"
+        className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-amber-400/50 dark:border-zinc-600 shadow-2xl p-6 sm:p-7 text-center transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button Top-Right */}
@@ -113,7 +113,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
             type="button"
             disabled={isDeleting}
             onClick={onCancel}
-            className="w-full sm:w-1/2 min-h-[42px] px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-black dark:text-white text-sm font-bold border border-slate-300 dark:border-zinc-700 transition-colors cursor-pointer disabled:opacity-50"
+            className="w-full sm:w-1/2 min-h-[42px] px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-300 dark:bg-zinc-600 dark:hover:bg-zinc-700 text-black dark:text-white text-sm font-bold border border-slate-300 dark:border-zinc-600 transition-colors cursor-pointer disabled:opacity-50"
           >
             {resolvedCancel}
           </button>

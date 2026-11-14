@@ -127,11 +127,11 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[92vh] overflow-hidden flex flex-col"
+        className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 scale-100 transition-all max-h-[92vh] overflow-hidden flex flex-col"
         role="dialog"
         aria-modal="true"
       >
-        <div className="kbelia-important-header px-6 sm:px-8 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
+        <div className="kbelia-important-header px-6 sm:px-8 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-300 dark:border-slate-600 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200 dark:border-indigo-800/70 shrink-0">
               <FileText className="w-5 h-5" />
@@ -157,8 +157,8 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
         <div className="p-6 sm:p-8 pt-5 overflow-y-auto flex-1">
 
         {/* Agreement Document Content */}
-        <div ref={agreementRef} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-black dark:text-white space-y-4 max-h-64 overflow-y-auto font-serif leading-relaxed">
-          <div className="text-center pb-2 border-b border-slate-200 dark:border-slate-700">
+        <div ref={agreementRef} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-xs text-black dark:text-white space-y-4 max-h-64 overflow-y-auto font-serif leading-relaxed">
+          <div className="text-center pb-2 border-b border-slate-300 dark:border-slate-600">
             <h4 className="font-bold text-sm text-black dark:text-white uppercase font-sans">
               PERJANJIAN PENYEWAAN KIOSK KAPSUL USAHAWAN BELIA
             </h4>
@@ -181,7 +181,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
         </div>
 
         {/* Signature Area */}
-        <div className="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <div className="mt-5 pt-4 border-t border-slate-300 dark:border-slate-600">
           {!isSigned ? (
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -205,7 +205,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                 </button>
               </div>
 
-              <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 p-1 flex justify-center">
+              <div className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-white dark:bg-slate-900 p-1 flex justify-center">
                 <canvas
                   ref={canvasRef}
                   width={480}
@@ -258,7 +258,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                       setTimeout(() => setIsDownloaded(false), 2500);
                     }
                   }}
-                  className="py-2 px-3.5 rounded-xl text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="py-2 px-3.5 rounded-xl text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
                   title="Muat turun salinan perjanjian"
                 >
                   <Download className="w-3.5 h-3.5 text-black dark:text-white/75" />
@@ -290,7 +290,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2 px-4 rounded-xl text-xs font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  className="py-2 px-4 rounded-xl text-xs font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   Selesai
                 </button>

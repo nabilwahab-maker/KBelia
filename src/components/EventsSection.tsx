@@ -21,6 +21,8 @@ import {
 import { KelantanDistrict } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { showToast } from './ToastNotification';
+import { PortalImage } from './PortalImage';
+import { resolveEventImage } from '../utils/visualAssets';
 
 interface YouthEvent {
   id: string;
@@ -36,6 +38,7 @@ interface YouthEvent {
   fee: string;
   description: string;
   whatsappContact: string;
+  imageUrl?: string;
 }
 
 const SAMPLE_EVENTS: YouthEvent[] = [
@@ -47,10 +50,10 @@ const SAMPLE_EVENTS: YouthEvent[] = [
     time: '10.00 PG - 11.00 MLM',
     district: 'Kota Bharu',
     location: 'Dataran Muhammadi & Perkarangan Stadium Sultan Muhammad IV',
-    organizer: 'Urusetia Belia & Sukan Negeri Kelantan',
+    organizer: 'Pihak Penganjur Belia & Sukan Kelantan',
     boothsAvailable: 8,
     totalBooths: 40,
-    fee: 'Percuma (Tajaan Penuh Urusetia)',
+    fee: 'Percuma (Tajaan Penuh Penganjur)',
     description: 'Peluang jualan mega terbuka untuk 40 usahawan makanan tradisi, batik kontemporari, dan kraf belia dengan sasaran 20,000 pengunjung.',
     whatsappContact: '601120508890'
   },
@@ -81,7 +84,7 @@ const SAMPLE_EVENTS: YouthEvent[] = [
     boothsAvailable: 4,
     totalBooths: 12,
     fee: 'Percuma (Atas Jemputan)',
-    description: 'Sesi perbentangan 5-minit pitch di hadapan panel dana benih MARA, TEKUN, dan angel investor untuk pembiayaan sehingga RM50,000.',
+    description: 'Sesi pembentangan 5-minit pitch di hadapan panel geran permulaan MARA, TEKUN, dan pelabur untuk pembiayaan sehingga RM50,000.',
     whatsappContact: '60133445566'
   }
 ];
@@ -144,7 +147,7 @@ export const EventsSection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Banner (Important Header) */}
-      <div className="kbelia-important-header dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-xs relative overflow-hidden">
+      <div className="kbelia-important-header dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-300 dark:border-slate-600 shadow-xs relative overflow-hidden">
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white text-xs font-bold mb-3 border border-amber-200 dark:border-amber-800/70">
             <Calendar className="w-3.5 h-3.5" />
@@ -162,7 +165,7 @@ export const EventsSection: React.FC = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="relative w-full md:w-72">
           <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
@@ -170,7 +173,7 @@ export const EventsSection: React.FC = () => {
             placeholder={isEn ? 'Search event, venue, organizer...' : 'Cari acara, lokasi, penganjur...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
           />
         </div>
 
@@ -179,7 +182,7 @@ export const EventsSection: React.FC = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
           >
             <option value="all">{isEn ? 'All Event Types' : 'Semua Kategori'}</option>
             <option value="karnival">{isEn ? 'Carnivals & Expos' : 'Karnival Jualan'}</option>
@@ -192,7 +195,7 @@ export const EventsSection: React.FC = () => {
           <select
             value={selectedDistrict}
             onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
           >
             <option value="all">{isEn ? 'Across Kelantan' : 'Seluruh Kelantan'}</option>
             <option value="Kota Bharu">Kota Bharu</option>
@@ -217,53 +220,64 @@ export const EventsSection: React.FC = () => {
           return (
             <div
               key={evt.id}
-              className="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-200 dark:border-slate-700 shadow-xs flex flex-col justify-between hover:shadow-md hover:border-blue-400/70 transition-all relative"
+              className="bg-white dark:bg-slate-800 rounded-3xl p-4 sm:p-5 border border-slate-300 dark:border-slate-600 shadow-xs flex flex-col sm:flex-row gap-4 items-stretch hover:shadow-md hover:border-blue-400/70 transition-all relative"
             >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-50 text-black dark:bg-amber-950/60 dark:text-white border border-amber-200 dark:border-amber-800/70">
-                    {evt.category}
-                  </span>
-                  <span className="text-[11px] font-bold text-black dark:text-white/75">
-                    {evt.fee}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-extrabold text-black dark:text-white leading-snug">
-                    {evt.title}
-                  </h3>
-                  <div className="text-[11px] text-black/70 dark:text-white/75 font-medium mt-0.5">
-                    {isEn ? 'Organized by:' : 'Anjuran:'} {evt.organizer}
-                  </div>
-                </div>
-
-                <p className="text-xs text-black dark:text-white leading-relaxed line-clamp-2">
-                  {evt.description}
-                </p>
-
-                <div className="space-y-1.5 pt-2 text-xs text-black/70 dark:text-white/75">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                    <span className="font-semibold text-black dark:text-white">{evt.date}</span>
-                    <span className="text-black/35 dark:text-white/35">•</span>
-                    <span>{evt.time}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                    <span className="truncate">{evt.location} ({evt.district})</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Store className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                    <span>
-                      {evt.boothsAvailable} {isEn ? 'stalls available left' : 'tapak niaga masih kosong'} ({isEn ? 'out of' : 'daripada'} {evt.totalBooths})
-                    </span>
-                  </div>
-                </div>
+              <div className="w-full sm:w-44 md:w-48 shrink-0 aspect-[4/3] sm:aspect-auto sm:min-h-[180px] rounded-2xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
+                <PortalImage
+                  src={resolveEventImage(evt.category, evt.imageUrl)}
+                  alt={evt.title}
+                  fallbackType="event"
+                  fallbackLabel={evt.category}
+                  className="w-full h-full object-cover"
+                />
               </div>
 
+              <div className="flex-1 min-w-0 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-50 text-black dark:bg-amber-950/60 dark:text-white border border-amber-200 dark:border-amber-800/70">
+                      {evt.category}
+                    </span>
+                    <span className="text-[11px] font-bold text-black dark:text-white/75 text-right">
+                      {evt.fee}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-extrabold text-black dark:text-white leading-snug">
+                      {evt.title}
+                    </h3>
+                    <div className="text-[11px] text-black/70 dark:text-white/75 font-medium mt-0.5">
+                      {isEn ? 'Organized by:' : 'Anjuran:'} {evt.organizer}
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-black dark:text-white leading-relaxed line-clamp-2">
+                    {evt.description}
+                  </p>
+
+                  <div className="space-y-1.5 pt-2 text-xs text-black/70 dark:text-white/75">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                      <span className="font-semibold text-black dark:text-white">{evt.date}</span>
+                      <span className="text-black/35 dark:text-white/35">•</span>
+                      <span>{evt.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                      <span className="truncate">{evt.location} ({evt.district})</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Store className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                      <span>
+                        {evt.boothsAvailable} {isEn ? 'stalls available left' : 'tapak niaga masih kosong'} ({isEn ? 'out of' : 'daripada'} {evt.totalBooths})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
               {/* Action Buttons */}
-              <div className="pt-4 mt-4 border-t border-slate-200/80 dark:border-slate-700 flex items-center gap-2">
+              <div className="pt-4 mt-4 border-t border-slate-300 dark:border-slate-600 flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => !isBooked && handleBookBooth(evt.id, evt.title)}
@@ -301,14 +315,15 @@ export const EventsSection: React.FC = () => {
                 )}
 
                 <a
-                  href={`https://wa.me/${evt.whatsappContact}?text=Salam%20Urusetia,%20saya%20berminat%20dengan%20${encodeURIComponent(evt.title)}`}
+                  href={`https://wa.me/${evt.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(evt.title)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 dark:border-slate-700 transition-colors"
-                  title="WhatsApp Urusetia"
+                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 transition-colors"
+                  title="WhatsApp Penganjur"
                 >
                   <MessageCircle className="w-4 h-4 text-black dark:text-white/75" />
                 </a>
+              </div>
               </div>
             </div>
           );
@@ -319,7 +334,7 @@ export const EventsSection: React.FC = () => {
       {eventToCancel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
           <div 
-            className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 animate-in zoom-in-95 duration-200"
+            className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-2xl border border-slate-300 dark:border-slate-600 space-y-4 animate-in zoom-in-95 duration-200"
             role="dialog"
             aria-modal="true"
           >
@@ -339,7 +354,7 @@ export const EventsSection: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs space-y-1.5">
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-xs space-y-1.5">
               <div className="flex justify-between">
                 <span className="text-black/70 dark:text-white/75">{isEn ? 'Event:' : 'Acara:'}</span>
                 <span className="font-bold text-black dark:text-white truncate max-w-[200px]">{eventToCancel.title}</span>
@@ -358,7 +373,7 @@ export const EventsSection: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setEventToCancel(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
               >
                 {isEn ? 'Keep Registration' : 'Kekalkan Pendaftaran'}
               </button>

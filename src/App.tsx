@@ -191,7 +191,7 @@ function MainApp() {
   const [selectedBusinessForDetail, setSelectedBusinessForDetail] = useState<BusinessListing | null>(null);
   const [isBusinessDetailModalOpen, setIsBusinessDetailModalOpen] = useState(false);
   const [isGrantModalOpen, setIsGrantModalOpen] = useState(false);
-  const [selectedGrantTitle, setSelectedGrantTitle] = useState('Dana Benih Usahawan Belia Kelantan (RM3,000)');
+  const [selectedGrantTitle, setSelectedGrantTitle] = useState('Geran Permulaan Usahawan Belia Kelantan (RM3,000)');
   const [selectedGrantAmount, setSelectedGrantAmount] = useState('RM3,000');
   const [isOfferLetterOpen, setIsOfferLetterOpen] = useState(false);
   const [selectedBookingForOffer, setSelectedBookingForOffer] = useState<CapsuleBooking | null>(null);
@@ -413,7 +413,13 @@ function MainApp() {
           const data = docSnap.data();
           const seedSlot = INITIAL_CAPSULE_SLOTS.find(s => s.id === docSnap.id);
           const rawImg = normalizeAsset(data.imageUrl);
-          const imageUrl = (!rawImg || rawImg.includes('kiosk_modular_kbelia'))
+          const isLegacyImage =
+            !rawImg ||
+            rawImg.includes('kiosk_modular_kbelia') ||
+            rawImg.includes('madu_kelulut_rimba') ||
+            rawImg.includes('wau_bulan_kelantan') ||
+            rawImg.includes('keropok_lekor_kelantan');
+          const imageUrl = isLegacyImage
             ? (seedSlot?.imageUrl || rawImg || '/assets/generated/kiosk_modular_kbelia.jpg')
             : rawImg;
           loaded.push({
@@ -617,7 +623,13 @@ function MainApp() {
       (snapshot) => {
         const loaded: YouthProgram[] = [];
         snapshot.forEach((docSnap) => {
-          loaded.push({ id: docSnap.id, ...docSnap.data() } as YouthProgram);
+          const data = docSnap.data();
+          const seedProg = INITIAL_PROGRAMS.find(p => p.id === docSnap.id);
+          loaded.push({
+            id: docSnap.id,
+            ...data,
+            imageUrl: normalizeAsset(data.imageUrl, seedProg?.imageUrl)
+          } as YouthProgram);
         });
         firestoreProg = loaded;
         recomputeProg();
@@ -1237,7 +1249,7 @@ function MainApp() {
   // 0. STANDALONE LANDING PAGE (Welcoming homepage on initial link load)
   if (activeTab === 'landing') {
     return (
-      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
         <TopProgressBar />
         <LandingPage
           setActiveTab={setActiveTab}
@@ -1285,7 +1297,7 @@ function MainApp() {
   // 1. STANDALONE LOGIN PAGE (Separated from dashboard)
   if (activeTab === 'login') {
     return (
-      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
         <LoginPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -1315,7 +1327,7 @@ function MainApp() {
   // 1b. STANDALONE REGISTER PAGE (Dedicated Laman Pendaftaran Usahawan Belia)
   if (activeTab === 'register') {
     return (
-      <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
         <RegisterPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
@@ -1343,7 +1355,7 @@ function MainApp() {
   }
 
   return (
-    <div className="h-screen bg-slate-50/50 dark:bg-zinc-950 flex flex-col text-black dark:text-white font-sans antialiased transition-colors duration-200 overflow-hidden">
+    <div className="h-screen bg-slate-50 dark:bg-zinc-950 flex flex-col text-black dark:text-white font-sans antialiased transition-colors duration-200 overflow-hidden">
       <TopProgressBar />
       {/* 1. TOP HEADER BAR */}
       <UMKHeader
@@ -1399,7 +1411,7 @@ function MainApp() {
         />
 
         {/* Center/Right Dynamic Body */}
-        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3.5 lg:p-4 w-full max-w-none min-w-0 scroll-smooth bg-slate-50/50 dark:bg-zinc-950 bg-grid-pattern">
+        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3.5 lg:p-4 w-full max-w-none min-w-0 scroll-smooth bg-slate-50 dark:bg-zinc-950 bg-grid-pattern">
           
           {/* Portal Maintenance / Announcement Bar from Admin Settings */}
           {portalSettings.systemStatus === 'maintenance' && !isAdmin && (
@@ -1424,7 +1436,7 @@ function MainApp() {
             <>
               {/* 1. ADMIN DASHBOARD VIEW */}
               {isAdmin && (
-                <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
                   <AdminDashboard
                     slots={enrichedSlots}
                     businesses={businesses}
@@ -1446,7 +1458,7 @@ function MainApp() {
 
               {/* 2. MENTOR DASHBOARD VIEW */}
               {isMentor && (
-                <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
                   <MentorPortal
                     mentors={mentors}
                     registrations={scopedMentorRegistrations}
@@ -1460,7 +1472,7 @@ function MainApp() {
 
               {/* 3. YOUTH ENTREPRENEUR DASHBOARD VIEW */}
               {isYouth && (
-                <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
                   <MerchantPortal
                     myBusiness={myBusiness}
                     myProducts={myProducts}
@@ -1496,14 +1508,14 @@ function MainApp() {
           {/* KAPSUL NIAGA VIEW (Strictly Belia / Admin Monitoring Only - Blocked for Mentor) */}
           {activeTab === 'academic' && (
             isMentor ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Kapsul Niaga Disekat</h3>
+                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Kiosk Belia Disekat</h3>
                   <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
-                    Akaun Mentor bertauliah dihadkan kepada portal bimbingan, perakuan geran, dan log jurnal mentee sahaja tanpa capaian modul sewaan kiosk belia.
+                    Akaun Mentor dihadkan kepada portal bimbingan, surat sokongan geran, dan rekod sesi usahawan sahaja tanpa capaian modul sewaan kiosk.
                   </p>
                 </div>
                 <button
@@ -1516,8 +1528,8 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
-                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200/80 dark:border-zinc-800">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-300 dark:border-zinc-600">
                   <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
                     <Building2 className="w-4 h-4" />
                     <span>{t('tab_kiosk_title')}</span>
@@ -1550,7 +1562,7 @@ function MainApp() {
           {/* DIREKTORI USAHAWAN KELANTAN (Belia / Admin Audit Only - Blocked for Mentor) */}
           {activeTab === 'hepa' && (
             isMentor ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1570,8 +1582,8 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
-                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200/80 dark:border-zinc-800">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-300 dark:border-zinc-600">
                   <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
                     <Store className="w-4 h-4" />
                     <span>{t('tab_directory_title')}</span>
@@ -1596,7 +1608,7 @@ function MainApp() {
           {/* GERAN & DANA BELIA (Belia / Admin Monitoring Only - Blocked for Mentor) */}
           {activeTab === 'ceed' && (
             isMentor ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1616,8 +1628,8 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
-                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-200/80 dark:border-zinc-800">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-300 dark:border-zinc-600">
                   <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
                     <Award className="w-4 h-4" />
                     <span>{t('tab_grants_title')}</span>
@@ -1643,7 +1655,7 @@ function MainApp() {
           {/* JADUAL ACARA & KARNIVAL BELIA (Strictly Youth Portal Only) */}
           {activeTab === 'events' && (
             !isYouth ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1662,7 +1674,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
                 <EventsSection />
               </div>
             )
@@ -1671,7 +1683,7 @@ function MainApp() {
           {/* RUANG IKLAN & PELUANG NIAGA BELIA (Strictly Youth Portal Only) */}
           {activeTab === 'b2b' && (
             !isYouth ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1690,7 +1702,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
                 <B2BMarketSection />
               </div>
             )
@@ -1699,7 +1711,7 @@ function MainApp() {
           {/* KALKULATOR KELAYAKAN GERAN & PEMBIAYAAN (Strictly Youth Portal Only) */}
           {activeTab === 'calculator' && (
             !isYouth ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1718,7 +1730,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
                 <GrantCalculatorSection 
                   onOpenGrantModal={handleOpenGrantModal}
                   onOpenMentorship={handleOpenMentorshipClinicGuarded}
@@ -1730,7 +1742,7 @@ function MainApp() {
           {/* PENTADBIRAN (ADMIN - STRICTLY ADMIN ROLE ONLY) */}
           {activeTab === 'admin' && (
             !isAdmin ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
@@ -1740,7 +1752,7 @@ function MainApp() {
                   </h3>
                   <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {isMentor 
-                      ? 'Akaun anda adalah Mentor Bertauliah. Modul kawalan pentadbir sistem dikhaskan kepada pihak urus setia kerajaan.'
+                      ? 'Akaun anda adalah akaun Mentor. Modul kawalan pentadbir sistem hanya dikhaskan kepada pihak pentadbir KBelia.'
                       : 'Halaman ini dikhaskan kepada Pentadbir Sistem Kerajaan Negeri & UMK.'}
                   </p>
                 </div>
@@ -1754,7 +1766,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
                 <AdminDashboard
                   slots={enrichedSlots}
                   businesses={businesses}
@@ -1778,18 +1790,18 @@ function MainApp() {
           {/* PORTAL MENTOR: HAB BIMBINGAN (STRICT ROLE GUARD - MENTOR ONLY) */}
           {activeTab === 'mentor' && (
             !isMentor ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black dark:text-white">
-                    {language === 'en' ? 'Certified Mentor Access Only' : 'Akses Khusus Mentor Bertauliah Sahaja'}
+                    {language === 'en' ? 'Certified Mentor Access Only' : 'Akses Khusus Mentor Sahaja'}
                   </h3>
                   <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {isAdmin
                       ? 'Akaun Pentadbir menggunakan modul Panel Mentor di Pusat Kawalan Pentadbir untuk melantik serta memantau mentor, manakala ruang bimbingan ini dikhaskan kepada Mentor sahaja.'
-                      : 'Hab Bimbingan Mentor dikhaskan kepada panel mentor bertauliah UMK & agensi keusahawanan.'}
+                      : 'Hab Bimbingan Mentor dikhaskan kepada panel mentor rasmi UMK & agensi keusahawanan.'}
                   </p>
                 </div>
                 <button
@@ -1802,7 +1814,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
                 <MentorPortal
                   mentors={mentors}
                   registrations={scopedMentorRegistrations}
@@ -1818,7 +1830,7 @@ function MainApp() {
           {/* MERCHANT PORTAL: BISNES SAYA (KHUSUS BELIA) */}
           {activeTab === 'merchant' && (
             isAdmin ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
@@ -1842,7 +1854,7 @@ function MainApp() {
                 </button>
               </div>
             ) : isMentor ? (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
@@ -1866,7 +1878,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
                 <MerchantPortal
                   myBusiness={myBusiness}
                   myProducts={myProducts}
@@ -1900,7 +1912,7 @@ function MainApp() {
 
           {/* DEDICATED NEWS PAGE (Accessible to All Logged-In Roles, Controlled by Admin) */}
           {activeTab === 'news' && (
-            <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
               <NewsPage
                 newsItems={newsItems}
                 onRefresh={triggerRefresh}
@@ -1918,7 +1930,7 @@ function MainApp() {
 
           {/* TETAPAN AKAUN & PROFIL */}
           {activeTab === 'settings' && (
-            <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-b-2xl rounded-t-none border border-t-0 border-slate-200/80 dark:border-zinc-800 p-4 sm:p-6 shadow-sm transition-colors">
+            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
               <SettingsPage
                 myBusiness={myBusiness}
                 onRefresh={triggerRefresh}

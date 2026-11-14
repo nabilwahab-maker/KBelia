@@ -97,7 +97,7 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex items-start justify-between gap-4 mb-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-start justify-between gap-4 mb-4 pb-4 border-b border-slate-300 dark:border-slate-600">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-black dark:text-white/75 flex items-center justify-center border border-amber-300/40 shrink-0">
               <Network className="w-5 h-5" />
@@ -164,7 +164,7 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
 
         {/* Add Listing Form */}
         {isAdding && (
-          <form onSubmit={handleAddListing} className="p-4 rounded-2xl bg-slate-50 dark:bg-[#242D3B] border border-slate-200 dark:border-slate-750 mb-5 space-y-3 text-xs animate-in fade-in">
+          <form onSubmit={handleAddListing} className="p-4 rounded-2xl bg-slate-50 dark:bg-[#242D3B] border border-slate-300 dark:border-slate-750 mb-5 space-y-3 text-xs animate-in fade-in">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="font-semibold block mb-1 text-black dark:text-white">
@@ -173,7 +173,7 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
                 <select
                   value={newType}
                   onChange={(e) => setNewType(e.target.value as any)}
-                  className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#1E2530] border border-slate-200 dark:border-slate-700 text-black dark:text-white"
+                  className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#1E2530] border border-slate-300 dark:border-slate-600 text-black dark:text-white"
                 >
                   <option value="demand">{language === 'en' ? 'Seeking Supplies / Materials' : 'Mencari Bahan / Pembekal'}</option>
                   <option value="supply">{language === 'en' ? 'Supplying Stock / Products' : 'Membekal Stok / Produk'}</option>
@@ -186,7 +186,7 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
                 <select
                   value={newDistrict}
                   onChange={(e) => setNewDistrict(e.target.value as any)}
-                  className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#1E2530] border border-slate-200 dark:border-slate-700 text-black dark:text-white"
+                  className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#1E2530] border border-slate-300 dark:border-slate-600 text-black dark:text-white"
                 >
                   <option value="Kota Bharu">Kota Bharu</option>
                   <option value="Bachok">Bachok</option>
@@ -212,7 +212,7 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
                 placeholder={language === 'en' ? 'e.g. Seeking fresh organic Robusta coffee beans...' : 'Contoh: Mencari pembekal biji kopi sangai Robusta segar...'}
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#1E2530] border border-slate-200 dark:border-slate-700 text-black dark:text-white"
+                className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#1E2530] border border-slate-300 dark:border-slate-600 text-black dark:text-white"
               />
             </div>
 
@@ -226,7 +226,7 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
                 placeholder={language === 'en' ? 'Specify estimated quantity, target price, delivery frequency...' : 'Nyatakan anggaran kuantiti, harga sasaran, kekerapan penghantaran...'}
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
-                className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#1E2530] border border-slate-200 dark:border-slate-700 text-black dark:text-white"
+                className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-[#1E2530] border border-slate-300 dark:border-slate-600 text-black dark:text-white"
               />
             </div>
 
@@ -253,7 +253,7 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
           {filtered.map((item) => (
             <div
               key={item.id}
-              className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#1E2530] hover:border-amber-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between"
+              className="p-4 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#1E2530] hover:border-amber-300 dark:hover:border-slate-500 transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -279,7 +279,7 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+              <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-xs">
                 <span className="text-black/70 dark:text-white/75 font-medium">
                   {item.authorBusiness} ({item.authorName})
                 </span>

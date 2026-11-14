@@ -1,10 +1,17 @@
 import { BusinessListing, CapsuleSlot, ProductItem, YouthProgram } from '../types';
+import {
+  kioskAgrotekImg,
+  kioskKrafBatikImg,
+  kioskKulinariImg,
+  programGeranInkubasiImg,
+  acaraKarnivalBeliaImg
+} from '../utils/visualAssets';
 
 export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-umk-01',
     code: 'CAP-UMK-01',
-    name: 'Kapsul Inkubator F&B A1',
+    name: 'Kiosk Inkubator F&B A1',
     hubLocation: 'Hub UMK Kampus Bachok (Zon Keusahawanan)',
     district: 'Bachok',
     size: '10ft x 10ft Smart Kiosk',
@@ -20,7 +27,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-kb-01',
     code: 'CAP-KB-01',
-    name: 'Kapsul Niaga KB Sentral B1',
+    name: 'Kiosk Belia KB Sentral B1',
     hubLocation: 'Pusat Transformasi Belia Kota Bharu (KB Sentral)',
     district: 'Kota Bharu',
     size: '12ft x 10ft Commercial Pod',
@@ -36,7 +43,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-jeli-01',
     code: 'CAP-JELI-01',
-    name: 'Kapsul Agrotek & Produk Lokal C1',
+    name: 'Kiosk Agrotek & Produk Lokal C1',
     hubLocation: 'Hub Komuniti Keusahawanan Jeli (UMK Jeli)',
     district: 'Jeli',
     size: '10ft x 10ft Eco Pod',
@@ -44,14 +51,14 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     dailyRate: 14,
     status: 'available',
     amenities: ['Chiller & Ruang Simpanan Sejuk', 'Palam Kuasa 13A', 'WiFi Komuniti', 'Rak Paparan Buluh Moden', 'Bantuan Logistik'],
-    imageUrl: '/assets/generated/madu_kelulut_rimba.jpg',
+    imageUrl: kioskAgrotekImg,
     createdAt: new Date().toISOString()
   },
   // +3 Demo Capsule Slots Tambahan
   {
     id: 'cap-tumpat-01',
     code: 'CAP-TMP-01',
-    name: 'Kapsul Kraf & Batik Tumpat T1',
+    name: 'Kiosk Kraf & Batik Tumpat T1',
     hubLocation: 'Hub Kraf & Budaya Tumpat (Pantai Sri Tujoh)',
     district: 'Tumpat',
     size: '10ft x 10ft Craft Pod',
@@ -59,13 +66,13 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     dailyRate: 15,
     status: 'available',
     amenities: ['Rak Pameran Seni Kraf', 'Lampu Spotlight Galeri', 'Palam Elektrik 13A', 'WiFi Komuniti', 'Kunci Pintar'],
-    imageUrl: '/assets/generated/wau_bulan_kelantan.jpg',
+    imageUrl: kioskKrafBatikImg,
     createdAt: new Date().toISOString()
   },
   {
     id: 'cap-kb-02',
     code: 'CAP-KB-02',
-    name: 'Kapsul Kreatif & Digital KB B2',
+    name: 'Kiosk Kreatif & Digital KB B2',
     hubLocation: 'Pusat Transformasi Belia Kota Bharu (KB Sentral)',
     district: 'Kota Bharu',
     size: '10ft x 10ft Studio Pod',
@@ -81,7 +88,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-pm-01',
     code: 'CAP-PM-01',
-    name: 'Kapsul Makanan Tradisi Pasir Mas P1',
+    name: 'Kiosk Makanan Tradisi Pasir Mas P1',
     hubLocation: 'Hub Niaga Belia Bandar Pasir Mas',
     district: 'Pasir Mas',
     size: '10ft x 8ft Culinary Kiosk',
@@ -89,7 +96,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     dailyRate: 14,
     status: 'available',
     amenities: ['Saluran Air & Sinki Keluli', 'Palam Kuasa Heavy Duty', 'Kaunter Servis Hadapan', 'Ekzos Pengudaraan'],
-    imageUrl: '/assets/generated/keropok_lekor_kelantan.jpg',
+    imageUrl: kioskKulinariImg,
     createdAt: new Date().toISOString()
   }
 ];
@@ -153,7 +160,7 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     tagline: 'Solusi fotografi produk, video TikTok ads & penjenamaan bisnes belia',
     category: 'Teknologi & Servis Digital',
     district: 'Kota Bharu',
-    description: 'Agensi kreatif dipelopori belia Kelantan menawarkan servis fotografi komersil, live streaming TikTok Shop, serta pembikinan video viral promosi usahawan mikro.',
+    description: 'Agensi kreatif dipelopori belia Kelantan menawarkan servis fotografi komersial, live streaming TikTok Shop, serta pembikinan video viral promosi usahawan mikro.',
     ssmNumber: '202403445566 (KT0298112-D)',
     whatsapp: '60139988776',
     instagram: '@studiobelia.kb',
@@ -248,20 +255,21 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
 export const INITIAL_PROGRAMS: YouthProgram[] = [
   {
     id: 'prog-01',
-    title: 'Geran Pelancaran Kapsul Belia Kelantan 2026 (Fasa 2)',
+    title: 'Geran Pelancaran Kiosk Belia Kelantan 2026 (Fasa 2)',
     category: 'Geran & Dana',
     date: 'Permohonan Dibuka: 1 - 30 Setiap Bulan',
     location: 'Atas Talian / Hub UMK Bachok',
-    description: 'Bantuan subsidi sewaan kapsul niaga sehingga 50% selama 6 bulan pertama serta pembiayaan mikro permulaan RM3,000 untuk belia Kelantan berumur 18-35 tahun.',
+    description: 'Bantuan subsidi sewaan kiosk belia sehingga 50% selama 6 bulan pertama serta pembiayaan mikro permulaan RM3,000 untuk belia Kelantan berumur 18-35 tahun.',
     organizer: 'Unit Pembangunan Usahawan Belia & UMK Entrepreneurship Centre',
-    grantAmount: 'RM3,000 + Subsidi Sewa Kapsul',
+    grantAmount: 'RM3,000 + Subsidi Sewa Kiosk',
     registrationLink: '#',
+    imageUrl: programGeranInkubasiImg,
     isFeatured: true,
     createdAt: new Date().toISOString()
   },
   {
     id: 'prog-02',
-    title: 'Bengkel Pemasaran Digital & TikTok Shop Usahawan Kapsul',
+    title: 'Bengkel Pemasaran Digital & TikTok Shop Usahawan Kiosk',
     category: 'Bengkel & Latihan',
     date: 'Setiap Hari Sabtu (9:00 AM - 1:00 PM)',
     location: 'Studio Media Belia KB Sentral, Kota Bharu',
@@ -269,6 +277,7 @@ export const INITIAL_PROGRAMS: YouthProgram[] = [
     organizer: 'Komuniti Belia Kreatif Kelantan',
     grantAmount: 'Percuma (Terhad 30 Peserta)',
     registrationLink: '#',
+    imageUrl: acaraKarnivalBeliaImg,
     isFeatured: true,
     createdAt: new Date().toISOString()
   },
@@ -282,6 +291,7 @@ export const INITIAL_PROGRAMS: YouthProgram[] = [
     organizer: 'UMK Venture & Inkubator Belia Kelantan',
     grantAmount: 'Dana Padanan Sehingga RM10,000',
     registrationLink: '#',
+    imageUrl: programGeranInkubasiImg,
     isFeatured: false,
     createdAt: new Date().toISOString()
   }

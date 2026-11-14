@@ -106,7 +106,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         type="button"
         id="kbelia-notifications-bell-btn"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 sm:p-2.5 rounded-xl text-black/70 hover:text-black hover:bg-slate-50 dark:text-white/75 dark:hover:text-white dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all duration-200 cursor-pointer shadow-2xs group interactive-press hover:border-blue-400/70"
+        className="relative p-2 sm:p-2.5 rounded-xl text-black/70 hover:text-black hover:bg-slate-50 dark:text-white/75 dark:hover:text-white dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-all duration-200 cursor-pointer shadow-2xs group interactive-press hover:border-blue-400/70"
         title={`Pemberitahuan (${accountRoleLabel})`}
         aria-label="Pusat Notifikasi"
       >
@@ -125,9 +125,9 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-84 sm:w-96 rounded-2xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="absolute right-0 mt-2 w-84 sm:w-96 rounded-2xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-300 dark:border-slate-600 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
             {/* Header: Displays notification title & active account badge */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-black dark:text-white">
                   Pemberitahuan
@@ -172,7 +172,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                     className={`p-3 rounded-2xl border cursor-pointer transition-all ${
                       !n.isRead
                         ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/70 shadow-xs hover:bg-amber-100/50'
-                        : 'bg-slate-50 dark:bg-slate-900/70 border-slate-200/80 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-900'
+                        : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-900'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2 mb-1">
@@ -193,7 +193,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                       {n.message}
                     </p>
 
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/70 dark:border-slate-700 text-[10px]">
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-300 dark:border-slate-600 text-[10px]">
                       <span className={`inline-flex items-center gap-1 font-bold ${
                         isAdmin 
                           ? 'text-black dark:text-white/75'
@@ -208,7 +208,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                         ) : (
                           <User className="w-3 h-3" />
                         )}
-                        <span>{n.sender || 'Urusetia KBelia'}</span>
+                        <span>{n.sender || 'Admin KBelia'}</span>
                       </span>
 
                       {n.actionTab && (
@@ -224,7 +224,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="pt-2 border-t border-slate-200/70 dark:border-slate-700 text-center">
+            <div className="pt-2 border-t border-slate-300 dark:border-slate-600 text-center">
               <span className="text-[10px] text-black/70 dark:text-white/75">
                 Memaparkan makluman rasmi khusus untuk {accountRoleLabel.toLowerCase()}
               </span>

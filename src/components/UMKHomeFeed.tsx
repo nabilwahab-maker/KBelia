@@ -40,6 +40,8 @@ import { useLanguage } from '../context/LanguageContext';
 import { KelantanDistrictsMap } from './KelantanDistrictsMap';
 import { CommunityAnalyticsWidget } from './CommunityAnalyticsWidget';
 import { BusinessSubsidyCalculator } from './BusinessSubsidyCalculator';
+import { PortalImage } from './PortalImage';
+import { resolveSlotImage } from '../utils/visualAssets';
 
 interface UMKHomeFeedProps {
   setActiveTab: (tab: UMKTab) => void;
@@ -153,7 +155,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
     <div className="space-y-6 w-full min-w-0">
       
       {/* 1. WELCOME HEADER (TOP-LEFT SOFT SKY BLUE GRADIENT FOR IMPORTANT HEADER ONLY) */}
-      <div className="kbelia-important-header rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-700 shadow-xs relative overflow-hidden transition-all duration-300">
+      <div className="kbelia-important-header rounded-3xl p-6 sm:p-7 border border-slate-300 dark:border-slate-600 shadow-xs relative overflow-hidden transition-all duration-300">
         <div className="relative z-10 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2">
@@ -161,7 +163,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 <Sparkles className="w-3.5 h-3.5 text-black dark:text-white/75" />
                 <span>{t('portal_brand_title')}</span>
               </span>
-              <span className="px-3 py-1 rounded-lg text-[11px] font-semibold bg-slate-50 dark:bg-slate-800 text-black dark:text-white flex items-center gap-1.5 border border-slate-200 dark:border-slate-700">
+              <span className="px-3 py-1 rounded-lg text-[11px] font-semibold bg-slate-50 dark:bg-slate-800 text-black dark:text-white flex items-center gap-1.5 border border-slate-300 dark:border-slate-600">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span>{user ? (isAdmin ? t('badge_admin') : t('badge_merchant')) : t('badge_session')}</span>
               </span>
@@ -198,7 +200,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 1: Mohon Kiosk */}
           <div
             onClick={onOpenBooking}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
               <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200 dark:border-blue-800/70 group-hover:scale-105 transition-transform">
@@ -224,7 +226,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               if (onOpenGrantModal) onOpenGrantModal();
               else setActiveTab('ceed');
             }}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
               <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white flex items-center justify-center border border-amber-200 group-hover:scale-105 transition-transform">
@@ -247,7 +249,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 3: Akademi Mikro & Sijil */}
           <div
             onClick={() => onOpenAcademy && onOpenAcademy()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
               <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200 group-hover:scale-105 transition-transform">
@@ -270,7 +272,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 4: Hab Temujanji Mentor */}
           <div
             onClick={() => onOpenMentorship && onOpenMentorship()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
               <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200 group-hover:scale-105 transition-transform">
@@ -293,13 +295,13 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 5: Semakan Status Permohonan & Dokumen Tawaran */}
           <div
             onClick={() => onOpenStatusDocuments && onOpenStatusDocuments()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
               <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-200 group-hover:scale-105 transition-transform">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300">
                 {language === 'en' ? 'Offer Letter' : 'Surat Tawaran'}
               </span>
             </div>
@@ -316,7 +318,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 6: Buku Tunai & Jualan */}
           <div
             onClick={() => onOpenCashflow && onOpenCashflow()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
               <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-200 group-hover:scale-105 transition-transform">
@@ -339,7 +341,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 7: Papan Padanan Ruang Niaga */}
           <div
             onClick={() => onOpenB2B && onOpenB2B()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
               <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-200 group-hover:scale-105 transition-transform">
@@ -362,13 +364,13 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {/* Card 8: Aduan Kerosakan Kiosk */}
           <div
             onClick={() => onOpenMaintenance && onOpenMaintenance()}
-            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs hover:-translate-y-1 hover:border-blue-400/70 hover:shadow-md active:scale-[0.99] transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between relative overflow-hidden"
           >
             <div className="flex items-center justify-between mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-black dark:text-white flex items-center justify-center border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-black dark:text-white flex items-center justify-center border border-slate-300 dark:border-slate-600 group-hover:scale-105 transition-transform">
                 <Wrench className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300">
                 {language === 'en' ? 'Facilities' : 'Fasiliti'}
               </span>
             </div>
@@ -387,8 +389,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
 
       {/* 3. KAD PENJEJAK STATUS PERMOHONAN KIOSK */}
       {userBooking ? (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 sm:p-5 shadow-xs transition-all">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3.5 border-b border-slate-200 dark:border-slate-700">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-4 sm:p-5 shadow-xs transition-all">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3.5 border-b border-slate-300 dark:border-slate-600">
             {/* Left: Compact Identity */}
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/70 flex items-center justify-center shrink-0">
@@ -438,7 +440,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                     <button
                       type="button"
                       onClick={() => onOpenTenancyAgreement(userBooking)}
-                      className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <PenTool className="w-3.5 h-3.5 text-black dark:text-white" />
                       <span>{language === 'en' ? 'Agreement' : 'Perjanjian'}</span>
@@ -449,7 +451,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                     <button
                       type="button"
                       onClick={() => onOpenVerification(`KBN-${userBooking.slotCode}`)}
-                      className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white border border-slate-200 rounded-lg text-xs transition-colors cursor-pointer"
+                      className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white border border-slate-300 rounded-lg text-xs transition-colors cursor-pointer"
                       title={language === 'en' ? 'Verify QR License' : 'Sahkan Lesen QR'}
                     >
                       <QrCode className="w-4 h-4" />
@@ -459,7 +461,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               )}
 
               <a
-                href={`https://wa.me/601120508890?text=${encodeURIComponent(language === 'en' ? `Hello KBelia Secretariat, I would like to inquire about kiosk status ${userBooking.slotCode}.` : `Salam Urusetia KBelia Kelantan, saya ingin membuat pertanyaan status kiosk ${userBooking.slotCode}.`)}`}
+                href={`https://wa.me/601120508890?text=${encodeURIComponent(language === 'en' ? `Hello KBelia Admin, I would like to inquire about kiosk status ${userBooking.slotCode}.` : `Salam Admin KBelia Kelantan, saya ingin bertanya tentang status kiosk ${userBooking.slotCode}.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
@@ -471,7 +473,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenMaintenance && onOpenMaintenance()}
-                className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white border border-slate-200 rounded-lg text-xs transition-colors cursor-pointer"
+                className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white border border-slate-300 rounded-lg text-xs transition-colors cursor-pointer"
                 title={language === 'en' ? 'Facility Maintenance Report' : 'Aduan Kerosakan Fasiliti'}
               >
                 <Wrench className="w-4 h-4 text-black dark:text-white" />
@@ -527,8 +529,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
 
       {/* 3B. KAD PENJEJAK STATUS GERAN BELIA (JIKA ADA PERMOHONAN) */}
       {userGrant ? (
-        <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 shadow-xs transition-all duration-300">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-700">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-300 dark:border-slate-600 p-6 shadow-xs transition-all duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-300 dark:border-slate-600">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs dark:bg-blue-600">
                 <Award className="w-6 h-6" />
@@ -559,7 +561,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
             </div>
 
             <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-              <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200 dark:border-slate-700">
+              <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600">
                 {t('purpose_label')} {userGrant.fundPurpose?.slice(0, 30) || (language === 'en' ? 'Entrepreneur Operations' : 'Operasi Usahawan')}...
               </span>
             </div>
@@ -567,7 +569,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
 
           {/* 4-Stage Workflow Progress Indicator for Grant */}
           <div className="pt-4 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1">
+            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 space-y-1">
               <div className="h-1.5 w-full bg-emerald-500 rounded-full" />
               <div className="font-bold text-black dark:text-white/75 flex items-center gap-1 text-[11px]">
                 <Check className="w-3 h-3" />
@@ -575,7 +577,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1">
+            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 space-y-1">
               <div className={`h-1.5 w-full rounded-full ${
                 userGrant.status === 'approved' || userGrant.status === 'rejected'
                   ? 'bg-emerald-500'
@@ -587,7 +589,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1">
+            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 space-y-1">
               <div className={`h-1.5 w-full rounded-full ${
                 userGrant.status === 'approved' ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
               }`} />
@@ -597,7 +599,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1">
+            <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 space-y-1">
               <div className={`h-1.5 w-full rounded-full ${
                 userGrant.status === 'approved' ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
               }`} />
@@ -612,7 +614,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
 
       {/* Empty State when no active booking or grant */}
       {!userBooking && !userGrant && (
-        <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-300 dark:border-slate-600 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
           <div className="flex items-center gap-3.5">
             <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 flex items-center justify-center shrink-0">
               <Building2 className="w-5 h-5" />
@@ -622,7 +624,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 {language === 'en' ? 'No active applications at the moment' : 'Tiada permohonan aktif buat masa ini'}
               </div>
               <p className="text-xs text-black dark:text-white mt-0.5">
-                {language === 'en' ? 'Rent modular business spaces from RM150/month or apply for RM3,000 Youth Seed Grant.' : 'Sewa ruang niaga modular serendah RM150/bulan atau mohon Geran Benih Belia RM3,000.'}
+                {language === 'en' ? 'Rent modular business spaces from RM150/month or apply for RM3,000 Youth Seed Grant.' : 'Sewa ruang niaga modular serendah RM150/bulan atau mohon Geran Permulaan Belia RM3,000.'}
               </p>
             </div>
           </div>
@@ -666,8 +668,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       />
 
       {/* 6. JADUAL KAPSUL NIAGA TERSEDIA */}
-      <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xs overflow-hidden transition-colors">
-        <div className="bg-white dark:bg-slate-800 p-5 sm:p-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-300 dark:border-slate-600 shadow-xs overflow-hidden transition-colors">
+        <div className="bg-white dark:bg-slate-800 p-5 sm:p-6 flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
           <div>
             <h2 className="text-base font-extrabold text-black dark:text-white flex items-center gap-2">
               <span>{t('slots_list_heading')}</span>
@@ -684,7 +686,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
             onClick={() => setActiveTab('academic')}
             className="text-xs font-bold text-black dark:text-white/75 hover:underline flex items-center gap-1 cursor-pointer"
           >
-            <span>{language === 'en' ? 'Open Full Kiosk Module' : 'Buka Modul Kapsul Penuh'}</span>
+            <span>{language === 'en' ? 'Open Full Kiosk Module' : 'Lihat Semua Kiosk'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -692,7 +694,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
         <div className="overflow-x-auto w-full min-w-0 scrollbar-thin">
           <table className="w-full text-left border-collapse min-w-[540px]">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold text-black dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+              <tr className="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold text-black dark:text-white uppercase tracking-wider border-b border-slate-300 dark:border-slate-600">
                 <th className="py-3 px-4">{language === 'en' ? 'KIOSK CODE' : 'KOD KIOSK'}</th>
                 <th className="py-3 px-4">{language === 'en' ? 'LOCATION & DISTRICT' : 'LOKASI & JAJAHAN'}</th>
                 <th className="py-3 px-4">{language === 'en' ? 'MONTHLY RATE' : 'KADAR BULANAN'}</th>
@@ -700,16 +702,29 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 <th className="py-3 px-4 text-right">{language === 'en' ? 'ACTION' : 'TINDAKAN'}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200/70 dark:divide-slate-700 text-xs">
+            <tbody className="divide-y divide-slate-300 dark:divide-slate-600 text-xs">
               {filteredSlots.slice(0, 5).map((slot) => {
                 const isAvail = slot.status === 'available';
                 return (
-                  <tr key={slot.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-black dark:text-white">
-                      {slot.code}
-                      <span className="block text-[11px] font-sans font-normal text-black/70 dark:text-white/75">
-                        {slot.name}
-                      </span>
+                  <tr key={slot.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-16 h-12 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                          <PortalImage
+                            src={resolveSlotImage(slot)}
+                            alt={slot.name}
+                            fallbackType="kiosk"
+                            fallbackLabel={slot.code}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-mono font-bold text-black dark:text-white">{slot.code}</div>
+                          <span className="block text-[11px] font-sans font-normal text-black/70 dark:text-white/75 truncate max-w-[180px]">
+                            {slot.name}
+                          </span>
+                        </div>
+                      </div>
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
@@ -735,7 +750,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold ${
                         isAvail 
                           ? 'bg-emerald-50 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-200' 
-                          : 'bg-slate-100 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-200'
+                          : 'bg-slate-100 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300'
                       }`}>
                         {isAvail ? t('available') : t('occupied')}
                       </span>
@@ -747,7 +762,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           isAvail
                             ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-2xs dark:bg-blue-600'
-                            : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200'
+                            : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300'
                         }`}
                       >
                         {isAvail ? (language === 'en' ? 'Apply Kiosk' : 'Mohon Kiosk') : (language === 'en' ? 'View Details' : 'Lihat Maklumat')}
@@ -762,12 +777,12 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       </div>
 
       {/* 7. DIREKTORI USAHAWAN BELIA PILIHAN */}
-      <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 shadow-xs transition-colors w-full min-w-0">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-xs transition-colors w-full min-w-0">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-base font-extrabold text-black dark:text-white flex items-center gap-2">
               <span>{language === 'en' ? 'Local Youth Entrepreneurs' : 'Usahawan Belia Tempatan'}</span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200 dark:border-slate-700">
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600">
                 {filteredBusinesses.length} {language === 'en' ? 'Active' : 'Aktif'}
               </span>
             </h2>
@@ -796,14 +811,14 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
             return (
               <div
                 key={biz.id}
-                className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all bg-white dark:bg-slate-800 flex flex-col justify-between group shadow-2xs hover:-translate-y-0.5"
+                className="p-4 rounded-2xl border border-slate-300 dark:border-slate-600 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all bg-white dark:bg-slate-800 flex flex-col justify-between group shadow-2xs hover:-translate-y-0.5"
               >
                 <div className="flex items-start gap-3">
                   <img
                     src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                     alt={biz.businessName}
                     referrerPolicy="no-referrer"
-                    className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0 group-hover:scale-105 transition-transform"
+                    className="w-12 h-12 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0 group-hover:scale-105 transition-transform"
                   />
                   <div className="overflow-hidden flex-1">
                     <div className="flex items-center gap-1">
@@ -827,7 +842,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-slate-200/70 dark:border-slate-700 flex items-center justify-between gap-2">
+                <div className="mt-3 pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => onSelectBusiness(biz)}

@@ -57,11 +57,11 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[92vh] overflow-hidden flex flex-col"
+        className="w-full max-w-xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 scale-100 transition-all max-h-[92vh] overflow-hidden flex flex-col"
         role="dialog"
         aria-modal="true"
       >
-        <div className="kbelia-important-header px-6 sm:px-8 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
+        <div className="kbelia-important-header px-6 sm:px-8 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-300 dark:border-slate-600 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200 dark:border-amber-800/70 shrink-0">
               <Calendar className="w-5 h-5" />
@@ -78,7 +78,7 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 border border-transparent hover:border-slate-200 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 border border-transparent hover:border-slate-400 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -88,7 +88,7 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
           {EVENTS.map((event) => (
             <div
               key={event.id}
-              className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:border-blue-400/70 dark:hover:border-slate-600 transition-all flex flex-col justify-between"
+              className="p-4 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-500 transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-1.5">
@@ -108,13 +108,13 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
                   {event.venue}
                 </p>
 
-                <p className="text-xs text-black dark:text-white leading-relaxed mb-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
+                <p className="text-xs text-black dark:text-white leading-relaxed mb-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                   <span className="font-semibold block text-black dark:text-white mb-0.5">Pengisian Utama:</span>
                   {event.highlights}
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs gap-3">
+              <div className="pt-2 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-xs gap-3">
                 <span className="text-[11px] text-black/70 dark:text-white/75">
                   Anjuran: {event.organizer}
                 </span>

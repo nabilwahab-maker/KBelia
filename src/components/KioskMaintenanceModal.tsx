@@ -109,12 +109,12 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div
-        className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 scale-100 transition-all max-h-[90vh] overflow-hidden flex flex-col my-6"
+        className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 scale-100 transition-all max-h-[90vh] overflow-hidden flex flex-col my-6"
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
-        <div className="kbelia-important-header border-b border-slate-200 dark:border-slate-700 py-4.5 px-6 sm:px-7 flex items-center justify-between shrink-0">
+        <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-4.5 px-6 sm:px-7 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
               <Wrench className="w-5 h-5" />
@@ -148,7 +148,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
 
           {!submitted ? (
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex items-center justify-between">
                 <div>
                   <span className="text-black/70 dark:text-white/75 block text-[10px] font-medium uppercase tracking-wider">
                     {language === 'en' ? 'Kiosk Location:' : 'Lokasi Kiosk:'}
@@ -181,7 +181,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                         className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-600 ring-1 ring-blue-500/30 text-black dark:text-white font-bold'
-                            : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-black dark:text-white hover:border-blue-400/70'
+                            : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black dark:text-white hover:border-blue-400/70'
                         }`}
                       >
                         <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-black dark:text-white/75' : 'text-black/70'}`} />
@@ -202,7 +202,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={language === 'en' ? 'e.g. Left electrical socket is not functional since this morning...' : 'Contoh: Soket elektrik sebelah kiri tidak berfungsi sejak pagi ini...'}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-rose-600 transition-all dark:focus:border-blue-500"
+                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-rose-600 transition-all dark:focus:border-blue-500"
                 />
               </div>
 
@@ -218,7 +218,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                     placeholder={language === 'en' ? 'Your full name' : 'Nama anda'}
                     value={reporterName}
                     onChange={(e) => setReporterName(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all dark:focus:border-blue-500"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -231,17 +231,17 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                     placeholder="01120508890"
                     value={reporterPhone}
                     onChange={(e) => setReporterPhone(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all dark:focus:border-blue-500"
+                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* Action Buttons Footer */}
-              <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                 >
                   {language === 'en' ? 'Cancel' : 'Batal'}
                 </button>

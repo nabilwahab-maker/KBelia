@@ -105,10 +105,10 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden transition-all duration-300 flex flex-col max-h-[94vh]">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden transition-all duration-300 flex flex-col max-h-[94vh]">
         
         {/* Top Header */}
-        <div className="kbelia-important-header text-black dark:text-white px-5 sm:px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-700 shrink-0">
+        <div className="kbelia-important-header text-black dark:text-white px-5 sm:px-6 py-4 flex items-center justify-between border-b border-slate-300 dark:border-slate-600 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 flex items-center justify-center border border-rose-200 dark:border-rose-800/70 shrink-0">
               <ShieldCheck className="w-6 h-6 text-black dark:text-white/75" />
@@ -121,7 +121,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-black/70 hover:text-black dark:text-white/75 dark:hover:text-white bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
+            className="p-2 text-black/70 hover:text-black dark:text-white/75 dark:hover:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
             title="Tutup tetingkap"
             aria-label="Tutup"
           >
@@ -146,7 +146,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
         <div className="p-5 sm:p-8 space-y-6 text-black dark:text-white overflow-y-auto flex-1">
           <div ref={letterRef} className="space-y-6 bg-white dark:bg-slate-900 p-2 rounded-xl">
             {/* Official Letterhead */}
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between pb-4 border-b-2 border-emerald-700/30 dark:border-slate-700 gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between pb-4 border-b-2 border-emerald-700/30 dark:border-slate-600 gap-3">
               <div>
                 <div className="font-black text-base sm:text-lg tracking-tight text-black dark:text-white">
                   PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)
@@ -193,32 +193,32 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
             </div>
 
             {/* Placement Terms Box */}
-            <div className="bg-slate-50 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+            <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-2xl border border-slate-300 dark:border-slate-600 space-y-3">
               <div className="text-xs font-bold uppercase tracking-wider text-black dark:text-white/75 flex items-center gap-1.5">
                 <Building2 className="w-4 h-4" />
                 <span>Butiran Penempatan Kiosk Bersubsidi</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600">
                   <span className="text-black/70 dark:text-white/75 block text-[11px]">Kod & Nama Premis:</span>
                   <span className="font-bold text-black dark:text-white text-sm font-mono">{booking.slotCode}</span>
                   <div className="text-black dark:text-white font-medium">{booking.slotName}</div>
                 </div>
 
-                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600">
                   <span className="text-black/70 dark:text-white/75 block text-[11px]">Lokasi Hab:</span>
                   <span className="font-bold text-black dark:text-white text-sm">{booking.hubLocation}</span>
                   <div className="text-black dark:text-white font-medium">Negeri Kelantan Darul Naim</div>
                 </div>
 
-                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600">
                   <span className="text-black/70 dark:text-white/75 block text-[11px]">Kadar Sewa Bersubsidi:</span>
                   <span className="font-extrabold text-black dark:text-white/75 text-sm tabular-nums">RM {monthlyRate.toFixed(2)} / bulan</span>
                   <div className="text-black dark:text-white/75 font-medium">Subsidi 50% Ditaja Negeri (Kadar Asal RM{marketRate})</div>
                 </div>
 
-                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600">
                   <span className="text-black/70 dark:text-white/75 block text-[11px]">Tarikh Mula Operasi:</span>
                   <span className="font-bold text-black dark:text-white text-sm">{formatDisplayDate(booking.startDate)}</span>
                   <div className="text-black/70 dark:text-white/75 font-medium text-[11px]">Penyerahan Kunci Kiosk</div>
@@ -233,7 +233,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
             </div>
 
             {/* Key Pickup & Official QR Verification Card */}
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-between gap-4">
+            <div className="p-4 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-2xl flex items-center justify-between gap-4">
               <div className="flex items-start gap-3">
                 <Key className="w-5 h-5 text-black dark:text-white/75 shrink-0 mt-0.5" />
                 <div className="text-xs space-y-1">
@@ -245,14 +245,14 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
               </div>
 
               {/* Verifiable QR Block */}
-              <div className="flex flex-col items-center shrink-0 p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
+              <div className="flex flex-col items-center shrink-0 p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 shadow-xs">
                 <QrCode className="w-12 h-12 text-black dark:text-white" />
                 <span className="text-[9px] font-mono text-black/70 dark:text-white/75 mt-1 font-bold">SAH & BERAUDIT</span>
               </div>
             </div>
 
             {/* Official Certification Footer Note */}
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-black/70 dark:text-white/75">
+            <div className="pt-2 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-[11px] text-black/70 dark:text-white/75">
               <div className="flex items-center gap-1.5">
                 <FileCheck2 className="w-4 h-4 text-black" />
                 <span>Dokumen rasmi dikeluarkan di bawah Akta Pembangunan Keusahawanan Belia Kelantan.</span>
@@ -263,12 +263,12 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleCopyRef}
-              className="py-2 px-3 rounded-xl text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className="py-2 px-3 rounded-xl text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
               title="Salin Nombor Rujukan Rasmi"
             >
               {isCopied ? <Check className="w-3.5 h-3.5 text-black" /> : <Copy className="w-3.5 h-3.5 text-black/70" />}
@@ -279,7 +279,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
               type="button"
               onClick={handleDownload}
               disabled={isDownloadingPdf}
-              className="py-2 px-3 rounded-xl text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-70"
+              className="py-2 px-3 rounded-xl text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-70"
               title="Muat turun dokumen PDF rasmi (.pdf) 1 muka surat A4"
             >
               {isDownloadingPdf ? (
@@ -328,7 +328,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="py-2 px-3.5 rounded-xl text-xs font-semibold text-black hover:text-black dark:text-white dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              className="py-2 px-3.5 rounded-xl text-xs font-semibold text-black hover:text-black dark:text-white dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
               Tutup
             </button>

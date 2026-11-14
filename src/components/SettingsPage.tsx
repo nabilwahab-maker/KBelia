@@ -182,7 +182,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
   // Admin Settings State (if admin)
   const initialPortalSettings = useMemo(() => loadLocalPortalSettings(), []);
   const [adminOfficerName, setAdminOfficerName] = useState(
-    initialPortalSettings.adminOfficerName || 'Pentadbir Nabil (Urusetia KBelia)'
+    initialPortalSettings.adminOfficerName || 'Pentadbir Nabil (Admin KBelia)'
   );
   const [adminHelpdeskPhone, setAdminHelpdeskPhone] = useState(
     initialPortalSettings.adminHelpdeskPhone || '+6011-2050 8890'
@@ -194,7 +194,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
     String(initialPortalSettings.maxLeaseDurationMonths ?? 12)
   );
   const [portalAnnouncement, setPortalAnnouncement] = useState(
-    initialPortalSettings.portalAnnouncement || 'Permohonan Kapsul Niaga & Geran Belia Kelantan 2026/2027 Kini Dibuka!'
+    initialPortalSettings.portalAnnouncement || 'Permohonan Kiosk Belia & Geran Belia Kelantan 2026/2027 Kini Dibuka!'
   );
 
   // Sync settings state if userProfile or myBusiness changes
@@ -493,7 +493,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         const currentPortal = loadLocalPortalSettings();
         await savePortalSettingsRecord({
           ...currentPortal,
-          adminOfficerName: adminOfficerName.trim() || 'Pentadbir Urusetia KBelia',
+          adminOfficerName: adminOfficerName.trim() || 'Pentadbir KBelia',
           adminHelpdeskPhone: adminHelpdeskPhone.trim() || '+6011-2050 8890',
           portalSubsidyRate: Number(portalSubsidyRate) || 50,
           maxLeaseDurationMonths: Number(maxLeaseDurationMonths) || 12,
@@ -524,7 +524,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
     <div id="kbelia-settings-module" className="w-full space-y-6">
       
       {/* 1. Header Banner */}
-      <div className="kbelia-important-header dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="kbelia-important-header dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1.5">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 text-[11px] font-bold uppercase tracking-wider">
             <Settings className="w-3.5 h-3.5" />
@@ -551,7 +551,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
       {/* Profile Completeness Card (PRD Item 16 - Khusus Usahawan Belia) */}
       {isYouth && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow-2xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-black dark:text-white/75" />
@@ -563,7 +563,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               {completeness.percent}% {language === 'en' ? 'Completed' : 'Lengkap'} ({completeness.completedCount}/{completeness.totalCount})
             </span>
           </div>
-          <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700 rounded-full overflow-hidden mb-2">
+          <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-full overflow-hidden mb-2">
             <div 
               className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${completeness.percent}%` }}
@@ -592,7 +592,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           className={`px-3.5 py-2 rounded-xl transition-all shrink-0 cursor-pointer ${
             activeSection === 'all'
               ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
-              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700'
+              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
           }`}
         >
           {t('tab_all')}
@@ -603,7 +603,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
             activeSection === 'theme'
               ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
-              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700'
+              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
           }`}
         >
           {isDark ? <Moon className={`w-3.5 h-3.5 ${activeSection === 'theme' ? 'text-white' : 'text-black/70 dark:text-white/75'}`} /> : <Sun className={`w-3.5 h-3.5 ${activeSection === 'theme' ? 'text-white' : 'text-black/70 dark:text-white/75'}`} />}
@@ -615,7 +615,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
             activeSection === 'language'
               ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
-              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700'
+              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
           }`}
         >
           <Globe className={`w-3.5 h-3.5 ${activeSection === 'language' ? 'text-white' : 'text-black dark:text-white/75'}`} />
@@ -627,7 +627,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
             activeSection === 'profile'
               ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
-              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700'
+              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
           }`}
         >
           <User className="w-3.5 h-3.5" />
@@ -640,7 +640,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
               activeSection === 'business'
                 ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700'
+                : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
             }`}
           >
             <Store className="w-3.5 h-3.5" />
@@ -654,7 +654,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
               activeSection === 'banking'
                 ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
-                : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700'
+                : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
             }`}
           >
             <Landmark className="w-3.5 h-3.5" />
@@ -667,7 +667,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
             activeSection === 'notifications'
               ? 'bg-rose-600 text-white shadow-2xs dark:bg-rose-600'
-              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700'
+              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
           }`}
         >
           <Bell className="w-3.5 h-3.5" />
@@ -679,7 +679,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
             activeSection === 'security'
               ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
-              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700'
+              : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
           }`}
         >
           <Lock className="w-3.5 h-3.5" />
@@ -692,7 +692,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             className={`px-3.5 py-2 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
               activeSection === 'admin'
                 ? 'bg-amber-100 text-black dark:bg-amber-900/40 dark:text-white font-bold border border-amber-300 dark:border-amber-700 shadow-2xs'
-                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600'
             }`}
           >
             <Sliders className="w-3.5 h-3.5 text-black dark:text-white/75" />
@@ -748,7 +748,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 0: TEMA & MOD GELAP                             */}
         {/* ======================================================== */}
         {(activeSection === 'all' || activeSection === 'theme') && (
-          <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors">
+          <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs transition-colors">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-sm font-bold text-black dark:text-white">{t('theme_display_title')}</h3>
@@ -756,13 +756,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </div>
 
               {/* Compact Horizontal Segmented Tab Control */}
-              <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0 self-start sm:self-auto">
+              <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 shrink-0 self-start sm:self-auto">
                 <button
                   type="button"
                   onClick={() => setTheme('light')}
                   className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     !isDark
-                      ? 'bg-white text-black shadow-xs border border-slate-200'
+                      ? 'bg-white text-black shadow-xs border border-slate-300'
                       : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
                   }`}
                 >
@@ -791,7 +791,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN: PILIHAN BAHASA / LANGUAGE SELECTION            */}
         {/* ======================================================== */}
         {(activeSection === 'all' || activeSection === 'theme' || activeSection === 'language') && (
-          <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors">
+          <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs transition-colors">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
@@ -806,7 +806,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </div>
 
               {/* Language Segmented Control */}
-              <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0 self-start sm:self-auto">
+              <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 shrink-0 self-start sm:self-auto">
                 <button
                   type="button"
                   id="btn-switch-lang-ms"
@@ -816,7 +816,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   }}
                   className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     language === 'ms'
-                      ? 'bg-white text-black shadow-xs border border-slate-200 dark:bg-slate-800 dark:text-white dark:border-slate-700'
+                      ? 'bg-white text-black shadow-xs border border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-600'
                       : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
                   }`}
                 >
@@ -833,7 +833,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   }}
                   className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     language === 'en'
-                      ? 'bg-white text-black shadow-xs border border-slate-200 dark:bg-slate-800 dark:text-white dark:border-slate-700'
+                      ? 'bg-white text-black shadow-xs border border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-600'
                       : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
                   }`}
                 >
@@ -849,8 +849,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 1: FOTO PROFIL & SERASI GAMBAR GOOGLE */}
         {/* ======================================================== */}
         {(activeSection === 'all' || activeSection === 'profile') && (
-          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-6 transition-colors">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-6 transition-colors">
+            <div className="flex items-center pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold">
                   <Camera className="w-4 h-4" />
@@ -860,7 +860,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   <p className="text-xs text-black/70 dark:text-white/75">{t('settings_profile_avatar_desc')}</p>
                 </div>
               </div>
-              <span className="text-[11px] font-bold text-black/70 dark:text-white/75 hidden sm:inline">{t('settings_part_1')}</span>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
@@ -884,7 +883,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <button
                   type="button"
                   onClick={() => avatarFileInputRef.current?.click()}
-                  className="absolute -bottom-2 -right-2 p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md border-2 border-white dark:border-slate-800 transition-all hover:scale-105 cursor-pointer dark:bg-indigo-600"
+                  className="absolute -bottom-2 -right-2 p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md border-2 border-white dark:border-slate-600 transition-all hover:scale-105 cursor-pointer dark:bg-indigo-600"
                   title={language === 'ms' ? "Tukar foto profil" : "Change profile photo"}
                 >
                   <Camera className="w-3.5 h-3.5" />
@@ -933,8 +932,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 2: MAKLUMAT PERIBADI & HUBUNGAN */}
         {/* ======================================================== */}
         {(activeSection === 'all' || activeSection === 'profile') && (
-          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-5 transition-colors">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold">
                 <User className="w-4 h-4" />
               </div>
@@ -958,7 +957,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsFullName}
                     onChange={(e) => setSettingsFullName(e.target.value)}
                     placeholder={t('settings_full_name_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -975,7 +974,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsIcNumber}
                     onChange={(e) => setSettingsIcNumber(e.target.value)}
                     placeholder={t('settings_ic_number_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -992,7 +991,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     disabled
                     value={user?.email || ''}
                     placeholder={language === 'en' ? 'Email' : 'Emel'}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-black/70 dark:text-white/75 cursor-not-allowed"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black/70 dark:text-white/75 cursor-not-allowed"
                   />
                 </div>
                 <span className="text-[10px] text-black/70 dark:text-white/75 mt-1 block">{t('settings_email_locked_notice')}</span>
@@ -1011,7 +1010,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsPhone}
                     onChange={(e) => setSettingsPhone(e.target.value)}
                     placeholder={t('settings_phone_number_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1026,7 +1025,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   <select
                     value={settingsDistrict}
                     onChange={(e) => setSettingsDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
                   >
                     {DISTRICTS.map((d) => (
                       <option key={d} value={d} className="bg-white dark:bg-slate-900 text-black dark:text-white">
@@ -1040,7 +1039,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
             {/* MAKLUMAT PENGKHUSUSAN PEMENTORAN (KHUSUS MENTOR) */}
             {isMentor && (
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-4">
+              <div className="pt-4 border-t border-slate-300 dark:border-slate-600 space-y-4">
                 <div className="flex items-center gap-2">
                   <GraduationCap className="w-4 h-4 text-black dark:text-white/75" />
                   <h5 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider">
@@ -1058,7 +1057,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                       value={mentorDepartment}
                       onChange={(e) => setMentorDepartment(e.target.value)}
                       placeholder={language === 'en' ? 'e.g. Faculty of Entrepreneurship and Business (FKP) UMK' : 'cth. Fakulti Keusahawanan dan Perniagaan (FKP) UMK'}
-                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                     />
                   </div>
 
@@ -1071,7 +1070,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                       value={mentorExpertise}
                       onChange={(e) => setMentorExpertise(e.target.value)}
                       placeholder={language === 'en' ? 'e.g. Digital Marketing, Halal Compliance, Financial Planning' : 'cth. Pemasaran Digital, Pensijilan Halal, Perancangan Kewangan'}
-                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1084,8 +1083,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 3: MAKLUMAT BISNES, LOGO SYARIKAT & MEDIA SOSIAL */}
         {/* ======================================================== */}
         {isYouth && (activeSection === 'all' || activeSection === 'business') && (
-          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-6 transition-colors">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-6 transition-colors">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800 flex items-center justify-center font-bold">
                 <Briefcase className="w-4 h-4" />
               </div>
@@ -1096,8 +1095,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             </div>
 
             {/* Logo Syarikat / Jenama Box */}
-            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center gap-4">
-              <div className="w-16 h-16 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs overflow-hidden flex items-center justify-center shrink-0">
+            <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row items-center gap-4">
+              <div className="w-16 h-16 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden flex items-center justify-center shrink-0">
                 {settingsLogoUrl ? (
                   <img src={settingsLogoUrl} alt="Logo Bisnes" className="w-full h-full object-contain p-1" />
                 ) : (
@@ -1112,7 +1111,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <button
                   type="button"
                   onClick={() => logoFileInputRef.current?.click()}
-                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-600 text-black dark:text-white text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-indigo-600 text-black dark:text-white text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Upload className="w-3.5 h-3.5 text-black dark:text-white" />
                   <span>{t('settings_choose_logo_btn')}</span>
@@ -1150,7 +1149,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsBusinessName}
                     onChange={(e) => setSettingsBusinessName(e.target.value)}
                     placeholder={t('settings_business_name_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1163,7 +1162,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <select
                   value={settingsCategory}
                   onChange={(e) => setSettingsCategory(e.target.value as BusinessCategory)}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat} className="bg-white dark:bg-slate-900 text-black dark:text-white">
@@ -1181,7 +1180,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <select
                   value={settingsSsmStatus}
                   onChange={(e) => setSettingsSsmStatus(e.target.value as 'registered' | 'in_progress' | 'not_registered')}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
                 >
                   <option value="registered" className="bg-white dark:bg-slate-900 text-black dark:text-white">{t('settings_ssm_reg_official')}</option>
                   <option value="in_progress" className="bg-white dark:bg-slate-900 text-black dark:text-white">{t('settings_ssm_in_progress')}</option>
@@ -1201,7 +1200,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsSsmNumber}
                     onChange={(e) => setSettingsSsmNumber(e.target.value)}
                     placeholder={t('settings_ssm_number_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1218,7 +1217,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsBusinessHours}
                     onChange={(e) => setSettingsBusinessHours(e.target.value)}
                     placeholder={t('settings_operating_hours_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1235,14 +1234,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsBusinessAddress}
                     onChange={(e) => setSettingsBusinessAddress(e.target.value)}
                     placeholder={t('settings_premise_address_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
             </div>
 
             {/* Rangkaian Media Sosial */}
-            <div className="pt-3 border-t border-slate-200 dark:border-slate-700 space-y-3">
+            <div className="pt-3 border-t border-slate-300 dark:border-slate-600 space-y-3">
               <div className="flex items-center gap-2">
                 <Share2 className="w-4 h-4 text-black dark:text-white/75" />
                 <h5 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider">
@@ -1261,7 +1260,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsFacebook}
                     onChange={(e) => setSettingsFacebook(e.target.value)}
                     placeholder="facebook.com/namabisnes"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
 
@@ -1275,7 +1274,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsInstagram}
                     onChange={(e) => setSettingsInstagram(e.target.value)}
                     placeholder="@namabisnes"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
 
@@ -1289,7 +1288,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsTiktok}
                     onChange={(e) => setSettingsTiktok(e.target.value)}
                     placeholder="@namabisnes.tiktok"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1302,8 +1301,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 4: AKAUN BANK PENYALURAN DANA & GERAN */}
         {/* ======================================================== */}
         {isYouth && (activeSection === 'all' || activeSection === 'banking') && (
-          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-5 transition-colors">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold">
                 <Landmark className="w-4 h-4" />
               </div>
@@ -1329,7 +1328,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <select
                   value={settingsBankName}
                   onChange={(e) => setSettingsBankName(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
                 >
                   {BANK_OPTIONS.map((b) => (
                     <option key={b} value={b} className="bg-white dark:bg-slate-900 text-black dark:text-white">
@@ -1349,7 +1348,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   value={settingsBankAccountNumber}
                   onChange={(e) => setSettingsBankAccountNumber(e.target.value)}
                   placeholder={t('settings_bank_account_no_ph')}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -1363,7 +1362,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   value={settingsBankAccountHolder}
                   onChange={(e) => setSettingsBankAccountHolder(e.target.value)}
                   placeholder={settingsFullName || (language === 'ms' ? 'Nama penuh atau nama syarikat' : 'Full name or company name')}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                 />
               </div>
             </div>
@@ -1374,8 +1373,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 5: TETAPAN MAKLUMAN & NOTIFIKASI */}
         {/* ======================================================== */}
         {(activeSection === 'all' || activeSection === 'notifications') && (
-          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-5 transition-colors">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 flex items-center justify-center font-bold">
                 <Bell className="w-4 h-4" />
               </div>
@@ -1387,7 +1386,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
             <div className="space-y-3.5">
               {/* WhatsApp Notification Toggle */}
-              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                 <div className="flex items-start gap-3.5 pr-4">
                   <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-black dark:text-white/75 flex items-center justify-center shrink-0 mt-0.5">
                     <Phone className="w-4 h-4" />
@@ -1407,7 +1406,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </div>
 
               {/* Email Notification Toggle */}
-              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                 <div className="flex items-start gap-3.5 pr-4">
                   <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center shrink-0 mt-0.5">
                     <Mail className="w-4 h-4" />
@@ -1434,9 +1433,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 6: KESELAMATAN & TUKAR KATA LALUAN */}
         {/* ======================================================== */}
         {(activeSection === 'all' || activeSection === 'security') && (
-          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-5 transition-colors">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
-              <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 flex items-center justify-center font-bold border border-slate-200 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-5 transition-colors">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-300 dark:border-slate-600">
+              <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 flex items-center justify-center font-bold border border-slate-300 dark:border-slate-600">
                 <Lock className="w-4 h-4" />
               </div>
               <div>
@@ -1474,7 +1473,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder={t('settings_current_password_ph')}
-                    className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                   <button
                     type="button"
@@ -1498,7 +1497,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder={language === 'en' ? 'New Password' : 'Kata Laluan Baharu'}
-                      className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                      className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                     />
                     <button
                       type="button"
@@ -1521,7 +1520,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder={language === 'en' ? 'Confirm New Password' : 'Sahkan Kata Laluan Baharu'}
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1552,32 +1551,32 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 8: TETAPAN PENTADBIR URUSETIA (ADMIN ONLY) */}
         {/* ======================================================== */}
         {isAdmin && (activeSection === 'all' || activeSection === 'admin') && (
-          <div className="bg-white dark:bg-slate-800 text-black dark:text-white p-6 sm:p-7 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-6">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 text-black dark:text-white p-6 sm:p-7 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-6">
+            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-black dark:text-white border border-amber-200 dark:border-amber-700 flex items-center justify-center font-bold">
                 <Sliders className="w-4 h-4" />
               </div>
               <div>
                 <h4 className="text-sm font-bold text-black dark:text-white">
-                  {language === 'ms' ? 'Panel Parameter Pentadbir & Urusetia KBelia' : 'Secretariat & Admin Parameter Controls'}
+                  {language === 'ms' ? 'Tetapan Parameter Pentadbir & Admin KBelia' : 'Secretariat & Admin Parameter Controls'}
                 </h4>
                 <p className="text-xs text-black/70 dark:text-white/75">
-                  {language === 'ms' ? 'Konfigurasi operasi peringkat pentadbiran kerajaan negeri.' : 'State-level operational and administrative configuration.'}
+                  {language === 'ms' ? 'Tetapan operasi peringkat pentadbiran negeri.' : 'State-level operational and administrative configuration.'}
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Pegawai Urusetia */}
+              {/* Pegawai Pentadbir */}
               <div>
                 <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {language === 'ms' ? 'Nama Pegawai Urusetia Pentadbir' : 'Secretariat Officer Name'}
+                  {language === 'ms' ? 'Nama Pegawai Pentadbir' : 'Secretariat Officer Name'}
                 </label>
                 <input
                   type="text"
                   value={adminOfficerName}
                   onChange={(e) => setAdminOfficerName(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -1590,7 +1589,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   type="text"
                   value={adminHelpdeskPhone}
                   onChange={(e) => setAdminHelpdeskPhone(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 font-mono dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 font-mono dark:focus:border-blue-500"
                 />
               </div>
 
@@ -1605,7 +1604,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   max="100"
                   value={portalSubsidyRate}
                   onChange={(e) => setPortalSubsidyRate(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -1620,26 +1619,26 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   max="36"
                   value={maxLeaseDurationMonths}
                   onChange={(e) => setMaxLeaseDurationMonths(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
               {/* Pengumuman Portal */}
               <div className="sm:col-span-2">
                 <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {language === 'ms' ? 'Teks Hebahan / Pengumuman Khas Portal' : 'Special Portal Broadcast / Announcement Text'}
+                  {language === 'ms' ? 'Teks Pengumuman Khas Portal' : 'Special Portal Broadcast / Announcement Text'}
                 </label>
                 <input
                   type="text"
                   value={portalAnnouncement}
                   onChange={(e) => setPortalAnnouncement(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
                 />
               </div>
             </div>
 
             {/* Seed Database button for admin */}
-            <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+            <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between">
               <span className="text-[11px] text-black/70 dark:text-white/75">
                 {language === 'ms' ? 'Penyegerakan Pangkalan Data Awalan' : 'Initial Database Synchronization'}
               </span>
@@ -1672,7 +1671,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* ======================================================== */}
         {/* BOTTOM SAVE BAR */}
         {/* ======================================================== */}
-        <div className="sticky bottom-4 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 transition-colors">
+        <div className="sticky bottom-4 z-30 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 transition-colors">
           <div className="text-xs text-black dark:text-white text-center sm:text-left">
             {t('settings_bottom_notice')}
           </div>

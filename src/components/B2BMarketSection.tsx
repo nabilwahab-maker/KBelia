@@ -226,7 +226,7 @@ export const B2BMarketSection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-xs">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-300 dark:border-slate-600 shadow-xs">
         <div className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-wider text-black dark:text-white/75 mb-1.5">
             {isEn ? 'Youth Ruang Niaga & Commercial Opportunities' : 'Ruang Niaga & Peluang Belia'}
@@ -243,7 +243,7 @@ export const B2BMarketSection: React.FC = () => {
       </div>
 
       {/* Control Bar */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="relative w-full md:w-72">
           <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
@@ -251,19 +251,19 @@ export const B2BMarketSection: React.FC = () => {
             placeholder={isEn ? 'Search supplies, ingredients, packaging...' : 'Cari bekalan, ramuan, pembungkusan...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           {/* Type Toggle */}
-          <div className="flex rounded-lg bg-slate-50 dark:bg-slate-900 p-1 border border-slate-200 dark:border-slate-700">
+          <div className="flex rounded-lg bg-slate-50 dark:bg-slate-900 p-1 border border-slate-300 dark:border-slate-600">
             <button
               type="button"
               onClick={() => setFilterType('all')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'all'
-                  ? 'bg-white dark:bg-slate-700 text-black dark:text-white shadow-xs border border-slate-200 dark:border-slate-600'
+                  ? 'bg-white dark:bg-slate-700 text-black dark:text-white shadow-xs border border-slate-300 dark:border-slate-600'
                   : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
               }`}
             >
@@ -297,7 +297,7 @@ export const B2BMarketSection: React.FC = () => {
           <select
             value={filterDistrict}
             onChange={(e) => setFilterDistrict(e.target.value)}
-            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-black dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
           >
             <option value="all">{isEn ? 'Across Kelantan' : 'Seluruh Kelantan'}</option>
             <option value="Kota Bharu">Kota Bharu</option>
@@ -326,7 +326,7 @@ export const B2BMarketSection: React.FC = () => {
 
       {/* Listings Grid */}
       {filteredListings.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 py-14 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 py-14 text-center">
           <Megaphone className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <p className="text-sm font-bold text-black dark:text-white">
             {isEn ? 'No Ruang Niaga listings match your filter' : 'Tiada iklan Ruang Niaga sepadan dengan carian anda'}
@@ -337,7 +337,7 @@ export const B2BMarketSection: React.FC = () => {
           {filteredListings.map((item) => (
             <div
               key={item.id}
-              className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 hover:border-blue-400/70 shadow-xs flex flex-col justify-between group transition-colors"
+              className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-300 dark:border-slate-600 hover:border-blue-400/70 shadow-xs flex flex-col justify-between group transition-colors"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
@@ -379,7 +379,7 @@ export const B2BMarketSection: React.FC = () => {
               </div>
 
               {/* Direct WhatsApp Call to Action */}
-              <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
+              <div className="pt-4 mt-4 border-t border-slate-300 dark:border-slate-600">
                 <a
                   href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20Ruang%20Niaga%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
                   target="_blank"
@@ -399,8 +399,8 @@ export const B2BMarketSection: React.FC = () => {
       {isPostingModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
           <div className="fixed inset-0" onClick={() => setIsPostingModalOpen(false)} />
-          <div className="relative bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full border border-slate-200 dark:border-slate-700 shadow-2xl z-10 overflow-hidden">
-            <div className="px-6 pt-5 pb-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-900/70">
+          <div className="relative bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full border border-slate-300 dark:border-slate-600 shadow-2xl z-10 overflow-hidden">
+            <div className="px-6 pt-5 pb-4 border-b border-slate-300 dark:border-slate-600 flex items-center justify-between bg-slate-50 dark:bg-slate-900">
               <div className="flex items-center gap-2">
                 <Megaphone className="w-5 h-5 text-black dark:text-white/75" />
                 <h3 className="text-base font-extrabold text-black dark:text-white">
@@ -429,7 +429,7 @@ export const B2BMarketSection: React.FC = () => {
                     className={`py-2 px-3 text-xs font-bold rounded-xl border text-center transition-colors cursor-pointer ${
                       newType === 'demand'
                         ? 'bg-amber-500 text-white border-amber-600'
-                        : 'bg-slate-50 text-black border-slate-200 dark:bg-slate-900 dark:text-white/75 dark:border-slate-700'
+                        : 'bg-slate-50 text-black border-slate-300 dark:bg-slate-900 dark:text-white/75 dark:border-slate-600'
                     }`}
                   >
                     {isEn ? 'Seeking Supply' : 'Mencari Pembekal'}
@@ -440,7 +440,7 @@ export const B2BMarketSection: React.FC = () => {
                     className={`py-2 px-3 text-xs font-bold rounded-xl border text-center transition-colors cursor-pointer ${
                       newType === 'supply'
                         ? 'bg-teal-600 text-white border-teal-600 dark:bg-teal-600'
-                        : 'bg-slate-50 text-black border-slate-200 dark:bg-slate-900 dark:text-white/75 dark:border-slate-700'
+                        : 'bg-slate-50 text-black border-slate-300 dark:bg-slate-900 dark:text-white/75 dark:border-slate-600'
                     }`}
                   >
                     {isEn ? 'Supplying / Wholesale' : 'Tawarkan Bekalan Borong'}
@@ -458,7 +458,7 @@ export const B2BMarketSection: React.FC = () => {
                   placeholder={isEn ? 'State listing title...' : 'Tajuk tawaran atau keperluan bekalan...'}
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -473,7 +473,7 @@ export const B2BMarketSection: React.FC = () => {
                     placeholder="Nama perniagaan anda"
                     value={newBusiness}
                     onChange={(e) => setNewBusiness(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
 
@@ -484,7 +484,7 @@ export const B2BMarketSection: React.FC = () => {
                   <select
                     value={newDistrict}
                     onChange={(e) => setNewDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   >
                     <option value="Kota Bharu">Kota Bharu</option>
                     <option value="Bachok">Bachok</option>
@@ -510,7 +510,7 @@ export const B2BMarketSection: React.FC = () => {
                     placeholder="Nama anda"
                     value={newAuthor}
                     onChange={(e) => setNewAuthor(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
 
@@ -524,7 +524,7 @@ export const B2BMarketSection: React.FC = () => {
                     placeholder="0123456789"
                     value={newWhatsApp}
                     onChange={(e) => setNewWhatsApp(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -538,7 +538,7 @@ export const B2BMarketSection: React.FC = () => {
                   placeholder={isEn ? 'State volume, price terms, delivery location...' : 'Nyatakan kuantiti, harga anggaran borong, syarat penghantaran...'}
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-black dark:text-white resize-none focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white resize-none focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 

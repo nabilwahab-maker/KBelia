@@ -58,7 +58,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast as triggerToast } from './ToastNotification';
-import { SaaSKpiCard, SparkPoint } from './SaaSKpiCard';
+import { SaaSKpiCard } from './SaaSKpiCard';
 import {
   BarChart,
   Bar,
@@ -93,8 +93,8 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     businessCategory: 'Makanan & Minuman (F&B)',
     district: 'Kota Bharu',
     recommendedAmount: 'RM3,000',
-    grantProgramTitle: 'Dana Benih Usahawan Belia Kelantan (RM3,000)',
-    justification: 'Usahawan menunjukkan komitmen tinggi dengan rekod jualan tunai konsisten melebihi RM4,200 sebulan. Penggunaan mesin retort pembungkusan akan melipatgandakan jangka hayat sambal dan sedia dipasarkan di Kapsul Niaga KB Sentral.',
+    grantProgramTitle: 'Geran Permulaan Usahawan Belia Kelantan (RM3,000)',
+    justification: 'Usahawan menunjukkan komitmen tinggi dengan rekod jualan tunai konsisten melebihi RM4,200 sebulan. Penggunaan mesin retort pembungkusan akan memanjangkan jangka hayat sambal dan sedia dipasarkan di Kiosk Belia KB Sentral.',
     businessReadinessRemark: 'Telah menghadiri 3 sesi bimbingan penuh dan mematuhi piawaian pembungkusan label produk UMK CEED.',
     issuedAt: '2026-03-28',
     status: 'active'
@@ -447,8 +447,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
     onUpdateRegistration(updated);
     emitAdminOrMentorNotification({
-      title: `Pelan Tindakan Mentor: ${selectedMenteeForNotes.entrepreneurName}`,
-      message: `${currentMentor.name} telah menghantar nota bimbingan & pelan tindakan baharu (${selectedMenteeForNotes.topic}).`,
+      title: `Nota Bimbingan Mentor: ${selectedMenteeForNotes.entrepreneurName}`,
+      message: `${currentMentor.name} telah menghantar nota bimbingan & cadangan tindakan baharu (${selectedMenteeForNotes.topic}).`,
       type: 'mentorship',
       senderRole: 'mentor',
       targetRole: 'youth',
@@ -457,7 +457,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       actionTab: 'merchant'
     });
     setSelectedMenteeForNotes(null);
-    showToast('Nota bimbingan & pelan tindakan berjaya dihantar kepada usahawan!');
+    showToast('Nota bimbingan & cadangan tindakan berjaya dihantar kepada usahawan!');
   };
 
   const handleStatusChange = (mentee: MentorshipRegistration, newStatus: MentorshipRegistration['status']) => {
@@ -519,7 +519,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
     const uniqueCode = `PERAKUAN-UMK-2026-${Math.floor(1000 + Math.random() * 9000)}`;
     const programTitle = newEndorsementGrantType === 'RM3,000' 
-      ? 'Dana Benih Usahawan Belia Kelantan (RM3,000)'
+      ? 'Geran Permulaan Usahawan Belia Kelantan (RM3,000)'
       : newEndorsementGrantType === 'RM5,000'
       ? 'Geran Pemangkin Usahawan Belia Kelantan (RM5,000)'
       : 'Dana Pertumbuhan & Eksport Digital (RM10,000)';
@@ -611,7 +611,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     saveLogEntries([newEntry, ...logEntries]);
     void saveMentoringLogRecord(newEntry).catch(console.error);
     setIsNewLogModalOpen(false);
-    showToast('Log jurnal minit bimbingan berjaya direkodkan!');
+    showToast('Rekod sesi bimbingan berjaya disimpan!');
 
     // Reset
     setNewLogMenteeName('');
@@ -628,7 +628,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   if (!isMentor) {
     return (
       <div className="py-8 px-2 sm:px-4 w-full animate-in fade-in duration-300">
-        <div className="bg-white dark:bg-slate-800 text-black dark:text-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden text-center space-y-6">
+        <div className="bg-white dark:bg-slate-800 text-black dark:text-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-300 dark:border-slate-600 relative overflow-hidden text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center mx-auto shadow-inner">
             <Lock className="w-8 h-8" />
           </div>
@@ -639,10 +639,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               Akses Eksklusif Peranan Mentor
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-black dark:text-white tracking-tight">
-              Pusat Pengurusan Mentor Bertauliah
+              Portal Pengurusan Mentor
             </h2>
             <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
-              Bahagian ini dikhaskan untuk <strong>Mentor Bertauliah (UMK, INSKEN & SME Corp)</strong> sahaja bagi menguruskan sesi bimbingan mentee seliaan sendiri, mengeluarkan <strong>Surat Perakuan Rasmi Geran Belia</strong>, dan mencatat log jurnal tindakan. Modul ini diasingkan sepenuhnya daripada fungsi usahawan mahupun pentadbir sistem.
+              Bahagian ini dikhaskan untuk <strong>Mentor Rasmi (UMK, INSKEN & SME Corp)</strong> sahaja bagi menguruskan sesi bimbingan usahawan seliaan sendiri, mengeluarkan <strong>Surat Sokongan Geran Belia</strong>, dan mencatat rekod sesi serta tugasan. Modul ini diasingkan sepenuhnya daripada fungsi usahawan mahupun pentadbir sistem.
             </p>
           </div>
 
@@ -677,7 +677,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       )}
 
       {/* 1. MENTOR PORTAL HERO BANNER WITH UMK & KBELIA BRANDING */}
-      <div className="kbelia-important-header dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+      <div className="kbelia-important-header dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-300 dark:border-slate-600 relative overflow-hidden">
         <div className="relative z-10 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-rose-50 dark:bg-rose-950/60 text-black dark:text-white border border-rose-200 dark:border-rose-800/70 flex items-center gap-1.5">
@@ -704,32 +704,6 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* TAB 0: RINGKASAN EKSEKUTIF (BENTO SAAS COMMAND CENTER)                */}
       {/* ===================================================================== */}
       {currentSubTab === 'overview' && (() => {
-        // Real Sparkline series for the 4 Mentor KPI cards
-        const menteeSpark: SparkPoint[] = [
-          { label: 'Menunggu', value: pendingCount },
-          { label: 'Disahkan', value: confirmedCount },
-          { label: 'Selesai', value: completedCount },
-          { label: 'Jumlah', value: totalMentees }
-        ];
-        const sessionSpark: SparkPoint[] = [
-          { label: 'Kampus', value: mentorRegistrations.filter(r => r.mode !== 'Google Meet Maya').length },
-          { label: 'Maya', value: mentorRegistrations.filter(r => r.mode === 'Google Meet Maya').length },
-          { label: 'Disahkan', value: confirmedCount },
-          { label: 'Selesai', value: completedCount }
-        ];
-        const endorseSpark: SparkPoint[] = mentorEndorsements.length > 0
-          ? mentorEndorsements.slice(0, 5).reverse().map((e, idx) => ({
-              label: e.district?.slice(0, 6) || `P${idx + 1}`,
-              value: Number((e.recommendedAmount || '3000').replace(/[^0-9]/g, '')) || 3000
-            }))
-          : [{ label: 'Tiada', value: 0 }];
-        const logSpark: SparkPoint[] = mentorLogs.length > 0
-          ? mentorLogs.slice(0, 5).reverse().map((l, idx) => ({
-              label: l.sessionDate?.slice(5) || `L${idx + 1}`,
-              value: l.actionItems?.length || 1
-            }))
-          : [{ label: 'Tiada', value: 0 }];
-
         // District breakdown for Recharts BarChart
         const districtMap = new Map<string, { district: string; sesi: number; perakuan: number }>();
         mentorRegistrations.forEach(r => {
@@ -749,10 +723,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         return (
         <div className="space-y-6 animate-in fade-in duration-200">
 
-          {/* 4 Graphic SaaS KPI Cards inside Overview Bento */}
+          {/* 4 Compact Summary KPI Cards inside Overview Bento */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <SaaSKpiCard
-              chartId="mentor-mentees"
               title="Jumlah Usahawan Mentee"
               value={totalMentees}
               subtitle={`${pendingCount} Menunggu Tindakan`}
@@ -760,12 +733,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               trendLabel={pendingCount > 0 ? `${pendingCount} Baharu` : 'Terkawal'}
               trendDirection={pendingCount > 0 ? 'up' : 'neutral'}
               accentColor="sky"
-              sparkData={menteeSpark}
               onClick={() => handleSubTabChange('sessions')}
             />
 
             <SaaSKpiCard
-              chartId="mentor-sessions"
               title="Sesi Bimbingan Disahkan"
               value={confirmedCount}
               subtitle="Kampus & Google Meet Maya"
@@ -773,41 +744,36 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               trendLabel={`${completedCount} Selesai`}
               trendDirection={confirmedCount > 0 ? 'up' : 'neutral'}
               accentColor="emerald"
-              sparkData={sessionSpark}
               onClick={() => handleSubTabChange('sessions')}
             />
 
             <SaaSKpiCard
-              chartId="mentor-endorsements"
               title="Perakuan Geran Dikeluarkan"
               value={totalEndorsementsCount}
-              subtitle="Sah Untuk Semakan Urus Setia"
+              subtitle="Sah Untuk Semakan Admin"
               icon={Award}
               trendLabel="Aktif"
               trendDirection={totalEndorsementsCount > 0 ? 'up' : 'neutral'}
               accentColor="amber"
-              sparkData={endorseSpark}
               onClick={() => handleSubTabChange('endorsements')}
             />
 
             <SaaSKpiCard
-              chartId="mentor-logbook"
-              title="Minit & Log Tindakan"
+              title="Rekod Sesi & Tugasan"
               value={totalLogbookCount}
-              subtitle="Garis Masa Pelan Mentee"
+              subtitle="Nota & Tugasan Usahawan"
               icon={FileText}
               trendLabel={`${mentorLogs.reduce((acc, l) => acc + (l.actionItems?.filter(a => a.completed).length || 0), 0)} Selesai`}
               trendDirection={totalLogbookCount > 0 ? 'up' : 'neutral'}
               accentColor="violet"
-              sparkData={logSpark}
               onClick={() => handleSubTabChange('logbook')}
             />
           </div>
 
-          <div className="bg-white/85 dark:bg-zinc-900/75 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-zinc-800 shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 shadow-sm overflow-hidden">
           
           {/* Header Bersepadu: Pusat Kawalan & Pemantauan Usahawan Belia */}
-          <div className="px-5 py-4 border-b border-slate-200/80 dark:border-zinc-800 bg-slate-50/70 dark:bg-zinc-950/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold shrink-0">
                 <LayoutDashboard className="w-5 h-5" />
@@ -823,7 +789,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             <div className="flex items-center gap-2 self-start sm:self-auto">
-              <span className="text-[11px] font-semibold text-black dark:text-white bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 px-3 py-1 rounded-lg tabular-nums">
+              <span className="text-[11px] font-semibold text-black dark:text-white bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 px-3 py-1 rounded-lg tabular-nums">
                 {totalMentees} Mentee &middot; {mentorEndorsements.length} Perakuan
               </span>
             </div>
@@ -837,8 +803,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <div className="lg:col-span-7 space-y-5">
 
                 {/* Interactive Recharts District & Endorsement Distribution */}
-                <div className="bg-slate-50/60 dark:bg-zinc-950/50 rounded-xl p-4 sm:p-5 border border-slate-200/80 dark:border-zinc-800">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-zinc-800 mb-4">
+                <div className="bg-slate-50 dark:bg-zinc-950 rounded-xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-600">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-zinc-600 mb-4">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="w-4 h-4 text-black dark:text-white/75" />
                       <h3 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider">
@@ -880,9 +846,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
 
                 {/* Temujanji Terdekat & Tindakan Segera */}
-                <div className="bg-slate-50/60 dark:bg-zinc-950/50 rounded-xl p-4 sm:p-5 border border-slate-200/80 dark:border-zinc-800 flex flex-col justify-between">
+                <div className="bg-slate-50 dark:bg-zinc-950 rounded-xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-600 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700 mb-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-black dark:text-white/75" />
                       <h3 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider">
@@ -898,14 +864,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     {mentorRegistrations.slice(0, 3).map((reg) => (
                       <div 
                         key={reg.id}
-                        className="p-3.5 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3"
+                        className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
-                        <div className="min-w-0 space-y-0.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-black dark:text-white truncate">
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-xs font-bold text-black dark:text-white leading-snug break-words">
                               {reg.entrepreneurName}
                             </span>
-                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${
+                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md shrink-0 ${
                               reg.status === 'confirmed'
                                 ? 'bg-amber-100 text-black dark:bg-teal-600 dark:text-white'
                                 : reg.status === 'completed'
@@ -915,11 +881,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               {reg.status === 'confirmed' ? 'Disahkan' : reg.status === 'completed' ? 'Selesai' : 'Menunggu'}
                             </span>
                           </div>
-                          <p className="text-[11px] text-black/70 dark:text-white/75 truncate">
+                          <p className="text-[11px] text-black/70 dark:text-white/75 leading-relaxed break-words">
                             {reg.businessName} &middot; <span className="font-medium text-black dark:text-white">{reg.district}</span>
                           </p>
-                          <div className="flex items-center gap-2 text-[10px] text-black/70 dark:text-white/75 pt-0.5">
-                            <Clock className="w-3 h-3 text-black/70 dark:text-white/75" />
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-black/70 dark:text-white/75 pt-0.5">
+                            <Clock className="w-3 h-3 text-black/70 dark:text-white/75 shrink-0" />
                             <span>{reg.preferredDate || 'Akan ditetapkan'} &middot; {reg.preferredTime || '10:00 AM'}</span>
                             <span>&middot;</span>
                             <span>{reg.mode === 'Google Meet Maya' ? 'Google Meet Maya' : 'Bersemuka Kampus'}</span>
@@ -949,7 +915,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <button
                               type="button"
                               onClick={() => handleSubTabChange('sessions')}
-                              className="px-3 py-1.5 rounded-lg bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 dark:border-slate-700 text-[11px] font-semibold transition-all cursor-pointer whitespace-nowrap"
+                              className="px-3 py-1.5 rounded-lg bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-[11px] font-semibold transition-all cursor-pointer whitespace-nowrap"
                             >
                               Butiran
                             </button>
@@ -966,7 +932,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-200 dark:border-slate-700 mt-4 flex items-center justify-between">
+                <div className="pt-4 border-t border-slate-300 dark:border-slate-600 mt-4 flex items-center justify-between">
                   <span className="text-[11px] text-black/70 dark:text-white/75">
                     Semak jadual lengkap & pengurusan mentee
                   </span>
@@ -984,9 +950,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
 
               {/* Right Span (5 Cols): Status Perakuan Geran & Dana Benih */}
-              <div className="lg:col-span-5 bg-slate-50/60 dark:bg-zinc-950/50 rounded-xl p-4 sm:p-5 border border-slate-200/80 dark:border-zinc-800 flex flex-col justify-between">
+              <div className="lg:col-span-5 bg-slate-50 dark:bg-zinc-950 rounded-xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-600 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700 mb-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
                     <div className="flex items-center gap-2">
                       <Award className="w-4 h-4 text-black/70 dark:text-white/75" />
                       <h3 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider">
@@ -1002,21 +968,21 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     {mentorEndorsements.slice(0, 3).map((end) => (
                       <div 
                         key={end.id}
-                        className="p-3.5 rounded-xl bg-white dark:bg-amber-950/20 border border-slate-200 dark:border-amber-900/40 flex items-center justify-between gap-3"
+                        className="p-3.5 rounded-xl bg-white dark:bg-amber-950/20 border border-slate-300 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
-                        <div className="min-w-0 space-y-0.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-black dark:text-white truncate">
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-xs font-bold text-black dark:text-white leading-snug break-words">
                               {end.menteeName}
                             </span>
-                            <span className="text-[10px] font-mono font-bold text-black dark:text-white bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded">
+                            <span className="text-[10px] font-mono font-bold text-black dark:text-white bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded shrink-0">
                               {end.recommendedAmount}
                             </span>
                           </div>
-                          <p className="text-[11px] text-black dark:text-white truncate">
+                          <p className="text-[11px] text-black dark:text-white leading-relaxed break-words">
                             {end.businessName} &middot; <span className="text-black/70 dark:text-white/75">{end.district}</span>
                           </p>
-                          <p className="text-[10px] font-mono text-black/70 dark:text-white/75 pt-0.5">
+                          <p className="text-[10px] font-mono text-black/70 dark:text-white/75 pt-0.5 break-words">
                             Kod: {end.endorsementCode} &middot; Tarikh: {end.issuedAt}
                           </p>
                         </div>
@@ -1044,7 +1010,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-200 dark:border-slate-700 mt-4 flex items-center justify-between">
+                <div className="pt-4 border-t border-slate-300 dark:border-slate-600 mt-4 flex items-center justify-between">
                   <button
                     type="button"
                     onClick={() => setIsNewEndorsementModalOpen(true)}
@@ -1068,8 +1034,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             {/* Direktori Ringkas Usahawan Mentee (Integrated Table) */}
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 overflow-hidden">
-              <div className="px-4 sm:px-5 py-3.5 border-b border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 overflow-hidden">
+              <div className="px-4 sm:px-5 py-3.5 border-b border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider">
                     Direktori Ringkas Usahawan Mentee
@@ -1086,7 +1052,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari usahawan, jajahan..."
-                    className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-600 dark:focus:border-blue-500"
+                    className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-xs text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1094,7 +1060,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-black/70 dark:text-white/75">
+                    <tr className="bg-slate-50 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 text-[11px] font-semibold text-black/70 dark:text-white/75">
                       <th className="py-3 px-4">Usahawan & Perniagaan</th>
                       <th className="py-3 px-4">Jajahan</th>
                       <th className="py-3 px-4">Kategori</th>
@@ -1103,13 +1069,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       <th className="py-3 px-4 text-right">Tindakan</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  <tbody className="divide-y divide-slate-300 dark:divide-slate-600">
                     {filteredRegistrations.map((mentee) => {
                       const hasEndorsement = mentorEndorsements.some(e => e.menteeName.toLowerCase() === mentee.entrepreneurName.toLowerCase());
                       return (
                         <tr 
                           key={mentee.id}
-                          className="hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors"
+                          className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
                         >
                           <td className="py-3 px-4">
                             <div className="font-bold text-black dark:text-white">{mentee.entrepreneurName}</div>
@@ -1148,7 +1114,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <button
                               type="button"
                               onClick={() => handleSubTabChange('sessions')}
-                              className="px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 dark:border-slate-700 text-[11px] font-semibold transition-all cursor-pointer whitespace-nowrap"
+                              className="px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-[11px] font-semibold transition-all cursor-pointer whitespace-nowrap"
                             >
                               Buka Sesi
                             </button>
@@ -1183,8 +1149,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           {/* =================================================================== */}
           {/* SEKSYEN 1: PERMOHONAN BIMBINGAN (FULL-WIDTH STACKED CARD)           */}
           {/* =================================================================== */}
-          <section id="mentor-applications-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-700 gap-3">
+          <section id="mentor-applications-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-300 dark:border-slate-600 gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center">
@@ -1215,7 +1181,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cari nama usahawan, jenama perniagaan atau topik bimbingan..."
-                  className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs sm:text-sm text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
                 />
               </div>
 
@@ -1229,7 +1195,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all whitespace-nowrap cursor-pointer ${
                       statusFilter === tab
                         ? 'bg-teal-600 text-white shadow-xs font-bold dark:bg-teal-600'
-                        : 'text-black dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-slate-700'
+                        : 'text-black dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
                     }`}
                   >
                     {tab === 'all' ? `Semua (${mentorRegistrations.length})` : tab === 'pending' ? `Menunggu (${pendingCount})` : tab === 'confirmed' ? `Disahkan (${confirmedCount})` : `Selesai (${completedCount})`}
@@ -1241,7 +1207,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Mentee Applications Full-Width Stacked Cards */}
             <div className="space-y-4 pt-1">
               {filteredRegistrations.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/40">
+                <div className="text-center py-12 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900">
                   <GraduationCap className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto mb-2 opacity-50" />
                   <p className="text-sm font-bold text-black dark:text-white">Tiada rekod padanan permohonan bimbingan.</p>
                   <p className="text-xs text-black/70 dark:text-white/75 mt-1">Cuba tukar kata kunci carian atau pilih tab status lain di atas.</p>
@@ -1258,7 +1224,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   return (
                     <div
                       key={mentee.id}
-                      className="p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all space-y-4 shadow-2xs"
+                      className="p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all space-y-4 shadow-2xs"
                     >
                       {/* Top Row: Mentee Info & Status Badge */}
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -1310,7 +1276,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       </div>
 
                       {/* Prominent Mentee Message & Challenges Box (Generous space & large readable font) */}
-                      <div className="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-2">
+                      <div className="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 space-y-2">
                         <div className="flex items-center gap-2 text-xs font-bold text-black dark:text-white">
                           <MessageSquare className="w-4 h-4 text-black dark:text-white/75" />
                           <span>Mesej Permohonan & Cabaran Dihadapi Usahawan:</span>
@@ -1332,7 +1298,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <div className="flex items-center justify-between text-xs font-bold text-black dark:text-white">
                             <span className="flex items-center gap-1.5">
                               <FileText className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                              <span>Pelan Tindakan Mentor Tersimpan:</span>
+                              <span>Nota Bimbingan Mentor Tersimpan:</span>
                             </span>
                             <span className="text-[11px] font-normal text-black dark:text-white/75">Telah dihantar</span>
                           </div>
@@ -1343,7 +1309,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       )}
 
                       {/* Action Buttons Row */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-300 dark:border-slate-600">
                         {/* Left: Contact */}
                         <div className="flex items-center gap-2">
                           <a
@@ -1384,10 +1350,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleOpenNotesModal(mentee)}
-                            className="px-3.5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                            className="px-3.5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
                           >
                             <FileText className="w-3.5 h-3.5" />
-                            <span>{mentee.mentorActionPlan ? 'Kemaskini Pelan Tindakan' : '+ Sediakan Pelan Tindakan'}</span>
+                            <span>{mentee.mentorActionPlan ? 'Kemaskini Nota Bimbingan' : '+ Tambah Nota Bimbingan'}</span>
                           </button>
 
                           <button
@@ -1415,8 +1381,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           {/* =================================================================== */}
           {/* SEKSYEN 2: JADUAL (FULL-WIDTH STACKED CARD)                         */}
           {/* =================================================================== */}
-          <section id="mentor-schedule-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-700 gap-3">
+          <section id="mentor-schedule-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-300 dark:border-slate-600 gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/70 flex items-center justify-center">
@@ -1444,7 +1410,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Confirmed Sessions List */}
             <div className="space-y-4">
               {mentorRegistrations.filter(m => m.status === 'confirmed').length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/40">
+                <div className="text-center py-12 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900">
                   <Clock className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto mb-2 opacity-50" />
                   <p className="text-sm font-bold text-black dark:text-white">Tiada sesi bimbingan aktif ditetapkan dalam jadual.</p>
                   <p className="text-xs text-black/70 dark:text-white/75 mt-1">Sahkan permohonan bimbingan di bahagian atas untuk menjadualkan tarikh dan slot.</p>
@@ -1483,7 +1449,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               <ExternalLink className="w-3 h-3 ml-0.5" />
                             </a>
                           ) : (
-                            <span className="text-xs text-black dark:text-white flex items-center gap-1 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 font-medium">
+                            <span className="text-xs text-black dark:text-white flex items-center gap-1 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-600 font-medium">
                               <MapPin className="w-3.5 h-3.5 text-black dark:text-white" />
                               <span>Bilik Bimbingan UMK CEED</span>
                             </span>
@@ -1522,9 +1488,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => handleOpenNotesModal(mentee)}
-                            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                           >
-                            Nota / Pelan Tindakan
+                            Nota Bimbingan
                           </button>
 
                           <button
@@ -1547,25 +1513,25 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           {/* =================================================================== */}
           {/* SEKSYEN 3: PELAN TINDAKAN (FULL-WIDTH STACKED CARD)                 */}
           {/* =================================================================== */}
-          <section id="mentor-action-plans-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-700 gap-3">
+          <section id="mentor-action-plans-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-300 dark:border-slate-600 gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center">
                     <FileText className="w-4 h-4" />
                   </div>
                   <h3 className="text-base sm:text-lg font-black text-black dark:text-white tracking-tight">
-                    Pelan Tindakan
+                    Nota Bimbingan Usahawan
                   </h3>
                 </div>
                 <p className="text-xs text-black dark:text-white/75 mt-1">
-                  Garis panduan bimbingan, sasaran KPI jualan dan langkah penambahbaikan berstruktur untuk usahawan belia.
+                  Panduan bimbingan, sasaran jualan, dan langkah susulan untuk bantu usahawan belia berkembang.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
                 <span className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
-                  {mentorRegistrations.filter(m => m.mentorActionPlan).length} Pelan Disediakan
+                  {mentorRegistrations.filter(m => m.mentorActionPlan).length} Nota Disediakan
                 </span>
               </div>
             </div>
@@ -1573,10 +1539,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Action Plans Feed in Full Width */}
             <div className="space-y-4">
               {mentorRegistrations.filter(m => m.mentorActionPlan).length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-900/40 space-y-2">
+                <div className="text-center py-12 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900 space-y-2">
                   <MessageSquare className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto opacity-50" />
-                  <p className="text-sm font-bold text-black dark:text-white">Belum ada nota pelan tindakan.</p>
-                  <p className="text-xs text-black/70 dark:text-white/75">Tekan "+ Sediakan Pelan Tindakan" pada senarai permohonan bimbingan di atas untuk menetapkan hala tuju bisnes usahawan.</p>
+                  <p className="text-sm font-bold text-black dark:text-white">Belum ada nota bimbingan lagi.</p>
+                  <p className="text-xs text-black/70 dark:text-white/75">Tekan "+ Tambah Nota Bimbingan" pada senarai sesi di atas untuk rekodkan panduan bisnes usahawan.</p>
                 </div>
               ) : (
                 mentorRegistrations.filter(m => m.mentorActionPlan).map((mentee) => (
@@ -1599,11 +1565,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         onClick={() => handleOpenNotesModal(mentee)}
                         className="px-3 py-1.5 rounded-lg text-xs font-bold text-black dark:text-white bg-amber-100 dark:bg-teal-600 hover:bg-amber-200 dark:hover:bg-teal-600 transition-colors cursor-pointer self-start sm:self-auto"
                       >
-                        Kemaskini Pelan Tindakan
+                        Kemaskini Nota Bimbingan
                       </button>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-white dark:bg-slate-900/70 border border-teal-200 dark:border-teal-800/70 space-y-1.5">
+                    <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-800/70 space-y-1.5">
                       <span className="text-xs font-bold text-black dark:text-white block">
                         Garis Panduan & Sasaran Tindakan Mentor:
                       </span>
@@ -1635,7 +1601,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         <div className="space-y-6 animate-in fade-in duration-200">
           
           {/* Header Action Banner */}
-          <div className="p-5 kbelia-important-header dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-5 kbelia-important-header dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-black dark:text-white/75 shrink-0" />
@@ -1644,7 +1610,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </h3>
               </div>
               <p className="text-xs text-black dark:text-white max-w-2xl leading-relaxed">
-                Mentor bertauliah mempunyai autoriti rasmi untuk menilai usahawan dan mengeluarkan Surat Perakuan Sokongan Geran. Dokumen digital bertandatangan rasmi ini diperlukan oleh urus setia kerajaan bagi kelulusan pembiayaan Dana Benih (RM3,000) dan Geran Pemangkin (RM5,000).
+                Mentor berdaftar boleh menilai usahawan dan mengeluarkan Surat Sokongan Geran. Dokumen bertandatangan rasmi ini diperlukan oleh pihak admin KBelia untuk meluluskan Geran Permulaan (RM3,000) dan Geran Pemangkin (RM5,000).
               </p>
             </div>
 
@@ -1659,8 +1625,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           </div>
 
           {/* List of Issued Endorsements */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-6 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-4 h-4 text-black dark:text-white/75" />
                 <h4 className="text-sm font-bold text-black dark:text-white">
@@ -1673,7 +1639,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             {mentorEndorsements.length === 0 ? (
-              <div className="py-10 text-center text-xs text-black/70 dark:text-white/75 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl">
+              <div className="py-10 text-center text-xs text-black/70 dark:text-white/75 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl">
                 Tiada surat perakuan geran dikeluarkan di bawah seliaan anda buat masa ini.
               </div>
             ) : (
@@ -1681,7 +1647,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               {mentorEndorsements.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-4 space-y-3 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all shadow-2xs flex flex-col justify-between"
+                  className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-4 space-y-3 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all shadow-2xs flex flex-col justify-between"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -1712,12 +1678,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-black dark:text-white line-clamp-3 leading-relaxed italic bg-white dark:bg-slate-900/70 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <p className="text-[11px] text-black dark:text-white line-clamp-3 leading-relaxed italic bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-300 dark:border-slate-600">
                       "{item.justification}"
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between gap-2">
                     <span className="text-[10px] text-black/70 dark:text-white/75">
                       Tarikh: {item.issuedAt}
                     </span>
@@ -1746,16 +1712,16 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {currentSubTab === 'logbook' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           
-          <div className="p-5 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="p-5 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-black dark:text-white/75 shrink-0" />
                 <h3 className="text-base font-bold text-black dark:text-white">
-                  Log Jurnal Bimbingan & Pelan Tindakan Berstruktur
+                  Rekod Sesi Bimbingan & Tugasan Usahawan
                 </h3>
               </div>
               <p className="text-xs text-black dark:text-white max-w-2xl leading-relaxed">
-                Catatkan minit mesyuarat bimbingan, garis masa sasaran peniaga, dan senarai tugasan wajib mentee. Anda boleh menyemak kemajuan tugasan secara berterusan bagi memastikan objektif inkubasi tercapai.
+                Catatkan nota perbincangan sesi bimbingan, sasaran peniaga, dan senarai tugasan penting usahawan. Anda boleh menyemak kemajuan tugasan secara berterusan supaya sasaran bisnes tercapai.
               </p>
             </div>
 
@@ -1765,21 +1731,21 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               className="interactive-press interactive-lift px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer dark:bg-teal-600"
             >
               <Plus className="w-4 h-4 text-white" />
-              <span>Catat Log Jurnal Baharu</span>
+              <span>Tambah Rekod Sesi</span>
             </button>
           </div>
 
           <div className="space-y-4">
             {mentorLogs.length === 0 ? (
-              <div className="py-10 text-center text-xs text-black/70 dark:text-white/75 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
-                Belum ada catatan log jurnal bimbingan direkodkan untuk mentee seliaan anda.
+              <div className="py-10 text-center text-xs text-black/70 dark:text-white/75 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
+                Belum ada rekod sesi bimbingan untuk usahawan seliaan anda.
               </div>
             ) : mentorLogs.map((log) => (
               <div
                 key={log.id}
-                className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-2xs space-y-4"
+                className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 shadow-2xs space-y-4"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-slate-600">
                   <div>
                     <span className="text-[10px] font-bold text-black dark:text-white/75 uppercase tracking-wider block">
                       Tarikh Sesi: {log.sessionDate}
@@ -1797,7 +1763,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <div className="text-xs font-bold text-black dark:text-white">
                     Ringkasan Minit Bimbingan Mentor:
                   </div>
-                  <p className="text-xs text-black dark:text-white bg-slate-50 dark:bg-slate-900/70 p-3 rounded-xl border border-slate-200 dark:border-slate-700 leading-relaxed font-sans">
+                  <p className="text-xs text-black dark:text-white bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-300 dark:border-slate-600 leading-relaxed font-sans">
                     {log.minutes}
                   </p>
                 </div>
@@ -1817,7 +1783,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
                             task.completed
                               ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-black/70 dark:text-white/75 line-through'
-                              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-blue-400/70 dark:hover:border-blue-400/70 text-black dark:text-white'
+                              : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 hover:border-blue-400/70 dark:hover:border-blue-400/70 text-black dark:text-white'
                           }`}
                         >
                           <div className="flex items-center gap-2.5">
@@ -1832,7 +1798,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           </div>
 
                           <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${
-                            task.completed ? 'bg-emerald-100 text-black' : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-200 dark:border-slate-700'
+                            task.completed ? 'bg-emerald-100 text-black' : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600'
                           }`}>
                             Sasaran: {task.dueDate}
                           </span>
@@ -1852,12 +1818,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* TAB 4: PROFIL MENTOR & JADUAL KELAPANGAN                              */}
       {/* ===================================================================== */}
       {currentSubTab === 'profile' && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-2xs space-y-6 animate-in fade-in duration-200">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-6 shadow-2xs space-y-6 animate-in fade-in duration-200">
           
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-700">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-300 dark:border-slate-600">
             <div>
               <h3 className="text-lg font-bold text-black dark:text-white">
-                Profil & Kredensial Mentor Bertauliah
+                Profil & Maklumat Mentor
               </h3>
               <p className="text-xs text-black dark:text-white/75">
                 Maklumat ini dipaparkan kepada usahawan belia yang ingin memohon bimbingan perniagaan.
@@ -1870,7 +1836,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               className="interactive-press interactive-lift px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer dark:bg-teal-600"
             >
               <Edit3 className="w-4 h-4" />
-              <span>Sunting Maklumat Profil</span>
+              <span>Edit Profil Saya</span>
             </button>
           </div>
 
@@ -1880,7 +1846,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <label className="text-xs font-semibold text-black dark:text-white/75 block mb-1">
                   Nama Penuh & Gelaran:
                 </label>
-                <div className="text-sm font-bold text-black dark:text-white p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                <div className="text-sm font-bold text-black dark:text-white p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                   {currentMentor.name}
                 </div>
               </div>
@@ -1889,7 +1855,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <label className="text-xs font-semibold text-black dark:text-white/75 block mb-1">
                   Jawatan & Agensi:
                 </label>
-                <div className="text-sm font-medium text-black dark:text-white p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                <div className="text-sm font-medium text-black dark:text-white p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                   {currentMentor.title} &middot; <span className="font-bold text-black dark:text-white/75">{currentMentor.agency}</span>
                 </div>
               </div>
@@ -1899,11 +1865,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   Saluran Perhubungan Rasmi:
                 </label>
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-black dark:text-white p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center gap-2 text-xs text-black dark:text-white p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                     <Phone className="w-4 h-4 text-black dark:text-white" />
                     <span>WhatsApp: +{currentMentor.phone}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-black dark:text-white p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center gap-2 text-xs text-black dark:text-white p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                     <Mail className="w-4 h-4 text-black dark:text-white" />
                     <span>Emel Rasmi: {currentMentor.email}</span>
                   </div>
@@ -1916,7 +1882,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <label className="text-xs font-semibold text-black dark:text-white/75 block mb-1">
                   Waktu & Hari Kelapangan Bimbingan:
                 </label>
-                <div className="text-sm font-bold text-black dark:text-white p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center gap-2">
+                <div className="text-sm font-bold text-black dark:text-white p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-black/70 dark:text-white/75" />
                   <span>{currentMentor.availableDays}</span>
                 </div>
@@ -1926,7 +1892,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <label className="text-xs font-semibold text-black dark:text-white/75 block mb-1">
                   Bidang Pengkhususan Bimbingan:
                 </label>
-                <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                   {currentMentor.expertise.map((exp, idx) => (
                     <span key={idx} className="text-xs font-semibold bg-teal-50 text-black border border-teal-200 dark:bg-teal-950/60 dark:text-white dark:border-teal-800/70 px-3 py-1 rounded-lg">
                       {exp}
@@ -1939,7 +1905,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <label className="text-xs font-semibold text-black dark:text-white/75 block mb-1">
                   Biodata Ringkas Mentor:
                 </label>
-                <p className="text-xs text-black dark:text-white p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 leading-relaxed font-sans">
+                <p className="text-xs text-black dark:text-white p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 leading-relaxed font-sans">
                   {currentMentor.bio}
                 </p>
               </div>
@@ -1954,9 +1920,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* ===================================================================== */}
       {isNewEndorsementModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[92vh] overflow-y-auto overflow-hidden">
+          <div className="w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 max-h-[92vh] overflow-y-auto overflow-hidden">
             
-            <div className="kbelia-important-header px-6 sm:px-7 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-700">
+            <div className="kbelia-important-header px-6 sm:px-7 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-2.5">
                 <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-black dark:bg-amber-950/80 dark:text-white dark:border-amber-800 flex items-center justify-center">
                   <Award className="w-6 h-6" />
@@ -1973,7 +1939,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <button
                 type="button"
                 onClick={() => setIsNewEndorsementModalOpen(false)}
-                className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black hover:bg-white/80 dark:hover:bg-slate-800 transition-colors cursor-pointer dark:hover:text-white"
+                className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer dark:hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1992,7 +1958,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     value={newEndorsementMenteeName}
                     onChange={(e) => setNewEndorsementMenteeName(e.target.value)}
                     placeholder="Cth: Siti Aminah binti Yusof"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
 
@@ -2006,7 +1972,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     value={newEndorsementBusinessName}
                     onChange={(e) => setNewEndorsementBusinessName(e.target.value)}
                     placeholder="Cth: Sambal Tok Abah Original"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -2019,7 +1985,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <select
                     value={newEndorsementCategory}
                     onChange={(e) => setNewEndorsementCategory(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   >
                     <option value="Makanan & Minuman (F&B)">Makanan & Minuman (F&B)</option>
                     <option value="Fesyen, Batik & Kraf Kelantan">Fesyen, Batik & Kraf Kelantan</option>
@@ -2037,7 +2003,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <select
                     value={newEndorsementDistrict}
                     onChange={(e) => setNewEndorsementDistrict(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   >
                     <option value="Kota Bharu">Kota Bharu</option>
                     <option value="Bachok">Bachok</option>
@@ -2064,10 +2030,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                       newEndorsementGrantType === 'RM3,000'
                         ? 'bg-emerald-50 text-black border-emerald-600 font-bold dark:bg-emerald-950/60 dark:text-white'
-                        : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-black dark:text-white/75 hover:border-blue-400/70'
+                        : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-black dark:text-white/75 hover:border-blue-400/70'
                     }`}
                   >
-                    <div className="text-[10px] uppercase font-semibold">Dana Benih</div>
+                    <div className="text-[10px] uppercase font-semibold">Geran Permulaan</div>
                     <div className="text-sm font-black">RM3,000</div>
                   </button>
 
@@ -2077,7 +2043,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                       newEndorsementGrantType === 'RM5,000'
                         ? 'bg-emerald-50 text-black border-emerald-600 font-bold dark:bg-emerald-950/60 dark:text-white'
-                        : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-black dark:text-white/75 hover:border-blue-400/70'
+                        : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-black dark:text-white/75 hover:border-blue-400/70'
                     }`}
                   >
                     <div className="text-[10px] uppercase font-semibold">Geran Pemangkin</div>
@@ -2090,7 +2056,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                       newEndorsementGrantType === 'RM10,000'
                         ? 'bg-emerald-50 text-black border-emerald-600 font-bold dark:bg-emerald-950/60 dark:text-white'
-                        : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-black dark:text-white/75 hover:border-blue-400/70'
+                        : 'bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-black dark:text-white/75 hover:border-blue-400/70'
                     }`}
                   >
                     <div className="text-[10px] uppercase font-semibold">Dana Pertumbuhan</div>
@@ -2109,7 +2075,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   value={newEndorsementJustification}
                   onChange={(e) => setNewEndorsementJustification(e.target.value)}
                   placeholder="Terangkan komitmen usahawan, prestasi jualan, potensi produk, dan impak penggunaan dana geran terhadap perkembangan perniagaan..."
-                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 leading-relaxed font-sans dark:focus:border-blue-500"
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 leading-relaxed font-sans dark:focus:border-blue-500"
                 />
               </div>
 
@@ -2122,7 +2088,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   value={newEndorsementReadiness}
                   onChange={(e) => setNewEndorsementReadiness(e.target.value)}
                   placeholder="Cth: Telah lulus 3 sesi bimbingan mentor & mematuhi piawaian pembungkusan UMK"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -2135,12 +2101,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     className="mt-0.5 rounded text-black dark:text-white focus:ring-blue-500/30 w-4 h-4 cursor-pointer"
                   />
                   <span className="leading-relaxed">
-                    Saya dengan ini memperakui bahawa saya telah menyemak dokumen perniagaan dan membimbing usahawan belia ini. Perakuan ini dibuat dengan penuh integriti bagi kegunaan urus setia kerajaan.
+                    Saya mengesahkan bahawa saya telah menyemak dokumen perniagaan dan membimbing usahawan belia ini. Perakuan ini dibuat dengan penuh integriti untuk semakan pihak pentadbir.
                   </span>
                 </label>
               </div>
 
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsNewEndorsementModalOpen(false)}
@@ -2168,10 +2134,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* ===================================================================== */}
       {selectedEndorsementForView && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="w-full max-w-2xl bg-white text-black rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[94vh] overflow-y-auto space-y-6">
+          <div className="w-full max-w-2xl bg-white text-black rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-300 max-h-[94vh] overflow-y-auto space-y-6">
             
             {/* Action Bar */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-300">
               <span className="text-xs font-bold text-black uppercase tracking-wider flex items-center gap-1.5">
                 <Award className="w-4 h-4 text-black" />
                 Dokumen Rasmi Sokongan Geran Belia
@@ -2180,7 +2146,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-black border border-slate-200 hover:border-blue-400/70 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-black border border-slate-300 hover:border-blue-400/70 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Cetak / PDF</span>
@@ -2252,7 +2218,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 menilai potensi perniagaan penama di bawah:
               </p>
 
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 font-sans space-y-1 text-xs">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-300 font-sans space-y-1 text-xs">
                 <div><strong>Nama Usahawan Belia:</strong> {selectedEndorsementForView.menteeName}</div>
                 <div><strong>Nama Syarikat / Jenama:</strong> {selectedEndorsementForView.businessName}</div>
                 <div><strong>Kategori Perniagaan:</strong> {selectedEndorsementForView.businessCategory}</div>
@@ -2280,7 +2246,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             {/* Signature & Seal Block */}
-            <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:items-end justify-between gap-4 font-sans text-xs">
+            <div className="pt-6 border-t border-slate-300 flex flex-col sm:flex-row sm:items-end justify-between gap-4 font-sans text-xs">
               <div className="space-y-2">
                 <div className="min-w-24 h-12 border-b-2 border-slate-800 flex items-end pb-1">
                   <span className="font-serif italic text-black font-bold text-sm">
@@ -2321,26 +2287,26 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* ===================================================================== */}
       {isNewLogModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[92vh] overflow-y-auto overflow-hidden">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 max-h-[92vh] overflow-y-auto overflow-hidden">
             
-            <div className="kbelia-important-header px-6 sm:px-7 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-700">
+            <div className="kbelia-important-header px-6 sm:px-7 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-200 dark:bg-indigo-950/60 dark:border-indigo-800/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-black dark:text-white">
-                    Catat Minit Log Jurnal Bimbingan
+                    Tambah Rekod Sesi Bimbingan
                   </h3>
                   <p className="text-xs text-black/70 dark:text-white/75">
-                    Rekod minit perbincangan dan tugasan mentee
+                    Simpan nota perbincangan dan senarai tugasan usahawan
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsNewLogModalOpen(false)}
-                className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black hover:bg-white/80 dark:hover:bg-slate-800 transition-colors cursor-pointer dark:hover:text-white"
+                className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer dark:hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2359,7 +2325,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     value={newLogMenteeName}
                     onChange={(e) => setNewLogMenteeName(e.target.value)}
                     placeholder="Cth: Siti Aminah"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
 
@@ -2373,7 +2339,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     value={newLogBusinessName}
                     onChange={(e) => setNewLogBusinessName(e.target.value)}
                     placeholder="Cth: Sambal Tok Abah"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -2388,7 +2354,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   value={newLogTopic}
                   onChange={(e) => setNewLogTopic(e.target.value)}
                   placeholder="Cth: Penetapan Harga & Pemasaran TikTok Shop"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -2402,11 +2368,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   value={newLogMinutes}
                   onChange={(e) => setNewLogMinutes(e.target.value)}
                   placeholder="Catatkan nasihat mentor, isu aliran tunai atau penemuan bimbingan..."
-                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white font-sans leading-relaxed focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white font-sans leading-relaxed focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
                 />
               </div>
 
-              <div className="space-y-2 pt-1 border-t border-slate-200 dark:border-slate-700">
+              <div className="space-y-2 pt-1 border-t border-slate-300 dark:border-slate-600">
                 <label className="block text-xs font-bold text-black dark:text-white">
                   Tugasan Wajib Usahawan (Action Checklist):
                 </label>
@@ -2417,14 +2383,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     value={newLogTask1}
                     onChange={(e) => setNewLogTask1(e.target.value)}
                     placeholder="Tugasan 1 (Cth: Buka akaun bank)"
-                    className="col-span-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="col-span-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                   <input
                     type="text"
                     value={newLogDueDate1}
                     onChange={(e) => setNewLogDueDate1(e.target.value)}
                     placeholder="Tarikh sasaran"
-                    className="px-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white font-mono focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="px-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white font-mono focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
 
@@ -2434,19 +2400,19 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     value={newLogTask2}
                     onChange={(e) => setNewLogTask2(e.target.value)}
                     placeholder="Tugasan 2 (Cth: Hantar borang SSM)"
-                    className="col-span-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                    className="col-span-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   />
                   <input
                     type="text"
                     value={newLogDueDate2}
                     onChange={(e) => setNewLogDueDate2(e.target.value)}
                     placeholder="Tarikh sasaran"
-                    className="px-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white font-mono focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                    className="px-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white font-mono focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsNewLogModalOpen(false)}
@@ -2458,7 +2424,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   type="submit"
                   className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm cursor-pointer dark:bg-blue-600"
                 >
-                  Simpan Log Jurnal
+                  Simpan Rekod Sesi
                 </button>
               </div>
 
@@ -2473,16 +2439,16 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* ===================================================================== */}
       {selectedMenteeForNotes && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[92vh] overflow-y-auto overflow-hidden">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 max-h-[92vh] overflow-y-auto overflow-hidden">
             
-            <div className="kbelia-important-header px-6 sm:px-7 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-700">
+            <div className="kbelia-important-header px-6 sm:px-7 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-200 dark:bg-indigo-950/60 dark:border-indigo-800/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-black dark:text-white">
-                    Nota Nasihat & Pelan Tindakan Usahawan
+                    Nota Nasihat & Tindakan Usahawan
                   </h3>
                   <p className="text-xs text-black/70 dark:text-white/75">
                     Untuk: <span className="font-bold text-black dark:text-white">{selectedMenteeForNotes.entrepreneurName}</span> ({selectedMenteeForNotes.businessName})
@@ -2492,7 +2458,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedMenteeForNotes(null)}
-                className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black hover:bg-white/80 dark:hover:bg-slate-800 transition-colors cursor-pointer dark:hover:text-white"
+                className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer dark:hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2501,14 +2467,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             <form onSubmit={handleSaveNotes} className="px-6 sm:px-7 pb-6 sm:pb-7 pt-4 space-y-4">
               <div>
                 <label className="block text-xs font-bold text-black dark:text-white mb-1">
-                  Pelan Tindakan Usahawan (Action Items / Checklist):
+                  Senarai Langkah & Tindakan Usahawan:
                 </label>
                 <textarea
                   rows={4}
                   value={actionPlanInput}
                   onChange={(e) => setActionPlanInput(e.target.value)}
                   placeholder="Contoh:&#10;1. Sediakan 3 video promosi menu baharu sebelum 28 Mac.&#10;2. Buka akaun perniagaan khusus untuk elak campur duit peribadi.&#10;3. Hadiri bengkel pengurusan inventori UMK."
-                  className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 leading-relaxed font-sans dark:focus:border-blue-500"
+                  className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 leading-relaxed font-sans dark:focus:border-blue-500"
                 />
               </div>
 
@@ -2521,7 +2487,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   value={mentorNotesInput}
                   onChange={(e) => setMentorNotesInput(e.target.value)}
                   placeholder="Catatan prestasi, komitmen usahawan atau cadangan susulan..."
-                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -2534,11 +2500,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   value={meetLinkInput}
                   onChange={(e) => setMeetLinkInput(e.target.value)}
                   placeholder="https://meet.google.com/abc-defg-hij"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setSelectedMenteeForNotes(null)}
@@ -2565,8 +2531,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* ===================================================================== */}
       {isNewSlotModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div className="kbelia-important-header px-6 pt-5 pb-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden">
+            <div className="kbelia-important-header px-6 pt-5 pb-4 flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
               <h3 className="font-bold text-sm text-black dark:text-white">
                 Buka Slot Jadual Bimbingan Baharu
               </h3>
@@ -2585,7 +2551,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   value={newSlotDate}
                   onChange={(e) => setNewSlotDate(e.target.value)}
                   placeholder="Cth: 12 April 2026 (Ahad)"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -2597,7 +2563,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   type="text"
                   value={newSlotTime}
                   onChange={(e) => setNewSlotTime(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
@@ -2608,14 +2574,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <select
                   value={newSlotMode}
                   onChange={(e) => setNewSlotMode(e.target.value as any)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                 >
                   <option value="Bersemuka di Kampus">Bersemuka di Kampus (Bilik Bimbingan UMK)</option>
                   <option value="Google Meet Maya">Google Meet Maya</option>
                 </select>
               </div>
 
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+              <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsNewSlotModalOpen(false)}

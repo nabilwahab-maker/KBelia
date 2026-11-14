@@ -14,6 +14,8 @@ import { YouthProgram } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from './ToastNotification';
+import { PortalImage } from './PortalImage';
+import { resolveProgramImage } from '../utils/visualAssets';
 
 interface ProgramsSectionProps {
   programs: YouthProgram[];
@@ -105,7 +107,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
 
     const noticeMsg = isEn
       ? `Registration for "${prog.title}" recorded. Secretariat will send confirmation details before the event date.`
-      : `Pendaftaran penyertaan "${prog.title}" berjaya direkodkan. Urusetia akan menghubungi anda sebelum tarikh program.`;
+      : `Pendaftaran penyertaan "${prog.title}" berjaya direkodkan. Pihak Admin KBelia akan menghubungi anda sebelum tarikh program.`;
     setActiveNotice(noticeMsg);
     showToast({
       type: 'success',
@@ -169,7 +171,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
               selectedCategory === cat.key
                 ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
-                : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700 hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700'
+                : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
             }`}
           >
             {cat.label}
@@ -179,7 +181,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
 
       {/* Empty State */}
       {filteredPrograms.length === 0 ? (
-        <div className="text-center py-14 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
+        <div className="text-center py-14 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600">
           <Award className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <p className="text-sm font-bold text-black dark:text-white">
             {isEn ? 'No programs found in this category' : 'Tiada program ditemui dalam kategori ini'}
@@ -195,12 +197,22 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
               <div
                 key={prog.id}
                 id={`program-card-${prog.id}`}
-                className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-400/70 dark:hover:border-blue-400/70 overflow-hidden shadow-xs flex flex-col justify-between group transition-colors"
+                className="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-600 hover:border-blue-400/70 dark:hover:border-blue-400/70 overflow-hidden shadow-xs flex flex-col justify-between group transition-colors"
               >
-                <div className="p-6 space-y-4">
+                <div>
+                  <div className="h-44 w-full overflow-hidden bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600">
+                    <PortalImage
+                      src={resolveProgramImage(prog)}
+                      alt={prog.title}
+                      fallbackType="program"
+                      fallbackLabel={prog.category}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                    />
+                  </div>
+                  <div className="p-6 space-y-4">
                   {/* Category & Featured Badge */}
                   <div className="flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-0.5 bg-slate-50 dark:bg-slate-700 text-black dark:text-white border border-slate-200 dark:border-slate-600 rounded text-[11px] font-semibold">
+                    <span className="px-2.5 py-0.5 bg-slate-50 dark:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 rounded text-[11px] font-semibold">
                       {prog.category}
                     </span>
                     {prog.isFeatured && (
@@ -236,7 +248,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                   )}
 
                   {/* Date & Location Details */}
-                  <div className="space-y-1.5 pt-2 text-xs text-black/70 dark:text-white/75 border-t border-slate-200/80 dark:border-slate-700">
+                  <div className="space-y-1.5 pt-2 text-xs text-black/70 dark:text-white/75 border-t border-slate-300 dark:border-slate-600">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-3.5 h-3.5 text-black dark:text-white shrink-0" />
                       <span>{prog.date}</span>
@@ -251,13 +263,14 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                         {isEn ? 'Organized by:' : 'Anjuran:'} {prog.organizer}
                       </span>
                     </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Footer Action */}
-                <div className="p-4 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-700">
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600">
                   {isReadOnly ? (
-                    <div className="w-full py-2 px-4 bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium flex items-center justify-center gap-2">
+                    <div className="w-full py-2 px-4 bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-medium flex items-center justify-center gap-2">
                       <Eye className="w-3.5 h-3.5 text-black dark:text-white/75" />
                       <span>{isEn ? 'Status: State Initiative (Monitored)' : 'Status: Inisiatif Negeri (Dipantau)'}</span>
                     </div>

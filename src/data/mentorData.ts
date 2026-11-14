@@ -21,7 +21,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
   {
     id: 'mentor-2',
     name: 'Puan Siti Aminah Binti Yusof',
-    title: 'Pengasas Warisan Batik Kontemporari Kelantan & Jurulatih Bertauliah',
+    title: 'Pengasas Warisan Batik Kontemporari Kelantan & Jurulatih Keusahawanan',
     agency: 'Institut Keusahawanan Negara (INSKEN Coach)',
     expertise: [
       'Penembusan Pasaran Eksport & Fesyen',
@@ -38,7 +38,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
   {
     id: 'mentor-3',
     name: 'En. Khairul Hafiz Bin Razali, CA',
-    title: 'Perunding Kewangan SME & Juruaudit Bertauliah MIA',
+    title: 'Perunding Kewangan SME & Juruaudit Bertauliah',
     agency: 'Dewan Perniagaan Melayu Kelantan & SME Corp Panel',
     expertise: [
       'Penyediaan Penyata Kewangan Kiosk',
@@ -48,7 +48,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     avatarUrl: '/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
     email: 'khairul.audit@smeadvisor.my',
     phone: '60139123456',
-    bio: 'Akauntan bertauliah membantu usahawan mikro menyediakan buku tunai piawai dan kertas kerja pembiayaan perniagaan sehingga RM50,000.',
+    bio: 'Akauntan berpengalaman membantu usahawan mikro menyediakan rekod tunai dan kertas kerja pembiayaan perniagaan sehingga RM50,000.',
     availableDays: 'Setiap Rabu & Sabtu (11:00 AM - 3:00 PM)',
     activeMenteesCount: 2
   },

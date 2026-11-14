@@ -42,7 +42,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
         if (role === 'admin') {
           return {
             pageLabel: 'Admin',
-            breadcrumb: isMs ? 'Papan Pemuka Pentadbir' : 'Admin Dashboard',
+            breadcrumb: isMs ? 'Dashboard Admin' : 'Admin Dashboard',
             dashboardTitle: 'ADMIN DASHBOARD',
             subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
             icon: ShieldCheck,
@@ -52,7 +52,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
         if (role === 'mentor') {
           return {
             pageLabel: 'Mentor',
-            breadcrumb: isMs ? 'Papan Pemuka Mentor' : 'Mentor Dashboard',
+            breadcrumb: isMs ? 'Dashboard Mentor' : 'Mentor Dashboard',
             dashboardTitle: 'MENTOR DASHBOARD',
             subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
             icon: GraduationCap,
@@ -61,7 +61,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
         }
         return {
           pageLabel: isMs ? 'Belia' : 'Youth',
-          breadcrumb: isMs ? 'Papan Pemuka Belia' : 'Belia Dashboard',
+          breadcrumb: isMs ? 'Dashboard Belia' : 'Belia Dashboard',
           dashboardTitle: 'BELIA DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Store,
@@ -71,7 +71,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
       case 'merchant':
         return {
           pageLabel: isMs ? 'Belia' : 'Youth',
-          breadcrumb: isMs ? 'Papan Pemuka Belia' : 'Belia Dashboard',
+          breadcrumb: isMs ? 'Dashboard Belia' : 'Belia Dashboard',
           dashboardTitle: 'BELIA DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Store,
@@ -81,7 +81,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
       case 'mentor':
         return {
           pageLabel: 'Mentor',
-          breadcrumb: isMs ? 'Papan Pemuka Mentor' : 'Mentor Dashboard',
+          breadcrumb: isMs ? 'Dashboard Mentor' : 'Mentor Dashboard',
           dashboardTitle: 'MENTOR DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: GraduationCap,
@@ -91,7 +91,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
       case 'admin':
         return {
           pageLabel: 'Admin',
-          breadcrumb: isMs ? 'Papan Pemuka Pentadbir' : 'Admin Dashboard',
+          breadcrumb: isMs ? 'Dashboard Admin' : 'Admin Dashboard',
           dashboardTitle: 'ADMIN DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: ShieldCheck,
@@ -100,9 +100,9 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
 
       case 'academic':
         return {
-          pageLabel: isMs ? 'Kapsul Niaga' : 'Modular Kiosks',
-          breadcrumb: isMs ? 'Kapsul & Kiosk Modular' : 'Modular Kiosks & Capsules',
-          dashboardTitle: isMs ? 'KIOSK & KAPSUL NIAGA' : 'MODULAR KIOSK DASHBOARD',
+          pageLabel: isMs ? 'Kiosk Belia' : 'Modular Kiosks',
+          breadcrumb: isMs ? 'Senarai & Tempahan Kiosk' : 'Modular Kiosks & Capsules',
+          dashboardTitle: isMs ? 'KIOSK USAHAWAN BELIA' : 'MODULAR KIOSK DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Building2,
           iconBg: 'bg-indigo-600'
@@ -110,8 +110,8 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
 
       case 'hepa':
         return {
-          pageLabel: isMs ? 'Direktori' : 'Directory',
-          breadcrumb: isMs ? 'Direktori Usahawan Kelantan' : 'Entrepreneurs Directory',
+          pageLabel: isMs ? 'Senarai Kedai' : 'Directory',
+          breadcrumb: isMs ? 'Senarai Usahawan Kelantan' : 'Entrepreneurs Directory',
           dashboardTitle: 'DIREKTORI USAHAWAN',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Users,
@@ -121,7 +121,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
       case 'ceed':
         return {
           pageLabel: isMs ? 'Geran' : 'Grants',
-          breadcrumb: isMs ? 'Geran dan Pembiayaan Belia' : 'Youth Grants & Financing',
+          breadcrumb: isMs ? 'Geran dan Bantuan Modal' : 'Youth Grants & Financing',
           dashboardTitle: 'GERAN & PEMBIAYAAN BELIA',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Award,
@@ -131,7 +131,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
       case 'events':
         return {
           pageLabel: isMs ? 'Acara' : 'Events',
-          breadcrumb: isMs ? 'Karnival & Ekspo Belia' : 'Youth Events & Expo',
+          breadcrumb: isMs ? 'Program & Ekspo Belia' : 'Youth Events & Expo',
           dashboardTitle: 'ACARA & EKSPO DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Calendar,
@@ -140,8 +140,8 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
 
       case 'b2b':
         return {
-          pageLabel: isMs ? 'Iklan' : 'Ads',
-          breadcrumb: isMs ? 'Ruang Iklan Niaga' : 'Youth Ads & Commercial',
+          pageLabel: isMs ? 'Ruang Niaga' : 'Ads',
+          breadcrumb: isMs ? 'Ruang Iklan & Pembekal' : 'Youth Ads & Commercial',
           dashboardTitle: 'HAB IKLAN & NIAGA',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Briefcase,
@@ -150,8 +150,8 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
 
       case 'calculator':
         return {
-          pageLabel: isMs ? 'Kalkulator' : 'Calculator',
-          breadcrumb: isMs ? 'Kalkulator Kelayakan Geran' : 'Grant Eligibility Calculator',
+          pageLabel: isMs ? 'Kira Untung' : 'Calculator',
+          breadcrumb: isMs ? 'Kira Kelayakan Geran' : 'Grant Eligibility Calculator',
           dashboardTitle: 'KALKULATOR KELAYAKAN',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Coins,
@@ -161,7 +161,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
       case 'news':
         return {
           pageLabel: 'News',
-          breadcrumb: isMs ? 'Berita & Pengumuman Rasmi' : 'Official News & Updates',
+          breadcrumb: isMs ? 'Berita & Pengumuman' : 'Official News & Updates',
           dashboardTitle: 'BERITA RASMI KBELIA',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
           icon: Newspaper,
@@ -180,7 +180,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
 
       default:
         return {
-          pageLabel: isMs ? 'Papan Pemuka' : 'Dashboard',
+          pageLabel: isMs ? 'Dashboard' : 'Dashboard',
           breadcrumb: isMs ? 'Utama' : 'Home',
           dashboardTitle: 'BELIA DASHBOARD',
           subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
@@ -221,7 +221,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
   })();
 
   return (
-    <div className="w-full kbelia-important-header rounded-t-2xl rounded-b-none border border-b border-slate-200 dark:border-zinc-800 px-4 sm:px-6 py-3.5 sm:py-4 shadow-sm transition-colors">
+    <div className="w-full kbelia-important-header rounded-t-2xl rounded-b-none border border-b border-slate-300 dark:border-zinc-600 px-4 sm:px-6 py-3.5 sm:py-4 shadow-sm transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         
         {/* Navigation Breadcrumb */}

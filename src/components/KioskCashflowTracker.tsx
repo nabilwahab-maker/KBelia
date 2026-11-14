@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Save,
   Coins,
-  Trash2
+  Trash2,
+  Edit3
 } from 'lucide-react';
 import { KioskDailySale } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +11,7 @@ import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { isProductionAuthenticated, saveCashflowRecord, deleteCashflowRecord } from '../services/dataService';
 import { mergeUniqueById, subscribeCrossTabSync, subscribeDemoSyncCollection } from '../services/realtimeSync';
 import { showToast } from './ToastNotification';
+import { EditCashflowModal } from './EditCashflowModal';
 
 interface KioskCashflowTrackerProps {
   kioskName?: string;
@@ -39,6 +41,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [editingRecord, setEditingRecord] = useState<KioskDailySale | null>(null);
 
   useEffect(() => {
     const prodAuth = isProductionAuthenticated();
@@ -145,7 +148,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
       showToast({
         type: 'info',
         title: 'Rekod Dipadam',
-        message: 'Entri aliran tunai telah dikeluarkan daripada lejar anda.'
+        message: 'Rekod jualan harian telah dipadam daripada senarai.'
       });
     } catch (err: any) {
       setValidationError(err?.message || 'Gagal memadam rekod.');
@@ -160,8 +163,8 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     : 0;
 
   return (
-    <div className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 sm:p-6 shadow-xs">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-200 dark:border-slate-700">
+    <div className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-300 dark:border-slate-600">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-black dark:text-white/75">
@@ -181,7 +184,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
 
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 my-5">
-        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
           <span className="text-[11px] font-medium text-black/70 dark:text-white/75 block mb-0.5">
             Jumlah Jualan Kasar
           </span>
@@ -190,7 +193,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
           </span>
         </div>
 
-        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
           <span className="text-[11px] font-medium text-black/70 dark:text-white/75 block mb-0.5">
             Kos & Belanja Stok
           </span>
@@ -208,21 +211,21 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
           </span>
         </div>
 
-        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
           <span className="text-[11px] font-medium text-black/70 dark:text-white/75 block mb-0.5">
-            Nisbah Bayaran DuitNow QR
+            Peratusan Bayaran DuitNow QR
           </span>
           <div className="flex items-baseline gap-1.5">
             <span className="text-xl sm:text-2xl font-bold text-black dark:text-white/75 tabular-nums tracking-tight">
               {qrPercentage}%
             </span>
-            <span className="text-xs text-black/70 dark:text-white/75">Cashless</span>
+            <span className="text-xs text-black/70 dark:text-white/75">Tanpa Tunai</span>
           </div>
         </div>
       </div>
 
       {/* Record Input Form */}
-      <form onSubmit={handleAddRecord} className="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mb-6 space-y-3">
+      <form onSubmit={handleAddRecord} className="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 mb-6 space-y-3">
         {validationError && (
           <div className="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-black dark:text-white text-xs font-semibold border border-rose-200 dark:border-rose-800">
             {validationError}
@@ -238,7 +241,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
             />
           </div>
           <div>
@@ -250,7 +253,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               placeholder="0.00"
               value={cash}
               onChange={(e) => setCash(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
             />
           </div>
           <div>
@@ -262,7 +265,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               placeholder="0.00"
               value={qr}
               onChange={(e) => setQr(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
             />
           </div>
           <div>
@@ -274,7 +277,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               placeholder="0.00"
               value={expenses}
               onChange={(e) => setExpenses(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
             />
           </div>
         </div>
@@ -286,7 +289,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               placeholder="Catatan ringkas (cth: Belian stok bahan mentah atau jualan karnival)..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+              className="w-full px-3 py-2 rounded-lg text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
             />
           </div>
           <button
@@ -301,13 +304,13 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
 
       {/* Sales Log Table */}
       {salesRecords.length === 0 ? (
-        <div className="text-center py-10 text-xs text-black/70 dark:text-white/75 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
+        <div className="text-center py-10 text-xs text-black/70 dark:text-white/75 border border-dashed border-slate-300 dark:border-slate-600 rounded-xl">
           Tiada rekod jualan lagi. Gunakan borang di atas untuk merekodkan jualan harian anda.
         </div>
       ) : (
-        <div className="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
+        <div className="overflow-x-auto border border-slate-300 dark:border-slate-600 rounded-xl">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 dark:bg-slate-900 text-black/70 dark:text-white/75 uppercase text-[10px] tracking-wider font-semibold border-b border-slate-200 dark:border-slate-700">
+            <thead className="bg-slate-50 dark:bg-slate-900 text-black/70 dark:text-white/75 uppercase text-[10px] tracking-wider font-semibold border-b border-slate-300 dark:border-slate-600">
               <tr>
                 <th className="py-2.5 px-3">Tarikh</th>
                 <th className="py-2.5 px-3">Tunai</th>
@@ -318,11 +321,11 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                 <th className="py-2.5 px-3 text-right">Tindakan</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200/80 dark:divide-slate-700 text-black dark:text-white">
+            <tbody className="divide-y divide-slate-300 dark:divide-slate-600 text-black dark:text-white">
               {salesRecords.map((r) => {
                 const dailyNet = (r.cashSales + r.qrSales) - r.expenses;
                 return (
-                  <tr key={r.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/40">
+                  <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
                     <td className="py-2.5 px-3 font-semibold text-black dark:text-white tabular-nums whitespace-nowrap">
                       {r.date}
                     </td>
@@ -336,20 +339,32 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                       {r.notes || '-'}
                     </td>
                     <td className="py-2.5 px-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          confirmDelete({
-                            itemName: `${r.date} — RM ${(r.cashSales + r.qrSales).toFixed(2)}`,
-                            itemType: 'Rekod Aliran Tunai',
-                            onConfirm: () => handleDeleteRecord(r.id)
-                          })
-                        }
-                        className="p-1 text-black/70 dark:text-white/75 hover:text-black transition-colors cursor-pointer dark:hover:text-white"
-                        title="Padam Rekod"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="inline-flex items-center justify-end gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setEditingRecord(r)}
+                          className="px-2.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/70 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 text-xs font-semibold whitespace-nowrap shrink-0"
+                          title="Edit Rekod"
+                        >
+                          <Edit3 className="w-3.5 h-3.5 shrink-0" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            confirmDelete({
+                              itemName: `${r.date} — RM ${(r.cashSales + r.qrSales).toFixed(2)}`,
+                              itemType: 'Rekod Jualan Harian',
+                              onConfirm: () => handleDeleteRecord(r.id)
+                            })
+                          }
+                          className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 text-xs font-semibold whitespace-nowrap shrink-0"
+                          title="Padam Rekod"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                          <span>Padam</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -358,6 +373,23 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
           </table>
         </div>
       )}
+
+      <EditCashflowModal
+        isOpen={Boolean(editingRecord)}
+        record={editingRecord}
+        ownerId={ownerId}
+        businessName={kioskName}
+        onClose={() => setEditingRecord(null)}
+        onSaved={(updated) => {
+          setSalesRecords(prev => prev.map(item => (item.id === updated.id ? updated : item)));
+          setEditingRecord(null);
+          showToast({
+            type: 'success',
+            title: 'Rekod Dikemas Kini',
+            message: `Rekod jualan bertarikh ${updated.date} berjaya disimpan.`
+          });
+        }}
+      />
     </div>
   );
 };

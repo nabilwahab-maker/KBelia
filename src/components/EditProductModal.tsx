@@ -124,11 +124,11 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl transition-colors"
+        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between">
+        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <Edit3 className="w-4 h-4" />
@@ -138,10 +138,10 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 id="edit-product-modal-title"
                 className="text-sm sm:text-base font-bold text-black dark:text-white truncate"
               >
-                Sunting Maklumat Produk
+                Edit Produk
               </h3>
               <p className="text-[11px] text-black/70 dark:text-white/75 truncate">
-                Kemaskini harga, gambar, penerangan dan status stok produk anda.
+                Ubah harga, gambar, info dan status stok produk anda.
               </p>
             </div>
           </div>
@@ -150,7 +150,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
             type="button"
             disabled={isSaving}
             onClick={onClose}
-            aria-label="Tutup tetingkap suntingan"
+            aria-label="Tutup tetingkap edit"
             className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
           >
             <X className="w-4 h-4" />
@@ -178,7 +178,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Contoh: Nasi Kerabu Daging Bakar"
-                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium"
+                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium"
               />
             </div>
 
@@ -194,7 +194,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="0.00"
-                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
               />
             </div>
 
@@ -208,7 +208,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="Contoh: Menu Utama"
-                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
               />
             </div>
           </div>
@@ -226,7 +226,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
                   inStock
                     ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 dark:border-emerald-600 text-emerald-800 dark:text-emerald-300 shadow-2xs'
-                    : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -239,7 +239,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
                   !inStock
                     ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 dark:border-rose-600 text-rose-800 dark:text-rose-300 shadow-2xs'
-                    : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 <XCircle className="w-4 h-4 shrink-0" />
@@ -259,7 +259,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Terangkan bahan, saiz hidangan, atau keistimewaan produk anda..."
-                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
               />
               <div className="mt-1 text-[11px] text-black/60 dark:text-white/60 text-right tabular-nums">
                 {description.length}/1000 aksara
@@ -277,12 +277,12 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
           </div>
 
           {/* Modal Footer */}
-          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
             <button
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-50"
+              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-50"
             >
               Batal
             </button>

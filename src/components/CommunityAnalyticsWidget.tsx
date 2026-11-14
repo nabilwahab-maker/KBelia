@@ -39,9 +39,9 @@ export const CommunityAnalyticsWidget: React.FC = () => {
   const [chartTab, setChartTab] = useState<'sectors' | 'growth'>('sectors');
 
   return (
-    <div className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 md:p-8 shadow-2xs w-full min-w-0 transition-colors">
+    <div className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-6 md:p-8 shadow-2xs w-full min-w-0 transition-colors">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-700">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-300 dark:border-slate-600">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-black dark:text-white/75">
@@ -59,7 +59,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
         </div>
 
         {/* Chart View Toggle */}
-        <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-slate-900 rounded-xl self-start sm:self-auto border border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-slate-900 rounded-xl self-start sm:self-auto border border-slate-300 dark:border-slate-600">
           <button
             type="button"
             onClick={() => setChartTab('sectors')}
@@ -88,7 +88,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
       {/* 4 Tabular Metric KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5 sm:gap-4 my-6 w-full min-w-0">
         {/* Metric 1 */}
-        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 transition-all hover:-translate-y-0.5">
+        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 transition-all hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-black/70 dark:text-white/75">
               Kiosk Beroperasi
@@ -112,7 +112,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
         </div>
 
         {/* Metric 2 */}
-        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 transition-all hover:-translate-y-0.5">
+        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 transition-all hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-black/70 dark:text-white/75">
               Dana Geran Disalurkan
@@ -133,7 +133,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
         </div>
 
         {/* Metric 3 */}
-        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 transition-all hover:-translate-y-0.5">
+        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 transition-all hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-black/70 dark:text-white/75">
               Usahawan Belia Aktif
@@ -157,7 +157,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
         </div>
 
         {/* Metric 4 */}
-        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 transition-all hover:-translate-y-0.5">
+        <div className="rounded-xl p-4 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 transition-all hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-black/70 dark:text-white/75">
               Penjimatan Subsidi Sewa
@@ -196,7 +196,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
                 className={`p-3 rounded-xl border cursor-pointer transition-all ${
                   activeSector.name === sec.name
                     ? 'bg-blue-50/70 dark:bg-blue-950/40 border-blue-400 dark:border-blue-500/70 shadow-xs'
-                    : 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 hover:bg-blue-50/40 dark:hover:bg-slate-800/60'
+                    : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 hover:bg-blue-50/40 dark:hover:bg-slate-800/60'
                 }`}
               >
                 <div className="flex items-center justify-between text-xs mb-1.5">
@@ -227,7 +227,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
           </div>
 
           {/* Active Sector Highlight Spotlight */}
-          <div className="xl:col-span-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-6 flex flex-col justify-between h-full w-full min-w-0">
+          <div className="xl:col-span-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 p-6 flex flex-col justify-between h-full w-full min-w-0">
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider text-black dark:text-white bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 mb-3">
                 <PieChart className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -242,7 +242,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
               </p>
             </div>
 
-            <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+            <div className="pt-4 mt-4 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between">
               <div>
                 <span className="text-[10px] uppercase font-bold text-black/70 dark:text-white/75 block">
                   Jumlah Usahawan
@@ -269,14 +269,14 @@ export const CommunityAnalyticsWidget: React.FC = () => {
             Prestasi Pertumbuhan Suku Tahunan Ekonomi Belia
           </span>
 
-          <div className="grid grid-cols-4 gap-3 sm:gap-6 items-end h-56 pt-6 pb-2 border-b border-slate-200 dark:border-slate-700 px-2 sm:px-6">
+          <div className="grid grid-cols-4 gap-3 sm:gap-6 items-end h-56 pt-6 pb-2 border-b border-slate-300 dark:border-slate-600 px-2 sm:px-6">
             {QUARTERLY_DATA.map((q) => (
               <div key={q.quarter} className="flex flex-col items-center h-full justify-end group">
                 <span className="text-[11px] font-bold text-black dark:text-white tabular-nums mb-2 group-hover:-translate-y-0.5 transition-transform">
                   {q.grants}
                 </span>
 
-                <div className="w-full max-w-[56px] bg-slate-50 border border-slate-200 dark:border-slate-700 dark:bg-slate-900 rounded-t-xl overflow-hidden h-36 flex items-end">
+                <div className="w-full max-w-[56px] bg-slate-50 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 rounded-t-xl overflow-hidden h-36 flex items-end">
                   <div 
                     className="w-full bg-gradient-to-t from-blue-600 to-indigo-500 group-hover:from-blue-500 group-hover:to-emerald-400 rounded-t-xl transition-all duration-500"
                     style={{ height: `${q.heightPct}%` }}

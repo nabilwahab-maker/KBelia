@@ -51,7 +51,7 @@ export const BudgetSlider: React.FC<BudgetSliderProps> = ({
         </div>
 
         {/* Track Bar (Divider Line) */}
-        <div className="relative w-full h-2.5 bg-slate-100 border border-slate-200 dark:border-slate-700 dark:bg-slate-700 rounded-full overflow-hidden">
+        <div className="relative w-full h-2.5 bg-slate-100 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-600 rounded-full transition-all duration-75"
             style={{ width: `${percentage}%` }}

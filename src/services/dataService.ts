@@ -47,7 +47,7 @@ export const DEFAULT_PORTAL_SETTINGS: PortalSettings = {
   portalSubsidyRate: 50,
   maxLeaseDurationMonths: 12,
   systemStatus: 'operational',
-  portalAnnouncement: 'Permohonan Kapsul Niaga Belia Kelantan Sesi 2026 kini dibuka dengan subsidi sewaan sehingga 50%.'
+  portalAnnouncement: 'Permohonan Kiosk Belia Kelantan Sesi 2026 kini dibuka dengan subsidi sewaan sehingga 50%.'
 };
 
 export function getDeletedIds(): string[] {
@@ -592,7 +592,7 @@ export async function updateGrantApplicationStatus(
 ) {
   const notes =
     adminNotes ||
-    (status === 'approved' ? 'Permohonan geran diluluskan oleh Urusetia KBelia.' : 'Permohonan ditolak.');
+    (status === 'approved' ? 'Permohonan geran diluluskan oleh Admin KBelia.' : 'Permohonan ditolak.');
 
   if (!isProductionAuthenticated()) {
     let updatedGrant: GrantApplication | undefined;

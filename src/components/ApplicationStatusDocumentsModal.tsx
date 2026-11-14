@@ -70,13 +70,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
       <div 
-        className="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[92vh] transition-all"
+        className="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden flex flex-col max-h-[92vh] transition-all"
         role="dialog"
         aria-modal="true"
       >
         
         {/* Header */}
-        <div className="kbelia-important-header dark:bg-slate-800 px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-slate-200 dark:border-slate-700">
+        <div className="kbelia-important-header dark:bg-slate-800 px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-slate-300 dark:border-slate-600">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 flex items-center justify-center border border-rose-200 dark:border-rose-800/70">
               <ShieldCheck className="w-6 h-6 text-black dark:text-white/75" />
@@ -93,14 +93,14 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Sub-Tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-7 pt-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shrink-0 overflow-x-auto">
+        <div className="flex items-center gap-2 px-5 sm:px-7 pt-4 border-b border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 shrink-0 overflow-x-auto">
           <button
             onClick={() => setActiveTab('status')}
             className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap ${
@@ -109,7 +109,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
-            1. Status Permohonan Semasa
+            Status Permohonan Semasa
           </button>
 
           <button
@@ -121,7 +121,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>2. Surat Tawaran Kiosk</span>
+            <span>Surat Tawaran Kiosk</span>
           </button>
 
           <button
@@ -133,7 +133,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             }`}
           >
             <Award className="w-3.5 h-3.5" />
-            <span>3. Perjanjian Sewaan (Tenancy)</span>
+            <span>Perjanjian Sewaan (Tenancy)</span>
           </button>
 
           <button
@@ -145,7 +145,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             }`}
           >
             <QrCode className="w-3.5 h-3.5" />
-            <span>4. Pengesahan Kod Digital</span>
+            <span>Pengesahan Kod Digital</span>
           </button>
         </div>
 
@@ -158,8 +158,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
               
               {/* Card 1: Modular Kiosk Status */}
               {userBooking ? (
-                <div className="p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 shadow-xs">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 shadow-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-blue-600 text-black dark:text-white/75 border border-blue-200 dark:border-blue-800/70 flex items-center justify-center shrink-0">
                         <Building2 className="w-5 h-5" />
@@ -208,7 +208,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                         <button
                           type="button"
                           onClick={() => setActiveTab('tenancy')}
-                          className="px-3 py-1.5 rounded-xl font-semibold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                          className="px-3 py-1.5 rounded-xl font-semibold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
                         >
                           Perjanjian Sewa
                         </button>
@@ -217,14 +217,14 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </div>
                 </div>
               ) : (
-                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-black/70 dark:text-white/75 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 text-black/70 dark:text-white/75 flex items-center justify-center shrink-0">
                       <Building2 className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-black dark:text-white">Tiada Permohonan Kapsul Aktif</h4>
-                      <p className="text-xs text-black/70 dark:text-white/75">Anda belum menghantar sebarang permohonan sewaan kapsul modular.</p>
+                      <h4 className="font-bold text-sm text-black dark:text-white">Tiada Permohonan Kiosk Aktif</h4>
+                      <p className="text-xs text-black/70 dark:text-white/75">Anda belum menghantar sebarang permohonan sewaan kiosk.</p>
                     </div>
                   </div>
                   <button
@@ -232,15 +232,15 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     onClick={() => { onClose(); onOpenBooking(); }}
                     className="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer shrink-0 dark:bg-blue-600"
                   >
-                    Mohon Kapsul Sekarang
+                    Mohon Kiosk Sekarang
                   </button>
                 </div>
               )}
 
               {/* Card 2: SEED Grant Status */}
               {userGrant ? (
-                <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-black dark:text-white/75 border border-amber-200 dark:border-amber-800 flex items-center justify-center shrink-0">
                         <Award className="w-5 h-5" />
@@ -267,13 +267,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     }`}>
                       <Clock className="w-4 h-4" />
                       <span>
-                        {userGrant.status === 'approved' ? 'Diluluskan' : userGrant.status === 'rejected' ? 'Ditolak' : 'Sedang Dinilai Urusetia'}
+                        {userGrant.status === 'approved' ? 'Diluluskan' : userGrant.status === 'rejected' ? 'Ditolak' : 'Sedang Disemak Admin'}
                       </span>
                     </span>
                   </div>
 
                   <div className="pt-3 flex items-center justify-between text-xs text-black dark:text-white/75">
-                    <span>{userGrant.adminNotes || 'Permohonan geran telah direkodkan oleh Urusetia KBelia.'}</span>
+                    <span>{userGrant.adminNotes || 'Permohonan geran telah direkodkan oleh Pentadbir KBelia.'}</span>
                     <button
                       type="button"
                       onClick={onOpenGrantModal}
@@ -284,9 +284,9 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </div>
                 </div>
               ) : (
-                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-black/70 dark:text-white/75 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 text-black/70 dark:text-white/75 flex items-center justify-center shrink-0">
                       <Award className="w-5 h-5" />
                     </div>
                     <div>
@@ -297,7 +297,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <button
                     type="button"
                     onClick={() => { onClose(); onOpenGrantModal(); }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
                   >
                     Mohon Geran Belia
                   </button>
@@ -306,8 +306,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
               {/* Card 3: Mentorship Session Status */}
               {userMentorship ? (
-                <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow-xs">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-indigo-600 text-black dark:text-white/75 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center shrink-0">
                         <GraduationCap className="w-5 h-5" />
@@ -374,9 +374,9 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </div>
                 </div>
               ) : (
-                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-black/70 dark:text-white/75 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-800 text-black/70 dark:text-white/75 flex items-center justify-center shrink-0">
                       <GraduationCap className="w-5 h-5" />
                     </div>
                     <div>
@@ -387,7 +387,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <button
                     type="button"
                     onClick={() => { onClose(); onOpenMentorship(); }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
                   >
                     Tempah Klinik Mentor
                   </button>
@@ -429,7 +429,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                           <button
                             type="button"
                             onClick={() => setIsCancelConfirmOpen(false)}
-                            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-black dark:text-white font-bold text-xs border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-black dark:text-white font-bold text-xs border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
                           >
                             Kekalkan Pendaftaran
                           </button>
@@ -449,13 +449,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <FileText className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto" />
                 <h4 className="font-bold text-sm text-black dark:text-white">Surat Tawaran Belum Tersedia</h4>
                 <p className="text-xs text-black/70 dark:text-white/75 max-w-md mx-auto">
-                  Surat tawaran digital akan dijana secara automatik sebaik sahaja permohonan kapsul modular anda diluluskan oleh pihak Urusetia UMK.
+                  Surat tawaran digital akan dijana secara automatik sebaik sahaja permohonan kiosk anda diluluskan oleh pihak Pentadbir KBelia.
                 </p>
               </div>
             ) : (
             <div className="space-y-4 animate-in fade-in duration-200">
               
-              <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-300 dark:border-slate-600">
                 <span className="text-xs text-black dark:text-white/75">
                   Surat tawaran rasmi boleh dicetak atau disimpan sebagai rujukan pihak berkuasa tempatan (PBT).
                 </span>
@@ -470,7 +470,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
               </div>
 
               {/* Printable Official Document Container (Crisp White for Print) */}
-              <div className="bg-white text-black p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-md font-sans space-y-5 print:border-none print:shadow-none">
+              <div className="bg-white text-black p-6 sm:p-8 rounded-2xl border border-slate-300 shadow-md font-sans space-y-5 print:border-none print:shadow-none">
                 
                 {/* Letterhead */}
                 <div className="flex items-center justify-between border-b-2 border-emerald-700 pb-4">
@@ -514,7 +514,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </p>
                   
                   {/* Table of Details */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 text-[11px]">
+                  <div className="bg-slate-50 border border-slate-300 rounded-xl p-3 space-y-1.5 text-[11px]">
                     <div className="flex justify-between">
                       <span className="text-black">Kod Kiosk Ditetapkan:</span>
                       <span className="font-mono font-bold text-black">{slotCode}</span>
@@ -547,7 +547,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 </div>
 
                 {/* Sign-off & Digital Stamp */}
-                <div className="pt-4 border-t border-slate-200 flex items-end justify-between">
+                <div className="pt-4 border-t border-slate-300 flex items-end justify-between">
                   <div>
                     <div className="text-[11px] font-bold text-black">Prof. Madya Dr. Wan Azhar</div>
                     <div className="text-[10px] text-black">Penyelaras Keusahawanan UMK & Urusetia KBelia Kelantan</div>
@@ -579,8 +579,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
               </div>
             ) : (
             <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-4 text-xs leading-relaxed text-black dark:text-white">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-4 text-xs leading-relaxed text-black dark:text-white">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
                   <div>
                     <h4 className="font-bold text-sm text-black dark:text-white uppercase">
                       Ringkasan Terma Perjanjian Sewaan Kiosk Modular
@@ -622,7 +622,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px]">
+                <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-[11px]">
                   <span className="text-black dark:text-white/75 font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-4 h-4" /> {userBooking.tenancySigned ? 'Perjanjian Disahkan Secara Digital' : 'Sedia Untuk Tandatangan Digital'}
                   </span>
@@ -652,7 +652,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 Kod rujukan dokumen anda dilindungi dengan jejak digital rasmi untuk mengelakkan pemalsuan lesen atau surat penempatan di pihak berkuasa tempatan.
               </p>
 
-              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 max-w-sm mx-auto font-mono text-xs">
+              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 max-w-sm mx-auto font-mono text-xs">
                 <div className="text-[10px] text-black/70 dark:text-white/75 uppercase font-bold">Kod Hash Rujukan:</div>
                 <div className="font-bold text-black dark:text-white/75 text-sm mt-0.5">{bookingRef || 'REG-2026-BELIA'}</div>
                 <div className="text-[10px] text-black dark:text-white/75 mt-1 flex items-center justify-center gap-1">
@@ -678,14 +678,14 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:px-7 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
+        <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
           <div className="text-[11px] text-black/70">
-            Perlukan bantuan sokongan? Hubungi Urusetia UMK di <span className="font-bold text-black dark:text-white">09-771 7000</span>
+            Perlukan bantuan? Hubungi Khidmat Bantuan UMK & KBelia di <span className="font-bold text-black dark:text-white">09-771 7000</span>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             Tutup
           </button>
