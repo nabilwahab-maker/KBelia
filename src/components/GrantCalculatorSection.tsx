@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { 
-  Calculator, 
   Award, 
   CheckCircle2, 
   Sparkles, 
@@ -63,28 +62,24 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-4">
       {/* Header Banner */}
-      <div className="kbelia-important-header dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-300 dark:border-slate-600 shadow-sm relative overflow-hidden">
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white text-xs font-bold mb-3 border border-emerald-200 dark:border-emerald-800/70">
-            <Calculator className="w-3.5 h-3.5" />
-            <span>{isEn ? 'Smart Simulation Tool' : 'Alat Simulasi Pintar Belia'}</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-black dark:text-white">
+      <div className="rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 border border-slate-200 dark:border-zinc-700">
+        <div className="max-w-2xl">
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
             {isEn ? 'Grant & Micro-Finance Eligibility Calculator' : 'Semak Kelayakan Geran & Bantuan Modal'}
           </h1>
-          <p className="text-xs sm:text-sm text-black dark:text-white mt-2 leading-relaxed">
+          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 mt-1 leading-relaxed">
             {isEn
-              ? 'Calculate your match score across Kelantan state grant schemes (TEKUN, YBK, MARA & RM3,000 Starter Grant) based on your business stage and district.'
-              : 'Semak kelayakan bantuan modal, geran permulaan dan pinjaman mikro kerajaan negeri Kelantan dalam masa 30 saat.'}
+              ? 'Estimate your match score across state schemes (TEKUN, YBK, MARA & RM3,000 Starter Fund) in 30 seconds.'
+              : 'Anggarkan skor padanan skim TEKUN, YBK, MARA dan dana permulaan negeri Kelantan dalam 30 saat.'}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Form Input Parameters (7 cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-slate-800 rounded-3xl p-5 sm:p-7 border border-slate-300 dark:border-slate-600 shadow-xs space-y-5">
+        <div className="lg:col-span-7 bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-slate-600 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
             <h2 className="text-base font-extrabold text-black dark:text-white flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-black dark:text-white/75" />

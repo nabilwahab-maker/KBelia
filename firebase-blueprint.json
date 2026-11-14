@@ -394,6 +394,47 @@
       },
       "required": ["id", "title", "summary", "content", "category", "status", "isPinned", "authorId", "authorName", "updatedAt", "createdAt"]
     },
+    "CommunityPost": {
+      "title": "CommunityPost",
+      "description": "Topik perbincangan dan soal jawab usahawan belia, mentor dan pentadbir di halaman Komuniti",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "content": { "type": "string", "minLength": 1, "maxLength": 5000 },
+        "category": { "type": "string", "enum": ["Soal Jawab Geran", "Operasi Kapsul", "Pemasaran & Jualan", "Lesen & SSM", "Jaringan Daerah"] },
+        "district": { "type": "string", "maxLength": 50 },
+        "authorId": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 120 },
+        "authorRole": { "type": "string", "enum": ["user", "mentor", "admin"] },
+        "status": { "type": "string", "enum": ["open", "resolved"] },
+        "isPinned": { "type": "boolean" },
+        "helpfulUserIds": { "type": "array" },
+        "helpfulCount": { "type": "number" },
+        "replyCount": { "type": "number" },
+        "acceptedReplyId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "title", "content", "category", "district", "authorId", "authorName", "authorRole", "status", "isPinned", "helpfulUserIds", "helpfulCount", "replyCount", "createdAt", "updatedAt"]
+    },
+    "CommunityReply": {
+      "title": "CommunityReply",
+      "description": "Balasan perbincangan pada topik Komuniti",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "postId": { "type": "string", "maxLength": 128 },
+        "content": { "type": "string", "minLength": 1, "maxLength": 3000 },
+        "authorId": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 120 },
+        "authorRole": { "type": "string", "enum": ["user", "mentor", "admin"] },
+        "isAccepted": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "postId", "content", "authorId", "authorName", "authorRole", "createdAt"]
+    },
     "DemoSyncRecord": {
       "title": "DemoSyncRecord",
       "description": "Rekod penyelarasan masa nyata sandbox mod demo tanpa PII sensitif",
@@ -402,7 +443,7 @@
         "id": { "type": "string", "maxLength": 128 },
         "entityType": {
           "type": "string",
-          "enum": ["booking", "grant", "ticket", "session", "endorsement", "log", "cashflow", "notification", "business", "product", "slot", "program", "b2b", "news", "mentor", "settings", "deleted"]
+          "enum": ["booking", "grant", "ticket", "session", "endorsement", "log", "cashflow", "notification", "business", "product", "slot", "program", "b2b", "news", "community_post", "community_reply", "mentor", "settings", "deleted"]
         },
         "actorId": { "type": "string", "maxLength": 128 },
         "scope": { "type": "string", "enum": ["demo"] },
@@ -485,6 +526,14 @@
     "/portal_news/{newsId}": {
       "schema": { "$ref": "#/entities/PortalNews" },
       "description": "Berita rasmi dan pengumuman portal kawalan Admin"
+    },
+    "/community_posts/{postId}": {
+      "schema": { "$ref": "#/entities/CommunityPost" },
+      "description": "Topik perbincangan dan soal jawab forum Komuniti untuk semua pengguna log masuk"
+    },
+    "/community_replies/{replyId}": {
+      "schema": { "$ref": "#/entities/CommunityReply" },
+      "description": "Balasan perbincangan pada topik Komuniti"
     },
     "/demo_sync/{syncId}": {
       "schema": { "$ref": "#/entities/DemoSyncRecord" },

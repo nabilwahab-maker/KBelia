@@ -148,16 +148,16 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="w-full space-y-4">
       
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
             Senarai Kiosk Belia Kelantan
-          </h2>
-          <p className="text-black dark:text-white/75 text-sm mt-1 max-w-2xl leading-relaxed">
-            Pilih dan sewa kiosk serba lengkap di lokasi strategik universiti dan pusat bandar Kelantan untuk memulakan perniagaan anda dengan modal rendah.
+          </h1>
+          <p className="text-black/75 dark:text-white/75 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
+            Pilih dan sewa ruang niaga serba lengkap di lokasi strategik universiti dan pusat bandar untuk memulakan perniagaan anda dengan modal rendah.
           </p>
         </div>
 
@@ -184,7 +184,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
       </div>
 
       {/* Info Callout: UMK Capsule Model */}
-      <div className="mb-8 p-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+      <div className="p-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
         <div className="flex items-start gap-3">
           <div className="p-2.5 bg-blue-600 text-white rounded-xl shrink-0 shadow-2xs dark:bg-blue-600">
             <Building2 className="w-5 h-5" />
@@ -199,7 +199,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
       </div>
 
       {/* Modern Minimalist Filter Section */}
-      <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs mb-8 transition-all">
+      <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs transition-all">
         {/* Top Control Bar: Search & Quick Metas */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-300 dark:border-slate-600">
           {/* Instant Search Bar */}
@@ -348,7 +348,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           <p className="text-xs text-black/70 dark:text-white/75 mt-1">Cuba tukar pilihan lokasi atau status kiosk.</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredSlots.map((slot) => {
             // Check active bookings associated with this slot
             const slotBookings = (bookings || []).filter(b => 

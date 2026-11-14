@@ -144,19 +144,15 @@ export const NewsPage: React.FC<NewsPageProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-4">
       {/* Page Intro & Admin Controls */}
-      <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
-            <Newspaper className="w-4 h-4" />
-            <span>Warta & Pengumuman Rasmi</span>
-          </div>
+      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="space-y-1">
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance">
             Berita Terkini Ekosistem KBelia Kelantan
           </h1>
-          <p className="text-xs sm:text-sm text-black dark:text-white max-w-2xl leading-relaxed">
-            Ikuti hebahan rasmi geran, pembukaan kapsul niaga, jadual karnival, dan pengumuman terkini Pentadbir.
+          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
+            Ikuti hebahan geran, pembukaan kapsul niaga, jadual karnival, dan makluman rasmi Pentadbir.
           </p>
         </div>
 
@@ -368,7 +364,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
 
           {/* Grid of Regular Articles */}
           {gridArticles.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
               {gridArticles.map(article => (
                 <article
                   key={article.id}

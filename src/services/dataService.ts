@@ -21,7 +21,9 @@ import {
   MentoringLogEntry,
   B2BListing,
   PortalSettings,
-  PortalNews
+  PortalNews,
+  CommunityPost,
+  CommunityReply
 } from '../types';
 import {
   INITIAL_BUSINESSES,
@@ -30,6 +32,7 @@ import {
   INITIAL_PROGRAMS
 } from '../data/seedData';
 import { INITIAL_PORTAL_NEWS } from '../data/newsData';
+import { INITIAL_COMMUNITY_POSTS, INITIAL_COMMUNITY_REPLIES } from '../data/communityData';
 import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import { broadcastSyncUpdate, publishDemoSyncRecord } from './realtimeSync';
 
@@ -126,6 +129,12 @@ export async function seedInitialData() {
     }
     for (const newsItem of INITIAL_PORTAL_NEWS) {
       await setDoc(doc(db, 'portal_news', newsItem.id), newsItem, { merge: true });
+    }
+    for (const post of INITIAL_COMMUNITY_POSTS) {
+      await setDoc(doc(db, 'community_posts', post.id), post, { merge: true });
+    }
+    for (const reply of INITIAL_COMMUNITY_REPLIES) {
+      await setDoc(doc(db, 'community_replies', reply.id), reply, { merge: true });
     }
     for (const mentor of INITIAL_MENTOR_PROFILES) {
       await setDoc(doc(db, 'mentor_profiles', mentor.id), mentor, { merge: true });
@@ -1045,6 +1054,409 @@ export async function restoreDefaultDemoNews(): Promise<void> {
   } else {
     for (const item of INITIAL_PORTAL_NEWS) {
       await publishDemoSyncRecord('news', item.id, item, false);
+    }
+  }
+}
+
+// --- COMMUNITY FORUM (Posts & Replies, All Signed-In Users) ---
+const DEMO_COMMUNITY_POSTS_KEY = 'kbelia_demo_community_posts_v1';
+const DEMO_COMMUNITY_REPLIES_KEY = 'kbelia_demo_community_replies_v1';
+
+export function loadLocalDemoCommunityPosts(): CommunityPost[] {
+  try {
+    const raw = localStorage.getItem(DEMO_COMMUNITY_POSTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function loadLocalDemoCommunityReplies(): CommunityReply[] {
+  try {
+    const raw = localStorage.getItem(DEMO_COMMUNITY_REPLIES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function saveCommunityPostRecord(
+  post: Partial<CommunityPost> & {
+    title: string;
+    content: string;
+    category: CommunityPost['category'];
+    district: CommunityPost['district'];
+    authorId: string;
+    authorName: string;
+    authorRole: CommunityPost['authorRole'];
+  }
+): Promise<CommunityPost> {
+  const id = (post.id || `comm-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`)
+    .replace(/[^a-zA-Z0-9_-]/g, '-')
+    .slice(0, 128);
+  const now = new Date().toISOString();
+  const helpfulIds = Array.isArray(post.helpfulUserIds)
+    ? Array.from(new Set(post.helpfulUserIds.filter((x): x is string => typeof x === 'string'))).slice(0, 500)
+    : [];
+
+  const sanitized: CommunityPost = {
+    id,
+    title: post.title.trim().slice(0, 200),
+    content: post.content.trim().slice(0, 5000),
+    category: post.category,
+    district: post.district || 'Kota Bharu',
+    authorId: (post.authorId || auth.currentUser?.uid || 'guest').slice(0, 128),
+    authorName: (post.authorName || 'Usahawan Belia').trim().slice(0, 120),
+    authorRole: post.authorRole || 'user',
+    status: post.status === 'resolved' ? 'resolved' : 'open',
+    isPinned: Boolean(post.isPinned),
+    helpfulUserIds: helpfulIds,
+    helpfulCount: typeof post.helpfulCount === 'number' ? Math.max(0, post.helpfulCount) : helpfulIds.length,
+    replyCount: typeof post.replyCount === 'number' ? Math.max(0, post.replyCount) : 0,
+    ...(post.acceptedReplyId ? { acceptedReplyId: post.acceptedReplyId.slice(0, 128) } : {}),
+    createdAt: post.createdAt || now,
+    updatedAt: now
+  };
+
+  try {
+    const deleted = getDeletedIds().filter(d => d !== id);
+    localStorage.setItem(CACHE_KEYS.DELETED_IDS, JSON.stringify(deleted));
+  } catch {
+    // ignore
+  }
+
+  if (!isProductionAuthenticated()) {
+    try {
+      const existing = loadLocalDemoCommunityPosts();
+      const updated = [sanitized, ...existing.filter(p => p.id !== id)];
+      localStorage.setItem(DEMO_COMMUNITY_POSTS_KEY, JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('community_post', id, sanitized);
+    return sanitized;
+  }
+
+  try {
+    await setDoc(doc(db, 'community_posts', id), sanitized, { merge: true });
+    return sanitized;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, 'community_posts');
+    throw error;
+  }
+}
+
+export async function deleteCommunityPostRecord(postId: string): Promise<void> {
+  markIdAsDeleted(postId);
+
+  if (!isProductionAuthenticated()) {
+    try {
+      const existingPosts = loadLocalDemoCommunityPosts();
+      localStorage.setItem(
+        DEMO_COMMUNITY_POSTS_KEY,
+        JSON.stringify(existingPosts.filter(p => p.id !== postId))
+      );
+      const existingReplies = loadLocalDemoCommunityReplies();
+      localStorage.setItem(
+        DEMO_COMMUNITY_REPLIES_KEY,
+        JSON.stringify(existingReplies.filter(r => r.postId !== postId))
+      );
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('community_post', postId, { id: postId }, true);
+    return;
+  }
+
+  try {
+    await deleteDoc(doc(db, 'community_posts', postId));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, 'community_posts');
+    throw error;
+  }
+}
+
+export async function toggleCommunityHelpfulRecord(
+  post: CommunityPost,
+  userId: string
+): Promise<CommunityPost> {
+  const alreadyVoted = post.helpfulUserIds.includes(userId);
+  const nextIds = alreadyVoted
+    ? post.helpfulUserIds.filter(id => id !== userId)
+    : [...post.helpfulUserIds, userId].slice(0, 500);
+  const delta = alreadyVoted ? -1 : 1;
+  const nextCount = Math.max(0, (post.helpfulCount || 0) + delta);
+  const updatedAt = new Date().toISOString();
+
+  const updatedPost: CommunityPost = {
+    ...post,
+    helpfulUserIds: nextIds,
+    helpfulCount: nextCount,
+    updatedAt
+  };
+
+  if (!isProductionAuthenticated()) {
+    try {
+      const existing = loadLocalDemoCommunityPosts();
+      localStorage.setItem(
+        DEMO_COMMUNITY_POSTS_KEY,
+        JSON.stringify([updatedPost, ...existing.filter(p => p.id !== post.id)])
+      );
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('community_post', post.id, updatedPost);
+    return updatedPost;
+  }
+
+  try {
+    await setDoc(
+      doc(db, 'community_posts', post.id),
+      {
+        ...updatedPost,
+        helpfulUserIds: nextIds,
+        helpfulCount: nextCount,
+        updatedAt
+      },
+      { merge: true }
+    );
+    return updatedPost;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, 'community_posts');
+    throw error;
+  }
+}
+
+export async function saveCommunityReplyRecord(
+  reply: Partial<CommunityReply> & {
+    postId: string;
+    content: string;
+    authorId: string;
+    authorName: string;
+    authorRole: CommunityReply['authorRole'];
+  },
+  parentPost?: CommunityPost
+): Promise<CommunityReply> {
+  const id = (reply.id || `rep-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`)
+    .replace(/[^a-zA-Z0-9_-]/g, '-')
+    .slice(0, 128);
+  const now = new Date().toISOString();
+
+  const sanitizedReply: CommunityReply = {
+    id,
+    postId: reply.postId.slice(0, 128),
+    content: reply.content.trim().slice(0, 3000),
+    authorId: (reply.authorId || auth.currentUser?.uid || 'guest').slice(0, 128),
+    authorName: (reply.authorName || 'Usahawan Belia').trim().slice(0, 120),
+    authorRole: reply.authorRole || 'user',
+    isAccepted: Boolean(reply.isAccepted),
+    createdAt: reply.createdAt || now,
+    updatedAt: now
+  };
+
+  const isNewReply = !reply.id;
+  const nextParent: CommunityPost | undefined = parentPost
+    ? {
+        ...parentPost,
+        replyCount: isNewReply ? (parentPost.replyCount || 0) + 1 : parentPost.replyCount,
+        updatedAt: now
+      }
+    : undefined;
+
+  if (!isProductionAuthenticated()) {
+    try {
+      const existingReplies = loadLocalDemoCommunityReplies();
+      localStorage.setItem(
+        DEMO_COMMUNITY_REPLIES_KEY,
+        JSON.stringify([...existingReplies.filter(r => r.id !== id), sanitizedReply])
+      );
+      if (nextParent) {
+        const existingPosts = loadLocalDemoCommunityPosts();
+        localStorage.setItem(
+          DEMO_COMMUNITY_POSTS_KEY,
+          JSON.stringify([nextParent, ...existingPosts.filter(p => p.id !== nextParent.id)])
+        );
+      }
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('community_reply', id, sanitizedReply);
+    if (nextParent) {
+      await publishDemoSyncRecord('community_post', nextParent.id, nextParent);
+    }
+    return sanitizedReply;
+  }
+
+  try {
+    await setDoc(doc(db, 'community_replies', id), sanitizedReply, { merge: true });
+    if (nextParent && isNewReply) {
+      await setDoc(
+        doc(db, 'community_posts', nextParent.id),
+        { ...nextParent, replyCount: nextParent.replyCount, updatedAt: now },
+        { merge: true }
+      );
+    }
+    return sanitizedReply;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, 'community_replies');
+    throw error;
+  }
+}
+
+export async function deleteCommunityReplyRecord(
+  replyId: string,
+  parentPost?: CommunityPost
+): Promise<void> {
+  markIdAsDeleted(replyId);
+  const now = new Date().toISOString();
+
+  const nextParent: CommunityPost | undefined = parentPost
+    ? {
+        ...parentPost,
+        replyCount: Math.max(0, (parentPost.replyCount || 1) - 1),
+        ...(parentPost.acceptedReplyId === replyId ? { acceptedReplyId: '', status: 'open' as const } : {}),
+        updatedAt: now
+      }
+    : undefined;
+
+  if (!isProductionAuthenticated()) {
+    try {
+      const existingReplies = loadLocalDemoCommunityReplies();
+      localStorage.setItem(
+        DEMO_COMMUNITY_REPLIES_KEY,
+        JSON.stringify(existingReplies.filter(r => r.id !== replyId))
+      );
+      if (nextParent) {
+        const existingPosts = loadLocalDemoCommunityPosts();
+        localStorage.setItem(
+          DEMO_COMMUNITY_POSTS_KEY,
+          JSON.stringify([nextParent, ...existingPosts.filter(p => p.id !== nextParent.id)])
+        );
+      }
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('community_reply', replyId, { id: replyId }, true);
+    if (nextParent) {
+      await publishDemoSyncRecord('community_post', nextParent.id, nextParent);
+    }
+    return;
+  }
+
+  try {
+    await deleteDoc(doc(db, 'community_replies', replyId));
+    if (nextParent) {
+      await setDoc(
+        doc(db, 'community_posts', nextParent.id),
+        { ...nextParent, replyCount: nextParent.replyCount, updatedAt: now },
+        { merge: true }
+      );
+    }
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, 'community_replies');
+    throw error;
+  }
+}
+
+export async function markAcceptedCommunityReplyRecord(
+  post: CommunityPost,
+  reply: CommunityReply,
+  allRepliesForPost: CommunityReply[]
+): Promise<void> {
+  const isUnmarking = post.acceptedReplyId === reply.id;
+  const now = new Date().toISOString();
+  const nextPost: CommunityPost = {
+    ...post,
+    acceptedReplyId: isUnmarking ? '' : reply.id,
+    status: isUnmarking ? 'open' : 'resolved',
+    updatedAt: now
+  };
+
+  if (!isProductionAuthenticated()) {
+    try {
+      const existingPosts = loadLocalDemoCommunityPosts();
+      localStorage.setItem(
+        DEMO_COMMUNITY_POSTS_KEY,
+        JSON.stringify([nextPost, ...existingPosts.filter(p => p.id !== post.id)])
+      );
+      const existingReplies = loadLocalDemoCommunityReplies();
+      const updatedMap = new Map(existingReplies.map(r => [r.id, r]));
+      for (const r of allRepliesForPost) {
+        updatedMap.set(r.id, {
+          ...r,
+          isAccepted: !isUnmarking && r.id === reply.id,
+          updatedAt: now
+        });
+      }
+      localStorage.setItem(DEMO_COMMUNITY_REPLIES_KEY, JSON.stringify(Array.from(updatedMap.values())));
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('community_post', nextPost.id, nextPost);
+    for (const r of allRepliesForPost) {
+      await publishDemoSyncRecord('community_reply', r.id, {
+        ...r,
+        isAccepted: !isUnmarking && r.id === reply.id,
+        updatedAt: now
+      });
+    }
+    return;
+  }
+
+  try {
+    await setDoc(doc(db, 'community_posts', nextPost.id), nextPost, { merge: true });
+    for (const r of allRepliesForPost) {
+      const nextAccepted = !isUnmarking && r.id === reply.id;
+      if (Boolean(r.isAccepted) !== nextAccepted) {
+        await setDoc(
+          doc(db, 'community_replies', r.id),
+          { ...r, isAccepted: nextAccepted, updatedAt: now },
+          { merge: true }
+        );
+      }
+    }
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, 'community_posts');
+    throw error;
+  }
+}
+
+export async function restoreDefaultDemoCommunity(): Promise<void> {
+  try {
+    const demoPostIds = new Set(INITIAL_COMMUNITY_POSTS.map(p => p.id));
+    const demoReplyIds = new Set(INITIAL_COMMUNITY_REPLIES.map(r => r.id));
+    const deleted = getDeletedIds().filter(id => !demoPostIds.has(id) && !demoReplyIds.has(id));
+    localStorage.setItem(CACHE_KEYS.DELETED_IDS, JSON.stringify(deleted));
+
+    const customPosts = loadLocalDemoCommunityPosts().filter(p => !demoPostIds.has(p.id));
+    localStorage.setItem(DEMO_COMMUNITY_POSTS_KEY, JSON.stringify(customPosts));
+
+    const customReplies = loadLocalDemoCommunityReplies().filter(r => !demoReplyIds.has(r.id));
+    localStorage.setItem(DEMO_COMMUNITY_REPLIES_KEY, JSON.stringify(customReplies));
+
+    broadcastSyncUpdate('community_post');
+  } catch {
+    // ignore
+  }
+
+  if (isProductionAuthenticated()) {
+    try {
+      for (const post of INITIAL_COMMUNITY_POSTS) {
+        await setDoc(doc(db, 'community_posts', post.id), post, { merge: true });
+      }
+      for (const reply of INITIAL_COMMUNITY_REPLIES) {
+        await setDoc(doc(db, 'community_replies', reply.id), reply, { merge: true });
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'community_posts');
+      throw error;
+    }
+  } else {
+    for (const post of INITIAL_COMMUNITY_POSTS) {
+      await publishDemoSyncRecord('community_post', post.id, post, false);
+    }
+    for (const reply of INITIAL_COMMUNITY_REPLIES) {
+      await publishDemoSyncRecord('community_reply', reply.id, reply, false);
     }
   }
 }

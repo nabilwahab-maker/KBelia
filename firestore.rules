@@ -462,6 +462,55 @@ service cloud.firestore {
         (!('publishedAt' in data) || validStr(data.publishedAt, 50));
     }
 
+    function isValidCommunityPost(data) {
+      return data.keys().hasAll([
+          'id', 'title', 'content', 'category', 'district', 'authorId',
+          'authorName', 'authorRole', 'status', 'isPinned', 'helpfulUserIds',
+          'helpfulCount', 'replyCount', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'title', 'content', 'category', 'district', 'authorId',
+          'authorName', 'authorRole', 'status', 'isPinned', 'helpfulUserIds',
+          'helpfulCount', 'replyCount', 'acceptedReplyId', 'createdAt', 'updatedAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.content is string && data.content.size() >= 1 && data.content.size() <= 5000 &&
+        data.category in ['Soal Jawab Geran', 'Operasi Kapsul', 'Pemasaran & Jualan', 'Lesen & SSM', 'Jaringan Daerah'] &&
+        validStr(data.district, 50) &&
+        validStr(data.authorId, 128) &&
+        validStr(data.authorName, 120) &&
+        data.authorRole in ['user', 'mentor', 'admin'] &&
+        data.status in ['open', 'resolved'] &&
+        data.isPinned is bool &&
+        data.helpfulUserIds is list && data.helpfulUserIds.size() <= 500 &&
+        (data.helpfulUserIds.size() == 0 || data.helpfulUserIds[0] is string) &&
+        data.helpfulCount is number && data.helpfulCount >= 0 &&
+        data.replyCount is number && data.replyCount >= 0 &&
+        (!('acceptedReplyId' in data) || validStr(data.acceptedReplyId, 128)) &&
+        validStr(data.createdAt, 50) &&
+        validStr(data.updatedAt, 50);
+    }
+
+    function isValidCommunityReply(data) {
+      return data.keys().hasAll([
+          'id', 'postId', 'content', 'authorId', 'authorName', 'authorRole', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'postId', 'content', 'authorId', 'authorName', 'authorRole',
+          'isAccepted', 'createdAt', 'updatedAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.postId, 128) &&
+        data.content is string && data.content.size() >= 1 && data.content.size() <= 3000 &&
+        validStr(data.authorId, 128) &&
+        validStr(data.authorName, 120) &&
+        data.authorRole in ['user', 'mentor', 'admin'] &&
+        (!('isAccepted' in data) || data.isAccepted is bool) &&
+        validStr(data.createdAt, 50) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
+    }
+
     function isValidDemoSync(data) {
       return data.keys().hasAll(['id', 'entityType', 'actorId', 'scope', 'payload', 'updatedAt']) &&
         data.keys().hasOnly(['id', 'entityType', 'actorId', 'scope', 'payload', 'deleted', 'updatedAt']) &&
@@ -469,7 +518,7 @@ service cloud.firestore {
         data.entityType in [
           'booking', 'grant', 'ticket', 'session', 'endorsement', 'log', 'cashflow',
           'notification', 'business', 'product', 'slot', 'program', 'b2b', 'news',
-          'mentor', 'settings', 'deleted'
+          'community_post', 'community_reply', 'mentor', 'settings', 'deleted'
         ] &&
         validStr(data.actorId, 128) &&
         data.scope == 'demo' &&
@@ -838,7 +887,92 @@ service cloud.firestore {
       allow delete: if isAdmin() && isValidId(newsId);
     }
 
-    // 19. Demo Sandbox Sync Collection (Non-PII Real-Time Sync for Demo Sessions)
+    // 19. Community Posts Collection (All Signed-In Users Read & Create; Author/Admin Edit/Delete; Admin Pin)
+    match /community_posts/{postId} {
+      allow get: if isValidId(postId) && isSignedIn();
+      allow list: if isSignedIn() && existing().status in ['open', 'resolved'];
+      allow create: if isSignedIn() && isValidId(postId) && isValidCommunityPost(incoming()) && (
+        isAdmin() || (
+          incoming().authorId == request.auth.uid &&
+          incoming().isPinned == false &&
+          (
+            (isMentor() && incoming().authorRole == 'mentor') ||
+            (!isMentor() && incoming().authorRole == 'user')
+          )
+        )
+      );
+      allow update: if isSignedIn() && isValidId(postId) && isValidCommunityPost(incoming()) && (
+        isAdmin() || (
+          existing().authorId == request.auth.uid &&
+          incoming().authorId == existing().authorId &&
+          incoming().authorRole == existing().authorRole &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().isPinned == existing().isPinned &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'title', 'content', 'category', 'district', 'status', 'acceptedReplyId', 'replyCount', 'updatedAt'
+          ])
+        ) || (
+          incoming().authorId == existing().authorId &&
+          incoming().authorRole == existing().authorRole &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().isPinned == existing().isPinned &&
+          (
+            incoming().diff(existing()).affectedKeys().hasOnly(['helpfulUserIds', 'helpfulCount', 'updatedAt']) ||
+            incoming().diff(existing()).affectedKeys().hasOnly(['replyCount', 'updatedAt']) ||
+            (
+              'acceptedReplyId' in existing() &&
+              existing().acceptedReplyId != '' &&
+              incoming().acceptedReplyId == '' &&
+              incoming().status == 'open' &&
+              !exists(/databases/$(database)/documents/community_replies/$(existing().acceptedReplyId)) &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['replyCount', 'acceptedReplyId', 'status', 'updatedAt'])
+            )
+          )
+        )
+      );
+      allow delete: if isSignedIn() && isValidId(postId) && (
+        isAdmin() || existing().authorId == request.auth.uid
+      );
+    }
+
+    // 20. Community Replies Collection (All Signed-In Users Read & Create; Author/Admin Edit/Delete; Post Owner/Admin Mark Accepted)
+    match /community_replies/{replyId} {
+      allow get: if isValidId(replyId) && isSignedIn();
+      allow list: if isSignedIn() && existing().postId is string;
+      allow create: if isSignedIn() && isValidId(replyId) && isValidCommunityReply(incoming()) &&
+        exists(/databases/$(database)/documents/community_posts/$(incoming().postId)) && (
+        isAdmin() || (
+          incoming().authorId == request.auth.uid &&
+          (!('isAccepted' in incoming()) || incoming().isAccepted == false) &&
+          (
+            (isMentor() && incoming().authorRole == 'mentor') ||
+            (!isMentor() && incoming().authorRole == 'user')
+          )
+        )
+      );
+      allow update: if isSignedIn() && isValidId(replyId) && isValidCommunityReply(incoming()) && (
+        isAdmin() || (
+          existing().authorId == request.auth.uid &&
+          incoming().postId == existing().postId &&
+          incoming().authorId == existing().authorId &&
+          incoming().authorRole == existing().authorRole &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['content', 'updatedAt'])
+        ) || (
+          get(/databases/$(database)/documents/community_posts/$(existing().postId)).data.authorId == request.auth.uid &&
+          incoming().postId == existing().postId &&
+          incoming().authorId == existing().authorId &&
+          incoming().authorRole == existing().authorRole &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['isAccepted', 'updatedAt'])
+        )
+      );
+      allow delete: if isSignedIn() && isValidId(replyId) && (
+        isAdmin() || existing().authorId == request.auth.uid
+      );
+    }
+
+    // 21. Demo Sandbox Sync Collection (Non-PII Real-Time Sync for Demo Sessions)
     match /demo_sync/{syncId} {
       allow get: if isValidId(syncId) && (isAdmin() || (isSignedIn() && existing().scope == 'demo'));
       allow list: if isAdmin() || (isSignedIn() && existing().scope == 'demo');
@@ -852,7 +986,7 @@ service cloud.firestore {
       allow delete: if isSignedIn() && isValidId(syncId) && (isAdmin() || existing().actorId == request.auth.uid);
     }
 
-    // 20. Test connection doc (read-only ping)
+    // 22. Test connection doc (read-only ping)
     match /test/{docId} {
       allow get: if isValidId(docId);
       allow write: if isAdmin() && isValidId(docId);

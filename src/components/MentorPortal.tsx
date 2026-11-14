@@ -716,7 +716,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300 pb-16">
+    <div className="w-full space-y-4 animate-in fade-in duration-300 pb-2">
       
       {/* Toast Notification */}
       {isSuccessToast && (
@@ -729,27 +729,39 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         </div>
       )}
 
-      {/* 1. MENTOR PORTAL HERO BANNER WITH UMK & KBELIA BRANDING */}
-      <div className="kbelia-important-header dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-300 dark:border-slate-600 relative overflow-hidden">
-        <div className="relative z-10 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-rose-50 dark:bg-rose-950/60 text-black dark:text-white border border-rose-200 dark:border-rose-800/70 flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75" />
-              Kuasa Eksklusif Bimbingan & Perakuan Geran
-            </span>
-            <span className="text-xs text-black/70 dark:text-white/75">
-              Pusat Bimbingan Usahawan Belia Universiti Malaysia Kelantan (UMK)
-            </span>
-          </div>
+      {/* 1. MENTOR PORTAL HEADER STRIP WITH AMBIENT GLOW & SHEEN */}
+      <div className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Autonomous Ambient Glowing Orbs */}
+        <div className="pointer-events-none absolute -top-14 -left-10 w-56 h-56 rounded-full bg-teal-500/14 dark:bg-teal-500/16 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-cyan-500/12 dark:bg-cyan-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
 
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white flex items-center gap-2.5 flex-wrap">
-            <span>Selamat Kembali,</span> 
-            <span className="text-black dark:text-white/75">{currentMentor.name}</span>
+        <div className="relative z-10 space-y-1">
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
+            Selamat Kembali, <span className="kbelia-title-shimmer">{currentMentor.name}</span>
           </h1>
           
-          <p className="text-xs sm:text-sm text-black dark:text-white max-w-2xl leading-relaxed">
-            {currentMentor.title} &middot; <span className="text-black dark:text-white/75 font-semibold">{currentMentor.agency}</span>
+          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
+            {currentMentor.title} &middot; <span className="font-semibold text-black dark:text-white">{currentMentor.agency}</span>
           </p>
+        </div>
+
+        <div className="relative z-10 flex flex-wrap items-center gap-2.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => handleSubTabChange('sessions')}
+            className="py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer interactive-press dark:bg-teal-600"
+          >
+            <Calendar className="w-4 h-4 text-white" />
+            <span>Jadual Bimbingan ({totalMentees})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsNewEndorsementModalOpen(true)}
+            className="py-2.5 px-4 rounded-xl text-xs font-semibold text-black dark:text-white bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-700 transition-all flex items-center gap-2 cursor-pointer interactive-press"
+          >
+            <Award className="w-4 h-4 text-black dark:text-white/75" />
+            <span>Perakuan Geran ({mentorEndorsements.length})</span>
+          </button>
         </div>
       </div>
 
@@ -786,6 +798,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               trendLabel={pendingCount > 0 ? `${pendingCount} Baharu` : 'Terkawal'}
               trendDirection={pendingCount > 0 ? 'up' : 'neutral'}
               accentColor="sky"
+              isLive
               onClick={() => handleSubTabChange('sessions')}
             />
 
@@ -797,6 +810,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               trendLabel={`${completedCount} Selesai`}
               trendDirection={confirmedCount > 0 ? 'up' : 'neutral'}
               accentColor="emerald"
+              isLive
               onClick={() => handleSubTabChange('sessions')}
             />
 
@@ -823,40 +837,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             />
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 shadow-sm overflow-hidden">
-          
-          {/* Header Bersepadu: Pusat Kawalan & Pemantauan Usahawan Belia */}
-          <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold shrink-0">
-                <LayoutDashboard className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-black dark:text-white">
-                  Pusat Kawalan & Pemantauan Usahawan Belia
-                </h2>
-                <p className="text-xs text-black/70 dark:text-white/75">
-                  {currentMentor.agency} &middot; Kelantan
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 self-start sm:self-auto">
-              <span className="text-[11px] font-semibold text-black dark:text-white bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 px-3 py-1 rounded-lg tabular-nums">
-                {totalMentees} Mentee &middot; {mentorEndorsements.length} Perakuan
-              </span>
-            </div>
-          </div>
-
-          <div className="p-5 space-y-5">
-            {/* Asymmetric Bento Grid (lg:grid-cols-12): Left Analytics + Temujanji, Right Perakuan Geran */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* Asymmetric Bento Grid (lg:grid-cols-12): Left Analytics + Temujanji, Right Perakuan Geran */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
               
               {/* Left Span (7 Cols): Interactive Recharts Analytics + Temujanji Terdekat */}
               <div className="lg:col-span-7 space-y-5">
 
                 {/* Interactive Recharts District & Endorsement Distribution */}
-                <div className="bg-slate-50 dark:bg-zinc-950 rounded-xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-600">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-zinc-600 mb-4">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="w-4 h-4 text-black dark:text-white/75" />
@@ -899,7 +887,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
 
                 {/* Temujanji Terdekat & Tindakan Segera */}
-                <div className="bg-slate-50 dark:bg-zinc-950 rounded-xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-600 flex flex-col justify-between">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
                     <div className="flex items-center gap-2">
@@ -1035,7 +1023,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
 
               {/* Right Span (5 Cols): Status Perakuan Geran & Dana Benih */}
-              <div className="lg:col-span-5 bg-slate-50 dark:bg-zinc-950 rounded-xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-600 flex flex-col justify-between">
+              <div className="lg:col-span-5 h-full bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
                     <div className="flex items-center gap-2">
@@ -1053,7 +1041,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     {mentorEndorsements.slice(0, 3).map((end) => (
                       <div 
                         key={end.id}
-                        className="p-3.5 rounded-xl bg-white dark:bg-amber-950/20 border border-slate-300 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        className="p-3.5 rounded-xl bg-slate-50 dark:bg-amber-950/20 border border-slate-200 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -1119,7 +1107,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             {/* Direktori Ringkas Usahawan Mentee (Integrated Table) */}
-            <div className="rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 overflow-hidden">
+            <div className="rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
               <div className="px-4 sm:px-5 py-3.5 border-b border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider">
@@ -1261,9 +1249,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
               )}
             </div>
-          </div>
 
-        </div>
         </div>
         );
       })()}

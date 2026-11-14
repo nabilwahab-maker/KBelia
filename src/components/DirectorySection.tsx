@@ -76,15 +76,15 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="w-full space-y-4">
       
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
             {t('directory_title')}
-          </h2>
-          <p className="text-black dark:text-white/75 text-sm mt-1 max-w-2xl leading-relaxed">
+          </h1>
+          <p className="text-black/75 dark:text-white/75 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
             {t('directory_subtitle')}
           </p>
         </div>
@@ -113,7 +113,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
       </div>
 
       {/* Search & Filter Controls */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs mb-8 space-y-4 transition-colors">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-4 transition-colors">
         <div className="grid md:grid-cols-12 gap-3">
           
           {/* Search input */}
@@ -187,7 +187,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
           <p className="text-xs text-black/70 dark:text-white/75 mt-1">{t('no_businesses_desc')}</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredBusinesses.map((biz) => {
             const rawPhone = biz.whatsapp || biz.ownerPhone || '';
             const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';

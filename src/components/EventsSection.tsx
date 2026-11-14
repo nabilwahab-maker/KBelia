@@ -145,21 +145,17 @@ export const EventsSection: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Banner (Important Header) */}
-      <div className="kbelia-important-header dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-300 dark:border-slate-600 shadow-xs relative overflow-hidden">
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white text-xs font-bold mb-3 border border-amber-200 dark:border-amber-800/70">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{isEn ? 'Official Events' : 'Kalendar Acara Rasmi'}</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-black dark:text-white">
+    <div className="w-full space-y-4">
+      {/* Section Header */}
+      <div className="rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 border border-slate-200 dark:border-zinc-700">
+        <div className="max-w-2xl">
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
             {isEn ? 'Youth Events & Carnivals' : 'Acara & Karnival Belia Kelantan'}
           </h1>
-          <p className="text-xs sm:text-sm text-black dark:text-white mt-2 leading-relaxed">
+          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 mt-1 leading-relaxed">
             {isEn
-              ? 'Book popup stalls, join halal workshops, and network with partners across Kelantan.'
-              : 'Tempah tapak gerai karnival, sertai bengkel pensijilan halal, dan temui rakan niaga di seluruh Kelantan.'}
+              ? 'Book popup stalls, join halal workshops, and network with partners across the state.'
+              : 'Tempah tapak gerai, sertai bengkel pensijilan halal, dan temui rakan niaga seluruh negeri.'}
           </p>
         </div>
       </div>
@@ -213,7 +209,7 @@ export const EventsSection: React.FC = () => {
       </div>
 
       {/* Events Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredEvents.map((evt) => {
           const isBooked = bookedEvents.includes(evt.id);
 

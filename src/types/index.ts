@@ -373,6 +373,46 @@ export interface PortalNews {
   createdAt: string;
 }
 
+export type CommunityCategory =
+  | 'Soal Jawab Geran'
+  | 'Operasi Kapsul'
+  | 'Pemasaran & Jualan'
+  | 'Lesen & SSM'
+  | 'Jaringan Daerah';
+
+export type CommunityStatus = 'open' | 'resolved';
+
+export interface CommunityPost {
+  id: string;
+  title: string;
+  content: string;
+  category: CommunityCategory;
+  district: KelantanDistrict;
+  authorId: string;
+  authorName: string;
+  authorRole: UserRole;
+  status: CommunityStatus;
+  isPinned: boolean;
+  helpfulUserIds: string[];
+  helpfulCount: number;
+  replyCount: number;
+  acceptedReplyId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommunityReply {
+  id: string;
+  postId: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  authorRole: UserRole;
+  isAccepted?: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface GrantEndorsementLetter {
   id: string;
   endorsementCode: string; // e.g. 'PERAKUAN-UMK-2026-0814'

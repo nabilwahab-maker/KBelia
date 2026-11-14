@@ -409,28 +409,49 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   };
 
   return (
-    <div className="w-full px-1 sm:px-3 py-4">
+    <div className="w-full space-y-4">
       
-      {/* Header */}
+      {/* Clean Single-Elevation Header with Ambient Glow & Sheen */}
       <div 
         id="merchant-portal-header" 
-        className="kbelia-important-header rounded-2xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 mb-2 transition-colors"
+        className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors"
       >
-        <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider">
-          <Store className="w-4 h-4" />
-          <span>Pusat Kawalan Usahawan KBelia</span>
+        {/* Autonomous Ambient Glowing Orbs */}
+        <div className="pointer-events-none absolute -top-14 -left-10 w-56 h-56 rounded-full bg-blue-500/14 dark:bg-blue-500/16 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-emerald-500/12 dark:bg-emerald-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
+
+        <div className="relative z-10">
+          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+            Urus Bisnes &amp; <span className="kbelia-title-shimmer">Kiosk Saya</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 mt-1">
+            Selamat kembali, <span className="font-semibold text-black dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span>
+          </p>
         </div>
-        <h2 className="text-2xl font-extrabold text-black dark:text-white tracking-tight mt-1">
-          Urus Bisnes &amp; Kiosk Saya
-        </h2>
-        <p className="text-xs text-black dark:text-white/75 mt-0.5">
-          Selamat kembali, <span className="font-semibold text-black dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span>
-        </p>
+
+        <div className="relative z-10 flex flex-wrap items-center gap-2.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setActiveTab('cashflow')}
+            className="py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer interactive-press dark:bg-emerald-600"
+          >
+            <Coins className="w-4 h-4 text-white" />
+            <span>Rekod Jualan Tunai</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('products')}
+            className="py-2.5 px-4 rounded-xl text-xs font-semibold text-black dark:text-white bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-700 transition-all flex items-center gap-2 cursor-pointer interactive-press"
+          >
+            <ShoppingBag className="w-4 h-4 text-black dark:text-white/75" />
+            <span>Daftar Produk ({safeProducts.length})</span>
+          </button>
+        </div>
       </div>
 
       {/* Alert Messages */}
       {message && (
-        <div className={`mt-4 p-3 rounded-xl text-xs font-medium flex items-center justify-between ${
+        <div className={`p-3.5 rounded-xl text-xs font-medium flex items-center justify-between ${
           message.type === 'success' 
             ? 'bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 dark:border-emerald-800' 
             : 'bg-rose-50 dark:bg-rose-950/60 text-black dark:text-white border border-rose-200 dark:border-rose-800'
@@ -627,48 +648,26 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         }
 
         return (
-        <div className="mt-6 space-y-6">
+        <div className="space-y-6">
           
-          {/* Executive Greeting Banner */}
-          <div className="relative rounded-2xl bg-white dark:bg-zinc-900 p-6 sm:p-7 border border-slate-300 dark:border-zinc-600 shadow-sm overflow-hidden">
-            <div className="absolute inset-0 bg-dot-pattern opacity-35 pointer-events-none" aria-hidden="true" />
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-semibold text-black dark:text-white/75 tracking-wider uppercase">
-                  <Activity className="w-3.5 h-3.5" />
-                  <span>Dashboard Usahawan Belia Kelantan</span>
-                  <span className="text-black/35 dark:text-white/35">·</span>
-                  <span className="text-black dark:text-white font-mono text-[11px]">
-                    {primaryBooking ? `Slot ${primaryBooking.slotCode}` : 'Akaun Berdaftar'}
-                  </span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
-                  {myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Usahawan Belia'}
-                </h3>
-                <p className="text-xs sm:text-sm text-black dark:text-white max-w-2xl leading-relaxed">
-                  Pemilik: <span className="font-semibold text-black dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span> · {myBusiness?.district || userProfile?.district || 'Kota Bharu'} · SSM: <span className="font-mono text-black dark:text-white/75 font-semibold">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Belum Didaftarkan'}</span>
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('cashflow')}
-                  className="py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer interactive-press dark:bg-emerald-600"
-                >
-                  <Coins className="w-4 h-4 text-white" />
-                  <span>Rekod Jualan Tunai</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('products')}
-                  className="py-2.5 px-4 rounded-xl text-xs font-semibold text-black dark:text-white bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-700 transition-all flex items-center gap-2 cursor-pointer interactive-press"
-                >
-                  <ShoppingBag className="w-4 h-4 text-black dark:text-white/75" />
-                  <span>Daftar Produk ({safeProducts.length})</span>
-                </button>
-              </div>
+          {/* Compact Business Identity Summary Strip */}
+          <div className="rounded-xl bg-white dark:bg-zinc-900 px-4 py-3.5 border border-slate-200 dark:border-zinc-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs">
+              <span className="font-extrabold text-black dark:text-white text-sm">
+                {myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Usahawan Belia'}
+              </span>
+              <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
+              <span className="text-black/75 dark:text-white/75">
+                {myBusiness?.district || userProfile?.district || 'Kota Bharu'}
+              </span>
+              <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
+              <span className="font-mono text-[11px] font-semibold text-black/80 dark:text-white/80">
+                SSM: {myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Belum Didaftarkan'}
+              </span>
             </div>
+            <span className="font-mono text-[11px] font-bold text-black dark:text-white px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 self-start sm:self-auto">
+              {primaryBooking ? `Slot ${primaryBooking.slotCode}` : 'Akaun Berdaftar'}
+            </span>
           </div>
 
           {/* 4 Compact Summary KPI Metric Cards */}
@@ -685,6 +684,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               trendLabel={safeCashflow.length > 0 ? `+${safeCashflow.length} rekod` : '0 rekod'}
               trendDirection={safeCashflow.length > 0 ? 'up' : 'neutral'}
               accentColor="emerald"
+              isLive
               onClick={() => setActiveTab('cashflow')}
             />
 
@@ -700,6 +700,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               trendLabel={approvedBooking ? 'Aktif' : pendingBooking ? 'Semakan' : 'Kosong'}
               trendDirection={approvedBooking ? 'up' : 'neutral'}
               accentColor="amber"
+              isLive
               onClick={() => setActiveTab('bookings')}
             />
 
@@ -741,10 +742,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           </div>
 
           {/* Asymmetric Bento Grid (lg:grid-cols-12) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
             
             {/* Left Bento Span (7 Cols): Carta Recharts Analitik Jualan Interaktif */}
-            <div className="lg:col-span-7 rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col">
+            <div className="lg:col-span-7 h-full rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col">
               
               {/* Card Header */}
               <div className="border-b border-slate-300 dark:border-zinc-600 py-4.5 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">

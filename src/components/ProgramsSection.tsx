@@ -117,10 +117,10 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="w-full space-y-4">
       {/* Notice Banner */}
       {activeNotice && (
-        <div className="mb-6 p-4 bg-white dark:bg-slate-800 text-black dark:text-white rounded-xl border border-emerald-200 dark:border-emerald-800 flex items-center justify-between gap-3 shadow-xs">
+        <div className="p-4 bg-white dark:bg-slate-800 text-black dark:text-white rounded-xl border border-emerald-200 dark:border-emerald-800 flex items-center justify-between gap-3 shadow-xs">
           <div className="flex items-center gap-2.5 text-xs font-medium">
             <CheckCircle2 className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
             <span>{activeNotice}</span>
@@ -137,15 +137,15 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
             {isEn ? 'Youth Grants & Programs' : 'Geran & Program Belia'}
-          </h2>
-          <p className="text-black dark:text-white/75 text-sm mt-1 max-w-2xl leading-relaxed">
+          </h1>
+          <p className="text-black/75 dark:text-white/75 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
             {isEn
-              ? 'Join incubation programs, digital workshops, TEKUN/MARA/UMK matching, and kiosk subsidy grants.'
-              : 'Sertai program inkubasi, bengkel digital, padanan TEKUN/MARA/UMK, dan subsidi sewa kapsul niaga.'}
+              ? 'Join incubation tracks, digital workshops, TEKUN/MARA/UMK matching, and kiosk rental subsidies.'
+              : 'Sertai inisiatif inkubasi, bengkel digital, padanan TEKUN/MARA/UMK, dan subsidi sewa kapsul niaga.'}
           </p>
         </div>
 
@@ -162,7 +162,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
       </div>
 
       {/* Categories Filter */}
-      <div className="flex flex-wrap items-center gap-2 mb-8">
+      <div className="flex flex-wrap items-center gap-2">
         {categoryOptions.map((cat) => (
           <button
             key={cat.key}
@@ -188,7 +188,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           </p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredPrograms.map((prog) => {
             const isGrant = prog.category === 'Geran & Dana';
             const isRegistered = !isGrant && registeredIds.includes(prog.id);

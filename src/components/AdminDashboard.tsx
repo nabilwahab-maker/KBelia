@@ -544,20 +544,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   }
 
   return (
-    <div className="w-full px-1 sm:px-3 py-4">
+    <div className="w-full space-y-4">
       
-      {/* Admin Subheader & Quick Action Bar (Important Header Only) */}
-      <div className="kbelia-important-header relative overflow-hidden rounded-2xl border border-slate-300 dark:border-zinc-600 p-5 sm:p-6 mb-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="absolute inset-0 bg-dot-pattern opacity-35 pointer-events-none" aria-hidden="true" />
+      {/* Admin Subheader & Quick Action Bar */}
+      <div className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Autonomous Ambient Glowing Orbs */}
+        <div className="pointer-events-none absolute -top-14 -left-10 w-56 h-56 rounded-full bg-indigo-500/14 dark:bg-indigo-500/16 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-rose-500/12 dark:bg-rose-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
+
         <div className="relative z-10">
-          <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
-            <Shield className="w-4 h-4" />
-            <span>Pusat Kawalan & Pengurusan Pentadbiran</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
-            Panel Pengurusan & Kelulusan Hab KBelia
-          </h2>
-          <p className="text-xs text-black/70 dark:text-white/75 mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+            Panel Pengurusan &amp; Kelulusan <span className="kbelia-title-shimmer">Hab KBelia</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 mt-1 max-w-2xl">
             Semak dan luluskan permohonan sewaan kapsul, geran pembiayaan, profil usahawan dan program belia.
           </p>
         </div>
@@ -604,7 +603,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         return (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <SaaSKpiCard
                 title="Permohonan Menunggu"
                 value={pendingBookingsCount}
@@ -613,6 +612,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 trendLabel={pendingBookingsCount > 0 ? `${pendingBookingsCount} Segera` : 'Selesai'}
                 trendDirection={pendingBookingsCount > 0 ? 'down' : 'up'}
                 accentColor="amber"
+                isLive
                 onClick={() => setAdminTab('bookings')}
               />
 
@@ -635,6 +635,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 trendLabel={`${availableSlotsCount} Kosong`}
                 trendDirection={occupancyRate >= 50 ? 'up' : 'neutral'}
                 accentColor="emerald"
+                isLive
                 onClick={() => setAdminTab('slots')}
               />
 
@@ -652,10 +653,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             {/* Asymmetric Bento Analytics Section inside Queue / Overview */}
             {adminTab === 'queue' && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
                 
                 {/* Left Bento (7 Cols): Interactive Recharts Analytics */}
-                <div className="lg:col-span-7 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 shadow-sm overflow-hidden flex flex-col">
+                <div className="lg:col-span-7 h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col">
                   <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2">

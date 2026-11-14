@@ -44,6 +44,24 @@ import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { useScrollReveal, useCountUp } from '../hooks/useMotion';
+
+const RevealBlock: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+  delayMs?: number;
+}> = ({ children, className = '', delayMs = 0 }) => {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      style={delayMs > 0 ? { transitionDelay: `${delayMs}ms` } : undefined}
+      className={`reveal-section ${isVisible ? 'is-revealed' : ''} ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
 
 interface LandingPageProps {
   setActiveTab: (tab: UMKTab) => void;
@@ -77,6 +95,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [legalModalType, setLegalModalType] = useState<'privacy' | 'terms' | null>(null);
 
   const availableSlotsCount = slots.filter(s => s.status === 'available').length;
+  const { ref: statsRef, isVisible: statsVisible } = useScrollReveal<HTMLDivElement>({ threshold: 0.08, rootMargin: '0px' });
+  const animatedSlotsCount = useCountUp(slots.length, statsVisible);
+  const animatedAvailableSlots = useCountUp(availableSlotsCount, statsVisible);
+  const animatedBusinessesCount = useCountUp(businesses.length, statsVisible);
+  const animatedProgramsCount = useCountUp(programs.length, statsVisible);
+  const animatedMentorsCount = useCountUp(INITIAL_MENTOR_PROFILES.length, statsVisible);
+  const animatedSubsidyPercent = useCountUp(50, statsVisible);
 
   const navigateToPage = (tab: UMKTab) => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -216,8 +241,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           
           {/* Logo & Identity */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-xs dark:bg-blue-600">
-              <span>KB</span>
+            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-xs dark:bg-blue-600 kbelia-ambient-sheen">
+              <span className="relative z-10">KB</span>
             </div>
             <div>
               <div className="flex items-center gap-1.5">
@@ -309,10 +334,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               type="button"
               id="landing-login-btn"
               onClick={() => navigateToPage('login')}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer interactive-press interactive-lift group dark:bg-blue-600"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer interactive-press interactive-lift group dark:bg-blue-600 kbelia-ambient-sheen"
             >
-              <LogIn className="w-3.5 h-3.5 text-white transition-transform duration-200 group-hover:translate-x-0.5" />
-              <span>{isBM ? 'Log Masuk' : 'Log In'}</span>
+              <LogIn className="relative z-10 w-3.5 h-3.5 text-white transition-transform duration-200 group-hover:translate-x-0.5" />
+              <span className="relative z-10">{isBM ? 'Log Masuk' : 'Log In'}</span>
             </button>
           </div>
 
@@ -321,19 +346,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* 3. HERO SECTION & CAROUSEL VISUAL (Important Header: Top-Left Soft Sky Glow + Grid & Ambient Orbs) */}
       <section id="hero" className="kbelia-important-header relative overflow-hidden pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-slate-300 dark:border-zinc-600 text-black dark:text-white transition-colors">
-        {/* Subtle SVG Grid & Ambient Radial Glow */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-80 pointer-events-none" aria-hidden="true" />
-        <div className="absolute -top-24 left-1/4 w-96 h-96 bg-blue-500/12 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute bottom-12 right-1/4 w-80 h-80 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        {/* Subtle SVG Grid, Ambient Radial Orbs & Diagonal Sheen */}
+        <div className="absolute -inset-8 bg-grid-pattern animate-ambient-grid opacity-80 pointer-events-none" aria-hidden="true" />
+        <div className="kbelia-ambient-sheen absolute inset-0 pointer-events-none" aria-hidden="true" />
+        <div className="absolute -top-24 left-1/4 w-96 h-96 bg-blue-500/14 dark:bg-blue-500/12 rounded-full blur-3xl pointer-events-none animate-ambient-orb-a" aria-hidden="true" />
+        <div className="absolute bottom-12 right-1/4 w-80 h-80 bg-indigo-500/12 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none animate-ambient-orb-b" aria-hidden="true" />
 
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 text-center space-y-6">
           
           {/* Headline & Subhead */}
-          <div className="max-w-4xl mx-auto space-y-4">
+          <div className="max-w-4xl mx-auto space-y-4 animate-fade-in">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-black dark:text-white leading-[1.12] text-balance">
-              {isBM 
-                ? 'Platform Bersepadu Usahawan Belia Kelantan'
-                : 'Integrated Kelantan Youth Entrepreneurship Platform'}
+              {isBM ? (
+                <>
+                  Platform Bersepadu{' '}
+                  <span className="kbelia-title-shimmer">Usahawan Belia Kelantan</span>
+                </>
+              ) : (
+                <>
+                  Integrated Kelantan{' '}
+                  <span className="kbelia-title-shimmer">Youth Entrepreneurship Platform</span>
+                </>
+              )}
             </h1>
             <p className="text-base sm:text-lg text-black dark:text-white font-normal leading-relaxed max-w-2xl mx-auto">
               {isBM
@@ -366,7 +400,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <img 
                       src={slide.imageUrl} 
                       alt={slide.title}
-                      className="w-full h-full object-cover object-center"
+                      className={`w-full h-full object-cover object-center ${index === currentSlide ? 'animate-hero-ken-burns' : ''}`}
                     />
                     {/* Deep gradient overlay for extreme text readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/65 to-slate-900/30" />
@@ -467,12 +501,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* ========================================================================= */}
-          {/* STATISTIK EKOSISTEM SEMASA (LIVE METRICS) */}
+          {/* STATISTIK EKOSISTEM SEMASA (LIVE METRICS WITH COUNT-UP) */}
           {/* ========================================================================= */}
-          <div className="pt-6 w-full mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
+          <div className="pt-6 inline-flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-wider text-black/75 dark:text-white/75">
+            <span className="kbelia-live-dot" aria-hidden="true" />
+            <span>{isBM ? 'Statistik Ekosistem Langsung' : 'Live Ecosystem Metrics'}</span>
+          </div>
+
+          <div
+            ref={statsRef}
+            className={`pt-2 w-full mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 reveal-section ${statsVisible ? 'is-revealed' : ''}`}
+          >
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-blue-400/70 dark:hover:border-blue-400/70 cursor-default group">
               <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center animate-float-gentle">
                   <MapPin className="w-4 h-4" />
                 </div>
               </div>
@@ -483,55 +525,55 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-blue-400/70 dark:hover:border-blue-400/70 cursor-default group">
               <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-black dark:text-white/75 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-black dark:text-white/75 flex items-center justify-center animate-float-gentle-alt">
                   <Building2 className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white tabular-nums">{slots.length}</div>
+              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white tabular-nums">{animatedSlotsCount}</div>
               <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
-              <div className="text-[11px] text-black dark:text-white/75 mt-0.5 font-bold tabular-nums">{availableSlotsCount} {isBM ? 'slot sedia' : 'slots ready'}</div>
+              <div className="text-[11px] text-black dark:text-white/75 mt-0.5 font-bold tabular-nums">{animatedAvailableSlots} {isBM ? 'slot sedia' : 'slots ready'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-blue-400/70 dark:hover:border-blue-400/70 cursor-default group">
               <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center animate-float-gentle">
                   <Store className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white tabular-nums">{businesses.length}</div>
+              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white tabular-nums">{animatedBusinessesCount}</div>
               <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Usahawan Direktori' : 'Listed Merchants'}</div>
               <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Disahkan SSM' : 'SSM Verified'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-amber-300 dark:hover:border-amber-500/40 cursor-default group">
               <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-black dark:text-white/75 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-black dark:text-white/75 flex items-center justify-center animate-float-gentle-alt">
                   <Award className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{programs.length}</div>
+              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{animatedProgramsCount}</div>
               <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Program & Geran' : 'Programs & Grants'}</div>
               <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Inisiatif aktif' : 'Active initiatives'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-violet-300 dark:hover:border-violet-500/40 cursor-default group">
               <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-950/60 border border-violet-200/80 dark:border-violet-800/60 text-black dark:text-white/75 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-950/60 border border-violet-200/80 dark:border-violet-800/60 text-black dark:text-white/75 flex items-center justify-center animate-float-gentle">
                   <Users className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{INITIAL_MENTOR_PROFILES.length}</div>
+              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{animatedMentorsCount}</div>
               <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Panel Mentor' : 'Industry Mentors'}</div>
               <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Certified mentors'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-emerald-300 dark:hover:border-emerald-500/40 cursor-default group">
               <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-black dark:text-white/75 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-black dark:text-white/75 flex items-center justify-center animate-float-gentle-alt">
                   <Sparkles className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">50%</div>
+              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{animatedSubsidyPercent}%</div>
               <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Subsidi Sewaan' : 'Rental Subsidy'}</div>
               <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Serendah RM12/hari' : 'From RM12/day'}</div>
             </div>
@@ -609,7 +651,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section id="masalah-solusi" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
         <div className="absolute inset-0 bg-dot-pattern opacity-45 pointer-events-none" aria-hidden="true" />
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
+          <RevealBlock className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
               <Layers className="w-3.5 h-3.5" />
               <span>Cabaran & Penyelesaian</span>
@@ -620,9 +662,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
               Menangani halangan utama usahawan muda Kelantan memulakan operasi perniagaan.
             </p>
-          </div>
+          </RevealBlock>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          <RevealBlock delayMs={80} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             
             {/* Column 1: Cabaran Tradisional */}
             <div className="kbelia-glass-card interactive-card relative overflow-hidden p-7 sm:p-8 rounded-2xl bg-rose-50/50 dark:bg-rose-950/15 border border-rose-200/80 dark:border-rose-900/50 space-y-5">
@@ -726,7 +768,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </ul>
             </div>
 
-          </div>
+          </RevealBlock>
         </div>
       </section>
 
@@ -738,7 +780,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="absolute top-1/3 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
 
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
+          <RevealBlock className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
               <Zap className="w-3.5 h-3.5" />
               <span>Modul Utama</span>
@@ -749,14 +791,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
               Infrastruktur digital lengkap daripada analitik jualan hingga pematuhan rasmi.
             </p>
-          </div>
+          </RevealBlock>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          <RevealBlock delayMs={80} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             
             {/* Feature 1: Business Analytics (Wide Bento Card - col-span-2) */}
             <div className="lg:col-span-2 kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
               <div className="space-y-3 max-w-lg relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle">
                   <TrendingUp className="w-6 h-6" />
                 </div>
                 <h3 className="font-extrabold text-lg text-black dark:text-white">
@@ -792,7 +834,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Feature 2: Funding & Grant Tracker */}
             <div className="kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-amber-300 dark:hover:border-amber-500/40 space-y-3 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle-alt">
                 <Award className="w-6 h-6" />
               </div>
               <h3 className="font-extrabold text-base text-black dark:text-white">
@@ -811,7 +853,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Feature 3: Mentorship & Networking */}
             <div className="kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 space-y-3 group">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle">
                 <Users className="w-6 h-6" />
               </div>
               <h3 className="font-extrabold text-base text-black dark:text-white">
@@ -831,7 +873,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Feature 4: Upskilling & Academy (Wide Bento Card - col-span-2) */}
             <div className="lg:col-span-2 kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
               <div className="space-y-3 max-w-lg relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle-alt">
                   <BookOpen className="w-6 h-6" />
                 </div>
                 <h3 className="font-extrabold text-lg text-black dark:text-white">
@@ -863,7 +905,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Feature 5: Compliance & SSM Guide */}
             <div className="kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 space-y-3 group">
-              <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle">
                 <FileText className="w-6 h-6" />
               </div>
               <h3 className="font-extrabold text-base text-black dark:text-white">
@@ -883,7 +925,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Feature 6: Kiosk Modular IoT Hub (Wide Bento Card - col-span-2) */}
             <div className="lg:col-span-2 kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
               <div className="space-y-3 max-w-lg relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle-alt">
                   <Building2 className="w-6 h-6" />
                 </div>
                 <h3 className="font-extrabold text-lg text-black dark:text-white">
@@ -912,7 +954,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
             </div>
 
-          </div>
+          </RevealBlock>
         </div>
       </section>
 
@@ -921,7 +963,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       <section className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-14">
+          <RevealBlock className="text-center max-w-3xl mx-auto space-y-2.5 mb-14">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>4 Langkah Mudah</span>
@@ -932,9 +974,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
               Pendaftaran pantas dan percuma untuk semua usahawan belia Kelantan.
             </p>
-          </div>
+          </RevealBlock>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+          <RevealBlock delayMs={80} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
             
             {/* Step 1 */}
             <div className="kbelia-glass-card interactive-card p-6 rounded-2xl relative space-y-3 hover:border-blue-400/70 dark:hover:border-blue-400/70">
@@ -992,7 +1034,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </p>
             </div>
 
-          </div>
+          </RevealBlock>
         </div>
       </section>
 
@@ -1003,7 +1045,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="absolute inset-0 bg-dot-pattern opacity-40 pointer-events-none" aria-hidden="true" />
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
-          <div className="text-center max-w-2xl mx-auto space-y-2.5 mb-12">
+          <RevealBlock className="text-center max-w-2xl mx-auto space-y-2.5 mb-12">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
               <Shield className="w-3.5 h-3.5" />
               <span>{isBM ? 'Inisiatif Negeri' : 'State Pillars'}</span>
@@ -1016,13 +1058,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 ? 'Menangani keperluan tapak operasi, pemasaran digital, dan bimbingan.'
                 : 'Designed to lower retail overhead, boost digital reach, and provide mentorship.'}
             </p>
-          </div>
+          </RevealBlock>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <RevealBlock delayMs={80} className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Pillar 1: Kiosk Modular */}
             <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all duration-300 space-y-4 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110 animate-float-gentle">
                 <Building2 className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
@@ -1047,7 +1089,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Pillar 2: Direktori Digital */}
             <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all duration-300 space-y-4 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110 animate-float-gentle-alt">
                 <Store className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
@@ -1072,7 +1114,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Pillar 3: Geran & Bantuan */}
             <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-amber-300 dark:hover:border-amber-500/40 transition-all duration-300 space-y-4 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/80 text-black dark:text-white/75 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/80 text-black dark:text-white/75 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110 animate-float-gentle">
                 <Award className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
@@ -1095,7 +1137,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
             </div>
 
-          </div>
+          </RevealBlock>
 
         </div>
       </section>
@@ -1106,7 +1148,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section id="kiosk" className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+          <RevealBlock className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
                 <Building2 className="w-3.5 h-3.5" />
@@ -1119,9 +1161,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 Tapak strategik lengkap dengan elektrik dan internet.
               </p>
             </div>
-          </div>
+          </RevealBlock>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+          <RevealBlock delayMs={80} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
             {(() => {
               const av = slots.filter((slot) => slot.status === 'available');
               const fallbackAvailable = INITIAL_CAPSULE_SLOTS.filter((s) => s.status === 'available');
@@ -1185,7 +1227,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               ));
             })()}
-          </div>
+          </RevealBlock>
 
         </div>
       </section>
@@ -1197,7 +1239,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="absolute inset-0 bg-grid-pattern opacity-45 pointer-events-none" aria-hidden="true" />
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+          <RevealBlock className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
                 <Store className="w-3.5 h-3.5" />
@@ -1210,9 +1252,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 Sokong produk usahawan muda merentasi pelbagai sektor.
               </p>
             </div>
-          </div>
+          </RevealBlock>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <RevealBlock delayMs={80} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {businesses.slice(0, 3).map((biz) => (
               <div 
                 key={biz.id}
@@ -1251,7 +1293,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
             ))}
-          </div>
+          </RevealBlock>
 
         </div>
       </section>
@@ -1262,7 +1304,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section id="faq" className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-5xl w-full mx-auto px-4 sm:px-8 lg:px-12">
           
-          <div className="text-center space-y-2.5 mb-10">
+          <RevealBlock className="text-center space-y-2.5 mb-10">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Bantuan & Panduan</span>
@@ -1273,9 +1315,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <p className="text-xs sm:text-sm text-black dark:text-white/75">
               Jawapan pantas mengenai permohonan kiosk, geran, mentor, dan direktori.
             </p>
-          </div>
+          </RevealBlock>
 
-          <div className="space-y-3">
+          <RevealBlock delayMs={80} className="space-y-3">
             {faqs.map((faq, index) => {
               const isOpen = activeFaq === index;
               return (
@@ -1285,21 +1327,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 >
                   <button
                     type="button"
+                    aria-expanded={isOpen}
                     onClick={() => setActiveFaq(isOpen ? null : index)}
                     className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-black dark:text-white hover:bg-amber-50/50 dark:hover:bg-zinc-900/60 transition-colors cursor-pointer"
                   >
                     <span>{faq.q}</span>
                     <ChevronDown className={`w-4 h-4 text-black/70 dark:text-white/75 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-black dark:text-white' : ''}`} />
                   </button>
-                  {isOpen && (
-                    <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-xs sm:text-sm text-black dark:text-white leading-relaxed border-t border-slate-300 dark:border-zinc-600 pt-3 bg-white dark:bg-zinc-900">
-                      {faq.a}
+                  <div
+                    className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+                      isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-xs sm:text-sm text-black dark:text-white leading-relaxed border-t border-slate-300 dark:border-zinc-600 pt-3 bg-white dark:bg-zinc-900">
+                        {faq.a}
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
-          </div>
+          </RevealBlock>
 
         </div>
       </section>
@@ -1310,7 +1359,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className="kbelia-important-header relative overflow-hidden py-16 sm:py-24 text-black dark:text-white border-b border-slate-300 dark:border-zinc-600 transition-colors">
         <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" aria-hidden="true" />
         <div className="absolute -bottom-24 left-1/3 w-96 h-96 bg-blue-500/12 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-        <div className="relative z-10 max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
+        <RevealBlock className="relative z-10 max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Permohonan 2026/2027 Dibuka</span>
@@ -1359,7 +1408,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span>Semakan Digital Pantas</span>
             </span>
           </div>
-        </div>
+        </RevealBlock>
       </section>
 
       {/* ========================================================================= */}

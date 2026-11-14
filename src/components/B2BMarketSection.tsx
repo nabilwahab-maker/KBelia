@@ -117,20 +117,16 @@ export const B2BMarketSection: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-4">
       {/* Compact Standardized Module Header */}
-      <div className="p-4 rounded-xl kbelia-important-header border border-slate-300 dark:border-zinc-600">
-        <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
-          <Megaphone className="w-4 h-4" />
-          <span>{isEn ? 'Commercial & Supply Hub' : 'Ruang Niaga & Bekalan'}</span>
-        </div>
-        <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white">
+      <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700">
+        <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
           {isEn ? 'Supply Network & Commercial Ads' : 'Rangkaian Bekalan & Ruang Niaga'}
         </h1>
-        <p className="text-xs sm:text-sm text-black dark:text-white mt-1">
+        <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 mt-1">
           {isEn
-            ? 'Browse verified local products, source wholesale supplies, and connect with partner merchants across Kelantan.'
-            : 'Teroka produk tempatan, dapatkan bekalan borong, dan hubungi rakan niaga di seluruh Kelantan.'}
+            ? 'Browse verified local products, source wholesale goods, and connect with partner merchants across Kelantan.'
+            : 'Teroka produk tempatan, dapatkan stok borong, dan hubungi rakan niaga di seluruh Kelantan.'}
         </p>
       </div>
 
@@ -215,7 +211,7 @@ export const B2BMarketSection: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredListings.map((item) => (
             <div
               key={item.id}

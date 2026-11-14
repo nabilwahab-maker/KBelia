@@ -9,6 +9,8 @@ interface SaaSKpiCardProps {
   trendLabel: string;
   trendDirection?: 'up' | 'down' | 'neutral';
   accentColor?: 'sky' | 'emerald' | 'amber' | 'violet';
+  isLive?: boolean;
+  floatIcon?: boolean;
   onClick?: () => void;
 }
 
@@ -43,6 +45,8 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
   trendLabel,
   trendDirection = 'up',
   accentColor = 'sky',
+  isLive = false,
+  floatIcon = true,
   onClick
 }) => {
   const theme = COLOR_MAP[accentColor];
@@ -66,9 +70,12 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
       {/* Top Header: Title, Metric Value & Icon Badge */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <span className="text-xs font-semibold text-black/70 dark:text-white/75 block leading-snug break-words">
-            {title}
-          </span>
+          <div className="flex items-center gap-1.5">
+            {isLive && <span className="kbelia-live-dot" aria-hidden="true" />}
+            <span className="text-xs font-semibold text-black/70 dark:text-white/75 block leading-snug break-words">
+              {title}
+            </span>
+          </div>
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className={`text-xl sm:text-2xl font-black font-mono tabular-nums tracking-tight leading-tight break-words ${theme.valueText}`}>
               {value}
@@ -80,7 +87,7 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
           </div>
         </div>
 
-        <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 ${theme.iconBg}`}>
+        <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 ${floatIcon ? 'animate-float-gentle' : ''} ${theme.iconBg}`}>
           <Icon className="w-4 h-4" />
         </div>
       </div>

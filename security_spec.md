@@ -12,6 +12,7 @@
 9. **Notifications (`/notifications/{notifId}`)**: Readers may only `get`/`list` notifications addressed to `targetRole == 'all'`, their role (`'mentor'` / `'youth'`), or their specific `targetUserId == request.auth.uid` (plus Admin). Recipients can only update `isRead` on their own targeted notifications.
 10. **Admins**: Verified via `request.auth.token.email_verified == true` for authorized admin emails (`nabilwahab03020302@gmail.com`, `s24b0382@siswa.umk.edu.my`) or `exists(/databases/$(database)/documents/admins/$(request.auth.uid))`.
 11. **Portal News (`/portal_news/{newsId}`)**: Only Admins may create, update, pin, publish/unpublish, or delete news items. Authenticated non-admin users (Belia & Mentor) may only `get`/`list` items where `status == 'published'` (drafts are strictly Admin-only at the database level).
+12. **Community Forum (`/community_posts/{postId}`, `/community_replies/{replyId}`)**: All signed-in users (Belia, Mentor, Admin) may read posts/replies and create posts/replies using their own `request.auth.uid` and true role (`'user'` / `'mentor'` / `'admin'`). Only the author or Admin may edit post content, mark accepted answers, or delete; only Admin may pin/unpin (`isPinned`). Other signed-in users may only toggle helpful votes or update `replyCount`.
 
 ## Dirty Dozen Payloads Handled
 1. Youth user attempting to set `role: 'mentor'` or `mentorId: 'mentor-1'` via `users/{uid}` create or update.
@@ -27,3 +28,5 @@
 11. Modifying immutable ownership/relation fields (`ownerId`, `applicantId`, `mentorId`, `userId`, `createdAt`) on update.
 12. Unauthenticated write or private PII read attempts against any collection.
 13. Non-admin (Belia/Mentor) attempting to `get`/`list` a `draft` document or write/delete `/portal_news/{newsId}`.
+14. Non-admin attempting to set `isPinned: true`, spoof another user's `authorId`/`authorRole`, or edit/delete another user's `/community_posts/{postId}` or `/community_replies/{replyId}`.
+15. Creating a `/community_replies/{replyId}` referencing a non-existent `postId` or pre-marking `isAccepted: true` as a non-author.

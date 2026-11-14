@@ -62,10 +62,10 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   });
 
   const allowedTabsForRole = isAdmin
-    ? new Set(['home', 'admin', 'academic', 'ceed', 'hepa', 'news', 'settings'])
+    ? new Set(['home', 'admin', 'academic', 'ceed', 'hepa', 'news', 'community', 'settings'])
     : isMentor
-    ? new Set(['home', 'mentor', 'news', 'settings'])
-    : new Set(['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'mentorship', 'news', 'settings']);
+    ? new Set(['home', 'mentor', 'news', 'community', 'settings'])
+    : new Set(['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'mentorship', 'news', 'community', 'settings']);
 
   const unreadCount = filteredNotifications.filter(n => !n.isRead).length;
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   collection, 
   doc,
@@ -25,6 +25,8 @@ import {
   MaintenanceTicket,
   PortalSettings,
   PortalNews,
+  CommunityPost,
+  CommunityReply,
   GrantEndorsement,
   MerchantSubTab,
   AdminSubTab,
@@ -42,6 +44,7 @@ import {
   INITIAL_MENTORSHIP_REGISTRATIONS 
 } from './data/mentorData';
 import { INITIAL_PORTAL_NEWS } from './data/newsData';
+import { INITIAL_COMMUNITY_POSTS, INITIAL_COMMUNITY_REPLIES } from './data/communityData';
 import { 
   getDeletedIds, 
   isProductionAuthenticated,
@@ -49,6 +52,8 @@ import {
   DEFAULT_PORTAL_SETTINGS, 
   loadLocalPortalSettings,
   loadLocalDemoNews,
+  loadLocalDemoCommunityPosts,
+  loadLocalDemoCommunityReplies,
   saveMentorshipRegistrationRecord,
   saveMentorProfileRecord
 } from './services/dataService';
@@ -72,7 +77,9 @@ import { MerchantPortal } from './components/MerchantPortal';
 import { MentorPortal } from './components/MentorPortal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { NewsPage } from './components/NewsPage';
+import { CommunityPage } from './components/CommunityPage';
 import { DashboardBannerHeader } from './components/DashboardBannerHeader';
+import { PageSkeleton } from './components/PageSkeleton';
 import { SettingsPage } from './components/SettingsPage';
 import { LoginPage } from './components/LoginPage';
 import { RegisterPage } from './components/RegisterPage';
@@ -114,6 +121,57 @@ function MainApp() {
   const [activeTab, setActiveTab] = useState<UMKTab>('landing');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  // Youth Merchant, Admin, and Mentor Sub-Navigation States
+  const [merchantSubTab, setMerchantSubTab] = useState<MerchantSubTab>('overview');
+  const [adminSubTab, setAdminSubTab] = useState<AdminSubTab>('queue');
+  const [mentorSubTab, setMentorSubTab] = useState<MentorSubTab>('overview');
+
+  const [isPageSkeletonVisible, setIsPageSkeletonVisible] = useState(false);
+  const [skeletonTransitionKey, setSkeletonTransitionKey] = useState('home');
+  const mainScrollRef = useRef<HTMLElement>(null);
+  const skeletonTimerRef = useRef<number | null>(null);
+
+  const triggerSkeletonTransition = useCallback((targetTab: UMKTab, overrideSubTab?: string) => {
+    if (skeletonTimerRef.current !== null) {
+      window.clearTimeout(skeletonTimerRef.current);
+      skeletonTimerRef.current = null;
+    }
+
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+    if (targetTab === 'landing' || targetTab === 'login' || targetTab === 'register') {
+      setIsPageSkeletonVisible(false);
+      triggerTopNavigationProgress(300);
+      return;
+    }
+
+    const currentRole = isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia';
+    const subKey = overrideSubTab || `${adminSubTab}:${mentorSubTab}:${merchantSubTab}`;
+    setSkeletonTransitionKey(`${targetTab}:${currentRole}:${subKey}:${Date.now()}`);
+    setIsPageSkeletonVisible(true);
+    triggerTopNavigationProgress(800);
+
+    skeletonTimerRef.current = window.setTimeout(() => {
+      setIsPageSkeletonVisible(false);
+      skeletonTimerRef.current = null;
+    }, 800);
+  }, [isAdmin, isMentor, merchantSubTab, mentorSubTab, adminSubTab]);
+
+  const navigateWithSkeleton = useCallback((tab: UMKTab, overrideSubTab?: string) => {
+    setActiveTab(tab);
+    triggerSkeletonTransition(tab, overrideSubTab);
+  }, [triggerSkeletonTransition]);
+
+  useEffect(() => {
+    return () => {
+      if (skeletonTimerRef.current !== null) {
+        window.clearTimeout(skeletonTimerRef.current);
+      }
+    };
+  }, []);
 
   // Sync dark mode class consistently across all tabs
   useEffect(() => {
@@ -124,9 +182,11 @@ function MainApp() {
     }
   }, [theme]);
 
-  // Trigger top progress bar and reset scroll position whenever navigating tabs
+  // Reset scroll position whenever navigating tabs
   useEffect(() => {
-    triggerTopNavigationProgress(400);
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTo({ top: 0, behavior: 'auto' });
+    }
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -167,21 +227,15 @@ function MainApp() {
   const [maintenanceTickets, setMaintenanceTickets] = useState<MaintenanceTicket[]>([]);
   const [portalSettings, setPortalSettings] = useState<PortalSettings>(() => loadLocalPortalSettings());
   const [newsItems, setNewsItems] = useState<PortalNews[]>(INITIAL_PORTAL_NEWS);
+  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>(INITIAL_COMMUNITY_POSTS);
+  const [communityReplies, setCommunityReplies] = useState<CommunityReply[]>(INITIAL_COMMUNITY_REPLIES);
+  const [isCommunityLoading, setIsCommunityLoading] = useState(false);
   const [grantEndorsements, setGrantEndorsements] = useState<GrantEndorsement[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Filters for Kapsul Niaga
   const [selectedHubFilter, setSelectedHubFilter] = useState('Semua');
   const [maxBudgetFilter, setMaxBudgetFilter] = useState(500);
-
-  // Youth Merchant Sub-Navigation State (Executive Summary, Profile, Products, Bookings, Cashflow, Vault, Card)
-  const [merchantSubTab, setMerchantSubTab] = useState<MerchantSubTab>('overview');
-
-  // Admin Sub-Navigation State (Queue, Bookings, Businesses, Slots, Programs, Mentors, Sync, Settings)
-  const [adminSubTab, setAdminSubTab] = useState<AdminSubTab>('queue');
-
-  // Mentor Sub-Navigation State (Overview, Sessions, Endorsements, Logbook, Profile)
-  const [mentorSubTab, setMentorSubTab] = useState<MentorSubTab>('overview');
 
   // Modals state
   const [selectedSlotForBooking, setSelectedSlotForBooking] = useState<CapsuleSlot | null>(null);
@@ -245,9 +299,9 @@ function MainApp() {
     if (!user) return;
     if (activeTab === 'landing' || activeTab === 'login' || activeTab === 'register') return;
 
-    const adminAllowedTabs: UMKTab[] = ['home', 'admin', 'academic', 'ceed', 'hepa', 'news', 'settings'];
-    const mentorAllowedTabs: UMKTab[] = ['home', 'mentor', 'news', 'settings'];
-    const youthAllowedTabs: UMKTab[] = ['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'mentorship', 'news', 'settings'];
+    const adminAllowedTabs: UMKTab[] = ['home', 'admin', 'academic', 'ceed', 'hepa', 'news', 'community', 'settings'];
+    const mentorAllowedTabs: UMKTab[] = ['home', 'mentor', 'news', 'community', 'settings'];
+    const youthAllowedTabs: UMKTab[] = ['home', 'merchant', 'academic', 'ceed', 'hepa', 'events', 'b2b', 'calculator', 'mentorship', 'news', 'community', 'settings'];
 
     if (isAdmin && !adminAllowedTabs.includes(activeTab)) {
       setActiveTab('admin');
@@ -741,6 +795,110 @@ function MainApp() {
       unsubDemoNews();
     };
   }, [user?.uid, user?.isDemo, isAdmin, refreshTrigger]);
+
+  // 4b2. Real-time Community Forum Listener (Posts & Replies, All Signed-In Users)
+  useEffect(() => {
+    let firestorePosts: CommunityPost[] = [];
+    let firestoreReplies: CommunityReply[] = [];
+    let demoSyncPosts: CommunityPost[] = [];
+    let demoSyncReplies: CommunityReply[] = [];
+    let demoSyncDeletedPosts: string[] = [];
+    let demoSyncDeletedReplies: string[] = [];
+
+    const recomputeCommunity = () => {
+      const deleted = [...getDeletedIds(), ...demoSyncDeletedPosts, ...demoSyncDeletedReplies];
+      const localPosts = loadLocalDemoCommunityPosts();
+      const localReplies = loadLocalDemoCommunityReplies();
+      const prodAuth = isProductionAuthenticated();
+
+      const postPriority = prodAuth
+        ? [firestorePosts, demoSyncPosts, localPosts, INITIAL_COMMUNITY_POSTS]
+        : [demoSyncPosts, localPosts, firestorePosts, INITIAL_COMMUNITY_POSTS];
+      const replyPriority = prodAuth
+        ? [firestoreReplies, demoSyncReplies, localReplies, INITIAL_COMMUNITY_REPLIES]
+        : [demoSyncReplies, localReplies, firestoreReplies, INITIAL_COMMUNITY_REPLIES];
+
+      setCommunityPosts(mergeUniqueById<CommunityPost>(postPriority, deleted));
+      setCommunityReplies(mergeUniqueById<CommunityReply>(replyPriority, deleted));
+    };
+
+    recomputeCommunity();
+
+    const handleDemoCommunityUpdate = () => recomputeCommunity();
+    window.addEventListener('kbelia_demo_community_updated', handleDemoCommunityUpdate);
+
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (
+        entity === 'all' ||
+        entity === 'community_post' ||
+        entity === 'community_reply' ||
+        entity === 'deleted'
+      ) {
+        recomputeCommunity();
+      }
+    });
+
+    let unsubPosts = () => {};
+    let unsubReplies = () => {};
+
+    if (user && isProductionAuthenticated()) {
+      setIsCommunityLoading(true);
+      unsubPosts = onSnapshot(
+        collection(db, 'community_posts'),
+        (snapshot) => {
+          const loaded: CommunityPost[] = [];
+          snapshot.forEach((docSnap) => {
+            loaded.push({ id: docSnap.id, ...docSnap.data() } as CommunityPost);
+          });
+          firestorePosts = loaded;
+          setIsCommunityLoading(false);
+          recomputeCommunity();
+        },
+        (err) => {
+          console.debug('Community posts listener notice:', err?.message || err);
+          setIsCommunityLoading(false);
+          recomputeCommunity();
+        }
+      );
+
+      unsubReplies = onSnapshot(
+        collection(db, 'community_replies'),
+        (snapshot) => {
+          const loaded: CommunityReply[] = [];
+          snapshot.forEach((docSnap) => {
+            loaded.push({ id: docSnap.id, ...docSnap.data() } as CommunityReply);
+          });
+          firestoreReplies = loaded;
+          recomputeCommunity();
+        },
+        (err) => {
+          console.debug('Community replies listener notice:', err?.message || err);
+          recomputeCommunity();
+        }
+      );
+    }
+
+    const unsubDemoPosts = subscribeDemoSyncCollection<CommunityPost>('community_post', (items, delIds) => {
+      demoSyncPosts = items;
+      demoSyncDeletedPosts = delIds;
+      recomputeCommunity();
+    });
+
+    const unsubDemoReplies = subscribeDemoSyncCollection<CommunityReply>('community_reply', (items, delIds) => {
+      demoSyncReplies = items;
+      demoSyncDeletedReplies = delIds;
+      recomputeCommunity();
+    });
+
+    return () => {
+      window.removeEventListener('kbelia_demo_community_updated', handleDemoCommunityUpdate);
+      unsubCrossTab();
+      unsubPosts();
+      unsubReplies();
+      unsubDemoPosts();
+      unsubDemoReplies();
+    };
+  }, [user?.uid, user?.isDemo, refreshTrigger]);
 
   // 4c. Real-time Mentor Profiles Listener
   useEffect(() => {
@@ -1242,7 +1400,7 @@ function MainApp() {
       });
       return;
     }
-    setActiveTab('mentorship');
+    navigateWithSkeleton('mentorship');
   };
 
   const handleViewOfferLetter = (booking: CapsuleBooking) => {
@@ -1387,17 +1545,17 @@ function MainApp() {
       {/* 1. TOP HEADER BAR */}
       <UMKHeader
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={navigateWithSkeleton}
         isSidebarCollapsed={isSidebarCollapsed}
         setIsSidebarCollapsed={setIsSidebarCollapsed}
         onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
         onSelectMerchantSubTab={(sub) => {
-          setActiveTab('merchant');
           setMerchantSubTab(sub);
+          navigateWithSkeleton('merchant');
         }}
         onSelectMentorSubTab={(sub) => {
-          setActiveTab('mentor');
           setMentorSubTab(sub);
+          navigateWithSkeleton('mentor');
         }}
         onOpenBooking={handleOpenNewBooking}
         slots={enrichedSlots}
@@ -1414,7 +1572,7 @@ function MainApp() {
         {/* Left Collapsible Sidebar + Responsive Mobile Drawer */}
         <UMKSidebar
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          setActiveTab={navigateWithSkeleton}
           isCollapsed={isSidebarCollapsed}
           isMobileOpen={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
@@ -1422,24 +1580,27 @@ function MainApp() {
           onOpenMentorshipClinic={handleOpenMentorshipClinicGuarded}
           merchantSubTab={merchantSubTab}
           onSelectMerchantSubTab={(sub) => {
-            setActiveTab('merchant');
             setMerchantSubTab(sub);
+            navigateWithSkeleton('merchant');
           }}
           adminSubTab={adminSubTab}
           onSelectAdminSubTab={(sub) => {
-            setActiveTab('admin');
             setAdminSubTab(sub);
+            navigateWithSkeleton('admin');
           }}
           mentorSubTab={mentorSubTab}
           onSelectMentorSubTab={(sub) => {
-            setActiveTab('mentor');
             setMentorSubTab(sub);
+            navigateWithSkeleton('mentor');
           }}
         />
 
         {/* Center/Right Dynamic Body */}
-        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3.5 lg:p-4 w-full max-w-none min-w-0 scroll-smooth bg-slate-50 dark:bg-zinc-950 bg-grid-pattern">
-          
+        <main
+          ref={mainScrollRef}
+          className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3 w-full max-w-none min-w-0 scroll-smooth bg-slate-50 dark:bg-zinc-950 bg-grid-pattern"
+        >
+          <div className="w-full">
           {/* Portal Maintenance / Announcement Bar from Admin Settings */}
           {portalSettings.systemStatus === 'maintenance' && !isAdmin && (
             <div className="mb-3 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-black dark:text-white text-xs flex items-center justify-between gap-3">
@@ -1454,16 +1615,20 @@ function MainApp() {
             activeTab={activeTab}
             role={isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia'}
             userName={userProfile?.fullName || user?.displayName || 'Pengguna KBelia'}
-            onNavigateHome={() => setActiveTab('home')}
-            onNavigateTab={(tab) => setActiveTab(tab)}
+            onNavigateHome={() => navigateWithSkeleton('home')}
+            onNavigateTab={navigateWithSkeleton}
           />
 
+          <PageSkeleton
+            active={isPageSkeletonVisible}
+            transitionKey={`${skeletonTransitionKey}:${activeTab}:${adminSubTab}:${mentorSubTab}:${merchantSubTab}`}
+          >
           {/* Tab Route Content: Home View strictly routed by role */}
           {activeTab === 'home' && (
             <>
               {/* 1. ADMIN DASHBOARD VIEW */}
               {isAdmin && (
-                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                   <AdminDashboard
                     slots={enrichedSlots}
                     businesses={businesses}
@@ -1478,14 +1643,17 @@ function MainApp() {
                     onUpdateMentor={handleUpdateMentorProfile}
                     onRefresh={triggerRefresh}
                     activeSubTab={adminSubTab}
-                    onSelectSubTab={setAdminSubTab}
+                    onSelectSubTab={(sub) => {
+                      setAdminSubTab(sub);
+                      triggerSkeletonTransition('admin', sub);
+                    }}
                   />
                 </div>
               )}
 
               {/* 2. MENTOR DASHBOARD VIEW */}
               {isMentor && (
-                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                   <MentorPortal
                     mentors={mentors}
                     registrations={scopedMentorRegistrations}
@@ -1493,14 +1661,17 @@ function MainApp() {
                     onUpdateRegistration={handleUpdateMentorshipRegistration}
                     onUpdateMentor={handleUpdateMentorProfile}
                     activeSubTab={mentorSubTab}
-                    onSelectSubTab={setMentorSubTab}
+                    onSelectSubTab={(sub) => {
+                      setMentorSubTab(sub);
+                      triggerSkeletonTransition('mentor', sub);
+                    }}
                   />
                 </div>
               )}
 
               {/* 3. YOUTH ENTREPRENEUR DASHBOARD VIEW */}
               {isYouth && (
-                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                   <MerchantPortal
                     myBusiness={myBusiness}
                     myProducts={myProducts}
@@ -1520,13 +1691,16 @@ function MainApp() {
                       setIsVerificationModalOpen(true);
                     }}
                     onOpenBookingModal={handleOpenNewBooking}
-                    onOpenBookingTab={() => setActiveTab('academic')}
-                    onOpenSettingsTab={() => setActiveTab('settings')}
+                    onOpenBookingTab={() => navigateWithSkeleton('academic')}
+                    onOpenSettingsTab={() => navigateWithSkeleton('settings')}
                     onOpenMentorshipClinic={handleOpenMentorshipClinicGuarded}
                     onOpenMaintenanceModal={() => setIsMaintenanceModalOpen(true)}
                     onRefresh={triggerRefresh}
                     activeSubTab={merchantSubTab}
-                    onSelectSubTab={setMerchantSubTab}
+                    onSelectSubTab={(sub) => {
+                      setMerchantSubTab(sub);
+                      triggerSkeletonTransition('merchant', sub);
+                    }}
                   />
                 </div>
               )}
@@ -1536,7 +1710,7 @@ function MainApp() {
           {/* KAPSUL NIAGA VIEW (Strictly Belia / Admin Monitoring Only - Blocked for Mentor) */}
           {activeTab === 'academic' && (
             isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1548,7 +1722,7 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('mentor')}
+                  onClick={() => navigateWithSkeleton('mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
@@ -1556,27 +1730,14 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
-                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-300 dark:border-zinc-600">
-                  <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
-                    <Building2 className="w-4 h-4" />
-                    <span>{t('tab_kiosk_title')}</span>
-                  </div>
-                  <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white">
-                    {t('tab_kiosk_heading')}
-                  </h1>
-                  <p className="text-xs sm:text-sm text-black dark:text-white mt-1">
-                    {t('tab_kiosk_desc')}
-                  </p>
-                </div>
-
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <CapsuleGrid
                   slots={enrichedSlots}
                   bookings={bookings}
                   onSelectSlot={handleOpenBookingForSlot}
                   onViewTenantDetail={handleOpenTenantDetail}
                   onOpenNewBooking={handleOpenNewBooking}
-                  onAddSlot={isAdmin ? () => { setActiveTab('admin'); setAdminSubTab('slots'); } : undefined}
+                  onAddSlot={isAdmin ? () => { setAdminSubTab('slots'); navigateWithSkeleton('admin', 'slots'); } : undefined}
                   selectedHub={selectedHubFilter}
                   onSelectHub={setSelectedHubFilter}
                   maxBudget={maxBudgetFilter}
@@ -1590,7 +1751,7 @@ function MainApp() {
           {/* DIREKTORI USAHAWAN KELANTAN (Belia / Admin Audit Only - Blocked for Mentor) */}
           {activeTab === 'hepa' && (
             isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1602,7 +1763,7 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('mentor')}
+                  onClick={() => navigateWithSkeleton('mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
@@ -1610,24 +1771,11 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
-                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-300 dark:border-zinc-600">
-                  <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
-                    <Store className="w-4 h-4" />
-                    <span>{t('tab_directory_title')}</span>
-                  </div>
-                  <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white">
-                    {t('tab_directory_title')}
-                  </h1>
-                  <p className="text-xs sm:text-sm text-black dark:text-white mt-1">
-                    {t('tab_directory_desc')}
-                  </p>
-                </div>
-
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <DirectorySection
                   businesses={businesses}
                   onSelectBusiness={handleOpenBusinessDetail}
-                  onRegisterBusiness={isYouth ? () => setActiveTab('merchant') : undefined}
+                  onRegisterBusiness={isYouth ? () => navigateWithSkeleton('merchant') : undefined}
                 />
               </div>
             )
@@ -1636,7 +1784,7 @@ function MainApp() {
           {/* GERAN & DANA BELIA (Belia / Admin Monitoring Only - Blocked for Mentor) */}
           {activeTab === 'ceed' && (
             isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1648,7 +1796,7 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('mentor')}
+                  onClick={() => navigateWithSkeleton('mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
@@ -1656,24 +1804,11 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
-                <div className="mb-6 p-4 rounded-xl kbelia-important-header border border-slate-300 dark:border-zinc-600">
-                  <div className="flex items-center gap-2 text-black dark:text-white/75 text-xs font-bold uppercase tracking-wider mb-1">
-                    <Award className="w-4 h-4" />
-                    <span>{t('tab_grants_title')}</span>
-                  </div>
-                  <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white">
-                    {t('tab_grants_heading')}
-                  </h1>
-                  <p className="text-xs sm:text-sm text-black dark:text-white mt-1">
-                    {t('tab_grants_desc')}
-                  </p>
-                </div>
-
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <ProgramsSection 
                   programs={programs} 
                   onOpenGrantModal={isYouth ? handleOpenGrantModal : undefined}
-                  onAddProgram={isAdmin ? () => { setActiveTab('admin'); setAdminSubTab('programs'); } : undefined}
+                  onAddProgram={isAdmin ? () => { setAdminSubTab('programs'); navigateWithSkeleton('admin', 'programs'); } : undefined}
                   isReadOnly={isAdmin}
                 />
               </div>
@@ -1683,7 +1818,7 @@ function MainApp() {
           {/* JADUAL ACARA & KARNIVAL BELIA (Strictly Youth Portal Only) */}
           {activeTab === 'events' && (
             !isYouth ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1695,14 +1830,14 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
+                  onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <EventsSection />
               </div>
             )
@@ -1711,7 +1846,7 @@ function MainApp() {
           {/* RUANG IKLAN & PELUANG NIAGA BELIA (Strictly Youth Portal Only) */}
           {activeTab === 'b2b' && (
             !isYouth ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1723,14 +1858,14 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
+                  onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <B2BMarketSection />
               </div>
             )
@@ -1739,7 +1874,7 @@ function MainApp() {
           {/* KALKULATOR KELAYAKAN GERAN & PEMBIAYAAN (Strictly Youth Portal Only) */}
           {activeTab === 'calculator' && (
             !isYouth ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <Lock className="w-7 h-7" />
                 </div>
@@ -1751,14 +1886,14 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
+                  onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <GrantCalculatorSection 
                   onOpenGrantModal={handleOpenGrantModal}
                   onOpenMentorship={handleOpenMentorshipClinicGuarded}
@@ -1770,7 +1905,7 @@ function MainApp() {
           {/* PENTADBIRAN (ADMIN - STRICTLY ADMIN ROLE ONLY) */}
           {activeTab === 'admin' && (
             !isAdmin ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
@@ -1786,7 +1921,7 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab(isMentor ? 'mentor' : 'home')}
+                  onClick={() => navigateWithSkeleton(isMentor ? 'mentor' : 'home')}
                   className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
                 >
                   <ShieldCheck className="w-4 h-4" />
@@ -1794,7 +1929,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <AdminDashboard
                   slots={enrichedSlots}
                   businesses={businesses}
@@ -1809,7 +1944,10 @@ function MainApp() {
                   onUpdateMentor={handleUpdateMentorProfile}
                   onRefresh={triggerRefresh}
                   activeSubTab={adminSubTab}
-                  onSelectSubTab={setAdminSubTab}
+                  onSelectSubTab={(sub) => {
+                    setAdminSubTab(sub);
+                    triggerSkeletonTransition('admin', sub);
+                  }}
                 />
               </div>
             )
@@ -1818,7 +1956,7 @@ function MainApp() {
           {/* PORTAL MENTOR: HAB BIMBINGAN (STRICT ROLE GUARD - MENTOR ONLY) */}
           {activeTab === 'mentor' && (
             !isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
@@ -1834,7 +1972,7 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'home')}
+                  onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'home')}
                   className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-blue-600"
                 >
                   <GraduationCap className="w-4 h-4" />
@@ -1842,7 +1980,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <MentorPortal
                   mentors={mentors}
                   registrations={scopedMentorRegistrations}
@@ -1850,7 +1988,10 @@ function MainApp() {
                   onUpdateRegistration={handleUpdateMentorshipRegistration}
                   onUpdateMentor={handleUpdateMentorProfile}
                   activeSubTab={mentorSubTab}
-                  onSelectSubTab={setMentorSubTab}
+                  onSelectSubTab={(sub) => {
+                    setMentorSubTab(sub);
+                    triggerSkeletonTransition('mentor', sub);
+                  }}
                 />
               </div>
             )
@@ -1859,7 +2000,7 @@ function MainApp() {
           {/* MERCHANT PORTAL: BISNES SAYA (KHUSUS BELIA) */}
           {activeTab === 'merchant' && (
             isAdmin ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <ShieldCheck className="w-8 h-8" />
                 </div>
@@ -1875,7 +2016,7 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('admin')}
+                  onClick={() => navigateWithSkeleton('admin')}
                   className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
                 >
                   <ShieldCheck className="w-4 h-4" />
@@ -1883,7 +2024,7 @@ function MainApp() {
                 </button>
               </div>
             ) : isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
@@ -1899,7 +2040,7 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('mentor')}
+                  onClick={() => navigateWithSkeleton('mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
@@ -1907,7 +2048,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <MerchantPortal
                   myBusiness={myBusiness}
                   myProducts={myProducts}
@@ -1927,13 +2068,16 @@ function MainApp() {
                     setIsVerificationModalOpen(true);
                   }}
                   onOpenBookingModal={handleOpenNewBooking}
-                  onOpenBookingTab={() => setActiveTab('academic')}
-                  onOpenSettingsTab={() => setActiveTab('settings')}
+                  onOpenBookingTab={() => navigateWithSkeleton('academic')}
+                  onOpenSettingsTab={() => navigateWithSkeleton('settings')}
                   onOpenMentorshipClinic={handleOpenMentorshipClinicGuarded}
                   onOpenMaintenanceModal={() => { if (isYouth) setIsMaintenanceModalOpen(true); }}
                   onRefresh={triggerRefresh}
                   activeSubTab={merchantSubTab}
-                  onSelectSubTab={setMerchantSubTab}
+                  onSelectSubTab={(sub) => {
+                    setMerchantSubTab(sub);
+                    triggerSkeletonTransition('merchant', sub);
+                  }}
                 />
               </div>
             )
@@ -1942,7 +2086,7 @@ function MainApp() {
           {/* HALAMAN BIMBINGAN BEBAS (STRICTLY YOUTH ROLE ONLY) */}
           {activeTab === 'mentorship' && (
             !isYouth ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-8 text-center space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
                 <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
                   <GraduationCap className="w-8 h-8" />
                 </div>
@@ -1958,7 +2102,7 @@ function MainApp() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActiveTab(isAdmin ? 'admin' : 'mentor')}
+                  onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
                 >
                   <GraduationCap className="w-4 h-4" />
@@ -1966,7 +2110,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <MentorshipPage
                   mentors={mentors}
                   registrations={scopedMentorRegistrations}
@@ -1984,15 +2128,15 @@ function MainApp() {
 
           {/* DEDICATED NEWS PAGE (Accessible to All Logged-In Roles, Controlled by Admin) */}
           {activeTab === 'news' && (
-            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
               <NewsPage
                 newsItems={newsItems}
                 onRefresh={triggerRefresh}
                 onOpenAdminNewsTab={
                   isAdmin
                     ? () => {
-                        setActiveTab('admin');
                         setAdminSubTab('news');
+                        navigateWithSkeleton('admin', 'news');
                       }
                     : undefined
                 }
@@ -2000,16 +2144,29 @@ function MainApp() {
             </div>
           )}
 
+          {/* DEDICATED KOMUNITI PAGE (Forum & Entrepreneur Q&A for All Logged-In Roles) */}
+          {activeTab === 'community' && (
+            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <CommunityPage
+                posts={communityPosts}
+                replies={communityReplies}
+                isLoading={isCommunityLoading}
+                onRefresh={triggerRefresh}
+              />
+            </div>
+          )}
+
           {/* TETAPAN AKAUN & PROFIL */}
           {activeTab === 'settings' && (
-            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-600 p-4 sm:p-6 shadow-sm transition-colors">
+            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
               <SettingsPage
                 myBusiness={myBusiness}
                 onRefresh={triggerRefresh}
               />
             </div>
           )}
-
+          </PageSkeleton>
+          </div>
         </main>
       </div>
 
@@ -2096,7 +2253,7 @@ function MainApp() {
         onOpenGrantModal={handleOpenGrantModal}
         onOpenMentorship={() => {
           setIsStatusDocumentsModalOpen(false);
-          if (isYouth) setActiveTab('mentorship');
+          if (isYouth) navigateWithSkeleton('mentorship');
         }}
         onOpenVerification={(refCode) => {
           setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');

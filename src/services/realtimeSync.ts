@@ -23,6 +23,8 @@ export type SyncEntityType =
   | 'program'
   | 'b2b'
   | 'news'
+  | 'community_post'
+  | 'community_reply'
   | 'mentor'
   | 'settings'
   | 'deleted';
@@ -74,6 +76,9 @@ export function broadcastSyncUpdate(entityType: SyncEntityType | 'all' = 'all') 
     }
     if (entityType === 'news') {
       window.dispatchEvent(new CustomEvent('kbelia_demo_news_updated'));
+    }
+    if (entityType === 'community_post' || entityType === 'community_reply') {
+      window.dispatchEvent(new CustomEvent('kbelia_demo_community_updated'));
     }
   } catch {
     // ignore

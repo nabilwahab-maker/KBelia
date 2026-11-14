@@ -279,21 +279,17 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       .join('');
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-4">
       {/* Page Intro Header */}
-      <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="space-y-1.5 max-w-2xl">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-black/70 dark:text-white/75">
-            <GraduationCap className="w-4 h-4" />
-            <span>{isEn ? '1-on-1 Advisory & Coaching' : 'Bimbingan 1-ke-1 Usahawan'}</span>
-          </div>
+      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="space-y-1 max-w-2xl">
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance">
-            {isEn ? 'Mentor Advisory & Appointment Hub' : 'Halaman Bimbingan & Temu Janji Mentor'}
+            {isEn ? 'Mentor Advisory & Appointments' : 'Bimbingan & Temu Janji Mentor'}
           </h1>
-          <p className="text-xs sm:text-sm text-black/80 dark:text-white/80 leading-relaxed">
+          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 leading-relaxed">
             {isEn
-              ? 'Choose one certified UMK or agency mentor at a time to schedule your 1-on-1 advisory session.'
-              : 'Pilih seorang mentor bertauliah UMK atau agensi pada satu masa untuk menempah sesi bimbingan.'}
+              ? 'Choose one certified UMK or agency mentor at a time to schedule your 1-on-1 session.'
+              : 'Pilih seorang penasihat bertauliah UMK atau agensi pada satu masa untuk menempah slot anda.'}
           </p>
         </div>
 

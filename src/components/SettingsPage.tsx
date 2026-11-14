@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
-  Settings, 
   User, 
   ShieldCheck, 
   FileText, 
@@ -521,19 +520,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
   };
 
   return (
-    <div id="kbelia-settings-module" className="w-full space-y-6">
+    <div id="kbelia-settings-module" className="w-full space-y-4">
       
       {/* 1. Header Banner */}
-      <div className="kbelia-important-header dark:bg-slate-800 p-6 sm:p-7 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 text-[11px] font-bold uppercase tracking-wider">
-            <Settings className="w-3.5 h-3.5" />
-            <span>{language === 'ms' ? 'Pusat Tetapan Bersepadu' : 'Unified Settings Center'}</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
             {t('settings_title')}
-          </h2>
-          <p className="text-xs text-black dark:text-white max-w-2xl leading-relaxed">
+          </h1>
+          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
             {t('settings_desc')}
           </p>
         </div>
