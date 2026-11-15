@@ -251,7 +251,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
             }`}
           >
             <Star className="w-4 h-4 shrink-0" />
-            <span>{isFeatured ? 'Program Pilihan Utama (Ya)' : 'Tandakan Sebagai Program Pilihan'}</span>
+            <span>{isFeatured ? 'Pilihan Utama (Ya)' : 'Program Pilihan'}</span>
           </button>
 
           <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">

@@ -8,9 +8,11 @@ import {
   CheckCircle2,
   Users,
   X,
+  XCircle,
+  Clock,
   Eye
 } from 'lucide-react';
-import { YouthProgram } from '../types';
+import { GrantApplication, YouthProgram } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from './ToastNotification';
@@ -19,14 +21,18 @@ import { resolveProgramImage } from '../utils/visualAssets';
 
 interface ProgramsSectionProps {
   programs: YouthProgram[];
+  grantApplications?: GrantApplication[];
   onOpenGrantModal?: (title?: string, amount?: string) => void;
+  onCancelGrant?: (grant: GrantApplication) => Promise<void> | void;
   onAddProgram?: () => void;
   isReadOnly?: boolean;
 }
 
 export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   programs = [],
+  grantApplications = [],
   onOpenGrantModal,
+  onCancelGrant,
   onAddProgram,
   isReadOnly = false
 }) => {
@@ -35,6 +41,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   const isEn = language === 'en';
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [activeNotice, setActiveNotice] = useState<string | null>(null);
+  const [cancellingGrantId, setCancellingGrantId] = useState<string | null>(null);
 
   const storageKey = `kbelia_program_registrations_${user?.uid || 'guest'}`;
   const [registeredIds, setRegisteredIds] = useState<string[]>(() => {
@@ -116,6 +123,43 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
     });
   };
 
+  const handleCancelProgramRegistration = (prog: YouthProgram) => {
+    const updated = registeredIds.filter((id) => id !== prog.id);
+    setRegisteredIds(updated);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+    } catch {
+      // ignore storage errors
+    }
+    const noticeMsg = isEn
+      ? `Your registration for "${prog.title}" has been cancelled.`
+      : `Penyertaan anda untuk "${prog.title}" telah dibatalkan.`;
+    setActiveNotice(noticeMsg);
+    showToast({
+      type: 'info',
+      title: isEn ? 'Registration Cancelled' : 'Penyertaan Dibatalkan',
+      message: prog.title
+    });
+  };
+
+  const handleCancelGrantClick = async (grant: GrantApplication) => {
+    if (!onCancelGrant || cancellingGrantId === grant.id) return;
+    try {
+      setCancellingGrantId(grant.id);
+      await onCancelGrant(grant);
+      setActiveNotice(
+        isEn
+          ? `Grant application "${grant.programTitle}" has been cancelled.`
+          : `Permohonan geran "${grant.programTitle}" telah berjaya dibatalkan.`
+      );
+    } finally {
+      setCancellingGrantId(null);
+    }
+  };
+
+  const visibleGrants = (grantApplications || []).filter((g) => g && g.status !== 'cancelled');
+  const pendingGrants = visibleGrants.filter((g) => g.status === 'pending');
+
   return (
     <div className="w-full space-y-4">
       {/* Notice Banner */}
@@ -156,7 +200,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer dark:bg-emerald-600"
           >
             <Award className="w-4 h-4" />
-            <span>{isEn ? 'Publish Program & Grant' : 'Terbitkan Program & Geran'}</span>
+            <span>{isEn ? 'Add Program' : 'Terbit Program'}</span>
           </button>
         )}
       </div>
@@ -179,6 +223,76 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
         ))}
       </div>
 
+      {/* Active Grant Applications Status & Cancel Controls */}
+      {!isReadOnly && visibleGrants.length > 0 && (
+        <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-600 p-4 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-extrabold text-black dark:text-white flex items-center gap-2">
+              <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>{isEn ? 'Your Grant Applications' : 'Permohonan Geran Anda'}</span>
+            </h2>
+            <span className="text-xs font-bold text-black/70 dark:text-white/75 tabular-nums">
+              {pendingGrants.length} {isEn ? 'Pending' : 'Dalam Semakan'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {visibleGrants.map((grant) => {
+              const isPending = grant.status === 'pending';
+              const isCancelling = cancellingGrantId === grant.id;
+              return (
+                <div
+                  key={grant.id}
+                  className="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-600 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-sm text-black dark:text-white truncate">
+                        {grant.programTitle}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-xs font-bold border ${
+                          grant.status === 'approved'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border-emerald-300 dark:border-emerald-700'
+                            : grant.status === 'rejected'
+                            ? 'bg-rose-50 dark:bg-rose-950/60 text-black dark:text-white border-rose-300 dark:border-rose-700'
+                            : 'bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border-amber-300 dark:border-amber-700'
+                        }`}
+                      >
+                        {grant.status === 'approved'
+                          ? (isEn ? 'Approved' : 'Diluluskan')
+                          : grant.status === 'rejected'
+                          ? (isEn ? 'Rejected' : 'Ditolak')
+                          : (isEn ? 'Pending' : 'Menunggu Semakan')}
+                      </span>
+                    </div>
+                    <p className="text-xs text-black/70 dark:text-white/75 mt-1 truncate">
+                      {grant.businessName} · <strong className="text-black dark:text-white">{grant.grantAmount || grant.amount}</strong>
+                    </p>
+                  </div>
+
+                  {isPending && onCancelGrant && (
+                    <button
+                      type="button"
+                      disabled={isCancelling}
+                      onClick={() => handleCancelGrantClick(grant)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold text-black dark:text-white bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 border border-rose-300 dark:border-rose-700 transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50"
+                    >
+                      <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                      <span>
+                        {isCancelling
+                          ? (isEn ? 'Cancelling...' : 'Membatalkan...')
+                          : (isEn ? 'Cancel Request' : 'Batal Permohonan')}
+                      </span>
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Empty State */}
       {filteredPrograms.length === 0 ? (
         <div className="text-center py-14 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600">
@@ -192,6 +306,13 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           {filteredPrograms.map((prog) => {
             const isGrant = prog.category === 'Geran & Dana';
             const isRegistered = !isGrant && registeredIds.includes(prog.id);
+            const matchingPendingGrant = isGrant
+              ? pendingGrants.find(
+                  (g) =>
+                    g.programId === prog.id ||
+                    g.programTitle.trim().toLowerCase() === prog.title.trim().toLowerCase()
+                )
+              : undefined;
 
             return (
               <div
@@ -274,10 +395,42 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                       <Eye className="w-3.5 h-3.5 text-black dark:text-white/75" />
                       <span>{isEn ? 'Status: State Initiative (Monitored)' : 'Status: Inisiatif Negeri (Dipantau)'}</span>
                     </div>
+                  ) : matchingPendingGrant ? (
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 py-2 px-3 bg-amber-50 dark:bg-amber-950/50 text-black dark:text-white border border-amber-300 dark:border-amber-700 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 shrink-0" />
+                        <span>{isEn ? 'Pending' : 'Disemak'}</span>
+                      </div>
+                      {onCancelGrant && (
+                        <button
+                          type="button"
+                          disabled={cancellingGrantId === matchingPendingGrant.id}
+                          onClick={() => handleCancelGrantClick(matchingPendingGrant)}
+                          className="py-2 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                          <span>
+                            {cancellingGrantId === matchingPendingGrant.id
+                              ? (isEn ? 'Cancelling...' : 'Membatalkan...')
+                              : (isEn ? 'Cancel Request' : 'Batal Permohonan')}
+                          </span>
+                        </button>
+                      )}
+                    </div>
                   ) : isRegistered ? (
-                    <div className="w-full py-2.5 px-4 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold flex items-center justify-center gap-2">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>{isEn ? 'Participation Registered' : 'Penyertaan Didaftarkan'}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 py-2 px-3 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        <span>{isEn ? 'Registered' : 'Didaftarkan'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCancelProgramRegistration(prog)}
+                        className="py-2 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                        <span>{isEn ? 'Cancel Join' : 'Batal Penyertaan'}</span>
+                      </button>
                     </div>
                   ) : (
                     <button
@@ -287,8 +440,8 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                     >
                       <span>
                         {isGrant
-                          ? (isEn ? 'Apply for Grant' : 'Mohon Geran & Dana')
-                          : (isEn ? 'Register Participation' : 'Daftar Penyertaan')}
+                          ? (isEn ? 'Apply Grant' : 'Mohon Geran')
+                          : (isEn ? 'Join Program' : 'Daftar Program')}
                       </span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>

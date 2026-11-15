@@ -243,7 +243,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
             }`}
           >
             <QrCode className="w-3.5 h-3.5" />
-            <span>Paparan QR DuitNow Kiosk</span>
+            <span>QR DuitNow</span>
           </button>
         </div>
 
@@ -479,7 +479,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                 <div>
                   <div className="font-extrabold text-sm text-black uppercase">{businessName}</div>
                   <div className="text-[0.8125rem] font-mono text-black font-semibold">{kioskName}</div>
-                  <div className="text-[0.8125rem] text-black/70 mt-1">Imbas menggunakan mana-mana aplikasi perbankan atau e-dompet (Touch &apos;n Go, GrabPay, MAE, CIMB).</div> </div> </div> <div className="flex items-center justify-center gap-3 print:hidden"> <button type="button" onClick={handlePrint} className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer dark:bg-blue-600" > <Printer className="w-4 h-4" /> <span>Cetak Stand QR Kiosk</span> </button> </div> </div> )} </div> {/* Footer */} <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0 print:hidden"> <div className="text-[0.8125rem] text-black/70 dark:text-white/75"> {isDemoSession ? 'Mod Demo: Rekod diasingkan daripada pangkalan data pengeluaran.'
+                  <div className="text-[0.8125rem] text-black/70 mt-1">Imbas menggunakan mana-mana aplikasi perbankan atau e-dompet (Touch &apos;n Go, GrabPay, MAE, CIMB).</div> </div> </div> <div className="flex items-center justify-center gap-3 print:hidden"> <button type="button" onClick={handlePrint} className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer dark:bg-blue-600" > <Printer className="w-4 h-4" /> <span>Cetak QR</span> </button> </div> </div> )} </div> {/* Footer */} <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0 print:hidden"> <div className="text-[0.8125rem] text-black/70 dark:text-white/75"> {isDemoSession ? 'Mod Demo: Rekod diasingkan daripada pangkalan data pengeluaran.'
               : 'Rekod disegerakkan dengan akaun usahawan anda.'}
           </div>
           <button

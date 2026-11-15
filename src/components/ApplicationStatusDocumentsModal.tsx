@@ -60,7 +60,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
   const businessName = userBooking?.businessName || '';
   const hubLocation = userBooking?.hubLocation || '';
   const monthlyRate = userBooking?.monthlyRate || 150;
-  const userGrant = grantApplications[0] || null;
+  const userGrant = grantApplications.find(g => g.status !== 'cancelled') || null;
   const userMentorship = mentorshipRegistrations[0] || null;
 
   const handlePrint = () => {
@@ -180,13 +180,19 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-[0.8125rem] font-bold border flex items-center gap-1.5 ${
                       userBooking.status === 'approved'
                         ? 'bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white border-emerald-300 dark:border-emerald-800'
-                        : userBooking.status === 'rejected'
+                        : userBooking.status === 'rejected' || userBooking.status === 'cancelled'
                           ? 'bg-rose-100 dark:bg-rose-950 text-black dark:text-white border-rose-300 dark:border-rose-800'
                           : 'bg-amber-100 dark:bg-amber-950 text-black dark:text-white border-amber-300 dark:border-amber-800'
                     }`}>
                       {userBooking.status === 'approved' ? <CheckCircle2 className="w-4 h-4 text-black dark:text-white" /> : <Clock className="w-4 h-4 text-black dark:text-white" />}
                       <span>
-                        {userBooking.status === 'approved' ? 'Permohonan Diluluskan' : userBooking.status === 'rejected' ? 'Tidak Berjaya' : 'Sedang Disemak'}
+                        {userBooking.status === 'approved'
+                          ? 'Permohonan Diluluskan'
+                          : userBooking.status === 'cancelled'
+                          ? 'Dibatalkan'
+                          : userBooking.status === 'rejected'
+                          ? 'Tidak Berjaya'
+                          : 'Sedang Disemak'}
                       </span>
                     </span>
                   </div>
@@ -203,7 +209,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                           className="px-3.5 py-1.5 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer dark:bg-indigo-600"
                         >
                           <FileText className="w-3.5 h-3.5" />
-                          <span>Lihat Surat Tawaran</span>
+                          <span>Surat Tawaran</span>
                         </button>
                         <button
                           type="button"
@@ -232,7 +238,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     onClick={() => { onClose(); onOpenBooking(); }}
                     className="px-4 py-2 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer shrink-0 dark:bg-blue-600"
                   >
-                    Mohon Kiosk Sekarang
+                    Mohon Kiosk
                   </button>
                 </div>
               )}
@@ -261,13 +267,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-[0.8125rem] font-bold border flex items-center gap-1.5 ${
                       userGrant.status === 'approved'
                         ? 'bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white border-emerald-300 dark:border-emerald-800'
-                        : userGrant.status === 'rejected'
+                        : userGrant.status === 'rejected' || userGrant.status === 'cancelled'
                           ? 'bg-rose-100 dark:bg-rose-950 text-black dark:text-white border-rose-300 dark:border-rose-800'
                           : 'bg-amber-100 dark:bg-amber-950 text-black dark:text-white border-amber-300 dark:border-amber-800'
                     }`}>
                       <Clock className="w-4 h-4" />
                       <span>
-                        {userGrant.status === 'approved' ? 'Diluluskan' : userGrant.status === 'rejected' ? 'Ditolak' : 'Sedang Disemak Admin'}
+                        {userGrant.status === 'approved' ? 'Diluluskan' : userGrant.status === 'rejected' ? 'Ditolak' : userGrant.status === 'cancelled' ? 'Dibatalkan' : 'Sedang Disemak Admin'}
                       </span>
                     </span>
                   </div>
@@ -279,7 +285,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                       onClick={onOpenGrantModal}
                       className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer shrink-0 ml-2"
                     >
-                      Mohon Geran Lain &rarr;
+                      Mohon Geran
                     </button>
                   </div>
                 </div>
@@ -299,7 +305,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     onClick={() => { onClose(); onOpenGrantModal(); }}
                     className="px-4 py-2 rounded-xl text-sm font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
                   >
-                    Mohon Geran Belia
+                    Mohon Geran
                   </button>
                 </div>
               )}
@@ -368,7 +374,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                         onClick={onOpenMentorship}
                         className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
                       >
-                        Pilihan Slot & Mentor &rarr;
+                        Pilih Mentor
                       </button>
                     </div>
                   </div>
@@ -669,7 +675,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   }}
                   className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors cursor-pointer dark:bg-indigo-600"
                 >
-                  Buka Portal Pengesahan Awam PBT
+                  Portal Pengesahan PBT
                 </button>
               )}
             </div>

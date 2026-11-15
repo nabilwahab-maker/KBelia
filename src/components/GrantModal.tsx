@@ -9,7 +9,6 @@ import {
   Building2, 
   CreditCard,
   Send,
-  HelpCircle,
   FileCheck2,
   FileText
 } from 'lucide-react';
@@ -18,7 +17,6 @@ import { useAuth } from '../context/AuthContext';
 import { createGrantApplication } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import confetti from 'canvas-confetti';
-import { Accordion } from './Accordion';
 import { showToast } from './ToastNotification';
 
 interface GrantModalProps {
@@ -250,7 +248,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                   onClick={handleResetAndClose}
                   className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer dark:bg-emerald-600"
                 >
-                  Selesai & Kembali ke Dashboard
+                  Selesai
                 </button>
               </div>
             </div>
@@ -334,43 +332,6 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                     );
                   })}
                 </div>
-              </div>
-
-              {/* Accordion: Syarat Kelayakan & Senarai Semak */}
-              <div className="bg-slate-50 dark:bg-slate-900 p-4.5 rounded-xl border border-slate-300 dark:border-slate-600">
-                <div className="flex items-center gap-2 mb-3">
-                  <HelpCircle className="w-4 h-4 text-black dark:text-white/75" />
-                  <span className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white">
-                    Panduan Permohonan & Syarat Kelayakan
-                  </span>
-                </div>
-                <Accordion
-                  items={[
-                    {
-                      id: 'grant-eligibility',
-                      title: 'Syarat Kelayakan Pemohon Geran Belia',
-                      badge: 'Kelayakan',
-                      content: (
-                        <div className="text-sm text-black dark:text-white space-y-1.5 leading-relaxed">
-                          <p>• Warganegara Malaysia menetap di negeri Kelantan berumur 18-40 tahun.</p>
-                          <p>• Mengusahakan perniagaan atau kiosk modular belia.</p>
-                          <p>• Bersedia mengikuti sesi bimbingan mentor berkanun sekurang-kurangnya sekali sebulan.</p>
-                        </div>
-                      )
-                    },
-                    {
-                      id: 'document-checklist',
-                      title: 'Maklumat Pengesahan Permohonan',
-                      badge: 'Panduan',
-                      content: (
-                        <div className="text-sm text-black dark:text-white space-y-1.5 leading-relaxed">
-                          <p>✓ Butiran ringkas perniagaan dan cadangan penggunaan modal.</p>
-                          <p>✓ Gambar produk atau perancangan tapak kiosk belia.</p>
-                        </div>
-                      )
-                    }
-                  ]}
-                />
               </div>
 
               {/* Grouped Section: Business Info */}
@@ -545,7 +506,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                   className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 dark:bg-emerald-600"
                 >
                   <Send className="w-4 h-4" />
-                  <span>{loading ? 'Menghantar...' : `Hantar Permohonan Geran (${grantAmount})`}</span>
+                  <span>{loading ? 'Menghantar...' : 'Hantar Permohonan'}</span>
                 </button>
               </div>
 

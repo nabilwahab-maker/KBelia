@@ -708,7 +708,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               className="w-full sm:w-auto px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer dark:bg-teal-600"
             >
               <GraduationCap className="w-4 h-4 text-white" />
-              <span>Log Masuk Sebagai Mentor</span>
+              <span>Log Masuk</span>
             </button>
           </div>
         </div>
@@ -1369,7 +1369,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     }`}
                   >
                     {tab === 'all'
-                      ? `Semua Aktif (${activeCount})`
+                      ? `Aktif (${activeCount})`
                       : tab === 'pending'
                       ? `Menunggu (${pendingCount})`
                       : tab === 'confirmed'
@@ -1990,7 +1990,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               className="interactive-press interactive-lift px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer dark:bg-teal-600"
             >
               <Plus className="w-4 h-4 text-white" />
-              <span>Keluarkan Surat Perakuan Baharu</span>
+              <span>Keluarkan Perakuan</span>
             </button>
           </div>
 
@@ -2065,7 +2065,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-[0.8125rem] rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-teal-600"
                     >
                       <Printer className="w-3.5 h-3.5" />
-                      <span>Lihat & Cetak Surat</span>
+                      <span>Cetak Surat</span>
                     </button>
                   </div>
                 </div>
@@ -2586,7 +2586,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center gap-1.5 cursor-pointer dark:bg-blue-600"
                 >
                   <Award className="w-4 h-4" />
-                  <span>Jana Surat Perakuan Rasmi</span>
+                  <span>Jana Perakuan</span>
                 </button>
               </div>
 
@@ -2984,7 +2984,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center gap-1.5 cursor-pointer dark:bg-blue-600"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Simpan & Hantar Nota</span>
+                  <span>Simpan Nota</span>
                 </button>
               </div>
             </form>

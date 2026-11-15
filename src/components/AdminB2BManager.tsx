@@ -125,13 +125,6 @@ export const AdminB2BManager: React.FC = () => {
     };
   }, [user?.uid, isDemoSession]);
 
-  const stats = useMemo(() => {
-    const supply = listings.filter((l) => l.type === 'supply').length;
-    const demand = listings.filter((l) => l.type === 'demand').length;
-    const withImage = listings.filter((l) => Boolean(resolveB2BImage(l))).length;
-    return { total: listings.length, supply, demand, withImage };
-  }, [listings]);
-
   const filteredListings = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return listings.filter((item) => {
@@ -297,26 +290,6 @@ export const AdminB2BManager: React.FC = () => {
           {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           <span>{showForm ? 'Tutup Borang' : 'Tambah Iklan Bergambar'}</span>
         </button>
-      </div>
-
-      {/* Compact Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Jumlah Iklan</div>
-          <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.total}</div>
-        </div>
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Tawaran Bekalan</div>
-          <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.supply}</div>
-        </div>
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Permintaan Belia</div>
-          <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.demand}</div>
-        </div>
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Iklan Bergambar</div>
-          <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.withImage}</div>
-        </div>
       </div>
 
       {/* Create / Edit Form with Live Card Preview */}
@@ -510,7 +483,7 @@ export const AdminB2BManager: React.FC = () => {
                       ? 'Menyimpan...'
                       : editingId
                         ? 'Simpan Perubahan'
-                        : 'Siarkan ke Ruang Niaga'}
+                        : 'Siar Iklan'}
                   </span>
                 </button>
               </div>

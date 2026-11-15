@@ -116,13 +116,6 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
     return typeof loaded === 'number' && loaded > 0 ? loaded : post.replyCount || 0;
   };
 
-  const stats = useMemo(() => {
-    const total = posts.length;
-    const resolved = posts.filter(p => p.status === 'resolved').length;
-    const open = total - resolved;
-    return { total, resolved, open };
-  }, [posts]);
-
   const filteredPosts = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     const filtered = posts.filter(post => {
@@ -399,24 +392,6 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
-          {/* Compact Tabular Metrics */}
-          <div className="flex items-center gap-4 px-4 py-2.5 rounded-xl bg-white/90 dark:bg-zinc-900/90 border border-slate-200/80 dark:border-zinc-800 text-sm">
-            <div>
-              <div className="text-[0.8125rem] text-slate-500 dark:text-zinc-400">Topik</div>
-              <div className="font-black text-slate-900 dark:text-white tabular-nums">{stats.total}</div>
-            </div>
-            <div className="w-px h-7 bg-slate-200 dark:bg-zinc-800" />
-            <div>
-              <div className="text-[0.8125rem] text-slate-500 dark:text-zinc-400">Terjawab</div>
-              <div className="font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{stats.resolved}</div>
-            </div>
-            <div className="w-px h-7 bg-slate-200 dark:bg-zinc-800" />
-            <div>
-              <div className="text-[0.8125rem] text-slate-500 dark:text-zinc-400">Dibuka</div>
-              <div className="font-black text-amber-700 dark:text-amber-400 tabular-nums">{stats.open}</div>
-            </div>
-          </div>
-
           <div className="flex items-center gap-2">
             {isAdmin && (
               <button

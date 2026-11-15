@@ -40,7 +40,8 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  Loader2
+  Loader2,
+  Lock
 } from 'lucide-react';
 import { 
   BusinessListing, 
@@ -255,7 +256,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
   // Booking action states
   const [selectedReceiptBooking, setSelectedReceiptBooking] = useState<CapsuleBooking | null>(null);
-  const [confirmCancelBooking, setConfirmCancelBooking] = useState<CapsuleBooking | null>(null);
+  const [inlineCancelBookingId, setInlineCancelBookingId] = useState<string | null>(null);
   const [cancellingBooking, setCancellingBooking] = useState(false);
   const [maintenanceComplaintBooking, setMaintenanceComplaintBooking] = useState<CapsuleBooking | null>(null);
   const [complaintType, setComplaintType] = useState('Bekalan Elektrik 13A & Lampu');
@@ -273,9 +274,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     );
   };
 
-  const bookingOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2 };
+  const hasActiveKioskBooking = safeBookings.some(
+    (b) => b.status === 'pending' || b.status === 'approved'
+  );
+  const bookingOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2, cancelled: 3 };
   const sortedBookings = [...safeBookings].sort(
-    (a, b) => (bookingOrder[a.status] ?? 3) - (bookingOrder[b.status] ?? 3)
+    (a, b) => (bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4)
   );
   const bookingsPagination = usePagination(sortedBookings, 5, [sortedBookings.length]);
 
@@ -304,7 +308,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer dark:bg-blue-600"
           >
             <LogIn className="w-4 h-4 text-white" />
-            <span>Log Masuk / Pilih Profil Demo</span>
+            <span>Log Masuk</span>
           </button>
         </div>
       </div>
@@ -510,17 +514,18 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         // Real Kiosk Status
         const approvedBooking = safeBookings.find(b => b.status === 'approved') || null;
         const pendingBooking = safeBookings.find(b => b.status === 'pending') || null;
-        const primaryBooking = approvedBooking || pendingBooking || safeBookings[0] || null;
+        const primaryBooking = approvedBooking || pendingBooking || null;
         const activeSlotInfo = primaryBooking ? safeSlots.find(s => s.id === primaryBooking.slotId || s.code === primaryBooking.slotCode) : null;
 
         // Real Grant Computation
-        const latestGrant = grantApplications[0] || null;
-        const approvedGrants = grantApplications.filter(g => g.status === 'approved');
+        const activeGrants = grantApplications.filter(g => g.status !== 'cancelled');
+        const latestGrant = activeGrants[0] || null;
+        const approvedGrants = activeGrants.filter(g => g.status === 'approved');
         const parseAmount = (amt?: string) => {
           const num = Number((amt || '0').replace(/[^0-9.]/g, ''));
           return isNaN(num) ? 0 : num;
         };
-        const totalGrantValue = (approvedGrants.length > 0 ? approvedGrants : grantApplications)
+        const totalGrantValue = (approvedGrants.length > 0 ? approvedGrants : activeGrants)
           .reduce((sum, g) => sum + parseAmount(g.grantAmount || g.amount), 0);
 
         // Real Mentorship Computation
@@ -665,7 +670,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         // Dynamic Application Stepper based on user's actual state
         const hasBusiness = Boolean(myBusiness || userProfile?.businessName);
         const hasSsm = Boolean(myBusiness?.ssmNumber || userProfile?.ssmNumber);
-        const hasBooking = safeBookings.length > 0;
+        const hasBooking = Boolean(primaryBooking);
         const isBookingApproved = Boolean(approvedBooking);
         const isTenancySigned = Boolean(approvedBooking?.tenancySigned);
 
@@ -1679,7 +1684,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     className="min-h-[40px] py-2.5 px-6 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer active:scale-[0.98] disabled:opacity-50"
                   >
                     <Save className="w-4 h-4 shrink-0" />
-                    <span>{loading ? 'Menyimpan...' : `Simpan Produk Ini (RM${prodPrice ? Number(prodPrice).toFixed(2) : '0.00'})`}</span>
+                    <span>{loading ? 'Menyimpan...' : 'Simpan Produk'}</span>
                   </button>
                 </div>
               </form>
@@ -1829,26 +1834,42 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       {/* Tab 3: Capsule Bookings */}
       {activeTab === 'bookings' && (
         <div className="mt-6 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-base font-bold text-black dark:text-white">Rekod Permohonan Kiosk Anda</h3>
-              <p className="text-[0.9375rem] text-black dark:text-white/75">Status semakan dan kelulusan kiosk oleh pihak pengurusan.</p>
+              <p className="text-[0.9375rem] text-black dark:text-white/75">
+                {hasActiveKioskBooking
+                  ? 'Had 1 tempahan kiosk aktif sedang digunakan (1 / 1). Batalkan tempahan aktif untuk memohon unit lain.'
+                  : 'Status semakan dan kelulusan kiosk oleh pihak pengurusan (0 / 1 aktif).'}
+              </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                if (onOpenBookingModal) {
-                  onOpenBookingModal();
-                } else if (onOpenBookingTab) {
-                  onOpenBookingTab();
-                }
-              }}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-bold rounded-xl flex items-center gap-1.5 shadow-xs transition-all cursor-pointer interactive-press dark:bg-blue-600"
-            >
-              <Building2 className="w-4 h-4" />
-              <span>Mohon Slot Kiosk</span>
-            </button>
+            {hasActiveKioskBooking ? (
+              <button
+                type="button"
+                disabled
+                title="Hanya 1 tempahan kiosk aktif dibenarkan pada satu masa"
+                className="px-4 py-2 bg-slate-200 dark:bg-zinc-800 text-black/60 dark:text-white/60 border border-slate-300 dark:border-zinc-600 text-sm font-bold rounded-xl flex items-center gap-1.5 cursor-not-allowed self-start sm:self-auto"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Sudah Ditempah</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (onOpenBookingModal) {
+                    onOpenBookingModal();
+                  } else if (onOpenBookingTab) {
+                    onOpenBookingTab();
+                  }
+                }}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-bold rounded-xl flex items-center gap-1.5 shadow-xs transition-all cursor-pointer interactive-press dark:bg-blue-600 self-start sm:self-auto"
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Mohon Kiosk</span>
+              </button>
+            )}
           </div>
 
           {safeBookings.length === 0 ? (
@@ -1865,7 +1886,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors cursor-pointer interactive-press dark:bg-blue-600"
               >
                 <Building2 className="w-4 h-4" />
-                <span>Pilih &amp; Mohon Kiosk Sekarang</span>
+                <span>Mohon Kiosk</span>
               </button>
             </div>
           ) : (
@@ -1927,6 +1948,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             <span className="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/80 text-black dark:text-white rounded-full text-[0.8125rem] font-bold flex items-center gap-1 border border-rose-200 dark:border-rose-800 whitespace-nowrap">
                               <AlertCircle className="w-3 h-3" />
                               Tidak Berjaya
+                            </span>
+                          )}
+                          {b.status === 'cancelled' && (
+                            <span className="px-2.5 py-1 bg-slate-100 dark:bg-zinc-800 text-black dark:text-white rounded-full text-[0.8125rem] font-bold flex items-center gap-1 border border-slate-300 dark:border-zinc-600 whitespace-nowrap">
+                              <XCircle className="w-3 h-3" />
+                              Dibatalkan
                             </span>
                           )}
 
@@ -2028,17 +2055,73 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                               <span>Aduan Kiosk</span>
                             </button>
 
-                            {b.status === 'pending' && (
+                            {(b.status === 'pending' || b.status === 'approved') && inlineCancelBookingId !== b.id && (
                               <button
                                 type="button"
-                                onClick={() => setConfirmCancelBooking(b)}
+                                onClick={() => setInlineCancelBookingId(b.id)}
                                 className="px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 border border-rose-200 dark:border-rose-800 text-black dark:text-white font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ml-auto"
                               >
                                 <XCircle className="w-3.5 h-3.5 text-black dark:text-white" />
-                                <span>Batal Permohonan</span>
+                                <span>Batalkan Tempahan</span>
                               </button>
                             )}
                           </div>
+
+                          {(b.status === 'pending' || b.status === 'approved') && inlineCancelBookingId === b.id && (
+                            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div className="text-sm text-black dark:text-white">
+                                <span className="font-bold">Sahkan pembatalan tempahan slot {b.slotCode}?</span>{' '}
+                                <span className="text-black/75 dark:text-white/75">
+                                  Slot ini akan dilepaskan dan anda boleh memilih kiosk lain selepas pembatalan.
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button
+                                  type="button"
+                                  disabled={cancellingBooking}
+                                  onClick={async () => {
+                                    try {
+                                      setCancellingBooking(true);
+                                      await updateBookingStatus(
+                                        b.id,
+                                        'cancelled',
+                                        'Tempahan dibatalkan oleh usahawan.',
+                                        b.slotId,
+                                        b.businessName,
+                                        b.applicantId
+                                      );
+                                      showToast({
+                                        type: 'info',
+                                        title: 'Tempahan Kiosk Dibatalkan',
+                                        message: `Tempahan slot ${b.slotCode} telah dibatalkan. Anda kini boleh memohon unit kiosk lain.`
+                                      });
+                                      setInlineCancelBookingId(null);
+                                      onRefresh();
+                                    } catch {
+                                      showToast({
+                                        type: 'error',
+                                        title: 'Ralat Pembatalan',
+                                        message: 'Gagal membatalkan tempahan. Sila cuba lagi.'
+                                      });
+                                    } finally {
+                                      setCancellingBooking(false);
+                                    }
+                                  }}
+                                  className="px-3.5 py-2 rounded-lg text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 cursor-pointer"
+                                >
+                                  {cancellingBooking ? 'Memproses...' : 'Ya, Batalkan'}
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={cancellingBooking}
+                                  onClick={() => setInlineCancelBookingId(null)}
+                                  className="px-3.5 py-2 rounded-lg text-sm font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                                >
+                                  Kekalkan
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -2107,60 +2190,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           )}
 
-          {/* CANCEL CONFIRMATION MODAL */}
-          {confirmCancelBooking && (
-            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-              <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-300 dark:border-slate-600 p-6 space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
-                    <AlertCircle className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-black dark:text-white">
-                      Batalkan Permohonan Slot?
-                    </h4>
-                    <p className="text-[0.9375rem] text-black dark:text-white mt-1 leading-relaxed">
-                      Adakah anda pasti ingin membatalkan permohonan slot <span className="font-mono font-bold">{confirmCancelBooking.slotCode}</span> ({confirmCancelBooking.slotName})?
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-300 dark:border-slate-600">
-                  <button
-                    type="button"
-                    disabled={cancellingBooking}
-                    onClick={() => setConfirmCancelBooking(null)}
-                    className="px-4 py-2 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                  >
-                    Kembali
-                  </button>
-                  <button
-                    type="button"
-                    disabled={cancellingBooking}
-                    onClick={async () => {
-                      try {
-                        setCancellingBooking(true);
-                        await updateBookingStatus(confirmCancelBooking.id, 'rejected', 'Permohonan dibatalkan oleh usahawan.');
-                        showToast({
-                          type: 'info',
-                          title: 'Permohonan Dibatalkan',
-                          message: `Permohonan slot ${confirmCancelBooking.slotCode} telah dibatalkan.`
-                        });
-                        setConfirmCancelBooking(null);
-                        onRefresh();
-                      } catch {
-                        showToast('Gagal membatalkan permohonan. Sila cuba lagi.', 'error');
-                      } finally {
-                        setCancellingBooking(false);
-                      }
-                    }}
-                    className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 cursor-pointer"
-                  >
-                    {cancellingBooking ? 'Memproses...' : 'Ya, Batalkan'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Inline 2-step cancellation is used above (zero pop-up modal) */}
 
           {/* MODAL 1: OFFICIAL RECEIPT (RESIT RASMI BAYARAN KBELIA) */}
           {selectedReceiptBooking && (

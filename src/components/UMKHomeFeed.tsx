@@ -11,7 +11,6 @@ import {
   ChevronRight, 
   Clock, 
   AlertCircle, 
-  Sparkles, 
   Filter, 
   FileText, 
   Check, 
@@ -137,11 +136,12 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
     return isOwnerUid || isOwnerEmail || isOwnerName;
   }) || (bookings.length > 0 && user ? bookings[0] : null);
 
-  // Identify user's grant application if any
-  const userGrant = grantApplications.find(g => {
+  // Identify user's active grant application if any
+  const activeGrants = grantApplications.filter(g => g.status !== 'cancelled');
+  const userGrant = activeGrants.find(g => {
     if (!user) return false;
     return g.applicantId === user.uid || (user.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase());
-  }) || (grantApplications.length > 0 && user ? grantApplications[0] : null);
+  }) || (activeGrants.length > 0 && user ? activeGrants[0] : null);
 
   const displayName = userProfile?.fullName || user?.displayName || (language === 'en' ? 'Kelantan Youth Entrepreneur' : 'Usahawan Belia Kelantan');
 
@@ -156,32 +156,13 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       
       {/* 1. WELCOME HEADER (TOP-LEFT SOFT SKY BLUE GRADIENT FOR IMPORTANT HEADER ONLY) */}
       <div className="kbelia-important-header rounded-3xl p-6 sm:p-7 border border-slate-300 dark:border-slate-600 shadow-xs relative overflow-hidden transition-all duration-300">
-        <div className="relative z-10 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2.5">
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-lg text-[0.8125rem] font-bold tracking-wide uppercase bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white flex items-center gap-1.5 border border-amber-200 dark:border-amber-800/70">
-                <Sparkles className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                <span>{t('portal_brand_title')}</span>
-              </span>
-              <span className="px-3 py-1 rounded-lg text-[0.8125rem] font-semibold bg-slate-50 dark:bg-slate-800 text-black dark:text-white flex items-center gap-1.5 border border-slate-300 dark:border-slate-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>{user ? (isAdmin ? t('badge_admin') : t('badge_merchant')) : t('badge_session')}</span>
-              </span>
-            </div>
-
-            <div className="text-sm text-black dark:text-white font-medium">
-              {t('fiscal_year')}
-            </div>
-          </div>
-
-          <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-black dark:text-white leading-snug">
-              {t('welcome_greeting')} <span className="text-black dark:text-white/75">{displayName}</span>
-            </h1>
-            <p className="text-[0.9375rem] text-black dark:text-white mt-1 max-w-2xl leading-relaxed">
-              {t('home_subtitle')}
-            </p>
-          </div>
+        <div className="relative z-10">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-black dark:text-white leading-snug">
+            {t('welcome_greeting')} <span className="text-black dark:text-white/75">{displayName}</span>
+          </h1>
+          <p className="text-[0.9375rem] text-black dark:text-white mt-1 max-w-2xl leading-relaxed">
+            {t('home_subtitle')}
+          </p>
         </div>
       </div>
 
@@ -543,7 +524,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   <span className={`text-[0.8125rem] font-bold px-2.5 py-0.5 rounded-lg border ${
                     userGrant.status === 'approved'
                       ? 'bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white border-emerald-300'
-                      : userGrant.status === 'rejected'
+                      : userGrant.status === 'rejected' || userGrant.status === 'cancelled'
                       ? 'bg-rose-100 dark:bg-rose-950/80 text-black dark:text-white border-rose-300'
                       : 'bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white border-amber-300'
                   }`}>
@@ -551,6 +532,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                       ? (language === 'en' ? '✓ Grant Approved' : '✓ Geran Diluluskan') 
                       : userGrant.status === 'rejected' 
                       ? (language === 'en' ? 'Application Rejected' : 'Permohonan Ditolak') 
+                      : userGrant.status === 'cancelled'
+                      ? (language === 'en' ? 'Cancelled' : 'Dibatalkan')
                       : (language === 'en' ? '⏳ Panel Reviewing' : '⏳ Sedang Disemak Panel')}
                   </span>
                 </div>
@@ -695,7 +678,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
             onClick={() => setActiveTab('academic')}
             className="text-sm font-bold text-black dark:text-white/75 hover:underline flex items-center gap-1 cursor-pointer"
           >
-            <span>{language === 'en' ? 'Open Full Kiosk Module' : 'Lihat Semua Kiosk'}</span>
+            <span>{language === 'en' ? 'View Kiosks' : 'Lihat Kiosk'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>

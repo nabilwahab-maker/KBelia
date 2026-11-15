@@ -40,11 +40,10 @@ import {
 import { UMKTab } from './UMKHeader';
 import { CapsuleSlot, BusinessListing, YouthProgram, KelantanDistrict } from '../types';
 import { INITIAL_CAPSULE_SLOTS } from '../data/seedData';
-import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
-import { useScrollReveal, useCountUp } from '../hooks/useMotion';
+import { useScrollReveal } from '../hooks/useMotion';
 import { KelantanDistrictsMap } from './KelantanDistrictsMap';
 
 const RevealBlock: React.FC<{
@@ -95,15 +94,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [legalModalType, setLegalModalType] = useState<'privacy' | 'terms' | null>(null);
   const [selectedMapDistrict, setSelectedMapDistrict] = useState<KelantanDistrict>('Semua Jajahan');
-
-  const availableSlotsCount = slots.filter(s => s.status === 'available').length;
-  const { ref: statsRef, isVisible: statsVisible } = useScrollReveal<HTMLDivElement>({ threshold: 0.08, rootMargin: '0px' });
-  const animatedSlotsCount = useCountUp(slots.length, statsVisible);
-  const animatedAvailableSlots = useCountUp(availableSlotsCount, statsVisible);
-  const animatedBusinessesCount = useCountUp(businesses.length, statsVisible);
-  const animatedProgramsCount = useCountUp(programs.length, statsVisible);
-  const animatedMentorsCount = useCountUp(INITIAL_MENTOR_PROFILES.length, statsVisible);
-  const animatedSubsidyPercent = useCountUp(50, statsVisible);
 
   const navigateToPage = (tab: UMKTab) => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -500,85 +490,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             </div>
 
-          </div>
-
-          {/* ========================================================================= */}
-          {/* STATISTIK EKOSISTEM SEMASA (LIVE METRICS WITH COUNT-UP) */}
-          {/* ========================================================================= */}
-          <div className="pt-6 inline-flex items-center justify-center gap-2 text-[0.8125rem] font-bold uppercase tracking-wider text-black/75 dark:text-white/75">
-            <span className="kbelia-live-dot" aria-hidden="true" />
-            <span>{isBM ? 'Statistik Ekosistem Langsung' : 'Live Ecosystem Metrics'}</span>
-          </div>
-
-          <div
-            ref={statsRef}
-            className={`pt-2 w-full mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 reveal-section ${statsVisible ? 'is-revealed' : ''}`}
-          >
-            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-blue-400/70 dark:hover:border-blue-400/70 cursor-default group">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center animate-float-gentle">
-                  <MapPin className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-lg sm:text-xl font-black text-black dark:text-white leading-tight">{isBM ? 'Seluruh Kelantan' : 'Across Kelantan'}</div>
-              <div className="text-sm font-bold text-black dark:text-white mt-1">{isBM ? 'Liputan Negeri' : 'State Coverage'}</div>
-              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Rangkaian Hab & Kiosk' : 'Hub & Kiosk Network'}</div>
-            </div>
-
-            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-blue-400/70 dark:hover:border-blue-400/70 cursor-default group">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-black dark:text-white/75 flex items-center justify-center animate-float-gentle-alt">
-                  <Building2 className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white tabular-nums">{animatedSlotsCount}</div>
-              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
-              <div className="text-[0.8125rem] text-black dark:text-white/75 mt-0.5 font-bold tabular-nums">{animatedAvailableSlots} {isBM ? 'slot sedia' : 'slots ready'}</div>
-            </div>
-
-            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-blue-400/70 dark:hover:border-blue-400/70 cursor-default group">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center animate-float-gentle">
-                  <Store className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white tabular-nums">{animatedBusinessesCount}</div>
-              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Usahawan Direktori' : 'Listed Merchants'}</div>
-              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Disahkan SSM' : 'SSM Verified'}</div>
-            </div>
-
-            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-amber-300 dark:hover:border-amber-500/40 cursor-default group">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-black dark:text-white/75 flex items-center justify-center animate-float-gentle-alt">
-                  <Award className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{animatedProgramsCount}</div>
-              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Program & Geran' : 'Programs & Grants'}</div>
-              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Inisiatif aktif' : 'Active initiatives'}</div>
-            </div>
-
-            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-violet-300 dark:hover:border-violet-500/40 cursor-default group">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-950/60 border border-violet-200/80 dark:border-violet-800/60 text-black dark:text-white/75 flex items-center justify-center animate-float-gentle">
-                  <Users className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{animatedMentorsCount}</div>
-              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Panel Mentor' : 'Industry Mentors'}</div>
-              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Certified mentors'}</div>
-            </div>
-
-            <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-emerald-300 dark:hover:border-emerald-500/40 cursor-default group">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 text-black dark:text-white/75 flex items-center justify-center animate-float-gentle-alt">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{animatedSubsidyPercent}%</div>
-              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Subsidi Sewaan' : 'Rental Subsidy'}</div>
-              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Serendah RM12/hari' : 'From RM12/day'}</div>
-            </div>
           </div>
 
         </div>

@@ -34,7 +34,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     search_no_results: 'Tiada carian dijumpai untuk',
 
     // Sidebar items by role
-    nav_my_kiosk: 'Kiosk Saya',
+    nav_my_kiosk: 'Tempahan Kiosk',
     nav_sales_pos: 'Rekod Jualan',
     nav_grant_application: 'Geran Belia',
     nav_mentor_clinic: 'Bimbingan',
@@ -264,7 +264,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     break_even_target_label: 'Sasaran Balik Modal:',
     zakat_nisab_label: 'Nisab Zakat Perniagaan MAIK:',
     grant_recommendation_title: 'Cadangan Geran Sesuai Untuk Anda',
-    apply_this_grant_btn: 'Mohon Geran Ini',
+    apply_this_grant_btn: 'Mohon Geran',
     book_kiosk_btn: 'Tempah Kiosk',
 
     // Mentor Portal & Metrics
@@ -298,11 +298,11 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     search_business_ph: 'Masukkan kata kunci carian',
     all_categories: 'Semua Kategori',
     popular_categories_label: 'Kategori Popular:',
-    manage_business_btn: 'Urus Bisnes Saya',
-    register_business_btn: 'Urus Bisnes Saya',
+    manage_business_btn: 'Urus Bisnes',
+    register_business_btn: 'Urus Bisnes',
     mentor_review_mode_title: 'Mod Semakan Mentor',
     mentor_review_mode_desc: 'Anda log masuk sebagai Mentor dan boleh menyemak profil serta produk usahawan.',
-    view_catalog_btn: 'Lihat Produk & Hubungi',
+    view_catalog_btn: 'Lihat Profil',
     no_businesses_found: 'Tiada Kedai Dijumpai',
     no_businesses_desc: 'Cuba tukar kata carian atau pilih kategori lain.',
     featured_badge: 'Pilihan',
@@ -364,7 +364,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     search_no_results: 'No matches found for',
 
     // Sidebar items by role
-    nav_my_kiosk: 'My Kiosk',
+    nav_my_kiosk: 'Kiosk Booking',
     nav_sales_pos: 'Cash Flow',
     nav_grant_application: 'Youth Grant',
     nav_mentor_clinic: 'Mentoring',
@@ -608,7 +608,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     break_even_target_label: 'Break-Even Target:',
     zakat_nisab_label: 'MAIK Business Zakat Nisab:',
     grant_recommendation_title: 'Recommended Grant Match',
-    apply_this_grant_btn: 'Apply For This Grant',
+    apply_this_grant_btn: 'Apply Grant',
     book_kiosk_btn: 'Book Kiosk',
 
     // Mentor Portal & Metrics
@@ -642,11 +642,11 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     search_business_ph: 'Enter search keyword',
     all_categories: 'All Categories',
     popular_categories_label: 'Popular Categories:',
-    manage_business_btn: 'Manage My Business',
-    register_business_btn: 'Manage My Business',
+    manage_business_btn: 'Manage Business',
+    register_business_btn: 'Manage Business',
     mentor_review_mode_title: 'Mentor Review Mode',
     mentor_review_mode_desc: 'Logged in as Mentor. Review mentee profiles and products for coaching.',
-    view_catalog_btn: 'View Catalog & Contact',
+    view_catalog_btn: 'View Profile',
     no_businesses_found: 'No Businesses Found',
     no_businesses_desc: 'Try adjusting your search query or category filters.',
     featured_badge: 'Featured',

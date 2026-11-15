@@ -1,20 +1,10 @@
 import React from 'react';
 import { 
-  Building2, 
-  Store, 
-  Award, 
-  ArrowRight,
   Bell, 
   Headphones,
-  Phone,
-  Clock,
-  ShieldCheck,
-  MessageSquare,
-  HelpCircle,
-  ExternalLink
+  MessageSquare
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
-import { useAuth } from '../context/AuthContext';
 import { CapsuleSlot, BusinessListing, YouthProgram } from '../types';
 
 interface UMKRightWidgetsProps {
@@ -26,60 +16,11 @@ interface UMKRightWidgetsProps {
 }
 
 export const UMKRightWidgets: React.FC<UMKRightWidgetsProps> = ({
-  setActiveTab,
   onOpenBooking,
-  slots = [],
 }) => {
-  const { user, userProfile, isAdmin } = useAuth();
-  const availableCount = slots.filter(s => s && s.status === 'available').length;
-
   return (
     <div className="space-y-4 w-full min-w-0">
-      
-      {/* 1. STATUS SESI & PERANAN PENGGUNA */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 shadow-2xs transition-colors w-full min-w-0 overflow-hidden">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600 mb-3">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-            <span className="text-sm font-extrabold text-black dark:text-white">Sistem KBelia Aktif</span>
-          </div>
-          <span className="text-[0.8125rem] text-black dark:text-white font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-900/50">
-            Dalam Talian
-          </span>
-        </div>
-
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center justify-between text-black dark:text-white">
-            <span>Peranan Sesi:</span>
-            <span className="font-bold text-black dark:text-white">
-              {user ? (isAdmin ? 'Admin KBelia' : 'Usahawan Belia') : 'Pelawat Awam'}
-            </span>
-          </div>
-          {userProfile?.district && (
-            <div className="flex items-center justify-between text-black dark:text-white">
-              <span>Jajahan Asal:</span>
-              <span className="font-semibold text-black dark:text-white">{userProfile.district}</span>
-            </div>
-          )}
-          <div className="flex items-center justify-between text-black dark:text-white">
-            <span>Ketersediaan:</span>
-            <span className="font-bold text-black dark:text-white/75">{availableCount} Kiosk Terbuka</span>
-          </div>
-        </div>
-
-        <div className="mt-4 pt-3 border-t border-slate-300 dark:border-slate-600">
-          <button
-            id="widget-apply-capsule-btn"
-            onClick={onOpenBooking}
-            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer dark:bg-blue-600"
-          >
-            <Building2 className="w-4 h-4 text-white" />
-            <span>Mohon Kiosk Belia</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 2. PENGUMUMAN RASMI (ALERT BOX) */}
+      {/* 1. PENGUMUMAN RASMI (ALERT BOX) */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 shadow-2xs transition-colors w-full min-w-0 overflow-hidden">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5 text-sm font-bold text-black dark:text-white">

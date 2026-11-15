@@ -343,7 +343,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer dark:bg-blue-600"
             >
               <Sparkles className="w-4 h-4 text-white" />
-              <span>{isEn ? 'Recalculate Eligibility Score' : 'Kira Semula Skor Kelayakan'}</span>
+              <span>{isEn ? 'Recalculate' : 'Kira Semula'}</span>
             </button>
           </div>
         </div>

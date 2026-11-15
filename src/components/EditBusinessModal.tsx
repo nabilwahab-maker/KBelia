@@ -313,7 +313,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
               }`}
             >
               <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span>{isApproved ? 'Status: Aktif di Direktori' : 'Status: Disembunyikan'}</span>
+              <span>{isApproved ? 'Status: Aktif' : 'Status: Disembunyikan'}</span>
             </button>
 
             <button
@@ -326,7 +326,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
               }`}
             >
               <Star className="w-4 h-4 shrink-0" />
-              <span>{isFeatured ? 'Kedai Pilihan Utama (Ya)' : 'Jadikan Kedai Pilihan'}</span>
+              <span>{isFeatured ? 'Pilihan Utama (Ya)' : 'Kedai Pilihan'}</span>
             </button>
           </div>
 

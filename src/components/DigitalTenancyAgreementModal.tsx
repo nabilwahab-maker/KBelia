@@ -231,7 +231,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                   onClick={handleConfirmSignature}
                   className="py-2 px-5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-40 transition-all shadow-sm cursor-pointer dark:bg-blue-600"
                 >
-                  {isSaving ? 'Menyimpan...' : 'Sahkan & Meterai Perjanjian'}
+                  {isSaving ? 'Menyimpan...' : 'Meterai Perjanjian'}
                 </button>
               </div>
             </div>

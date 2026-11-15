@@ -178,7 +178,7 @@ export interface GrantApplication {
   bankName: string;
   bankAccountNumber: string;
   fundPurpose: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   adminNotes?: string;
   createdAt: string;
 }

@@ -11,7 +11,6 @@ import {
   Network,
   Coins,
   Settings,
-  ChevronRight,
   ChevronDown,
   FileCheck,
   ShoppingBag,
@@ -622,7 +621,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const youthCat1HasMatches =
     matchesSearch('papan pemuka usahawan belia dashboard') ||
     filteredYouthAccordion.length > 0 ||
-    matchesSearch('kiosk kapsul modular sewa tapak premis my kiosk') ||
+    matchesSearch('tempahan kiosk kapsul modular sewa tapak premis booking my kiosk') ||
     matchesSearch('jualan aliran tunai pos rekod harian untung sales cashflow');
   const youthCat2HasMatches =
     matchesSearch('permohonan geran benih pembiayaan modal grant') ||
@@ -799,13 +798,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_kiosk_monitoring')}</span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'academic'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
               </div>
@@ -834,13 +826,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_grant_monitoring')}</span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'ceed'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -869,13 +854,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Inisiatif Geran' : 'Grant Initiatives'}
                       </span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'admin' && adminSubTab === 'programs'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -904,13 +882,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Panel Mentor' : 'Mentor Panel'}
                       </span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'admin' && adminSubTab === 'mentors'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
               </div>
@@ -939,13 +910,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_audit_ssm')}</span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'hepa'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -967,13 +931,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Tetapan Akaun' : 'Account Settings'}
                       </span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'settings'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
               </div>
@@ -1103,13 +1060,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Sokongan Geran' : 'Grant Endorsements'}
                       </span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'mentor' && mentorSubTab === 'endorsements'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -1148,13 +1098,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Profil & Jadual' : 'Profile & Schedule'}
                       </span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'mentor' && mentorSubTab === 'profile'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -1176,13 +1119,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Tetapan Akaun' : 'Account Settings'}
                       </span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'settings'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
               </div>
@@ -1276,7 +1212,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   </div>
                 )}
 
-                {matchesSearch('kiosk kapsul modular sewa tapak premis my kiosk') && (
+                {matchesSearch('tempahan kiosk kapsul modular sewa tapak premis booking my kiosk') && (
                   <button
                     type="button"
                     onClick={() => navigateAndClose(() => setActiveTab('academic'))}
@@ -1292,13 +1228,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_my_kiosk')}</span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'academic'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -1327,13 +1256,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_sales_pos')}</span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'merchant' && merchantSubTab === 'cashflow'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
               </div>
@@ -1362,13 +1284,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_grant_application')}</span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'ceed'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -1388,13 +1303,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_mentor_clinic')}</span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'mentorship'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -1416,13 +1324,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Ruang Niaga' : 'Ruang Niaga Marketplace'}
                       </span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'b2b'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -1444,13 +1345,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Acara & Karnival' : 'Events & Expo'}
                       </span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'events'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
               </div>
@@ -1479,13 +1373,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('directory')}</span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'hepa'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
 
@@ -1507,13 +1394,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Tetapan Akaun' : 'Account Settings'}
                       </span>
                     </div>
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        activeTab === 'settings'
-                          ? 'text-black dark:text-white/75'
-                          : 'text-black/35 dark:text-white/35'
-                      }`}
-                    />
                   </button>
                 )}
               </div>

@@ -408,7 +408,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 }}
                 className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm cursor-pointer dark:bg-rose-600"
               >
-                Log Masuk untuk Memohon
+                Log Masuk
               </button>
             </div>
           ) : isMaintenanceMode ? (
@@ -868,7 +868,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all shadow-sm flex items-center gap-2 cursor-pointer dark:bg-blue-600"
                     >
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{loading ? 'Menghantar Permohonan...' : `Hantar Permohonan Sewaan (RM${monthlyRate}/bln)`}</span>
+                      <span>{loading ? 'Menghantar...' : 'Hantar Permohonan'}</span>
                     </button>
                   </div>
                 </div>

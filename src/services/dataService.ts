@@ -182,7 +182,7 @@ export async function createCapsuleBooking(
 
 export async function updateBookingStatus(
   bookingId: string,
-  status: 'approved' | 'rejected',
+  status: 'approved' | 'rejected' | 'cancelled',
   adminNotes: string,
   slotId?: string,
   businessName?: string,
@@ -193,6 +193,8 @@ export async function updateBookingStatus(
     adminNotes ||
     (status === 'approved'
       ? 'Permohonan diluluskan. Sila hadir ke pejabat pentadbiran untuk penyerahan kunci.'
+      : status === 'cancelled'
+      ? 'Tempahan dibatalkan oleh usahawan.'
       : 'Permohonan ditolak.');
 
   if (!isProductionAuthenticated()) {
@@ -224,6 +226,19 @@ export async function updateBookingStatus(
         };
         localStorage.setItem('kbelia_demo_slots', JSON.stringify([updatedSlot, ...slotList.filter(s => s.id !== slotId)]));
         await publishDemoSyncRecord('slot', slotId, updatedSlot);
+      }
+    } else if (status === 'cancelled' && slotId) {
+      const slotList: CapsuleSlot[] = JSON.parse(localStorage.getItem('kbelia_demo_slots') || '[]');
+      const existingSlot = slotList.find(s => s.id === slotId) || INITIAL_CAPSULE_SLOTS.find(s => s.id === slotId);
+      if (existingSlot && (existingSlot.currentTenantId === (targetBooking?.applicantId || applicantId) || existingSlot.status === 'reserved')) {
+        const releasedSlot: CapsuleSlot = {
+          ...existingSlot,
+          status: 'available',
+          currentTenantBusinessName: '',
+          currentTenantId: ''
+        };
+        localStorage.setItem('kbelia_demo_slots', JSON.stringify([releasedSlot, ...slotList.filter(s => s.id !== slotId)]));
+        await publishDemoSyncRecord('slot', slotId, releasedSlot);
       }
     }
     return;
@@ -596,12 +611,16 @@ export async function fetchGrantApplications(): Promise<GrantApplication[]> {
 
 export async function updateGrantApplicationStatus(
   grantId: string,
-  status: 'approved' | 'rejected',
+  status: 'approved' | 'rejected' | 'cancelled',
   adminNotes?: string
 ) {
   const notes =
     adminNotes ||
-    (status === 'approved' ? 'Permohonan geran diluluskan oleh Admin KBelia.' : 'Permohonan ditolak.');
+    (status === 'approved'
+      ? 'Permohonan geran diluluskan oleh Admin KBelia.'
+      : status === 'cancelled'
+      ? 'Permohonan geran dibatalkan oleh pemohon.'
+      : 'Permohonan ditolak.');
 
   if (!isProductionAuthenticated()) {
     let updatedGrant: GrantApplication | undefined;

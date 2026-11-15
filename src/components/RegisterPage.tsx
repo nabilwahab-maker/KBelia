@@ -239,7 +239,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 className="flex items-center justify-center gap-2.5 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-amber-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-sm font-semibold transition-all cursor-pointer disabled:opacity-60"
               >
                 <GoogleIcon className="w-4 h-4 shrink-0" />
-                <span className="truncate">{isEn ? 'Sign up with Google' : 'Daftar dengan Google'}</span>
+                <span className="truncate">{isEn ? 'Google Sign-Up' : 'Akaun Google'}</span>
               </button>
 
               <button

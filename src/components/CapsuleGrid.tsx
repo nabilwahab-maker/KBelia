@@ -13,7 +13,6 @@ import {
   Store,
   Sparkles,
   ArrowRight,
-  HelpCircle,
   ShieldCheck,
   FileText,
   Eye,
@@ -26,7 +25,6 @@ import {
 } from 'lucide-react';
 import { CapsuleBooking, CapsuleSlot, KelantanDistrict, PortalSettings, SlotStatus } from '../types';
 import { BudgetSlider } from './BudgetSlider';
-import { Accordion } from './Accordion';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { PortalImage } from './PortalImage';
@@ -46,6 +44,8 @@ interface CapsuleGridProps {
   maxBudget?: number;
   onBudgetChange?: (val: number) => void;
   isReadOnly?: boolean;
+  hasActiveBooking?: boolean;
+  onGoToManageBooking?: () => void;
 }
 
 export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
@@ -60,7 +60,9 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   onSelectHub: externalSetHub,
   maxBudget: externalBudget,
   onBudgetChange: externalSetBudget,
-  isReadOnly = false
+  isReadOnly = false,
+  hasActiveBooking = false,
+  onGoToManageBooking
 }) => {
   const subsidyRate = portalSettings?.portalSubsidyRate ?? 50;
   const { user } = useAuth();
@@ -171,11 +173,34 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
             >
               <Building2 className="w-4 h-4" />
-              <span>Daftar Kiosk Baharu</span>
+              <span>Daftar Kiosk</span>
             </button>
           )
+        ) : hasActiveBooking ? (
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              disabled
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-200 dark:bg-slate-700 text-black/60 dark:text-white/60 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-bold cursor-not-allowed shrink-0"
+              title="Hanya 1 tempahan kiosk aktif dibenarkan pada satu masa"
+            >
+              <Lock className="w-4 h-4" />
+              <span>Sudah Ditempah</span>
+            </button>
+            {onGoToManageBooking && (
+              <button
+                type="button"
+                onClick={onGoToManageBooking}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Urus Tempahan</span>
+              </button>
+            )}
+          </div>
         ) : (
           <button
+            type="button"
             onClick={onOpenNewBooking}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
           >
@@ -183,21 +208,6 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
             <span>Mohon Kiosk</span>
           </button>
         )}
-      </div>
-
-      {/* Info Callout: UMK Capsule Model */}
-      <div className="p-4 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
-        <div className="flex items-start gap-3">
-          <div className="p-2.5 bg-blue-600 text-white rounded-xl shrink-0 shadow-2xs dark:bg-blue-600">
-            <Building2 className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-sm font-bold text-black dark:text-white">Kemudahan Kiosk Belia</div>
-            <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed mt-0.5">
-              Setiap unit kiosk dilengkapi soket elektrik 13A, Wi-Fi laju, pembayaran DuitNow QR, dan sokongan pameran rasmi.
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Live Google Maps Kiosk Hub Explorer */}
@@ -218,6 +228,10 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
         }}
         onSelectSlot={onSelectSlot}
         onOpenBookingForDistrict={(_district, slot) => {
+          if (hasActiveBooking) {
+            if (onGoToManageBooking) onGoToManageBooking();
+            return;
+          }
           if (slot) onSelectSlot(slot);
           else onOpenNewBooking();
         }}
@@ -249,13 +263,9 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
             )}
           </div>
 
-          {/* Right Controls: Filter Count & Reset */}
-          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70">
-              <strong className="font-bold tabular-nums">{filteredSlots.length}</strong> pod sepadan
-            </span>
-
-            {isFiltered && (
+          {/* Right Controls: Reset */}
+          {isFiltered && (
+            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
               <button
                 type="button"
                 onClick={handleResetFilters}
@@ -265,8 +275,8 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset</span>
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Bottom Row: Hubs, Status & Budget Slider */}
@@ -404,7 +414,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                     if (onViewTenantDetail) onViewTenantDetail(slot);
                     return;
                   }
-                  if (isAvailable && !isReadOnly) {
+                  if (isAvailable && !isReadOnly && !hasActiveBooking) {
                     onSelectSlot(slot);
                   }
                 }}
@@ -575,7 +585,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                         className="w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Pendaftaran Anda ({myBooking.status === 'approved' ? 'Telah Diluluskan' : 'Sedang Disemak'})</span>
+                        <span>Permohonan Anda</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     ) : isRegistered ? (
@@ -588,14 +598,24 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                         className="w-full py-2.5 px-4 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer bg-slate-50 hover:bg-slate-100 text-black dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-slate-300 dark:border-slate-600"
                       >
                         <Lock className="w-3.5 h-3.5 text-black/70 dark:text-white/75 shrink-0" />
-                        <span>Telah Berdaftar (Lihat Butiran Penyewa)</span>
+                        <span>Lihat Penyewa</span>
                         <ArrowRight className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
                       </button>
                     ) : isReadOnly ? (
                       <div className="w-full py-2.5 px-4 rounded-lg text-sm font-semibold text-center bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 flex items-center justify-center gap-2">
                         <Eye className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                        <span>Status: Kekosongan Tersedia (Dipantau)</span>
+                        <span>Status Tersedia</span>
                       </div>
+                    ) : hasActiveBooking ? (
+                      <button
+                        type="button"
+                        disabled
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-900 text-black/55 dark:text-white/55 border border-slate-300 dark:border-slate-600 cursor-not-allowed"
+                      >
+                        <Lock className="w-3.5 h-3.5 shrink-0" />
+                        <span>Sudah Ditempah</span>
+                      </button>
                     ) : (
                       <button
                         type="button"
@@ -605,7 +625,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                         }}
                         className="w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm dark:bg-blue-600"
                       >
-                        <span>Mohon Kiosk Ini (RM{slot.monthlyRate}/bln)</span>
+                        <span>Mohon Kiosk</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     )}
@@ -617,90 +637,6 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           })}
         </div>
       )}
-
-      {/* FAQ & Panduan Accordion: Clean collapsible sections to prevent cognitive overload */}
-      <div className="mt-12 bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-300 dark:border-slate-600 shadow-xs">
-        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-300 dark:border-slate-600">
-          <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/70 flex items-center justify-center font-bold">
-            <HelpCircle className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-base font-bold text-black dark:text-white">
-              Panduan &amp; Soalan Lazim Kiosk Belia (FAQ)
-            </h3>
-            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-              Ketahui syarat kelayakan, subsidi sewaan dan kemudahan yang disediakan bagi setiap kiosk.
-            </p>
-          </div>
-        </div>
-
-        <Accordion
-          items={[
-            {
-              id: 'eligibility',
-              title: 'Siapakah yang layak memohon Kiosk Belia?',
-              badge: 'Syarat Utama',
-              content: (
-                <div className="text-sm text-black dark:text-white space-y-2 leading-relaxed">
-                  <p>Inisiatif ini terbuka kepada:</p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Belia warganegara Malaysia berumur antara 18 hingga 40 tahun.</li>
-                    <li>Keutamaan diberikan kepada anak jati Kelantan, graduan TVET, atau mahasiswa/alumni universiti tempatan (UMK, UiTM, Politeknik).</li>
-                    <li>Mempunyai perniagaan aktif atau perancangan produk fizikal/servis yang berdaya maju.</li>
-                    <li>Pendaftaran SSM aktif atau bersedia mendaftar di bawah bimbingan Universiti Malaysia Kelantan (UMK) semasa memulakan perniagaan.</li>
-                  </ul>
-                </div>
-              )
-            },
-            {
-              id: 'subsidy',
-              title: 'Bagaimanakah penstrukturan subsidi sewaan 50% dilaksanakan?',
-              badge: 'RM150 / Bulan',
-              content: (
-                <div className="text-sm text-black dark:text-white space-y-2 leading-relaxed">
-                  <p>
-                    Kadar pasaran komersial bagi pod niaga modular ini adalah <strong>RM 300 sebulan</strong>. Kerajaan Negeri Kelantan melalui Universiti Malaysia Kelantan (UMK) menyerap subsidi 50% sebanyak <strong>RM 150 sebulan</strong> untuk setiap usahawan belia terpilih.
-                  </p>
-                  <p>
-                    Ini menjadikan kadar sewaan bersih yang perlu dibayar hanyalah <strong>RM 150 sebulan</strong> bagi meringankan kos modal operasi awal perniagaan.
-                  </p>
-                </div>
-              )
-            },
-            {
-              id: 'facilities',
-              title: 'Apakah kemudahan yang disertakan dalam setiap unit pod kiosk?',
-              badge: 'Serba Lengkap',
-              content: (
-                <div className="text-sm text-black dark:text-white space-y-2 leading-relaxed">
-                  <p>Setiap unit kapsul telah sedia dilengkapi dengan:</p>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Palam kuasa elektrik individu 13A dengan meter pemantauan selamat.</li>
-                    <li>Akses jalur lebar Wi-Fi tanpa wayar percuma di seluruh kawasan hab.</li>
-                    <li>Sistem paparan papan tanda rasmi serta terminal penerimaan DuitNow QR digital.</li>
-                    <li>Akses kepada fasiliti tandas, surau, tempat parkir pelanggan, dan kawalan keselamatan hab 24 jam.</li>
-                  </ul>
-                </div>
-              )
-            },
-            {
-              id: 'process',
-              title: 'Berapa lamakah tempoh semakan dan bagaimana tawaran disahkan?',
-              badge: '48 Jam',
-              content: (
-                <div className="text-sm text-black dark:text-white space-y-2 leading-relaxed">
-                  <p>
-                    Permohonan disemak oleh jawatankuasa urusetia UMK dalam masa <strong>48 jam waktu bekerja</strong>.
-                  </p>
-                  <p>
-                    Sebaik diluluskan, status penjejak permohonan dalam papan pemuka akan bertukar kepada <em>'Diluluskan'</em> dan Surat Tawaran Digital rasmi bersekuriti kod QR boleh dijana serta ditandatangani secara digital terus di dalam sistem.
-                  </p>
-                </div>
-              )
-            }
-          ]}
-        />
-      </div>
 
     </div>
   );

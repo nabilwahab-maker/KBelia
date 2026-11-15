@@ -210,7 +210,7 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
                   onClick={() => handleCompleteCourse(activeCourse.id)}
                   className="py-1.5 px-4 rounded-xl text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors shadow-sm"
                 >
-                  Selesai & Tebur Lencana
+                  Tebus Lencana
                 </button>
               ) : (
                 <span className="text-sm font-bold text-black dark:text-white/75 flex items-center gap-1">

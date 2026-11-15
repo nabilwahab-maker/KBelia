@@ -10,7 +10,6 @@ import {
   ShieldCheck, 
   Store, 
   LogIn, 
-  ChevronDown, 
   Clock,
   Settings,
   Bell,
@@ -32,7 +31,8 @@ import {
   ExternalLink,
   Check,
   Newspaper,
-  MessagesSquare
+  MessagesSquare,
+  MapPin
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -171,11 +171,99 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   }, [globalSearch, slots, businesses, programs, isMentor]);
 
   const displayName = userProfile?.fullName || user?.displayName || (isAdmin ? 'Pentadbir Sistem' : 'Usahawan Belia');
+  const roleLabel = isAdmin
+    ? (language === 'en' ? 'Administration' : 'Pentadbiran')
+    : userProfile?.role === 'mentor'
+      ? t('role_mentor')
+      : t('role_youth');
   const avatarSrc = userProfile?.avatarUrl || user?.photoURL || (isAdmin 
     ? '/assets/generated/avatar_admin_kelantan_1793924251898.jpg' 
     : userProfile?.role === 'mentor' 
       ? '/assets/generated/avatar_mentor_umk_1793924250411.jpg' 
       : '/assets/generated/avatar_youth_male_1793924250192.jpg');
+
+  const myBusiness = useMemo(
+    () => (businesses || []).find(b => b.ownerId === user?.uid || (user?.email && b.ownerEmail === user.email)),
+    [businesses, user?.uid, user?.email]
+  );
+
+  const roleDetails = useMemo(() => {
+    if (isAdmin) {
+      return {
+        sectionTitle: language === 'en' ? 'Administration Details' : 'Maklumat Pentadbiran',
+        rows: [
+          {
+            label: language === 'en' ? 'Department' : 'Jabatan / Bahagian',
+            value: userProfile?.department || 'Urus Setia KBelia Kelantan',
+            icon: 'building' as const,
+          },
+          {
+            label: language === 'en' ? 'Designation' : 'Jawatan',
+            value: userProfile?.designation || 'Pentadbir Sistem',
+            icon: 'shield' as const,
+          },
+          {
+            label: language === 'en' ? 'Coverage' : 'Kawasan Tugas',
+            value: userProfile?.district || 'Negeri Kelantan',
+            icon: 'pin' as const,
+          },
+        ],
+      };
+    }
+
+    if (userProfile?.role === 'mentor') {
+      return {
+        sectionTitle: language === 'en' ? 'Agency & Mentorship Details' : 'Maklumat Agensi & Bimbingan',
+        rows: [
+          {
+            label: language === 'en' ? 'Agency / Institution' : 'Agensi / Institusi',
+            value: userProfile?.institution || userProfile?.department || 'UMK / Agensi Pembimbing',
+            icon: 'building' as const,
+          },
+          {
+            label: language === 'en' ? 'Designation' : 'Jawatan',
+            value: userProfile?.designation || 'Mentor Bimbingan Usahawan',
+            icon: 'briefcase' as const,
+          },
+          {
+            label: language === 'en' ? 'Expertise' : 'Kepakaran',
+            value: userProfile?.expertise || 'Keusahawanan & Pembangunan Perniagaan',
+            icon: 'file' as const,
+          },
+        ],
+      };
+    }
+
+    const ssmValue =
+      userProfile?.ssmNumber ||
+      myBusiness?.ssmNumber ||
+      (userProfile?.ssmStatus === 'registered'
+        ? (language === 'en' ? 'Registered' : 'Berdaftar')
+        : userProfile?.ssmStatus === 'in_progress'
+          ? (language === 'en' ? 'In Progress' : 'Dalam Proses')
+          : (language === 'en' ? 'Not Registered Yet' : 'Belum Berdaftar'));
+
+    return {
+      sectionTitle: language === 'en' ? 'Business Details' : 'Maklumat Perniagaan',
+      rows: [
+        {
+          label: language === 'en' ? 'Business Name' : 'Perniagaan',
+          value: userProfile?.businessName || myBusiness?.businessName || (language === 'en' ? 'Not registered yet' : 'Belum didaftarkan'),
+          icon: 'store' as const,
+        },
+        {
+          label: language === 'en' ? 'District' : 'Jajahan',
+          value: userProfile?.district || myBusiness?.district || 'Kelantan',
+          icon: 'pin' as const,
+        },
+        {
+          label: language === 'en' ? 'SSM Status / No.' : 'Status / No. SSM',
+          value: ssmValue,
+          icon: 'file' as const,
+        },
+      ],
+    };
+  }, [isAdmin, userProfile, myBusiness, language]);
 
   return (
     <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-300 dark:border-slate-600 sticky top-0 z-40 transition-colors duration-200 shadow-2xs w-full shrink-0">
@@ -245,17 +333,17 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
           {user ? (
             <nav
               aria-label="Navigasi Pantas Header"
-              className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100/90 dark:bg-zinc-800/90 border border-slate-300/80 dark:border-zinc-700 shrink-0"
+              className="inline-flex items-center gap-2 sm:gap-2.5 shrink-0"
             >
               <button
                 id="kbelia-header-news-btn"
                 type="button"
                 onClick={() => setActiveTab('news')}
                 aria-current={activeTab === 'news' ? 'page' : undefined}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold border transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 shadow-2xs ${
                   activeTab === 'news'
-                    ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
-                    : 'text-black/80 hover:text-black hover:bg-white/80 dark:text-white/80 dark:hover:text-white dark:hover:bg-zinc-700/80'
+                    ? 'bg-blue-600 text-white border-blue-700 dark:bg-blue-600 dark:border-blue-500'
+                    : 'bg-slate-50 hover:bg-slate-100 text-black border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:border-slate-600'
                 }`}
                 title="Berita & Pengumuman Rasmi"
               >
@@ -268,10 +356,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 type="button"
                 onClick={() => setActiveTab('community')}
                 aria-current={activeTab === 'community' ? 'page' : undefined}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold border transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 shadow-2xs ${
                   activeTab === 'community'
-                    ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
-                    : 'text-black/80 hover:text-black hover:bg-white/80 dark:text-white/80 dark:hover:text-white dark:hover:bg-zinc-700/80'
+                    ? 'bg-blue-600 text-white border-blue-700 dark:bg-blue-600 dark:border-blue-500'
+                    : 'bg-slate-50 hover:bg-slate-100 text-black border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:border-slate-600'
                 }`}
                 title="Komuniti — Forum & Soal Jawab Usahawan"
               >
@@ -747,37 +835,72 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 id="kbelia-user-profile-btn"
                 type="button"
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center gap-2.5 pl-3 sm:pl-4 pr-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-50/70 dark:hover:bg-slate-700 transition-colors border border-slate-300 dark:border-slate-600 hover:border-amber-300 cursor-pointer shadow-2xs group"
-                title={`${displayName} - ${isAdmin ? 'Pentadbiran' : userProfile?.role === 'mentor' ? 'Mentor' : 'Usahawan'}`}
+                aria-label={`${displayName} - ${roleLabel}`}
+                aria-expanded={profileDropdownOpen}
+                title={`${displayName} - ${roleLabel}`}
+                className="relative w-10 h-10 p-0.5 rounded-xl bg-white dark:bg-slate-800 hover:border-blue-500 dark:hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all border border-slate-300 dark:border-slate-600 cursor-pointer shadow-2xs shrink-0 overflow-hidden group"
               >
-                <div className="text-right hidden sm:block">
-                  <div className="text-sm font-bold text-black dark:text-white leading-tight whitespace-nowrap group-hover:text-black dark:group-hover:text-white transition-colors">
-                    {displayName}
-                  </div>
-                  <div className="text-[0.8125rem] font-semibold text-black/80 dark:text-white/80 whitespace-nowrap">
-                    {isAdmin ? 'Pentadbiran' : userProfile?.role === 'mentor' ? t('role_mentor') : t('role_youth')}
-                  </div>
-                </div>
-
                 <img
                   src={avatarSrc}
                   alt={displayName}
                   referrerPolicy="no-referrer"
-                  className="w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-lg object-cover border border-amber-300 dark:border-slate-600 shadow-2xs shrink-0"
+                  className="w-full h-full rounded-[10px] object-cover group-hover:scale-[1.03] transition-transform duration-150"
                 />
-
-                <ChevronDown className="w-3.5 h-3.5 text-black/70 dark:text-white/75 group-hover:text-black shrink-0 dark:group-hover:text-white" />
               </button>
 
               {/* Profile Dropdown Menu */}
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-68 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2 border border-slate-300 dark:border-slate-600">
-                    <div className="text-sm font-bold text-black dark:text-white truncate">{displayName}</div>
-                    <div className="text-[0.8125rem] text-black/75 dark:text-white/80 truncate">{user.email}</div>
-                    <div className="mt-1 flex items-center gap-1.5 text-[0.8125rem] text-black dark:text-white/80 font-medium">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{isDemoSession ? 'Mod Demo Ujian' : t('active_session')}</span>
+                <div className="absolute right-0 mt-2 w-76 sm:w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-3 z-50 animate-in fade-in zoom-in-95 duration-100">
+                  {/* Kad Identiti Utama */}
+                  <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2.5 border border-slate-300 dark:border-slate-600">
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={avatarSrc}
+                        alt={displayName}
+                        referrerPolicy="no-referrer"
+                        className="w-12 h-12 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">
+                          {displayName}
+                        </div>
+                        <div className="text-[0.8125rem] text-black/75 dark:text-white/80 break-all mt-0.5">
+                          {user.email}
+                        </div>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold">
+                          <span className="text-teal-700 dark:text-teal-400">{roleLabel}</span>
+                          <span className="text-slate-400 dark:text-slate-500">•</span>
+                          <span className="inline-flex items-center gap-1 text-black/75 dark:text-white/75 font-medium">
+                            <Clock className="w-3 h-3 shrink-0" />
+                            <span>{isDemoSession ? 'Mod Demo Ujian' : t('active_session')}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ringkasan Maklumat Khusus Mengikut Peranan */}
+                  <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2.5 border border-slate-300 dark:border-slate-600">
+                    <div className="text-[0.75rem] font-bold uppercase tracking-wider text-black/70 dark:text-white/75 mb-2">
+                      {roleDetails.sectionTitle}
+                    </div>
+                    <div className="space-y-2">
+                      {roleDetails.rows.map((row) => (
+                        <div key={row.label} className="flex items-start gap-2.5 text-[0.8125rem]">
+                          <span className="mt-0.5 text-black/65 dark:text-white/70 shrink-0">
+                            {row.icon === 'store' && <Store className="w-3.5 h-3.5" />}
+                            {row.icon === 'pin' && <MapPin className="w-3.5 h-3.5" />}
+                            {row.icon === 'file' && <FileCheck className="w-3.5 h-3.5" />}
+                            {row.icon === 'building' && <Building2 className="w-3.5 h-3.5" />}
+                            {row.icon === 'briefcase' && <Briefcase className="w-3.5 h-3.5" />}
+                            {row.icon === 'shield' && <ShieldCheck className="w-3.5 h-3.5" />}
+                          </span>
+                          <div className="min-w-0 flex-1 leading-snug">
+                            <span className="text-black/65 dark:text-white/70 font-medium">{row.label}: </span>
+                            <span className="text-black dark:text-white font-semibold break-words">{row.value}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -793,7 +916,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <Settings className={`w-4 h-4 ${activeTab === 'settings' ? 'text-black dark:text-white/75' : 'text-black/70'}`} />
+                        <Settings className={`w-4 h-4 ${activeTab === 'settings' ? 'text-black dark:text-white/75' : 'text-black/70 dark:text-white/75'}`} />
                         <span>{language === 'en' ? 'Account Settings' : 'Tetapan Akaun'}</span>
                       </div>
                     </button>
@@ -813,10 +936,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                               setActiveTab('merchant');
                               setProfileDropdownOpen(false);
                             }}
-                            className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
+                            className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer border ${
                               !isAdmin && userProfile?.role !== 'mentor'
-                                ? 'bg-teal-600 text-white dark:bg-teal-600'
-                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700'
+                                ? 'bg-teal-600 text-white border-teal-700 dark:bg-teal-600 dark:border-teal-500'
+                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
                             }`}
                           >
                             {t('role_youth')}
@@ -828,10 +951,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                               setActiveTab('mentor');
                               setProfileDropdownOpen(false);
                             }}
-                            className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
+                            className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer border ${
                               userProfile?.role === 'mentor'
-                                ? 'bg-teal-600 text-white dark:bg-teal-600'
-                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700'
+                                ? 'bg-teal-600 text-white border-teal-700 dark:bg-teal-600 dark:border-teal-500'
+                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
                             }`}
                           >
                             {t('role_mentor')}
@@ -843,10 +966,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                               setActiveTab('admin');
                               setProfileDropdownOpen(false);
                             }}
-                            className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
+                            className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer border ${
                               isAdmin
-                                ? 'bg-blue-600 text-white font-black dark:bg-blue-600'
-                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700'
+                                ? 'bg-blue-600 text-white font-black border-blue-700 dark:bg-blue-600 dark:border-blue-500'
+                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
                             }`}
                           >
                             {t('role_admin')}

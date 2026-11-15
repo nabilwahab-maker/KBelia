@@ -175,7 +175,7 @@ service cloud.firestore {
         validStr(data.applicantId, 128) &&
         validStr(data.applicantName, 120) &&
         validStr(data.businessName, 150) &&
-        data.status in ['pending', 'approved', 'rejected'] &&
+        data.status in ['pending', 'approved', 'rejected', 'cancelled'] &&
         (!('slotCode' in data) || validStr(data.slotCode, 50)) &&
         (!('slotName' in data) || validStr(data.slotName, 120)) &&
         (!('hubLocation' in data) || validStr(data.hubLocation, 150)) &&
@@ -207,7 +207,7 @@ service cloud.firestore {
         validStr(data.applicantId, 128) &&
         validStr(data.applicantName, 120) &&
         validStr(data.businessName, 150) &&
-        data.status in ['pending', 'approved', 'rejected'] &&
+        data.status in ['pending', 'approved', 'rejected', 'cancelled'] &&
         (!('programId' in data) || validStr(data.programId, 128)) &&
         (!('grantAmount' in data) || validStr(data.grantAmount, 100)) &&
         (!('amount' in data) || validStr(data.amount, 100)) &&
@@ -629,6 +629,12 @@ service cloud.firestore {
           incoming().applicantId == existing().applicantId &&
           incoming().status == existing().status &&
           incoming().diff(existing()).affectedKeys().hasOnly(['tenancySigned', 'tenancySignedAt', 'tenancySignatureName', 'pitchNotes', 'applicantPhone'])
+        ) || (
+          existing().applicantId == request.auth.uid &&
+          incoming().applicantId == existing().applicantId &&
+          existing().status in ['pending', 'approved'] &&
+          incoming().status == 'cancelled' &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes'])
         )
       );
       allow delete: if isAdmin() && isValidId(bookingId);
@@ -644,7 +650,15 @@ service cloud.firestore {
           incoming().status == 'pending'
         )
       );
-      allow update: if isAdmin() && isValidId(grantId) && isValidGrantApplication(incoming());
+      allow update: if isSignedIn() && isValidId(grantId) && isValidGrantApplication(incoming()) && (
+        isAdmin() || (
+          existing().applicantId == request.auth.uid &&
+          incoming().applicantId == existing().applicantId &&
+          existing().status == 'pending' &&
+          incoming().status == 'cancelled' &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes'])
+        )
+      );
       allow delete: if isAdmin() && isValidId(grantId);
     }
 

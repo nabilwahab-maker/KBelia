@@ -103,7 +103,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   // Filter Grants directly by statusFilter
   const filteredGrants = grantApplications.filter((g) => {
     const matchStatus = statusFilter === 'all' 
-      ? g.status !== 'rejected' 
+      ? (g.status !== 'rejected' && g.status !== 'cancelled') 
       : g.status === statusFilter;
     const matchSearch = (g.applicantName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
                         (g.businessName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -111,7 +111,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
     return matchStatus && matchSearch;
   });
 
-  const statusOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2 };
+  const statusOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2, cancelled: 3 };
   const sortedBookings = [...filteredBookings].sort(
     (a, b) => (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3)
   );
@@ -344,7 +344,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             className="px-3.5 py-2 rounded-xl text-sm font-bold text-black bg-amber-50 hover:bg-amber-100 border border-amber-300 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
           >
             <Award className="w-3.5 h-3.5 text-black dark:text-white" />
-            <span>Terbitkan Program & Geran</span>
+            <span>Terbit Program</span>
           </button>
 
           <button
@@ -354,7 +354,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             title="Muat turun ringkasan rasmi kelulusan"
           >
             <Printer className="w-3.5 h-3.5 text-black dark:text-white/75" />
-            <span>Muat Turun Ringkasan Permohonan Berjaya (PDF Rasmi)</span>
+            <span>Laporan PDF</span>
           </button>
         </div>
       </div>
@@ -371,7 +371,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           }`}
         >
           <LayoutDashboard className="w-3.5 h-3.5" />
-          <span>Pusat Kawalan 3-Kolum</span>
+          <span>Ringkasan 3-Kolum</span>
         </button>
 
         <button
@@ -384,7 +384,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           }`}
         >
           <Store className="w-3.5 h-3.5" />
-          Permohonan Kiosk ({bookings.filter(b => b.status === 'pending').length} Menunggu)
+          <span>Kiosk ({bookings.filter(b => b.status === 'pending').length})</span>
         </button>
 
         <button
@@ -397,7 +397,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           }`}
         >
           <Coins className="w-3.5 h-3.5" />
-          Permohonan Dana Geran ({grantApplications.filter(g => g.status === 'pending').length} Menunggu)
+          <span>Geran ({grantApplications.filter(g => g.status === 'pending').length})</span>
         </button>
 
         <button
@@ -410,7 +410,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           }`}
         >
           <Wrench className="w-3.5 h-3.5" />
-          Kawalan Fasiliti Kiosk ({slots.length} Unit)
+          <span>Fasiliti ({slots.length})</span>
         </button>
 
         <button
@@ -423,7 +423,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           }`}
         >
           <TrendingUp className="w-3.5 h-3.5" />
-          Peta Haba Permintaan & Audit
+          <span>Peta Audit</span>
         </button>
       </div>
 
@@ -616,7 +616,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   className="w-full py-2 px-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer dark:bg-blue-600"
                 >
                   <Building2 className="w-3.5 h-3.5" />
-                  <span>Daftar Kiosk Niaga Baharu</span>
+                  <span>Daftar Kiosk</span>
                 </button>
 
                 <button
@@ -625,7 +625,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   className="w-full py-2 px-3 rounded-xl text-sm font-bold text-black bg-amber-50 hover:bg-amber-100 border border-amber-300 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                 >
                   <Award className="w-3.5 h-3.5 text-black" />
-                  <span>Terbitkan Program & Geran</span>
+                  <span>Terbit Program</span>
                 </button>
 
                 <button
@@ -634,7 +634,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   className="w-full py-2 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5 text-black dark:text-white" />
-                  <span>Cetak Laporan PDF Rasmi</span>
+                  <span>Laporan PDF</span>
                 </button>
               </div>
 
@@ -804,7 +804,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                 className="py-1.5 px-3 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center gap-1 cursor-pointer"
                               >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
-                                Luluskan & Jana Tawaran
+                                Luluskan
                               </button>
 
                               <button
@@ -885,9 +885,11 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                               ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
                               : grant.status === 'rejected'
                                 ? 'bg-rose-100 text-black dark:bg-rose-950/60 dark:text-white'
-                                : 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
+                                : grant.status === 'cancelled'
+                                  ? 'bg-slate-200 text-black dark:bg-slate-700 dark:text-white'
+                                  : 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
                           }`}>
-                            {grant.status === 'approved' ? 'Diluluskan' : grant.status === 'rejected' ? 'Ditolak' : 'Menunggu Semakan'}
+                            {grant.status === 'approved' ? 'Diluluskan' : grant.status === 'rejected' ? 'Ditolak' : grant.status === 'cancelled' ? 'Dibatalkan' : 'Menunggu Semakan'}
                           </span>
 
                           <button

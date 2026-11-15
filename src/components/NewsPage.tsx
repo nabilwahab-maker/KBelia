@@ -165,7 +165,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
               className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 dark:bg-blue-600"
             >
               <SlidersHorizontal className="w-4 h-4" />
-              <span>Urus & Tambah Berita</span>
+              <span>Urus Berita</span>
             </button>
             {onOpenAdminNewsTab && (
               <button
@@ -173,7 +173,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                 onClick={onOpenAdminNewsTab}
                 className="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
-                <span>Buka di Panel Admin</span>
+                <span>Panel Admin</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
@@ -206,9 +206,9 @@ export const NewsPage: React.FC<NewsPageProps> = ({
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Admin-only Status View Filter */}
-            {isAdmin && (
+          {/* Admin-only Status View Filter */}
+          {isAdmin && (
+            <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
                 {([
                   { id: 'all', label: 'Semua' },
@@ -229,12 +229,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                   </button>
                 ))}
               </div>
-            )}
-
-            <span className="text-sm font-medium text-black/70 dark:text-white/75 tabular-nums whitespace-nowrap">
-              {filteredNews.length} berita dipaparkan
-            </span>
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Category Filter Segmented Bar */}
@@ -512,7 +508,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                   }}
                   className="px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800/70 bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white text-sm font-bold cursor-pointer"
                 >
-                  Urus Artikel di Panel Admin
+                  Urus Artikel
                 </button>
               ) : (
                 <span className="text-sm text-black/70 dark:text-white/75">

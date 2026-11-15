@@ -270,7 +270,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
                   className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 font-bold text-sm flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-black dark:text-white" />
-                  <span>Lihat Profil Direktori Penuh</span>
+                  <span>Profil Direktori</span>
                 </button>
               )}
             </div>
@@ -323,7 +323,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
             }`}
           >
             <BellRing className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
-            <span>{interestSaved ? 'Minat Direkodkan ✓' : 'Beritahu Saya Jika Kosong'}</span>
+            <span>{interestSaved ? 'Minat Direkodkan' : 'Beritahu Saya'}</span>
           </button>
 
           <button

@@ -464,7 +464,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       className="w-full py-3 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-sm sm:text-[0.9375rem] font-semibold transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60"
                     >
                       <GoogleIcon className="w-4 h-4 shrink-0" />
-                      <span>{isEn ? 'Sign in with Google' : 'Log masuk Google'}</span>
+                      <span>{isEn ? 'Google Sign-In' : 'Akaun Google'}</span>
                     </button>
                   </div>
                 )}

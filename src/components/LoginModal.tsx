@@ -213,7 +213,7 @@ export const LoginModal: React.FC = () => {
                     : 'border-transparent text-black/70 dark:text-white/75'
                 }`}
               >
-                Log Masuk Sedia Ada
+                Log Masuk
               </button>
               <button
                 type="button"
@@ -313,7 +313,7 @@ export const LoginModal: React.FC = () => {
                     <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.26C.46 8.23 0 10.06 0 12s.46 3.77 1.26 5.39l4.01-3.15z" />
                     <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.25 2.64 1.26 6.61l4.01 3.15c.95-2.85 3.6-4.96 6.73-4.96z" />
                   </svg>
-                  <span>Log Masuk dengan Google</span>
+                  <span>Akaun Google</span>
                 </button>
               )}
             </form>
@@ -399,7 +399,7 @@ export const LoginModal: React.FC = () => {
                 className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-60 dark:bg-blue-600"
               >
                 <UserPlus className="w-4 h-4" />
-                <span>{isSubmitting ? 'Mendaftar...' : 'Daftar & Terus Buka Dashboard'}</span>
+                <span>{isSubmitting ? 'Mendaftar...' : 'Daftar Akaun'}</span>
               </button>
             </form>
           )}

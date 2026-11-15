@@ -613,20 +613,11 @@ html.dark .kbelia-ambient-sheen::after {
 }
 
 .kbelia-title-shimmer {
-  background-image: linear-gradient(110deg, #1d4ed8 0%, #4338ca 30%, #0284c7 50%, #1d4ed8 72%, #059669 100%);
-  background-size: 220% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: kbeliaTitleShimmer 6.5s ease-in-out infinite;
+  color: #000000;
 }
 
 html.dark .kbelia-title-shimmer {
-  background-image: linear-gradient(110deg, #93c5fd 0%, #a5b4fc 30%, #67e8f9 50%, #60a5fa 72%, #6ee7b7 100%);
-  background-size: 220% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #FFFFFF;
 }
 
 .kbelia-live-dot {
@@ -676,8 +667,7 @@ html.dark .kbelia-live-dot::after {
   .animate-ambient-grid,
   .animate-float-gentle,
   .animate-float-gentle-alt,
-  .animate-hero-ken-burns,
-  .kbelia-title-shimmer {
+  .animate-hero-ken-burns {
     animation: none;
   }
 

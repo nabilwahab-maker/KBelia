@@ -55,7 +55,8 @@ import {
   loadLocalDemoCommunityPosts,
   loadLocalDemoCommunityReplies,
   saveMentorshipRegistrationRecord,
-  saveMentorProfileRecord
+  saveMentorProfileRecord,
+  updateGrantApplicationStatus
 } from './services/dataService';
 import { emitAdminOrMentorNotification } from './services/notificationStore';
 import {
@@ -84,7 +85,7 @@ import { SettingsPage } from './components/SettingsPage';
 import { LoginPage } from './components/LoginPage';
 import { RegisterPage } from './components/RegisterPage';
 import { LandingPage } from './components/LandingPage';
-import { BookingModal } from './components/BookingModal';
+import { KioskBookingPage, KioskPageView } from './components/KioskBookingPage';
 import { CapsuleTenantDetailModal } from './components/CapsuleTenantDetailModal';
 import { BusinessDetailModal } from './components/BusinessDetailModal';
 import { GrantModal } from './components/GrantModal';
@@ -112,7 +113,7 @@ import {
 } from 'lucide-react';
 
 function MainApp() {
-  const { user, userProfile, isAdmin, isMentor, isYouth: isAuthenticatedYouth } = useAuth();
+  const { user, userProfile, isAdmin, isMentor, isYouth: isAuthenticatedYouth, openLoginModal } = useAuth();
   const { t, language } = useLanguage();
   const isYouth = !isAdmin && !isMentor;
   const { theme } = useTheme();
@@ -125,6 +126,7 @@ function MainApp() {
   const [merchantSubTab, setMerchantSubTab] = useState<MerchantSubTab>('overview');
   const [adminSubTab, setAdminSubTab] = useState<AdminSubTab>('queue');
   const [mentorSubTab, setMentorSubTab] = useState<MentorSubTab>('overview');
+  const [kioskPageView, setKioskPageView] = useState<KioskPageView>('browse');
 
   const [isPageSkeletonVisible, setIsPageSkeletonVisible] = useState(false);
   const [skeletonTransitionKey, setSkeletonTransitionKey] = useState('home');
@@ -161,6 +163,9 @@ function MainApp() {
   }, [isAdmin, isMentor, merchantSubTab, mentorSubTab, adminSubTab]);
 
   const navigateWithSkeleton = useCallback((tab: UMKTab, overrideSubTab?: string) => {
+    if (tab === 'academic' && !overrideSubTab) {
+      setKioskPageView('browse');
+    }
     setActiveTab(tab);
     triggerSkeletonTransition(tab, overrideSubTab);
   }, [triggerSkeletonTransition]);
@@ -195,7 +200,6 @@ function MainApp() {
   // Handle idle session termination: close open modals and redirect to login
   useEffect(() => {
     const handleSessionTerminated = () => {
-      setIsBookingModalOpen(false);
       setIsTenantDetailModalOpen(false);
       setIsBusinessDetailModalOpen(false);
       setIsGrantModalOpen(false);
@@ -239,7 +243,6 @@ function MainApp() {
 
   // Modals state
   const [selectedSlotForBooking, setSelectedSlotForBooking] = useState<CapsuleSlot | null>(null);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [selectedSlotForTenantDetail, setSelectedSlotForTenantDetail] = useState<CapsuleSlot | null>(null);
   const [isTenantDetailModalOpen, setIsTenantDetailModalOpen] = useState(false);
   const [selectedBusinessForDetail, setSelectedBusinessForDetail] = useState<BusinessListing | null>(null);
@@ -1332,6 +1335,16 @@ function MainApp() {
     });
   }, [slots, bookings]);
 
+  const hasActiveYouthBooking =
+    isYouth &&
+    Boolean(user) &&
+    bookings.some(
+      (b) =>
+        (b.applicantId === user?.uid ||
+          (user?.email && b.applicantEmail?.toLowerCase() === user.email.toLowerCase())) &&
+        (b.status === 'pending' || b.status === 'approved')
+    );
+
   const handleOpenBookingForSlot = (slot: CapsuleSlot) => {
     // If slot is occupied, reserved, or has an active tenant, display the Tenant & Capsule details dossier
     const isOccupied = slot.status !== 'available' || Boolean(slot.currentTenantBusinessName);
@@ -1352,8 +1365,26 @@ function MainApp() {
       });
       return;
     }
+
+    if (!user) {
+      openLoginModal();
+      return;
+    }
+
+    if (hasActiveYouthBooking) {
+      showToast({
+        type: 'warning',
+        title: 'Had 1 Tempahan Kiosk Aktif',
+        message: 'Anda sudah mempunyai 1 tempahan kiosk aktif. Sila batalkan tempahan sedia ada di halaman Urus & Batal Tempahan sebelum memilih unit baharu.'
+      });
+      setKioskPageView('manage');
+      navigateWithSkeleton('academic', 'manage');
+      return;
+    }
+
     setSelectedSlotForBooking(slot);
-    setIsBookingModalOpen(true);
+    setKioskPageView('book');
+    navigateWithSkeleton('academic', 'book');
   };
 
   const handleOpenTenantDetail = (slot: CapsuleSlot) => {
@@ -1370,9 +1401,27 @@ function MainApp() {
       });
       return;
     }
+
+    if (!user) {
+      openLoginModal();
+      return;
+    }
+
+    if (hasActiveYouthBooking) {
+      showToast({
+        type: 'warning',
+        title: 'Had 1 Tempahan Kiosk Aktif',
+        message: 'Anda sudah mempunyai 1 tempahan kiosk aktif. Sila batalkan tempahan sedia ada terlebih dahulu.'
+      });
+      setKioskPageView('manage');
+      navigateWithSkeleton('academic', 'manage');
+      return;
+    }
+
     const firstAvailable = enrichedSlots.find(s => s.status === 'available' && !s.currentTenantBusinessName);
     setSelectedSlotForBooking(firstAvailable || null);
-    setIsBookingModalOpen(true);
+    setKioskPageView('book');
+    navigateWithSkeleton('academic', 'book');
   };
 
   const handleOpenGrantModal = (programTitle?: string, amount?: string) => {
@@ -1418,6 +1467,24 @@ function MainApp() {
     setRefreshTrigger(prev => prev + 1);
   };
 
+  const handleCancelGrantApplication = async (grant: GrantApplication) => {
+    try {
+      await updateGrantApplicationStatus(grant.id, 'cancelled', 'Permohonan geran dibatalkan oleh pemohon.');
+      triggerRefresh();
+      showToast({
+        type: 'info',
+        title: language === 'en' ? 'Grant Request Cancelled' : 'Permohonan Geran Dibatalkan',
+        message: grant.programTitle
+      });
+    } catch (err: any) {
+      showToast({
+        type: 'error',
+        title: language === 'en' ? 'Cancellation Failed' : 'Gagal Membatalkan',
+        message: err?.message || 'Sila cuba lagi.'
+      });
+    }
+  };
+
   // Strictly role-scoped derived collections
   const myBusiness = isYouth ? (businesses.find(b => b.ownerId === user?.uid) || null) : null;
   const myProducts = isYouth ? products.filter(p => p.ownerId === user?.uid || (myBusiness && p.businessId === myBusiness.id)) : [];
@@ -1445,15 +1512,6 @@ function MainApp() {
           onSelectBusiness={handleOpenBusinessDetail}
           onOpenNewBooking={handleOpenNewBooking}
           onOpenGrantModal={handleOpenGrantModal}
-        />
-
-        <BookingModal
-          isOpen={isBookingModalOpen}
-          onClose={() => setIsBookingModalOpen(false)}
-          selectedSlot={selectedSlotForBooking}
-          allSlots={enrichedSlots}
-          portalSettings={portalSettings}
-          onBookingSuccess={triggerRefresh}
         />
 
         <BusinessDetailModal
@@ -1487,15 +1545,6 @@ function MainApp() {
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
         />
-        
-        <BookingModal
-          isOpen={isBookingModalOpen}
-          onClose={() => setIsBookingModalOpen(false)}
-          selectedSlot={selectedSlotForBooking}
-          allSlots={enrichedSlots}
-          portalSettings={portalSettings}
-          onBookingSuccess={triggerRefresh}
-        />
 
         <BusinessDetailModal
           isOpen={isBusinessDetailModalOpen}
@@ -1516,15 +1565,6 @@ function MainApp() {
         <RegisterPage 
           setActiveTab={setActiveTab} 
           onOpenBooking={handleOpenNewBooking} 
-        />
-        
-        <BookingModal
-          isOpen={isBookingModalOpen}
-          onClose={() => setIsBookingModalOpen(false)}
-          selectedSlot={selectedSlotForBooking}
-          allSlots={enrichedSlots}
-          portalSettings={portalSettings}
-          onBookingSuccess={triggerRefresh}
         />
 
         <BusinessDetailModal
@@ -1692,7 +1732,11 @@ function MainApp() {
                       setIsVerificationModalOpen(true);
                     }}
                     onOpenBookingModal={handleOpenNewBooking}
-                    onOpenBookingTab={() => navigateWithSkeleton('academic')}
+                    onOpenBookingTab={() => {
+                      const targetView: KioskPageView = hasActiveYouthBooking ? 'manage' : 'browse';
+                      setKioskPageView(targetView);
+                      navigateWithSkeleton('academic', targetView);
+                    }}
                     onOpenSettingsTab={() => navigateWithSkeleton('settings')}
                     onOpenMentorshipClinic={handleOpenMentorshipClinicGuarded}
                     onOpenMaintenanceModal={() => setIsMaintenanceModalOpen(true)}
@@ -1727,25 +1771,47 @@ function MainApp() {
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Kembali ke Portal Mentor</span>
+                  <span>Portal Mentor</span>
                 </button>
               </div>
-            ) : (
+            ) : isAdmin ? (
               <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <CapsuleGrid
                   slots={enrichedSlots}
                   bookings={bookings}
+                  portalSettings={portalSettings}
                   onSelectSlot={handleOpenBookingForSlot}
                   onViewTenantDetail={handleOpenTenantDetail}
                   onOpenNewBooking={handleOpenNewBooking}
-                  onAddSlot={isAdmin ? () => { setAdminSubTab('slots'); navigateWithSkeleton('admin', 'slots'); } : undefined}
+                  onAddSlot={() => { setAdminSubTab('slots'); navigateWithSkeleton('admin', 'slots'); }}
                   selectedHub={selectedHubFilter}
                   onSelectHub={setSelectedHubFilter}
                   maxBudget={maxBudgetFilter}
                   onBudgetChange={setMaxBudgetFilter}
-                  isReadOnly={isAdmin}
+                  isReadOnly={true}
                 />
               </div>
+            ) : (
+              <KioskBookingPage
+                slots={enrichedSlots}
+                bookings={bookings}
+                portalSettings={portalSettings}
+                view={kioskPageView}
+                onChangeView={setKioskPageView}
+                preselectedSlot={selectedSlotForBooking}
+                onSelectSlotForBooking={(slot) => setSelectedSlotForBooking(slot)}
+                onViewTenantDetail={handleOpenTenantDetail}
+                selectedHub={selectedHubFilter}
+                onSelectHub={setSelectedHubFilter}
+                maxBudget={maxBudgetFilter}
+                onBudgetChange={setMaxBudgetFilter}
+                onRefresh={triggerRefresh}
+                onViewOfferLetter={handleViewOfferLetter}
+                onOpenTenancyAgreement={(booking) => {
+                  setSelectedBookingForTenancy(booking);
+                  setIsTenancyModalOpen(true);
+                }}
+              />
             )
           )}
 
@@ -1768,7 +1834,7 @@ function MainApp() {
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Kembali ke Portal Mentor</span>
+                  <span>Portal Mentor</span>
                 </button>
               </div>
             ) : (
@@ -1801,14 +1867,16 @@ function MainApp() {
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Kembali ke Portal Mentor</span>
+                  <span>Portal Mentor</span>
                 </button>
               </div>
             ) : (
               <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <ProgramsSection 
                   programs={programs} 
+                  grantApplications={myYouthGrants}
                   onOpenGrantModal={isYouth ? handleOpenGrantModal : undefined}
+                  onCancelGrant={isYouth ? handleCancelGrantApplication : undefined}
                   onAddProgram={isAdmin ? () => { setAdminSubTab('programs'); navigateWithSkeleton('admin', 'programs'); } : undefined}
                   isReadOnly={isAdmin}
                 />
@@ -1834,7 +1902,7 @@ function MainApp() {
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
-                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
+                  <span>{isAdmin ? 'Panel Pentadbir' : 'Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
@@ -1862,7 +1930,7 @@ function MainApp() {
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
-                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
+                  <span>{isAdmin ? 'Panel Pentadbir' : 'Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
@@ -1890,7 +1958,7 @@ function MainApp() {
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
-                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
+                  <span>{isAdmin ? 'Panel Pentadbir' : 'Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
@@ -1926,7 +1994,7 @@ function MainApp() {
                   className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  <span>{isMentor ? 'Kembali ke Hab Mentor' : 'Kembali ke Laman Utama'}</span>
+                  <span>{isMentor ? 'Portal Mentor' : 'Laman Utama'}</span>
                 </button>
               </div>
             ) : (
@@ -1978,7 +2046,7 @@ function MainApp() {
                   className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-blue-600"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Laman Utama'}</span>
+                  <span>{isAdmin ? 'Panel Pentadbir' : 'Laman Utama'}</span>
                 </button>
               </div>
             ) : (
@@ -2022,7 +2090,7 @@ function MainApp() {
                   className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  <span>{language === 'en' ? 'Back to Admin Control Panel' : 'Kembali ke Pusat Kawalan Pentadbir'}</span>
+                  <span>{language === 'en' ? 'Admin Panel' : 'Panel Pentadbir'}</span>
                 </button>
               </div>
             ) : isMentor ? (
@@ -2046,7 +2114,7 @@ function MainApp() {
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{language === 'en' ? 'Back to Mentor Coaching Hub' : 'Kembali ke Hab Bimbingan Mentor'}</span>
+                  <span>{language === 'en' ? 'Mentor Hub' : 'Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
@@ -2070,7 +2138,11 @@ function MainApp() {
                     setIsVerificationModalOpen(true);
                   }}
                   onOpenBookingModal={handleOpenNewBooking}
-                  onOpenBookingTab={() => navigateWithSkeleton('academic')}
+                  onOpenBookingTab={() => {
+                    const targetView: KioskPageView = hasActiveYouthBooking ? 'manage' : 'browse';
+                    setKioskPageView(targetView);
+                    navigateWithSkeleton('academic', targetView);
+                  }}
                   onOpenSettingsTab={() => navigateWithSkeleton('settings')}
                   onOpenMentorshipClinic={handleOpenMentorshipClinicGuarded}
                   onOpenMaintenanceModal={() => { if (isYouth) setIsMaintenanceModalOpen(true); }}
@@ -2108,7 +2180,7 @@ function MainApp() {
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
+                  <span>{isAdmin ? 'Panel Pentadbir' : 'Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
@@ -2173,15 +2245,6 @@ function MainApp() {
       </div>
 
       {/* Global Modals */}
-      <BookingModal
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-        selectedSlot={selectedSlotForBooking}
-        allSlots={enrichedSlots}
-        portalSettings={portalSettings}
-        onBookingSuccess={triggerRefresh}
-      />
-
       {/* Capsule Tenant & Premises Details Modal */}
       <CapsuleTenantDetailModal
         isOpen={isTenantDetailModalOpen}
@@ -2248,7 +2311,7 @@ function MainApp() {
       <ApplicationStatusDocumentsModal
         isOpen={isStatusDocumentsModalOpen}
         onClose={() => setIsStatusDocumentsModalOpen(false)}
-        userBooking={myBookings[0] || null}
+        userBooking={myBookings.find(b => b.status === 'pending' || b.status === 'approved') || null}
         grantApplications={grantApplications.filter(g => g.applicantId === user?.uid || (user?.email && g.applicantEmail.toLowerCase() === user.email.toLowerCase()))}
         mentorshipRegistrations={mentorshipRegistrations.filter(r => r.applicantId === user?.uid || (user?.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()))}
         onOpenBooking={handleOpenNewBooking}

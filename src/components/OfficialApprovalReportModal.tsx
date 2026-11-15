@@ -162,17 +162,17 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-white" />
-                    <span>Menjana PDF Rasmi...</span>
+                    <span>Menjana PDF...</span>
                   </>
                 ) : isSaved ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 text-white" />
-                    <span>PDF Berjaya Disimpan!</span>
+                    <span>PDF Disimpan</span>
                   </>
                 ) : (
                   <>
                     <Printer className="w-4 h-4 text-white" />
-                    <span>Cetak / Simpan PDF</span>
+                    <span>Simpan PDF</span>
                   </>
                 )}
               </button>
@@ -197,8 +197,8 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                   >
                     <Download className="w-4 h-4 text-black dark:text-white/75" />
                     <div>
-                      <div className="font-bold">Muat Turun Fail PDF (.pdf)</div>
-                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75">Bingkai keselamatan rasmi A4</div>
+                      <div className="font-bold">Muat Turun PDF</div>
+                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75">Bingkai keselamatan A4</div>
                     </div>
                   </button>
                   <button
@@ -208,8 +208,8 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                   >
                     <Printer className="w-4 h-4 text-black dark:text-white" />
                     <div>
-                      <div className="font-bold">Buka Dialog Cetakan (A4)</div>
-                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75">Cetak pencetak atau cetak ke PDF</div>
+                      <div className="font-bold">Cetak A4</div>
+                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75">Dialog cetakan</div>
                     </div>
                   </button>
                 </div>

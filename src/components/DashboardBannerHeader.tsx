@@ -213,33 +213,6 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
   const meta = getHeaderMeta();
   const IconComponent = meta.icon;
 
-  // Format date supporting both Bahasa Melayu and Bahasa Inggeris
-  const formattedTodayDate = (() => {
-    try {
-      const now = new Date();
-      if (isMs) {
-        const dayShort = ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'][now.getDay()];
-        const monthNames = [
-          'Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun',
-          'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'
-        ];
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = monthNames[now.getMonth()];
-        const year = now.getFullYear();
-        return `${dayShort}, ${day} ${month} ${year}`;
-      } else {
-        return new Intl.DateTimeFormat('en-GB', {
-          weekday: 'short',
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        }).format(now);
-      }
-    } catch {
-      return isMs ? 'Isn, 02 November 2026' : 'Mon, 02 November 2026';
-    }
-  })();
-
   return (
     <div className="w-full bg-white dark:bg-zinc-900 rounded-t-2xl rounded-b-none border border-b border-slate-300 dark:border-zinc-700 px-3 sm:px-4 py-2.5 sm:py-3 transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
@@ -264,19 +237,6 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
               {meta.breadcrumb}
             </span>
           </nav>
-        </div>
-
-        {/* Today's Date */}
-        <div className="self-start sm:self-auto flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 rounded-lg text-[0.8125rem] shrink-0">
-          <span className="kbelia-live-dot" aria-hidden="true" />
-          <Calendar className="w-3.5 h-3.5 text-black/65 dark:text-white/70 shrink-0" />
-          <span className="text-black/70 dark:text-white/75 font-medium capitalize">
-            {isMs ? 'Hari ini' : 'Today'}
-          </span>
-          <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-          <span className="text-black dark:text-white font-bold tracking-tight tabular-nums">
-            {formattedTodayDate}
-          </span>
         </div>
       </div>
     </div>

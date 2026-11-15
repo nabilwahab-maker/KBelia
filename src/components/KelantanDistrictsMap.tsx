@@ -261,7 +261,7 @@ const HubAdvancedMarker: React.FC<HubMarkerProps> = ({
               onClick={() => onBookHub(geo.district, firstAvailable)}
               className="w-full py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer"
             >
-              {stats.available > 0 ? `Mohon Kiosk (${geo.name})` : `Lihat Hab ${geo.name}`}
+              {stats.available > 0 ? 'Mohon Kiosk' : 'Lihat Hab'}
             </button>
           </div>
         </InfoWindow>
@@ -372,7 +372,7 @@ const LiveMapCanvas: React.FC<LiveMapCanvasProps> = ({
           onClick={onSwitchToGrid}
           className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer"
         >
-          Buka Mod Senarai Jajahan
+          Mod Senarai
         </button>
       </div>
     );
@@ -552,11 +552,6 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
     }
   };
 
-  const totalAvailableAll = useMemo(
-    () => (slots || []).filter((s) => s.status === 'available').length,
-    [slots]
-  );
-
   return (
     <div className="relative rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 sm:p-7 shadow-xs overflow-hidden w-full min-w-0 transition-colors">
       {/* 1. Header Bar */}
@@ -566,10 +561,6 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
             <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white">
               <MapPin className="w-3.5 h-3.5 text-[#EA4335]" />
               <span>Google Maps Langsung</span>
-            </span>
-            <span className="text-black/35 dark:text-white/35">•</span>
-            <span className="text-sm text-black/75 dark:text-white/80 font-medium">
-              {totalAvailableAll} Unit Tersedia di Seluruh Kelantan
             </span>
           </div>
 
@@ -782,7 +773,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                     onClick={() => setViewMode('grid')}
                     className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer"
                   >
-                    Tukar ke Mod Senarai
+                    Mod Senarai
                   </button>
                 </div>
               )}
@@ -974,7 +965,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                   className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Store className="w-4 h-4 text-white" />
-                  <span>Mohon Kiosk di Jajahan {activeDistrictData.name}</span>
+                  <span>Mohon Kiosk</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 

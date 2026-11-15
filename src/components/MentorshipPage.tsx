@@ -281,7 +281,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
   return (
     <div className="w-full space-y-4">
       {/* Page Intro Header */}
-      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700">
         <div className="space-y-1 max-w-2xl">
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance">
             {isEn ? 'Mentor Advisory & Appointments' : 'Bimbingan & Temu Janji Mentor'}
@@ -291,25 +291,6 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               ? 'Choose one certified UMK or agency mentor at a time to schedule your 1-on-1 session.'
               : 'Pilih seorang penasihat bertauliah UMK atau agensi pada satu masa untuk menempah slot anda.'}
           </p>
-        </div>
-
-        <div className="flex items-center gap-4 text-sm shrink-0 pt-2 lg:pt-0">
-          <div className="px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-            <div className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
-              {isEn ? 'Available Mentors' : 'Mentor Tersedia'}
-            </div>
-            <div className="text-base font-black text-black dark:text-white tabular-nums">
-              {mentors.length}
-            </div>
-          </div>
-          <div className="px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-            <div className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
-              {isEn ? 'Active Limit' : 'Had Aktif'}
-            </div>
-            <div className="text-base font-black text-black dark:text-white tabular-nums">
-              {hasActiveSession ? '1 / 1' : '0 / 1'}
-            </div>
-          </div>
         </div>
       </div>
 
@@ -723,7 +704,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold transition-colors cursor-pointer shadow-xs"
               >
                 <Send className="w-3.5 h-3.5" />
-                <span>{isEn ? 'Confirm & Book Appointment' : 'Sahkan & Tempah Temu Janji'}</span>
+                <span>{isEn ? 'Confirm Booking' : 'Sahkan Tempahan'}</span>
               </button>
             </div>
           </form>
@@ -911,7 +892,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black/50 dark:text-white/50 text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
                       >
                         <Lock className="w-3.5 h-3.5" />
-                        <span>{isEn ? 'Locked (1 Active Limit)' : 'Dikunci (Had 1 Sesi)'}</span>
+                        <span>{isEn ? 'Limit Reached' : 'Had Penuh'}</span>
                       </button>
                     ) : (
                       <button
@@ -958,9 +939,6 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 {isEn ? 'Session History' : 'Sejarah Sesi Bimbingan'}
               </h2>
             </div>
-            <span className="text-sm font-bold text-black/65 dark:text-white/70 tabular-nums">
-              {sessionHistory.length} {isEn ? 'records' : 'rekod'}
-            </span>
           </div>
 
           {sessionHistory.length === 0 ? (

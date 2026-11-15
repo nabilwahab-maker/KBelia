@@ -407,7 +407,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                         onClick={() => handleStartBooking(mentor)}
                         className="py-2 px-4 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors shadow-xs shrink-0 cursor-pointer self-start sm:self-auto flex items-center gap-1.5 dark:bg-teal-600"
                       >
-                        <span>Pilih Mentor & Tempah</span>
+                        <span>Pilih Mentor</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>

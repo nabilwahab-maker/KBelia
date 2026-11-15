@@ -119,7 +119,7 @@
         "startDate": { "type": "string", "maxLength": 30 },
         "monthlyRate": { "type": "number" },
         "pitchNotes": { "type": "string", "maxLength": 2000 },
-        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "cancelled"] },
         "adminNotes": { "type": "string", "maxLength": 1000 },
         "tenancySigned": { "type": "boolean" },
         "tenancySignedAt": { "type": "string", "maxLength": 50 },
@@ -149,7 +149,7 @@
         "bankName": { "type": "string", "maxLength": 80 },
         "bankAccountNumber": { "type": "string", "maxLength": 40 },
         "fundPurpose": { "type": "string", "maxLength": 2000 },
-        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "cancelled"] },
         "adminNotes": { "type": "string", "maxLength": 1000 },
         "createdAt": { "type": "string", "maxLength": 50 }
       },
