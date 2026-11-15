@@ -655,11 +655,20 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
         slots={safeSlots}
         selectedDistrict={selectedDistrict}
         onSelectDistrict={(dist) => setSelectedDistrict(dist)}
-        onOpenBookingForDistrict={() => onOpenBooking()}
+        onSelectSlot={(slot) => onSelectSlot(slot)}
+        onOpenBookingForDistrict={(_dist, slot) => {
+          if (slot) onSelectSlot(slot);
+          else onOpenBooking();
+        }}
       />
 
       {/* 5. WIDGET STATISTIK LANGSUNG & ANALITIK KOMUNITI */}
-      <CommunityAnalyticsWidget />
+      <CommunityAnalyticsWidget
+        slots={safeSlots}
+        businesses={safeBusinesses}
+        programs={safePrograms}
+        grantApplications={grantApplications}
+      />
 
       {/* 6. KALKULATOR SUBSIDI SEWAAN & PULANGAN MODAL (ROI) */}
       <BusinessSubsidyCalculator

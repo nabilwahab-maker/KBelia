@@ -1,47 +1,62 @@
-import React, { useState } from 'react';
-import { 
-  MapPin, 
-  Store, 
-  CheckCircle2, 
-  Sparkles, 
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  APIProvider,
+  Map as GoogleMap,
+  AdvancedMarker,
+  Pin,
+  InfoWindow,
+  CollisionBehavior,
+  useAdvancedMarkerRef,
+  useMap,
+  useApiLoadingStatus,
+  APILoadingStatus
+} from '@vis.gl/react-google-maps';
+import {
+  MapPin,
+  Store,
+  Sparkles,
   ArrowRight,
-  TrendingUp,
   SlidersHorizontal,
   Compass,
   Plus,
   Minus,
   RotateCcw,
   Search,
-  Layers,
-  Navigation,
   MessageCircle,
   Building2,
-  Check
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  AlertTriangle,
+  Loader2
 } from 'lucide-react';
 import { KelantanDistrict, CapsuleSlot } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface KelantanDistrictsMapProps {
   slots: CapsuleSlot[];
   selectedDistrict: KelantanDistrict;
   onSelectDistrict: (district: KelantanDistrict) => void;
-  onOpenBookingForDistrict?: (district: KelantanDistrict) => void;
+  onOpenBookingForDistrict?: (district: KelantanDistrict, slot?: CapsuleSlot) => void;
+  onSelectSlot?: (slot: CapsuleSlot) => void;
 }
 
 interface DistrictGeoData {
-  district: KelantanDistrict;
+  district: Exclude<KelantanDistrict, 'Semua Jajahan'>;
   code: string;
   name: string;
   tagline: string;
-  path: string;
-  centerX: number;
-  centerY: number;
+  lat: number;
+  lng: number;
   popularNiche: string;
-  hubsCount: number;
   terrainType: 'urban' | 'green' | 'coastal';
   mainHubName: string;
 }
 
-// Precise topological vectors for Kelantan's 10 districts in viewBox 50 20 440 640
+const KELANTAN_DEFAULT_CENTER = { lat: 5.58, lng: 102.14 };
+const KELANTAN_DEFAULT_ZOOM = 8;
+
+// Grounded Kelantan kiosk hub coordinates for the 10 districts
 const KELANTAN_DISTRICTS: DistrictGeoData[] = [
   {
     district: 'Tumpat',
@@ -49,12 +64,10 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Tumpat',
     tagline: 'Zon Pesisir & Warisan Kraf Kelantan',
     popularNiche: 'Makanan Laut, Kraftangan & Dodol',
-    hubsCount: 2,
-    centerX: 285,
-    centerY: 65,
+    lat: 6.2244,
+    lng: 102.1319,
     terrainType: 'coastal',
-    mainHubName: 'Hab Kiosk Pantai Sri Tujuh',
-    path: 'M 255 70 L 290 40 L 315 60 L 305 95 L 265 90 Z'
+    mainHubName: 'Hub Kraf & Budaya Tumpat (Pantai Sri Tujoh)'
   },
   {
     district: 'Kota Bharu',
@@ -62,12 +75,10 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Kota Bharu',
     tagline: 'Pusat Pentadbiran & Perdagangan Komersial',
     popularNiche: 'F&B Moden, Butik Batik & Kafe Kiosk',
-    hubsCount: 5,
-    centerX: 345,
-    centerY: 75,
+    lat: 6.1254,
+    lng: 102.2386,
     terrainType: 'urban',
-    mainHubName: 'Hab Niaga Digital Kota Bharu (UTC)',
-    path: 'M 315 60 L 355 45 L 380 75 L 350 110 L 305 95 Z'
+    mainHubName: 'Pusat Transformasi Belia Kota Bharu (KB Sentral)'
   },
   {
     district: 'Bachok',
@@ -75,12 +86,10 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Bachok',
     tagline: 'Hab Kampus UMK Bachok & Eko-Pelancongan',
     popularNiche: 'Servis Mahasiswa, Percetakan & Kopi Pelajar',
-    hubsCount: 3,
-    centerX: 410,
-    centerY: 105,
+    lat: 6.0094,
+    lng: 102.4169,
     terrainType: 'coastal',
-    mainHubName: 'Hab Siswa Niaga Kampus UMK Bachok',
-    path: 'M 380 75 L 435 80 L 445 130 L 390 145 L 350 110 Z'
+    mainHubName: 'Hub UMK Kampus Bachok (Zon Keusahawanan)'
   },
   {
     district: 'Pasir Mas',
@@ -88,12 +97,10 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Pasir Mas',
     tagline: 'Hab Niaga Sempadan & Pasar Tradisi',
     popularNiche: 'Kain Ela, Runcit Borong & Bakeri',
-    hubsCount: 3,
-    centerX: 250,
-    centerY: 135,
+    lat: 6.0425,
+    lng: 102.1422,
     terrainType: 'urban',
-    mainHubName: 'Hab Komersial Bandar Tasek Raja',
-    path: 'M 220 120 L 265 90 L 305 95 L 295 165 L 225 170 Z'
+    mainHubName: 'Hub Niaga Belia Bandar Pasir Mas'
   },
   {
     district: 'Pasir Puteh',
@@ -101,12 +108,10 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Pasir Puteh',
     tagline: 'Hab Industri Nelayan, Agropreneur & Sempadan Terengganu',
     popularNiche: 'Keropok Lekor, Produk Sejukbeku & Baja',
-    hubsCount: 2,
-    centerX: 415,
-    centerY: 175,
+    lat: 5.8935,
+    lng: 102.4785,
     terrainType: 'green',
-    mainHubName: 'Hab Agromart Tok Bali',
-    path: 'M 390 145 L 445 130 L 460 190 L 395 210 L 365 170 Z'
+    mainHubName: 'Hab Agromart Tok Bali'
   },
   {
     district: 'Machang',
@@ -114,12 +119,10 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Machang',
     tagline: 'Pusat Pengajian Tinggi & Komuniti Setempat',
     popularNiche: 'Peralatan Belajar, F&B & Gajet',
-    hubsCount: 2,
-    centerX: 345,
-    centerY: 170,
+    lat: 5.7647,
+    lng: 102.2156,
     terrainType: 'green',
-    mainHubName: 'Hab Usahawan Siswa Machang',
-    path: 'M 295 165 L 350 110 L 365 170 L 395 210 L 330 225 L 290 200 Z'
+    mainHubName: 'Hab Usahawan Siswa Machang'
   },
   {
     district: 'Tanah Merah',
@@ -127,12 +130,10 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Tanah Merah',
     tagline: 'Zon Bebas Cukai & Transit Komersial',
     popularNiche: 'Pakaian Sukan, Aksesori Kereta & Logistik',
-    hubsCount: 3,
-    centerX: 245,
-    centerY: 215,
+    lat: 5.8083,
+    lng: 102.1497,
     terrainType: 'urban',
-    mainHubName: 'Hab Niaga Transit Tanah Merah',
-    path: 'M 190 190 L 225 170 L 295 165 L 290 200 L 275 255 L 180 235 Z'
+    mainHubName: 'Hab Niaga Transit Tanah Merah'
   },
   {
     district: 'Jeli',
@@ -140,12 +141,10 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Jeli',
     tagline: 'Hab Kampus UMK Jeli & Eko-Teknologi Banjaran Titiwangsa',
     popularNiche: 'Produk Eko-Herba, Madu Kelulut & IT Pelajar',
-    hubsCount: 2,
-    centerX: 140,
-    centerY: 240,
+    lat: 5.7445,
+    lng: 101.8697,
     terrainType: 'green',
-    mainHubName: 'Hab Eko-Sains UMK Jeli',
-    path: 'M 100 195 L 190 190 L 180 235 L 205 300 L 115 310 Z'
+    mainHubName: 'Hub Komuniti Keusahawanan Jeli (UMK Jeli)'
   },
   {
     district: 'Kuala Krai',
@@ -153,12 +152,10 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Kuala Krai',
     tagline: 'Hab Agrotek, Perkayuan & Pertemuan Sungai Kelantan',
     popularNiche: 'Pertanian Cendawan, Bengkel Membaiki & Runcit',
-    hubsCount: 2,
-    centerX: 320,
-    centerY: 295,
+    lat: 5.5308,
+    lng: 102.2019,
     terrainType: 'green',
-    mainHubName: 'Hab Agrotek Kuala Krai',
-    path: 'M 275 255 L 290 200 L 330 225 L 395 210 L 420 300 L 335 365 L 255 330 Z'
+    mainHubName: 'Hab Agrotek Kuala Krai'
   },
   {
     district: 'Gua Musang',
@@ -166,109 +163,463 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     name: 'Gua Musang',
     tagline: 'Gerbang Selatan, Agropreneur Ladang Luas & Pelancongan Gua',
     popularNiche: 'Agro Buah-buahan, Kembara Gua & Minuman Segar',
-    hubsCount: 3,
-    centerX: 275,
-    centerY: 490,
+    lat: 4.8842,
+    lng: 101.9647,
     terrainType: 'green',
-    mainHubName: 'Hab Komersial Bandar Gua Musang',
-    path: 'M 115 310 L 205 300 L 255 330 L 335 365 L 420 300 L 410 440 L 375 580 L 290 640 L 180 590 L 120 450 Z'
+    mainHubName: 'Hab Komersial Bandar Gua Musang'
   }
 ];
+
+interface DistrictStats {
+  total: number;
+  available: number;
+  occupied: number;
+  reservedOrMaintenance: number;
+  minMonthlyRate: number;
+  districtSlots: CapsuleSlot[];
+}
+
+interface HubMarkerProps {
+  geo: DistrictGeoData;
+  stats: DistrictStats;
+  isSelected: boolean;
+  isInfoOpen: boolean;
+  zIndex: number;
+  onSelect: (district: KelantanDistrict) => void;
+  onCloseInfo: () => void;
+  onBookHub: (district: KelantanDistrict, firstAvailable?: CapsuleSlot) => void;
+}
+
+const HubAdvancedMarker: React.FC<HubMarkerProps> = ({
+  geo,
+  stats,
+  isSelected,
+  isInfoOpen,
+  zIndex,
+  onSelect,
+  onCloseInfo,
+  onBookHub
+}) => {
+  const [markerRef, marker] = useAdvancedMarkerRef();
+  const firstAvailable = stats.districtSlots.find((s) => s.status === 'available');
+
+  const pinColors = isSelected
+    ? { background: '#EA4335', borderColor: '#B31412', glyphColor: '#FFFFFF', scale: 1.25 }
+    : stats.available > 0
+      ? { background: '#059669', borderColor: '#047857', glyphColor: '#FFFFFF', scale: 1.08 }
+      : stats.total > 0
+        ? { background: '#2563EB', borderColor: '#1D4ED8', glyphColor: '#FFFFFF', scale: 1.0 }
+        : { background: '#64748B', borderColor: '#475569', glyphColor: '#FFFFFF', scale: 0.95 };
+
+  return (
+    <>
+      <AdvancedMarker
+        ref={markerRef}
+        position={{ lat: geo.lat, lng: geo.lng }}
+        zIndex={zIndex}
+        title={`${geo.mainHubName} (${stats.available} tersedia)`}
+        collisionBehavior={
+          isSelected
+            ? CollisionBehavior.REQUIRED
+            : CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY
+        }
+        onClick={() => onSelect(geo.district)}
+      >
+        <Pin
+          background={pinColors.background}
+          borderColor={pinColors.borderColor}
+          glyphColor={pinColors.glyphColor}
+          glyphText={String(stats.available)}
+          scale={pinColors.scale}
+        />
+      </AdvancedMarker>
+
+      {isInfoOpen && marker && (
+        <InfoWindow anchor={marker} maxWidth={290} onCloseClick={onCloseInfo}>
+          <div className="p-1 text-slate-900 space-y-2 min-w-[220px]">
+            <div>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                Jajahan {geo.name} ({geo.code})
+              </div>
+              <h4 className="text-sm font-extrabold text-slate-900 leading-snug mt-0.5">
+                {geo.mainHubName}
+              </h4>
+            </div>
+
+            <div className="flex items-center justify-between gap-2 text-xs bg-slate-100 rounded-lg px-2.5 py-1.5">
+              <span>
+                <strong className="text-emerald-700">{stats.available}</strong> tersedia /{' '}
+                <strong>{stats.total}</strong> unit
+              </span>
+              <span className="font-bold text-slate-800">
+                RM{stats.minMonthlyRate}/bln
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onBookHub(geo.district, firstAvailable)}
+              className="w-full py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer"
+            >
+              {stats.available > 0 ? `Mohon Kiosk (${geo.name})` : `Lihat Hab ${geo.name}`}
+            </button>
+          </div>
+        </InfoWindow>
+      )}
+    </>
+  );
+};
+
+const MapCameraController: React.FC<{
+  selectedDistrict: KelantanDistrict;
+  resetSignal: number;
+  zoomStepSignal: { delta: number; seq: number } | null;
+}> = ({ selectedDistrict, resetSignal, zoomStepSignal }) => {
+  const map = useMap();
+
+  const fitAllKelantan = useCallback(() => {
+    if (!map || typeof google === 'undefined' || !google.maps?.LatLngBounds) return;
+    const bounds = new google.maps.LatLngBounds();
+    KELANTAN_DISTRICTS.forEach((d) => bounds.extend({ lat: d.lat, lng: d.lng }));
+    map.fitBounds(bounds, { top: 48, right: 36, bottom: 48, left: 36 });
+  }, [map]);
+
+  useEffect(() => {
+    if (!map) return;
+    if (selectedDistrict === 'Semua Jajahan') {
+      fitAllKelantan();
+      return;
+    }
+    const target = KELANTAN_DISTRICTS.find((d) => d.district === selectedDistrict);
+    if (target) {
+      map.panTo({ lat: target.lat, lng: target.lng });
+      const currentZoom = map.getZoom() ?? KELANTAN_DEFAULT_ZOOM;
+      if (currentZoom < 11) {
+        map.setZoom(12);
+      }
+    }
+  }, [map, selectedDistrict, fitAllKelantan]);
+
+  useEffect(() => {
+    if (!map || resetSignal === 0) return;
+    fitAllKelantan();
+  }, [map, resetSignal, fitAllKelantan]);
+
+  useEffect(() => {
+    if (!map || !zoomStepSignal) return;
+    const current = map.getZoom() ?? KELANTAN_DEFAULT_ZOOM;
+    const next = Math.min(18, Math.max(7, current + zoomStepSignal.delta));
+    map.setZoom(next);
+  }, [map, zoomStepSignal]);
+
+  return null;
+};
+
+interface LiveMapCanvasProps {
+  mapTypeId: 'roadmap' | 'terrain' | 'hybrid';
+  selectedDistrict: KelantanDistrict;
+  infoWindowDistrict: KelantanDistrict | null;
+  districtStatsMap: Record<string, DistrictStats>;
+  resetSignal: number;
+  zoomStepSignal: { delta: number; seq: number } | null;
+  onMarkerSelect: (district: KelantanDistrict) => void;
+  onCloseInfo: () => void;
+  onBookHub: (district: KelantanDistrict, firstAvailable?: CapsuleSlot) => void;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onResetView: () => void;
+  onSwitchToGrid: () => void;
+}
+
+const LiveMapCanvas: React.FC<LiveMapCanvasProps> = ({
+  mapTypeId,
+  selectedDistrict,
+  infoWindowDistrict,
+  districtStatsMap,
+  resetSignal,
+  zoomStepSignal,
+  onMarkerSelect,
+  onCloseInfo,
+  onBookHub,
+  onZoomIn,
+  onZoomOut,
+  onResetView,
+  onSwitchToGrid
+}) => {
+  const apiStatus = useApiLoadingStatus();
+
+  const sortedDistricts = useMemo(
+    () => [...KELANTAN_DISTRICTS].sort((a, b) => b.lat - a.lat),
+    []
+  );
+
+  if (apiStatus === APILoadingStatus.FAILED || apiStatus === APILoadingStatus.AUTH_FAILURE) {
+    return (
+      <div className="w-full h-[460px] sm:h-[520px] flex flex-col items-center justify-center p-6 text-center bg-slate-50 dark:bg-slate-900 gap-3">
+        <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-600 dark:text-amber-400">
+          <AlertTriangle className="w-6 h-6" />
+        </div>
+        <div className="max-w-md space-y-1">
+          <h4 className="text-base font-bold text-black dark:text-white">
+            Paparan Peta Langsung Tidak Dapat Dimuatkan
+          </h4>
+          <p className="text-sm text-black/75 dark:text-white/80">
+            Anda masih boleh memilih mana-mana jajahan melalui cip di atas untuk menyemak unit kiosk pada panel sisi atau bertukar ke mod senarai.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onSwitchToGrid}
+          className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer"
+        >
+          Buka Mod Senarai Jajahan
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-[460px] sm:h-[520px]">
+      {apiStatus !== APILoadingStatus.LOADED && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-xs pointer-events-none">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow-sm text-sm font-bold text-black dark:text-white">
+            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+            <span>Memuatkan Google Maps Kelantan...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Top Location Indicator */}
+      <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xs px-3.5 py-1.5 rounded-xl shadow-md border border-slate-300 dark:border-slate-600 text-sm max-w-[calc(100%-5rem)]">
+        <MapPin className="w-4 h-4 text-[#EA4335] shrink-0" />
+        <span className="font-bold text-black dark:text-white truncate">
+          {selectedDistrict === 'Semua Jajahan'
+            ? 'Kelantan, Malaysia (10 Hab Kiosk)'
+            : `${selectedDistrict}, Kelantan`}
+        </span>
+      </div>
+
+      {/* Floating Zoom & Reset Controls */}
+      <div className="absolute bottom-24 right-3 z-20 flex flex-col gap-1.5">
+        <button
+          type="button"
+          onClick={onZoomIn}
+          title="Zum Masuk"
+          aria-label="Zum Masuk"
+          className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-black dark:text-white shadow-md border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-transform active:scale-95 cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onZoomOut}
+          title="Zum Keluar"
+          aria-label="Zum Keluar"
+          className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-black dark:text-white shadow-md border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-transform active:scale-95 cursor-pointer"
+        >
+          <Minus className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onResetView}
+          title="Pusat Peta Seluruh Kelantan"
+          aria-label="Pusat Peta Seluruh Kelantan"
+          className="w-9 h-9 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-black dark:text-white shadow-md border border-slate-300 dark:border-slate-600 flex items-center justify-center transition-transform active:scale-95 cursor-pointer"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <GoogleMap
+        mapId="DEMO_MAP_ID"
+        internalUsageAttributionIds={['gmp_mcp_codeassist_v1_aistudio']}
+        defaultCenter={KELANTAN_DEFAULT_CENTER}
+        defaultZoom={KELANTAN_DEFAULT_ZOOM}
+        mapTypeId={mapTypeId}
+        gestureHandling="greedy"
+        mapTypeControl={false}
+        streetViewControl={false}
+        fullscreenControl={true}
+        zoomControl={false}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <MapCameraController
+          selectedDistrict={selectedDistrict}
+          resetSignal={resetSignal}
+          zoomStepSignal={zoomStepSignal}
+        />
+
+        {sortedDistricts.map((geo, idx) => {
+          const isSelected = selectedDistrict === geo.district;
+          const stats = districtStatsMap[geo.district];
+          return (
+            <HubAdvancedMarker
+              key={geo.code}
+              geo={geo}
+              stats={stats}
+              isSelected={isSelected}
+              isInfoOpen={infoWindowDistrict === geo.district}
+              zIndex={isSelected ? 1000 : idx + 1}
+              onSelect={onMarkerSelect}
+              onCloseInfo={onCloseInfo}
+              onBookHub={onBookHub}
+            />
+          );
+        })}
+      </GoogleMap>
+    </div>
+  );
+};
 
 export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
   slots,
   selectedDistrict,
   onSelectDistrict,
-  onOpenBookingForDistrict
+  onOpenBookingForDistrict,
+  onSelectSlot
 }) => {
-  const [hoveredDistrict, setHoveredDistrict] = useState<KelantanDistrict | null>(null);
+  const { language } = useLanguage();
   const [viewMode, setViewMode] = useState<'map' | 'grid'>('map');
-  const [zoomLevel, setZoomLevel] = useState<number>(1);
-  const [mapTheme, setMapTheme] = useState<'standard' | 'terrain' | 'satellite'>('standard');
+  const [mapTypeId, setMapTypeId] = useState<'roadmap' | 'terrain' | 'hybrid'>('roadmap');
   const [searchDistrictQuery, setSearchDistrictQuery] = useState('');
+  const [infoWindowDistrict, setInfoWindowDistrict] = useState<KelantanDistrict | null>(null);
+  const [resetSignal, setResetSignal] = useState(0);
+  const [zoomStepSignal, setZoomStepSignal] = useState<{ delta: number; seq: number } | null>(null);
 
-  // Calculate statistics per district
-  const getDistrictStats = (districtName: KelantanDistrict) => {
-    const districtSlots = slots.filter(s => s.district === districtName);
-    const available = districtSlots.filter(s => s.status === 'available').length;
-    const total = districtSlots.length;
-    return {
-      total: total || 3,
-      available: available || (districtSlots.length === 0 ? 1 : 0),
-      occupied: total - available
-    };
+  const mapsApiKey = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined) || '';
+
+  // Compute live statistics per district from real slots array
+  const districtStatsMap = useMemo(() => {
+    const record: Record<string, DistrictStats> = {};
+    KELANTAN_DISTRICTS.forEach((geo) => {
+      const districtSlots = (slots || []).filter((s) => s.district === geo.district);
+      const available = districtSlots.filter((s) => s.status === 'available').length;
+      const occupied = districtSlots.filter((s) => s.status === 'occupied').length;
+      const reservedOrMaintenance = districtSlots.filter(
+        (s) => s.status === 'reserved' || s.status === 'maintenance'
+      ).length;
+      const rates = districtSlots
+        .map((s) => Number(s.monthlyRate))
+        .filter((r) => Number.isFinite(r) && r > 0);
+      const minMonthlyRate = rates.length > 0 ? Math.min(...rates) : 150;
+
+      record[geo.district] = {
+        total: districtSlots.length,
+        available,
+        occupied,
+        reservedOrMaintenance,
+        minMonthlyRate,
+        districtSlots
+      };
+    });
+    return record;
+  }, [slots]);
+
+  const activeDistrictData = useMemo(() => {
+    if (selectedDistrict !== 'Semua Jajahan') {
+      return KELANTAN_DISTRICTS.find((d) => d.district === selectedDistrict) || KELANTAN_DISTRICTS[1];
+    }
+    return KELANTAN_DISTRICTS[1]; // Kota Bharu as default detail focus when viewing all Kelantan
+  }, [selectedDistrict]);
+
+  const activeStats = districtStatsMap[activeDistrictData.district];
+
+  const filteredDistrictChips = useMemo(() => {
+    const q = searchDistrictQuery.trim().toLowerCase();
+    if (!q) return KELANTAN_DISTRICTS;
+    return KELANTAN_DISTRICTS.filter(
+      (d) =>
+        d.name.toLowerCase().includes(q) ||
+        d.mainHubName.toLowerCase().includes(q) ||
+        d.tagline.toLowerCase().includes(q) ||
+        d.popularNiche.toLowerCase().includes(q)
+    );
+  }, [searchDistrictQuery]);
+
+  const handleSelectDistrictWithInfo = (district: KelantanDistrict) => {
+    onSelectDistrict(district);
+    setInfoWindowDistrict(district === 'Semua Jajahan' ? null : district);
   };
 
-  const activeDistrictData = KELANTAN_DISTRICTS.find(d => d.district === selectedDistrict) 
-    || KELANTAN_DISTRICTS[1]; // default to Kota Bharu
+  const handleBookHub = (district: KelantanDistrict, specificSlot?: CapsuleSlot) => {
+    onSelectDistrict(district);
+    if (specificSlot && onSelectSlot) {
+      onSelectSlot(specificSlot);
+      return;
+    }
+    if (onOpenBookingForDistrict) {
+      onOpenBookingForDistrict(district, specificSlot);
+    }
+  };
 
-  const activeStats = getDistrictStats(activeDistrictData.district);
-
-  // Zoom controls
-  const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.25, 1.75));
-  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.25, 0.85));
-  const handleResetZoom = () => setZoomLevel(1);
-
-  // Filtered districts for chip search
-  const filteredDistrictChips = KELANTAN_DISTRICTS.filter(d => 
-    !searchDistrictQuery || 
-    d.name.toLowerCase().includes(searchDistrictQuery.toLowerCase()) ||
-    d.tagline.toLowerCase().includes(searchDistrictQuery.toLowerCase()) ||
-    d.popularNiche.toLowerCase().includes(searchDistrictQuery.toLowerCase())
+  const totalAvailableAll = useMemo(
+    () => (slots || []).filter((s) => s.status === 'available').length,
+    [slots]
   );
 
   return (
     <div className="relative rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 sm:p-7 shadow-xs overflow-hidden w-full min-w-0 transition-colors">
-      
-      {/* 1. Header Bar in Google Maps Look & Feel */}
+      {/* 1. Header Bar */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-300 dark:border-slate-600">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white">
-              <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75" />
-              <span>Peta Interaktif Negeri</span>
+              <MapPin className="w-3.5 h-3.5 text-[#EA4335]" />
+              <span>Google Maps Langsung</span>
             </span>
             <span className="text-black/35 dark:text-white/35">•</span>
             <span className="text-sm text-black/75 dark:text-white/80 font-medium">
-              Seluruh Kelantan
+              {totalAvailableAll} Unit Tersedia di Seluruh Kelantan
             </span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight flex items-center gap-2">
-            <span>Peta Lokasi & Ketersediaan Kiosk Niaga</span>
+          <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+            Peta Hab Kiosk &amp; Kekosongan Unit Kelantan
           </h2>
           <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
-            Peta interaktif berwarna gaya Google Maps. Klik mana-mana jajahan atau pin merah untuk semak kekosongan sewaan kiosk.
+            Klik pin lokasi hab pada peta Google Maps atau pilih jajahan untuk melihat butiran unit dan memohon tapak kiosk.
           </p>
         </div>
 
-        {/* View Toggle & Map Layer Buttons */}
+        {/* Layer & View Toggles */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Layer Mode Toggle */}
-          <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold">
-            <button
-              type="button"
-              onClick={() => setMapTheme('standard')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                mapTheme === 'standard'
-                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/85 shadow-2xs'
-                  : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-              }`}
-            >
-              Peta Standard
-            </button>
-            <button
-              type="button"
-              onClick={() => setMapTheme('terrain')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                mapTheme === 'terrain'
-                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/85 shadow-2xs'
-                  : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-              }`}
-            >
-              Rupa Bumi
-            </button>
-          </div>
+          {viewMode === 'map' && (
+            <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold">
+              <button
+                type="button"
+                onClick={() => setMapTypeId('roadmap')}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  mapTypeId === 'roadmap'
+                    ? 'bg-white dark:bg-slate-800 text-black dark:text-white/90 shadow-2xs'
+                    : 'text-black/75 dark:text-white/75 hover:text-black dark:hover:text-white'
+                }`}
+              >
+                Peta Jalan
+              </button>
+              <button
+                type="button"
+                onClick={() => setMapTypeId('terrain')}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  mapTypeId === 'terrain'
+                    ? 'bg-white dark:bg-slate-800 text-black dark:text-white/90 shadow-2xs'
+                    : 'text-black/75 dark:text-white/75 hover:text-black dark:hover:text-white'
+                }`}
+              >
+                Rupa Bumi
+              </button>
+              <button
+                type="button"
+                onClick={() => setMapTypeId('hybrid')}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  mapTypeId === 'hybrid'
+                    ? 'bg-white dark:bg-slate-800 text-black dark:text-white/90 shadow-2xs'
+                    : 'text-black/75 dark:text-white/75 hover:text-black dark:hover:text-white'
+                }`}
+              >
+                Satelit
+              </button>
+            </div>
+          )}
 
           {/* Map vs Grid Toggle */}
           <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold">
@@ -277,8 +628,8 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               onClick={() => setViewMode('map')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                 viewMode === 'map'
-                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/85 shadow-2xs'
-                  : 'text-black dark:text-white/80'
+                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/90 shadow-2xs'
+                  : 'text-black/75 dark:text-white/75'
               }`}
             >
               <Compass className="w-3.5 h-3.5" />
@@ -289,8 +640,8 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               onClick={() => setViewMode('grid')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                 viewMode === 'grid'
-                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/85 shadow-2xs'
-                  : 'text-black dark:text-white/80'
+                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/90 shadow-2xs'
+                  : 'text-black/75 dark:text-white/75'
               }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -300,14 +651,14 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
         </div>
       </div>
 
-      {/* 2. Google Maps Quick Search Bar & Fast Selector Chips */}
+      {/* 2. Search & Fast Jajahan Chips */}
       <div className="mt-4 space-y-3">
         <div className="flex flex-col sm:flex-row items-center gap-2">
           <div className="relative flex-1 w-full">
             <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Masukkan nama daerah atau lokasi"
+              placeholder="Cari nama jajahan, hab kiosk atau kategori produk..."
               value={searchDistrictQuery}
               onChange={(e) => setSearchDistrictQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors dark:focus:border-blue-400"
@@ -317,10 +668,14 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
           <div className="flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
             <button
               type="button"
-              onClick={() => onSelectDistrict('Semua Jajahan')}
+              onClick={() => {
+                onSelectDistrict('Semua Jajahan');
+                setInfoWindowDistrict(null);
+                setResetSignal((s) => s + 1);
+              }}
               className={`px-3.5 py-2.5 text-sm font-bold rounded-xl transition-all cursor-pointer ${
                 selectedDistrict === 'Semua Jajahan'
-                  ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-blue-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
               }`}
             >
@@ -333,21 +688,38 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
         <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none text-sm">
           {filteredDistrictChips.map((geo) => {
             const isSelected = selectedDistrict === geo.district;
+            const stats = districtStatsMap[geo.district];
             return (
               <button
                 key={geo.code}
                 type="button"
-                onClick={() => onSelectDistrict(geo.district)}
+                onClick={() => handleSelectDistrictWithInfo(geo.district)}
                 className={`px-3.5 py-1.5 rounded-full font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
                   isSelected
-                    ? 'bg-blue-600 text-white shadow-sm ring-2 ring-blue-500/30 dark:ring-blue-400/30 dark:bg-blue-600'
+                    ? 'bg-blue-600 text-white shadow-sm ring-2 ring-blue-500/30 dark:ring-blue-400/30'
                     : 'bg-slate-50 hover:bg-blue-50 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600'
                 }`}
               >
-                <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-white' : geo.terrainType === 'green' ? 'bg-emerald-500' : 'bg-blue-500'}`} />
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    isSelected
+                      ? 'bg-white'
+                      : stats.available > 0
+                        ? 'bg-emerald-500'
+                        : stats.total > 0
+                          ? 'bg-blue-500'
+                          : 'bg-slate-400'
+                  }`}
+                />
                 <span>{geo.name}</span>
-                <span className={`text-[0.8125rem] px-2 py-0.5 rounded-full tabular-nums ${isSelected ? 'bg-blue-700 text-white' : 'bg-white dark:bg-slate-800 text-black dark:text-white'}`}>
-                  {getDistrictStats(geo.district).available}
+                <span
+                  className={`text-[0.8125rem] px-2 py-0.5 rounded-full tabular-nums ${
+                    isSelected
+                      ? 'bg-blue-700 text-white'
+                      : 'bg-white dark:bg-slate-800 text-black dark:text-white'
+                  }`}
+                >
+                  {stats.available}
                 </span>
               </button>
             );
@@ -355,346 +727,251 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
         </div>
       </div>
 
-      {/* 3. Main Interactive Map Workspace */}
+      {/* 3. Main Embedded Google Maps + Side Detail Panel */}
       {viewMode === 'map' ? (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start mt-4 w-full min-w-0">
-          
-          {/* Left Column: Authentic Google Maps Styled Canvas (7 Cols) */}
-          <div className="xl:col-span-7 flex flex-col items-center w-full min-w-0">
-            <div className="relative w-full rounded-3xl overflow-hidden border border-slate-300 dark:border-slate-600 shadow-md bg-[#E8EEF5] dark:bg-slate-900 flex flex-col items-center">
-              
-              {/* Google Maps Top Location Badge */}
-              <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-white dark:bg-slate-800 px-3.5 py-1.5 rounded-xl shadow-md border border-slate-300 dark:border-slate-600 text-sm">
-                <MapPin className="w-4 h-4 text-[#EA4335] shrink-0" />
-                <span className="font-bold text-black dark:text-white truncate">
-                  {selectedDistrict === 'Semua Jajahan' ? 'Kelantan, Malaysia' : `${selectedDistrict}, Kelantan`}
-                </span>
-                <span className="text-[0.8125rem] text-black/75 dark:text-white/80 font-semibold">• Google Maps View</span>
-              </div>
-
-              {/* Google Maps Floating Zoom & Reset Controls */}
-              <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-1.5">
-                <button
-                  type="button"
-                  onClick={handleZoomIn}
-                  title="Zum Masuk (Zoom In)"
-                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-black dark:text-white shadow-md border border-slate-300 dark:border-slate-600 flex items-center justify-center font-bold text-sm transition-transform active:scale-95 cursor-pointer"
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch mt-4 w-full min-w-0">
+          {/* Left Column: Live Google Map (7 Cols) */}
+          <div className="xl:col-span-7 flex flex-col w-full min-w-0">
+            <div className="relative w-full rounded-3xl overflow-hidden border border-slate-300 dark:border-slate-600 shadow-md bg-slate-100 dark:bg-slate-900 flex flex-col">
+              {mapsApiKey ? (
+                <APIProvider
+                  apiKey={mapsApiKey}
+                  libraries={['marker']}
+                  language={language === 'en' ? 'en' : 'ms'}
+                  region="MY"
                 >
-                  <Plus className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleZoomOut}
-                  title="Zum Keluar (Zoom Out)"
-                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-black dark:text-white shadow-md border border-slate-300 dark:border-slate-600 flex items-center justify-center font-bold text-sm transition-transform active:scale-95 cursor-pointer"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleResetZoom}
-                  title="Pusat Peta Asal"
-                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-black dark:text-white shadow-md border border-slate-300 dark:border-slate-600 flex items-center justify-center text-sm transition-transform active:scale-95 cursor-pointer"
-                >
-                  <RotateCcw className="w-3.5 h-3.5 text-black dark:text-white" />
-                </button>
-              </div>
-
-              {/* Google Maps Scale Legend Bar (Bottom Left) */}
-              <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xs px-2.5 py-1 rounded-md text-[0.8125rem] font-mono text-black dark:text-white border border-slate-300 dark:border-slate-600">
-                <div className="w-8 h-1 bg-slate-800 dark:bg-slate-200 border-x border-slate-900" />
-                <span>20 km</span>
-              </div>
-
-              {/* SVG Map Container */}
-              <div 
-                className="w-full flex items-center justify-center transition-transform duration-300 ease-out"
-                style={{ transform: `scale(${zoomLevel})` }}
-              >
-                <svg
-                  viewBox="50 20 440 640"
-                  className="w-full h-auto max-h-[520px] drop-shadow-sm select-none"
-                >
-                  <defs>
-                    {/* Water Pattern for South China Sea */}
-                    <pattern id="seaPattern" width="30" height="30" patternUnits="userSpaceOnUse">
-                      <path d="M 0 15 Q 7.5 10 15 15 T 30 15" fill="none" stroke="#2563EB" strokeWidth="0.8" opacity="0.28" />
-                    </pattern>
-
-                    {/* Google Maps Road Drop Shadow */}
-                    <filter id="mapShadow" x="-10%" y="-10%" width="120%" height="120%">
-                      <feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.15" />
-                    </filter>
-                  </defs>
-
-                  {/* 1. Sea Water Background Texture (North & East Coastal Area) */}
-                  <rect x="50" y="20" width="440" height="640" fill={mapTheme === 'terrain' ? '#A5D6A7' : '#DBEAFE'} opacity={mapTheme === 'terrain' ? 0.25 : 1} />
-                  <rect x="50" y="20" width="440" height="640" fill="url(#seaPattern)" />
-
-                  {/* Sea Water Label */}
-                  <text x="392" y="50" fontSize={11} className="font-extrabold fill-black/60 dark:fill-white/65 uppercase tracking-widest pointer-events-none">
-                    Laut China Selatan
-                  </text>
-
-                  {/* 2. Main Land Mass / Districts Group */}
-                  <g filter="url(#mapShadow)">
-                    {KELANTAN_DISTRICTS.map((geo) => {
-                      const isSelected = selectedDistrict === geo.district;
-                      const isHovered = hoveredDistrict === geo.district;
-                      const stats = getDistrictStats(geo.district);
-
-                      // Royal Kelantan Map Palette
-                      let fillColor = '#FFF8E7';
-                      let strokeColor = '#E0D6C3';
-
-                      if (geo.terrainType === 'green') {
-                        fillColor = mapTheme === 'terrain' ? '#C8E6C9' : '#D4EDDA';
-                        strokeColor = '#A3D9B1';
-                      } else if (geo.terrainType === 'coastal') {
-                        fillColor = '#FFF3D6';
-                        strokeColor = '#E6CCA0';
-                      }
-
-                      // Interactive States (Standard Blue & Amber)
-                      if (isSelected) {
-                        fillColor = '#DBEAFE'; // Crisp Blue selection tint
-                        strokeColor = '#2563EB'; // Standard Royal Blue border
-                      } else if (isHovered) {
-                        fillColor = '#FEF3C7';
-                        strokeColor = '#F59E0B';
-                      }
-
-                      return (
-                        <g 
-                          key={geo.code}
-                          onClick={() => onSelectDistrict(geo.district)}
-                          onMouseEnter={() => setHoveredDistrict(geo.district)}
-                          onMouseLeave={() => setHoveredDistrict(null)}
-                          className="cursor-pointer transition-all duration-200 group"
-                        >
-                          <path
-                            d={geo.path}
-                            fill={fillColor}
-                            stroke={strokeColor}
-                            strokeWidth={isSelected ? 2.5 : 1.2}
-                            strokeLinejoin="round"
-                            className="transition-all duration-200"
-                          />
-
-                          {/* District Name Label */}
-                          <text
-                            x={geo.centerX}
-                            y={geo.centerY - 2}
-                            textAnchor="middle"
-                            fontSize={12.5}
-                            className={`font-bold pointer-events-none select-none transition-colors ${
-                              isSelected
-                                ? 'fill-black font-black'
-                                : 'fill-black'
-                            }`}
-                          >
-                            {geo.name}
-                          </text>
-
-                          {/* Small Kiosk Count Badge */}
-                          <rect
-                            x={geo.centerX - 30}
-                            y={geo.centerY + 4}
-                            width="60"
-                            height="16"
-                            rx="8"
-                            className={`${isSelected ? 'fill-blue-600' : 'fill-white/95 shadow-2xs'} pointer-events-none`}
-                          />
-                          <text
-                            x={geo.centerX}
-                            y={geo.centerY + 15}
-                            textAnchor="middle"
-                            fontSize={10}
-                            className={`font-bold pointer-events-none tabular-nums ${
-                              isSelected ? 'fill-white' : 'fill-black'
-                            }`}
-                          >
-                            {stats.available} kosong
-                          </text>
-                        </g>
-                      );
-                    })}
-                  </g>
-
-                  {/* 3. Major Rivers Layer (Sungai Kelantan) */}
-                  <g pointerEvents="none">
-                    <path
-                      d="M 320 310 Q 305 240 285 200 T 310 130 Q 320 90 315 50"
-                      fill="none"
-                      stroke="#3B82F6"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      opacity="0.72"
-                    />
-                    <path
-                      d="M 285 200 Q 250 170 230 140"
-                      fill="none"
-                      stroke="#3B82F6"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      opacity="0.6"
-                    />
-                    {/* River Label */}
-                    <text x="270" y="235" fontSize={9.5} className="font-semibold fill-black/75 italic pointer-events-none -rotate-45">
-                      Sg. Kelantan
-                    </text>
-                  </g>
-
-                  {/* 4. Major Highways */}
-                  <g pointerEvents="none">
-                    {/* CSR Highway Route 8: Kota Bharu -> Kuala Krai -> Gua Musang */}
-                    <path
-                      d="M 345 75 L 345 170 L 320 295 L 275 490 L 290 635"
-                      fill="none"
-                      stroke="#F59E0B"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeDasharray="4 2"
-                      opacity="0.9"
-                    />
-                    {/* Route 3 Coastal Highway: Tumpat -> Kota Bharu -> Bachok -> Pasir Puteh */}
-                    <path
-                      d="M 285 65 L 345 75 L 410 105 L 415 175"
-                      fill="none"
-                      stroke="#F59E0B"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      opacity="0.85"
-                    />
-                    {/* Route Label [ 8 ] */}
-                    <rect x="337" y="114" width="16" height="13" rx="2.5" fill="#FBBF24" stroke="#1E40AF" strokeWidth="0.8" />
-                    <text x="345" y="124" textAnchor="middle" fontSize={9.5} className="font-black fill-black">8</text>
-                  </g>
-
-                  {/* 5. Google Maps Red Teardrop Location Marker on Active District */}
-                  <g 
-                    transform={`translate(${activeDistrictData.centerX}, ${activeDistrictData.centerY - 22})`}
-                    className="pointer-events-none"
+                  <LiveMapCanvas
+                    mapTypeId={mapTypeId}
+                    selectedDistrict={selectedDistrict}
+                    infoWindowDistrict={infoWindowDistrict}
+                    districtStatsMap={districtStatsMap}
+                    resetSignal={resetSignal}
+                    zoomStepSignal={zoomStepSignal}
+                    onMarkerSelect={handleSelectDistrictWithInfo}
+                    onCloseInfo={() => setInfoWindowDistrict(null)}
+                    onBookHub={handleBookHub}
+                    onZoomIn={() =>
+                      setZoomStepSignal((prev) => ({ delta: 1, seq: (prev?.seq ?? 0) + 1 }))
+                    }
+                    onZoomOut={() =>
+                      setZoomStepSignal((prev) => ({ delta: -1, seq: (prev?.seq ?? 0) + 1 }))
+                    }
+                    onResetView={() => {
+                      onSelectDistrict('Semua Jajahan');
+                      setInfoWindowDistrict(null);
+                      setResetSignal((s) => s + 1);
+                    }}
+                    onSwitchToGrid={() => setViewMode('grid')}
+                  />
+                </APIProvider>
+              ) : (
+                <div className="w-full h-[460px] sm:h-[520px] flex flex-col items-center justify-center p-6 text-center bg-slate-50 dark:bg-slate-900 gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                    <MapPin className="w-6 h-6" />
+                  </div>
+                  <div className="max-w-md space-y-1">
+                    <h4 className="text-base font-bold text-black dark:text-white">
+                      Peta Google Maps Belum Dikonfigurasi
+                    </h4>
+                    <p className="text-sm text-black/75 dark:text-white/80">
+                      Kunci API peta belum tersedia dalam persekitaran ini. Anda masih boleh meneroka semua hab dan unit kiosk melalui panel butiran di sisi atau mod senarai.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('grid')}
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer"
                   >
-                    {/* Animated Pulsing Ring under the Pin */}
-                    <circle cx="0" cy="18" r="8" fill="#EA4335" opacity="0.25" className="animate-ping" />
-                    <circle cx="0" cy="18" r="3.5" fill="#333333" opacity="0.4" />
+                    Tukar ke Mod Senarai
+                  </button>
+                </div>
+              )}
 
-                    {/* Google Maps Red Pin SVG */}
-                    <path
-                      d="M 0 0 C -7 0 -12 5.5 -12 12 C -12 19 0 28 0 28 C 0 28 12 19 12 12 C 12 5.5 7 0 0 0 Z"
-                      fill="#EA4335"
-                      stroke="#C5221F"
-                      strokeWidth="1"
-                    />
-                    {/* White Core Circle */}
-                    <circle cx="0" cy="11" r="4.5" fill="#FFFFFF" />
-                  </g>
-
-                </svg>
-              </div>
-
-              {/* Google Maps Legend Footer */}
+              {/* Map Legend Footer */}
               <div className="w-full flex flex-wrap items-center justify-between text-[0.8125rem] text-black dark:text-white px-4 py-3 bg-white dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600 gap-2">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="flex items-center gap-1.5 text-[0.8125rem] font-semibold">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#EA4335] inline-block ring-2 ring-red-200" />
-                    Jajahan Dipilih
+                <div className="flex flex-wrap items-center gap-3.5">
+                  <span className="flex items-center gap-1.5 font-semibold">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#EA4335] inline-block ring-2 ring-red-200 dark:ring-red-900" />
+                    Hab Dipilih
                   </span>
-                  <span className="flex items-center gap-1.5 text-[0.8125rem] font-semibold">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-[#CEEAD6] border border-[#A3D9B1] inline-block" />
-                    Zon Hijau / Agrotek
+                  <span className="flex items-center gap-1.5 font-semibold">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
+                    Ada Kekosongan Unit
                   </span>
-                  <span className="flex items-center gap-1.5 text-[0.8125rem] font-semibold">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-[#FFF8E7] border border-[#E0D6C3] inline-block" />
-                    Zon Komersial / Pesisir
+                  <span className="flex items-center gap-1.5 font-semibold">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block" />
+                    Beroperasi Penuh
+                  </span>
+                  <span className="flex items-center gap-1.5 font-semibold">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-500 inline-block" />
+                    Zon Pengembangan
                   </span>
                 </div>
                 <span className="text-[0.8125rem] text-black/75 dark:text-white/80">
-                  Tip: Klik jajahan untuk memuatkan info hab
+                  Klik pin untuk info &amp; permohonan pantas
                 </span>
               </div>
-
             </div>
           </div>
 
-          {/* Right Column: Google Maps Location Card (5 Cols) */}
+          {/* Right Column: Side Location & Slot Availability Panel (5 Cols) */}
           <div className="xl:col-span-5 flex flex-col gap-4 w-full min-w-0">
-            <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-sm relative overflow-hidden transition-all space-y-4">
-              
-              {/* Card Header: Google Maps Place Card Style */}
-              <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
-                <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.8125rem] font-bold bg-blue-50 text-black dark:bg-blue-950/60 dark:text-white border border-blue-200 dark:border-blue-800/70 mb-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-[#EA4335]" />
-                    <span>Jajahan {activeDistrictData.name} ({activeDistrictData.code})</span>
+            <div className="h-full rounded-3xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-sm flex flex-col justify-between gap-4">
+              <div className="space-y-4">
+                {/* Hub Header */}
+                <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
+                  <div>
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.8125rem] font-bold bg-blue-50 text-black dark:bg-blue-950/60 dark:text-white border border-blue-200 dark:border-blue-800/70 mb-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#EA4335]" />
+                      <span>
+                        Jajahan {activeDistrictData.name} ({activeDistrictData.code})
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-black text-black dark:text-white leading-tight">
+                      {activeDistrictData.mainHubName}
+                    </h3>
+                    <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-1">
+                      {activeDistrictData.tagline}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-black text-black dark:text-white leading-tight">
-                    {activeDistrictData.mainHubName}
-                  </h3>
-                  <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-1">
-                    {activeDistrictData.tagline}
+
+                  <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-800/70">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                </div>
+
+                {/* Live Availability Metrics */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
+                    <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black/75 dark:text-white/80 block mb-0.5">
+                      Kekosongan Unit
+                    </span>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-2xl sm:text-[1.75rem] font-black text-emerald-700 dark:text-emerald-400 tabular-nums">
+                        {activeStats.available}
+                      </span>
+                      <span className="text-sm text-black/75 dark:text-white/80 font-semibold">
+                        / {activeStats.total} unit
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
+                    <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black/75 dark:text-white/80 block mb-0.5">
+                      Kadar Bermula
+                    </span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl sm:text-[1.75rem] font-black text-black dark:text-white tabular-nums">
+                        RM {activeStats.minMonthlyRate}
+                      </span>
+                      <span className="text-sm text-black/75 dark:text-white/80 font-semibold">
+                        / bln
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live Unit List inside Selected Hub */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm font-bold text-black dark:text-white">
+                    <span>Senarai Unit Kiosk di Hab Ini</span>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${activeDistrictData.lat},${activeDistrictData.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <span>Buka di Google Maps</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+
+                  {activeStats.districtSlots.length > 0 ? (
+                    <div className="space-y-2 max-h-[190px] overflow-y-auto pr-1">
+                      {activeStats.districtSlots.map((slot) => {
+                        const isAvail = slot.status === 'available';
+                        return (
+                          <div
+                            key={slot.id}
+                            className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3"
+                          >
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs font-bold text-blue-700 dark:text-blue-400">
+                                  {slot.code}
+                                </span>
+                                <span
+                                  className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                                    isAvail
+                                      ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
+                                      : 'bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-slate-200'
+                                  }`}
+                                >
+                                  {isAvail ? (
+                                    <CheckCircle2 className="w-3 h-3" />
+                                  ) : (
+                                    <Clock className="w-3 h-3" />
+                                  )}
+                                  <span>
+                                    {isAvail
+                                      ? 'Tersedia'
+                                      : slot.status === 'occupied'
+                                        ? 'Beroperasi'
+                                        : 'Dalam Proses'}
+                                  </span>
+                                </span>
+                              </div>
+                              <div className="text-sm font-bold text-black dark:text-white truncate mt-0.5">
+                                {slot.name}
+                              </div>
+                              <div className="text-xs text-black/70 dark:text-white/75 truncate">
+                                {slot.size} · RM{slot.monthlyRate}/bln
+                              </div>
+                            </div>
+
+                            {isAvail && (
+                              <button
+                                type="button"
+                                onClick={() => handleBookHub(activeDistrictData.district, slot)}
+                                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 cursor-pointer transition-colors"
+                              >
+                                Mohon
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-black/75 dark:text-white/80">
+                      Tiada unit kiosk didaftarkan secara aktif di jajahan ini buat masa ini. Anda masih boleh menghantar permohonan minat bagi pembukaan batch seterusnya.
+                    </div>
+                  )}
+                </div>
+
+                {/* Focus Niche */}
+                <div className="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 space-y-1">
+                  <div className="flex items-center gap-1.5 text-sm font-bold text-black dark:text-white">
+                    <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span>Tumpuan Produk Jajahan:</span>
+                  </div>
+                  <p className="text-sm text-black dark:text-white leading-relaxed font-medium">
+                    {activeDistrictData.popularNiche}
                   </p>
                 </div>
-
-                <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-800/70">
-                  <Building2 className="w-5 h-5" />
-                </div>
               </div>
 
-              {/* Status Metrics: Google Maps Style */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
-                  <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black/75 dark:text-white/80 block mb-0.5">
-                    Kekosongan Slot Kiosk
-                  </span>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl sm:text-[1.75rem] font-black text-black dark:text-white tabular-nums">
-                      {activeStats.available}
-                    </span>
-                    <span className="text-sm text-black/75 dark:text-white/80 font-semibold">
-                      / {activeStats.total} Kiosk Tersedia
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
-                  <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black/75 dark:text-white/80 block mb-0.5">
-                    Kadar Sewaan Bersubsidi
-                  </span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl sm:text-[1.75rem] font-black text-black dark:text-white tabular-nums">
-                      RM 150
-                    </span>
-                    <span className="text-sm text-black/75 dark:text-white/80 font-semibold">
-                      / sebulan
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Focus Niche & Opportunities */}
-              <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 space-y-1">
-                <div className="flex items-center gap-1.5 text-sm font-bold text-black dark:text-white">
-                  <Sparkles className="w-4 h-4 text-black dark:text-white/80" />
-                  <span>Kategori Produk & Tumpuan Jajahan:</span>
-                </div>
-                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed font-medium">
-                  {activeDistrictData.popularNiche}
-                </p>
-              </div>
-
-              {/* Action Buttons: 1-Click Booking & WhatsApp */}
+              {/* Action Buttons */}
               <div className="space-y-2.5 pt-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    onSelectDistrict(activeDistrictData.district);
-                    if (onOpenBookingForDistrict) {
-                      onOpenBookingForDistrict(activeDistrictData.district);
-                    }
-                  }}
-                  className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer dark:bg-blue-600 dark:hover:bg-blue-500"
+                  onClick={() =>
+                    handleBookHub(
+                      activeDistrictData.district,
+                      activeStats.districtSlots.find((s) => s.status === 'available')
+                    )
+                  }
+                  className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Store className="w-4 h-4 text-white" />
                   <span>Mohon Kiosk di Jajahan {activeDistrictData.name}</span>
@@ -702,31 +979,34 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                 </button>
 
                 <a
-                  href={`https://wa.me/601120508890?text=${encodeURIComponent(`Salam Pegawai Hab ${activeDistrictData.name}, saya berminat untuk membuat permohonan kiosk di ${activeDistrictData.mainHubName}.`)}`}
+                  href={`https://wa.me/601120508890?text=${encodeURIComponent(
+                    `Salam Pegawai Hab ${activeDistrictData.name}, saya berminat untuk membuat permohonan kiosk di ${activeDistrictData.mainHubName}.`
+                  )}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2 shadow-2xs"
+                  className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 shadow-2xs"
                 >
                   <MessageCircle className="w-4 h-4 text-white" />
                   <span>WhatsApp Pegawai Hab Bertugas</span>
                 </a>
               </div>
-
             </div>
           </div>
-
         </div>
       ) : (
         /* Grid View Mode: 10 Jajahan Cards */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-3.5 mt-5 w-full min-w-0">
           {KELANTAN_DISTRICTS.map((geo) => {
             const isSelected = selectedDistrict === geo.district;
-            const stats = getDistrictStats(geo.district);
+            const stats = districtStatsMap[geo.district];
 
             return (
               <div
                 key={geo.code}
-                onClick={() => onSelectDistrict(geo.district)}
+                onClick={() => {
+                  handleSelectDistrictWithInfo(geo.district);
+                  setViewMode('map');
+                }}
                 className={`cursor-pointer rounded-2xl p-4 transition-all duration-200 border flex flex-col justify-between ${
                   isSelected
                     ? 'bg-blue-50/80 dark:bg-blue-950/50 border-blue-500 shadow-sm -translate-y-0.5'
@@ -738,7 +1018,13 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                     <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/75 dark:text-white/80">
                       {geo.code}
                     </span>
-                    <span className="text-[0.8125rem] font-bold text-black dark:text-white/85 tabular-nums">
+                    <span
+                      className={`text-[0.8125rem] font-bold tabular-nums px-2 py-0.5 rounded-full ${
+                        stats.available > 0
+                          ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
+                          : 'bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-300'
+                      }`}
+                    >
                       {stats.available} kosong
                     </span>
                   </div>
@@ -746,16 +1032,16 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                     {geo.name}
                   </h4>
                   <p className="text-sm text-black/75 dark:text-white/80 line-clamp-2 mb-3">
-                    {geo.tagline}
+                    {geo.mainHubName}
                   </p>
                 </div>
 
                 <div className="pt-2.5 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm">
                   <span className="text-black/75 dark:text-white/80 font-medium">
-                    RM150 /bln
+                    RM{stats.minMonthlyRate} /bln
                   </span>
-                  <span className="font-bold text-black dark:text-white/85 inline-flex items-center gap-0.5">
-                    Pilih <ArrowRight className="w-3.5 h-3.5" />
+                  <span className="font-bold text-blue-700 dark:text-blue-400 inline-flex items-center gap-0.5">
+                    Lihat di Peta <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
               </div>
@@ -763,7 +1049,6 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
           })}
         </div>
       )}
-
     </div>
   );
 };

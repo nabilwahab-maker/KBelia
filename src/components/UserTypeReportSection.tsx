@@ -7,6 +7,7 @@ import {
   MessageSquare,
   Search,
   PieChart as PieChartIcon,
+  BarChart3,
   FileText,
   ChevronDown,
   ChevronUp
@@ -16,7 +17,13 @@ import {
   PieChart,
   Pie,
   Cell,
-  Tooltip
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  LabelList
 } from 'recharts';
 import {
   BusinessListing,
@@ -99,6 +106,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
   const [selectedType, setSelectedType] = useState<ReportUserTypeKey>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+  const [chartMode, setChartMode] = useState<'bar' | 'donut'>('bar');
 
   const consolidatedRecords = useMemo<UserTypeReportRecord[]>(() => {
     const records: UserTypeReportRecord[] = [];
@@ -472,80 +480,172 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             </button>
           </div>
 
-          {/* Right 5 Cols: Added Clean Percentage Donut Chart for User Types */}
-          <div className="lg:col-span-5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 p-4 sm:p-5 flex flex-col justify-between">
-            <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-700">
+          {/* Right 5 Cols: BarChart Default + Donut Toggle for User Types */}
+          <div className="lg:col-span-5 min-w-0 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 p-4 sm:p-5 flex flex-col justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-700">
               <div className="flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 text-black dark:text-white" />
+                {chartMode === 'bar' ? (
+                  <BarChart3 className="w-4 h-4 text-black dark:text-white" />
+                ) : (
+                  <PieChartIcon className="w-4 h-4 text-black dark:text-white" />
+                )}
                 <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
                   Komposisi Jenis Pengguna
                 </h4>
               </div>
-              <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                100%
-              </span>
+              <div className="inline-flex items-center gap-1 p-0.5 bg-white dark:bg-zinc-900 rounded-lg border border-slate-300 dark:border-zinc-700">
+                <button
+                  type="button"
+                  onClick={() => setChartMode('bar')}
+                  className={`px-2 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer ${
+                    chartMode === 'bar'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
+                  }`}
+                >
+                  Graf Bar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChartMode('donut')}
+                  className={`px-2 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer ${
+                    chartMode === 'donut'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
+                  }`}
+                >
+                  Donut
+                </button>
+              </div>
             </div>
 
-            <div className="relative h-56 w-full my-1">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={donutChartData}
-                    dataKey="count"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={56}
-                    outerRadius={84}
-                    paddingAngle={2}
-                    strokeWidth={2}
-                    stroke="#FFFFFF"
-                    onClick={(_, idx) => {
-                      const clicked = donutChartData[idx];
-                      if (clicked) {
-                        setSelectedType(selectedType === clicked.key ? 'all' : clicked.key);
-                      }
-                    }}
-                    className="cursor-pointer outline-none"
+            <div className="relative h-60 w-full min-w-0 my-1 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+              <ResponsiveContainer width="100%" height={240} minWidth={0}>
+                {chartMode === 'bar' ? (
+                  <BarChart
+                    data={donutChartData.map(d => ({
+                      ...d,
+                      shortLabel:
+                        d.key === 'usahawan' ? 'Usahawan'
+                          : d.key === 'mentor' ? 'Mentor'
+                          : d.key === 'pentadbir' ? 'Pentadbir'
+                          : 'Komuniti'
+                    }))}
+                    barCategoryGap="22%"
+                    margin={{ top: 24, right: 8, left: -18, bottom: 4 }}
                   >
-                    {donutChartData.map((entry) => (
-                      <Cell
-                        key={entry.key}
-                        fill={entry.color}
-                        opacity={selectedType === 'all' || selectedType === entry.key ? 1 : 0.45}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const d = payload[0].payload as typeof donutChartData[number];
-                        return (
-                          <div className="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-sm shadow-xl border border-slate-700">
-                            <div className="font-bold text-white">{d.name}</div>
-                            <div className="font-mono tabular-nums text-white/90">
-                              {d.count} Rekod ({d.percentage}%)
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                    <XAxis dataKey="shortLabel" tick={{ fontSize: 12, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                    <Tooltip
+                      cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload as typeof donutChartData[number];
+                          return (
+                            <div className="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-sm shadow-xl border border-slate-700">
+                              <div className="font-bold text-white">{d.name}</div>
+                              <div className="font-mono tabular-nums text-white/90">
+                                {d.count} Rekod ({d.percentage}%)
+                              </div>
                             </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                </PieChart>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar
+                      dataKey="count"
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={46}
+                      isAnimationActive={false}
+                      onClick={(data) => {
+                        const clickedKey = (data as unknown as { key?: Exclude<ReportUserTypeKey, 'all'> })?.key;
+                        if (clickedKey) {
+                          setSelectedType(selectedType === clickedKey ? 'all' : clickedKey);
+                        }
+                      }}
+                      className="cursor-pointer"
+                    >
+                      {donutChartData.map((entry) => (
+                        <Cell
+                          key={entry.key}
+                          fill={entry.color}
+                          opacity={selectedType === 'all' || selectedType === entry.key ? 1 : 0.4}
+                        />
+                      ))}
+                      <LabelList
+                        dataKey="count"
+                        position="top"
+                        formatter={(val: unknown) => String(Number(val) || 0)}
+                        className="fill-slate-900 dark:fill-slate-100 font-mono"
+                        style={{ fontSize: 12, fontWeight: 700 }}
+                      />
+                    </Bar>
+                  </BarChart>
+                ) : (
+                  <PieChart>
+                    <Pie
+                      data={donutChartData}
+                      dataKey="count"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={56}
+                      outerRadius={84}
+                      paddingAngle={2}
+                      strokeWidth={2}
+                      stroke="#FFFFFF"
+                      isAnimationActive={false}
+                      onClick={(_, idx) => {
+                        const clicked = donutChartData[idx];
+                        if (clicked) {
+                          setSelectedType(selectedType === clicked.key ? 'all' : clicked.key);
+                        }
+                      }}
+                      className="cursor-pointer outline-none"
+                    >
+                      {donutChartData.map((entry) => (
+                        <Cell
+                          key={entry.key}
+                          fill={entry.color}
+                          opacity={selectedType === 'all' || selectedType === entry.key ? 1 : 0.45}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload as typeof donutChartData[number];
+                          return (
+                            <div className="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-sm shadow-xl border border-slate-700">
+                              <div className="font-bold text-white">{d.name}</div>
+                              <div className="font-mono tabular-nums text-white/90">
+                                {d.count} Rekod ({d.percentage}%)
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                  </PieChart>
+                )}
               </ResponsiveContainer>
 
-              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                <span className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/80 truncate max-w-[115px]">
-                  {activeDonutFocus.label}
-                </span>
-                <span className="text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums leading-tight">
-                  {activeDonutFocus.percentage}%
-                </span>
-                <span className="text-[0.8125rem] font-medium text-black/75 dark:text-white/80 tabular-nums">
-                  {activeDonutFocus.count} Rekod
-                </span>
-              </div>
+              {chartMode === 'donut' && (
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                  <span className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/80 truncate max-w-[115px]">
+                    {activeDonutFocus.label}
+                  </span>
+                  <span className="text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums leading-tight">
+                    {activeDonutFocus.percentage}%
+                  </span>
+                  <span className="text-[0.8125rem] font-medium text-black/75 dark:text-white/80 tabular-nums">
+                    {activeDonutFocus.count} Rekod
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-300 dark:border-zinc-700">

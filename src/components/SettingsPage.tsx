@@ -33,13 +33,11 @@ import {
   Sun,
   Moon,
   Globe,
-  GraduationCap,
-  Type
+  GraduationCap
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useTextSize } from '../context/TextSizeContext';
 import { BusinessListing, BusinessCategory, KelantanDistrict } from '../types';
 import { saveBusinessListing, seedInitialData, loadLocalPortalSettings, savePortalSettingsRecord } from '../services/dataService';
 import confetti from 'canvas-confetti';
@@ -93,7 +91,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
   const { user, userProfile, updateProfileData, changeUserPassword, isAdmin } = useAuth();
   const { theme, isDark, toggleTheme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
-  const { textSize, setTextSize } = useTextSize();
   const { confirmDelete } = useConfirmDelete();
 
   // Role detection: youth vs mentor vs admin
@@ -779,49 +776,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 >
                   <Moon className={`w-4 h-4 ${isDark ? 'text-black/70 dark:text-white/75 fill-amber-400' : 'text-black/70 dark:text-white/75'}`} />
                   <span>{t('mode_dark_btn')}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Type className="w-4 h-4 text-black dark:text-white/80" />
-                  <h3 className="text-base font-bold text-black dark:text-white">Saiz Teks Laman Web</h3>
-                </div>
-                <p className="text-sm text-black/80 dark:text-white/80 mt-0.5">
-                  Pilih saiz teks Biasa atau Besar mengikut keselesaan mata di semua halaman.
-                </p>
-              </div>
-
-              <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 shrink-0 self-start sm:self-auto">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTextSize('normal');
-                    showToast('Saiz teks ditetapkan ke mod Biasa.', 'info');
-                  }}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
-                    textSize === 'normal'
-                      ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                  }`}
-                >
-                  Biasa
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTextSize('large');
-                    showToast('Saiz teks ditetapkan ke mod Besar.', 'info');
-                  }}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
-                    textSize === 'large'
-                      ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                  }`}
-                >
-                  Besar
                 </button>
               </div>
             </div>

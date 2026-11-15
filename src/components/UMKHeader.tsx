@@ -32,13 +32,11 @@ import {
   ExternalLink,
   Check,
   Newspaper,
-  MessagesSquare,
-  Type
+  MessagesSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useTextSize } from '../context/TextSizeContext';
 import { NotificationDropdown } from './NotificationDropdown';
 import { showToast } from './ToastNotification';
 import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab, MentorSubTab } from '../types';
@@ -97,7 +95,6 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   const { user, userProfile, isAdmin, isMentor, isYouth, isDemoSession, logout, loginAsDemoUser } = useAuth();
   const { isDark, setTheme } = useTheme();
   const { t, language } = useLanguage();
-  const { textSize, setTextSize } = useTextSize();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -288,49 +285,6 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
         <div className="flex items-center gap-2 shrink-0">
 
-          {/* Text Size Switcher (Biasa / Besar) */}
-          <div
-            role="group"
-            aria-label="Pilihan Saiz Teks"
-            className="hidden sm:inline-flex items-center gap-0.5 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shrink-0"
-          >
-            <span className="px-1.5 text-black/70 dark:text-white/75 flex items-center" title="Saiz Teks">
-              <Type className="w-3.5 h-3.5" />
-            </span>
-            <button
-              id="kbelia-text-size-normal"
-              type="button"
-              onClick={() => {
-                setTextSize('normal');
-                showToast('Saiz teks ditetapkan ke mod Biasa.', 'info');
-              }}
-              aria-pressed={textSize === 'normal'}
-              className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                textSize === 'normal'
-                  ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                  : 'text-black dark:text-white hover:bg-white dark:hover:bg-slate-700'
-              }`}
-            >
-              Biasa
-            </button>
-            <button
-              id="kbelia-text-size-large"
-              type="button"
-              onClick={() => {
-                setTextSize('large');
-                showToast('Saiz teks ditetapkan ke mod Besar.', 'info');
-              }}
-              aria-pressed={textSize === 'large'}
-              className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                textSize === 'large'
-                  ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                  : 'text-black dark:text-white hover:bg-white dark:hover:bg-slate-700'
-              }`}
-            >
-              Besar
-            </button>
-          </div>
-          
           {/* Global Search Button & Popover */}
           <div ref={searchContainerRef} className="relative">
             <button
@@ -636,39 +590,6 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
               {mobileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="text-[0.8125rem] font-extrabold text-black/75 dark:text-white/80 uppercase tracking-wider px-2.5 py-1 mb-1">
-                    Saiz Teks
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5 px-1 pb-2 mb-2 border-b border-slate-300 dark:border-slate-600">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTextSize('normal');
-                        showToast('Saiz teks ditetapkan ke mod Biasa.', 'info');
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
-                        textSize === 'normal'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-slate-100 dark:bg-slate-900 text-black dark:text-white'
-                      }`}
-                    >
-                      Biasa
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTextSize('large');
-                        showToast('Saiz teks ditetapkan ke mod Besar.', 'info');
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
-                        textSize === 'large'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-slate-100 dark:bg-slate-900 text-black dark:text-white'
-                      }`}
-                    >
-                      Besar
-                    </button>
-                  </div>
                   <div className="text-[0.8125rem] font-extrabold text-black/75 dark:text-white/80 uppercase tracking-wider px-2.5 py-1 mb-1">
                     {t('nav_quick_nav')}
                   </div>

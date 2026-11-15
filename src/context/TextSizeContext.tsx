@@ -14,42 +14,32 @@ const STORAGE_KEY = 'kbelia_text_size';
 const TextSizeContext = createContext<TextSizeContextType | undefined>(undefined);
 
 export const TextSizeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [textSize, setTextSizeState] = useState<TextSizeMode>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === 'normal' || saved === 'large') {
-        return saved;
-      }
-    } catch {
-      // ignore storage errors
-    }
-    return 'normal';
-  });
+  const [textSize] = useState<TextSizeMode>('normal');
 
   useEffect(() => {
     const root = document.documentElement;
-    root.dataset.textSize = textSize;
-    root.style.fontSize = textSize === 'large' ? '18px' : '16px';
+    delete root.dataset.textSize;
+    root.style.fontSize = '16px';
     try {
-      localStorage.setItem(STORAGE_KEY, textSize);
+      localStorage.removeItem(STORAGE_KEY);
     } catch {
       // ignore storage errors
     }
-  }, [textSize]);
+  }, []);
 
-  const setTextSize = (size: TextSizeMode) => {
-    setTextSizeState(size);
+  const setTextSize = (_size: TextSizeMode) => {
+    // Locked to standard 16px across all pages
   };
 
   const toggleTextSize = () => {
-    setTextSizeState(prev => (prev === 'large' ? 'normal' : 'large'));
+    // Locked to standard 16px across all pages
   };
 
   return (
     <TextSizeContext.Provider
       value={{
         textSize,
-        isLargeText: textSize === 'large',
+        isLargeText: false,
         setTextSize,
         toggleTextSize
       }}

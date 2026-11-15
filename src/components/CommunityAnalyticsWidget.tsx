@@ -24,6 +24,8 @@ import {
   LabelList
 } from 'recharts';
 
+import { BusinessListing, CapsuleSlot, GrantApplication, YouthProgram } from '../types';
+
 interface SectorData {
   name: string;
   shortName: string;
@@ -31,6 +33,13 @@ interface SectorData {
   entrepreneurs: number;
   color: string;
   darkColor: string;
+}
+
+interface CommunityAnalyticsWidgetProps {
+  slots?: CapsuleSlot[];
+  businesses?: BusinessListing[];
+  programs?: YouthProgram[];
+  grantApplications?: GrantApplication[];
 }
 
 const SECTOR_BREAKDOWN: SectorData[] = [
@@ -41,16 +50,41 @@ const SECTOR_BREAKDOWN: SectorData[] = [
   { name: 'Runcit & Gaya Hidup', shortName: 'Runcit & Gaya Hidup', percentage: 8, entrepreneurs: 11, color: '#4F46E5', darkColor: '#818CF8' }
 ];
 
-const QUARTERLY_DATA = [
-  { quarter: 'S1 2025', grants: 'RM 65K', grantsAmount: 65, kiosks: 18, businesses: 42 },
-  { quarter: 'S2 2025', grants: 'RM 120K', grantsAmount: 120, kiosks: 24, businesses: 68 },
-  { quarter: 'S3 2025', grants: 'RM 210K', grantsAmount: 210, kiosks: 32, businesses: 94 },
-  { quarter: 'S4 2025 (Kini)', grants: 'RM 345K', grantsAmount: 345, kiosks: 38, businesses: 128 }
+const BASE_QUARTERLY_DATA = [
+  { quarter: 'S1 2026', grants: 'RM 65K', grantsAmount: 65, kiosks: 18, businesses: 42 },
+  { quarter: 'S2 2026', grants: 'RM 120K', grantsAmount: 120, kiosks: 24, businesses: 68 },
+  { quarter: 'S3 2026', grants: 'RM 210K', grantsAmount: 210, kiosks: 32, businesses: 94 },
+  { quarter: 'S4 2026 (Kini)', grants: 'RM 345K', grantsAmount: 345, kiosks: 38, businesses: 128 }
 ];
 
-export const CommunityAnalyticsWidget: React.FC = () => {
+export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> = ({
+  slots = [],
+  businesses = [],
+  grantApplications = []
+}) => {
   const [activeSector, setActiveSector] = useState<SectorData>(SECTOR_BREAKDOWN[0]);
-  const [chartTab, setChartTab] = useState<'sectors' | 'growth'>('sectors');
+  const [chartTab, setChartTab] = useState<'sectors' | 'growth'>('growth');
+
+  const liveBusinessesTotal = 128 + Math.max(0, businesses.length - 6);
+  const liveKiosksOccupied = 38 + slots.filter(s => s.status === 'occupied' || s.status === 'reserved').length;
+  const approvedGrantsBonusK = Math.round(
+    grantApplications
+      .filter(g => g.status === 'approved')
+      .reduce((sum, g) => sum + (Number((g.grantAmount || g.amount || '0').replace(/[^0-9.]/g, '')) || 0), 0) / 1000
+  );
+  const currentGrantAmountK = 345 + approvedGrantsBonusK;
+
+  const quarterlyData = BASE_QUARTERLY_DATA.map((item, idx) =>
+    idx === BASE_QUARTERLY_DATA.length - 1
+      ? {
+          ...item,
+          grantsAmount: currentGrantAmountK,
+          grants: `RM ${currentGrantAmountK}K`,
+          kiosks: liveKiosksOccupied,
+          businesses: liveBusinessesTotal
+        }
+      : item
+  );
 
   const totalEntrepreneurs = SECTOR_BREAKDOWN.reduce((sum, sec) => sum + sec.entrepreneurs, 0);
 
@@ -78,18 +112,6 @@ export const CommunityAnalyticsWidget: React.FC = () => {
         <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-slate-900 rounded-xl self-start sm:self-auto border border-slate-300 dark:border-slate-600">
           <button
             type="button"
-            onClick={() => setChartTab('sectors')}
-            className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap ${
-              chartTab === 'sectors'
-                ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
-                : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-            }`}
-          >
-            <PieChartIcon className="w-4 h-4" />
-            <span>Pecahan Sektor</span>
-          </button>
-          <button
-            type="button"
             onClick={() => setChartTab('growth')}
             className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap ${
               chartTab === 'growth'
@@ -99,6 +121,18 @@ export const CommunityAnalyticsWidget: React.FC = () => {
           >
             <BarChart3 className="w-4 h-4" />
             <span>Trend Pertumbuhan</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setChartTab('sectors')}
+            className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap ${
+              chartTab === 'sectors'
+                ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
+                : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            <PieChartIcon className="w-4 h-4" />
+            <span>Pecahan Sektor</span>
           </button>
         </div>
       </div>
@@ -117,15 +151,15 @@ export const CommunityAnalyticsWidget: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-1.5">
             <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
-              38
+              {liveKiosksOccupied}
             </span>
             <span className="text-sm font-medium text-black/75 dark:text-white/80">
-              / 45 Unit
+              / {Math.max(45, liveKiosksOccupied + 7)} Unit
             </span>
           </div>
           <span className="inline-flex items-center gap-1 text-[0.8125rem] sm:text-sm font-medium text-black/80 dark:text-white/80 mt-1.5">
             <ArrowUpRight className="w-3.5 h-3.5" />
-            84.4% Kadar Pengisian
+            {Math.min(99, Math.round((liveKiosksOccupied / Math.max(45, liveKiosksOccupied + 7)) * 1000) / 10)}% Kadar Pengisian
           </span>
         </div>
 
@@ -141,7 +175,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-1.5">
             <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
-              RM 345K
+              RM {currentGrantAmountK}K
             </span>
           </div>
           <span className="inline-flex items-center gap-1 text-[0.8125rem] sm:text-sm font-medium text-black/80 dark:text-white/80 mt-1.5">
@@ -162,7 +196,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
           </div>
           <div className="flex items-baseline gap-1.5">
             <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
-              128
+              {liveBusinessesTotal}
             </span>
             <span className="text-sm font-medium text-black/75 dark:text-white/80">
               Peniaga
@@ -267,8 +301,8 @@ export const CommunityAnalyticsWidget: React.FC = () => {
                 </span>
               </div>
 
-              <div className="relative h-64 sm:h-72 w-full my-2">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="relative h-64 sm:h-72 w-full min-w-0 my-2">
+                <ResponsiveContainer width="100%" height={272} minWidth={0}>
                   <PieChart>
                     <Pie
                       data={SECTOR_BREAKDOWN}
@@ -393,8 +427,8 @@ export const CommunityAnalyticsWidget: React.FC = () => {
           </div>
         </div>
       ) : (
-        /* Growth Trend Chart: Upgraded to Full Taller Tightly-Spaced Recharts BarChart */
-        <div className="pt-4">
+        /* Growth Trend Chart: Upgraded to Full Taller Tightly-Spaced Recharts BarChart with Dual Y-Axis */
+        <div className="pt-4 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <span className="text-[0.9375rem] sm:text-base font-bold text-black dark:text-white">
               Prestasi Pertumbuhan Suku Tahunan Ekonomi Belia
@@ -404,13 +438,13 @@ export const CommunityAnalyticsWidget: React.FC = () => {
             </span>
           </div>
 
-          <div className="h-80 w-full rounded-xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-600 p-4 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-80 w-full min-w-0 rounded-xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-600 p-4 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+            <ResponsiveContainer width="100%" height={288} minWidth={0}>
               <BarChart
-                data={QUARTERLY_DATA}
-                barCategoryGap="16%"
-                barGap={6}
-                margin={{ top: 24, right: 16, left: 0, bottom: 8 }}
+                data={quarterlyData}
+                barCategoryGap="18%"
+                barGap={8}
+                margin={{ top: 26, right: 12, left: 4, bottom: 8 }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.25)" />
                 <XAxis
@@ -420,16 +454,26 @@ export const CommunityAnalyticsWidget: React.FC = () => {
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 13, fontWeight: 500 }}
+                  yAxisId="left"
+                  tick={{ fontSize: 12.5, fontWeight: 500 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(val) => `RM ${val}K`}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  allowDecimals={false}
+                  tick={{ fontSize: 12.5, fontWeight: 500 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(val) => `${val} Org`}
                 />
                 <Tooltip
                   cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
-                      const d = payload[0].payload as typeof QUARTERLY_DATA[number];
+                      const d = payload[0].payload as typeof BASE_QUARTERLY_DATA[number];
                       return (
                         <div className="px-4 py-3 rounded-xl bg-slate-900 text-white text-sm shadow-xl border border-slate-700">
                           <div className="font-bold text-white mb-1">{d.quarter}</div>
@@ -442,21 +486,21 @@ export const CommunityAnalyticsWidget: React.FC = () => {
                     return null;
                   }}
                 />
-                <Bar dataKey="grantsAmount" name="Dana Geran" fill="#2563EB" radius={[8, 8, 0, 0]} maxBarSize={84}>
+                <Bar yAxisId="left" dataKey="grantsAmount" name="Dana Geran" fill="#2563EB" radius={[8, 8, 0, 0]} maxBarSize={72} isAnimationActive={false}>
                   <LabelList
                     dataKey="grants"
                     position="top"
                     className="fill-slate-900 dark:fill-white font-mono"
-                    style={{ fontSize: 13.5, fontWeight: 700 }}
+                    style={{ fontSize: 12.5, fontWeight: 700 }}
                   />
                 </Bar>
-                <Bar dataKey="businesses" name="Usahawan Aktif" fill="#059669" radius={[8, 8, 0, 0]} maxBarSize={84}>
+                <Bar yAxisId="right" dataKey="businesses" name="Usahawan Aktif" fill="#059669" radius={[8, 8, 0, 0]} maxBarSize={72} isAnimationActive={false}>
                   <LabelList
                     dataKey="businesses"
                     position="top"
                     formatter={(val: unknown) => `${val} Org`}
                     className="fill-slate-800 dark:fill-slate-200 font-mono"
-                    style={{ fontSize: 13, fontWeight: 600 }}
+                    style={{ fontSize: 12.5, fontWeight: 600 }}
                   />
                 </Bar>
               </BarChart>
@@ -464,7 +508,7 @@ export const CommunityAnalyticsWidget: React.FC = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm text-black/75 dark:text-white/80 pt-3.5">
-            <span>Data merangkumi permohonan dana geran benih dan pengisian kiosk.</span>
+            <span>Data merangkumi rekod langsung geran, usahawan, dan asas suku tahunan.</span>
             <span className="font-bold text-black dark:text-white">
               Pertumbuhan +180% Tahun ke Tahun
             </span>

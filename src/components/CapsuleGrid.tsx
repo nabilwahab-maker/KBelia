@@ -24,13 +24,14 @@ import {
   X,
   Lock
 } from 'lucide-react';
-import { CapsuleBooking, CapsuleSlot, PortalSettings, SlotStatus } from '../types';
+import { CapsuleBooking, CapsuleSlot, KelantanDistrict, PortalSettings, SlotStatus } from '../types';
 import { BudgetSlider } from './BudgetSlider';
 import { Accordion } from './Accordion';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { PortalImage } from './PortalImage';
 import { resolveSlotImage } from '../utils/visualAssets';
+import { KelantanDistrictsMap } from './KelantanDistrictsMap';
 
 interface CapsuleGridProps {
   slots: CapsuleSlot[];
@@ -68,6 +69,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   const [internalBudget, setInternalBudget] = useState<number>(500);
   const [selectedStatus, setSelectedStatus] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedMapDistrict, setSelectedMapDistrict] = useState<KelantanDistrict>('Semua Jajahan');
 
   const selectedHub = externalHub !== undefined ? externalHub : internalHub;
   const setSelectedHub = (hub: string) => {
@@ -197,6 +199,29 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Live Google Maps Kiosk Hub Explorer */}
+      <KelantanDistrictsMap
+        slots={slots}
+        selectedDistrict={selectedMapDistrict}
+        onSelectDistrict={(district) => {
+          setSelectedMapDistrict(district);
+          const hubMap: Record<string, string> = {
+            'Semua Jajahan': 'Semua',
+            Bachok: 'Hub UMK Bachok',
+            'Kota Bharu': 'Hub Belia Kota Bharu',
+            Tumpat: 'Hub Kraf Tumpat',
+            'Pasir Mas': 'Hub Pasir Mas',
+            Jeli: 'Hub Komuniti Jeli'
+          };
+          setSelectedHub(hubMap[district] || 'Semua');
+        }}
+        onSelectSlot={onSelectSlot}
+        onOpenBookingForDistrict={(_district, slot) => {
+          if (slot) onSelectSlot(slot);
+          else onOpenNewBooking();
+        }}
+      />
 
       {/* Modern Minimalist Filter Section */}
       <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs transition-all">

@@ -82,7 +82,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  LabelList
 } from 'recharts';
 import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
 import confetti from 'canvas-confetti';
@@ -206,7 +207,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   };
 
   const [salesPeriod, setSalesPeriod] = useState<'weekly' | 'monthly' | 'quarterly'>('weekly');
-  const [chartMode, setChartMode] = useState<'area' | 'bar'>('area');
+  const [chartMode, setChartMode] = useState<'area' | 'bar'>('bar');
   const [selectedStepperIndex, setSelectedStepperIndex] = useState<number>(0);
 
   // Business Form State
@@ -525,41 +526,107 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         // Real Mentorship Computation
         const upcomingMentor = safeMentorships.find(m => m.status === 'confirmed' || m.status === 'pending') || safeMentorships[0] || null;
 
-        // Build Chart Bars from real cashflowRecords
+        // Build Chart Bars combining real cashflowRecords + dynamic starter sample baseline
         const now = new Date();
+        const pad2 = (n: number) => String(n).padStart(2, '0');
+        const toLocalIso = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+
+        const starterDailySample = (() => {
+          const sampleAmounts = [
+            { cash: 180, qr: 210 },
+            { cash: 220, qr: 265 },
+            { cash: 165, qr: 240 },
+            { cash: 250, qr: 310 },
+            { cash: 290, qr: 345 },
+            { cash: 320, qr: 390 },
+            { cash: 275, qr: 360 }
+          ];
+          const records: { date: string; cashSales: number; qrSales: number; isSample: true }[] = [];
+          for (let i = 0; i < 7; i++) {
+            const d = new Date(now);
+            d.setDate(now.getDate() - (6 - i));
+            records.push({
+              date: toLocalIso(d),
+              cashSales: sampleAmounts[i].cash,
+              qrSales: sampleAmounts[i].qr,
+              isSample: true
+            });
+          }
+          // Prior 5 months starter baseline for monthly & quarterly views
+          const monthlyBase = [
+            { cash: 1450, qr: 1850 },
+            { cash: 1620, qr: 2150 },
+            { cash: 1890, qr: 2420 },
+            { cash: 2100, qr: 2780 },
+            { cash: 2350, qr: 3120 }
+          ];
+          for (let m = 1; m <= 5; m++) {
+            const d = new Date(now.getFullYear(), now.getMonth() - m, 15);
+            const idx = 5 - m;
+            records.push({
+              date: toLocalIso(d),
+              cashSales: monthlyBase[idx].cash,
+              qrSales: monthlyBase[idx].qr,
+              isSample: true
+            });
+          }
+          return records;
+        })();
+
+        const realDateSet = new Set(safeCashflow.map(r => (r.date || '').slice(0, 10)).filter(Boolean));
+        const realMonthSet = new Set(safeCashflow.map(r => (r.date || '').slice(0, 7)).filter(Boolean));
+        let usesStarterSample = false;
+
         const chartBars = (() => {
           if (salesPeriod === 'weekly') {
             const days = ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'];
-            const buckets = Array.from({ length: 7 }, (_, i) => {
+            return Array.from({ length: 7 }, (_, i) => {
               const d = new Date(now);
               d.setDate(now.getDate() - (6 - i));
-              const iso = d.toISOString().split('T')[0];
-              const dayRecs = safeCashflow.filter(r => r.date === iso);
-              const cash = dayRecs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
-              const qr = dayRecs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+              const iso = toLocalIso(d);
+              const dayRecs = safeCashflow.filter(r => (r.date || '').slice(0, 10) === iso);
+              if (dayRecs.length > 0) {
+                const cash = dayRecs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+                const qr = dayRecs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+                const value = cash + qr;
+                return {
+                  label: days[d.getDay()],
+                  value,
+                  tx: dayRecs.length,
+                  qr: value > 0 ? Math.round((qr / value) * 100) : 0
+                };
+              }
+              const sample = starterDailySample.find(s => s.date === iso);
+              if (sample) usesStarterSample = true;
+              const cash = sample?.cashSales || 0;
+              const qr = sample?.qrSales || 0;
               const value = cash + qr;
               return {
                 label: days[d.getDay()],
                 value,
-                tx: dayRecs.length,
+                tx: sample ? 1 : 0,
                 qr: value > 0 ? Math.round((qr / value) * 100) : 0
               };
             });
-            return buckets;
           }
           if (salesPeriod === 'monthly') {
             const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogo', 'Sep', 'Okt', 'Nov', 'Dis'];
             return Array.from({ length: 6 }, (_, i) => {
               const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
-              const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+              const ym = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
               const recs = safeCashflow.filter(r => (r.date || '').startsWith(ym));
-              const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
-              const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+              const sampleRecs = starterDailySample.filter(s => s.date.startsWith(ym) && !realDateSet.has(s.date));
+              const combined = recs.length > 0
+                ? recs
+                : sampleRecs;
+              if (recs.length === 0 && sampleRecs.length > 0) usesStarterSample = true;
+              const cash = combined.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+              const qr = combined.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
               const value = cash + qr;
               return {
                 label: months[d.getMonth()],
                 value,
-                tx: recs.length,
+                tx: combined.length,
                 qr: value > 0 ? Math.round((qr / value) * 100) : 0
               };
             });
@@ -572,13 +639,20 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               const dt = new Date(r.date);
               return dt.getFullYear() === now.getFullYear() && dt.getMonth() >= startMonth && dt.getMonth() <= startMonth + 2;
             });
-            const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
-            const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+            const sampleRecs = starterDailySample.filter(s => {
+              const dt = new Date(s.date);
+              const ym = s.date.slice(0, 7);
+              return dt.getFullYear() === now.getFullYear() && dt.getMonth() >= startMonth && dt.getMonth() <= startMonth + 2 && !realMonthSet.has(ym);
+            });
+            const combined = recs.length > 0 ? [...recs, ...sampleRecs] : sampleRecs;
+            if (sampleRecs.length > 0 && recs.length === 0) usesStarterSample = true;
+            const cash = combined.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+            const qr = combined.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
             const value = cash + qr;
             return {
               label: qLabel,
               value,
-              tx: recs.length,
+              tx: combined.length,
               qr: value > 0 ? Math.round((qr / value) * 100) : 0
             };
           });
@@ -782,7 +856,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
             
             {/* Left Bento Span (7 Cols): Carta Recharts Analitik Jualan Interaktif */}
-            <div className="lg:col-span-7 h-full rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col">
+            <div className="lg:col-span-7 min-w-0 h-full rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col">
               
               {/* Card Header */}
               <div className="border-b border-slate-300 dark:border-zinc-600 py-4.5 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -794,24 +868,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </h4>
                   </div>
                   <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-                    Transaksi tunai & DuitNow QR sebenar
+                    Transaksi tunai &amp; DuitNow QR (data sebenar &amp; asas sampel)
                   </p>
                 </div>
 
                 {/* Chart Mode + Period Selector Tabs */}
                 <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
                   <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
-                    <button
-                      type="button"
-                      onClick={() => setChartMode('area')}
-                      className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
-                        chartMode === 'area'
-                          ? 'bg-slate-800 dark:bg-zinc-700 text-white'
-                          : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
-                      }`}
-                    >
-                      Grafik
-                    </button>
                     <button
                       type="button"
                       onClick={() => setChartMode('bar')}
@@ -822,6 +885,17 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       }`}
                     >
                       Bar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setChartMode('area')}
+                      className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
+                        chartMode === 'area'
+                          ? 'bg-slate-800 dark:bg-zinc-700 text-white'
+                          : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
+                      }`}
+                    >
+                      Grafik
                     </button>
                   </div>
 
@@ -864,7 +938,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               </div>
 
               {/* Chart Content Area */}
-              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between min-w-0">
                 
                 {/* Metric Strip */}
                 <div className="grid grid-cols-3 gap-2 pb-4 mb-4 border-b border-slate-300 dark:border-zinc-600 text-center">
@@ -889,109 +963,115 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 </div>
 
                 {/* Interactive Recharts Chart */}
-                <div className="relative pt-2 pb-2">
-                  {periodMax === 0 ? (
-                    <div className="h-80 flex flex-col items-center justify-center text-center bg-slate-50 dark:bg-zinc-950 rounded-xl border border-dashed border-slate-300 dark:border-zinc-600 px-4">
-                      <BarChart3 className="w-8 h-8 text-black/35 dark:text-white/35 mb-2" />
-                      <p className="text-sm font-semibold text-black dark:text-white">Tiada Rekod Jualan Dalam Tempoh Ini</p>
-                      <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">
-                        Rekod jualan harian di tab Buku Tunai untuk memaparkan graf prestasi sebenar.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="h-80 w-full [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                      <ResponsiveContainer width="100%" height="100%">
-                        {chartMode === 'area' ? (
-                          <AreaChart data={chartBars} margin={{ top: 12, right: 14, left: -8, bottom: 4 }}>
-                            <defs>
-                              <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#10B981" stopOpacity={0.38} />
-                                <stop offset="100%" stopColor="#2563EB" stopOpacity={0.04} />
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                            <XAxis
-                              dataKey="label"
-                              tick={{ fontSize: 13.5, fontWeight: 600 }}
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <YAxis
-                              tick={{ fontSize: 13.5, fontWeight: 500 }}
-                              axisLine={false}
-                              tickLine={false}
-                              tickFormatter={(val) => `RM${val}`}
-                            />
-                            <Tooltip
-                              content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                  const d = payload[0].payload as { label: string; value: number; tx: number; qr: number };
-                                  return (
-                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                      <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.label}</div>
-                                      <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                      <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              }}
-                            />
-                            <Area
-                              type="monotone"
+                <div className="relative pt-2 pb-2 min-w-0">
+                  <div className="h-80 w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                    <ResponsiveContainer width="100%" height={320} minWidth={0}>
+                      {chartMode === 'area' ? (
+                        <AreaChart data={chartBars} margin={{ top: 20, right: 14, left: -4, bottom: 4 }}>
+                          <defs>
+                            <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#10B981" stopOpacity={0.38} />
+                              <stop offset="100%" stopColor="#2563EB" stopOpacity={0.04} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                          <XAxis
+                            dataKey="label"
+                            tick={{ fontSize: 13.5, fontWeight: 600 }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 13.5, fontWeight: 500 }}
+                            axisLine={false}
+                            tickLine={false}
+                            tickFormatter={(val) => `RM${val}`}
+                          />
+                          <Tooltip
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                const d = payload[0].payload as { label: string; value: number; tx: number; qr: number };
+                                return (
+                                  <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                    <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.label}</div>
+                                    <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
+                                    <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="value"
+                            stroke="#10B981"
+                            strokeWidth={2.5}
+                            fill="url(#beliaSalesGradient)"
+                            isAnimationActive={false}
+                            activeDot={{ r: 5, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
+                          />
+                        </AreaChart>
+                      ) : (
+                        <BarChart
+                          data={chartBars}
+                          barCategoryGap="16%"
+                          margin={{ top: 26, right: 14, left: -4, bottom: 4 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                          <XAxis
+                            dataKey="label"
+                            tick={{ fontSize: 13.5, fontWeight: 600 }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 13.5, fontWeight: 500 }}
+                            axisLine={false}
+                            tickLine={false}
+                            tickFormatter={(val) => `RM${val}`}
+                          />
+                          <Tooltip
+                            cursor={{ fill: 'rgba(37, 99, 235, 0.12)' }}
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                const d = payload[0].payload as { label: string; value: number; tx: number; qr: number };
+                                return (
+                                  <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                    <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.label}</div>
+                                    <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
+                                    <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar dataKey="value" fill="#2563EB" radius={[6, 6, 0, 0]} maxBarSize={56} isAnimationActive={false}>
+                            <LabelList
                               dataKey="value"
-                              stroke="#10B981"
-                              strokeWidth={2.5}
-                              fill="url(#beliaSalesGradient)"
-                              activeDot={{ r: 5, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
-                            />
-                          </AreaChart>
-                        ) : (
-                          <BarChart
-                            data={chartBars}
-                            barCategoryGap="14%"
-                            margin={{ top: 12, right: 14, left: -8, bottom: 4 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                            <XAxis
-                              dataKey="label"
-                              tick={{ fontSize: 13.5, fontWeight: 600 }}
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <YAxis
-                              tick={{ fontSize: 13.5, fontWeight: 500 }}
-                              axisLine={false}
-                              tickLine={false}
-                              tickFormatter={(val) => `RM${val}`}
-                            />
-                            <Tooltip
-                              cursor={{ fill: 'rgba(37, 99, 235, 0.12)' }}
-                              content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                  const d = payload[0].payload as { label: string; value: number; tx: number; qr: number };
-                                  return (
-                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                      <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.label}</div>
-                                      <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                      <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
-                                    </div>
-                                  );
-                                }
-                                return null;
+                              position="top"
+                              formatter={(val: unknown) => {
+                                const num = Number(val);
+                                return num > 0 ? `RM${num.toLocaleString()}` : '';
                               }}
+                              className="fill-slate-900 dark:fill-slate-100 font-mono"
+                              style={{ fontSize: 12, fontWeight: 700 }}
                             />
-                            <Bar dataKey="value" fill="#2563EB" radius={[6, 6, 0, 0]} maxBarSize={64} />
-                          </BarChart>
-                        )}
-                      </ResponsiveContainer>
-                    </div>
-                  )}
+                          </Bar>
+                        </BarChart>
+                      )}
+                    </ResponsiveContainer>
+                  </div>
                 </div>
 
                 {/* Footer notes & Cashflow shortcut */}
-                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex items-center justify-between text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80">
-                  <span className="leading-snug font-medium">Buku Tunai Transaksi Sah</span>
+                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex items-center justify-between text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 gap-2">
+                  <span className="leading-snug font-medium">
+                    {usesStarterSample
+                      ? 'Gabungan rekod semasa & sampel permulaan sistem'
+                      : 'Buku Tunai Transaksi Sah'}
+                  </span>
                   <button
                     type="button"
                     onClick={() => setActiveTab('cashflow')}

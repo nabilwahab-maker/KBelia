@@ -45,6 +45,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useScrollReveal, useCountUp } from '../hooks/useMotion';
+import { KelantanDistrictsMap } from './KelantanDistrictsMap';
 
 const RevealBlock: React.FC<{
   children: React.ReactNode;
@@ -93,6 +94,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [legalModalType, setLegalModalType] = useState<'privacy' | 'terms' | null>(null);
+  const [selectedMapDistrict, setSelectedMapDistrict] = useState<KelantanDistrict>('Semua Jajahan');
 
   const availableSlotsCount = slots.filter(s => s.status === 'available').length;
   const { ref: statsRef, isVisible: statsVisible } = useScrollReveal<HTMLDivElement>({ threshold: 0.08, rootMargin: '0px' });
@@ -1227,6 +1229,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               ));
             })()}
+          </RevealBlock>
+
+          <RevealBlock delayMs={120} className="mt-10">
+            <KelantanDistrictsMap
+              slots={slots}
+              selectedDistrict={selectedMapDistrict}
+              onSelectDistrict={setSelectedMapDistrict}
+              onSelectSlot={onSelectSlot}
+              onOpenBookingForDistrict={(_district, slot) => {
+                if (slot) onSelectSlot(slot);
+                else onOpenNewBooking();
+              }}
+            />
           </RevealBlock>
 
         </div>
