@@ -276,14 +276,14 @@ export const AdminB2BManager: React.FC = () => {
       {/* Header Banner */}
       <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+          <div className="flex items-center gap-2 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
             <Megaphone className="w-4 h-4" />
             <span>Kawalan Iklan Bergambar Pentadbir</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Pengurusan Ruang Niaga &amp; Iklan Bekalan
           </h3>
-          <p className="text-xs text-black dark:text-white/75 max-w-2xl leading-relaxed">
+          <p className="text-[0.9375rem] text-black dark:text-white/75 max-w-2xl leading-relaxed">
             Tambah iklan baharu beserta gambar produk, semak pratonton langsung kad iklan, atau kemas kini paparan Ruang Niaga usahawan belia.
           </p>
         </div>
@@ -292,7 +292,7 @@ export const AdminB2BManager: React.FC = () => {
           id="btn-admin-add-b2b"
           type="button"
           onClick={showForm ? () => setShowForm(false) : handleOpenCreate}
-          className="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 self-start lg:self-auto"
+          className="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 self-start lg:self-auto"
         >
           {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
           <span>{showForm ? 'Tutup Borang' : 'Tambah Iklan Bergambar'}</span>
@@ -302,19 +302,19 @@ export const AdminB2BManager: React.FC = () => {
       {/* Compact Stats Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-xs text-black/70 dark:text-white/75 font-medium">Jumlah Iklan</div>
+          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Jumlah Iklan</div>
           <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.total}</div>
         </div>
         <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-xs text-black/70 dark:text-white/75 font-medium">Tawaran Bekalan</div>
+          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Tawaran Bekalan</div>
           <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.supply}</div>
         </div>
         <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-xs text-black/70 dark:text-white/75 font-medium">Permintaan Belia</div>
+          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Permintaan Belia</div>
           <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.demand}</div>
         </div>
         <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-xs text-black/70 dark:text-white/75 font-medium">Iklan Bergambar</div>
+          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Iklan Bergambar</div>
           <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.withImage}</div>
         </div>
       </div>
@@ -336,7 +336,7 @@ export const AdminB2BManager: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleApplySampleTemplate}
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 hover:bg-slate-100 dark:hover:bg-zinc-800 text-black dark:text-white text-[11px] font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 hover:bg-slate-100 dark:hover:bg-zinc-800 text-black dark:text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                   <span>Isi Contoh Iklan</span>
@@ -360,14 +360,14 @@ export const AdminB2BManager: React.FC = () => {
             {/* Left Column: Form Fields + Image Dropzone */}
             <div className="lg:col-span-7 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   Jenis Iklan
                 </label>
                 <div className="grid grid-cols-2 gap-2.5">
                   <button
                     type="button"
                     onClick={() => setType('supply')}
-                    className={`py-2 px-3 text-xs font-bold rounded-xl border text-center transition-colors cursor-pointer ${
+                    className={`py-2 px-3 text-sm font-bold rounded-xl border text-center transition-colors cursor-pointer ${
                       type === 'supply'
                         ? 'bg-teal-600 text-white border-teal-600'
                         : 'bg-slate-50 text-black border-slate-300 dark:bg-zinc-950 dark:text-white/75 dark:border-zinc-600'
@@ -378,7 +378,7 @@ export const AdminB2BManager: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setType('demand')}
-                    className={`py-2 px-3 text-xs font-bold rounded-xl border text-center transition-colors cursor-pointer ${
+                    className={`py-2 px-3 text-sm font-bold rounded-xl border text-center transition-colors cursor-pointer ${
                       type === 'demand'
                         ? 'bg-amber-500 text-white border-amber-600'
                         : 'bg-slate-50 text-black border-slate-300 dark:bg-zinc-950 dark:text-white/75 dark:border-zinc-600'
@@ -390,8 +390,8 @@ export const AdminB2BManager: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  Tajuk Iklan <span className="text-black/70 dark:text-white/75">*</span>
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  Tajuk Iklan <span className="text-black dark:text-white">*</span>
                 </label>
                 <input
                   type="text"
@@ -399,15 +399,15 @@ export const AdminB2BManager: React.FC = () => {
                   maxLength={200}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="cth. Pembekal Pes Sambal & Kopi Sangai Kiosk Belia"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 font-semibold"
+                  placeholder="Masukkan tajuk iklan"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 font-semibold"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    Nama Perniagaan / Pembekal <span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                    Nama Perniagaan <span className="text-black dark:text-white">*</span>
                   </label>
                   <input
                     type="text"
@@ -415,19 +415,19 @@ export const AdminB2BManager: React.FC = () => {
                     maxLength={150}
                     value={authorBusiness}
                     onChange={(e) => setAuthorBusiness(e.target.value)}
-                    placeholder="cth. Aroma Dapur Pantai"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                    placeholder="Masukkan nama perniagaan"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    Jajahan Operasi
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                    Daerah
                   </label>
                   <select
                     value={district}
                     onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
                   >
                     {DISTRICTS.map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -438,22 +438,22 @@ export const AdminB2BManager: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    Nama Wakil / Pegawai
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                    Nama Wakil
                   </label>
                   <input
                     type="text"
                     maxLength={120}
                     value={authorName}
                     onChange={(e) => setAuthorName(e.target.value)}
-                    placeholder="Nama penyiar"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                    placeholder="Masukkan nama wakil"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    Nombor WhatsApp <span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                    Nombor Telefon <span className="text-black dark:text-white">*</span>
                   </label>
                   <input
                     type="tel"
@@ -461,29 +461,28 @@ export const AdminB2BManager: React.FC = () => {
                     maxLength={30}
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
-                    placeholder="0123456789"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                    placeholder="Masukkan nombor telefon"
+                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  Penerangan Terperinci
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  Keterangan Iklan
                 </label>
                 <textarea
                   rows={3}
                   maxLength={1500}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Nyatakan kuantiti bekalan, harga anggaran borong, atau syarat penghantaran..."
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                  placeholder="Masukkan keterangan iklan"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
                 />
               </div>
 
               <ImageDropzone
-                label="Muat Naik Gambar Iklan / Produk"
-                sublabel="Heret & lepas gambar atau klik untuk pilih dari peranti anda (JPG, PNG, WebP). Gambar dimampatkan secara automatik."
+                label="Gambar Iklan"
                 value={imageUrl}
                 onChange={setImageUrl}
                 aspectRatio="landscape"
@@ -496,14 +495,14 @@ export const AdminB2BManager: React.FC = () => {
                     setShowForm(false);
                     resetForm();
                   }}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 text-xs font-semibold text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 text-sm font-semibold text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold inline-flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
                 >
                   <Save className="w-4 h-4" />
                   <span>
@@ -541,8 +540,8 @@ export const AdminB2BManager: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari tajuk iklan, perniagaan, atau jajahan..."
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+            placeholder="Masukkan kata kunci carian"
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
           />
         </div>
 
@@ -556,7 +555,7 @@ export const AdminB2BManager: React.FC = () => {
               key={tab.id}
               type="button"
               onClick={() => setFilterType(tab.id)}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 filterType === tab.id
                   ? 'bg-white dark:bg-zinc-800 text-black dark:text-white shadow-2xs'
                   : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -598,7 +597,7 @@ export const AdminB2BManager: React.FC = () => {
                 <div className="p-4 space-y-2.5">
                   <div className="flex items-center justify-between gap-2">
                     <span
-                      className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${
+                      className={`px-2 py-0.5 rounded text-[0.8125rem] font-semibold border ${
                         item.type === 'supply'
                           ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-900/40'
                           : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800/40'
@@ -606,7 +605,7 @@ export const AdminB2BManager: React.FC = () => {
                     >
                       {item.type === 'supply' ? 'Membekal (Tawaran)' : 'Mencari Bekalan'}
                     </span>
-                    <span className="text-[11px] text-black/70 dark:text-white/75 font-mono">
+                    <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono">
                       {item.date}
                     </span>
                   </div>
@@ -615,18 +614,18 @@ export const AdminB2BManager: React.FC = () => {
                     <h4 className="text-sm font-bold text-black dark:text-white leading-snug">
                       {item.title}
                     </h4>
-                    <div className="text-[11px] text-black/70 dark:text-white/75 font-medium mt-0.5">
+                    <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-medium mt-0.5">
                       <span className="font-semibold text-black dark:text-white">{item.authorBusiness}</span>
                       <span> · </span>
                       <span>{item.authorName}</span>
                     </div>
                   </div>
 
-                  <p className="text-xs text-black/80 dark:text-white/80 leading-relaxed line-clamp-2">
+                  <p className="text-[0.9375rem] text-black/80 dark:text-white/80 leading-relaxed line-clamp-2">
                     {item.description}
                   </p>
 
-                  <div className="flex items-center justify-between text-[11px] text-black/70 dark:text-white/75 pt-1">
+                  <div className="flex items-center justify-between text-[0.8125rem] text-black/70 dark:text-white/75 pt-1">
                     <span className="inline-flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 shrink-0" />
                       {item.district}
@@ -643,7 +642,7 @@ export const AdminB2BManager: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleOpenEdit(item)}
-                  className="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-800 text-black dark:text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-800 text-black dark:text-white text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   <span>Edit</span>
@@ -651,7 +650,7 @@ export const AdminB2BManager: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleDelete(item)}
-                  className="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 hover:bg-rose-100 text-rose-700 dark:text-rose-300 text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 hover:bg-rose-100 text-black dark:text-white text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Padam</span>

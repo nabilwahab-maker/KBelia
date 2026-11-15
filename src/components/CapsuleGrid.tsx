@@ -119,28 +119,28 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
     switch (status) {
       case 'available':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white dark:bg-slate-800 text-black dark:text-white/75 border border-emerald-200 dark:border-emerald-800/60 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-white dark:bg-slate-800 text-black dark:text-white/75 border border-emerald-200 dark:border-emerald-800/60 shadow-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             Tersedia
           </span>
         );
       case 'occupied':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 shadow-xs">
             <CheckCircle2 className="w-3 h-3 text-black/70 dark:text-white/75" />
             Sedang Beroperasi
           </span>
         );
       case 'reserved':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white dark:bg-slate-800 text-black dark:text-white/75 border border-amber-200 dark:border-amber-800/60 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-white dark:bg-slate-800 text-black dark:text-white/75 border border-amber-200 dark:border-amber-800/60 shadow-xs">
             <Clock className="w-3 h-3 text-black/70 dark:text-white/75" />
             Dalam Tempahan
           </span>
         );
       case 'maintenance':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 shadow-xs">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-white dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 shadow-xs">
             Penyelenggaraan
           </span>
         );
@@ -156,7 +156,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
             Senarai Kiosk Belia Kelantan
           </h1>
-          <p className="text-black/75 dark:text-white/75 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
+          <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
             Pilih dan sewa ruang niaga serba lengkap di lokasi strategik universiti dan pusat bandar untuk memulakan perniagaan anda dengan modal rendah.
           </p>
         </div>
@@ -166,7 +166,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           onAddSlot && (
             <button
               onClick={onAddSlot}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
             >
               <Building2 className="w-4 h-4" />
               <span>Daftar Kiosk Baharu</span>
@@ -175,7 +175,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
         ) : (
           <button
             onClick={onOpenNewBooking}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
           >
             <Send className="w-4 h-4" />
             <span>Mohon Kiosk</span>
@@ -190,8 +190,8 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
             <Building2 className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs font-bold text-black dark:text-white">Kemudahan Kiosk Belia</div>
-            <p className="text-xs text-black dark:text-white/75 leading-relaxed mt-0.5">
+            <div className="text-sm font-bold text-black dark:text-white">Kemudahan Kiosk Belia</div>
+            <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed mt-0.5">
               Setiap unit kiosk dilengkapi soket elektrik 13A, Wi-Fi laju, pembayaran DuitNow QR, dan sokongan pameran rasmi.
             </p>
           </div>
@@ -209,8 +209,8 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari kod pod, nama kiosk, atau lokasi hab..."
-              className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all font-medium dark:focus:border-blue-500"
+              placeholder="Masukkan kata kunci carian"
+              className="w-full pl-9 pr-8 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all font-medium dark:focus:border-blue-500"
             />
             {searchQuery && (
               <button
@@ -226,7 +226,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
           {/* Right Controls: Filter Count & Reset */}
           <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70">
               <strong className="font-bold tabular-nums">{filteredSlots.length}</strong> pod sepadan
             </span>
 
@@ -234,7 +234,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-black dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-black dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 title="Tetapkan semula tapisan"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -248,7 +248,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
         <div className="pt-3.5 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
           {/* Hab Location Segmented Tabs */}
           <div className="lg:col-span-6 space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] font-bold text-black/70 dark:text-white/75 uppercase tracking-wider">
+            <div className="flex items-center justify-between text-[0.8125rem] font-bold text-black/70 dark:text-white/75 uppercase tracking-wider">
               <span className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75" />
                 Pilihan Hab Lokasi
@@ -263,7 +263,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                     key={hub}
                     type="button"
                     onClick={() => setSelectedHub(hub)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                       isActive
                         ? 'bg-blue-600 text-white font-bold shadow-xs dark:bg-blue-600'
                         : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/50'
@@ -278,7 +278,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
           {/* Status Segmented Buttons */}
           <div className="lg:col-span-3 space-y-1.5">
-            <div className="text-[11px] font-bold text-black/70 dark:text-white/75 uppercase tracking-wider">
+            <div className="text-[0.8125rem] font-bold text-black/70 dark:text-white/75 uppercase tracking-wider">
               Status Pod
             </div>
             <div className="p-1 bg-slate-50 dark:bg-slate-900 rounded-xl flex items-center gap-1 border border-slate-300 dark:border-slate-600">
@@ -294,7 +294,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                     key={st.id}
                     type="button"
                     onClick={() => setSelectedStatus(st.id)}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                    className={`flex-1 py-1.5 px-2 rounded-lg text-[0.8125rem] font-medium text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       isActive
                         ? 'bg-white dark:bg-slate-800 text-black dark:text-white font-bold shadow-xs border border-slate-300 dark:border-slate-600'
                         : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -310,12 +310,12 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
           {/* Integrated Modern Budget Slider */}
           <div className="lg:col-span-3 space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] font-bold text-black/70 dark:text-white/75 uppercase tracking-wider">
+            <div className="flex items-center justify-between text-[0.8125rem] font-bold text-black/70 dark:text-white/75 uppercase tracking-wider">
               <span className="flex items-center gap-1">
                 <SlidersHorizontal className="w-3 h-3 text-black dark:text-white/75" />
                 Had Bajet Sewa
               </span>
-              <span className="font-extrabold text-black dark:text-white/75 font-mono text-xs">
+              <span className="font-extrabold text-black dark:text-white/75 font-mono text-[0.8125rem]">
                 RM {maxBudget}/bln
               </span>
             </div>
@@ -331,7 +331,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                   className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
               </div>
-              <div className="flex justify-between text-[9px] text-black/70 dark:text-white/75 font-mono mt-0.5">
+              <div className="flex justify-between text-[0.8125rem] text-black/70 dark:text-white/75 font-mono mt-0.5">
                 <span>RM 100</span>
                 <span>RM 500</span>
               </div>
@@ -345,7 +345,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
         <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600">
           <Building2 className="w-12 h-12 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <h3 className="text-base font-bold text-black dark:text-white">Tiada Kiosk Dijumpai</h3>
-          <p className="text-xs text-black/70 dark:text-white/75 mt-1">Cuba tukar pilihan lokasi atau status kiosk.</p>
+          <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">Cuba tukar pilihan lokasi atau status kiosk.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -403,7 +403,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                   
                   {/* Top Left: Code Badge */}
                   <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 bg-slate-900/80 backdrop-blur-xs text-white text-[11px] font-mono font-bold rounded-lg border border-white/15 shadow-xs">
+                    <span className="px-2.5 py-1 bg-slate-900/80 backdrop-blur-xs text-white text-[0.8125rem] font-mono font-bold rounded-lg border border-white/15 shadow-xs">
                       {slot.code}
                     </span>
                   </div>
@@ -411,7 +411,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                   {/* Top Right: Status Badge (Dynamic & Accurate) */}
                   <div className="absolute top-3 right-3">
                     {myBooking ? (
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold text-white shadow-xs ${
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold text-white shadow-xs ${
                         myBooking.status === 'approved' ? 'bg-emerald-600' : 'bg-amber-600'
                       }`}>
                         {myBooking.status === 'approved' ? (
@@ -422,21 +422,21 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                         <span>Pendaftaran Anda ({myBooking.status === 'approved' ? 'Diluluskan' : 'Disemak'})</span>
                       </span>
                     ) : isOccupiedOrTenant ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-900/85 text-white border border-white/15 shadow-xs backdrop-blur-xs">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-slate-900/85 text-white border border-white/15 shadow-xs backdrop-blur-xs">
                         <Lock className="w-3 h-3 text-white/90" />
                         <span>Telah Berdaftar</span>
                       </span>
                     ) : isReserved ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-600/95 text-white border border-amber-500/50 shadow-xs">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-amber-600/95 text-white border border-amber-500/50 shadow-xs">
                         <Clock className="w-3 h-3" />
                         <span>Dalam Tempahan</span>
                       </span>
                     ) : isMaintenance ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-700 text-white shadow-xs">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-rose-700 text-white shadow-xs">
                         Penyelenggaraan
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white dark:bg-slate-800 text-black dark:text-white/75 border border-emerald-200 dark:border-emerald-800/60 shadow-xs">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-white dark:bg-slate-800 text-black dark:text-white/75 border border-emerald-200 dark:border-emerald-800/60 shadow-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span>Tersedia untuk Belia</span>
                       </span>
@@ -453,7 +453,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                         <h3 className="font-bold text-black dark:text-white text-base group-hover:text-black dark:group-hover:text-white transition-colors duration-200 leading-snug">
                           {slot.name}
                         </h3>
-                        <div className="flex items-center justify-between gap-1.5 text-xs text-black/70 dark:text-white/75 mt-1">
+                        <div className="flex items-center justify-between gap-1.5 text-sm text-black/70 dark:text-white/75 mt-1">
                           <div className="flex items-center gap-1.5 truncate">
                             <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                             <span className="truncate font-medium">{slot.hubLocation} ({slot.district})</span>
@@ -463,7 +463,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold text-black dark:text-white/75 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors shrink-0"
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[0.8125rem] font-bold text-black dark:text-white/75 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors shrink-0"
                             title={language === 'en' ? 'Open in Google Maps' : 'Buka lokasi di Google Maps'}
                           >
                             <ExternalLink className="w-3 h-3" />
@@ -474,18 +474,18 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
                       {/* Pricing Block */}
                       <div className="text-right shrink-0">
-                        <span className="text-[11px] font-semibold text-black dark:text-white/75 block mb-0.5">
+                        <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75 block mb-0.5">
                           Subsidi {subsidyRate}%
                         </span>
                         <div>
                           <span className="text-lg font-bold text-black dark:text-white tabular-nums">RM{slot.monthlyRate}</span>
-                          <span className="text-xs text-black/70 dark:text-white/75">/bln</span>
+                          <span className="text-sm text-black/70 dark:text-white/75">/bln</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Specifications Bar (Size & Jajahan) */}
-                    <div className="py-2 px-3 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-300 dark:border-slate-600 flex items-center justify-between text-xs">
+                    <div className="py-2 px-3 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm">
                       <span className="text-black/70 dark:text-white/75">
                         Saiz: <strong className="text-black dark:text-white font-semibold">{slot.size}</strong>
                       </span>
@@ -496,27 +496,27 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
                     {/* Registration / Occupancy Status Card */}
                     {myBooking ? (
-                      <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-lg flex items-center justify-between text-xs">
+                      <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-lg flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2 text-black dark:text-white font-medium min-w-0">
                           <ShieldCheck className="w-4 h-4 text-black dark:text-white shrink-0" />
                           <span className="truncate">Permohonan Anda: {myBooking.businessName || 'Didaftarkan'}</span>
                         </div>
-                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900 text-black dark:text-white shrink-0">
+                        <span className="text-[0.8125rem] font-bold uppercase px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900 text-black dark:text-white shrink-0">
                           {myBooking.status === 'approved' ? 'Aktif' : 'Semakan'}
                         </span>
                       </div>
                     ) : isRegistered ? (
-                      <div className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg flex items-center justify-between text-xs">
+                      <div className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2 min-w-0">
                           <Store className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0" />
                           <div className="min-w-0">
-                            <span className="text-[10px] text-black/70 dark:text-white/75 block font-normal">Status Pengisian:</span>
-                            <span className="text-xs font-semibold text-black dark:text-white truncate block">
+                            <span className="text-[0.8125rem] text-black/70 dark:text-white/75 block font-normal">Status Pengisian:</span>
+                            <span className="text-sm font-semibold text-black dark:text-white truncate block">
                               {slot.currentTenantBusinessName ? `Dioperasi oleh: ${slot.currentTenantBusinessName}` : 'Pendaftaran Penuh / Beroperasi'}
                             </span>
                           </div>
                         </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-black dark:text-white shrink-0 ml-2">
+                        <span className="text-[0.8125rem] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-black dark:text-white shrink-0 ml-2">
                           Telah Berdaftar
                         </span>
                       </div>
@@ -524,12 +524,12 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
                     {/* Amenities list */}
                     <div className="space-y-1.5">
-                      <span className="text-[11px] font-semibold text-black dark:text-white">Kemudahan Termasuk:</span>
+                      <span className="text-[0.8125rem] font-semibold text-black dark:text-white">Kemudahan Termasuk:</span>
                       <div className="flex flex-wrap gap-1.5">
                         {(slot.amenities || []).map((amenity, idx) => (
                           <span
                             key={idx}
-                            className="text-[10px] font-medium bg-slate-50 dark:bg-slate-900 text-black dark:text-white border border-slate-300 dark:border-slate-600 px-2 py-0.5 rounded-md"
+                            className="text-[0.8125rem] font-medium bg-slate-50 dark:bg-slate-900 text-black dark:text-white border border-slate-300 dark:border-slate-600 px-2 py-0.5 rounded-md"
                           >
                             {amenity}
                           </span>
@@ -547,7 +547,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                           e.stopPropagation();
                           if (onViewTenantDetail) onViewTenantDetail(slot);
                         }}
-                        className="w-full py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs"
+                        className="w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Pendaftaran Anda ({myBooking.status === 'approved' ? 'Telah Diluluskan' : 'Sedang Disemak'})</span>
@@ -560,14 +560,14 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                           e.stopPropagation();
                           if (onViewTenantDetail) onViewTenantDetail(slot);
                         }}
-                        className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer bg-slate-50 hover:bg-slate-100 text-black dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-slate-300 dark:border-slate-600"
+                        className="w-full py-2.5 px-4 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer bg-slate-50 hover:bg-slate-100 text-black dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-slate-300 dark:border-slate-600"
                       >
                         <Lock className="w-3.5 h-3.5 text-black/70 dark:text-white/75 shrink-0" />
                         <span>Telah Berdaftar (Lihat Butiran Penyewa)</span>
                         <ArrowRight className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
                       </button>
                     ) : isReadOnly ? (
-                      <div className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold text-center bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 flex items-center justify-center gap-2">
+                      <div className="w-full py-2.5 px-4 rounded-lg text-sm font-semibold text-center bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 flex items-center justify-center gap-2">
                         <Eye className="w-3.5 h-3.5 text-black dark:text-white/75" />
                         <span>Status: Kekosongan Tersedia (Dipantau)</span>
                       </div>
@@ -578,7 +578,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                           e.stopPropagation();
                           onSelectSlot(slot);
                         }}
-                        className="w-full py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm dark:bg-blue-600"
+                        className="w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm dark:bg-blue-600"
                       >
                         <span>Mohon Kiosk Ini (RM{slot.monthlyRate}/bln)</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -603,7 +603,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
             <h3 className="text-base font-bold text-black dark:text-white">
               Panduan &amp; Soalan Lazim Kiosk Belia (FAQ)
             </h3>
-            <p className="text-xs text-black/70 dark:text-white/75">
+            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
               Ketahui syarat kelayakan, subsidi sewaan dan kemudahan yang disediakan bagi setiap kiosk.
             </p>
           </div>
@@ -616,7 +616,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               title: 'Siapakah yang layak memohon Kiosk Belia?',
               badge: 'Syarat Utama',
               content: (
-                <div className="text-xs text-black dark:text-white space-y-2 leading-relaxed">
+                <div className="text-sm text-black dark:text-white space-y-2 leading-relaxed">
                   <p>Inisiatif ini terbuka kepada:</p>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>Belia warganegara Malaysia berumur antara 18 hingga 40 tahun.</li>
@@ -632,7 +632,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               title: 'Bagaimanakah penstrukturan subsidi sewaan 50% dilaksanakan?',
               badge: 'RM150 / Bulan',
               content: (
-                <div className="text-xs text-black dark:text-white space-y-2 leading-relaxed">
+                <div className="text-sm text-black dark:text-white space-y-2 leading-relaxed">
                   <p>
                     Kadar pasaran komersial bagi pod niaga modular ini adalah <strong>RM 300 sebulan</strong>. Kerajaan Negeri Kelantan melalui Universiti Malaysia Kelantan (UMK) menyerap subsidi 50% sebanyak <strong>RM 150 sebulan</strong> untuk setiap usahawan belia terpilih.
                   </p>
@@ -647,7 +647,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               title: 'Apakah kemudahan yang disertakan dalam setiap unit pod kiosk?',
               badge: 'Serba Lengkap',
               content: (
-                <div className="text-xs text-black dark:text-white space-y-2 leading-relaxed">
+                <div className="text-sm text-black dark:text-white space-y-2 leading-relaxed">
                   <p>Setiap unit kapsul telah sedia dilengkapi dengan:</p>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>Palam kuasa elektrik individu 13A dengan meter pemantauan selamat.</li>
@@ -663,7 +663,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               title: 'Berapa lamakah tempoh semakan dan bagaimana tawaran disahkan?',
               badge: '48 Jam',
               content: (
-                <div className="text-xs text-black dark:text-white space-y-2 leading-relaxed">
+                <div className="text-sm text-black dark:text-white space-y-2 leading-relaxed">
                   <p>
                     Permohonan disemak oleh jawatankuasa urusetia UMK dalam masa <strong>48 jam waktu bekerja</strong>.
                   </p>

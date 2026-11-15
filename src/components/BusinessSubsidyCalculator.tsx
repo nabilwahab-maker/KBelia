@@ -58,12 +58,12 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-slate-300 dark:border-slate-600">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-black dark:text-white/75">
+            <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold tracking-wider uppercase text-black dark:text-white/75">
               <Calculator className="w-3.5 h-3.5 text-black dark:text-white/75" />
               {t('calc_badge')}
             </span>
             <span className="text-black/35 dark:text-white/35">·</span>
-            <span className="text-xs text-black/70 dark:text-white/75 font-medium">
+            <span className="text-sm text-black/70 dark:text-white/75 font-medium">
               {t('calc_subtitle')}
             </span>
           </div>
@@ -79,15 +79,12 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
           {/* Daily Sales Numeric Input */}
           <div className="rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-black dark:text-white">
+              <label className="text-sm font-bold text-black dark:text-white">
                 {t('daily_sales_label')}
               </label>
-              <span className="text-xs font-semibold text-black/70 dark:text-white/75">
-                {t('manual_type')}
-              </span>
             </div>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-black/70 dark:text-white/75 pointer-events-none">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-black/70 dark:text-white/75 pointer-events-none">
                 RM
               </span>
               <input
@@ -99,7 +96,8 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                   const val = Number(e.target.value);
                   setDailySales(val >= 0 ? val : 0);
                 }}
-                className="w-full pl-11 pr-4 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 font-mono dark:focus:border-blue-500"
+                placeholder={language === 'en' ? 'Enter amount' : 'Masukkan jumlah'}
+                className="w-full pl-11 pr-4 py-2 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 font-mono dark:focus:border-blue-500"
               />
             </div>
             <div className="flex items-center gap-1.5 mt-2 overflow-x-auto pb-0.5">
@@ -108,7 +106,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                   key={sales}
                   type="button"
                   onClick={() => setDailySales(sales)}
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer shrink-0 ${
+                  className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 ${
                     dailySales === sales
                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
                       : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
@@ -124,7 +122,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold text-black dark:text-white">
+                <label className="text-sm font-bold text-black dark:text-white">
                   {t('margin_label')}
                 </label>
               </div>
@@ -138,9 +136,10 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                     const val = Number(e.target.value);
                     setMarginPct(val > 0 ? val : 10);
                   }}
-                  className="w-full pl-3.5 pr-8 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 font-mono dark:focus:border-blue-500"
+                  placeholder={language === 'en' ? 'Enter percentage' : 'Masukkan peratus'}
+                  className="w-full pl-3.5 pr-8 py-2 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 font-mono dark:focus:border-blue-500"
                 />
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-black/70 dark:text-white/75 pointer-events-none">
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-black/70 dark:text-white/75 pointer-events-none">
                   %
                 </span>
               </div>
@@ -150,7 +149,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                     key={pct}
                     type="button"
                     onClick={() => setMarginPct(pct)}
-                    className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer ${
                       marginPct === pct
                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
                         : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
@@ -164,7 +163,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
 
             <div className="rounded-2xl p-4 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold text-black dark:text-white">
+                <label className="text-sm font-bold text-black dark:text-white">
                   {t('operating_days_label')}
                 </label>
               </div>
@@ -178,9 +177,10 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                     const val = Number(e.target.value);
                     setOperatingDays(val > 0 ? val : 1);
                   }}
-                  className="w-full pl-3.5 pr-14 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 font-mono dark:focus:border-blue-500"
+                  placeholder={language === 'en' ? 'Enter operating days' : 'Masukkan bilangan hari'}
+                  className="w-full pl-3.5 pr-14 py-2 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-bold focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 font-mono dark:focus:border-blue-500"
                 />
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-black/70 dark:text-white/75 pointer-events-none">
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-black/70 dark:text-white/75 pointer-events-none">
                   {language === 'en' ? 'Days' : 'Hari'}
                 </span>
               </div>
@@ -190,7 +190,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                     key={d}
                     type="button"
                     onClick={() => setOperatingDays(d)}
-                    className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer ${
                       operatingDays === d
                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
                         : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
@@ -210,10 +210,10 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                 <Coins className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xs font-bold text-black dark:text-white block">
+                <span className="text-sm font-bold text-black dark:text-white block">
                   {t('subsidy_savings_banner_title')}
                 </span>
-                <span className="text-xs text-black dark:text-white/75">
+                <span className="text-sm text-black dark:text-white/75">
                   {t('subsidy_savings_banner_desc')}
                 </span>
               </div>
@@ -222,7 +222,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
               <span className="text-base font-extrabold text-black dark:text-white tabular-nums block">
                 {t('saved_per_year').replace('{amount}', annualSavings.toLocaleString())}
               </span>
-              <span className="text-[10px] font-semibold text-black dark:text-white/75">
+              <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
                 {t('saved_subtext')}
               </span>
             </div>
@@ -232,27 +232,27 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
         {/* Right Results Spotlight */}
         <div className="xl:col-span-5 flex flex-col gap-4 w-full min-w-0">
           <div className="rounded-2xl bg-slate-50 dark:bg-slate-900 p-6 shadow-xs border border-emerald-200 dark:border-emerald-800/70 relative overflow-hidden">
-            <span className="text-[11px] font-bold text-black dark:text-white/75 uppercase tracking-wider block mb-1">
+            <span className="text-[0.8125rem] font-bold text-black dark:text-white/75 uppercase tracking-wider block mb-1">
               {t('monthly_projection_title')}
             </span>
             <div className="flex items-baseline gap-2 mb-4">
               <span className="text-3xl font-extrabold text-black dark:text-white tabular-nums tracking-tight">
                 RM {netProfit.toLocaleString()}
               </span>
-              <span className="text-xs text-black/70 dark:text-white/75 font-medium">
+              <span className="text-sm text-black/70 dark:text-white/75 font-medium">
                 {t('net_profit_subtext')}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-300 dark:border-slate-600 text-xs">
+            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-300 dark:border-slate-600 text-sm">
               <div>
-                <span className="text-black/70 dark:text-white/75 block text-[11px]">{language === 'en' ? 'Gross Revenue:' : 'Jumlah Jualan Kasar:'}</span>
+                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">{language === 'en' ? 'Gross Revenue:' : 'Jumlah Jualan Kasar:'}</span>
                 <span className="font-bold text-black dark:text-white tabular-nums">
                   RM {monthlyRevenue.toLocaleString()}
                 </span>
               </div>
               <div>
-                <span className="text-black/70 dark:text-white/75 block text-[11px]">{t('break_even_target_label')}</span>
+                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">{t('break_even_target_label')}</span>
                 <span className="font-bold text-black dark:text-white/75 tabular-nums">
                   RM {dailyBreakEven} / {language === 'en' ? 'day' : 'hari'}
                 </span>
@@ -261,7 +261,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
 
             {/* Zakat Estimator */}
             {isZakatEligible && (
-              <div className="mt-4 pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-xs text-black dark:text-white">
+              <div className="mt-4 pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm text-black dark:text-white">
                 <span className="flex items-center gap-1">
                   <Landmark className="w-3.5 h-3.5 text-black dark:text-white/75" />
                   {t('zakat_nisab_label')}
@@ -276,14 +276,14 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
           {/* Recommended Action Card */}
           <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 p-5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-black dark:text-white/75 mb-1.5">
+              <div className="flex items-center gap-1.5 text-sm font-bold text-black dark:text-white/75 mb-1.5">
                 <Sparkles className="w-3.5 h-3.5" />
                 {t('grant_recommendation_title')}
               </div>
               <h4 className="text-sm font-bold text-black dark:text-white">
                 {recommendedGrant.title} ({recommendedGrant.amount})
               </h4>
-              <p className="text-xs text-black dark:text-white mt-1 leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white mt-1 leading-relaxed">
                 {language === 'en' 
                   ? `Based on projected sales of RM${dailySales}/day, you qualify to apply for this startup capital assistance to cover raw materials or digital POS equipment.`
                   : `Berdasarkan unjuran jualan RM${dailySales}/hari, anda layak memohon bantuan modal permulaan ini untuk menampung kos bahan mentah atau sistem POS digital.`}
@@ -295,7 +295,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                 <button
                   type="button"
                   onClick={() => onOpenGrantModal(recommendedGrant.title, recommendedGrant.amount)}
-                  className="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-black dark:text-white bg-emerald-50 hover:bg-amber-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-emerald-800/70 transition-colors text-center cursor-pointer"
+                  className="flex-1 py-2 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-emerald-50 hover:bg-amber-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-emerald-800/70 transition-colors text-center cursor-pointer"
                 >
                   {t('apply_this_grant_btn')}
                 </button>
@@ -304,7 +304,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                 <button
                   type="button"
                   onClick={onOpenBooking}
-                  className="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors text-center flex items-center justify-center gap-1 cursor-pointer shadow-xs dark:bg-blue-600"
+                  className="flex-1 py-2 px-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors text-center flex items-center justify-center gap-1 cursor-pointer shadow-xs dark:bg-blue-600"
                 >
                   {t('book_kiosk_btn')} <ArrowRight className="w-3 h-3" />
                 </button>

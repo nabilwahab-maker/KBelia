@@ -70,7 +70,7 @@ export const SessionTimeoutModal: React.FC = () => {
         </h2>
 
         {/* Account Context Line (clean unboxed metadata) */}
-        <div className="mt-1.5 flex items-center justify-center gap-1.5 text-xs text-black/70 dark:text-white/75">
+        <div className="mt-1.5 flex items-center justify-center gap-1.5 text-sm text-black/70 dark:text-white/75">
           <span className="font-semibold text-black dark:text-white truncate max-w-[200px]">
             {userProfile?.fullName || user.displayName || user.email}
           </span>
@@ -81,7 +81,7 @@ export const SessionTimeoutModal: React.FC = () => {
         {/* Main Idle Termination Message with Live Tabular Countdown */}
         <p
           id="session-timeout-desc"
-          className="mt-3 text-sm sm:text-[15px] text-black dark:text-white leading-relaxed"
+          className="mt-3 text-sm sm:text-[0.9375rem] text-black dark:text-white leading-relaxed"
         >
           {isEn ? (
             <>
@@ -113,7 +113,7 @@ export const SessionTimeoutModal: React.FC = () => {
           <button
             type="button"
             onClick={terminateSessionNow}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-black/75 dark:text-white/75 hover:bg-rose-100 dark:hover:bg-rose-950/60 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-black/75 dark:text-white/75 hover:bg-rose-100 dark:hover:bg-rose-950/60 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>{isEn ? 'Sign out now' : 'Log keluar sekarang'}</span>

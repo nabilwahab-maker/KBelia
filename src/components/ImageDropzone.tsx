@@ -143,11 +143,11 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({
   return (
     <div className="space-y-1.5 w-full">
       <div className="flex items-center justify-between">
-        <label className="block text-xs font-bold text-black dark:text-white">
+        <label className="block text-sm font-bold text-black dark:text-white">
           {label}
         </label>
         {value && (
-          <span className="text-[11px] font-semibold text-black dark:text-white/75 flex items-center gap-1">
+          <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75 flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Imej dipilih</span>
           </span>
@@ -173,14 +173,14 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="px-3 py-1.5 bg-white text-black rounded-xl text-xs font-bold shadow-md hover:bg-slate-100 transition-colors cursor-pointer"
+              className="px-3 py-1.5 bg-white text-black rounded-xl text-sm font-bold shadow-md hover:bg-slate-100 transition-colors cursor-pointer"
             >
               Tukar Imej
             </button>
             <button
               type="button"
               onClick={handleRemove}
-              className="p-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-rose-700 transition-colors cursor-pointer"
+              className="p-1.5 bg-rose-600 text-white rounded-xl text-sm font-bold shadow-md hover:bg-rose-700 transition-colors cursor-pointer"
               title="Padam Imej"
             >
               <X className="w-4 h-4" />
@@ -202,17 +202,17 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({
           <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-2xs border border-slate-300 dark:border-slate-600 flex items-center justify-center mb-2.5 text-black dark:text-white/75">
             <Upload className="w-5 h-5" />
           </div>
-          <div className="text-xs font-bold text-black dark:text-white">
+          <div className="text-sm font-bold text-black dark:text-white">
             Tekan untuk muat naik atau heret fail ke sini
           </div>
-          <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 max-w-sm">
+          <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5 max-w-sm">
             {sublabel}
           </p>
         </div>
       )}
 
       {error && (
-        <p className="text-xs font-semibold text-black dark:text-white/75 mt-1">
+        <p className="text-[0.9375rem] font-semibold text-black dark:text-white/75 mt-1">
           {error}
         </p>
       )}

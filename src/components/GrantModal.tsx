@@ -218,7 +218,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white tracking-tight">
                 Permohonan Geran &amp; Bantuan Modal
               </h3>
-              <p className="text-xs text-black dark:text-white">
+              <p className="text-[0.9375rem] text-black dark:text-white">
                 Skim Bantuan Modal Perniagaan Negeri Kelantan &amp; UMK
               </p>
             </div>
@@ -248,7 +248,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer dark:bg-emerald-600"
+                  className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer dark:bg-emerald-600"
                 >
                   Selesai & Kembali ke Dashboard
                 </button>
@@ -258,7 +258,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
             <form onSubmit={handleSubmit} className="space-y-5">
               
               {!user && (
-                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm">
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 rounded-xl flex items-center justify-between gap-3 text-sm sm:text-[0.9375rem]">
                   <span className="text-black dark:text-white font-medium">
                     Sila log masuk untuk menghantar permohonan geran rasmi.
                   </span>
@@ -273,7 +273,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               )}
 
               {error && (
-                <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-black dark:text-white text-xs sm:text-sm rounded-lg flex items-center gap-2">
+                <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-black dark:text-white text-sm sm:text-[0.9375rem] rounded-lg flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -282,12 +282,9 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               {/* Selectable Scheme Cards */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <label className="block text-xs sm:text-sm font-medium text-black dark:text-white">
-                    Pilih Skim Geran Bantuan: <span className="text-black dark:text-white">*</span>
+                  <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white">
+                    Skim Geran Bantuan *
                   </label>
-                  <span className="text-[11px] text-black/70 dark:text-white/75">
-                    Pilih mengikut keperluan modal anda
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3">
@@ -309,14 +306,14 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-bold text-xs sm:text-sm text-black dark:text-white">
+                            <span className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white">
                               {pkg.title}
                             </span>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${pkg.badgeColor}`}>
+                            <span className={`text-[0.8125rem] px-2 py-0.5 rounded-full font-medium ${pkg.badgeColor}`}>
                               {pkg.badge}
                             </span>
                           </div>
-                          <p className="text-xs text-black dark:text-white/75 leading-snug">
+                          <p className="text-[0.9375rem] text-black dark:text-white/75 leading-snug">
                             {pkg.description}
                           </p>
                         </div>
@@ -343,7 +340,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               <div className="bg-slate-50 dark:bg-slate-900 p-4.5 rounded-xl border border-slate-300 dark:border-slate-600">
                 <div className="flex items-center gap-2 mb-3">
                   <HelpCircle className="w-4 h-4 text-black dark:text-white/75" />
-                  <span className="text-xs sm:text-sm font-semibold text-black dark:text-white">
+                  <span className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white">
                     Panduan Permohonan & Syarat Kelayakan
                   </span>
                 </div>
@@ -354,7 +351,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                       title: 'Syarat Kelayakan Pemohon Geran Belia',
                       badge: 'Kelayakan',
                       content: (
-                        <div className="text-xs text-black dark:text-white space-y-1.5 leading-relaxed">
+                        <div className="text-sm text-black dark:text-white space-y-1.5 leading-relaxed">
                           <p>• Warganegara Malaysia menetap di negeri Kelantan berumur 18-40 tahun.</p>
                           <p>• Mengusahakan perniagaan atau kiosk modular belia.</p>
                           <p>• Bersedia mengikuti sesi bimbingan mentor berkanun sekurang-kurangnya sekali sebulan.</p>
@@ -366,7 +363,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                       title: 'Maklumat Pengesahan Permohonan',
                       badge: 'Panduan',
                       content: (
-                        <div className="text-xs text-black dark:text-white space-y-1.5 leading-relaxed">
+                        <div className="text-sm text-black dark:text-white space-y-1.5 leading-relaxed">
                           <p>✓ Butiran ringkas perniagaan dan cadangan penggunaan modal.</p>
                           <p>✓ Gambar produk atau perancangan tapak kiosk belia.</p>
                         </div>
@@ -380,24 +377,24 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Nama Bisnes / Jenama: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Nama Perniagaan *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="Nama perniagaan anda"
+                      placeholder="Masukkan nama perniagaan"
                       value={businessName}
                       onChange={(e) => {
                         setBusinessName(e.target.value);
                         if (fieldErrors.businessName) setFieldErrors(prev => ({ ...prev, businessName: '' }));
                       }}
-                      className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border ${
-                        fieldErrors.businessName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:bg-white focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
-                      } text-black dark:text-white font-medium focus:outline-none focus:ring-2 transition-all`}
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border ${
+                        fieldErrors.businessName ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
+                      } text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 font-medium focus:outline-none focus:ring-2 transition-all`}
                     />
                     {fieldErrors.businessName && (
-                      <p className="mt-1.5 text-[11px] text-black dark:text-white/75 flex items-center gap-1 font-medium">
+                      <p className="mt-1.5 text-[0.875rem] text-black dark:text-white/75 flex items-center gap-1 font-medium">
                         <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                         {fieldErrors.businessName}
                       </p>
@@ -405,13 +402,13 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Kategori Perniagaan: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Kategori Perniagaan *
                     </label>
                     <select
                       value={businessCategory}
                       onChange={(e) => setBusinessCategory(e.target.value as BusinessCategory)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       {CATEGORIES.map((c) => (
                         <option key={c} value={c} className="dark:bg-slate-900">{c}</option>
@@ -422,13 +419,13 @@ export const GrantModal: React.FC<GrantModalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Jajahan Operasi Perniagaan: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Jajahan Operasi *
                     </label>
                     <select
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       <option value="Kota Bharu" className="dark:bg-slate-900">Kota Bharu</option>
                       <option value="Bachok" className="dark:bg-slate-900">Bachok</option>
@@ -444,15 +441,15 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      No. Pendaftaran SSM (Jika Ada):
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Nombor Pendaftaran SSM
                     </label>
                     <input
                       type="text"
-                      placeholder="Cth: 202403123456 (TR0294811-M)"
+                      placeholder="Masukkan nombor pendaftaran SSM"
                       value={ssmNumber}
                       onChange={(e) => setSsmNumber(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all dark:focus:border-blue-500"
+                      className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -460,13 +457,13 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                 {/* Banking Details for Grant Disbursement */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Nama Bank Penerima: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Nama Bank *
                     </label>
                     <select
                       value={bankName}
                       onChange={(e) => setBankName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       {BANKS.map((bank) => (
                         <option key={bank} value={bank} className="dark:bg-slate-900">{bank}</option>
@@ -475,8 +472,8 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      No. Akaun Bank: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Nombor Akaun Bank *
                     </label>
                     <input
                       type="text"
@@ -487,12 +484,12 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                         setBankAccountNumber(e.target.value);
                         if (fieldErrors.bankAccountNumber) setFieldErrors(prev => ({ ...prev, bankAccountNumber: '' }));
                       }}
-                      className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border ${
-                        fieldErrors.bankAccountNumber ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
-                      } text-black dark:text-white focus:outline-none focus:ring-2 transition-all`}
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border ${
+                        fieldErrors.bankAccountNumber ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
+                      } text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 transition-all`}
                     />
                     {fieldErrors.bankAccountNumber && (
-                      <p className="mt-1.5 text-[11px] text-black dark:text-white/75 flex items-center gap-1 font-medium">
+                      <p className="mt-1.5 text-[0.875rem] text-black dark:text-white/75 flex items-center gap-1 font-medium">
                         <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                         {fieldErrors.bankAccountNumber}
                       </p>
@@ -503,24 +500,24 @@ export const GrantModal: React.FC<GrantModalProps> = ({
 
               {/* Fund Purpose */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                  Ringkasan Cadangan Penggunaan Dana: <span className="text-black dark:text-white">*</span>
+                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                  Cadangan Penggunaan Dana *
                 </label>
                 <textarea
                   required
                   rows={3}
-                  placeholder="Nyatakan ringkasan penggunaan dana secara ringkas..."
+                  placeholder="Masukkan cadangan penggunaan dana"
                   value={fundPurpose}
                   onChange={(e) => {
                     setFundPurpose(e.target.value);
                     if (fieldErrors.fundPurpose) setFieldErrors(prev => ({ ...prev, fundPurpose: '' }));
                   }}
-                  className={`w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border ${
-                    fieldErrors.fundPurpose ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:bg-white focus:border-rose-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
-                  } text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 transition-all`}
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border ${
+                    fieldErrors.fundPurpose ? 'border-rose-500 focus:ring-rose-500' : 'border-slate-300 dark:border-slate-600 focus:bg-white dark:focus:bg-slate-800 focus:border-blue-600 focus:ring-blue-500/30 dark:focus:border-blue-500'
+                  } text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 transition-all`}
                 />
                 {fieldErrors.fundPurpose && (
-                  <p className="mt-1.5 text-[11px] text-black dark:text-white/75 flex items-center gap-1 font-medium">
+                  <p className="mt-1.5 text-[0.875rem] text-black dark:text-white/75 flex items-center gap-1 font-medium">
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     {fieldErrors.fundPurpose}
                   </p>
@@ -528,7 +525,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
               </div>
 
               {/* Auto-filled Identity Chip */}
-              <div className="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-300 dark:border-slate-600 flex items-center justify-between text-xs text-black dark:text-white/75">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm text-black dark:text-white/75">
                 <span>Pemohon Berdaftar: <strong className="text-black dark:text-white">{userProfile?.fullName || user?.displayName || 'Usahawan Belia'}</strong></span>
                 <span>Emel Akaun: <strong className="text-black dark:text-white">{user?.email || 'N/A'}</strong></span>
               </div>
@@ -538,14 +535,14 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 dark:bg-emerald-600"
+                  className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 dark:bg-emerald-600"
                 >
                   <Send className="w-4 h-4" />
                   <span>{loading ? 'Menghantar...' : `Hantar Permohonan Geran (${grantAmount})`}</span>

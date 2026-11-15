@@ -123,7 +123,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white tracking-tight">
                 {language === 'en' ? 'Kiosk Maintenance & Issue Ticket' : 'Tiket Aduan & Penyelenggaraan Kiosk'}
               </h3>
-              <p className="text-xs text-black/70 dark:text-white/75">
+              <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
                 {language === 'en' ? 'Technical & Facilities Unit UMK / Kelantan PBT' : 'Unit Teknikal & Fasiliti UMK / PBT Kelantan'}
               </p>
             </div>
@@ -140,7 +140,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto">
           {errorMsg && (
-            <div className="mb-4 p-3.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-black dark:text-white text-xs sm:text-sm font-medium border border-rose-200 dark:border-rose-900 flex items-center gap-2">
+            <div className="mb-4 p-3.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-black dark:text-white text-sm sm:text-[0.9375rem] font-medium border border-rose-200 dark:border-rose-900 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
@@ -150,20 +150,20 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex items-center justify-between">
                 <div>
-                  <span className="text-black/70 dark:text-white/75 block text-[10px] font-medium uppercase tracking-wider">
+                  <span className="text-black/70 dark:text-white/75 block text-[0.8125rem] font-medium uppercase tracking-wider">
                     {language === 'en' ? 'Kiosk Location:' : 'Lokasi Kiosk:'}
                   </span>
-                  <span className="text-xs sm:text-sm font-bold text-black dark:text-white">{defaultKioskName}</span>
+                  <span className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white">{defaultKioskName}</span>
                 </div>
-                <span className="font-mono font-bold text-xs sm:text-sm text-black dark:text-white px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70">
+                <span className="font-mono font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70">
                   {defaultSlotCode}
                 </span>
               </div>
 
               {/* Category Selector */}
               <div>
-                <label className="text-xs sm:text-sm font-medium text-black dark:text-white block mb-2">
-                  {language === 'en' ? 'Issue Category:' : 'Kategori Kerosakan:'} <span className="text-black/70 dark:text-white/75">*</span>
+                <label className="text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white block mb-2">
+                  {language === 'en' ? 'Issue Category *' : 'Kategori Kerosakan *'}
                 </label>
                 <div className="grid grid-cols-2 gap-2.5">
                   {[
@@ -185,7 +185,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                         }`}
                       >
                         <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-black dark:text-white/75' : 'text-black/70'}`} />
-                        <span className="text-xs font-semibold">{language === 'en' ? labelEn : cat}</span>
+                        <span className="text-sm font-semibold">{language === 'en' ? labelEn : cat}</span>
                       </button>
                     );
                   })}
@@ -193,45 +193,45 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
               </div>
 
               <div>
-                <label className="text-xs sm:text-sm font-medium text-black dark:text-white block mb-2">
-                  {language === 'en' ? 'Issue Details / Description:' : 'Keterangan Isu / Kerosakan:'} <span className="text-black/70 dark:text-white/75">*</span>
+                <label className="text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white block mb-2">
+                  {language === 'en' ? 'Issue Details *' : 'Penerangan Masalah *'}
                 </label>
                 <textarea
                   rows={3}
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder={language === 'en' ? 'e.g. Left electrical socket is not functional since this morning...' : 'Contoh: Soket elektrik sebelah kiri tidak berfungsi sejak pagi ini...'}
-                  className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-rose-600 transition-all dark:focus:border-blue-500"
+                  placeholder={language === 'en' ? 'Enter issue details' : 'Masukkan penerangan masalah'}
+                  className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                 />
               </div>
 
               {/* 2-Column Paired Inputs */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="text-xs sm:text-sm font-medium text-black dark:text-white block mb-2">
-                    {language === 'en' ? 'Reporter Name:' : 'Nama Pengadu:'} <span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white block mb-2">
+                    {language === 'en' ? 'Reporter Name *' : 'Nama Pengadu *'}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder={language === 'en' ? 'Your full name' : 'Nama anda'}
+                    placeholder={language === 'en' ? 'Enter full name' : 'Masukkan nama penuh'}
                     value={reporterName}
                     onChange={(e) => setReporterName(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all dark:focus:border-blue-500"
+                    className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs sm:text-sm font-medium text-black dark:text-white block mb-2">
-                    {language === 'en' ? 'Phone No. (WhatsApp):' : 'No. Telefon (WhatsApp):'} <span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white block mb-2">
+                    {language === 'en' ? 'Phone Number *' : 'Nombor Telefon *'}
                   </label>
                   <input
                     type="tel"
                     required
-                    placeholder="01120508890"
+                    placeholder={language === 'en' ? 'Enter phone number' : 'Masukkan nombor telefon'}
                     value={reporterPhone}
                     onChange={(e) => setReporterPhone(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all dark:focus:border-blue-500"
+                    className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -241,14 +241,14 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                 >
                   {language === 'en' ? 'Cancel' : 'Batal'}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 shadow-sm transition-all flex items-center gap-2 cursor-pointer dark:bg-blue-600"
+                  className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 shadow-sm transition-all flex items-center gap-2 cursor-pointer dark:bg-blue-600"
                 >
                   <Send className="w-4 h-4" />
                   <span>{submitting ? (language === 'en' ? 'Submitting...' : 'Menghantar...') : (language === 'en' ? 'Submit Issue Ticket' : 'Hantar Tiket Aduan')}</span>
@@ -261,7 +261,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
               <h4 className="text-base sm:text-lg font-bold text-black dark:text-white mb-1">
                 {language === 'en' ? `Maintenance Ticket #${ticketId} Submitted` : `Tiket Aduan #${ticketId} Berjaya Dihantar`}
               </h4>
-              <p className="text-xs sm:text-sm text-black dark:text-white/75 leading-relaxed max-w-sm mx-auto mb-6">
+              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed max-w-sm mx-auto mb-6">
                 {language === 'en'
                   ? 'The facilities technical team has been notified. An on-duty technician will contact you within 2-4 working hours.'
                   : 'Pasukan teknikal fasiliti UMK telah dimaklumkan. Juruteknik bertugas akan menghubungi anda dalam tempoh 2-4 jam waktu bekerja.'}
@@ -269,7 +269,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer dark:bg-rose-600"
+                className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer dark:bg-rose-600"
               >
                 {language === 'en' ? 'Return to Dashboard' : 'Kembali ke Dashboard'}
               </button>

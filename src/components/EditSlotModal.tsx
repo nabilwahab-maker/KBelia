@@ -135,19 +135,19 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white rounded-2xl border border-slate-300 shadow-2xl"
+        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 px-6 py-4 flex items-center justify-between">
+        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <Edit3 className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <h3 id="edit-slot-modal-title" className="text-sm sm:text-base font-bold text-slate-900 truncate">
+              <h3 id="edit-slot-modal-title" className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
                 Edit Maklumat Slot Kiosk
               </h3>
-              <p className="text-[11px] text-slate-600 truncate">
+              <p className="text-[0.875rem] text-black/70 dark:text-white/75 truncate">
                 Ubah suai kod, nama kiosk, lokasi, kadar sewa bulanan dan status semasa.
               </p>
             </div>
@@ -158,7 +158,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
             disabled={isSaving}
             onClick={onClose}
             aria-label="Tutup tetingkap edit"
-            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -166,16 +166,16 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800 flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-sm font-medium text-black dark:text-white flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-800 mb-1.5">
-                Kod Kiosk <span className="text-rose-600">*</span>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                Kod Kiosk <span className="text-black dark:text-white">*</span>
               </label>
               <input
                 type="text"
@@ -183,13 +183,14 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 maxLength={30}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-mono bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500"
+                placeholder="Masukkan kod kiosk"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-800 mb-1.5">
-                Nama Kiosk <span className="text-rose-600">*</span>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                Nama Kiosk <span className="text-black dark:text-white">*</span>
               </label>
               <input
                 type="text"
@@ -197,27 +198,29 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 maxLength={100}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500"
+                placeholder="Masukkan nama kiosk"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-800 mb-1.5">Lokasi Tapak / Hub</label>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Lokasi Tapak</label>
               <input
                 type="text"
                 maxLength={150}
                 value={hubLocation}
                 onChange={(e) => setHubLocation(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500"
+                placeholder="Masukkan lokasi tapak"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-800 mb-1.5">Jajahan</label>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Daerah</label>
               <select
                 value={district}
                 onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 cursor-pointer"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer"
               >
                 {DISTRICTS.map((d) => (
                   <option key={d} value={d}>{d}</option>
@@ -226,8 +229,8 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-800 mb-1.5">
-                Sewa Bulanan (RM) <span className="text-rose-600">*</span>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                Sewa Bulanan <span className="text-black dark:text-white">*</span>
               </label>
               <input
                 type="number"
@@ -236,27 +239,29 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 step="1"
                 value={monthlyRate}
                 onChange={(e) => setMonthlyRate(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-mono tabular-nums bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500"
+                placeholder="Masukkan kadar sewa bulanan"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-800 mb-1.5">Saiz Unit</label>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Saiz Unit</label>
               <input
                 type="text"
                 maxLength={50}
                 value={size}
                 onChange={(e) => setSize(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500"
+                placeholder="Masukkan saiz unit kiosk"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-800 mb-1.5">Status Semasa</label>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Status Semasa</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as SlotStatus)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 cursor-pointer"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer"
               >
                 <option value="available">Kosong (Boleh Mohon)</option>
                 <option value="occupied">Sedang Beroperasi</option>
@@ -266,28 +271,28 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-800 mb-1.5">Nama Penyewa (Jika Ada)</label>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Nama Penyewa</label>
               <input
                 type="text"
                 maxLength={150}
                 disabled={status === 'available'}
                 value={status === 'available' ? '' : currentTenantBusinessName}
                 onChange={(e) => setCurrentTenantBusinessName(e.target.value)}
-                placeholder={status === 'available' ? 'Tiada penyewa (kosong)' : 'cth. Kopi & Kuih Bachok'}
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 disabled:opacity-50"
+                placeholder={status === 'available' ? 'Tiada penyewa' : 'Masukkan nama penyewa'}
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 disabled:opacity-50"
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-800 mb-1.5">
-                Kemudahan (Pisahkan dengan koma)
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                Kemudahan Disediakan
               </label>
               <input
                 type="text"
                 value={amenities}
                 onChange={(e) => setAmenities(e.target.value)}
-                placeholder="Palam Elektrik, WiFi 500Mbps, Rak Paparan"
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500"
+                placeholder="Masukkan senarai kemudahan"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
               />
             </div>
 
@@ -301,19 +306,19 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300">
+          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
             <button
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-colors cursor-pointer disabled:opacity-50"
+              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60"
+              className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60"
             >
               {isSaving ? (
                 <>

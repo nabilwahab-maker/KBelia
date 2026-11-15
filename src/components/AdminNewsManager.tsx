@@ -244,14 +244,14 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
       {/* Header Bar */}
       <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+          <div className="flex items-center gap-2 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
             <Newspaper className="w-4 h-4" />
             <span>Kawalan Berita Pentadbir</span>
           </div>
           <h3 className={`${compactHeader ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'} font-extrabold text-black dark:text-white tracking-tight`}>
             Urus Berita &amp; Pengumuman
           </h3>
-          <p className="text-xs text-black dark:text-white/75 max-w-2xl leading-relaxed">
+          <p className="text-[0.9375rem] text-black dark:text-white/75 max-w-2xl leading-relaxed">
             Tambah, edit, pin berita utama atau kawal status siaran. Hanya berita berstatus Siar dipaparkan kepada Usahawan Belia dan Mentor.
           </p>
         </div>
@@ -260,7 +260,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
           <button
             type="button"
             onClick={handleRestoreDemo}
-            className="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-xs font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            className="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Pulihkan Berita Demo</span>
@@ -270,7 +270,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
             id="btn-admin-add-news"
             type="button"
             onClick={showForm ? () => setShowForm(false) : handleOpenCreate}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 dark:bg-blue-600"
+            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 dark:bg-blue-600"
           >
             {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             <span>{showForm ? 'Tutup Borang' : 'Tambah Berita Baharu'}</span>
@@ -281,19 +281,19 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
       {/* Compact Stats Row (Single-elevation, Tabular numerals) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-xs text-black/70 dark:text-white/75 font-medium">Jumlah Artikel</div>
+          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Jumlah Artikel</div>
           <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.total}</div>
         </div>
         <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-xs text-black/70 dark:text-white/75 font-medium">Sedang Disiar</div>
+          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Sedang Disiar</div>
           <div className="text-xl font-black text-black dark:text-white/75 tabular-nums mt-0.5">{stats.published}</div>
         </div>
         <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-xs text-black/70 dark:text-white/75 font-medium">Draf Admin</div>
+          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Draf Admin</div>
           <div className="text-xl font-black text-black dark:text-white/75 tabular-nums mt-0.5">{stats.draft}</div>
         </div>
         <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-          <div className="text-xs text-black/70 dark:text-white/75 font-medium">Berita Utama Dipin</div>
+          <div className="text-sm text-black/70 dark:text-white/75 font-medium">Berita Utama Dipin</div>
           <div className="text-xl font-black text-black dark:text-white/75 tabular-nums mt-0.5">{stats.pinned}</div>
         </div>
       </div>
@@ -325,8 +325,8 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
           <div className="p-5 sm:p-6 space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               <div className="md:col-span-6">
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  Tajuk Berita <span className="text-black/70 dark:text-white/75">*</span>
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  Tajuk Berita <span className="text-black dark:text-white">*</span>
                 </label>
                 <input
                   type="text"
@@ -334,19 +334,19 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                   maxLength={200}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="cth. Pembukaan Permohonan Geran Pemangkin Belia Fasa 2"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 font-semibold dark:focus:border-blue-500"
+                  placeholder="Masukkan tajuk berita"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 font-semibold dark:focus:border-blue-500"
                 />
               </div>
 
               <div className="md:col-span-3">
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   Kategori
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as NewsCategory)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer dark:focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer dark:focus:border-blue-500"
                 >
                   {NEWS_CATEGORIES.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -355,13 +355,13 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
               </div>
 
               <div className="md:col-span-3">
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   Status Penerbitan
                 </label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as NewsStatus)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer dark:focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer dark:focus:border-blue-500"
                 >
                   <option value="published">Siar (Semua Pengguna)</option>
                   <option value="draft">Draf (Admin Sahaja)</option>
@@ -370,8 +370,8 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                Ringkasan Berita <span className="text-black/70 dark:text-white/75">*</span>
+              <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                Ringkasan Berita <span className="text-black dark:text-white">*</span>
               </label>
               <textarea
                 rows={2}
@@ -379,14 +379,14 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                 maxLength={500}
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
-                placeholder="Ringkasan pendek untuk pratonton kad dan sorotan berita..."
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                placeholder="Masukkan ringkasan berita"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                Isi Kandungan Penuh <span className="text-black/70 dark:text-white/75">*</span>
+              <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                Kandungan Berita <span className="text-black dark:text-white">*</span>
               </label>
               <textarea
                 rows={6}
@@ -394,13 +394,13 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                 maxLength={8000}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Tulis maklumat lengkap, tarikh penting, syarat kelayakan, dan langkah tindakan pengguna..."
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 leading-relaxed dark:focus:border-blue-500"
+                placeholder="Masukkan kandungan berita"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 leading-relaxed dark:focus:border-blue-500"
               />
             </div>
 
             <ImageDropzone
-              label="Muat Naik Gambar Sendiri (Pilihan)"
+              label="Gambar Berita"
               value={imageUrl}
               onChange={(val) => setImageUrl(val)}
               aspectRatio="16:9"
@@ -408,7 +408,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
 
             {/* Controls: Pin & Broadcast Notification */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-2 border-t border-slate-300 dark:border-zinc-600">
-              <label className="inline-flex items-center gap-2.5 text-xs font-semibold text-black dark:text-white cursor-pointer">
+              <label className="inline-flex items-center gap-2.5 text-sm font-semibold text-black dark:text-white cursor-pointer">
                 <input
                   type="checkbox"
                   checked={isPinned}
@@ -419,7 +419,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
               </label>
 
               {status === 'published' && (
-                <label className="inline-flex items-center gap-2.5 text-xs font-semibold text-black dark:text-white cursor-pointer">
+                <label className="inline-flex items-center gap-2.5 text-sm font-semibold text-black dark:text-white cursor-pointer">
                   <input
                     type="checkbox"
                     checked={notifyAllUsers}
@@ -438,14 +438,14 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                   setShowForm(false);
                   resetForm();
                 }}
-                className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 text-xs font-semibold text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 text-sm font-semibold text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer dark:bg-blue-600"
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer dark:bg-blue-600"
               >
                 {status === 'published' ? <Send className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
                 <span>
@@ -471,8 +471,8 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari tajuk, ringkasan atau kategori berita..."
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+            placeholder="Masukkan kata kunci carian"
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
           />
         </div>
 
@@ -486,7 +486,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
               key={tab.id}
               type="button"
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                 statusFilter === tab.id
                   ? 'bg-white dark:bg-zinc-800 text-black dark:text-white shadow-2xs'
                   : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -503,13 +503,13 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
         <div className="p-10 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 space-y-3">
           <Newspaper className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
           <p className="text-sm font-bold text-black dark:text-white">Tiada artikel ditemui</p>
-          <p className="text-xs text-black/70 dark:text-white/75">
+          <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
             Cipta berita baharu atau pulihkan set berita demo asal untuk mula mengurus kandungan.
           </p>
           <button
             type="button"
             onClick={handleOpenCreate}
-            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer inline-flex items-center gap-1.5 dark:bg-blue-600"
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold cursor-pointer inline-flex items-center gap-1.5 dark:bg-blue-600"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Tambah Berita Pertama</span>
@@ -539,7 +539,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                 </div>
 
                 <div className="min-w-0 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-black/70 dark:text-white/75 tabular-nums">
+                  <div className="flex flex-wrap items-center gap-2 text-[0.8125rem] font-medium text-black/70 dark:text-white/75 tabular-nums">
                     <span className="font-semibold text-black dark:text-white/75">{item.category}</span>
                     <span aria-hidden="true">·</span>
                     <span className={item.status === 'published' ? 'text-black dark:text-white/75 font-semibold' : 'text-black dark:text-white/75 font-semibold'}>
@@ -558,7 +558,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                   <h4 className="text-sm font-bold text-black dark:text-white line-clamp-1">
                     {item.title}
                   </h4>
-                  <p className="text-xs text-black dark:text-white/75 line-clamp-2">
+                  <p className="text-[0.9375rem] text-black dark:text-white/75 line-clamp-2">
                     {item.summary}
                   </p>
                 </div>
@@ -569,7 +569,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                 <button
                   type="button"
                   onClick={() => handleQuickTogglePin(item)}
-                  className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
+                  className={`px-2.5 py-1.5 rounded-lg border text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                     item.isPinned
                       ? 'bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border-amber-200 dark:border-amber-800/70'
                       : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-800'
@@ -583,7 +583,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                 <button
                   type="button"
                   onClick={() => handleQuickToggleStatus(item)}
-                  className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
+                  className={`px-2.5 py-1.5 rounded-lg border text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                     item.status === 'published'
                       ? 'bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border-emerald-200 dark:border-emerald-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
                       : 'bg-amber-50 dark:bg-amber-950/50 text-black dark:text-white border-amber-200 dark:border-amber-800 hover:bg-emerald-50 hover:text-black dark:hover:text-white'
@@ -606,7 +606,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                 <button
                   type="button"
                   onClick={() => handleOpenEdit(item)}
-                  className="px-2.5 py-1.5 rounded-lg border border-sky-200 dark:border-sky-800/70 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 text-xs font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 transition-colors"
+                  className="px-2.5 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/70 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 transition-colors"
                   title="Edit Berita"
                 >
                   <Edit3 className="w-3.5 h-3.5 shrink-0" />
@@ -622,7 +622,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                       onConfirm: () => handleDelete(item.id)
                     })
                   }
-                  className="px-2.5 py-1.5 rounded-lg border border-rose-200 dark:border-rose-800/70 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 text-xs font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 transition-colors"
+                  className="px-2.5 py-1.5 rounded-lg border border-rose-200 dark:border-rose-800/70 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 transition-colors"
                   title="Padam Berita"
                   aria-label="Padam berita"
                 >

@@ -140,7 +140,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
               >
                 Edit Produk
               </h3>
-              <p className="text-[11px] text-black/70 dark:text-white/75 truncate">
+              <p className="text-[0.875rem] text-black/70 dark:text-white/75 truncate">
                 Ubah harga, gambar, info dan status stok produk anda.
               </p>
             </div>
@@ -160,7 +160,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {error && (
-            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-xs font-medium text-rose-800 dark:text-rose-200 flex items-start gap-2.5">
+            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-sm font-medium text-rose-800 dark:text-rose-200 flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -168,8 +168,8 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-1.5">
-                Nama Produk <span className="text-rose-600 dark:text-rose-400">*</span>
+              <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-1.5">
+                Nama Produk *
               </label>
               <input
                 type="text"
@@ -177,14 +177,14 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 maxLength={150}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Contoh: Nasi Kerabu Daging Bakar"
-                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium"
+                placeholder="Masukkan nama produk"
+                className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium"
               />
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-1.5">
-                Harga Jualan (RM) <span className="text-rose-600 dark:text-rose-400">*</span>
+              <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-1.5">
+                Harga Jualan *
               </label>
               <input
                 type="number"
@@ -193,13 +193,13 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 step="0.10"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="0.00"
-                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                placeholder="Masukkan harga jualan"
+                className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-1.5">
+              <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-1.5">
                 Kategori Produk
               </label>
               <input
@@ -207,25 +207,25 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 maxLength={60}
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                placeholder="Contoh: Menu Utama"
-                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                placeholder="Masukkan kategori produk"
+                className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
               />
             </div>
           </div>
 
           {/* Stock Availability Toggle */}
           <div>
-            <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-1.5">
-              Status Ketersediaan Stok
+            <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-1.5">
+              Status Stok
             </label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 aria-pressed={inStock}
                 onClick={() => setInStock(true)}
-                className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+                className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-sm sm:text-[0.9375rem] font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
                   inStock
-                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 dark:border-emerald-600 text-emerald-800 dark:text-emerald-300 shadow-2xs'
+                    ? 'bg-emerald-100 dark:bg-emerald-900/70 border-emerald-500 dark:border-emerald-500 text-black dark:text-white shadow-2xs'
                     : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
@@ -236,9 +236,9 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 type="button"
                 aria-pressed={!inStock}
                 onClick={() => setInStock(false)}
-                className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+                className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-sm sm:text-[0.9375rem] font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
                   !inStock
-                    ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 dark:border-rose-600 text-rose-800 dark:text-rose-300 shadow-2xs'
+                    ? 'bg-rose-100 dark:bg-rose-900/70 border-rose-500 dark:border-rose-500 text-black dark:text-white shadow-2xs'
                     : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
@@ -250,18 +250,18 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-1.5">
-                Penerangan Produk &amp; Keistimewaan
+              <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-1.5">
+                Penerangan Produk
               </label>
               <textarea
                 rows={5}
                 maxLength={1000}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Terangkan bahan, saiz hidangan, atau keistimewaan produk anda..."
-                className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                placeholder="Masukkan penerangan produk"
+                className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
               />
-              <div className="mt-1 text-[11px] text-black/60 dark:text-white/60 text-right tabular-nums">
+              <div className="mt-1 text-[0.8125rem] text-black/60 dark:text-white/60 text-right tabular-nums">
                 {description.length}/1000 aksara
               </div>
             </div>
@@ -282,14 +282,14 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-50"
+              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-50"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-60"
+              className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-60"
             >
               {isSaving ? (
                 <>

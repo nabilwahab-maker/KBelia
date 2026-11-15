@@ -123,7 +123,7 @@ export const B2BMarketSection: React.FC = () => {
         <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
           {isEn ? 'Supply Network & Commercial Ads' : 'Rangkaian Bekalan & Ruang Niaga'}
         </h1>
-        <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 mt-1">
+        <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
           {isEn
             ? 'Browse verified local products, source wholesale goods, and connect with partner merchants across Kelantan.'
             : 'Teroka produk tempatan, dapatkan stok borong, dan hubungi rakan niaga di seluruh Kelantan.'}
@@ -136,10 +136,10 @@ export const B2BMarketSection: React.FC = () => {
           <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
-            placeholder={isEn ? 'Search supplies, ingredients, packaging...' : 'Cari bekalan, ramuan, pembungkusan...'}
+            placeholder={isEn ? 'Enter search keyword' : 'Masukkan kata kunci carian'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+            className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
           />
         </div>
 
@@ -149,7 +149,7 @@ export const B2BMarketSection: React.FC = () => {
             <button
               type="button"
               onClick={() => setFilterType('all')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-[0.8125rem] font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'all'
                   ? 'bg-white dark:bg-slate-700 text-black dark:text-white shadow-xs border border-slate-300 dark:border-slate-600'
                   : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -160,7 +160,7 @@ export const B2BMarketSection: React.FC = () => {
             <button
               type="button"
               onClick={() => setFilterType('demand')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-[0.8125rem] font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'demand'
                   ? 'bg-teal-600 text-white shadow-xs dark:bg-teal-600'
                   : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -171,7 +171,7 @@ export const B2BMarketSection: React.FC = () => {
             <button
               type="button"
               onClick={() => setFilterType('supply')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 text-[0.8125rem] font-bold rounded-md transition-colors cursor-pointer ${
                 filterType === 'supply'
                   ? 'bg-teal-600 text-white shadow-xs dark:bg-teal-600'
                   : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -185,7 +185,7 @@ export const B2BMarketSection: React.FC = () => {
           <select
             value={filterDistrict}
             onChange={(e) => setFilterDistrict(e.target.value)}
-            className="px-3 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+            className="px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
           >
             <option value="all">{isEn ? 'Across Kelantan' : 'Seluruh Kelantan'}</option>
             <option value="Kota Bharu">Kota Bharu</option>
@@ -231,7 +231,7 @@ export const B2BMarketSection: React.FC = () => {
                 <div className="p-5 space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span
-                      className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${
+                      className={`px-2 py-0.5 rounded text-[0.8125rem] font-semibold border ${
                         item.type === 'supply'
                           ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-900/40'
                           : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800/40'
@@ -241,7 +241,7 @@ export const B2BMarketSection: React.FC = () => {
                         ? (isEn ? 'Supplying / Wholesale' : 'Membekal (Tawaran)')
                         : (isEn ? 'Seeking Supply' : 'Mencari Bekalan')}
                     </span>
-                    <span className="text-[11px] text-black/70 dark:text-white/75 font-mono tabular-nums">
+                    <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono tabular-nums">
                       {item.date}
                     </span>
                   </div>
@@ -250,18 +250,18 @@ export const B2BMarketSection: React.FC = () => {
                     <h3 className="text-sm font-bold text-black dark:text-white leading-snug">
                       {item.title}
                     </h3>
-                    <div className="text-[11px] text-black/70 dark:text-white/75 font-medium mt-0.5 flex items-center gap-1.5">
+                    <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-medium mt-0.5 flex items-center gap-1.5">
                       <span className="font-semibold text-black dark:text-white">{item.authorBusiness}</span>
                       <span>·</span>
                       <span>{item.authorName}</span>
                     </div>
                   </div>
 
-                  <p className="text-xs text-black/85 dark:text-white/85 leading-relaxed line-clamp-3">
+                  <p className="text-[0.9375rem] text-black/85 dark:text-white/85 leading-relaxed line-clamp-3">
                     {item.description}
                   </p>
 
-                  <div className="flex items-center gap-1.5 text-xs text-black/70 dark:text-white/75 pt-1">
+                  <div className="flex items-center gap-1.5 text-sm text-black/70 dark:text-white/75 pt-1">
                     <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                     <span>{item.district}</span>
                   </div>
@@ -274,7 +274,7 @@ export const B2BMarketSection: React.FC = () => {
                   href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20Ruang%20Niaga%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 dark:bg-teal-600"
+                  className="w-full py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 dark:bg-teal-600"
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>

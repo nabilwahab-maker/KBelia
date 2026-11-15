@@ -70,7 +70,7 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
               <h3 className="text-base font-bold text-black dark:text-white">
                 Kalendar Ekspo & Karnival Usahawan Belia
               </h3>
-              <span className="text-[11px] font-semibold text-black dark:text-white/75">
+              <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
                 Peluang Jualan Terbuka Seluruh Jajahan
               </span>
             </div>
@@ -92,10 +92,10 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
             >
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70">
+                  <span className="px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70">
                     {event.date}
                   </span>
-                  <span className="text-[10px] font-semibold text-black dark:text-white/75">
+                  <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
                     {event.registrationStatus}
                   </span>
                 </div>
@@ -103,19 +103,19 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
                 <h4 className="text-sm font-bold text-black dark:text-white mb-1">
                   {event.title}
                 </h4>
-                <p className="text-[11px] text-black/70 dark:text-white/75 flex items-center gap-1 mb-2">
+                <p className="text-[0.875rem] text-black/70 dark:text-white/75 flex items-center gap-1 mb-2">
                   <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   {event.venue}
                 </p>
 
-                <p className="text-xs text-black dark:text-white leading-relaxed mb-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
+                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed mb-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                   <span className="font-semibold block text-black dark:text-white mb-0.5">Pengisian Utama:</span>
                   {event.highlights}
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-xs gap-3">
-                <span className="text-[11px] text-black/70 dark:text-white/75">
+              <div className="pt-2 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm gap-3">
+                <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
                   Anjuran: {event.organizer}
                 </span>
 

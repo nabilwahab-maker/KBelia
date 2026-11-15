@@ -224,12 +224,12 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-300 dark:border-slate-600">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-black dark:text-white">
+            <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white">
               <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75" />
               <span>Peta Interaktif Negeri</span>
             </span>
             <span className="text-black/35 dark:text-white/35">•</span>
-            <span className="text-xs text-black/70 dark:text-white/75 font-medium">
+            <span className="text-sm text-black/75 dark:text-white/80 font-medium">
               Seluruh Kelantan
             </span>
           </div>
@@ -237,7 +237,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
           <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight flex items-center gap-2">
             <span>Peta Lokasi & Ketersediaan Kiosk Niaga</span>
           </h2>
-          <p className="text-xs sm:text-sm text-black/70 dark:text-white/75 mt-0.5">
+          <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
             Peta interaktif berwarna gaya Google Maps. Klik mana-mana jajahan atau pin merah untuk semak kekosongan sewaan kiosk.
           </p>
         </div>
@@ -245,14 +245,14 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
         {/* View Toggle & Map Layer Buttons */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Layer Mode Toggle */}
-          <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-xs font-bold">
+          <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold">
             <button
               type="button"
               onClick={() => setMapTheme('standard')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 mapTheme === 'standard'
-                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/75 shadow-2xs'
-                  : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/85 shadow-2xs'
+                  : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
               }`}
             >
               Peta Standard
@@ -262,8 +262,8 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               onClick={() => setMapTheme('terrain')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 mapTheme === 'terrain'
-                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/75 shadow-2xs'
-                  : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
+                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/85 shadow-2xs'
+                  : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
               }`}
             >
               Rupa Bumi
@@ -271,14 +271,14 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
           </div>
 
           {/* Map vs Grid Toggle */}
-          <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-xs font-bold">
+          <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold">
             <button
               type="button"
               onClick={() => setViewMode('map')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                 viewMode === 'map'
-                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/75 shadow-2xs'
-                  : 'text-black dark:text-white/75'
+                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/85 shadow-2xs'
+                  : 'text-black dark:text-white/80'
               }`}
             >
               <Compass className="w-3.5 h-3.5" />
@@ -289,8 +289,8 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               onClick={() => setViewMode('grid')}
               className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                 viewMode === 'grid'
-                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/75 shadow-2xs'
-                  : 'text-black dark:text-white/75'
+                  ? 'bg-white dark:bg-slate-800 text-black dark:text-white/85 shadow-2xs'
+                  : 'text-black dark:text-white/80'
               }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -307,10 +307,10 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
             <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Cari jajahan atau hab niaga (cth: Kota Bharu, Bachok, Tok Bali, Gua Musang)..."
+              placeholder="Masukkan nama daerah atau lokasi"
               value={searchDistrictQuery}
               onChange={(e) => setSearchDistrictQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors dark:focus:border-blue-400"
+              className="w-full pl-9 pr-4 py-2.5 text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors dark:focus:border-blue-400"
             />
           </div>
 
@@ -318,7 +318,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
             <button
               type="button"
               onClick={() => onSelectDistrict('Semua Jajahan')}
-              className={`px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+              className={`px-3.5 py-2.5 text-sm font-bold rounded-xl transition-all cursor-pointer ${
                 selectedDistrict === 'Semua Jajahan'
                   ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
                   : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-blue-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
@@ -330,7 +330,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
         </div>
 
         {/* Jajahan Fast Selector Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none text-xs">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none text-sm">
           {filteredDistrictChips.map((geo) => {
             const isSelected = selectedDistrict === geo.district;
             return (
@@ -338,7 +338,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                 key={geo.code}
                 type="button"
                 onClick={() => onSelectDistrict(geo.district)}
-                className={`px-3 py-1.5 rounded-full font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-full font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
                   isSelected
                     ? 'bg-blue-600 text-white shadow-sm ring-2 ring-blue-500/30 dark:ring-blue-400/30 dark:bg-blue-600'
                     : 'bg-slate-50 hover:bg-blue-50 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600'
@@ -346,7 +346,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               >
                 <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-white' : geo.terrainType === 'green' ? 'bg-emerald-500' : 'bg-blue-500'}`} />
                 <span>{geo.name}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-blue-700 text-white' : 'bg-white dark:bg-slate-800 text-black dark:text-white'}`}>
+                <span className={`text-[0.8125rem] px-2 py-0.5 rounded-full tabular-nums ${isSelected ? 'bg-blue-700 text-white' : 'bg-white dark:bg-slate-800 text-black dark:text-white'}`}>
                   {getDistrictStats(geo.district).available}
                 </span>
               </button>
@@ -364,12 +364,12 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
             <div className="relative w-full rounded-3xl overflow-hidden border border-slate-300 dark:border-slate-600 shadow-md bg-[#E8EEF5] dark:bg-slate-900 flex flex-col items-center">
               
               {/* Google Maps Top Location Badge */}
-              <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-xl shadow-md border border-slate-300 dark:border-slate-600 text-xs">
+              <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-white dark:bg-slate-800 px-3.5 py-1.5 rounded-xl shadow-md border border-slate-300 dark:border-slate-600 text-sm">
                 <MapPin className="w-4 h-4 text-[#EA4335] shrink-0" />
                 <span className="font-bold text-black dark:text-white truncate">
                   {selectedDistrict === 'Semua Jajahan' ? 'Kelantan, Malaysia' : `${selectedDistrict}, Kelantan`}
                 </span>
-                <span className="text-[10px] text-black/70 dark:text-white/75 font-semibold">• Google Maps View</span>
+                <span className="text-[0.8125rem] text-black/75 dark:text-white/80 font-semibold">• Google Maps View</span>
               </div>
 
               {/* Google Maps Floating Zoom & Reset Controls */}
@@ -394,14 +394,14 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                   type="button"
                   onClick={handleResetZoom}
                   title="Pusat Peta Asal"
-                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-black dark:text-white shadow-md border border-slate-300 dark:border-slate-600 flex items-center justify-center text-xs transition-transform active:scale-95 cursor-pointer"
+                  className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-black dark:text-white shadow-md border border-slate-300 dark:border-slate-600 flex items-center justify-center text-sm transition-transform active:scale-95 cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-black dark:text-white" />
                 </button>
               </div>
 
               {/* Google Maps Scale Legend Bar (Bottom Left) */}
-              <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xs px-2.5 py-1 rounded-md text-[10px] font-mono text-black dark:text-white border border-slate-300 dark:border-slate-600">
+              <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xs px-2.5 py-1 rounded-md text-[0.8125rem] font-mono text-black dark:text-white border border-slate-300 dark:border-slate-600">
                 <div className="w-8 h-1 bg-slate-800 dark:bg-slate-200 border-x border-slate-900" />
                 <span>20 km</span>
               </div>
@@ -432,7 +432,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                   <rect x="50" y="20" width="440" height="640" fill="url(#seaPattern)" />
 
                   {/* Sea Water Label */}
-                  <text x="410" y="50" className="text-[10px] font-extrabold fill-black/55 dark:fill-white/60 uppercase tracking-widest pointer-events-none">
+                  <text x="392" y="50" fontSize={11} className="font-extrabold fill-black/60 dark:fill-white/65 uppercase tracking-widest pointer-events-none">
                     Laut China Selatan
                   </text>
 
@@ -486,7 +486,8 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                             x={geo.centerX}
                             y={geo.centerY - 2}
                             textAnchor="middle"
-                            className={`text-[11px] font-bold pointer-events-none select-none transition-colors ${
+                            fontSize={12.5}
+                            className={`font-bold pointer-events-none select-none transition-colors ${
                               isSelected
                                 ? 'fill-black font-black'
                                 : 'fill-black'
@@ -497,18 +498,19 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
 
                           {/* Small Kiosk Count Badge */}
                           <rect
-                            x={geo.centerX - 24}
+                            x={geo.centerX - 30}
                             y={geo.centerY + 4}
-                            width="48"
-                            height="13"
-                            rx="6.5"
+                            width="60"
+                            height="16"
+                            rx="8"
                             className={`${isSelected ? 'fill-blue-600' : 'fill-white/95 shadow-2xs'} pointer-events-none`}
                           />
                           <text
                             x={geo.centerX}
-                            y={geo.centerY + 13}
+                            y={geo.centerY + 15}
                             textAnchor="middle"
-                            className={`text-[8.5px] font-bold pointer-events-none tabular-nums ${
+                            fontSize={10}
+                            className={`font-bold pointer-events-none tabular-nums ${
                               isSelected ? 'fill-white' : 'fill-black'
                             }`}
                           >
@@ -538,7 +540,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                       opacity="0.6"
                     />
                     {/* River Label */}
-                    <text x="270" y="235" className="text-[7.5px] font-semibold fill-black/75 italic pointer-events-none -rotate-45">
+                    <text x="270" y="235" fontSize={9.5} className="font-semibold fill-black/75 italic pointer-events-none -rotate-45">
                       Sg. Kelantan
                     </text>
                   </g>
@@ -565,8 +567,8 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                       opacity="0.85"
                     />
                     {/* Route Label [ 8 ] */}
-                    <rect x="338" y="115" width="14" height="10" rx="2" fill="#FBBF24" stroke="#1E40AF" strokeWidth="0.8" />
-                    <text x="345" y="123" textAnchor="middle" className="text-[7px] font-black fill-black">8</text>
+                    <rect x="337" y="114" width="16" height="13" rx="2.5" fill="#FBBF24" stroke="#1E40AF" strokeWidth="0.8" />
+                    <text x="345" y="124" textAnchor="middle" fontSize={9.5} className="font-black fill-black">8</text>
                   </g>
 
                   {/* 5. Google Maps Red Teardrop Location Marker on Active District */}
@@ -593,22 +595,22 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               </div>
 
               {/* Google Maps Legend Footer */}
-              <div className="w-full flex flex-wrap items-center justify-between text-xs text-black dark:text-white px-4 py-2.5 bg-white dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600 gap-2">
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1.5 text-[11px] font-semibold">
+              <div className="w-full flex flex-wrap items-center justify-between text-[0.8125rem] text-black dark:text-white px-4 py-3 bg-white dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600 gap-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="flex items-center gap-1.5 text-[0.8125rem] font-semibold">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#EA4335] inline-block ring-2 ring-red-200" />
                     Jajahan Dipilih
                   </span>
-                  <span className="flex items-center gap-1.5 text-[11px] font-semibold">
+                  <span className="flex items-center gap-1.5 text-[0.8125rem] font-semibold">
                     <span className="w-2.5 h-2.5 rounded-sm bg-[#CEEAD6] border border-[#A3D9B1] inline-block" />
                     Zon Hijau / Agrotek
                   </span>
-                  <span className="flex items-center gap-1.5 text-[11px] font-semibold">
+                  <span className="flex items-center gap-1.5 text-[0.8125rem] font-semibold">
                     <span className="w-2.5 h-2.5 rounded-sm bg-[#FFF8E7] border border-[#E0D6C3] inline-block" />
                     Zon Komersial / Pesisir
                   </span>
                 </div>
-                <span className="text-[10px] text-black/70 dark:text-white/75">
+                <span className="text-[0.8125rem] text-black/75 dark:text-white/80">
                   Tip: Klik jajahan untuk memuatkan info hab
                 </span>
               </div>
@@ -623,14 +625,14 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               {/* Card Header: Google Maps Place Card Style */}
               <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-black dark:bg-blue-950/60 dark:text-white border border-blue-200 dark:border-blue-800/70 mb-1.5">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.8125rem] font-bold bg-blue-50 text-black dark:bg-blue-950/60 dark:text-white border border-blue-200 dark:border-blue-800/70 mb-1.5">
                     <MapPin className="w-3.5 h-3.5 text-[#EA4335]" />
                     <span>Jajahan {activeDistrictData.name} ({activeDistrictData.code})</span>
                   </div>
                   <h3 className="text-xl font-black text-black dark:text-white leading-tight">
                     {activeDistrictData.mainHubName}
                   </h3>
-                  <p className="text-xs text-black/70 dark:text-white/75 mt-1">
+                  <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-1">
                     {activeDistrictData.tagline}
                   </p>
                 </div>
@@ -642,29 +644,29 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
 
               {/* Status Metrics: Google Maps Style */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-black/70 dark:text-white/75 block mb-0.5">
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
+                  <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black/75 dark:text-white/80 block mb-0.5">
                     Kekosongan Slot Kiosk
                   </span>
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl font-black text-black dark:text-white/75 tabular-nums">
+                    <span className="text-2xl sm:text-[1.75rem] font-black text-black dark:text-white tabular-nums">
                       {activeStats.available}
                     </span>
-                    <span className="text-xs text-black/70 dark:text-white/75 font-semibold">
+                    <span className="text-sm text-black/75 dark:text-white/80 font-semibold">
                       / {activeStats.total} Kiosk Tersedia
                     </span>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-black/70 dark:text-white/75 block mb-0.5">
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
+                  <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black/75 dark:text-white/80 block mb-0.5">
                     Kadar Sewaan Bersubsidi
                   </span>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-black dark:text-white tabular-nums">
+                    <span className="text-2xl sm:text-[1.75rem] font-black text-black dark:text-white tabular-nums">
                       RM 150
                     </span>
-                    <span className="text-xs text-black/70 dark:text-white/75 font-semibold">
+                    <span className="text-sm text-black/75 dark:text-white/80 font-semibold">
                       / sebulan
                     </span>
                   </div>
@@ -672,18 +674,18 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               </div>
 
               {/* Focus Niche & Opportunities */}
-              <div className="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-black dark:text-white">
-                  <Sparkles className="w-3.5 h-3.5 text-black dark:text-white/75" />
+              <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 space-y-1">
+                <div className="flex items-center gap-1.5 text-sm font-bold text-black dark:text-white">
+                  <Sparkles className="w-4 h-4 text-black dark:text-white/80" />
                   <span>Kategori Produk & Tumpuan Jajahan:</span>
                 </div>
-                <p className="text-xs text-black dark:text-white leading-relaxed font-medium">
+                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed font-medium">
                   {activeDistrictData.popularNiche}
                 </p>
               </div>
 
               {/* Action Buttons: 1-Click Booking & WhatsApp */}
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2.5 pt-1">
                 <button
                   type="button"
                   onClick={() => {
@@ -692,18 +694,18 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                       onOpenBookingForDistrict(activeDistrictData.district);
                     }
                   }}
-                  className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer dark:bg-blue-600 dark:hover:bg-blue-500"
+                  className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer dark:bg-blue-600 dark:hover:bg-blue-500"
                 >
                   <Store className="w-4 h-4 text-white" />
                   <span>Mohon Kiosk di Jajahan {activeDistrictData.name}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-4 h-4" />
                 </button>
 
                 <a
                   href={`https://wa.me/601120508890?text=${encodeURIComponent(`Salam Pegawai Hab ${activeDistrictData.name}, saya berminat untuk membuat permohonan kiosk di ${activeDistrictData.mainHubName}.`)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-2 px-4 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2 shadow-2xs"
+                  className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2 shadow-2xs"
                 >
                   <MessageCircle className="w-4 h-4 text-white" />
                   <span>WhatsApp Pegawai Hab Bertugas</span>
@@ -733,27 +735,27 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-black/70 dark:text-white/75">
+                    <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/75 dark:text-white/80">
                       {geo.code}
                     </span>
-                    <span className="text-[11px] font-bold text-black dark:text-white/75 tabular-nums">
+                    <span className="text-[0.8125rem] font-bold text-black dark:text-white/85 tabular-nums">
                       {stats.available} kosong
                     </span>
                   </div>
-                  <h4 className="text-sm font-bold text-black dark:text-white mb-1">
+                  <h4 className="text-base font-bold text-black dark:text-white mb-1">
                     {geo.name}
                   </h4>
-                  <p className="text-[11px] text-black/70 dark:text-white/75 line-clamp-2 mb-3">
+                  <p className="text-sm text-black/75 dark:text-white/80 line-clamp-2 mb-3">
                     {geo.tagline}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-xs">
-                  <span className="text-black/70 dark:text-white/75 font-medium">
+                <div className="pt-2.5 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm">
+                  <span className="text-black/75 dark:text-white/80 font-medium">
                     RM150 /bln
                   </span>
-                  <span className="font-bold text-black dark:text-white/75 inline-flex items-center gap-0.5">
-                    Pilih <ArrowRight className="w-3 h-3" />
+                  <span className="font-bold text-black dark:text-white/85 inline-flex items-center gap-0.5">
+                    Pilih <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
               </div>

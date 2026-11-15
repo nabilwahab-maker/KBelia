@@ -24,7 +24,7 @@ export const BudgetSlider: React.FC<BudgetSliderProps> = ({
   return (
     <div className="relative pt-6 pb-1.5 w-full max-w-xs select-none">
       {/* Header Label and Current Value */}
-      <div className="flex items-center justify-between text-xs font-bold text-black dark:text-white mb-2">
+      <div className="flex items-center justify-between text-sm font-bold text-black dark:text-white mb-2">
         <span>{label}:</span>
         <span className="font-extrabold text-black dark:text-white bg-amber-100 dark:bg-emerald-600 border border-emerald-200 dark:border-emerald-800/70 px-2 py-0.5 rounded font-mono">
           RM {value} /bln
@@ -43,7 +43,7 @@ export const BudgetSlider: React.FC<BudgetSliderProps> = ({
             transform: 'translateX(-50%)'
           }}
         >
-          <div className="relative px-2 py-0.5 rounded-lg bg-emerald-600 text-white border border-emerald-400/70 text-[10px] font-black font-mono shadow-md whitespace-nowrap">
+          <div className="relative px-2 py-0.5 rounded-lg bg-emerald-600 text-white border border-emerald-400/70 text-[0.8125rem] font-black font-mono shadow-md whitespace-nowrap">
             RM {value}
             {/* Bubble arrow tip */}
             <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-emerald-600" />
@@ -85,7 +85,7 @@ export const BudgetSlider: React.FC<BudgetSliderProps> = ({
       </div>
 
       {/* Min/Max Labels perfectly aligned with track edges */}
-      <div className="flex justify-between text-[10px] text-black/65 dark:text-white/70 mt-1 font-medium">
+      <div className="flex justify-between text-[0.8125rem] text-black/65 dark:text-white/70 mt-1 font-medium">
         <span>RM {min}</span>
         <span>RM {max}</span>
       </div>

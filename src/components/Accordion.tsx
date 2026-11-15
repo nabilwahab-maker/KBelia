@@ -68,17 +68,17 @@ export const Accordion: React.FC<AccordionProps> = ({
                 )}
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs sm:text-sm font-bold text-black dark:text-white leading-snug">
+                    <span className="text-[0.9375rem] sm:text-base font-bold text-black dark:text-white leading-snug">
                       {item.title}
                     </span>
                     {item.badge && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-50 text-black border border-amber-200 dark:bg-amber-950/60 dark:text-white dark:border-amber-800/70">
+                      <span className="text-[0.8125rem] px-2.5 py-0.5 rounded-full font-bold bg-amber-50 text-black border border-amber-200 dark:bg-amber-950/60 dark:text-white dark:border-amber-800/70">
                         {item.badge}
                       </span>
                     )}
                   </div>
                   {item.subtitle && (
-                    <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 truncate">
+                    <p className="text-[0.8125rem] text-black/75 dark:text-white/80 mt-0.5 truncate">
                       {item.subtitle}
                     </p>
                   )}
@@ -96,7 +96,7 @@ export const Accordion: React.FC<AccordionProps> = ({
 
             {/* Collapsible Content */}
             {isOpen && (
-              <div className="px-4 pb-4 pt-1 text-xs text-black dark:text-white leading-relaxed border-t border-slate-300 dark:border-slate-600 animate-in fade-in duration-150">
+              <div className="px-4 pb-4 pt-2.5 text-[0.9375rem] text-black dark:text-white leading-relaxed border-t border-slate-300 dark:border-slate-600 animate-in fade-in duration-150">
                 {item.content}
               </div>
             )}

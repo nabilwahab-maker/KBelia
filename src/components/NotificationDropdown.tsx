@@ -112,7 +112,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       >
         <Bell className="w-4 h-4 transition-transform duration-200 group-hover:scale-110 hover-bell-icon" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-600 text-white text-[9px] font-extrabold flex items-center justify-center tabular-nums ring-2 ring-white dark:ring-slate-900 dark:bg-rose-600">
+          <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 rounded-full bg-rose-600 text-white text-[0.8125rem] font-extrabold flex items-center justify-center tabular-nums ring-2 ring-white dark:ring-slate-900 dark:bg-rose-600">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -125,23 +125,23 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-84 sm:w-96 rounded-2xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-300 dark:border-slate-600 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="absolute right-0 mt-2 w-88 sm:w-[26rem] rounded-2xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-300 dark:border-slate-600 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
             {/* Header: Displays notification title & active account badge */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-black dark:text-white">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[0.9375rem] font-bold text-black dark:text-white">
                   Pemberitahuan
                 </span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 border ${
+                <span className={`text-[0.8125rem] px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 border ${
                   isAdmin 
                     ? 'bg-amber-100 text-black dark:bg-amber-950/80 dark:text-white border-amber-300 dark:border-amber-800'
                     : isMentor 
                       ? 'bg-amber-100 text-black dark:bg-rose-600 dark:text-white border-rose-200 dark:border-rose-800/70'
                       : 'bg-amber-100 text-black dark:bg-rose-600 dark:text-white border-amber-400 dark:border-amber-400/40'
                 }`}>
-                  {isAdmin && <ShieldCheck className="w-2.5 h-2.5 text-black dark:text-white/75" />}
-                  {isMentor && <GraduationCap className="w-2.5 h-2.5 text-black dark:text-white/75" />}
-                  {!isAdmin && !isMentor && <User className="w-2.5 h-2.5 text-black dark:text-white/75" />}
+                  {isAdmin && <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/80" />}
+                  {isMentor && <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/80" />}
+                  {!isAdmin && !isMentor && <User className="w-3.5 h-3.5 text-black dark:text-white/80" />}
                   <span>{accountRoleLabel}</span>
                 </span>
               </div>
@@ -150,7 +150,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 <button
                   type="button"
                   onClick={markAllAsRead}
-                  className="text-[11px] text-black dark:text-white/75 hover:underline font-semibold cursor-pointer"
+                  className="text-[0.8125rem] text-black dark:text-white/80 hover:underline font-semibold cursor-pointer shrink-0"
                 >
                   Tanda semua dibaca
                 </button>
@@ -158,18 +158,18 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             </div>
 
             {/* Notification List filtered strictly by current account type */}
-            <div className="flex flex-col gap-2 my-2.5 max-h-72 overflow-y-auto pr-0.5">
+            <div className="flex flex-col gap-2.5 my-3 max-h-72 overflow-y-auto pr-0.5">
               {filteredNotifications.length === 0 ? (
-                <div className="py-8 flex flex-col items-center justify-center text-center text-black/70 dark:text-white/75">
+                <div className="py-8 flex flex-col items-center justify-center text-center text-black/75 dark:text-white/80">
                   <Inbox className="w-8 h-8 stroke-1 text-black/35 dark:text-white/35 mb-2" />
-                  <p className="text-xs font-medium">Tiada pemberitahuan baharu untuk {accountRoleLabel.toLowerCase()}.</p>
+                  <p className="text-[0.9375rem] font-medium">Tiada pemberitahuan baharu untuk {accountRoleLabel.toLowerCase()}.</p>
                 </div>
               ) : (
                 filteredNotifications.map((n) => (
                   <div
                     key={n.id}
                     onClick={() => markAsRead(n.id, n.actionTab)}
-                    className={`p-3 rounded-2xl border cursor-pointer transition-all ${
+                    className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
                       !n.isRead
                         ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/70 shadow-xs hover:bg-amber-100/50'
                         : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-900'
@@ -180,41 +180,35 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                         {!n.isRead && (
                           <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0 dark:bg-amber-400" />
                         )}
-                        <span className="text-xs font-bold text-black dark:text-white leading-tight">
+                        <span className="text-sm font-bold text-black dark:text-white leading-tight">
                           {n.title}
                         </span>
                       </div>
-                      <span className="text-[10px] text-black/70 dark:text-white/75 tabular-nums shrink-0">
+                      <span className="text-[0.8125rem] text-black/70 dark:text-white/75 tabular-nums shrink-0">
                         {n.timestamp}
                       </span>
                     </div>
 
-                    <p className="text-[11px] text-black dark:text-white leading-snug">
+                    <p className="text-sm text-black dark:text-white leading-snug">
                       {n.message}
                     </p>
 
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-300 dark:border-slate-600 text-[10px]">
-                      <span className={`inline-flex items-center gap-1 font-bold ${
-                        isAdmin 
-                          ? 'text-black dark:text-white/75'
-                          : isMentor 
-                            ? 'text-black dark:text-white/75' 
-                            : 'text-black dark:text-white/75'
-                      }`}>
+                    <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-300 dark:border-slate-600 text-[0.8125rem]">
+                      <span className="inline-flex items-center gap-1 font-bold text-black dark:text-white/80">
                         {isAdmin ? (
-                          <ShieldCheck className="w-3 h-3" />
+                          <ShieldCheck className="w-3.5 h-3.5" />
                         ) : isMentor ? (
-                          <GraduationCap className="w-3 h-3" />
+                          <GraduationCap className="w-3.5 h-3.5" />
                         ) : (
-                          <User className="w-3 h-3" />
+                          <User className="w-3.5 h-3.5" />
                         )}
                         <span>{n.sender || 'Admin KBelia'}</span>
                       </span>
 
                       {n.actionTab && (
-                        <span className="font-bold text-black dark:text-white/75 flex items-center gap-0.5 hover:underline">
+                        <span className="font-bold text-black dark:text-white/80 flex items-center gap-0.5 hover:underline">
                           <span>Buka</span>
-                          <ArrowRight className="w-2.5 h-2.5" />
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </span>
                       )}
                     </div>
@@ -225,7 +219,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
             {/* Footer */}
             <div className="pt-2 border-t border-slate-300 dark:border-slate-600 text-center">
-              <span className="text-[10px] text-black/70 dark:text-white/75">
+              <span className="text-[0.8125rem] text-black/75 dark:text-white/80">
                 Memaparkan makluman rasmi khusus untuk {accountRoleLabel.toLowerCase()}
               </span>
             </div>

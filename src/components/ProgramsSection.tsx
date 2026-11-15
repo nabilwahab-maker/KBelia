@@ -121,7 +121,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
       {/* Notice Banner */}
       {activeNotice && (
         <div className="p-4 bg-white dark:bg-slate-800 text-black dark:text-white rounded-xl border border-emerald-200 dark:border-emerald-800 flex items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-2.5 text-xs font-medium">
+          <div className="flex items-center gap-2.5 text-sm font-medium">
             <CheckCircle2 className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
             <span>{activeNotice}</span>
           </div>
@@ -142,7 +142,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
             {isEn ? 'Youth Grants & Programs' : 'Geran & Program Belia'}
           </h1>
-          <p className="text-black/75 dark:text-white/75 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
+          <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
             {isEn
               ? 'Join incubation tracks, digital workshops, TEKUN/MARA/UMK matching, and kiosk rental subsidies.'
               : 'Sertai inisiatif inkubasi, bengkel digital, padanan TEKUN/MARA/UMK, dan subsidi sewa kapsul niaga.'}
@@ -153,7 +153,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           <button
             type="button"
             onClick={onAddProgram}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors shrink-0 cursor-pointer dark:bg-emerald-600"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer dark:bg-emerald-600"
           >
             <Award className="w-4 h-4" />
             <span>{isEn ? 'Publish Program & Grant' : 'Terbitkan Program & Geran'}</span>
@@ -168,7 +168,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             key={cat.key}
             type="button"
             onClick={() => setSelectedCategory(cat.key)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
               selectedCategory === cat.key
                 ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
                 : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
@@ -212,11 +212,11 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                   <div className="p-6 space-y-4">
                   {/* Category & Featured Badge */}
                   <div className="flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-0.5 bg-slate-50 dark:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 rounded text-[11px] font-semibold">
+                    <span className="px-2.5 py-0.5 bg-slate-50 dark:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 rounded text-[0.8125rem] font-semibold">
                       {prog.category}
                     </span>
                     {prog.isFeatured && (
-                      <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70 rounded text-[10px] font-bold">
+                      <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70 rounded text-[0.8125rem] font-bold">
                         {isEn ? 'Featured' : 'Utama'}
                       </span>
                     )}
@@ -227,17 +227,17 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                     <h3 className="font-bold text-black dark:text-white text-base leading-snug group-hover:text-black dark:group-hover:text-white transition-colors">
                       {prog.title}
                     </h3>
-                    <p className="text-xs text-black dark:text-white/75 mt-2 leading-relaxed">
+                    <p className="text-[0.9375rem] text-black dark:text-white/75 mt-2 leading-relaxed">
                       {prog.description}
                     </p>
                   </div>
 
                   {/* Grant amount callout if present */}
                   {prog.grantAmount && (
-                    <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-xs flex items-center gap-2">
+                    <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 rounded-lg text-sm flex items-center gap-2">
                       <DollarSign className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
                       <div>
-                        <span className="text-[10px] text-black dark:text-white font-medium block">
+                        <span className="text-[0.8125rem] text-black dark:text-white font-medium block">
                           {isGrant
                             ? (isEn ? 'Aid Value / Grant Amount:' : 'Nilai Bantuan / Geran:')
                             : (isEn ? 'Prize / Incentive:' : 'Hadiah / Insentif:')}
@@ -248,7 +248,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                   )}
 
                   {/* Date & Location Details */}
-                  <div className="space-y-1.5 pt-2 text-xs text-black/70 dark:text-white/75 border-t border-slate-300 dark:border-slate-600">
+                  <div className="space-y-1.5 pt-2 text-sm text-black/70 dark:text-white/75 border-t border-slate-300 dark:border-slate-600">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-3.5 h-3.5 text-black dark:text-white shrink-0" />
                       <span>{prog.date}</span>
@@ -270,12 +270,12 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                 {/* Footer Action */}
                 <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600">
                   {isReadOnly ? (
-                    <div className="w-full py-2 px-4 bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-medium flex items-center justify-center gap-2">
+                    <div className="w-full py-2 px-4 bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
                       <Eye className="w-3.5 h-3.5 text-black dark:text-white/75" />
                       <span>{isEn ? 'Status: State Initiative (Monitored)' : 'Status: Inisiatif Negeri (Dipantau)'}</span>
                     </div>
                   ) : isRegistered ? (
-                    <div className="w-full py-2.5 px-4 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold flex items-center justify-center gap-2">
+                    <div className="w-full py-2.5 px-4 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-lg text-sm font-bold flex items-center justify-center gap-2">
                       <CheckCircle2 className="w-4 h-4" />
                       <span>{isEn ? 'Participation Registered' : 'Penyertaan Didaftarkan'}</span>
                     </div>
@@ -283,7 +283,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                     <button
                       type="button"
                       onClick={() => handleProgramAction(prog)}
-                      className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer dark:bg-emerald-600"
+                      className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer dark:bg-emerald-600"
                     >
                       <span>
                         {isGrant

@@ -84,18 +84,18 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
             {t('directory_title')}
           </h1>
-          <p className="text-black/75 dark:text-white/75 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
+          <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
             {t('directory_subtitle')}
           </p>
         </div>
 
         {isMentor ? (
-          <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white rounded-xl text-xs font-bold border border-teal-200 dark:border-teal-800/70 shrink-0">
+          <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white rounded-xl text-sm font-bold border border-teal-200 dark:border-teal-800/70 shrink-0">
             <GraduationCap className="w-4 h-4 text-black dark:text-white/75" />
             <span>{t('mentor_review_mode_title')}</span>
           </div>
         ) : isAdmin ? (
-          <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 text-black dark:text-white rounded-xl text-xs font-bold border border-amber-200 dark:border-amber-800 shrink-0">
+          <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 text-black dark:text-white rounded-xl text-sm font-bold border border-amber-200 dark:border-amber-800 shrink-0">
             <ShieldCheck className="w-4 h-4 text-black dark:text-white/75" />
             <span>{language === 'en' ? 'Directory Audit Mode (Admin)' : 'Mod Audit Direktori & SSM (Pentadbir)'}</span>
           </div>
@@ -103,7 +103,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
           <button
             type="button"
             onClick={handleRegister}
-            className="interactive-press interactive-lift inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all shrink-0 cursor-pointer dark:bg-blue-600"
+            className="interactive-press interactive-lift inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm transition-all shrink-0 cursor-pointer dark:bg-blue-600"
             title={language === 'en' ? 'Open Merchant Business Management' : 'Buka Dashboard Pengurusan Bisnes Usahawan'}
           >
             <Store className="w-4 h-4" />
@@ -124,7 +124,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
               placeholder={t('search_business_ph')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 transition-colors dark:focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 transition-colors dark:focus:border-blue-500"
             />
           </div>
 
@@ -133,7 +133,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
+              className="w-full px-3 py-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
             >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
@@ -148,7 +148,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value as KelantanDistrict)}
-              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
+              className="w-full px-3 py-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
             >
               {DISTRICTS.map((d) => (
                 <option key={d} value={d}>
@@ -161,13 +161,13 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
         </div>
 
         {/* Quick category pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs pt-1 border-t border-slate-300 dark:border-slate-600">
-          <span className="text-[11px] font-bold text-black/70 dark:text-white/75 shrink-0">{t('popular_categories_label')}</span>
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-sm pt-1 border-t border-slate-300 dark:border-slate-600">
+          <span className="text-[0.8125rem] font-bold text-black/70 dark:text-white/75 shrink-0">{t('popular_categories_label')}</span>
           {CATEGORIES.slice(1, 5).map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`interactive-press px-2.5 py-1 rounded-lg text-[11px] font-medium shrink-0 transition-colors cursor-pointer ${
+              className={`interactive-press px-2.5 py-1 rounded-lg text-[0.8125rem] font-medium shrink-0 transition-colors cursor-pointer ${
                 selectedCategory === cat
                   ? 'bg-amber-100 dark:bg-indigo-600 text-black dark:text-white font-bold border border-indigo-200 dark:border-indigo-800/70'
                   : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700 dark:hover:text-white border border-slate-300 dark:border-slate-600'
@@ -184,7 +184,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
         <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600">
           <Store className="w-12 h-12 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <h3 className="text-base font-bold text-black dark:text-white">{t('no_businesses_found')}</h3>
-          <p className="text-xs text-black/70 dark:text-white/75 mt-1">{t('no_businesses_desc')}</p>
+          <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">{t('no_businesses_desc')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -213,14 +213,14 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
 
                     {/* Category kicker */}
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-900/80 backdrop-blur-xs text-white">
+                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md text-[0.8125rem] font-semibold bg-slate-900/80 backdrop-blur-xs text-white">
                       {biz.category}
                     </div>
 
                     {/* Verified SSM mark */}
                     <div className="absolute top-3 right-3 flex items-center gap-1">
                       {biz.ssmNumber && (
-                        <div className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-black shadow-xs flex items-center gap-1">
+                        <div className="px-2 py-0.5 rounded-md text-[0.8125rem] font-bold bg-white text-black shadow-xs flex items-center gap-1">
                           <ShieldCheck className="w-3 h-3 text-black dark:text-white" />
                           <span>SSM Sah</span>
                         </div>
@@ -242,21 +242,21 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                         {biz.businessName}
                       </h3>
                       
-                      <p className="text-xs text-black dark:text-white/75 font-medium line-clamp-1 mt-0.5">
+                      <p className="text-[0.9375rem] text-black dark:text-white/75 font-medium line-clamp-1 mt-0.5">
                         {biz.tagline}
                       </p>
                     </div>
 
-                    <p className="text-xs text-black dark:text-white line-clamp-2 leading-relaxed">
+                    <p className="text-[0.9375rem] text-black dark:text-white line-clamp-2 leading-relaxed">
                       {biz.description}
                     </p>
 
-                    <div className="flex items-center justify-between text-xs text-black/70 dark:text-white/75 pt-1">
+                    <div className="flex items-center justify-between text-sm text-black/70 dark:text-white/75 pt-1">
                       <div className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
                         <span>{biz.district}, Kelantan</span>
                       </div>
-                      <div className="flex items-center gap-1 text-black dark:text-white font-semibold text-xs tabular-nums">
+                      <div className="flex items-center gap-1 text-black dark:text-white font-semibold text-sm tabular-nums">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-black/70 dark:text-white/75" />
                         <span>{biz.rating || 5.0}</span>
                       </div>
@@ -268,7 +268,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                 <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600 flex items-center gap-2">
                   <button
                     onClick={() => onSelectBusiness(biz)}
-                    className="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs dark:bg-indigo-600"
+                    className="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs dark:bg-indigo-600"
                   >
                     <span>{language === 'en' ? 'View Profile & Catalog' : 'Katalog & Profil'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />

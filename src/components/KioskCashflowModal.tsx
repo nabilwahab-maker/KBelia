@@ -201,7 +201,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
               <Coins className="w-6 h-6 text-black dark:text-white" />
             </div>
             <div>
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-black dark:text-white/75">
+              <div className="text-[0.8125rem] font-extrabold uppercase tracking-widest text-black dark:text-white/75">
                 Sistem Pengurusan Kewangan Kiosk
               </div>
               <h3 className="font-black text-base sm:text-lg text-black dark:text-white">
@@ -223,7 +223,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('sales')}
-            className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
+            className={`pb-3 px-3 text-sm font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'sales'
                 ? 'border-emerald-600 text-black dark:border-amber-400 dark:text-white/75'
                 : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -236,7 +236,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('qr')}
-            className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
+            className={`pb-3 px-3 text-sm font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'qr'
                 ? 'border-blue-600 text-black dark:border-amber-400 dark:text-white/75'
                 : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -256,28 +256,28 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
               {/* Financial KPI Strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
-                  <span className="text-[11px] font-semibold text-black/70 dark:text-white/75">Jumlah Kasar</span>
+                  <span className="text-[0.8125rem] font-semibold text-black/70 dark:text-white/75">Jumlah Kasar</span>
                   <div className="text-lg sm:text-xl font-black text-black dark:text-white tabular-nums mt-0.5">
                     RM {totalRevenue.toFixed(2)}
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
-                  <span className="text-[11px] font-semibold text-black dark:text-white/75">DuitNow QR</span>
+                  <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">DuitNow QR</span>
                   <div className="text-lg sm:text-xl font-black text-black dark:text-white tabular-nums mt-0.5">
                     RM {totalQr.toFixed(2)}
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800">
-                  <span className="text-[11px] font-semibold text-black dark:text-white/75">Perbelanjaan</span>
+                  <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">Perbelanjaan</span>
                   <div className="text-lg sm:text-xl font-black text-black dark:text-white tabular-nums mt-0.5">
                     RM {totalExpenses.toFixed(2)}
                   </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-emerald-600 text-white shadow-xs">
-                  <span className="text-[11px] font-semibold text-white">Untung Bersih</span>
+                  <span className="text-[0.8125rem] font-semibold text-white">Untung Bersih</span>
                   <div className="text-lg sm:text-xl font-black tabular-nums mt-0.5">
                     RM {netProfit.toFixed(2)}
                   </div>
@@ -286,22 +286,22 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
 
               {/* Form Tambah Rekod */}
               <div className="bg-slate-50 dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 print:hidden">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-black dark:text-white mb-3 flex items-center justify-between">
+                <h4 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white mb-3 flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
                     <Coins className="w-4 h-4 text-black dark:text-white/75" />
                     Tambah Rekod Jualan Hari Ini
                   </span>
-                  <span className="text-[11px] font-normal text-black/70 dark:text-white/75">{kioskName}</span>
+                  <span className="text-[0.8125rem] font-normal text-black/70 dark:text-white/75">{kioskName}</span>
                 </h4>
 
                 {validationError && (
-                  <div className="mb-3 p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-black dark:text-white text-xs font-semibold border border-rose-200 dark:border-rose-800">
+                  <div className="mb-3 p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-black dark:text-white text-sm font-semibold border border-rose-200 dark:border-rose-800">
                     {validationError}
                   </div>
                 )}
 
                 {showSuccess && (
-                  <div className="mb-3 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white text-xs font-bold border border-emerald-300 dark:border-emerald-800 flex items-center gap-2">
+                  <div className="mb-3 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white text-sm font-bold border border-emerald-300 dark:border-emerald-800 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-black dark:text-white" />
                     Rekod jualan berjaya disimpan!
                   </div>
@@ -310,51 +310,51 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                 <form onSubmit={handleAddRecord} className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div>
-                      <label className="block text-[11px] font-bold text-black dark:text-white mb-1">Tarikh</label>
+                      <label className="block text-sm font-medium text-black dark:text-white mb-1.5">Tarikh</label>
                       <input
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-black dark:text-white mb-1">Jualan Tunai (RM)</label>
+                      <label className="block text-sm font-medium text-black dark:text-white mb-1.5">Jualan Tunai</label>
                       <input
                         type="number"
                         min="0"
                         step="0.01"
-                        placeholder="0.00"
+                        placeholder="Masukkan jumlah tunai"
                         value={cash}
                         onChange={(e) => setCash(e.target.value)}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-black dark:text-white mb-1">DuitNow QR (RM)</label>
+                      <label className="block text-sm font-medium text-black dark:text-white mb-1.5">Jualan DuitNow QR</label>
                       <input
                         type="number"
                         min="0"
                         step="0.01"
-                        placeholder="0.00"
+                        placeholder="Masukkan jumlah QR"
                         value={qr}
                         onChange={(e) => setQr(e.target.value)}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-black dark:text-white mb-1">Belanja / Kos (RM)</label>
+                      <label className="block text-sm font-medium text-black dark:text-white mb-1.5">Belanja Kos</label>
                       <input
                         type="number"
                         min="0"
                         step="0.01"
-                        placeholder="0.00"
+                        placeholder="Masukkan jumlah belanja"
                         value={expenses}
                         onChange={(e) => setExpenses(e.target.value)}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -362,15 +362,15 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                     <input
                       type="text"
-                      placeholder="Catatan jualan (cth: Habis 60 cawan kopi waktu pagi)..."
+                      placeholder="Masukkan catatan jualan"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                      className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                     />
                     <button
                       type="submit"
                       disabled={saving}
-                      className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 shadow-sm transition-colors cursor-pointer shrink-0 dark:bg-emerald-600"
+                      className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 shadow-sm transition-colors cursor-pointer shrink-0 dark:bg-emerald-600"
                     >
                       {saving ? 'Menyimpan...' : '+ Simpan Jualan'}
                     </button>
@@ -381,26 +381,26 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
               {/* Senarai Lejar Jualan */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-black dark:text-white">
+                  <h4 className="text-sm font-bold text-black dark:text-white">
                     Sejarah Transaksi Jualan ({salesRecords.length} Hari Direkod)
                   </h4>
                   <button
                     type="button"
                     onClick={handlePrint}
-                    className="text-[11px] text-black dark:text-white/75 font-bold hover:underline flex items-center gap-1 cursor-pointer print:hidden"
+                    className="text-sm text-black dark:text-white/75 font-bold hover:underline flex items-center gap-1 cursor-pointer print:hidden"
                   >
                     <Printer className="w-3.5 h-3.5" /> Cetak Rekod
                   </button>
                 </div>
 
                 {salesRecords.length === 0 ? (
-                  <div className="text-center py-8 text-xs text-black/70 dark:text-white/75 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl">
+                  <div className="text-center py-8 text-sm text-black/70 dark:text-white/75 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl">
                     Tiada rekod jualan lagi. Rekodkan transaksi pertama anda di atas.
                   </div>
                 ) : (
                   <div className="border border-slate-300 dark:border-slate-600 rounded-2xl overflow-x-auto">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-slate-50 dark:bg-slate-900 text-black/70 dark:text-white/75 border-b border-slate-300 dark:border-slate-600 text-[11px]">
+                    <table className="w-full text-sm text-left">
+                      <thead className="bg-slate-50 dark:bg-slate-900 text-black/70 dark:text-white/75 border-b border-slate-300 dark:border-slate-600 text-[0.8125rem]">
                         <tr>
                           <th className="py-2.5 px-3">Tarikh</th>
                           <th className="py-2.5 px-3">Tunai</th>
@@ -421,13 +421,13 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                               <td className="py-2.5 px-3 tabular-nums font-mono text-black dark:text-white/75 font-bold">RM {r.qrSales.toFixed(2)}</td>
                               <td className="py-2.5 px-3 tabular-nums font-mono text-black dark:text-white/75">RM {r.expenses.toFixed(2)}</td>
                               <td className="py-2.5 px-3 tabular-nums font-mono font-bold text-black dark:text-white">RM {dailyNet.toFixed(2)}</td>
-                              <td className="py-2.5 px-3 text-[11px] text-black/70 dark:text-white/75 max-w-[160px] truncate">{r.notes}</td>
+                              <td className="py-2.5 px-3 text-[0.875rem] text-black/70 dark:text-white/75 max-w-[160px] truncate">{r.notes}</td>
                               <td className="py-2.5 px-3 text-right print:hidden">
                                 <div className="inline-flex items-center justify-end gap-2 shrink-0">
                                   <button
                                     type="button"
                                     onClick={() => setEditingRecord(r)}
-                                    className="px-2.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/70 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 text-xs font-semibold whitespace-nowrap shrink-0"
+                                    className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 text-[0.8125rem] font-semibold whitespace-nowrap shrink-0"
                                     title="Edit rekod"
                                   >
                                     <Edit3 className="w-3.5 h-3.5 shrink-0" />
@@ -442,7 +442,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                                         onConfirm: () => handleDelete(r.id)
                                       })
                                     }
-                                    className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 text-xs font-semibold whitespace-nowrap shrink-0"
+                                    className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-200 dark:border-rose-800/70 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 text-[0.8125rem] font-semibold whitespace-nowrap shrink-0"
                                     title="Padam rekod"
                                   >
                                     <Trash2 className="w-3.5 h-3.5 shrink-0" />
@@ -478,14 +478,14 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
 
                 <div>
                   <div className="font-extrabold text-sm text-black uppercase">{businessName}</div>
-                  <div className="text-xs font-mono text-black font-semibold">{kioskName}</div>
-                  <div className="text-[10px] text-black/70 mt-1">Imbas menggunakan mana-mana aplikasi perbankan atau e-dompet (Touch &apos;n Go, GrabPay, MAE, CIMB).</div> </div> </div> <div className="flex items-center justify-center gap-3 print:hidden"> <button type="button" onClick={handlePrint} className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer dark:bg-blue-600" > <Printer className="w-4 h-4" /> <span>Cetak Stand QR Kiosk</span> </button> </div> </div> )} </div> {/* Footer */} <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0 print:hidden"> <div className="text-[11px] text-black/70 dark:text-white/75"> {isDemoSession ? 'Mod Demo: Rekod diasingkan daripada pangkalan data pengeluaran.'
+                  <div className="text-[0.8125rem] font-mono text-black font-semibold">{kioskName}</div>
+                  <div className="text-[0.8125rem] text-black/70 mt-1">Imbas menggunakan mana-mana aplikasi perbankan atau e-dompet (Touch &apos;n Go, GrabPay, MAE, CIMB).</div> </div> </div> <div className="flex items-center justify-center gap-3 print:hidden"> <button type="button" onClick={handlePrint} className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer dark:bg-blue-600" > <Printer className="w-4 h-4" /> <span>Cetak Stand QR Kiosk</span> </button> </div> </div> )} </div> {/* Footer */} <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0 print:hidden"> <div className="text-[0.8125rem] text-black/70 dark:text-white/75"> {isDemoSession ? 'Mod Demo: Rekod diasingkan daripada pangkalan data pengeluaran.'
               : 'Rekod disegerakkan dengan akaun usahawan anda.'}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-xs font-bold text-black dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-xl text-sm font-bold text-black dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             Tutup
           </button>

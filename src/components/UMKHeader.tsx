@@ -32,12 +32,15 @@ import {
   ExternalLink,
   Check,
   Newspaper,
-  MessagesSquare
+  MessagesSquare,
+  Type
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTextSize } from '../context/TextSizeContext';
 import { NotificationDropdown } from './NotificationDropdown';
+import { showToast } from './ToastNotification';
 import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab, MentorSubTab } from '../types';
 
 export type UMKTab = 
@@ -94,6 +97,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   const { user, userProfile, isAdmin, isMentor, isYouth, isDemoSession, logout, loginAsDemoUser } = useAuth();
   const { isDark, setTheme } = useTheme();
   const { t, language } = useLanguage();
+  const { textSize, setTextSize } = useTextSize();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -216,7 +220,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     KBelia
                   </span>
                 </div>
-                <p className="text-[11px] text-black/70 dark:text-white/75 font-normal">
+                <p className="text-[0.8125rem] text-black/75 dark:text-white/80 font-medium">
                   {isAdmin ? 'Panel Pentadbir' : userProfile?.role === 'mentor' ? 'Portal Mentor' : 'Portal Usahawan Belia'}
                 </p>
               </div>
@@ -251,14 +255,14 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 type="button"
                 onClick={() => setActiveTab('news')}
                 aria-current={activeTab === 'news' ? 'page' : undefined}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
                   activeTab === 'news'
                     ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
                     : 'text-black/80 hover:text-black hover:bg-white/80 dark:text-white/80 dark:hover:text-white dark:hover:bg-zinc-700/80'
                 }`}
                 title="Berita & Pengumuman Rasmi"
               >
-                <Newspaper className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'news' ? 'text-white' : 'text-black/75 dark:text-white/75'}`} />
+                <Newspaper className={`w-4 h-4 shrink-0 ${activeTab === 'news' ? 'text-white' : 'text-black/75 dark:text-white/75'}`} />
                 <span>News</span>
               </button>
 
@@ -267,14 +271,14 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 type="button"
                 onClick={() => setActiveTab('community')}
                 aria-current={activeTab === 'community' ? 'page' : undefined}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
                   activeTab === 'community'
                     ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
                     : 'text-black/80 hover:text-black hover:bg-white/80 dark:text-white/80 dark:hover:text-white dark:hover:bg-zinc-700/80'
                 }`}
                 title="Komuniti — Forum & Soal Jawab Usahawan"
               >
-                <MessagesSquare className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'community' ? 'text-white' : 'text-black/75 dark:text-white/75'}`} />
+                <MessagesSquare className={`w-4 h-4 shrink-0 ${activeTab === 'community' ? 'text-white' : 'text-black/75 dark:text-white/75'}`} />
                 <span>Komuniti</span>
               </button>
             </nav>
@@ -283,6 +287,49 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
           )}
 
         <div className="flex items-center gap-2 shrink-0">
+
+          {/* Text Size Switcher (Biasa / Besar) */}
+          <div
+            role="group"
+            aria-label="Pilihan Saiz Teks"
+            className="hidden sm:inline-flex items-center gap-0.5 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shrink-0"
+          >
+            <span className="px-1.5 text-black/70 dark:text-white/75 flex items-center" title="Saiz Teks">
+              <Type className="w-3.5 h-3.5" />
+            </span>
+            <button
+              id="kbelia-text-size-normal"
+              type="button"
+              onClick={() => {
+                setTextSize('normal');
+                showToast('Saiz teks ditetapkan ke mod Biasa.', 'info');
+              }}
+              aria-pressed={textSize === 'normal'}
+              className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                textSize === 'normal'
+                  ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                  : 'text-black dark:text-white hover:bg-white dark:hover:bg-slate-700'
+              }`}
+            >
+              Biasa
+            </button>
+            <button
+              id="kbelia-text-size-large"
+              type="button"
+              onClick={() => {
+                setTextSize('large');
+                showToast('Saiz teks ditetapkan ke mod Besar.', 'info');
+              }}
+              aria-pressed={textSize === 'large'}
+              className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                textSize === 'large'
+                  ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                  : 'text-black dark:text-white hover:bg-white dark:hover:bg-slate-700'
+              }`}
+            >
+              Besar
+            </button>
+          </div>
           
           {/* Global Search Button & Popover */}
           <div ref={searchContainerRef} className="relative">
@@ -306,10 +353,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder={isMentor ? 'Cari modul Portal Mentor (sesi, perakuan, log)...' : (t('search_global_ph') || 'Cari kiosk, usahawan, geran...')}
+                    placeholder={t('search_global_ph') || 'Masukkan kata kunci carian'}
                     value={globalSearch}
                     onChange={(e) => setGlobalSearch(e.target.value)}
-                    className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 shadow-2xs dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-8 py-2 text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 shadow-2xs dark:focus:border-blue-500"
                   />
                   <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 pointer-events-none" />
                   {globalSearch && (
@@ -329,7 +376,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     {searchResults.totalCount === 0 ? (
                       <div className="py-5 px-3 text-center">
                         <Search className="w-6 h-6 text-black/35 dark:text-white/35 mx-auto mb-1.5" />
-                        <p className="text-xs font-semibold text-black dark:text-white">
+                        <p className="text-sm font-semibold text-black dark:text-white">
                           {t('search_no_results')} "{globalSearch}"
                         </p>
                       </div>
@@ -338,8 +385,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         {/* Mentor Quick Navigation Results */}
                         {searchResults.mentorQuickLinks.length > 0 && (
                           <div>
-                            <div className="text-[10px] font-extrabold uppercase tracking-wider text-black dark:text-white/75 px-2 mb-1 flex items-center gap-1.5">
-                              <GraduationCap className="w-3 h-3" />
+                            <div className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black dark:text-white/80 px-2 mb-1 flex items-center gap-1.5">
+                              <GraduationCap className="w-3.5 h-3.5" />
                               <span>Modul Portal Mentor</span>
                             </div>
                             <div className="space-y-0.5">
@@ -356,10 +403,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                   className="w-full p-2 text-left rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between transition-colors cursor-pointer"
                                 >
                                   <div>
-                                    <span className="font-bold text-xs text-black dark:text-white block">
+                                    <span className="font-bold text-sm text-black dark:text-white block">
                                       {item.label}
                                     </span>
-                                    <span className="text-[10px] text-black/70 dark:text-white/75">
+                                    <span className="text-[0.8125rem] text-black/75 dark:text-white/80">
                                       {item.desc}
                                     </span>
                                   </div>
@@ -372,8 +419,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         {/* Kiosks results (Admin monitoring or Youth booking) */}
                         {searchResults.matchedSlots.length > 0 && (
                           <div>
-                            <div className="text-[10px] font-extrabold uppercase tracking-wider text-black dark:text-white/75 px-2 mb-1 flex items-center gap-1.5">
-                              <Building2 className="w-3 h-3" />
+                            <div className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black dark:text-white/80 px-2 mb-1 flex items-center gap-1.5">
+                              <Building2 className="w-3.5 h-3.5" />
                               <span>{t('search_results_kiosks')}</span>
                             </div>
                             <div className="space-y-0.5">
@@ -390,17 +437,17 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                   className="w-full p-2 text-left rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between transition-colors cursor-pointer"
                                 >
                                   <div>
-                                    <span className="font-bold text-xs text-black dark:text-white block">
+                                    <span className="font-bold text-sm text-black dark:text-white block">
                                       {slot.name} ({slot.code})
                                     </span>
-                                    <span className="text-[10px] text-black/70 dark:text-white/75 tabular-nums">
+                                    <span className="text-[0.8125rem] text-black/75 dark:text-white/80 tabular-nums">
                                       {slot.district} · RM{slot.monthlyRate}/bln
                                     </span>
                                   </div>
-                                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                  <span className={`text-[0.8125rem] font-bold px-2 py-0.5 rounded ${
                                     slot.status === 'available'
                                       ? 'bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white'
-                                      : 'bg-slate-100 dark:bg-slate-800 text-black dark:text-white/75'
+                                      : 'bg-slate-100 dark:bg-slate-800 text-black dark:text-white/80'
                                   }`}>
                                     {slot.status === 'available' ? t('slot_status_available') : t('slot_status_occupied')}
                                   </span>
@@ -413,8 +460,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         {/* Merchants results */}
                         {searchResults.matchedBiz.length > 0 && (
                           <div className="pt-2 border-t border-slate-300 dark:border-slate-600">
-                            <div className="text-[10px] font-extrabold uppercase tracking-wider text-black dark:text-white/75 px-2 mb-1 flex items-center gap-1.5">
-                              <Store className="w-3 h-3" />
+                            <div className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black dark:text-white/80 px-2 mb-1 flex items-center gap-1.5">
+                              <Store className="w-3.5 h-3.5" />
                               <span>{t('search_results_merchants')}</span>
                             </div>
                             <div className="space-y-0.5">
@@ -431,14 +478,14 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                   className="w-full p-2 text-left rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between transition-colors cursor-pointer"
                                 >
                                   <div>
-                                    <span className="font-bold text-xs text-black dark:text-white block">
+                                    <span className="font-bold text-sm text-black dark:text-white block">
                                       {biz.businessName}
                                     </span>
-                                    <span className="text-[10px] text-black/70 dark:text-white/75">
+                                    <span className="text-[0.8125rem] text-black/75 dark:text-white/80">
                                       {biz.category} · {biz.district}
                                     </span>
                                   </div>
-                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white">
+                                  <span className="text-[0.8125rem] font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white">
                                     SSM Disahkan
                                   </span>
                                 </button>
@@ -450,8 +497,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         {/* Programs results (Youth can open grant modal; Admin views grant monitoring) */}
                         {searchResults.matchedProg.length > 0 && (
                           <div className="pt-2 border-t border-slate-300 dark:border-slate-600">
-                            <div className="text-[10px] font-extrabold uppercase tracking-wider text-black dark:text-white/75 px-2 mb-1 flex items-center gap-1.5">
-                              <Award className="w-3 h-3" />
+                            <div className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black dark:text-white/80 px-2 mb-1 flex items-center gap-1.5">
+                              <Award className="w-3.5 h-3.5" />
                               <span>{t('search_results_grants')}</span>
                             </div>
                             <div className="space-y-0.5">
@@ -468,14 +515,14 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                   className="w-full p-2 text-left rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between transition-colors cursor-pointer"
                                 >
                                   <div>
-                                    <span className="font-bold text-xs text-black dark:text-white block">
+                                    <span className="font-bold text-sm text-black dark:text-white block">
                                       {prog.title}
                                     </span>
-                                    <span className="text-[10px] text-black/70 dark:text-white/75">
+                                    <span className="text-[0.8125rem] text-black/75 dark:text-white/80">
                                       {prog.category} · {prog.grantAmount}
                                     </span>
                                   </div>
-                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white">
+                                  <span className="text-[0.8125rem] font-bold px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white">
                                     Bantuan
                                   </span>
                                 </button>
@@ -487,7 +534,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     )}
                   </div>
                 ) : (
-                  <div className="py-2.5 px-2 text-[11px] text-black/70 dark:text-white/75">
+                  <div className="py-2.5 px-2 text-[0.8125rem] text-black/75 dark:text-white/80">
                     {isMentor
                       ? 'Taip modul Portal Mentor seperti sesi, perakuan, log atau profil.'
                       : 'Taip nama kiosk, produk usahawan, atau geran untuk carian pantas.'}
@@ -520,8 +567,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
             {/* Dropdown Menu below Theme Button */}
             {themeDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
-                <div className="text-[10px] font-extrabold text-black/70 dark:text-white/75 uppercase tracking-wider px-2.5 py-1 mb-1">
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="text-[0.8125rem] font-extrabold text-black/75 dark:text-white/80 uppercase tracking-wider px-2.5 py-1 mb-1">
                   Pilihan Tema
                 </div>
 
@@ -532,7 +579,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     setTheme('light');
                     setThemeDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold text-left transition-colors cursor-pointer ${
                     !isDark 
                       ? 'bg-blue-50 text-black dark:bg-blue-950/60 dark:text-white font-bold' 
                       : 'text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -542,7 +589,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     <Sun className="w-4 h-4 text-black/70 dark:text-white/75" />
                     <span>Mod Cerah</span>
                   </div>
-                  {!isDark && <Check className="w-3.5 h-3.5 text-black dark:text-white/75" />}
+                  {!isDark && <Check className="w-4 h-4 text-black dark:text-white/75" />}
                 </button>
 
                 {/* Mod Malam Option */}
@@ -552,7 +599,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     setTheme('dark');
                     setThemeDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold text-left transition-colors cursor-pointer ${
                     isDark 
                       ? 'bg-blue-50 text-black dark:bg-blue-950/60 dark:text-white font-bold' 
                       : 'text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -562,7 +609,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     <Moon className="w-4 h-4 text-black/70 dark:text-white/75" />
                     <span>Mod Malam</span>
                   </div>
-                  {isDark && <Check className="w-3.5 h-3.5 text-black dark:text-white/75" />}
+                  {isDark && <Check className="w-4 h-4 text-black dark:text-white/75" />}
                 </button>
               </div>
             )}
@@ -588,15 +635,48 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               </button>
 
               {mobileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="text-[10px] font-extrabold text-black/70 dark:text-white/75 uppercase tracking-wider px-2.5 py-1 mb-1">
+                <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="text-[0.8125rem] font-extrabold text-black/75 dark:text-white/80 uppercase tracking-wider px-2.5 py-1 mb-1">
+                    Saiz Teks
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5 px-1 pb-2 mb-2 border-b border-slate-300 dark:border-slate-600">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTextSize('normal');
+                        showToast('Saiz teks ditetapkan ke mod Biasa.', 'info');
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
+                        textSize === 'normal'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-slate-100 dark:bg-slate-900 text-black dark:text-white'
+                      }`}
+                    >
+                      Biasa
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTextSize('large');
+                        showToast('Saiz teks ditetapkan ke mod Besar.', 'info');
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
+                        textSize === 'large'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-slate-100 dark:bg-slate-900 text-black dark:text-white'
+                      }`}
+                    >
+                      Besar
+                    </button>
+                  </div>
+                  <div className="text-[0.8125rem] font-extrabold text-black/75 dark:text-white/80 uppercase tracking-wider px-2.5 py-1 mb-1">
                     {t('nav_quick_nav')}
                   </div>
                   <div className="space-y-1">
                     <button
                       type="button"
                       onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left transition-colors cursor-pointer ${
                         activeTab === 'home' 
                           ? 'bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70' 
                           : 'text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -609,7 +689,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     <button
                       type="button"
                       onClick={() => { setActiveTab('news'); setMobileMenuOpen(false); }}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left transition-colors cursor-pointer ${
                         activeTab === 'news' 
                           ? 'bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70' 
                           : 'text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -622,7 +702,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     <button
                       type="button"
                       onClick={() => { setActiveTab('community'); setMobileMenuOpen(false); }}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-colors cursor-pointer ${
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left transition-colors cursor-pointer ${
                         activeTab === 'community' 
                           ? 'bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70' 
                           : 'text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -637,7 +717,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('admin'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <ShieldCheck className="w-4 h-4 text-black dark:text-white/75" />
                           <span>{t('nav_admin_control')}</span>
@@ -645,7 +725,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('academic'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Building2 className="w-4 h-4 text-black dark:text-white/75" />
                           <span>{t('nav_kiosk_approval')}</span>
@@ -653,7 +733,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('ceed'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Award className="w-4 h-4 text-black dark:text-white/75" />
                           <span>{t('nav_grant_approval')}</span>
@@ -666,7 +746,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('overview'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <LayoutDashboard className="w-4 h-4 text-black dark:text-white/75" />
                           <span>Ringkasan Mentor</span>
@@ -674,7 +754,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('sessions'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Calendar className="w-4 h-4 text-black dark:text-white/75" />
                           <span>Sesi Bimbingan</span>
@@ -682,7 +762,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('endorsements'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Award className="w-4 h-4 text-black dark:text-white/75" />
                           <span>Perakuan Geran</span>
@@ -690,7 +770,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('logbook'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <FileCheck className="w-4 h-4 text-black dark:text-white/75" />
                           <span>Rekod Sesi</span>
@@ -703,7 +783,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('merchant'); if (onSelectMerchantSubTab) onSelectMerchantSubTab('overview'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <LayoutDashboard className="w-4 h-4 text-black dark:text-white/75" />
                           <span>{t('dashboard')}</span>
@@ -711,7 +791,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('academic'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Building2 className="w-4 h-4 text-black dark:text-white/75" />
                           <span>{t('nav_my_kiosk')}</span>
@@ -719,7 +799,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('merchant'); if (onSelectMerchantSubTab) onSelectMerchantSubTab('cashflow'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Coins className="w-4 h-4 text-black dark:text-white/75" />
                           <span>{t('nav_sales_pos')}</span>
@@ -727,7 +807,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <button
                           type="button"
                           onClick={() => { setActiveTab('ceed'); setMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Award className="w-4 h-4 text-black dark:text-white/75" />
                           <span>{t('grants')}</span>
@@ -750,10 +830,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 title={`${displayName} - ${isAdmin ? 'Pentadbiran' : userProfile?.role === 'mentor' ? 'Mentor' : 'Usahawan'}`}
               >
                 <div className="text-right hidden sm:block">
-                  <div className="text-xs font-bold text-black dark:text-white leading-tight whitespace-nowrap group-hover:text-black dark:group-hover:text-white transition-colors">
+                  <div className="text-sm font-bold text-black dark:text-white leading-tight whitespace-nowrap group-hover:text-black dark:group-hover:text-white transition-colors">
                     {displayName}
                   </div>
-                  <div className="text-[10.5px] font-bold text-black dark:text-white/75 whitespace-nowrap">
+                  <div className="text-[0.8125rem] font-semibold text-black/80 dark:text-white/80 whitespace-nowrap">
                     {isAdmin ? 'Pentadbiran' : userProfile?.role === 'mentor' ? t('role_mentor') : t('role_youth')}
                   </div>
                 </div>
@@ -770,12 +850,12 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
               {/* Profile Dropdown Menu */}
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute right-0 mt-2 w-68 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
                   <div className="p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2 border border-slate-300 dark:border-slate-600">
-                    <div className="text-xs font-bold text-black dark:text-white truncate">{displayName}</div>
-                    <div className="text-[11px] text-black/70 dark:text-white/75 truncate">{user.email}</div>
-                    <div className="mt-1 flex items-center gap-1 text-[10px] text-black dark:text-white/75 font-medium">
-                      <Clock className="w-3 h-3" />
+                    <div className="text-sm font-bold text-black dark:text-white truncate">{displayName}</div>
+                    <div className="text-[0.8125rem] text-black/75 dark:text-white/80 truncate">{user.email}</div>
+                    <div className="mt-1 flex items-center gap-1.5 text-[0.8125rem] text-black dark:text-white/80 font-medium">
+                      <Clock className="w-3.5 h-3.5" />
                       <span>{isDemoSession ? 'Mod Demo Ujian' : t('active_session')}</span>
                     </div>
                   </div>
@@ -785,7 +865,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       id="kbelia-dropdown-setting-btn"
                       type="button"
                       onClick={() => { setActiveTab('settings'); setProfileDropdownOpen(false); }}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold rounded-xl text-left transition-colors cursor-pointer ${
+                      className={`w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl text-left transition-colors cursor-pointer ${
                         activeTab === 'settings'
                           ? 'bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white font-bold border border-indigo-200 dark:border-indigo-800/70'
                           : 'text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -800,8 +880,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     {/* QUICK ROLE SWITCHER STRICTLY RESTRICTED TO ISOLATED DEMO SESSIONS */}
                     {isDemoSession && (
                       <div className="pt-2 border-t border-slate-300 dark:border-slate-600 mt-1.5">
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-black/70 dark:text-white/75 px-3 mb-1.5 flex items-center gap-1">
-                          <Sparkles className="w-3 h-3 text-black/70 dark:text-white/75" />
+                        <div className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/75 dark:text-white/80 px-3 mb-1.5 flex items-center gap-1">
+                          <Sparkles className="w-3.5 h-3.5 text-black/75 dark:text-white/80" />
                           <span>Mod Demo Ujian</span>
                         </div>
                         <div className="grid grid-cols-3 gap-1 px-1">
@@ -812,7 +892,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                               setActiveTab('merchant');
                               setProfileDropdownOpen(false);
                             }}
-                            className={`px-1.5 py-1 rounded text-[10px] font-bold text-center transition-colors cursor-pointer ${
+                            className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
                               !isAdmin && userProfile?.role !== 'mentor'
                                 ? 'bg-teal-600 text-white dark:bg-teal-600'
                                 : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700'
@@ -827,7 +907,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                               setActiveTab('mentor');
                               setProfileDropdownOpen(false);
                             }}
-                            className={`px-1.5 py-1 rounded text-[10px] font-bold text-center transition-colors cursor-pointer ${
+                            className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
                               userProfile?.role === 'mentor'
                                 ? 'bg-teal-600 text-white dark:bg-teal-600'
                                 : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700'
@@ -842,7 +922,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                               setActiveTab('admin');
                               setProfileDropdownOpen(false);
                             }}
-                            className={`px-1.5 py-1 rounded text-[10px] font-bold text-center transition-colors cursor-pointer ${
+                            className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer ${
                               isAdmin
                                 ? 'bg-blue-600 text-white font-black dark:bg-blue-600'
                                 : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700'
@@ -862,7 +942,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           setProfileDropdownOpen(false);
                           setShowLogoutConfirm(true);
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs font-bold text-black dark:text-white/75 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl text-left transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-bold text-black dark:text-white/80 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl text-left transition-colors cursor-pointer"
                       >
                         <LogOut className="w-4 h-4 text-black/70 dark:text-white/75" />
                         <span>{t('logout')}</span>
@@ -877,7 +957,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               id="kbelia-header-login-btn"
               type="button"
               onClick={() => setActiveTab('login')}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-2xs transition-colors cursor-pointer dark:bg-blue-600"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-2xs transition-colors cursor-pointer dark:bg-blue-600 whitespace-nowrap shrink-0"
             >
               <LogIn className="w-4 h-4 text-white" />
               <span>{t('login')}</span>
@@ -904,10 +984,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
             <LogOut className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-base font-extrabold text-black dark:text-white">
+            <h3 className="text-lg font-extrabold text-black dark:text-white">
               {t('logout_confirm_title')}
             </h3>
-            <p className="text-xs text-black/70 dark:text-white/75 mt-1 leading-relaxed">
+            <p className="text-[0.9375rem] text-black/75 dark:text-white/80 mt-1.5 leading-relaxed">
               {t('logout_confirm_desc')}
             </p>
           </div>
@@ -916,7 +996,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               type="button"
               id="btn-logout-confirm-no"
               onClick={() => setShowLogoutConfirm(false)}
-              className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
+              className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
             >
               {t('cancel')}
             </button>
@@ -928,7 +1008,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 setShowLogoutConfirm(false);
                 setActiveTab('login');
               }}
-              className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs transition-colors cursor-pointer dark:bg-rose-600"
+              className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs transition-colors cursor-pointer dark:bg-rose-600"
             >
               {t('confirm_logout')}
             </button>

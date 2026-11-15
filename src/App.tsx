@@ -1603,7 +1603,7 @@ function MainApp() {
           <div className="w-full">
           {/* Portal Maintenance / Announcement Bar from Admin Settings */}
           {portalSettings.systemStatus === 'maintenance' && !isAdmin && (
-            <div className="mb-3 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-black dark:text-white text-xs flex items-center justify-between gap-3">
+            <div className="mb-3 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-black dark:text-white text-sm flex items-center justify-between gap-3">
               <span className="font-semibold">
                 Mod Penyelenggaraan Sistem Aktif — Sebahagian permohonan baharu ditutup buat sementara waktu. {portalSettings.portalAnnouncement}
               </span>
@@ -1640,6 +1640,7 @@ function MainApp() {
                     maintenanceTickets={maintenanceTickets}
                     portalSettings={portalSettings}
                     newsItems={newsItems}
+                    communityPosts={communityPosts}
                     onUpdateMentor={handleUpdateMentorProfile}
                     onRefresh={triggerRefresh}
                     activeSubTab={adminSubTab}
@@ -1716,14 +1717,14 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Kiosk Belia Disekat</h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Akaun Mentor dihadkan kepada portal bimbingan, surat sokongan geran, dan rekod sesi usahawan sahaja tanpa capaian modul sewaan kiosk.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>Kembali ke Portal Mentor</span>
@@ -1757,14 +1758,14 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black dark:text-white">Akses Direktori Awam Disekat</h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Untuk keselamatan dan batas peranan, Mentor hanya melihat usahawan mentee di bawah seliaan sendiri di Portal Mentor.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>Kembali ke Portal Mentor</span>
@@ -1790,14 +1791,14 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Permohonan Geran Disekat</h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Mentor hanya mengurus surat perakuan rasmi melalui tab Perakuan Geran di Portal Mentor.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>Kembali ke Portal Mentor</span>
@@ -1824,14 +1825,14 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Acara Belia Sahaja</h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Halaman penyertaan acara & karnival ini dikhaskan untuk Usahawan Belia.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
                 </button>
@@ -1852,14 +1853,14 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black dark:text-white">Akses Ruang Niaga Usahawan Sahaja</h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Ruang Niaga dikhaskan untuk rantaian bekalan dan kerjasama antara usahawan belia.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
                 </button>
@@ -1880,14 +1881,14 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black dark:text-white">Akses Kalkulator Geran Usahawan Sahaja</h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Simulasi kelayakan geran ini dikhaskan kepada pemohon Usahawan Belia.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>
                 </button>
@@ -1913,7 +1914,7 @@ function MainApp() {
                   <h3 className="text-lg font-bold text-black dark:text-white">
                     {language === 'en' ? 'Administrator Access Only' : 'Akses Khusus Pentadbir Sistem Sahaja'}
                   </h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {isMentor 
                       ? 'Akaun anda adalah akaun Mentor. Modul kawalan pentadbir sistem hanya dikhaskan kepada pihak pentadbir KBelia.'
                       : 'Halaman ini dikhaskan kepada Pentadbir Sistem Kerajaan Negeri & UMK.'}
@@ -1922,7 +1923,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isMentor ? 'mentor' : 'home')}
-                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
+                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>{isMentor ? 'Kembali ke Hab Mentor' : 'Kembali ke Laman Utama'}</span>
@@ -1941,6 +1942,7 @@ function MainApp() {
                   maintenanceTickets={maintenanceTickets}
                   portalSettings={portalSettings}
                   newsItems={newsItems}
+                  communityPosts={communityPosts}
                   onUpdateMentor={handleUpdateMentorProfile}
                   onRefresh={triggerRefresh}
                   activeSubTab={adminSubTab}
@@ -1964,7 +1966,7 @@ function MainApp() {
                   <h3 className="text-lg font-bold text-black dark:text-white">
                     {language === 'en' ? 'Certified Mentor Access Only' : 'Akses Khusus Mentor Sahaja'}
                   </h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {isAdmin
                       ? 'Akaun Pentadbir menggunakan modul Panel Mentor di Pusat Kawalan Pentadbir untuk melantik serta memantau mentor, manakala ruang bimbingan ini dikhaskan kepada Mentor sahaja.'
                       : 'Hab Bimbingan Mentor dikhaskan kepada panel mentor rasmi UMK & agensi keusahawanan.'}
@@ -1973,7 +1975,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'home')}
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-blue-600"
+                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-blue-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Laman Utama'}</span>
@@ -2008,7 +2010,7 @@ function MainApp() {
                   <h3 className="text-lg font-bold text-black dark:text-white">
                     {language === 'en' ? 'Youth Entrepreneur Portal Only' : 'Akses Khusus Usahawan Belia Sahaja'}
                   </h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {language === 'en'
                       ? 'You are logged in with an Administrator account. Merchant business operations and kiosk management are reserved for registered youth.'
                       : 'Akaun anda adalah Pentadbir Sistem (Admin). Modul pengurusan bisnes usahawan dikhaskan kepada usahawan belia Kelantan.'}
@@ -2017,7 +2019,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('admin')}
-                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
+                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>{language === 'en' ? 'Back to Admin Control Panel' : 'Kembali ke Pusat Kawalan Pentadbir'}</span>
@@ -2032,7 +2034,7 @@ function MainApp() {
                   <h3 className="text-lg font-bold text-black dark:text-white">
                     {language === 'en' ? 'Youth Entrepreneur Portal Only' : 'Akses Khusus Usahawan Belia Sahaja'}
                   </h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {language === 'en'
                       ? 'You are logged in with an Academic Mentor account. Business management is reserved for youth mentees. Please use the Mentor Coaching Hub.'
                       : 'Akaun anda adalah Mentor Bimbingan UMK. Modul pengurusan bisnes dikhaskan kepada usahawan belia. Sila gunakan Hab Mentor untuk menyemak dan membimbing usahawan.'}
@@ -2041,7 +2043,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>{language === 'en' ? 'Back to Mentor Coaching Hub' : 'Kembali ke Hab Bimbingan Mentor'}</span>
@@ -2094,7 +2096,7 @@ function MainApp() {
                   <h3 className="text-lg font-bold text-black dark:text-white">
                     {language === 'en' ? 'Youth Entrepreneur Access Only' : 'Akses Khusus Usahawan Belia Sahaja'}
                   </h3>
-                  <p className="text-xs text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {language === 'en'
                       ? 'Mentor appointment booking is reserved for Youth Entrepreneur accounts.'
                       : 'Halaman tempahan dan pengurusan temu janji mentor dikhaskan kepada akaun Usahawan Belia.'}
@@ -2103,7 +2105,7 @@ function MainApp() {
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span>{isAdmin ? 'Kembali ke Pusat Kawalan Pentadbir' : 'Kembali ke Portal Mentor'}</span>

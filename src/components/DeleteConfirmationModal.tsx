@@ -93,7 +93,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
         {/* Highlighted Item Name */}
         <div className="mt-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 px-4 py-3">
           {itemType && (
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-black/70 dark:text-white/75 mb-0.5">
+            <div className="text-[0.8125rem] font-semibold uppercase tracking-wider text-black/70 dark:text-white/75 mb-0.5">
               {itemType}
             </div>
           )}
@@ -103,7 +103,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
         </div>
 
         {/* Warning Description */}
-        <p className="mt-3 text-xs sm:text-sm text-black/80 dark:text-white/80 leading-relaxed">
+        <p className="mt-3 text-[0.9375rem] text-black/80 dark:text-white/80 leading-relaxed">
           {resolvedDesc}
         </p>
 

@@ -117,7 +117,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white tracking-tight">
                 Hab Temujanji Klinik Usahawan & Mentor
               </h3>
-              <p className="text-xs text-black dark:text-white">
+              <p className="text-[0.9375rem] text-black dark:text-white">
                 Bimbingan 1-ke-1 Percuma Bersama Mentor UMK & Industri (Tajaan Dana Belia)
               </p>
             </div>
@@ -144,12 +144,12 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 <h4 className="text-base sm:text-lg font-bold text-black dark:text-white">
                   Permohonan Bimbingan Berjaya Dihantar!
                 </h4>
-                <p className="text-xs sm:text-sm text-black dark:text-white max-w-md mx-auto">
+                <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto">
                   Permohonan anda telah dihantar terus ke papan pemuka <span className="font-bold text-black dark:text-white/75">{selectedMentor?.name}</span>. Mentor akan menyemak butiran dan mengesahkan temujanji anda.
                 </p>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-900 p-4.5 rounded-xl border border-slate-300 dark:border-slate-600 max-w-md mx-auto text-left text-xs sm:text-sm space-y-2">
+              <div className="bg-slate-50 dark:bg-slate-900 p-4.5 rounded-xl border border-slate-300 dark:border-slate-600 max-w-md mx-auto text-left text-sm sm:text-[0.9375rem] space-y-2">
                 <div className="flex justify-between">
                   <span className="text-black/70 dark:text-white/75 font-medium">Mentor:</span>
                   <span className="font-bold text-black dark:text-white">{selectedMentor?.name}</span>
@@ -175,14 +175,14 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     setSelectedMentor(null);
                     setIsSubmitted(false);
                   }}
-                  className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                 >
                   Pilih Mentor Lain
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all cursor-pointer dark:bg-teal-600"
+                  className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all cursor-pointer dark:bg-teal-600"
                 >
                   Selesai & Tutup
                 </button>
@@ -197,21 +197,21 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     <GraduationCap className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs sm:text-sm font-bold text-black dark:text-white">{selectedMentor.name}</div>
-                    <div className="text-xs text-black dark:text-white/75">{selectedMentor.title} &middot; {selectedMentor.agency}</div>
+                    <div className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white">{selectedMentor.name}</div>
+                    <div className="text-sm text-black dark:text-white/75">{selectedMentor.title} &middot; {selectedMentor.agency}</div>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedMentor(null)}
-                  className="text-xs font-semibold text-black dark:text-white/75 hover:underline cursor-pointer"
+                  className="text-sm font-semibold text-black dark:text-white/75 hover:underline cursor-pointer"
                 >
                   Tukar Mentor
                 </button>
               </div>
 
               {validationError && (
-                <div className="p-3.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-black dark:text-white flex items-center gap-2">
+                <div className="p-3.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-sm text-black dark:text-white flex items-center gap-2">
                   <span>{validationError}</span>
                 </div>
               )}
@@ -220,29 +220,30 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 {/* 2-Column Row 1: Nama Usahawan + Telefon */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Nama Penuh Usahawan: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Nama Penuh <span className="text-black dark:text-white">*</span>
                     </label>
                     <input
                       type="text"
                       required
                       value={entrepreneurName}
                       onChange={(e) => setEntrepreneurName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                      placeholder="Masukkan nama penuh"
+                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Nombor WhatsApp: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Nombor Telefon <span className="text-black dark:text-white">*</span>
                     </label>
                     <input
                       type="text"
                       required
                       value={entrepreneurPhone}
                       onChange={(e) => setEntrepreneurPhone(e.target.value)}
-                      placeholder="Nombor telefon"
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                      placeholder="Masukkan nombor telefon"
+                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -250,26 +251,27 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 {/* 2-Column Row 2: Nama Perniagaan + Jajahan */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Nama Perniagaan / Kiosk: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Nama Perniagaan <span className="text-black dark:text-white">*</span>
                     </label>
                     <input
                       type="text"
                       required
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                      placeholder="Masukkan nama perniagaan"
+                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Jajahan Premis: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Daerah <span className="text-black dark:text-white">*</span>
                     </label>
                     <select
                       value={district}
                       onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       <option value="Kota Bharu" className="dark:bg-slate-900">Kota Bharu</option>
                       <option value="Bachok" className="dark:bg-slate-900">Bachok</option>
@@ -287,47 +289,47 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
 
                 {/* Topik Bimbingan */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                    Topik Bimbingan Utama yang Diperlukan: <span className="text-black dark:text-white">*</span>
+                  <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                    Topik Bimbingan <span className="text-black dark:text-white">*</span>
                   </label>
                   <select
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                    className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
                   >
-                    <option value="Strategi Pemasaran Digital & TikTok Shop" className="dark:bg-slate-900">Strategi Pemasaran Digital & TikTok Shop</option>
-                    <option value="Pengurusan Aliran Tunai & Penyata Kewangan Kiosk" className="dark:bg-slate-900">Pengurusan Aliran Tunai & Penyata Kewangan Kiosk</option>
-                    <option value="Permohonan Pembiayaan TEKUN, MARA & Geran Negeri" className="dark:bg-slate-900">Permohonan Pembiayaan TEKUN, MARA & Geran Negeri</option>
-                    <option value="Penembusan Pasaran Eksport & Fesyen Batik Warisan" className="dark:bg-slate-900">Penembusan Pasaran Eksport & Fesyen Batik Warisan</option>
-                    <option value="Pensijilan Halal JAKIM & Piawaian Makanan MeSTI" className="dark:bg-slate-900">Pensijilan Halal JAKIM & Piawaian Makanan MeSTI</option>
-                    <option value="Rundingan Pembekal & Pengurusan Inventori" className="dark:bg-slate-900">Rundingan Pembekal & Pengurusan Inventori</option>
+                    <option value="Strategi Pemasaran Digital & TikTok Shop" className="dark:bg-slate-900">Strategi Pemasaran Digital &amp; TikTok Shop</option>
+                    <option value="Pengurusan Aliran Tunai & Penyata Kewangan Kiosk" className="dark:bg-slate-900">Pengurusan Aliran Tunai &amp; Penyata Kewangan Kiosk</option>
+                    <option value="Permohonan Pembiayaan TEKUN, MARA & Geran Negeri" className="dark:bg-slate-900">Permohonan Pembiayaan TEKUN, MARA &amp; Geran Negeri</option>
+                    <option value="Penembusan Pasaran Eksport & Fesyen Batik Warisan" className="dark:bg-slate-900">Penembusan Pasaran Eksport &amp; Fesyen Batik Warisan</option>
+                    <option value="Pensijilan Halal JAKIM & Piawaian Makanan MeSTI" className="dark:bg-slate-900">Pensijilan Halal JAKIM &amp; Piawaian Makanan MeSTI</option>
+                    <option value="Rundingan Pembekal & Pengurusan Inventori" className="dark:bg-slate-900">Rundingan Pembekal &amp; Pengurusan Inventori</option>
                   </select>
                 </div>
 
                 {/* Cabaran Khusus */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                    Keterangan Cabaran / Soalan Khusus untuk Mentor:
+                  <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                    Keterangan Permohonan
                   </label>
                   <textarea
                     rows={2}
                     value={challenges}
                     onChange={(e) => setChallenges(e.target.value)}
-                    placeholder="Nyatakan soalan atau cabaran anda secara ringkas..."
-                    className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                    placeholder="Masukkan keterangan permohonan"
+                    className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
 
                 {/* 2-Column Row 3: Tarikh + Mod */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Pilihan Tarikh & Masa: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Tarikh dan Masa <span className="text-black dark:text-white">*</span>
                     </label>
                     <select
                       value={preferredDate}
                       onChange={(e) => setPreferredDate(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       <option value="28 Mac 2026 (Sabtu)" className="dark:bg-slate-900">28 Mac 2026 (Sabtu) - 10:00 AM</option>
                       <option value="30 Mac 2026 (Isnin)" className="dark:bg-slate-900">30 Mac 2026 (Isnin) - 11:30 AM</option>
@@ -337,13 +339,13 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs sm:text-sm font-medium text-black dark:text-white mb-2">
-                      Mod Sesi Bimbingan: <span className="text-black dark:text-white">*</span>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Mod Sesi <span className="text-black dark:text-white">*</span>
                     </label>
                     <select
                       value={mode}
                       onChange={(e) => setMode(e.target.value as any)}
-                      className="w-full px-4.5 py-3 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       <option value="Bersemuka di Kampus" className="dark:bg-slate-900">Bersemuka di Kampus UMK</option>
                       <option value="Google Meet Maya" className="dark:bg-slate-900">Google Meet Maya (Atas Talian)</option>
@@ -356,13 +358,13 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setSelectedMentor(null)}
-                    className="py-2.5 px-5 rounded-lg text-xs sm:text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                    className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
                   >
                     Kembali
                   </button>
                   <button
                     type="submit"
-                    className="py-2.5 px-6 rounded-lg text-xs sm:text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer dark:bg-teal-600"
+                    className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer dark:bg-teal-600"
                   >
                     <Send className="w-4 h-4" />
                     <span>Hantar Permohonan Bimbingan</span>
@@ -373,7 +375,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
           ) : (
             /* View 3: Mentor List */
             <div className="space-y-4">
-              <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 Pilih mentor daripada Universiti Malaysia Kelantan (UMK) dan industri untuk mendapatkan maklum balas perniagaan, penetapan harga, atau pelan pensijilan secara percuma.
               </p>
 
@@ -386,16 +388,16 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
+                          <span className="text-[0.8125rem] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
                             {mentor.agency}
                           </span>
-                          <span className="text-[11px] text-black/70 dark:text-white/75">&bull; {mentor.availableDays}</span>
+                          <span className="text-[0.8125rem] text-black/70 dark:text-white/75">&bull; {mentor.availableDays}</span>
                         </div>
                         
                         <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
                           {mentor.name}
                         </h4>
-                        <p className="text-xs text-black dark:text-white/75">
+                        <p className="text-[0.9375rem] text-black dark:text-white/75">
                           {mentor.title}
                         </p>
                       </div>
@@ -403,7 +405,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleStartBooking(mentor)}
-                        className="py-2 px-4 rounded-lg text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors shadow-xs shrink-0 cursor-pointer self-start sm:self-auto flex items-center gap-1.5 dark:bg-teal-600"
+                        className="py-2 px-4 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors shadow-xs shrink-0 cursor-pointer self-start sm:self-auto flex items-center gap-1.5 dark:bg-teal-600"
                       >
                         <span>Pilih Mentor & Tempah</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -413,7 +415,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     {/* Expertise Tags */}
                     <div className="flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-300 dark:border-slate-600">
                       {mentor.expertise.map((exp, idx) => (
-                        <span key={idx} className="text-[10px] font-medium bg-slate-50 dark:bg-slate-900 text-black dark:text-white px-2 py-0.5 rounded-md border border-slate-300 dark:border-slate-600">
+                        <span key={idx} className="text-[0.8125rem] font-medium bg-slate-50 dark:bg-slate-900 text-black dark:text-white px-2 py-0.5 rounded-md border border-slate-300 dark:border-slate-600">
                           {exp}
                         </span>
                       ))}

@@ -191,8 +191,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
     if (!entrepreneurName.trim() || !businessName.trim() || !entrepreneurPhone.trim()) {
       setValidationError(
         isEn
-          ? 'Please fill in your full name, business name, and WhatsApp phone number.'
-          : 'Sila lengkapkan nama penuh, nama perniagaan, dan nombor WhatsApp anda.'
+          ? 'Please fill in your full name, business name, and phone number.'
+          : 'Sila lengkapkan nama penuh, nama perniagaan, dan nombor telefon anda.'
       );
       return;
     }
@@ -243,28 +243,28 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
         return {
           label: isEn ? 'Confirmed' : 'Disahkan',
           className:
-            'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700',
+            'bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border-emerald-300 dark:border-emerald-700',
           icon: CheckCircle2
         };
       case 'pending':
         return {
           label: isEn ? 'Pending Mentor Confirmation' : 'Menunggu Pengesahan Mentor',
           className:
-            'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700',
+            'bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border-amber-300 dark:border-amber-700',
           icon: Clock
         };
       case 'completed':
         return {
           label: isEn ? 'Completed' : 'Selesai',
           className:
-            'bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700',
+            'bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border-blue-300 dark:border-blue-700',
           icon: UserCheck
         };
       default:
         return {
           label: isEn ? 'Cancelled' : 'Dibatalkan',
           className:
-            'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700',
+            'bg-rose-50 dark:bg-rose-950/60 text-black dark:text-white border-rose-300 dark:border-rose-700',
           icon: XCircle
         };
     }
@@ -286,16 +286,16 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance">
             {isEn ? 'Mentor Advisory & Appointments' : 'Bimbingan & Temu Janji Mentor'}
           </h1>
-          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 leading-relaxed">
+          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed">
             {isEn
               ? 'Choose one certified UMK or agency mentor at a time to schedule your 1-on-1 session.'
               : 'Pilih seorang penasihat bertauliah UMK atau agensi pada satu masa untuk menempah slot anda.'}
           </p>
         </div>
 
-        <div className="flex items-center gap-4 text-xs shrink-0 pt-2 lg:pt-0">
+        <div className="flex items-center gap-4 text-sm shrink-0 pt-2 lg:pt-0">
           <div className="px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-            <div className="text-[11px] font-semibold text-black/65 dark:text-white/70">
+            <div className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
               {isEn ? 'Available Mentors' : 'Mentor Tersedia'}
             </div>
             <div className="text-base font-black text-black dark:text-white tabular-nums">
@@ -303,7 +303,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
             </div>
           </div>
           <div className="px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-            <div className="text-[11px] font-semibold text-black/65 dark:text-white/70">
+            <div className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
               {isEn ? 'Active Limit' : 'Had Aktif'}
             </div>
             <div className="text-base font-black text-black dark:text-white tabular-nums">
@@ -326,7 +326,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               >
                 {isEn ? 'Your Active Mentorship Appointment' : 'Temu Janji Bimbingan Aktif Anda'}
               </h2>
-              <p className="text-xs text-black/70 dark:text-white/75">
+              <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
                 {isEn
                   ? 'Only 1 active appointment is allowed per account at a time.'
                   : 'Hanya 1 temu janji aktif dibenarkan bagi setiap akaun dalam satu masa.'}
@@ -338,7 +338,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               const StatusIcon = meta.icon;
               return (
                 <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold self-start sm:self-auto ${meta.className}`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-bold self-start sm:self-auto ${meta.className}`}
                 >
                   <StatusIcon className="w-3.5 h-3.5 shrink-0" />
                   <span>{meta.label}</span>
@@ -353,19 +353,19 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
                 <div className="space-y-3 flex-1 min-w-0">
                   <div>
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-black/60 dark:text-white/65">
+                    <div className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65">
                       {isEn ? 'Assigned Mentor' : 'Mentor Pilihan'}
                     </div>
                     <h3 className="text-lg font-black text-black dark:text-white mt-0.5">
                       {activeSession.mentorName}
                     </h3>
-                    <p className="text-xs font-semibold text-black/75 dark:text-white/75 mt-0.5">
+                    <p className="text-[0.9375rem] font-semibold text-black/75 dark:text-white/75 mt-0.5">
                       {activeSession.topic}
                     </p>
                   </div>
 
                   {/* Clean Metadata Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-slate-200 dark:border-zinc-700 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-slate-200 dark:border-zinc-700 text-sm">
                     <div>
                       <div className="text-black/60 dark:text-white/65 font-medium flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5" />
@@ -414,7 +414,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 
               {/* Mentor Notes / Action Plan / Meeting Link */}
               {(activeSession.meetingLink || activeSession.mentorActionPlan || activeSession.notes) && (
-                <div className="pt-4 border-t border-slate-200 dark:border-zinc-700 space-y-2.5 text-xs">
+                <div className="pt-4 border-t border-slate-200 dark:border-zinc-700 space-y-2.5 text-sm">
                   {activeSession.meetingLink && (
                     <div className="flex flex-wrap items-center justify-between gap-3 py-2">
                       <div>
@@ -460,7 +460,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 
               {/* Action Bar with Inline 2-Step Cancel Confirmation */}
               <div className="pt-4 border-t border-slate-200 dark:border-zinc-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-xs text-black/75 dark:text-white/75">
+                <div className="flex items-center gap-2 text-sm text-black/75 dark:text-white/75">
                   <Lock className="w-3.5 h-3.5 shrink-0" />
                   <span>
                     {isEn
@@ -473,27 +473,27 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsConfirmingCancel(true)}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-950/80 text-rose-800 dark:text-rose-200 text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-950/80 text-black dark:text-white text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
                   >
                     <XCircle className="w-4 h-4" />
                     <span>{isEn ? 'Cancel Appointment' : 'Batalkan Temu Janji'}</span>
                   </button>
                 ) : (
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-bold text-rose-700 dark:text-rose-300">
+                    <span className="text-sm font-bold text-black dark:text-white">
                       {isEn ? 'Confirm cancellation?' : 'Sahkan pembatalan?'}
                     </span>
                     <button
                       type="button"
                       onClick={handleConfirmCancel}
-                      className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                      className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
                     >
                       {isEn ? 'Yes, Cancel' : 'Ya, Batalkan'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsConfirmingCancel(false)}
-                      className="px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                      className="px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0"
                     >
                       {isEn ? 'Keep Session' : 'Kekalkan'}
                     </button>
@@ -511,15 +511,15 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   <h3 className="text-sm font-bold text-black dark:text-white">
                     {isEn ? 'No Active Appointment' : 'Tiada Temu Janji Aktif'}
                   </h3>
-                  <p className="text-xs text-black/75 dark:text-white/75 mt-0.5 leading-relaxed">
+                  <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-0.5 leading-relaxed">
                     {isEn
                       ? 'Select one mentor from the directory below to book your 1-on-1 coaching session.'
                       : 'Pilih seorang mentor daripada senarai di bawah untuk menempah sesi bimbingan 1-ke-1 anda.'}
                   </p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 inline-flex items-center gap-1.5 shrink-0">
-                <CheckCircle2 className="w-4 h-4" />
+              <span className="text-sm font-bold text-black dark:text-white inline-flex items-center gap-1.5 shrink-0">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>{isEn ? 'Slot Ready to Book' : 'Sedia Untuk Ditempah'}</span>
               </span>
             </div>
@@ -548,7 +548,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 >
                   {isEn ? `Book Session with ${selectedMentor.name}` : `Borang Temu Janji: ${selectedMentor.name}`}
                 </h2>
-                <p className="text-xs text-black/75 dark:text-white/75">
+                <p className="text-[0.9375rem] text-black/75 dark:text-white/75">
                   {selectedMentor.agency} &middot; {selectedMentor.availableDays}
                 </p>
               </div>
@@ -560,7 +560,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 setSelectedMentor(null);
                 setValidationError(null);
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white text-xs font-semibold transition-colors cursor-pointer self-start sm:self-auto whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white text-sm font-semibold transition-colors cursor-pointer self-start sm:self-auto whitespace-nowrap shrink-0"
             >
               <X className="w-3.5 h-3.5" />
               <span>{isEn ? 'Change Mentor' : 'Tukar Mentor'}</span>
@@ -569,7 +569,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 
           <form onSubmit={handleSubmitBooking} className="p-5 sm:p-6 space-y-5">
             {validationError && (
-              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-700 text-xs text-rose-800 dark:text-rose-200 flex items-center gap-2 font-medium">
+              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-700 text-sm text-black dark:text-white flex items-center gap-2 font-medium">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{validationError}</span>
               </div>
@@ -577,53 +577,55 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {isEn ? 'Full Name' : 'Nama Penuh Usahawan'} *
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Full Name' : 'Nama Penuh'} *
                 </label>
                 <input
                   type="text"
                   required
                   value={entrepreneurName}
                   onChange={(e) => setEntrepreneurName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+                  placeholder={isEn ? 'Enter full name' : 'Masukkan nama penuh'}
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {isEn ? 'WhatsApp Number' : 'Nombor WhatsApp'} *
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Phone Number' : 'Nombor Telefon'} *
                 </label>
                 <input
                   type="text"
                   required
                   value={entrepreneurPhone}
                   onChange={(e) => setEntrepreneurPhone(e.target.value)}
-                  placeholder="60123456789"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-mono bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+                  placeholder={isEn ? 'Enter phone number' : 'Masukkan nombor telefon'}
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {isEn ? 'Business / Kiosk Name' : 'Nama Perniagaan / Kiosk'} *
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Business Name' : 'Nama Perniagaan'} *
                 </label>
                 <input
                   type="text"
                   required
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+                  placeholder={isEn ? 'Enter business name' : 'Masukkan nama perniagaan'}
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {isEn ? 'District' : 'Jajahan'} *
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'District' : 'Daerah'} *
                 </label>
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
                 >
                   {KELANTAN_DISTRICTS.map((d) => (
                     <option key={d} value={d}>
@@ -636,13 +638,13 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {isEn ? 'Primary Topic' : 'Topik Utama Bimbingan'} *
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Advisory Topic' : 'Topik Bimbingan'} *
                 </label>
                 <select
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
                 >
                   {(isEn ? TOPIC_OPTIONS_EN : TOPIC_OPTIONS_MS).map((opt) => (
                     <option key={opt} value={opt}>
@@ -653,13 +655,13 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {isEn ? 'Preferred Slot' : 'Pilihan Tarikh & Masa'} *
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Date and Time' : 'Tarikh dan Masa'} *
                 </label>
                 <select
                   value={selectedSlotIdx}
                   onChange={(e) => setSelectedSlotIdx(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
                 >
                   {DATE_SLOTS.map((slot, idx) => (
                     <option key={slot.date} value={idx}>
@@ -670,13 +672,13 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {isEn ? 'Session Mode' : 'Mod Sesi'} *
                 </label>
                 <select
                   value={mode}
                   onChange={(e) => setMode(e.target.value as 'Bersemuka di Kampus' | 'Google Meet Maya')}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
                 >
                   <option value="Bersemuka di Kampus">
                     {isEn ? 'In-Person (UMK Campus)' : 'Bersemuka di Kampus UMK'}
@@ -689,8 +691,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                {isEn ? 'Key Questions or Challenges' : 'Ringkasan Soalan atau Cabaran'}
+              <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                {isEn ? 'Application Details' : 'Keterangan Permohonan'}
               </label>
               <textarea
                 rows={2}
@@ -698,10 +700,10 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 onChange={(e) => setChallenges(e.target.value)}
                 placeholder={
                   isEn
-                    ? 'Briefly describe what you want to discuss during the session...'
-                    : 'Nyatakan perkara atau soalan yang ingin dibincangkan bersama mentor...'
+                    ? 'Enter application details'
+                    : 'Masukkan keterangan permohonan'
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
               />
             </div>
 
@@ -712,13 +714,13 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   setSelectedMentor(null);
                   setValidationError(null);
                 }}
-                className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white text-xs font-semibold transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white text-sm font-semibold transition-colors cursor-pointer"
               >
                 {isEn ? 'Cancel' : 'Batal'}
               </button>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold transition-colors cursor-pointer shadow-xs"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{isEn ? 'Confirm & Book Appointment' : 'Sahkan & Tempah Temu Janji'}</span>
@@ -740,7 +742,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
             >
               {isEn ? 'Certified Mentor Directory' : 'Senarai Mentor Bertauliah'}
             </h2>
-            <p className="text-xs text-black/70 dark:text-white/75">
+            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
               {isEn
                 ? 'Select a mentor matching your business sector and advisory needs.'
                 : 'Pilih mentor yang sepadan dengan bidang dan keperluan bimbingan anda.'}
@@ -755,8 +757,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={isEn ? 'Search mentor or expertise...' : 'Cari nama mentor atau kepakaran...'}
-                className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                placeholder={isEn ? 'Enter search keyword' : 'Masukkan kata kunci carian'}
+                className="w-full pl-9 pr-3.5 py-2 text-sm rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
               />
             </div>
 
@@ -773,7 +775,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   key={tab.id}
                   type="button"
                   onClick={() => setAgencyFilter(tab.id)}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  className={`px-3 py-1.5 text-sm font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                     agencyFilter === tab.id
                       ? 'bg-white dark:bg-zinc-900 text-black dark:text-white shadow-xs'
                       : 'text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white'
@@ -788,7 +790,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 
         {/* Active Lock Notice */}
         {hasActiveSession && (
-          <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 flex items-start sm:items-center gap-3 text-xs text-black dark:text-white">
+          <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 flex items-start sm:items-center gap-3 text-sm text-black dark:text-white">
             <Lock className="w-4 h-4 text-amber-700 dark:text-amber-300 shrink-0 mt-0.5 sm:mt-0" />
             <span>
               {isEn
@@ -804,7 +806,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
             <p className="text-sm font-bold text-black dark:text-white">
               {isEn ? 'No Matching Mentors Found' : 'Tiada Mentor Ditemui'}
             </p>
-            <p className="text-xs text-black/70 dark:text-white/75">
+            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
               {isEn
                 ? 'Try clearing your search keyword or changing the agency filter.'
                 : 'Cuba tukar kata carian atau pilih penapis agensi lain.'}
@@ -815,7 +817,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 setSearchQuery('');
                 setAgencyFilter('all');
               }}
-              className="mt-2 px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 text-xs font-bold text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+              className="mt-2 px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 text-sm font-bold text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
             >
               {isEn ? 'Reset Filters' : 'Set Semula Penapis'}
             </button>
@@ -855,23 +857,23 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                       )}
 
                       <div className="min-w-0 flex-1">
-                        <div className="text-[11px] font-semibold text-black/65 dark:text-white/70 truncate">
+                        <div className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70 truncate">
                           {mentor.agency}
                         </div>
                         <h3 className="text-sm sm:text-base font-extrabold text-black dark:text-white leading-snug">
                           {mentor.name}
                         </h3>
-                        <p className="text-xs text-black/75 dark:text-white/75 mt-0.5 leading-snug">
+                        <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-0.5 leading-snug">
                           {mentor.title}
                         </p>
                       </div>
                     </div>
 
-                    <p className="text-xs text-black/80 dark:text-white/80 leading-relaxed">
+                    <p className="text-[0.9375rem] text-black/80 dark:text-white/80 leading-relaxed">
                       {mentor.bio}
                     </p>
 
-                    <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 space-y-1.5 text-xs">
+                    <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 space-y-1.5 text-sm">
                       <div className="text-black/75 dark:text-white/75 flex items-center gap-1.5 tabular-nums">
                         <Clock className="w-3.5 h-3.5 shrink-0" />
                         <span>{mentor.availableDays}</span>
@@ -886,7 +888,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   </div>
 
                   <div className="pt-3 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between gap-3">
-                    <span className="text-[11px] font-medium text-black/65 dark:text-white/65 tabular-nums">
+                    <span className="text-[0.8125rem] font-medium text-black/65 dark:text-white/65 tabular-nums">
                       {isEn
                         ? `${mentor.activeMenteesCount ?? 0} active mentees`
                         : `${mentor.activeMenteesCount ?? 0} usahawan dibimbing`}
@@ -896,7 +898,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                       <button
                         type="button"
                         disabled
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-bold cursor-not-allowed whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-black dark:text-white text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>{isEn ? 'Active Mentor' : 'Mentor Aktif Anda'}</span>
@@ -906,7 +908,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                         type="button"
                         disabled
                         aria-disabled="true"
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black/50 dark:text-white/50 text-xs font-bold cursor-not-allowed whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black/50 dark:text-white/50 text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
                       >
                         <Lock className="w-3.5 h-3.5" />
                         <span>{isEn ? 'Locked (1 Active Limit)' : 'Dikunci (Had 1 Sesi)'}</span>
@@ -915,7 +917,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                       <button
                         type="button"
                         onClick={() => handleSelectMentor(mentor)}
-                        className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                        className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                           isSelectedForForm
                             ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
                             : 'bg-teal-600 hover:bg-teal-700 text-white'
@@ -956,13 +958,13 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 {isEn ? 'Session History' : 'Sejarah Sesi Bimbingan'}
               </h2>
             </div>
-            <span className="text-xs font-bold text-black/65 dark:text-white/70 tabular-nums">
+            <span className="text-sm font-bold text-black/65 dark:text-white/70 tabular-nums">
               {sessionHistory.length} {isEn ? 'records' : 'rekod'}
             </span>
           </div>
 
           {sessionHistory.length === 0 ? (
-            <div className="p-6 text-center text-xs text-black/70 dark:text-white/75">
+            <div className="p-6 text-center text-sm text-black/70 dark:text-white/75">
               {isEn
                 ? 'Completed or cancelled mentorship sessions will appear here.'
                 : 'Rekod sesi bimbingan yang telah selesai atau dibatalkan akan dipaparkan di sini.'}
@@ -978,7 +980,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                     className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="space-y-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <div className="flex flex-wrap items-center gap-2 text-sm">
                         <span className="font-bold text-black dark:text-white">
                           {item.mentorName}
                         </span>
@@ -993,18 +995,18 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                         </span>
                         <span className="text-black/70 dark:text-white/70">{item.mode}</span>
                       </div>
-                      <p className="text-xs text-black/80 dark:text-white/80 truncate">
+                      <p className="text-[0.9375rem] text-black/80 dark:text-white/80 truncate">
                         {item.topic}
                       </p>
                       {item.mentorActionPlan && (
-                        <p className="text-[11px] text-black/65 dark:text-white/70 whitespace-pre-line pt-1">
+                        <p className="text-[0.875rem] text-black/65 dark:text-white/70 whitespace-pre-line pt-1">
                           {item.mentorActionPlan}
                         </p>
                       )}
                     </div>
 
                     <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold self-start sm:self-center whitespace-nowrap shrink-0 ${meta.className}`}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[0.8125rem] font-bold self-start sm:self-center whitespace-nowrap shrink-0 ${meta.className}`}
                     >
                       <StatusIcon className="w-3.5 h-3.5 shrink-0" />
                       <span>{meta.label}</span>

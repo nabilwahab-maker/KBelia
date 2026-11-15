@@ -44,7 +44,7 @@ export const PortalImage: React.FC<PortalImageProps> = ({
       >
         <Icon className="w-5 h-5 opacity-70 shrink-0" />
         {fallbackLabel && (
-          <span className="text-[10px] font-semibold leading-tight line-clamp-2 opacity-80">
+          <span className="text-[0.8125rem] font-semibold leading-tight line-clamp-2 opacity-80">
             {fallbackLabel}
           </span>
         )}

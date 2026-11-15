@@ -38,11 +38,11 @@ export const B2BAdPreviewCard: React.FC<B2BAdPreviewCardProps> = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <div className="inline-flex items-center gap-1.5 text-xs font-bold text-black dark:text-white">
+        <div className="inline-flex items-center gap-1.5 text-sm font-bold text-black dark:text-white">
           <Eye className="w-4 h-4 text-teal-600 dark:text-teal-400" />
           <span>{isEn ? 'Live Ad Card Preview' : 'Pratonton Langsung Kad Iklan'}</span>
         </div>
-        <span className="text-[11px] font-medium text-black/60 dark:text-white/65">
+        <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65">
           {hasCustomImage
             ? (isEn ? 'Uploaded photo' : 'Gambar muat naik')
             : (isEn ? 'Sample guide photo' : 'Gambar contoh panduan')}
@@ -60,7 +60,7 @@ export const B2BAdPreviewCard: React.FC<B2BAdPreviewCardProps> = ({
             className="w-full h-full object-cover"
           />
           {!hasCustomImage && (
-            <div className="px-2.5 py-1 bg-slate-900/75 text-white text-[10px] font-semibold absolute bottom-2 left-2 rounded-md inline-flex items-center gap-1.5 backdrop-blur-xs">
+            <div className="px-2.5 py-1 bg-slate-900/75 text-white text-[0.8125rem] font-semibold absolute bottom-2 left-2 rounded-md inline-flex items-center gap-1.5 backdrop-blur-xs">
               <ImageIcon className="w-3 h-3" />
               <span>{isEn ? 'Example visual — upload your photo on the left' : 'Contoh visual — muat naik gambar anda di sebelah'}</span>
             </div>
@@ -71,7 +71,7 @@ export const B2BAdPreviewCard: React.FC<B2BAdPreviewCardProps> = ({
           <div className="space-y-2.5">
             <div className="flex items-center justify-between gap-2">
               <span
-                className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${
+                className={`px-2 py-0.5 rounded text-[0.8125rem] font-semibold border ${
                   type === 'supply'
                     ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-900/40'
                     : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800/40'
@@ -81,7 +81,7 @@ export const B2BAdPreviewCard: React.FC<B2BAdPreviewCardProps> = ({
                   ? (isEn ? 'Supplying / Wholesale' : 'Membekal (Tawaran)')
                   : (isEn ? 'Seeking Supply' : 'Mencari Bekalan')}
               </span>
-              <span className="text-[11px] text-black/70 dark:text-white/75 font-mono">
+              <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono">
                 {isEn ? 'Today' : 'Hari ini'}
               </span>
             </div>
@@ -90,7 +90,7 @@ export const B2BAdPreviewCard: React.FC<B2BAdPreviewCardProps> = ({
               <h4 className="text-sm font-bold text-black dark:text-white leading-snug line-clamp-2">
                 {title.trim() || (isEn ? 'e.g. Wholesale Roasted Coffee & Packaging' : 'cth. Pembekal Kopi Sangai & Pek Kiosk')}
               </h4>
-              <div className="text-[11px] text-black/70 dark:text-white/75 font-medium mt-0.5 truncate">
+              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-medium mt-0.5 truncate">
                 <span className="font-semibold text-black dark:text-white">
                   {authorBusiness.trim() || (isEn ? 'Your Business Name' : 'Nama Perniagaan Anda')}
                 </span>
@@ -99,21 +99,21 @@ export const B2BAdPreviewCard: React.FC<B2BAdPreviewCardProps> = ({
               </div>
             </div>
 
-            <p className="text-xs text-black/80 dark:text-white/85 leading-relaxed line-clamp-3">
+            <p className="text-[0.9375rem] text-black/80 dark:text-white/85 leading-relaxed line-clamp-3">
               {description.trim() ||
                 (isEn
                   ? 'State product quantity, wholesale price margin, MOQ, and delivery area clearly so business partners can respond fast.'
                   : 'Nyatakan kuantiti stok, harga anggaran borong, pesanan minimum (MOQ), dan kawasan penghantaran supaya rakan niaga mudah menghubungi anda.')}
             </p>
 
-            <div className="flex items-center gap-1.5 text-xs text-black/70 dark:text-white/75">
+            <div className="flex items-center gap-1.5 text-sm text-black/70 dark:text-white/75">
               <MapPin className="w-3.5 h-3.5 shrink-0" />
               <span>{district || 'Kota Bharu'}</span>
             </div>
           </div>
 
           <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
-            <div className="w-full py-2 px-3 bg-teal-600/90 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2 select-none">
+            <div className="w-full py-2 px-3 bg-teal-600/90 text-white font-bold text-sm rounded-lg flex items-center justify-center gap-2 select-none">
               <MessageCircle className="w-4 h-4" />
               <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>
             </div>
@@ -123,10 +123,10 @@ export const B2BAdPreviewCard: React.FC<B2BAdPreviewCardProps> = ({
 
       {/* Concise Visual Ad Tips */}
       <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 space-y-2">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-black dark:text-white/85">
+        <div className="text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/85">
           {isEn ? 'Quick Guide to an Effective Ad' : 'Panduan Ringkas Iklan Berkesan'}
         </div>
-        <ul className="space-y-1.5 text-[11px] text-black/75 dark:text-white/75">
+        <ul className="space-y-1.5 text-[0.8125rem] text-black/75 dark:text-white/75">
           <li className="flex items-start gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
             <span>{isEn ? 'Use a bright, clear landscape photo of your real product or stall.' : 'Gunakan foto produk sebenar yang terang dalam format melintang (4:3 / 16:9).'}</span>

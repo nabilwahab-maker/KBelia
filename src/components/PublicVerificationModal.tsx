@@ -159,7 +159,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
               <h3 className="text-base font-bold text-black dark:text-white">
                 Pengesahan Ketulenan Dokumen Awam
               </h3>
-              <span className="text-[11px] font-semibold text-black dark:text-white/75">
+              <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
                 Sistem Semakan Surat Tawaran & Sijil Rasmi
               </span>
             </div>
@@ -175,8 +175,8 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
 
         {/* Search Ref Bar */}
         <form onSubmit={handleVerify} className="mb-6">
-          <label className="text-xs font-semibold text-black dark:text-white/75 block mb-1.5">
-            Masukkan No. Rujukan Surat Tawaran / Kod Kiosk / SSM:
+          <label className="text-sm font-semibold text-black dark:text-white block mb-1.5">
+            Nombor Rujukan Dokumen
           </label>
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -185,13 +185,13 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
                 type="text"
                 value={inputRef}
                 onChange={(e) => setInputRef(e.target.value)}
-                placeholder="Contoh: KBN-CAP-KB-01-2026-8819 atau REG-2026-BELIA"
-                className="w-full pl-9 pr-3 py-2 rounded-xl text-xs font-mono font-bold bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 uppercase"
+                placeholder="Masukkan nombor rujukan dokumen"
+                className="w-full pl-9 pr-3 py-2 rounded-xl text-[0.8125rem] font-mono font-bold bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500 uppercase"
               />
             </div>
             <button
               type="submit"
-              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors cursor-pointer"
             >
               Sahkan
             </button>
@@ -203,39 +203,39 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
           <div className="rounded-2xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/20 p-5 flex flex-col gap-3">
             <div className="flex items-center gap-2 text-black dark:text-white/75">
               <CheckCircle2 className="w-5 h-5 shrink-0" />
-              <span className="text-xs font-extrabold uppercase tracking-wider">
+              <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider">
                 Dokumen Rasmi Diiktiraf & Sah
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-emerald-200/60 dark:border-emerald-900/60 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-emerald-200/60 dark:border-emerald-900/60 text-sm">
               <div>
-                <span className="text-black/70 dark:text-white/75 block text-[11px]">No. Siri Rujukan:</span>
+                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">No. Siri Rujukan:</span>
                 <span className="font-mono font-bold text-black dark:text-white">{verifiedRecord.refCode}</span>
               </div>
               <div>
-                <span className="text-black/70 dark:text-white/75 block text-[11px]">Penerima Tawaran:</span>
+                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">Penerima Tawaran:</span>
                 <span className="font-bold text-black dark:text-white">{verifiedRecord.recipient}</span>
               </div>
               <div>
-                <span className="text-black/70 dark:text-white/75 block text-[11px]">Lokasi / Premis:</span>
+                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">Lokasi / Premis:</span>
                 <span className="font-semibold text-black dark:text-white">{verifiedRecord.kioskLocation}</span>
               </div>
               <div>
-                <span className="text-black/70 dark:text-white/75 block text-[11px]">Butiran Kadar / Status:</span>
+                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">Butiran Kadar / Status:</span>
                 <span className="font-semibold text-black dark:text-white">{verifiedRecord.rate}</span>
               </div>
               <div>
-                <span className="text-black/70 dark:text-white/75 block text-[11px]">Tempoh Sah:</span>
+                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">Tempoh Sah:</span>
                 <span className="text-black dark:text-white">{verifiedRecord.issueDate} hingga {verifiedRecord.expiryDate}</span>
               </div>
               <div>
-                <span className="text-black/70 dark:text-white/75 block text-[11px]">Pihak Berkuasa Pengeluar:</span>
+                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">Pihak Berkuasa Pengeluar:</span>
                 <span className="text-black dark:text-white">{verifiedRecord.issuer}</span>
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-[11px] text-black/70 dark:text-white/75 flex items-center gap-2 mt-2">
+            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-[0.8125rem] text-black/70 dark:text-white/75 flex items-center gap-2 mt-2">
               <Lock className="w-3.5 h-3.5 text-black dark:text-white shrink-0" />
               <span>Mematuhi Akta Perlindungan Data Peribadi 2010 (PDPA) & Piawaian Keselamatan Kerajaan.</span>
             </div>
@@ -245,7 +245,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
         {verifiedRecord && verifiedRecord.status === 'invalid' && (
           <div className="rounded-2xl border border-rose-300 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-950/30 p-5 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-black dark:text-white/75 shrink-0 mt-0.5" />
-            <div className="text-xs space-y-1">
+            <div className="text-[0.8125rem] space-y-1">
               <div className="font-extrabold uppercase tracking-wider text-black dark:text-white">
                 Rekod Tidak Dijumpai ({verifiedRecord.refCode})
               </div>
@@ -260,7 +260,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-xs font-bold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             Tutup
           </button>

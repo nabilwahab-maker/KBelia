@@ -8,14 +8,14 @@ interface SaaSKpiCardProps {
   icon: LucideIcon;
   trendLabel: string;
   trendDirection?: 'up' | 'down' | 'neutral';
-  accentColor?: 'sky' | 'emerald' | 'amber' | 'violet';
+  accentColor?: 'blue' | 'emerald' | 'amber' | 'violet';
   isLive?: boolean;
   floatIcon?: boolean;
   onClick?: () => void;
 }
 
 const COLOR_MAP = {
-  sky: {
+  blue: {
     iconBg: 'bg-blue-600 dark:bg-blue-600 border-blue-500 text-white',
     hoverBorder: 'hover:border-blue-400/70 dark:hover:border-blue-400/70',
     valueText: 'text-black dark:text-white'
@@ -44,7 +44,7 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
   icon: Icon,
   trendLabel,
   trendDirection = 'up',
-  accentColor = 'sky',
+  accentColor = 'blue',
   isLive = false,
   floatIcon = true,
   onClick
@@ -70,31 +70,31 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
       {/* Top Header: Title, Metric Value & Icon Badge */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {isLive && <span className="kbelia-live-dot" aria-hidden="true" />}
-            <span className="text-xs font-semibold text-black/70 dark:text-white/75 block leading-snug break-words">
+            <span className="text-[0.9375rem] font-semibold text-black/85 dark:text-white/90 block leading-snug break-words">
               {title}
             </span>
           </div>
-          <div className="mt-2 flex items-center gap-2 flex-wrap">
-            <span className={`text-xl sm:text-2xl font-black font-mono tabular-nums tracking-tight leading-tight break-words ${theme.valueText}`}>
+          <div className="mt-2.5 flex items-center gap-2.5 flex-wrap">
+            <span className={`text-2xl sm:text-[1.875rem] font-extrabold font-mono tabular-nums tracking-tight leading-tight break-words ${theme.valueText}`}>
               {value}
             </span>
-            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border text-[10px] font-bold font-mono tabular-nums shrink-0 ${trendBadgeClass}`}>
-              <TrendIcon className="w-3 h-3" />
+            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border text-[0.8125rem] font-bold font-mono tabular-nums shrink-0 ${trendBadgeClass}`}>
+              <TrendIcon className="w-3.5 h-3.5" />
               <span>{trendLabel}</span>
             </span>
           </div>
         </div>
 
-        <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 ${floatIcon ? 'animate-float-gentle' : ''} ${theme.iconBg}`}>
-          <Icon className="w-4 h-4" />
+        <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 ${floatIcon ? 'animate-float-gentle' : ''} ${theme.iconBg}`}>
+          <Icon className="w-5 h-5" />
         </div>
       </div>
 
       {/* Full-Width Wrapping Summary Subtitle */}
-      <div className="pt-2.5 border-t border-slate-300 dark:border-zinc-600">
-        <p className="text-[11px] text-black/75 dark:text-white/75 leading-relaxed break-words">
+      <div className="pt-3 border-t border-slate-300 dark:border-zinc-600">
+        <p className="text-sm text-black/80 dark:text-white/85 leading-relaxed break-words">
           {subtitle}
         </p>
       </div>

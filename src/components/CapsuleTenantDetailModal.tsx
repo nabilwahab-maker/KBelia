@@ -100,10 +100,10 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-bold text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/70">
+                <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/70">
                   {slot.code}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-black dark:text-white bg-emerald-100/80 dark:bg-emerald-900/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-700">
+                <span className="inline-flex items-center gap-1 text-[0.8125rem] font-bold text-black dark:text-white bg-emerald-100/80 dark:bg-emerald-900/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-700">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   Berpenyewa & Aktif Beroperasi
                 </span>
@@ -149,34 +149,34 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-300 text-black uppercase tracking-wide inline-block mb-1">
+                <span className="px-2 py-0.5 rounded text-[0.8125rem] font-bold bg-amber-300 text-black uppercase tracking-wide inline-block mb-1">
                   Kiosk Belia Modular Negeri Kelantan
                 </span>
                 <h3 className="text-lg sm:text-xl font-black text-white leading-tight drop-shadow-xs">
                   {slot.name}
                 </h3>
-                <div className="flex items-center gap-2 text-xs text-white mt-1">
+                <div className="flex items-center gap-2 text-sm text-white mt-1">
                   <MapPin className="w-3.5 h-3.5 text-white/90 shrink-0" />
                   <span>{slot.hubLocation} ({slot.district})</span>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-white dark:bg-slate-800 text-xs border-t border-slate-300 dark:border-slate-600">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-white dark:bg-slate-800 text-sm border-t border-slate-300 dark:border-slate-600">
               <div>
-                <span className="text-[10px] text-black/70 dark:text-white/75 block uppercase font-semibold">Saiz Pod:</span>
+                <span className="text-[0.8125rem] text-black/70 dark:text-white/75 block uppercase font-semibold">Saiz Pod:</span>
                 <strong className="text-black dark:text-white font-bold">{slot.size || '10ft x 10ft Pod'}</strong>
               </div>
               <div>
-                <span className="text-[10px] text-black/70 dark:text-white/75 block uppercase font-semibold">Kadar Sewa:</span>
+                <span className="text-[0.8125rem] text-black/70 dark:text-white/75 block uppercase font-semibold">Kadar Sewa:</span>
                 <strong className="text-black dark:text-white/75 font-bold tabular-nums">RM{slot.monthlyRate}/bln</strong>
               </div>
               <div>
-                <span className="text-[10px] text-black/70 dark:text-white/75 block uppercase font-semibold">Jajahan:</span>
+                <span className="text-[0.8125rem] text-black/70 dark:text-white/75 block uppercase font-semibold">Jajahan:</span>
                 <strong className="text-black dark:text-white font-bold">{slot.district}</strong>
               </div>
               <div>
-                <span className="text-[10px] text-black/70 dark:text-white/75 block uppercase font-semibold">Status Premis:</span>
+                <span className="text-[0.8125rem] text-black/70 dark:text-white/75 block uppercase font-semibold">Status Premis:</span>
                 <strong className="text-black dark:text-white/75 font-bold">Beroperasi</strong>
               </div>
             </div>
@@ -190,56 +190,56 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
                   {businessName.charAt(0)}
                 </div>
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-black dark:text-white/75">
+                  <div className="text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
                     Penyewa Aktif Berdaftar
                   </div>
                   <h4 className="text-base sm:text-lg font-black text-black dark:text-white leading-tight">
                     {businessName}
                   </h4>
                   {tenantBusiness?.tagline && (
-                    <p className="text-xs text-black dark:text-white italic">
+                    <p className="text-[0.9375rem] text-black dark:text-white italic">
                       "{tenantBusiness.tagline}"
                     </p>
                   )}
                 </div>
               </div>
 
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 shadow-2xs">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-white dark:bg-slate-800 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 shadow-2xs">
                 <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white" />
                 Penyewa Sah UMK
               </span>
             </div>
 
             {/* Tenant Specific Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1">
-                <span className="text-[10px] text-black/70 dark:text-white/75 uppercase font-semibold">Pengusaha / Pemilik Belia:</span>
+                <span className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold">Pengusaha / Pemilik Belia:</span>
                 <div className="font-bold text-black dark:text-white">{tenantName}</div>
-                <div className="text-[11px] text-black/70 dark:text-white/75">Usahawan Anak Muda Jajahan {slot.district}</div>
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75">Usahawan Anak Muda Jajahan {slot.district}</div>
               </div>
 
               <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1">
-                <span className="text-[10px] text-black/70 dark:text-white/75 uppercase font-semibold">Kategori Perniagaan:</span>
+                <span className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold">Kategori Perniagaan:</span>
                 <div className="font-bold text-black dark:text-white">{tenantBusiness?.category || 'Makanan & Minuman / Agrotek'}</div>
-                <div className="text-[11px] text-black/70 dark:text-white/75 font-mono">SSM: {tenantBusiness?.ssmNumber || '202403112233 (KT0099881-X)'}</div>
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono">SSM: {tenantBusiness?.ssmNumber || '202403112233 (KT0099881-X)'}</div>
               </div>
 
               <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1">
-                <span className="text-[10px] text-black/70 dark:text-white/75 uppercase font-semibold">Perjanjian Sewaan:</span>
+                <span className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold">Perjanjian Sewaan:</span>
                 <div className="font-bold text-black dark:text-white">Tempoh Kontrak 12 Bulan</div>
-                <div className="text-[11px] text-black dark:text-white/75 font-semibold">Menerima Subsidi Sewa 50% Negeri</div>
+                <div className="text-[0.8125rem] text-black dark:text-white/75 font-semibold">Menerima Subsidi Sewa 50% Negeri</div>
               </div>
 
               <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1">
-                <span className="text-[10px] text-black/70 dark:text-white/75 uppercase font-semibold">Waktu Operasi Kiosk:</span>
+                <span className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold">Waktu Operasi Kiosk:</span>
                 <div className="font-bold text-black dark:text-white">9:00 Pagi - 10:00 Malam</div>
-                <div className="text-[11px] text-black/70 dark:text-white/75">Dibuka Setiap Hari Termasuk Cuti Umum</div>
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75">Dibuka Setiap Hari Termasuk Cuti Umum</div>
               </div>
             </div>
 
             {/* Tenant Business Description */}
-            <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-xs">
-              <span className="text-[10px] text-black/70 dark:text-white/75 uppercase font-semibold block mb-1">
+            <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-sm">
+              <span className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold block mb-1">
                 Skop Produk & Servis di Kiosk Ini:
               </span>
               <p className="text-black dark:text-white leading-relaxed">
@@ -254,7 +254,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>Hubungi Usahawan / WhatsApp</span>
@@ -267,7 +267,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
                     onClose();
                     onSelectBusiness(tenantBusiness);
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 font-bold text-sm flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-black dark:text-white" />
                   <span>Lihat Profil Direktori Penuh</span>
@@ -278,14 +278,14 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
 
           {/* 3. Fasiliti & Kemudahan Kiosk Pod */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-2">
-            <span className="text-xs font-bold text-black dark:text-white block">
+            <span className="text-sm font-bold text-black dark:text-white block">
               Kemudahan & Utiliti Termasuk Dalam Pod Kiosk Ini:
             </span>
             <div className="flex flex-wrap gap-1.5">
               {(slot.amenities || []).map((amenity, idx) => (
                 <span
                   key={idx}
-                  className="text-[11px] font-medium bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 px-2.5 py-1 rounded-lg flex items-center gap-1.5"
+                  className="text-[0.8125rem] font-medium bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 px-2.5 py-1 rounded-lg flex items-center gap-1.5"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 text-black dark:text-white/75" />
                   <span>{amenity}</span>
@@ -299,7 +299,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
             <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-black dark:text-white shrink-0">
               <Info className="w-4 h-4" />
             </div>
-            <div className="text-xs space-y-1">
+            <div className="text-sm space-y-1">
               <strong className="font-bold text-black dark:text-white block">
                 Status Permohonan Sewaan Pod Ini
               </strong>
@@ -316,7 +316,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
             type="button"
             onClick={handleSaveInterest}
             disabled={interestSaved}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
               interestSaved
                 ? 'bg-emerald-100 text-black border border-emerald-300 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-800'
                 : 'bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
@@ -329,7 +329,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs dark:bg-blue-600"
+            className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer shadow-xs dark:bg-blue-600"
           >
             Tutup
           </button>

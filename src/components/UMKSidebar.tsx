@@ -120,20 +120,20 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
   // Shared design tokens for uniform 3-category navigation across all 3 roles
   const navBtnBase =
-    'w-full flex items-center justify-between px-3 py-2.25 text-[13px] font-semibold rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
+    'w-full flex items-center justify-between px-3 py-2.25 text-[0.9375rem] font-semibold rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
   const navBtnActive =
     'bg-amber-50/90 dark:bg-[#1E4B85]/15 text-black dark:text-white border-blue-200 dark:border-blue-800/70 shadow-xs ring-1 ring-blue-500/30 font-bold';
   const navBtnIdle =
     'border-transparent text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
 
   const subNavBtnBase =
-    'w-full flex items-center gap-2 px-2.5 py-1.75 text-xs rounded-lg transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
+    'w-full flex items-center gap-2 px-2.5 py-2 text-sm rounded-lg transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
   const subNavBtnActive = 'bg-blue-600 text-white font-bold shadow-xs dark:bg-blue-600';
   const subNavBtnIdle =
-    'text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
+    'text-black dark:text-white/80 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
 
   const categoryHeaderClass =
-    'text-[11px] font-black tracking-wider text-black dark:text-white/75 uppercase px-2 pb-1 whitespace-nowrap truncate';
+    'text-[0.8125rem] font-black tracking-wider text-black/80 dark:text-white/80 uppercase px-2 pb-1 whitespace-nowrap truncate';
   const categoryDividerClass = 'pt-3 border-t border-slate-300 dark:border-zinc-600 space-y-1';
 
   const miniBtnBase =
@@ -647,7 +647,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
       <div className="space-y-4">
         {isMobileOpen && onCloseMobile && (
           <div className="md:hidden flex items-center justify-between pb-2 border-b border-slate-300 dark:border-zinc-600">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-black dark:text-white">
+            <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black dark:text-white">
               {isMs ? 'Navigasi KBelia' : 'KBelia Navigation'}
             </span>
             <button
@@ -668,7 +668,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             placeholder={t('search_sidebar')}
             value={sidebarSearch}
             onChange={(e) => setSidebarSearch(e.target.value)}
-            className="w-full pl-3.5 pr-8 py-2 text-xs bg-slate-50 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all duration-150 dark:focus:border-blue-500"
+            className="w-full pl-3.5 pr-8 py-2 text-[0.9375rem] bg-slate-50 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all duration-150 dark:focus:border-blue-500"
           />
           {sidebarSearch ? (
             <button
@@ -677,22 +677,22 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               aria-label={isMs ? 'Kosongkan carian' : 'Clear search'}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
           ) : (
-            <Search className="w-3.5 h-3.5 text-black/70 dark:text-white/75 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           )}
         </div>
 
         {!hasAnySearchMatch && (
           <div className="py-6 px-3 text-center space-y-2 border border-slate-300 dark:border-zinc-600 rounded-xl bg-slate-50 dark:bg-zinc-900">
-            <p className="text-xs text-black/70 dark:text-white/75">
+            <p className="text-sm text-black/75 dark:text-white/80">
               {isMs ? 'Tiada menu yang sepadan.' : 'No matching menu items.'}
             </p>
             <button
               type="button"
               onClick={() => setSidebarSearch('')}
-              className="text-xs font-semibold text-black dark:text-white/75 hover:underline cursor-pointer"
+              className="text-sm font-semibold text-black dark:text-white/80 hover:underline cursor-pointer"
             >
               {isMs ? 'Set Semula' : 'Reset'}
             </button>

@@ -35,13 +35,13 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
           {label && (
             <label
               htmlFor={switchId}
-              className="text-xs font-bold text-black dark:text-white block cursor-pointer"
+              className="text-[0.9375rem] font-bold text-black dark:text-white block cursor-pointer"
             >
               {label}
             </label>
           )}
           {description && (
-            <p className="text-[11px] text-black/70 dark:text-white/75 mt-0.5 leading-snug">
+            <p className="text-[0.8125rem] text-black/75 dark:text-white/80 mt-0.5 leading-snug">
               {description}
             </p>
           )}
@@ -68,11 +68,12 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
               checked ? 'translate-x-5.5' : 'translate-x-0'
             }`}
           >
-            {checked ? (
-              <span className="text-[8px] font-black text-black dark:text-white">ON</span>
-            ) : (
-              <span className="text-[8px] font-bold text-black/60 dark:text-white/60">OFF</span>
-            )}
+            <span
+              className={`w-2 h-2 rounded-full ${
+                checked ? 'bg-blue-600 dark:bg-amber-500' : 'bg-slate-400 dark:bg-slate-500'
+              }`}
+              aria-hidden="true"
+            />
           </div>
         </div>
       </div>

@@ -200,7 +200,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
                 setActiveTab('landing');
               }}
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white transition-colors cursor-pointer group"
+              className="inline-flex items-center gap-1.5 text-sm sm:text-[0.9375rem] font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white transition-colors cursor-pointer group"
             >
               <ChevronLeft className="w-4 h-4 text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white group-hover:-translate-x-0.5 transition-transform" />
               <span>{isEn ? 'Back' : 'Kembali'}</span>
@@ -208,10 +208,10 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
 
             {/* Mobile-only brand badge */}
             <div className="lg:hidden flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-xs dark:bg-blue-600">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-xs dark:bg-blue-600">
                 KB
               </div>
-              <span className="font-extrabold text-xs text-black dark:text-white tracking-tight">
+              <span className="font-extrabold text-[0.8125rem] text-black dark:text-white tracking-tight">
                 KBelia
               </span>
             </div>
@@ -225,7 +225,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-black dark:text-white tracking-tight">
                 {isEn ? 'Sign Up' : 'Daftar Akaun'}
               </h1>
-              <p className="text-xs sm:text-sm lg:text-base text-black/70 dark:text-white/75 mt-2 font-normal leading-relaxed">
+              <p className="text-[0.9375rem] lg:text-base text-black/70 dark:text-white/75 mt-2 font-normal leading-relaxed">
                 {isEn ? 'Enter your email and password to sign up!' : 'Masukkan maklumat dan kata laluan anda untuk mendaftar!'}
               </p>
             </div>
@@ -236,7 +236,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 type="button"
                 onClick={handleGoogleSignup}
                 disabled={isSubmitting}
-                className="flex items-center justify-center gap-2.5 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-amber-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-xs font-semibold transition-all cursor-pointer disabled:opacity-60"
+                className="flex items-center justify-center gap-2.5 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-amber-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-sm font-semibold transition-all cursor-pointer disabled:opacity-60"
               >
                 <GoogleIcon className="w-4 h-4 shrink-0" />
                 <span className="truncate">{isEn ? 'Sign up with Google' : 'Daftar dengan Google'}</span>
@@ -250,7 +250,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                   setEmail('usahawan.belia@gmail.com');
                   setPassword('kbelia123');
                 }}
-                className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-amber-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-xs font-semibold transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-amber-50/70 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-sm font-semibold transition-all cursor-pointer"
               >
                 <Store className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
                 <span className="truncate">{isEn ? 'Youth Preset' : 'Isi Automatik'}</span>
@@ -262,28 +262,28 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-300 dark:border-slate-600"></div>
               </div>
-              <span className="relative bg-white dark:bg-slate-900 px-3.5 text-xs text-black/70 dark:text-white/75 font-medium">
+              <span className="relative bg-white dark:bg-slate-900 px-3.5 text-sm text-black/70 dark:text-white/75 font-medium">
                 {isEn ? 'Or' : 'Atau'}
               </span>
             </div>
 
             {/* ALERT NOTICES: ERROR & SUCCESS */}
             {errorMessage && (
-              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-black dark:text-white text-xs flex items-start gap-2.5 animate-fade-slide-up">
+              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-black dark:text-white text-sm flex items-start gap-2.5 animate-fade-slide-up">
                 <AlertCircle className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                 <span className="flex-1 leading-relaxed">{errorMessage}</span>
               </div>
             )}
 
             {authError && (
-              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-black dark:text-white text-xs flex items-start gap-2.5 animate-fade-slide-up">
+              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-black dark:text-white text-sm flex items-start gap-2.5 animate-fade-slide-up">
                 <AlertCircle className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                 <span className="flex-1 leading-relaxed">{authError}</span>
               </div>
             )}
 
             {successMessage && (
-              <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl text-black dark:text-white text-xs flex items-center gap-2.5 animate-fade-slide-up">
+              <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl text-black dark:text-white text-sm flex items-center gap-2.5 animate-fade-slide-up">
                 <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0" />
                 <span className="font-bold flex-1 leading-relaxed">{successMessage}</span>
               </div>
@@ -295,53 +295,53 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               {/* FIRST NAME & LAST NAME */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    {isEn ? 'First Name' : 'Nama Pertama'}<span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                    {isEn ? 'First Name *' : 'Nama Pertama *'}
                   </label>
                   <input
                     type="text"
                     required
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    placeholder={isEn ? 'First Name' : 'Nama Pertama'}
-                    className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                    placeholder={isEn ? 'Enter first name' : 'Masukkan nama pertama'}
+                    className="w-full px-3.5 py-2.5 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    {isEn ? 'Last Name' : 'Nama Terakhir'}<span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                    {isEn ? 'Last Name *' : 'Nama Akhir *'}
                   </label>
                   <input
                     type="text"
                     required
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    placeholder={isEn ? 'Last Name' : 'Nama Terakhir'}
-                    className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                    placeholder={isEn ? 'Enter last name' : 'Masukkan nama akhir'}
+                    className="w-full px-3.5 py-2.5 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* EMAIL */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {isEn ? 'Email' : 'Emel'}<span className="text-black/70 dark:text-white/75">*</span>
+                <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Email *' : 'Emel *'}
                 </label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={isEn ? 'Email' : 'Emel'}
-                  className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                  placeholder={isEn ? 'Enter email address' : 'Masukkan alamat emel'}
+                  className="w-full px-3.5 py-2.5 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                 />
               </div>
 
               {/* PASSWORD WITH SHOW/HIDE EYE */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {isEn ? 'Password' : 'Kata Laluan'}<span className="text-black/70 dark:text-white/75">*</span>
+                <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Password *' : 'Kata Laluan *'}
                 </label>
                 <div className="relative">
                   <input
@@ -349,8 +349,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={isEn ? 'Password' : 'Kata Laluan'}
-                    className="w-full pl-3.5 pr-11 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                    placeholder={isEn ? 'Enter password' : 'Masukkan kata laluan'}
+                    className="w-full pl-3.5 pr-11 py-2.5 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                   />
                   <button
                     type="button"
@@ -363,16 +363,16 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 </div>
               </div>
 
-              {/* OPTIONAL KELANTAN DISTRICT & PHONE CHIPS */}
+              {/* OPTIONAL KELANTAN DISTRICT & PHONE */}
               <div className="grid grid-cols-2 gap-3 pt-1">
                 <div>
-                  <label className="block text-[11px] font-bold text-black dark:text-white/75 mb-1">
-                    {isEn ? 'District (Jajahan)' : 'Jajahan Kelantan'}
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                    {isEn ? 'District' : 'Jajahan'}
                   </label>
                   <select
                     value={district}
                     onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full px-2.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer dark:focus:border-blue-500"
+                    className="w-full px-3 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer dark:focus:border-blue-500"
                   >
                     {DISTRICT_LIST.map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -381,22 +381,22 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-black dark:text-white/75 mb-1">
-                    {isEn ? 'Phone / WhatsApp' : 'No. Telefon'}
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                    {isEn ? 'Phone Number' : 'Nombor Telefon'}
                   </label>
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder={isEn ? 'Phone / WhatsApp' : 'No. Telefon'}
-                    className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                    placeholder={isEn ? 'Enter phone number' : 'Masukkan nombor telefon'}
+                    className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* TERMS & PRIVACY CHECKBOX */}
               <div className="pt-1">
-                <label className="flex items-start gap-2.5 text-xs text-black dark:text-white/75 cursor-pointer select-none">
+                <label className="flex items-start gap-2.5 text-sm text-black dark:text-white/75 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     required
@@ -453,14 +453,14 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-600 active:scale-[0.99] text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
+                className="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-600 active:scale-[0.99] text-white rounded-xl font-bold text-sm sm:text-[0.9375rem] flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
               >
                 <UserPlus className="w-4 h-4 text-white" />
                 <span>{isSubmitting ? (isEn ? 'Processing...' : 'Memproses...') : (isEn ? 'Sign Up' : 'Daftar Sekarang')}</span>
               </button>
 
               {/* BOTTOM TOGGLE TO SIGN IN */}
-              <div className="pt-2 text-center text-xs text-black/70 dark:text-white/75">
+              <div className="pt-2 text-center text-sm text-black/70 dark:text-white/75">
                 <span>{isEn ? 'Already have an account? ' : 'Sudah ada akaun? '}</span>
                 <button
                   type="button"
@@ -480,9 +480,9 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
 
           {/* BOTTOM QUICK DEMO TESTING FOOTER */}
           <div className="w-full pt-4 border-t border-slate-300 dark:border-slate-600 space-y-2.5">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-black/70 dark:text-white/75">
+            <div className="flex items-center justify-between text-[0.8125rem] font-semibold text-black/70 dark:text-white/75">
               <span>{isEn ? 'Quick Testing Demo Accounts:' : 'Akaun Pengujian Pantas (Demo):'}</span>
-              <span className="text-[10px] text-black/70 dark:text-white/75">1-Klik Terus Masuk</span>
+              <span className="text-[0.8125rem] text-black/70 dark:text-white/75">1-Klik Terus Masuk</span>
             </div>
             
             <div className="grid grid-cols-2 gap-2">
@@ -491,11 +491,11 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 onClick={handleDemoMentor}
                 className="p-2.5 bg-slate-50 hover:bg-amber-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-black dark:text-white">
+                <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
                   <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Demo Mentor</span>
                 </div>
-                <div className="text-[10px] text-black/70 dark:text-white/75 truncate mt-0.5">
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
                   Dr. Wan Azhar (UMK)
                 </div>
               </button>
@@ -505,17 +505,17 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 onClick={handleDemoAdmin}
                 className="p-2.5 bg-slate-50 hover:bg-amber-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-black dark:text-white">
+                <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
                   <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Demo Admin</span>
                 </div>
-                <div className="text-[10px] text-black/70 dark:text-white/75 truncate mt-0.5">
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
                   Admin KBelia
                 </div>
               </button>
             </div>
 
-            <div className="text-center text-[10px] text-black/70 dark:text-white/75 pt-1">
+            <div className="text-center text-[0.8125rem] text-black/70 dark:text-white/75 pt-1">
               Hak Cipta Terpelihara © 2026 Portal KBelia Kelantan
             </div>
           </div>
@@ -567,12 +567,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             </div>
 
             {/* SUBTITLE MOTTO */}
-            <p className="text-xs xl:text-sm text-black dark:text-white font-normal leading-relaxed max-w-xs mt-1">
+            <p className="text-[0.9375rem] xl:text-sm text-black dark:text-white font-normal leading-relaxed max-w-xs mt-1">
               Portal Rasmi Kiosk & Keusahawanan Belia Kelantan 2026
             </p>
 
             {/* WELCOME BADGE */}
-            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-amber-50 border border-amber-300 text-black shadow-xs">
+            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[0.8125rem] font-semibold bg-amber-50 border border-amber-300 text-black shadow-xs">
               <Sparkles className="w-3.5 h-3.5 text-black" />
               <span>Selamat Datang ke KBelia</span>
             </div>
@@ -617,7 +617,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             </div>
 
             <div className="p-6 space-y-4">
-              <div className="space-y-3 text-xs text-black dark:text-white leading-relaxed">
+              <div className="space-y-3 text-sm text-black dark:text-white leading-relaxed">
                 <p>
                   <strong>1. Kelayakan Pemohon:</strong> Terbuka kepada warganegara Malaysia berumur 18 hingga 40 tahun yang menetap atau beroperasi di Negeri Kelantan.
                 </p>
@@ -635,7 +635,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                   setAgreeTerms(true);
                   setShowTermsModal(false);
                 }}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer dark:bg-blue-600"
+                className="w-full py-2.5 bg-blue-600 hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-colors cursor-pointer dark:bg-blue-600"
               >
                 Saya Bersetuju & Tutup
               </button>

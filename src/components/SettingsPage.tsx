@@ -33,11 +33,13 @@ import {
   Sun,
   Moon,
   Globe,
-  GraduationCap
+  GraduationCap,
+  Type
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTextSize } from '../context/TextSizeContext';
 import { BusinessListing, BusinessCategory, KelantanDistrict } from '../types';
 import { saveBusinessListing, seedInitialData, loadLocalPortalSettings, savePortalSettingsRecord } from '../services/dataService';
 import confetti from 'canvas-confetti';
@@ -91,6 +93,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
   const { user, userProfile, updateProfileData, changeUserPassword, isAdmin } = useAuth();
   const { theme, isDark, toggleTheme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const { textSize, setTextSize } = useTextSize();
   const { confirmDelete } = useConfirmDelete();
 
   // Role detection: youth vs mentor vs admin
@@ -528,12 +531,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
             {t('settings_title')}
           </h1>
-          <p className="text-xs sm:text-sm text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
+          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
             {t('settings_desc')}
           </p>
         </div>
         <div className="shrink-0 flex items-center gap-2">
-          <span className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+          <span className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-xl text-sm font-semibold flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-black dark:text-white/75" />
             {isAdmin 
               ? t('settings_superadmin_badge') 
@@ -550,11 +553,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-black dark:text-white/75" />
-              <span className="text-xs sm:text-sm font-bold text-black dark:text-white">
+              <span className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white">
                 {language === 'en' ? 'Profile & Business Completeness' : 'Tahap Kelengkapan Profil & Bisnes'}
               </span>
             </div>
-            <span className="text-xs font-mono font-extrabold text-black dark:text-white/75">
+            <span className="text-[0.8125rem] font-mono font-extrabold text-black dark:text-white/75">
               {completeness.percent}% {language === 'en' ? 'Completed' : 'Lengkap'} ({completeness.completedCount}/{completeness.totalCount})
             </span>
           </div>
@@ -565,13 +568,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             />
           </div>
           {completeness.nextItem ? (
-            <p className="text-[11px] text-black dark:text-white">
+            <p className="text-[0.875rem] text-black dark:text-white">
               {language === 'en' 
                 ? `Tip: Complete your "${completeness.nextItem.label}" to achieve 100% eligibility for State Youth Grants.` 
                 : `Tip: Lengkapkan "${completeness.nextItem.label}" anda untuk capai 100% kelayakan Geran Belia Negeri.`}
             </p>
           ) : (
-            <p className="text-[11px] text-black dark:text-white/75 font-semibold flex items-center gap-1">
+            <p className="text-[0.875rem] text-black dark:text-white/75 font-semibold flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>{language === 'en' ? 'Congratulations! Your profile is 100% complete and fully verified.' : 'Tahniah! Profil perniagaan anda 100% lengkap dan disahkan.'}</span>
             </p>
@@ -580,7 +583,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
       )}
 
       {/* 2. Interactive Navigation Filter Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs font-bold">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-sm font-bold">
         <button
           type="button"
           onClick={() => setActiveSection('all')}
@@ -698,7 +701,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
       {/* 3. Global Feedback Alert */}
       {settingsMessage && (
-        <div className={`p-4 rounded-xl text-xs font-semibold flex items-center justify-between shadow-xs transition-all ${
+        <div className={`p-4 rounded-xl text-sm font-semibold flex items-center justify-between shadow-xs transition-all ${
           settingsMessage.type === 'success'
             ? 'bg-emerald-50 text-black border border-emerald-300'
             : 'bg-rose-50 text-black border border-rose-300'
@@ -743,11 +746,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* SEKSYEN 0: TEMA & MOD GELAP                             */}
         {/* ======================================================== */}
         {(activeSection === 'all' || activeSection === 'theme') && (
-          <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs transition-colors">
+          <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs transition-colors space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-bold text-black dark:text-white">{t('theme_display_title')}</h3>
-                <p className="text-xs text-black dark:text-white">{t('theme_display_desc')}</p>
+                <h3 className="text-base font-bold text-black dark:text-white">{t('theme_display_title')}</h3>
+                <p className="text-sm text-black/80 dark:text-white/80 mt-0.5">{t('theme_display_desc')}</p>
               </div>
 
               {/* Compact Horizontal Segmented Tab Control */}
@@ -755,27 +758,70 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <button
                   type="button"
                   onClick={() => setTheme('light')}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
                     !isDark
                       ? 'bg-white text-black shadow-xs border border-slate-300'
                       : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
                   }`}
                 >
-                  <Sun className={`w-3.5 h-3.5 ${!isDark ? 'text-black/70 dark:text-white/75 fill-amber-500' : 'text-black/70 dark:text-white/75'}`} />
+                  <Sun className={`w-4 h-4 ${!isDark ? 'text-black/70 dark:text-white/75 fill-amber-500' : 'text-black/70 dark:text-white/75'}`} />
                   <span>{t('mode_light_btn')}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setTheme('dark')}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
                     isDark
                       ? 'bg-slate-800 text-white shadow-xs border border-slate-700'
                       : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
                   }`}
                 >
-                  <Moon className={`w-3.5 h-3.5 ${isDark ? 'text-black/70 dark:text-white/75 fill-amber-400' : 'text-black/70 dark:text-white/75'}`} />
+                  <Moon className={`w-4 h-4 ${isDark ? 'text-black/70 dark:text-white/75 fill-amber-400' : 'text-black/70 dark:text-white/75'}`} />
                   <span>{t('mode_dark_btn')}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Type className="w-4 h-4 text-black dark:text-white/80" />
+                  <h3 className="text-base font-bold text-black dark:text-white">Saiz Teks Laman Web</h3>
+                </div>
+                <p className="text-sm text-black/80 dark:text-white/80 mt-0.5">
+                  Pilih saiz teks Biasa atau Besar mengikut keselesaan mata di semua halaman.
+                </p>
+              </div>
+
+              <div className="inline-flex items-center p-1 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 shrink-0 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTextSize('normal');
+                    showToast('Saiz teks ditetapkan ke mod Biasa.', 'info');
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
+                    textSize === 'normal'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                  }`}
+                >
+                  Biasa
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTextSize('large');
+                    showToast('Saiz teks ditetapkan ke mod Besar.', 'info');
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
+                    textSize === 'large'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                  }`}
+                >
+                  Besar
                 </button>
               </div>
             </div>
@@ -795,7 +841,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     {t('lang_setting_title')}
                   </h3>
                 </div>
-                <p className="text-xs text-black dark:text-white mt-0.5">
+                <p className="text-[0.9375rem] text-black dark:text-white mt-0.5">
                   {t('lang_setting_desc')}
                 </p>
               </div>
@@ -809,7 +855,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     setLanguage('ms');
                     showToast('Bahasa sistem ditetapkan kepada Bahasa Melayu (Rasmi)');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-bold transition-all cursor-pointer ${
                     language === 'ms'
                       ? 'bg-white text-black shadow-xs border border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-600'
                       : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -826,7 +872,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     setLanguage('en');
                     showToast('System language set to English (International)');
                   }}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-bold transition-all cursor-pointer ${
                     language === 'en'
                       ? 'bg-white text-black shadow-xs border border-slate-300 dark:bg-slate-800 dark:text-white dark:border-slate-600'
                       : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -852,7 +898,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 </div>
                 <div>
                   <h3 className="text-sm font-black text-black dark:text-white">{t('settings_profile_avatar_title')}</h3>
-                  <p className="text-xs text-black/70 dark:text-white/75">{t('settings_profile_avatar_desc')}</p>
+                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_profile_avatar_desc')}</p>
                 </div>
               </div>
             </div>
@@ -897,7 +943,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                         : (language === 'ms' ? 'Usahawan Belia Kelantan' : 'Kelantan Youth Entrepreneur')
                     )}
                   </div>
-                  <div className="text-xs text-black/70 dark:text-white/75 mt-0.5">
+                  <div className="text-sm text-black/70 dark:text-white/75 mt-0.5">
                     {user?.email || t('settings_verified_account')} · {
                       isAdmin
                         ? (language === 'ms' ? 'Pentadbir Sistem Kerajaan Negeri' : 'State System Administrator')
@@ -909,12 +955,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 </div>
 
                 <div className="pt-1">
-                  <p className="text-xs text-black dark:text-white max-w-md leading-relaxed">
+                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md leading-relaxed">
                     {t('settings_avatar_help')}
                   </p>
                 </div>
 
-                <p className="text-[11px] text-black/70 dark:text-white/75">
+                <p className="text-[0.875rem] text-black/70 dark:text-white/75">
                   {t('settings_avatar_specs')}
                 </p>
               </div>
@@ -934,14 +980,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </div>
               <div>
                 <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_personal_info_title')}</h4>
-                <p className="text-xs text-black/70 dark:text-white/75">{t('settings_personal_info_desc')}</p>
+                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_personal_info_desc')}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Nama Penuh */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_full_name')} <span className="text-black dark:text-white/75">*</span>
                 </label>
                 <div className="relative">
@@ -952,14 +998,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsFullName}
                     onChange={(e) => setSettingsFullName(e.target.value)}
                     placeholder={t('settings_full_name_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* No. MyKad */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_ic_number')}
                 </label>
                 <div className="relative">
@@ -969,14 +1015,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsIcNumber}
                     onChange={(e) => setSettingsIcNumber(e.target.value)}
                     placeholder={t('settings_ic_number_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* Alamat Emel */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_email_registered')}
                 </label>
                 <div className="relative">
@@ -985,16 +1031,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     type="email"
                     disabled
                     value={user?.email || ''}
-                    placeholder={language === 'en' ? 'Email' : 'Emel'}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black/70 dark:text-white/75 cursor-not-allowed"
+                    placeholder={language === 'en' ? 'Enter email address' : 'Masukkan alamat emel'}
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-[0.9375rem] font-medium text-black/70 dark:text-white/75 cursor-not-allowed"
                   />
                 </div>
-                <span className="text-[10px] text-black/70 dark:text-white/75 mt-1 block">{t('settings_email_locked_notice')}</span>
               </div>
 
               {/* Nombor Telefon / WhatsApp */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_phone_number')} <span className="text-black dark:text-white/75">*</span>
                 </label>
                 <div className="relative">
@@ -1005,14 +1050,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsPhone}
                     onChange={(e) => setSettingsPhone(e.target.value)}
                     placeholder={t('settings_phone_number_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* Jajahan Operasi / Kediaman */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_district_label')} <span className="text-black dark:text-white/75">*</span>
                 </label>
                 <div className="relative">
@@ -1020,7 +1065,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   <select
                     value={settingsDistrict}
                     onChange={(e) => setSettingsDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
                   >
                     {DISTRICTS.map((d) => (
                       <option key={d} value={d} className="bg-white dark:bg-slate-900 text-black dark:text-white">
@@ -1037,35 +1082,35 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               <div className="pt-4 border-t border-slate-300 dark:border-slate-600 space-y-4">
                 <div className="flex items-center gap-2">
                   <GraduationCap className="w-4 h-4 text-black dark:text-white/75" />
-                  <h5 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider">
+                  <h5 className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">
                     {language === 'en' ? 'Mentor Academic & Mentoring Focus' : 'Maklumat Pengkhususan & Fakulti Mentor UMK'}
                   </h5>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                      {language === 'en' ? 'Faculty / Academic Department' : 'Fakulti / Jabatan Akademik'} <span className="text-black dark:text-white/75">*</span>
+                    <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                      {language === 'en' ? 'Academic Faculty' : 'Fakulti Akademik'} <span className="text-black dark:text-white">*</span>
                     </label>
                     <input
                       type="text"
                       value={mentorDepartment}
                       onChange={(e) => setMentorDepartment(e.target.value)}
-                      placeholder={language === 'en' ? 'e.g. Faculty of Entrepreneurship and Business (FKP) UMK' : 'cth. Fakulti Keusahawanan dan Perniagaan (FKP) UMK'}
-                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                      placeholder={language === 'en' ? 'Enter academic faculty' : 'Masukkan nama fakulti'}
+                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                      {language === 'en' ? 'Area of Mentoring Focus' : 'Bidang Pengkhususan Pementoran'} <span className="text-black dark:text-white/75">*</span>
+                    <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                      {language === 'en' ? 'Area of Expertise' : 'Bidang Kepakaran'} <span className="text-black dark:text-white">*</span>
                     </label>
                     <input
                       type="text"
                       value={mentorExpertise}
                       onChange={(e) => setMentorExpertise(e.target.value)}
-                      placeholder={language === 'en' ? 'e.g. Digital Marketing, Halal Compliance, Financial Planning' : 'cth. Pemasaran Digital, Pensijilan Halal, Perancangan Kewangan'}
-                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                      placeholder={language === 'en' ? 'Enter area of expertise' : 'Masukkan bidang kepakaran'}
+                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1085,7 +1130,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </div>
               <div>
                 <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_business_details_title')}</h4>
-                <p className="text-xs text-black/70 dark:text-white/75">{t('settings_business_details_desc')}</p>
+                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_business_details_desc')}</p>
               </div>
             </div>
 
@@ -1099,14 +1144,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 )}
               </div>
               <div className="flex-1 text-center sm:text-left space-y-1">
-                <div className="text-xs font-bold text-black dark:text-white">{t('settings_business_logo_title')}</div>
-                <p className="text-[11px] text-black/70 dark:text-white/75">{t('settings_business_logo_desc')}</p>
+                <div className="text-sm font-bold text-black dark:text-white">{t('settings_business_logo_title')}</div>
+                <p className="text-[0.875rem] text-black/70 dark:text-white/75">{t('settings_business_logo_desc')}</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => logoFileInputRef.current?.click()}
-                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-indigo-600 text-black dark:text-white text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-indigo-600 text-black dark:text-white text-sm font-bold shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Upload className="w-3.5 h-3.5 text-black dark:text-white" />
                   <span>{t('settings_choose_logo_btn')}</span>
@@ -1134,7 +1179,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Nama Perniagaan */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_business_name')}
                 </label>
                 <div className="relative">
@@ -1144,20 +1189,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsBusinessName}
                     onChange={(e) => setSettingsBusinessName(e.target.value)}
                     placeholder={t('settings_business_name_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* Kategori Perniagaan */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_business_category')}
                 </label>
                 <select
                   value={settingsCategory}
                   onChange={(e) => setSettingsCategory(e.target.value as BusinessCategory)}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat} className="bg-white dark:bg-slate-900 text-black dark:text-white">
@@ -1169,13 +1214,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
               {/* Status Pendaftaran SSM */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_ssm_status')}
                 </label>
                 <select
                   value={settingsSsmStatus}
                   onChange={(e) => setSettingsSsmStatus(e.target.value as 'registered' | 'in_progress' | 'not_registered')}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
                 >
                   <option value="registered" className="bg-white dark:bg-slate-900 text-black dark:text-white">{t('settings_ssm_reg_official')}</option>
                   <option value="in_progress" className="bg-white dark:bg-slate-900 text-black dark:text-white">{t('settings_ssm_in_progress')}</option>
@@ -1185,7 +1230,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
               {/* No. Pendaftaran SSM */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_ssm_number')}
                 </label>
                 <div className="relative">
@@ -1195,14 +1240,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsSsmNumber}
                     onChange={(e) => setSettingsSsmNumber(e.target.value)}
                     placeholder={t('settings_ssm_number_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* Waktu Operasi */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_operating_hours')}
                 </label>
                 <div className="relative">
@@ -1212,14 +1257,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsBusinessHours}
                     onChange={(e) => setSettingsBusinessHours(e.target.value)}
                     placeholder={t('settings_operating_hours_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* Alamat Premis / Kiosk */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_premise_address')}
                 </label>
                 <div className="relative">
@@ -1229,7 +1274,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={settingsBusinessAddress}
                     onChange={(e) => setSettingsBusinessAddress(e.target.value)}
                     placeholder={t('settings_premise_address_ph')}
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1239,7 +1284,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             <div className="pt-3 border-t border-slate-300 dark:border-slate-600 space-y-3">
               <div className="flex items-center gap-2">
                 <Share2 className="w-4 h-4 text-black dark:text-white/75" />
-                <h5 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider">
+                <h5 className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">
                   {t('settings_social_media_title')}
                 </h5>
               </div>
@@ -1247,43 +1292,43 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {/* Facebook */}
                 <div>
-                  <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1">
                     {t('settings_facebook_label')}
                   </label>
                   <input
                     type="text"
                     value={settingsFacebook}
                     onChange={(e) => setSettingsFacebook(e.target.value)}
-                    placeholder="facebook.com/namabisnes"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    placeholder={language === 'en' ? 'Enter Facebook link' : 'Masukkan pautan Facebook'}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
 
                 {/* Instagram */}
                 <div>
-                  <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1">
                     {t('settings_instagram_label')}
                   </label>
                   <input
                     type="text"
                     value={settingsInstagram}
                     onChange={(e) => setSettingsInstagram(e.target.value)}
-                    placeholder="@namabisnes"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    placeholder={language === 'en' ? 'Enter Instagram username' : 'Masukkan nama akaun Instagram'}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
 
                 {/* TikTok */}
                 <div>
-                  <label className="block text-[11px] font-bold text-black dark:text-white mb-1">
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1">
                     {t('settings_tiktok_label')}
                   </label>
                   <input
                     type="text"
                     value={settingsTiktok}
                     onChange={(e) => setSettingsTiktok(e.target.value)}
-                    placeholder="@namabisnes.tiktok"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    placeholder={language === 'en' ? 'Enter TikTok username' : 'Masukkan nama akaun TikTok'}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1303,11 +1348,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </div>
               <div>
                 <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_banking_title')}</h4>
-                <p className="text-xs text-black/70 dark:text-white/75">{t('settings_banking_desc')}</p>
+                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_banking_desc')}</p>
               </div>
             </div>
 
-            <div className="p-3.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 rounded-xl text-xs text-black dark:text-white flex items-start gap-2.5">
+            <div className="p-3.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 rounded-xl text-sm text-black dark:text-white flex items-start gap-2.5">
               <ShieldCheck className="w-4 h-4 text-black dark:text-white/75 shrink-0 mt-0.5" />
               <div className="leading-relaxed">
                 <span className="font-bold">{t('settings_privacy_assured')}</span> {t('settings_privacy_assured_desc')}
@@ -1317,13 +1362,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Nama Bank */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_bank_name')}
                 </label>
                 <select
                   value={settingsBankName}
                   onChange={(e) => setSettingsBankName(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white dark:focus:border-blue-500"
                 >
                   {BANK_OPTIONS.map((b) => (
                     <option key={b} value={b} className="bg-white dark:bg-slate-900 text-black dark:text-white">
@@ -1335,7 +1380,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
               {/* No. Akaun Bank */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_bank_account_no')}
                 </label>
                 <input
@@ -1343,21 +1388,21 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   value={settingsBankAccountNumber}
                   onChange={(e) => setSettingsBankAccountNumber(e.target.value)}
                   placeholder={t('settings_bank_account_no_ph')}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white font-mono placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                 />
               </div>
 
               {/* Nama Pemegang Akaun */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_bank_holder_name')}
                 </label>
                 <input
                   type="text"
                   value={settingsBankAccountHolder}
                   onChange={(e) => setSettingsBankAccountHolder(e.target.value)}
-                  placeholder={settingsFullName || (language === 'ms' ? 'Nama penuh atau nama syarikat' : 'Full name or company name')}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                  placeholder={language === 'en' ? 'Enter account holder name' : 'Masukkan nama pemilik akaun'}
+                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                 />
               </div>
             </div>
@@ -1375,7 +1420,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </div>
               <div>
                 <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_notifications_title')}</h4>
-                <p className="text-xs text-black/70 dark:text-white/75">{t('settings_notifications_desc')}</p>
+                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_notifications_desc')}</p>
               </div>
             </div>
 
@@ -1387,8 +1432,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     <Phone className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-black dark:text-white">{t('settings_notify_wa_title')}</div>
-                    <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">
+                    <div className="text-sm font-bold text-black dark:text-white">{t('settings_notify_wa_title')}</div>
+                    <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">
                       {t('settings_notify_wa_desc')}
                     </div>
                   </div>
@@ -1407,8 +1452,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     <Mail className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-black dark:text-white">{t('settings_notify_email_title')}</div>
-                    <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">
+                    <div className="text-sm font-bold text-black dark:text-white">{t('settings_notify_email_title')}</div>
+                    <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">
                       {t('settings_notify_email_desc')}
                     </div>
                   </div>
@@ -1435,13 +1480,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </div>
               <div>
                 <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_security_title')}</h4>
-                <p className="text-xs text-black/70 dark:text-white/75">{t('settings_security_desc')}</p>
+                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_security_desc')}</p>
               </div>
             </div>
 
             {/* Password Feedback */}
             {passwordNotice && (
-              <div className={`p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+              <div className={`p-3.5 rounded-xl text-sm font-semibold flex items-center gap-2 ${
                 passwordNotice.type === 'success'
                   ? 'bg-emerald-50 dark:bg-emerald-950/40 text-black dark:text-white border border-emerald-300 dark:border-emerald-800'
                   : 'bg-rose-50 dark:bg-rose-950/40 text-black dark:text-white border border-rose-300 dark:border-rose-800'
@@ -1458,7 +1503,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             <div className="space-y-4">
               {/* Kata Laluan Semasa / Lama */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {t('settings_current_password_label')} <span className="text-black dark:text-white/75">*</span>
                 </label>
                 <div className="relative">
@@ -1468,7 +1513,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder={t('settings_current_password_ph')}
-                    className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                    className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                   />
                   <button
                     type="button"
@@ -1482,7 +1527,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                     {t('settings_new_password_label')}
                   </label>
                   <div className="relative">
@@ -1491,8 +1536,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                       type={showPassword ? 'text' : 'password'}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder={language === 'en' ? 'New Password' : 'Kata Laluan Baharu'}
-                      className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                      placeholder={language === 'en' ? 'Enter new password' : 'Masukkan kata laluan baharu'}
+                      className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                     />
                     <button
                       type="button"
@@ -1505,7 +1550,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                     {t('settings_confirm_new_password_label')}
                   </label>
                   <div className="relative">
@@ -1514,8 +1559,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                       type={showPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder={language === 'en' ? 'Confirm New Password' : 'Sahkan Kata Laluan Baharu'}
-                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
+                      placeholder={language === 'en' ? 'Re-enter new password' : 'Masukkan semula kata laluan baharu'}
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1527,7 +1572,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 type="button"
                 onClick={handleChangePasswordSubmit}
                 disabled={isChangingPassword || !newPassword}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-indigo-600"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-indigo-600"
               >
                 {isChangingPassword ? (
                   <span>{t('settings_updating_password')}</span>
@@ -1555,7 +1600,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <h4 className="text-sm font-bold text-black dark:text-white">
                   {language === 'ms' ? 'Tetapan Parameter Pentadbir & Admin KBelia' : 'Secretariat & Admin Parameter Controls'}
                 </h4>
-                <p className="text-xs text-black/70 dark:text-white/75">
+                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
                   {language === 'ms' ? 'Tetapan operasi peringkat pentadbiran negeri.' : 'State-level operational and administrative configuration.'}
                 </p>
               </div>
@@ -1564,34 +1609,36 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Pegawai Pentadbir */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {language === 'ms' ? 'Nama Pegawai Pentadbir' : 'Secretariat Officer Name'}
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {language === 'ms' ? 'Nama Pegawai Pentadbir' : 'Administrator Name'}
                 </label>
                 <input
                   type="text"
                   value={adminOfficerName}
                   onChange={(e) => setAdminOfficerName(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                  placeholder={language === 'ms' ? 'Masukkan nama pegawai pentadbir' : 'Enter administrator name'}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
                 />
               </div>
 
               {/* Talian Meja Bantuan */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {language === 'ms' ? 'Talian WhatsApp Meja Bantuan Rasmi' : 'Official WhatsApp Helpdesk Line'}
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {language === 'ms' ? 'Nombor Telefon Pentadbiran' : 'Administrator Phone Number'}
                 </label>
                 <input
                   type="text"
                   value={adminHelpdeskPhone}
                   onChange={(e) => setAdminHelpdeskPhone(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 font-mono dark:focus:border-blue-500"
+                  placeholder={language === 'ms' ? 'Masukkan nombor telefon pentadbiran' : 'Enter administrator phone number'}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 font-mono dark:focus:border-blue-500"
                 />
               </div>
 
               {/* Kadar Subsidi Sewaan Kiosk */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {language === 'ms' ? 'Kadar Subsidi Sewaan Kiosk (%)' : 'Kiosk Rent Subsidy Rate (%)'}
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {language === 'ms' ? 'Kadar Subsidi Sewaan' : 'Kiosk Rent Subsidy Rate'}
                 </label>
                 <input
                   type="number"
@@ -1599,14 +1646,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   max="100"
                   value={portalSubsidyRate}
                   onChange={(e) => setPortalSubsidyRate(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                  placeholder={language === 'ms' ? 'Masukkan peratusan subsidi' : 'Enter subsidy percentage'}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
                 />
               </div>
 
               {/* Had Tempoh Sewaan */}
               <div>
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {language === 'ms' ? 'Had Maksimum Tempoh Perjanjian Kiosk (Bulan)' : 'Maximum Tenancy Agreement Limit (Months)'}
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {language === 'ms' ? 'Tempoh Maksimum Sewaan' : 'Maximum Lease Duration'}
                 </label>
                 <input
                   type="number"
@@ -1614,27 +1662,29 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   max="36"
                   value={maxLeaseDurationMonths}
                   onChange={(e) => setMaxLeaseDurationMonths(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  placeholder={language === 'ms' ? 'Masukkan tempoh dalam bulan' : 'Enter duration in months'}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                 />
               </div>
 
               {/* Pengumuman Portal */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                  {language === 'ms' ? 'Teks Pengumuman Khas Portal' : 'Special Portal Broadcast / Announcement Text'}
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {language === 'ms' ? 'Teks Pengumuman Portal' : 'Portal Announcement Text'}
                 </label>
                 <input
                   type="text"
                   value={portalAnnouncement}
                   onChange={(e) => setPortalAnnouncement(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-medium text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                  placeholder={language === 'ms' ? 'Masukkan teks pengumuman portal' : 'Enter portal announcement text'}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
                 />
               </div>
             </div>
 
             {/* Seed Database button for admin */}
             <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between">
-              <span className="text-[11px] text-black/70 dark:text-white/75">
+              <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
                 {language === 'ms' ? 'Penyegerakan Pangkalan Data Awalan' : 'Initial Database Synchronization'}
               </span>
               <button
@@ -1654,7 +1704,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                     });
                   }
                 }}
-                className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-black border border-amber-300 font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-black border border-amber-300 font-bold rounded-lg text-sm flex items-center gap-1.5 cursor-pointer"
               >
                 <Database className="w-3.5 h-3.5" />
                 <span>{language === 'ms' ? 'Penyegerakan Data Permulaan' : 'Sync Initial Data'}</span>
@@ -1667,14 +1717,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         {/* BOTTOM SAVE BAR */}
         {/* ======================================================== */}
         <div className="sticky bottom-4 z-30 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 transition-colors">
-          <div className="text-xs text-black dark:text-white text-center sm:text-left">
+          <div className="text-sm text-black dark:text-white text-center sm:text-left">
             {t('settings_bottom_notice')}
           </div>
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <button
               type="submit"
               disabled={savingSettings}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-sm transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-60 cursor-pointer dark:bg-indigo-600"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm sm:text-[0.9375rem] shadow-sm transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-60 cursor-pointer dark:bg-indigo-600"
             >
               {savingSettings ? (
                 <>

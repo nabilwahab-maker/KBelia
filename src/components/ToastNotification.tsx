@@ -143,11 +143,11 @@ const ToastItem: React.FC<{ toast: ToastMessage; onDismiss: () => void }> = ({ t
       <div className="p-3.5 flex items-start gap-3">
         <div className="pt-0.5">{theme.icon}</div>
         <div className="flex-1 min-w-0 pr-1">
-          <h5 className="text-xs font-bold text-black dark:text-white leading-snug">
+          <h5 className="text-sm font-bold text-black dark:text-white leading-snug">
             {toast.title}
           </h5>
           {toast.message && (
-            <p className="text-[11px] text-black dark:text-white mt-0.5 leading-relaxed">
+            <p className="text-[0.875rem] text-black dark:text-white mt-0.5 leading-relaxed">
               {toast.message}
             </p>
           )}

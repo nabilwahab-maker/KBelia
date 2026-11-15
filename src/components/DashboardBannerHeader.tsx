@@ -245,18 +245,18 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         
         {/* Navigation Breadcrumb */}
-        <div className="flex items-center gap-2.5 text-xs sm:text-sm flex-wrap min-w-0">
-          <div className={`w-7 h-7 rounded-lg ${meta.iconBg} text-white flex items-center justify-center shrink-0 shadow-2xs animate-float-gentle`}>
-            <IconComponent className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-2.5 text-sm sm:text-[0.9375rem] flex-wrap min-w-0">
+          <div className={`w-7.5 h-7.5 rounded-lg ${meta.iconBg} text-white flex items-center justify-center shrink-0 shadow-2xs animate-float-gentle`}>
+            <IconComponent className="w-4 h-4" />
           </div>
 
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-black/70 dark:text-white/75 min-w-0">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm sm:text-[0.9375rem] font-medium text-black/75 dark:text-white/80 min-w-0">
             <button
               type="button"
               onClick={onNavigateHome}
               className="hover:text-black dark:hover:text-white hover:underline transition-colors cursor-pointer flex items-center gap-1 shrink-0"
             >
-              <Home className="w-3.5 h-3.5 inline" />
+              <Home className="w-4 h-4 inline" />
               <span>{isMs ? 'Utama' : 'Home'}</span>
             </button>
             <span className="text-black/35 dark:text-white/35" aria-hidden="true">/</span>
@@ -267,10 +267,10 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
         </div>
 
         {/* Today's Date */}
-        <div className="self-start sm:self-auto flex items-center gap-2 px-2.5 py-1 bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 rounded-lg text-[11px] shrink-0">
+        <div className="self-start sm:self-auto flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 rounded-lg text-[0.8125rem] shrink-0">
           <span className="kbelia-live-dot" aria-hidden="true" />
-          <Calendar className="w-3 h-3 text-black/60 dark:text-white/60 shrink-0" />
-          <span className="text-black/65 dark:text-white/65 font-medium capitalize">
+          <Calendar className="w-3.5 h-3.5 text-black/65 dark:text-white/70 shrink-0" />
+          <span className="text-black/70 dark:text-white/75 font-medium capitalize">
             {isMs ? 'Hari ini' : 'Today'}
           </span>
           <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>

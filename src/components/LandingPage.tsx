@@ -248,14 +248,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="flex items-center gap-1.5">
                 <span className="text-base font-extrabold tracking-tight text-black dark:text-white">KBelia</span>
               </div>
-              <p className="text-[11px] text-black/70 dark:text-white/75 font-normal hidden sm:block">
+              <p className="text-[0.875rem] text-black/70 dark:text-white/75 font-normal hidden sm:block">
                 {isBM ? 'Portal Usahawan & Kiosk Belia Kelantan' : 'Kelantan Youth Entrepreneurship & Capsule Kiosks'}
               </p>
             </div>
           </div>
 
           {/* Quick Nav Anchors to Landing Sections */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-black dark:text-white">
+          <nav className="hidden lg:flex items-center gap-6 text-sm font-bold text-black dark:text-white">
             <a href="#hero" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Utama' : 'Home'}</a>
             <a href="#kiosk" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</a>
             <a href="#direktori" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Direktori Usahawan' : 'Directory'}</a>
@@ -295,7 +295,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
 
             {/* Penukar Bahasa Global */}
-            <div className="flex items-center bg-slate-50 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-300 dark:border-slate-600 text-[10px] font-bold">
+            <div className="flex items-center bg-slate-50 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-bold">
               <button
                 type="button"
                 onClick={() => setLanguage('ms')}
@@ -323,7 +323,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               type="button"
               id="landing-register-nav-btn"
               onClick={() => navigateToPage('register')}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-xs font-bold transition-all cursor-pointer interactive-press interactive-lift group"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-sm font-bold transition-all cursor-pointer interactive-press interactive-lift group"
             >
               <Users className="w-3.5 h-3.5 text-black dark:text-white/75 transition-transform duration-200 group-hover:scale-110" />
               <span>{isBM ? 'Daftar' : 'Register'}</span>
@@ -334,7 +334,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               type="button"
               id="landing-login-btn"
               onClick={() => navigateToPage('login')}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer interactive-press interactive-lift group dark:bg-blue-600 kbelia-ambient-sheen"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-all cursor-pointer interactive-press interactive-lift group dark:bg-blue-600 kbelia-ambient-sheen"
             >
               <LogIn className="relative z-10 w-3.5 h-3.5 text-white transition-transform duration-200 group-hover:translate-x-0.5" />
               <span className="relative z-10">{isBM ? 'Log Masuk' : 'Log In'}</span>
@@ -410,12 +410,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
               {/* Top Controls Bar within Slide */}
               <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-auto">
-                <div className="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-white/15 text-xs">
-                  <span className="px-2 py-0.5 rounded font-bold text-[10px] bg-blue-600 text-white border border-blue-400/40">
+                <div className="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-white/15 text-[0.8125rem]">
+                  <span className="px-2 py-0.5 rounded font-bold text-[0.8125rem] bg-blue-600 text-white border border-blue-400/40">
                     {activeSlideData.badge}
                   </span>
-                  <span className="text-white/40 text-[11px] hidden sm:inline">·</span>
-                  <span className="text-white/90 font-bold text-[11px] flex items-center gap-1">
+                  <span className="text-white/40 text-[0.8125rem] hidden sm:inline">·</span>
+                  <span className="text-white/90 font-bold text-[0.8125rem] flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
                     {activeSlideData.location}
                   </span>
@@ -444,13 +444,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {/* Bottom Content Overlay for Current Slide */}
               <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 z-20 space-y-3">
                 <div className="max-w-2xl space-y-1.5">
-                  <div className="text-white/90 text-xs font-bold uppercase tracking-wider">
+                  <div className="text-white/90 text-[0.8125rem] font-bold uppercase tracking-wider">
                     {activeSlideData.subtitle}
                   </div>
                   <h3 className="text-xl sm:text-3xl font-extrabold text-white leading-tight">
                     {activeSlideData.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-white line-clamp-2 leading-relaxed">
+                  <p className="text-[0.9375rem] text-white line-clamp-2 leading-relaxed">
                     {activeSlideData.description}
                   </p>
                 </div>
@@ -461,7 +461,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <button
                       type="button"
                       onClick={activeSlideData.onAction}
-                      className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-colors flex items-center gap-2 cursor-pointer active:scale-98 dark:bg-blue-600 dark:hover:bg-blue-500"
+                      className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition-colors flex items-center gap-2 cursor-pointer active:scale-98 dark:bg-blue-600 dark:hover:bg-blue-500"
                     >
                       <span>{activeSlideData.ctaText}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -503,7 +503,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* ========================================================================= */}
           {/* STATISTIK EKOSISTEM SEMASA (LIVE METRICS WITH COUNT-UP) */}
           {/* ========================================================================= */}
-          <div className="pt-6 inline-flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-wider text-black/75 dark:text-white/75">
+          <div className="pt-6 inline-flex items-center justify-center gap-2 text-[0.8125rem] font-bold uppercase tracking-wider text-black/75 dark:text-white/75">
             <span className="kbelia-live-dot" aria-hidden="true" />
             <span>{isBM ? 'Statistik Ekosistem Langsung' : 'Live Ecosystem Metrics'}</span>
           </div>
@@ -519,8 +519,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <div className="text-lg sm:text-xl font-black text-black dark:text-white leading-tight">{isBM ? 'Seluruh Kelantan' : 'Across Kelantan'}</div>
-              <div className="text-xs font-bold text-black dark:text-white mt-1">{isBM ? 'Liputan Negeri' : 'State Coverage'}</div>
-              <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Rangkaian Hab & Kiosk' : 'Hub & Kiosk Network'}</div>
+              <div className="text-sm font-bold text-black dark:text-white mt-1">{isBM ? 'Liputan Negeri' : 'State Coverage'}</div>
+              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Rangkaian Hab & Kiosk' : 'Hub & Kiosk Network'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-blue-400/70 dark:hover:border-blue-400/70 cursor-default group">
@@ -530,8 +530,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <div className="text-2xl sm:text-3xl font-black text-black dark:text-white tabular-nums">{animatedSlotsCount}</div>
-              <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
-              <div className="text-[11px] text-black dark:text-white/75 mt-0.5 font-bold tabular-nums">{animatedAvailableSlots} {isBM ? 'slot sedia' : 'slots ready'}</div>
+              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</div>
+              <div className="text-[0.8125rem] text-black dark:text-white/75 mt-0.5 font-bold tabular-nums">{animatedAvailableSlots} {isBM ? 'slot sedia' : 'slots ready'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-blue-400/70 dark:hover:border-blue-400/70 cursor-default group">
@@ -541,8 +541,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <div className="text-2xl sm:text-3xl font-black text-black dark:text-white tabular-nums">{animatedBusinessesCount}</div>
-              <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Usahawan Direktori' : 'Listed Merchants'}</div>
-              <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Disahkan SSM' : 'SSM Verified'}</div>
+              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Usahawan Direktori' : 'Listed Merchants'}</div>
+              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Disahkan SSM' : 'SSM Verified'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-amber-300 dark:hover:border-amber-500/40 cursor-default group">
@@ -552,8 +552,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{animatedProgramsCount}</div>
-              <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Program & Geran' : 'Programs & Grants'}</div>
-              <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Inisiatif aktif' : 'Active initiatives'}</div>
+              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Program & Geran' : 'Programs & Grants'}</div>
+              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Inisiatif aktif' : 'Active initiatives'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-violet-300 dark:hover:border-violet-500/40 cursor-default group">
@@ -563,8 +563,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{animatedMentorsCount}</div>
-              <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Panel Mentor' : 'Industry Mentors'}</div>
-              <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Certified mentors'}</div>
+              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Panel Mentor' : 'Industry Mentors'}</div>
+              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Bimbingan berkala' : 'Certified mentors'}</div>
             </div>
 
             <div className="kbelia-glass-card interactive-card p-4 sm:p-5 rounded-2xl text-left hover:border-emerald-300 dark:hover:border-emerald-500/40 cursor-default group">
@@ -574,8 +574,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
               <div className="text-2xl sm:text-3xl font-black text-black dark:text-white/75 tabular-nums">{animatedSubsidyPercent}%</div>
-              <div className="text-xs font-bold text-black dark:text-white mt-0.5">{isBM ? 'Subsidi Sewaan' : 'Rental Subsidy'}</div>
-              <div className="text-[11px] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Serendah RM12/hari' : 'From RM12/day'}</div>
+              <div className="text-sm font-bold text-black dark:text-white mt-0.5">{isBM ? 'Subsidi Sewaan' : 'Rental Subsidy'}</div>
+              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5">{isBM ? 'Serendah RM12/hari' : 'From RM12/day'}</div>
             </div>
           </div>
 
@@ -589,7 +589,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-4 h-4 text-black dark:text-white/75" />
-            <h3 className="text-xs sm:text-sm font-bold tracking-wide uppercase text-black dark:text-white">
+            <h3 className="text-sm sm:text-[0.9375rem] font-bold tracking-wide uppercase text-black dark:text-white">
               Galeri Kiosk & Produk Tempatan
             </h3>
           </div>
@@ -617,25 +617,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     alt={card.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur px-2 py-0.5 rounded text-[10px] font-bold text-white border border-white/10 flex items-center gap-1">
+                  <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur px-2 py-0.5 rounded text-[0.8125rem] font-bold text-white border border-white/10 flex items-center gap-1">
                     <MapPin className="w-2.5 h-2.5 text-white" />
                     <span>{card.location}</span>
                   </div>
                   <div className="absolute top-2 right-2">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border shadow-xs ${card.tagColor}`}>
+                    <span className={`px-2 py-0.5 rounded text-[0.8125rem] font-bold border shadow-xs ${card.tagColor}`}>
                       {card.tag}
                     </span>
                   </div>
-                  <div className="absolute bottom-2 left-2 bg-slate-900/75 backdrop-blur px-1.5 py-0.5 rounded text-[9px] font-mono font-bold text-white/85 uppercase">
+                  <div className="absolute bottom-2 left-2 bg-slate-900/75 backdrop-blur px-1.5 py-0.5 rounded text-[0.8125rem] font-mono font-bold text-white/85 uppercase">
                     {card.type}
                   </div>
                 </div>
 
                 <div className="p-3 space-y-1">
-                  <h4 className="text-xs font-bold text-black dark:text-white truncate group-hover:text-black dark:group-hover:text-white transition-colors">
+                  <h4 className="text-sm font-bold text-black dark:text-white truncate group-hover:text-black dark:group-hover:text-white transition-colors">
                     {card.title}
                   </h4>
-                  <p className="text-[11px] text-black/70 dark:text-white truncate">
+                  <p className="text-[0.875rem] text-black/70 dark:text-white truncate">
                     {card.subtitle}
                   </p>
                 </div>
@@ -652,14 +652,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="absolute inset-0 bg-dot-pattern opacity-45 pointer-events-none" aria-hidden="true" />
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           <RevealBlock className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
               <Layers className="w-3.5 h-3.5" />
               <span>Cabaran & Penyelesaian</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
               Cabaran Lazim vs. Solusi KBelia
             </h2>
-            <p className="text-xs sm:text-sm text-black dark:text-white/75">
+            <p className="text-[0.9375rem] text-black dark:text-white/75">
               Menangani halangan utama usahawan muda Kelantan memulakan operasi perniagaan.
             </p>
           </RevealBlock>
@@ -674,44 +674,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div>
                   <h3 className="font-extrabold text-base text-black dark:text-white">Cabaran Lazim Belia</h3>
-                  <p className="text-xs text-black dark:text-white/75 font-medium">Kekangan memulakan operasi tradisional</p>
+                  <p className="text-[0.9375rem] text-black dark:text-white/75 font-medium">Kekangan memulakan operasi tradisional</p>
                 </div>
               </div>
 
-              <ul className="space-y-4 text-xs sm:text-sm text-black dark:text-white">
+              <ul className="space-y-4 text-sm sm:text-[0.9375rem] text-black dark:text-white">
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Sewa Premis Tinggi</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Deposit 3+1 bulan dan sewa ribuan ringgit membebankan modal awal.</span>
+                    <span className="text-black/70 dark:text-white/75 text-sm">Deposit 3+1 bulan dan sewa ribuan ringgit membebankan modal awal.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Prosedur SSM & Lesen PBT</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Ketiadaan panduan berpusat melambatkan pendaftaran syarikat dan lesen.</span>
+                    <span className="text-black/70 dark:text-white/75 text-sm">Ketiadaan panduan berpusat melambatkan pendaftaran syarikat dan lesen.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Capaian Pasaran Terhad</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Sukar menembusi pasaran luar jajahan tanpa direktori rasmi.</span>
+                    <span className="text-black/70 dark:text-white/75 text-sm">Sukar menembusi pasaran luar jajahan tanpa direktori rasmi.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Kekurangan Bimbingan Mentor</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Beroperasi tanpa nasihat mentor berpengalaman meningkatkan risiko kegagalan.</span>
+                    <span className="text-black/70 dark:text-white/75 text-sm">Beroperasi tanpa nasihat mentor berpengalaman meningkatkan risiko kegagalan.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Maklumat Geran Tersebar</span>
-                    <span className="text-black/70 dark:text-white/75 text-xs">Info geran sukar dicapai dan semakan status memakan masa lama.</span>
+                    <span className="text-black/70 dark:text-white/75 text-sm">Info geran sukar dicapai dan semakan status memakan masa lama.</span>
                   </div>
                 </li>
               </ul>
@@ -725,44 +725,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div>
                   <h3 className="font-extrabold text-base text-black dark:text-white">Solusi Bersepadu KBelia</h3>
-                  <p className="text-xs text-black dark:text-white/75 font-medium">Ekosistem keusahawanan negeri</p>
+                  <p className="text-[0.9375rem] text-black dark:text-white/75 font-medium">Ekosistem keusahawanan negeri</p>
                 </div>
               </div>
 
-              <ul className="space-y-4 text-xs sm:text-sm text-black dark:text-white">
+              <ul className="space-y-4 text-sm sm:text-[0.9375rem] text-black dark:text-white">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Kiosk Modular Bersubsidi</span>
-                    <span className="text-black dark:text-white text-xs">Sewa RM12–RM25/hari di zon strategik lengkap elektrik 13A dan Wi-Fi.</span>
+                    <span className="text-black dark:text-white text-sm">Sewa RM12–RM25/hari di zon strategik lengkap elektrik 13A dan Wi-Fi.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Panduan SSM & Lesen</span>
-                    <span className="text-black dark:text-white text-xs">Rujukan tersusun bagi pendaftaran SSM, sijil Halal, dan lesen PBT.</span>
+                    <span className="text-black dark:text-white text-sm">Rujukan tersusun bagi pendaftaran SSM, sijil Halal, dan lesen PBT.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Direktori Pasaran Digital</span>
-                    <span className="text-black dark:text-white text-xs">Pamerkan katalog produk kepada pelanggan di seluruh negeri.</span>
+                    <span className="text-black dark:text-white text-sm">Pamerkan katalog produk kepada pelanggan di seluruh negeri.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Hab Mentor & Kemahiran</span>
-                    <span className="text-black dark:text-white text-xs">Padanan mentor industri serta latihan pemasaran digital dan kewangan.</span>
+                    <span className="text-black dark:text-white text-sm">Padanan mentor industri serta latihan pemasaran digital dan kewangan.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-black dark:text-white block">Penjejak Status Geran</span>
-                    <span className="text-black dark:text-white text-xs">Pantau kelulusan Geran Permulaan terus di papan pemuka.</span>
+                    <span className="text-black dark:text-white text-sm">Pantau kelulusan Geran Permulaan terus di papan pemuka.</span>
                   </div>
                 </li>
               </ul>
@@ -781,14 +781,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           <RevealBlock className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
               <Zap className="w-3.5 h-3.5" />
               <span>Modul Utama</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
               5 Ciri Utama Portal KBelia
             </h2>
-            <p className="text-xs sm:text-sm text-black dark:text-white/75">
+            <p className="text-[0.9375rem] text-black dark:text-white/75">
               Infrastruktur digital lengkap daripada analitik jualan hingga pematuhan rasmi.
             </p>
           </RevealBlock>
@@ -804,12 +804,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <h3 className="font-extrabold text-lg text-black dark:text-white">
                   {isBM ? 'Analitik & Laporan Jualan' : 'Business Analytics & Reporting'}
                 </h3>
-                <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
+                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                   {isBM
                     ? 'Pantau jualan harian, urus inventori produk, dan jana laporan prestasi ringkas untuk semakan pembiaya.'
                     : 'Track daily sales, manage product inventory, and export concise performance reports.'}
                 </p>
-                <div className="pt-1 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
+                <div className="pt-1 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>{isBM ? 'Graf visual & eksport PDF' : 'Visual charts & PDF export'}</span>
                 </div>
@@ -840,12 +840,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <h3 className="font-extrabold text-base text-black dark:text-white">
                 {isBM ? 'Penjejak Geran & Dana' : 'Funding & Grant Tracker'}
               </h3>
-              <p className="text-xs text-black dark:text-white leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 {isBM
                   ? 'Akses Geran Permulaan Negeri, geran digital MDEC, serta pembiayaan mikro TEKUN dan MARA.'
                   : 'Access state seed grants, MDEC digital grants, and TEKUN/MARA micro-financing schemes.'}
               </p>
-              <div className="pt-2 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
+              <div className="pt-2 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>{isBM ? 'Semakan status terus' : 'Direct status tracking'}</span>
               </div>
@@ -859,12 +859,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <h3 className="font-extrabold text-base text-black dark:text-white">
                 {isBM ? 'Hab Mentor & Rangkaian' : 'Mentorship & Networking Hub'}
               </h3>
-              <p className="text-xs text-black dark:text-white leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 {isBM
                   ? 'Padanan bersama mentor industri dan rangkaian kerjasama dengan usahawan belia Kelantan.'
                   : 'Connect with experienced mentors and build networks across Kelantan youth entrepreneurs.'}
               </p>
-              <div className="pt-2 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
+              <div className="pt-2 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <Video className="w-3.5 h-3.5" />
                 <span>{isBM ? 'Sesi 1-ke-1 & berkumpulan' : '1-on-1 & group coaching'}</span>
               </div>
@@ -879,12 +879,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <h3 className="font-extrabold text-lg text-black dark:text-white">
                   {isBM ? 'Akademi Kemahiran Belia' : 'Upskilling & Academy Module'}
                 </h3>
-                <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
+                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                   {isBM
                     ? 'Latihan praktikal TikTok Shop Ads, fotografi produk, penjenamaan, dan asas perakaunan.'
                     : 'Practical workshops covering TikTok Shop Ads, product photography, branding, and bookkeeping.'}
                 </p>
-                <div className="pt-1 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
+                <div className="pt-1 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5" />
                   <span>{isBM ? 'Sijil penyertaan rasmi' : 'Official completion certificate'}</span>
                 </div>
@@ -911,12 +911,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <h3 className="font-extrabold text-base text-black dark:text-white">
                 {isBM ? 'Panduan SSM & Lesen' : 'Compliance & SSM Guide'}
               </h3>
-              <p className="text-xs text-black dark:text-white leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 {isBM
                   ? 'Panduan pendaftaran SSM, pematuhan cukai LHDN, pensijilan Halal JAKIM, dan lesen PBT.'
                   : 'Interactive guidance for SSM registration, LHDN tax compliance, Halal JAKIM, and PBT permits.'}
               </p>
-              <div className="pt-2 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
+              <div className="pt-2 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>{isBM ? 'Templat & senarai semak' : 'Templates & checklists'}</span>
               </div>
@@ -931,12 +931,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <h3 className="font-extrabold text-lg text-black dark:text-white">
                   {isBM ? 'Hab Kiosk Modular Pintar' : 'Modular Capsule IoT Hub'}
                 </h3>
-                <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
+                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                   {isBM
                     ? 'Kunci digital pintar, pemantauan status kiosk dalam talian, dan sokongan teknikal berpusat.'
                     : 'Smart digital access, live kiosk occupancy tracking, and centralized technical support.'}
                 </p>
-                <div className="pt-1 text-xs font-bold text-black dark:text-white/75 flex items-center gap-1.5">
+                <div className="pt-1 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                   <Wifi className="w-3.5 h-3.5" />
                   <span>{isBM ? 'Pengurusan sewaan automatik' : 'Automated lease management'}</span>
                 </div>
@@ -964,14 +964,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           <RevealBlock className="text-center max-w-3xl mx-auto space-y-2.5 mb-14">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>4 Langkah Mudah</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
               Langkah Mula Beroperasi
             </h2>
-            <p className="text-xs sm:text-sm text-black dark:text-white/75">
+            <p className="text-[0.9375rem] text-black dark:text-white/75">
               Pendaftaran pantas dan percuma untuk semua usahawan belia Kelantan.
             </p>
           </RevealBlock>
@@ -987,7 +987,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <UserCheck className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
               <h4 className="font-extrabold text-base text-black dark:text-white">Daftar Akaun</h4>
-              <p className="text-xs text-black dark:text-white/75 leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
                 Cipta akaun percuma dengan emel atau Google untuk akses portal belia Kelantan.
               </p>
             </div>
@@ -1001,7 +1001,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <Briefcase className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
               <h4 className="font-extrabold text-base text-black dark:text-white">Lengkapkan Profil</h4>
-              <p className="text-xs text-black dark:text-white/75 leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
                 Isi maklumat kedai, muat naik katalog produk, logo jenama, dan pautan WhatsApp.
               </p>
             </div>
@@ -1015,7 +1015,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <Building2 className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
               <h4 className="font-extrabold text-base text-black dark:text-white">Pilih Kiosk & Geran</h4>
-              <p className="text-xs text-black dark:text-white/75 leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
                 Tempah slot kiosk bersubsidi di daerah anda atau mohon Geran Permulaan.
               </p>
             </div>
@@ -1029,7 +1029,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <TrendingUp className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
               <h4 className="font-extrabold text-base text-black dark:text-white">Tingkatkan Prestasi</h4>
-              <p className="text-xs text-black dark:text-white/75 leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
                 Terima bimbingan mentor, pantau jualan harian, dan luaskan capaian pelanggan.
               </p>
             </div>
@@ -1046,14 +1046,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <RevealBlock className="text-center max-w-2xl mx-auto space-y-2.5 mb-12">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
               <Shield className="w-3.5 h-3.5" />
               <span>{isBM ? 'Inisiatif Negeri' : 'State Pillars'}</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
               {isBM ? 'Teras Ekosistem KBelia' : 'KBelia Ecosystem Pillars'}
             </h2>
-            <p className="text-xs sm:text-sm text-black dark:text-white/75">
+            <p className="text-[0.9375rem] text-black dark:text-white/75">
               {isBM 
                 ? 'Menangani keperluan tapak operasi, pemasaran digital, dan bimbingan.'
                 : 'Designed to lower retail overhead, boost digital reach, and provide mentorship.'}
@@ -1070,7 +1070,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
                 {isBM ? 'Kiosk Belia Modular' : 'Modular Capsule Kiosks'}
               </h3>
-              <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 {isBM 
                   ? 'Ruang pasang-siap di lokasi tumpuan lengkap elektrik, Wi-Fi 500Mbps, dan keselamatan serendah RM12–RM25/hari.'
                   : 'Turnkey retail pods at high-footfall hubs with power, 500Mbps Wi-Fi, and security from RM12/day.'}
@@ -1079,7 +1079,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => navigateToPage('login')}
-                  className="text-xs font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
+                  className="text-sm font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
                   <span>{isBM ? 'Semak Lokasi' : 'View Locations'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -1095,7 +1095,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
                 {isBM ? 'Direktori Pasaran Digital' : 'Digital Market Directory'}
               </h3>
-              <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 {isBM 
                   ? 'Katalog rasmi yang memaparkan produk makanan, kraftangan batik, servis digital, dan hasil pertanian belia Kelantan.'
                   : 'Official catalog showcasing youth-crafted products from heritage delicacies to batik and digital services.'}
@@ -1104,7 +1104,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => navigateToPage('login')}
-                  className="text-xs font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
+                  className="text-sm font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
                   <span>{isBM ? 'Lihat Usahawan' : 'Browse Directory'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -1120,7 +1120,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
                 {isBM ? 'Geran & Modal Permulaan' : 'Grants & Seed Capital'}
               </h3>
-              <p className="text-xs sm:text-sm text-black dark:text-white leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 {isBM 
                   ? 'Akses Geran Permulaan Belia, geran digitalisasi, serta latihan intensif bersama mentor industri bagi memperkukuh operasi anda.'
                   : 'Fast-tracked youth seed grants, digitalization subsidies, and structured mentorship programs.'}
@@ -1129,7 +1129,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => navigateToPage('login')}
-                  className="text-xs font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
+                  className="text-sm font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
                   <span>{isBM ? 'Maklumat Skim' : 'View Schemes'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
@@ -1150,14 +1150,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           
           <RevealBlock className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+              <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
                 <Building2 className="w-3.5 h-3.5" />
                 <span>Lokasi Pilihan</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance">
                 Kiosk Belia Sedia Dimohon
               </h2>
-              <p className="text-xs sm:text-sm text-black dark:text-white/75 mt-1">
+              <p className="text-[0.9375rem] text-black dark:text-white/75 mt-1">
                 Tapak strategik lengkap dengan elektrik dan internet.
               </p>
             </div>
@@ -1183,12 +1183,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         alt={slot.name} 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                       />
-                      <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur px-2.5 py-1 rounded-md text-[11px] font-bold text-white shadow-xs flex items-center gap-1 border border-white/10">
+                      <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur px-2.5 py-1 rounded-md text-[0.8125rem] font-bold text-white shadow-xs flex items-center gap-1 border border-white/10">
                         <MapPin className="w-3 h-3 text-white" />
                         <span>{slot.district}</span>
                       </div>
                       <div className="absolute top-3 right-3">
-                        <span className="px-2.5 py-1 rounded-md text-[10px] font-bold border border-emerald-400/30 bg-emerald-900/85 text-white shadow-xs inline-block">
+                        <span className="px-2.5 py-1 rounded-md text-[0.8125rem] font-bold border border-emerald-400/30 bg-emerald-900/85 text-white shadow-xs inline-block">
                           Kekosongan Sedia
                         </span>
                       </div>
@@ -1197,11 +1197,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <div className="p-5 sm:p-6 space-y-3">
                       <div>
                         <h4 className="text-base sm:text-lg font-bold text-black dark:text-white leading-snug group-hover:text-black dark:group-hover:text-white transition-colors">{slot.name}</h4>
-                        <p className="text-xs text-black/70 dark:text-white/75 mt-1 line-clamp-2">{slot.hubLocation}</p>
+                        <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1 line-clamp-2">{slot.hubLocation}</p>
                       </div>
 
                       {/* Amenities */}
-                      <div className="text-xs text-black/70 dark:text-white/75 flex items-center gap-2 pt-1 border-t border-slate-300 dark:border-zinc-600">
+                      <div className="text-sm text-black/70 dark:text-white/75 flex items-center gap-2 pt-1 border-t border-slate-300 dark:border-zinc-600">
                         <span className="flex items-center gap-1 text-black dark:text-white">
                           <Zap className="w-3 h-3 text-black/70 dark:text-white/75" /> Elektrik
                         </span>
@@ -1217,9 +1217,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                   <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 flex items-center justify-between border-t border-slate-300 dark:border-zinc-600">
                     <div>
-                      <div className="text-[10px] text-black/70 dark:text-white/75 uppercase font-semibold">Kadar Sewaan Bersubsidi</div>
+                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold">Kadar Sewaan Bersubsidi</div>
                       <div className="text-sm sm:text-base font-extrabold text-black dark:text-white/75 tabular-nums">
-                        RM{slot.dailyRate} <span className="text-xs text-black/70 dark:text-white/75 font-normal">/ hari</span>
+                        RM{slot.dailyRate} <span className="text-sm text-black/70 dark:text-white/75 font-normal">/ hari</span>
                       </div>
                     </div>
                   </div>
@@ -1241,14 +1241,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           
           <RevealBlock className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+              <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
                 <Store className="w-3.5 h-3.5" />
                 <span>Direktori Produk Tempatan</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance">
                 Karya & Produk Belia Kelantan
               </h2>
-              <p className="text-xs sm:text-sm text-black dark:text-white/75 mt-1">
+              <p className="text-[0.9375rem] text-black dark:text-white/75 mt-1">
                 Sokong produk usahawan muda merentasi pelbagai sektor.
               </p>
             </div>
@@ -1269,25 +1269,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       className="w-12 h-12 rounded-lg object-cover bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 shrink-0"
                     />
                     <div className="min-w-0">
-                      <div className="text-[10px] text-black dark:text-white/75 font-bold uppercase tracking-wide">{biz.category}</div>
+                      <div className="text-[0.8125rem] text-black dark:text-white/75 font-bold uppercase tracking-wide">{biz.category}</div>
                       <h4 className="text-sm font-bold text-black dark:text-white truncate group-hover:text-black dark:group-hover:text-white transition-colors">
                         {biz.businessName}
                       </h4>
-                      <div className="text-[11px] text-black/70 dark:text-white/75 flex items-center gap-1">
+                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75 flex items-center gap-1">
                         <MapPin className="w-3 h-3 text-black dark:text-white" />
                         <span>{biz.district}</span>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-xs text-black dark:text-white line-clamp-2">
+                  <p className="text-[0.9375rem] text-black dark:text-white line-clamp-2">
                     {biz.description || biz.tagline}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 mt-3 flex items-center justify-between text-xs">
-                  <span className="text-black dark:text-white/75 text-[11px]">{biz.ownerName}</span>
-                  <span className="text-[11px] font-semibold text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/70">
+                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 mt-3 flex items-center justify-between text-sm">
+                  <span className="text-black dark:text-white/75 text-[0.8125rem]">{biz.ownerName}</span>
+                  <span className="text-[0.8125rem] font-semibold text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/70">
                     {biz.district}
                   </span>
                 </div>
@@ -1305,14 +1305,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-5xl w-full mx-auto px-4 sm:px-8 lg:px-12">
           
           <RevealBlock className="text-center space-y-2.5 mb-10">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Bantuan & Panduan</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
               Soalan Lazim
             </h2>
-            <p className="text-xs sm:text-sm text-black dark:text-white/75">
+            <p className="text-[0.9375rem] text-black dark:text-white/75">
               Jawapan pantas mengenai permohonan kiosk, geran, mentor, dan direktori.
             </p>
           </RevealBlock>
@@ -1340,7 +1340,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-xs sm:text-sm text-black dark:text-white leading-relaxed border-t border-slate-300 dark:border-zinc-600 pt-3 bg-white dark:bg-zinc-900">
+                      <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-sm sm:text-[0.9375rem] text-black dark:text-white leading-relaxed border-t border-slate-300 dark:border-zinc-600 pt-3 bg-white dark:bg-zinc-900">
                         {faq.a}
                       </div>
                     </div>
@@ -1360,7 +1360,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" aria-hidden="true" />
         <div className="absolute -bottom-24 left-1/3 w-96 h-96 bg-blue-500/12 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
         <RevealBlock className="relative z-10 max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black dark:text-white/75">
+          <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Permohonan 2026/2027 Dibuka</span>
           </div>
@@ -1368,7 +1368,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
             Mulakan Langkah Anda Hari Ini
           </h2>
-          <p className="text-xs sm:text-sm text-black dark:text-white max-w-xl mx-auto leading-relaxed">
+          <p className="text-[0.9375rem] text-black dark:text-white max-w-xl mx-auto leading-relaxed">
             Sertai usahawan muda Kelantan yang menggunakan fasiliti kiosk modular, bimbingan mentor, dan direktori negeri.
           </p>
 
@@ -1392,7 +1392,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
           </div>
 
-          <div className="pt-2 text-xs text-black dark:text-white/75 flex items-center justify-center gap-4">
+          <div className="pt-2 text-sm text-black dark:text-white/75 flex items-center justify-center gap-4">
             <span className="flex items-center gap-1">
               <Check className="w-3.5 h-3.5 text-black dark:text-white/75" />
               <span>Inisiatif Kerajaan Negeri</span>
@@ -1414,7 +1414,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================================= */}
       {/* 11. COMPREHENSIVE INSTITUTIONAL FOOTER */}
       {/* ========================================================================= */}
-      <footer className="bg-white dark:bg-zinc-950 text-black dark:text-white text-xs border-t border-slate-300 dark:border-zinc-600">
+      <footer className="bg-white dark:bg-zinc-950 text-black dark:text-white text-sm border-t border-slate-300 dark:border-zinc-600">
 
         {/* 4-Column Footer Content */}
         <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -1427,10 +1427,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <span className="text-base font-black text-black dark:text-white tracking-tight">KBelia Kelantan</span>
             </div>
-            <p className="text-xs text-black dark:text-white/75 leading-relaxed">
+            <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
               Portal rasmi kiosk modular, direktori pasaran, dan geran usahawan belia Negeri Kelantan.
             </p>
-            <div className="pt-2 text-[11px] text-black/70 dark:text-white/75">
+            <div className="pt-2 text-[0.8125rem] text-black/70 dark:text-white/75">
               Kompleks Kota Darulnaim, 15503 Kota Bharu, Kelantan Darul Naim.
             </div>
           </div>
@@ -1438,7 +1438,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Col 2: Navigation Links */}
           <div className="space-y-3">
             <h4 className="font-extrabold text-sm text-black dark:text-white">Navigasi Portal</h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2 text-sm">
               <li>
                 <a href="#hero" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Laman Utama</a>
               </li>
@@ -1466,7 +1466,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Col 3: Legal & Policy */}
           <div className="space-y-3">
             <h4 className="font-extrabold text-sm text-black dark:text-white">Perundangan</h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2 text-sm">
               <li>
                 <button
                   type="button"
@@ -1509,7 +1509,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Col 4: Contact & Socials */}
           <div className="space-y-3">
             <h4 className="font-extrabold text-sm text-black dark:text-white">Hubungi Pentadbir</h4>
-            <div className="space-y-2 text-xs">
+            <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2 text-black dark:text-white">
                 <Phone className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                 <span>+60 9-748 1000 (Pejabat Pentadbiran)</span>
@@ -1526,7 +1526,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             {/* Social Media Links */}
             <div className="pt-2">
-              <div className="text-[10px] uppercase font-bold text-black dark:text-white/75 mb-2">Ikuti Media Sosial</div>
+              <div className="text-[0.8125rem] uppercase font-bold text-black dark:text-white/75 mb-2">Ikuti Media Sosial</div>
               <div className="flex items-center gap-2">
                 <a
                   href="https://facebook.com"
@@ -1571,7 +1571,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* Bottom Bar: Copyright */}
-        <div className="border-t border-slate-300 dark:border-slate-600 py-6 text-center text-[11px] text-black/70 dark:text-white/75">
+        <div className="border-t border-slate-300 dark:border-slate-600 py-6 text-center text-[0.8125rem] text-black/70 dark:text-white/75">
           <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p>
               Hak Cipta Terpelihara © {new Date().getFullYear()} Kerajaan Negeri Kelantan · Inisiatif Ekonomi Belia.
@@ -1619,7 +1619,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </button>
             </div>
 
-            <div className="p-6 text-xs text-black dark:text-white space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed">
+            <div className="p-6 text-sm text-black dark:text-white space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed">
               {legalModalType === 'privacy' ? (
                 <>
                   <p className="font-bold text-black dark:text-white">
@@ -1669,7 +1669,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer dark:bg-blue-600"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition-colors cursor-pointer dark:bg-blue-600"
               >
                 Saya Faham & Setuju
               </button>

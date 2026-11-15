@@ -60,7 +60,7 @@ export const generateOfferLetterOfficialHtml = (
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Surat Tawaran Penempatan Kiosk - ${booking.slotCode} - ${refNumber}</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
 
     @page {
       size: A4 portrait;
@@ -74,11 +74,11 @@ export const generateOfferLetterOfficialHtml = (
     }
 
     body {
-      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Public Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background-color: #f1f5f9;
       color: #000000;
-      line-height: 1.5;
-      font-size: 11.5px;
+      line-height: 1.55;
+      font-size: 14px;
       padding: 20px 15px;
       -webkit-font-smoothing: antialiased;
     }
@@ -89,7 +89,7 @@ export const generateOfferLetterOfficialHtml = (
       margin: 0 auto 16px auto;
       background: #1E40AF;
       color: #ffffff;
-      padding: 10px 18px;
+      padding: 12px 18px;
       border-radius: 12px;
       display: flex;
       justify-content: space-between;
@@ -98,7 +98,7 @@ export const generateOfferLetterOfficialHtml = (
     }
 
     .screen-toolbar-title {
-      font-size: 11.5px;
+      font-size: 13.5px;
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -109,9 +109,9 @@ export const generateOfferLetterOfficialHtml = (
     .screen-toolbar-badge {
       background: #F59E0B;
       color: #000000;
-      padding: 2px 8px;
+      padding: 3px 10px;
       border-radius: 9999px;
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
     }
@@ -127,9 +127,9 @@ export const generateOfferLetterOfficialHtml = (
       background-image: linear-gradient(135deg, #FBBF24, #F59E0B);
       color: #000000;
       border: none;
-      padding: 7px 16px;
+      padding: 8px 16px;
       border-radius: 8px;
-      font-size: 11.5px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
@@ -145,12 +145,12 @@ export const generateOfferLetterOfficialHtml = (
     }
 
     .btn-close-screen {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 7px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 8px 14px;
       border-radius: 8px;
-      font-size: 11.5px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -201,46 +201,47 @@ export const generateOfferLetterOfficialHtml = (
     }
 
     .state-sub {
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 800;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       color: #000000;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
 
     .agency-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 16px;
-      font-weight: 900;
+      font-family: 'Public Sans', system-ui, sans-serif;
+      font-size: 19px;
+      font-weight: 800;
       color: #000000;
       letter-spacing: -0.3px;
       line-height: 1.2;
     }
 
     .agency-desc {
-      font-size: 10.5px;
+      font-size: 12.5px;
       color: #000000;
-      opacity: 0.78;
-      margin-top: 3px;
-      line-height: 1.35;
+      opacity: 0.82;
+      margin-top: 4px;
+      line-height: 1.4;
     }
 
     .ref-block {
       background: #fffbeb;
       border: 1px solid #fcd34d;
       border-radius: 8px;
-      padding: 8px 12px;
+      padding: 9px 13px;
       text-align: right;
-      font-size: 10.5px;
-      line-height: 1.4;
+      font-size: 12px;
+      line-height: 1.45;
       font-family: monospace;
       color: #000000;
-      min-width: 200px;
+      min-width: 215px;
     }
 
     .ref-val {
       font-weight: 800;
+      font-size: 13px;
       color: #000000;
     }
 
@@ -250,7 +251,7 @@ export const generateOfferLetterOfficialHtml = (
       border: 1px solid #cbd5e1;
       border-left: 4px solid #F59E0B;
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 11px 15px;
       margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
@@ -259,42 +260,42 @@ export const generateOfferLetterOfficialHtml = (
     }
 
     .recipient-lbl {
-      font-size: 9.5px;
+      font-size: 11.5px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.7px;
       color: #000000;
-      opacity: 0.68;
+      opacity: 0.72;
       margin-bottom: 2px;
     }
 
     .recipient-name {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 800;
       color: #000000;
     }
 
     .recipient-biz {
-      font-size: 11.5px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #000000;
-      margin-top: 1px;
+      margin-top: 2px;
     }
 
     .recipient-contact {
-      font-size: 10.5px;
+      font-size: 12.5px;
       color: #000000;
-      opacity: 0.75;
-      margin-top: 2px;
+      opacity: 0.78;
+      margin-top: 3px;
     }
 
     .status-pill {
       background: #ecfdf5;
       border: 1px solid #a7f3d0;
       color: #000000;
-      padding: 5px 10px;
+      padding: 6px 11px;
       border-radius: 6px;
-      font-size: 10.5px;
+      font-size: 12px;
       font-weight: 800;
       text-align: center;
       white-space: nowrap;
@@ -305,36 +306,36 @@ export const generateOfferLetterOfficialHtml = (
       background: #f0fdf4;
       border: 1.5px solid #86efac;
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 11px 15px;
       margin-bottom: 12px;
     }
 
     .decision-heading {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 800;
       color: #000000;
-      margin-bottom: 3px;
+      margin-bottom: 4px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
 
     .decision-text {
-      font-size: 11.5px;
+      font-size: 13.5px;
       color: #000000;
-      line-height: 1.45;
+      line-height: 1.5;
     }
 
     /* Structured Table */
     .table-section-title {
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.7px;
       color: #000000;
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -352,25 +353,25 @@ export const generateOfferLetterOfficialHtml = (
     table.info-table th {
       background: #f8fafc;
       border: 1px solid #cbd5e1;
-      padding: 7px 10px;
+      padding: 8px 11px;
       text-align: left;
-      font-size: 10.5px;
+      font-size: 12.5px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       color: #000000;
       width: 34%;
     }
 
     table.info-table td {
       border: 1px solid #cbd5e1;
-      padding: 7px 10px;
-      font-size: 11px;
+      padding: 8px 11px;
+      font-size: 13px;
       color: #000000;
     }
 
     .price-highlight {
-      font-size: 12.5px;
+      font-size: 14.5px;
       font-weight: 800;
       color: #000000;
     }
@@ -382,9 +383,9 @@ export const generateOfferLetterOfficialHtml = (
       color: #000000;
       border: 1px solid #a7f3d0;
       border-radius: 4px;
-      font-size: 9.5px;
+      font-size: 11.5px;
       font-weight: 700;
-      padding: 1px 6px;
+      padding: 2px 7px;
     }
 
     /* Handover Guide Card */
@@ -392,23 +393,23 @@ export const generateOfferLetterOfficialHtml = (
       background: #fffbeb;
       border: 1px solid #fde68a;
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 11px 15px;
       margin-bottom: 14px;
     }
 
     .handover-title {
-      font-size: 10.5px;
+      font-size: 12.5px;
       font-weight: 800;
       color: #000000;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
     }
 
     .handover-p {
-      font-size: 10.5px;
+      font-size: 12.5px;
       color: #000000;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     /* Authentication & Signature Block */
@@ -429,36 +430,36 @@ export const generateOfferLetterOfficialHtml = (
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      padding: 8px 12px;
-      max-width: 380px;
+      padding: 9px 13px;
+      max-width: 390px;
     }
 
     .qr-code-svg {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       flex-shrink: 0;
     }
 
     .audit-meta-title {
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 800;
       color: #000000;
       text-transform: uppercase;
     }
 
     .audit-meta-sub {
-      font-size: 9px;
+      font-size: 11.5px;
       color: #000000;
-      opacity: 0.72;
-      margin-top: 1px;
-      line-height: 1.3;
+      opacity: 0.78;
+      margin-top: 2px;
+      line-height: 1.35;
     }
 
     .audit-meta-hash {
-      font-size: 8.5px;
+      font-size: 11.5px;
       font-family: monospace;
       color: #000000;
-      opacity: 0.65;
+      opacity: 0.72;
       margin-top: 2px;
     }
 
@@ -472,36 +473,36 @@ export const generateOfferLetterOfficialHtml = (
       border: 1.5px solid #F59E0B;
       background: #fffbeb;
       color: #000000;
-      padding: 4px 10px;
+      padding: 5px 11px;
       border-radius: 6px;
-      font-size: 9.5px;
+      font-size: 11.5px;
       font-weight: 800;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
+      letter-spacing: 0.4px;
+      margin-bottom: 5px;
     }
 
     .sign-authority {
-      font-size: 10.5px;
+      font-size: 12.5px;
       font-weight: 800;
       color: #000000;
     }
 
     .sign-title {
-      font-size: 9px;
+      font-size: 11.5px;
       color: #000000;
-      opacity: 0.72;
-      margin-top: 1px;
+      opacity: 0.78;
+      margin-top: 2px;
     }
 
     .legal-disclaimer {
       margin-top: 10px;
-      padding-top: 6px;
+      padding-top: 7px;
       border-top: 1px dashed #cbd5e1;
       text-align: center;
-      font-size: 8.5px;
+      font-size: 11.5px;
       color: #000000;
-      opacity: 0.65;
-      line-height: 1.35;
+      opacity: 0.72;
+      line-height: 1.4;
     }
 
     /* Print Specific Overrides */
@@ -565,8 +566,8 @@ export const generateOfferLetterOfficialHtml = (
       <div class="ref-block">
         <div>NO. RUJUKAN:</div>
         <div class="ref-val">${refNumber}</div>
-        <div style="margin-top: 4px; font-size: 10px; color: #000000; opacity: 0.72;">TARIKH RASMI:</div>
-        <div style="font-weight: 700; color: #000000;">${formattedDate}</div>
+        <div style="margin-top: 5px; font-size: 11.5px; color: #000000; opacity: 0.78;">TARIKH RASMI:</div>
+        <div style="font-weight: 700; color: #000000; font-size: 13px;">${formattedDate}</div>
       </div>
     </div>
 
@@ -622,8 +623,8 @@ export const generateOfferLetterOfficialHtml = (
       <tr>
         <th>Tarikh Akhir Beroperasi (Tamat Tempoh)</th>
         <td>
-          <strong style="color: #000000; font-size: 13.5px;">${formattedEnd}</strong>
-          <span style="display: inline-block; margin-left: 8px; background: #fef2f2; color: #000000; border: 1px solid #fecaca; border-radius: 6px; font-size: 10.5px; font-weight: 700; padding: 2px 7px;">Tempoh Penuh ${booking.durationMonths} Bulan</span>
+          <strong style="color: #000000; font-size: 14.5px;">${formattedEnd}</strong>
+          <span style="display: inline-block; margin-left: 8px; background: #fef2f2; color: #000000; border: 1px solid #fecaca; border-radius: 6px; font-size: 11.5px; font-weight: 700; padding: 2px 8px;">Tempoh Penuh ${booking.durationMonths} Bulan</span>
         </td>
       </tr>
       <tr>
@@ -785,7 +786,7 @@ export const printHtmlViaIframe = (
                   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                   color: #0f172a;
                   background: #ffffff;
-                  font-size: 13px;
+                  font-size: 14px;
                   line-height: 1.6;
                   margin: 0;
                   padding: 10px;
@@ -851,7 +852,7 @@ export const downloadHtmlDocument = (
               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
               color: #0f172a;
               background: #ffffff;
-              font-size: 13px;
+              font-size: 14px;
               line-height: 1.6;
               margin: 0 auto;
               max-width: 800px;

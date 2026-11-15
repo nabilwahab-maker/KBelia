@@ -24,10 +24,10 @@ export const generateSinglePageA4OfferLetterHtml = (
       max-height: 1122px;
       overflow: hidden;
       box-sizing: border-box;
-      padding: 32px 38px 24px 38px;
+      padding: 24px 34px 18px 34px;
       background: #ffffff;
       color: #000000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Public Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -48,8 +48,8 @@ export const generateSinglePageA4OfferLetterHtml = (
         <!-- Official Header / Letterhead -->
         <div style="
           border-bottom: 2px solid #1E40AF;
-          padding-bottom: 12px;
-          margin-bottom: 14px;
+          padding-bottom: 10px;
+          margin-bottom: 10px;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
@@ -57,9 +57,9 @@ export const generateSinglePageA4OfferLetterHtml = (
         ">
           <div style="flex: 1;">
             <div style="
-              font-size: 10px;
+              font-size: 11.5px;
               font-weight: 800;
-              letter-spacing: 1.5px;
+              letter-spacing: 1.2px;
               text-transform: uppercase;
               color: #000000;
               margin-bottom: 2px;
@@ -67,7 +67,7 @@ export const generateSinglePageA4OfferLetterHtml = (
               KERAJAAN NEGERI KELANTAN · UNIVERSITI MALAYSIA KELANTAN (UMK)
             </div>
             <div style="
-              font-size: 17px;
+              font-size: 18px;
               font-weight: 900;
               color: #000000;
               letter-spacing: -0.3px;
@@ -76,9 +76,9 @@ export const generateSinglePageA4OfferLetterHtml = (
               PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN
             </div>
             <div style="
-              font-size: 10.5px;
+              font-size: 12px;
               color: #000000;
-              opacity: 0.78;
+              opacity: 0.82;
               margin-top: 3px;
               line-height: 1.35;
             ">
@@ -92,15 +92,15 @@ export const generateSinglePageA4OfferLetterHtml = (
             border-radius: 8px;
             padding: 8px 12px;
             text-align: right;
-            font-size: 10.5px;
+            font-size: 12px;
             font-family: monospace;
-            min-width: 200px;
+            min-width: 215px;
             flex-shrink: 0;
           ">
-            <div style="color: #000000; opacity: 0.72; font-size: 9.5px; font-weight: 600;">NO. RUJUKAN:</div>
-            <div style="font-weight: 800; color: #000000; font-size: 11px;">${refNumber}</div>
-            <div style="margin-top: 3px; color: #000000; opacity: 0.72; font-size: 9.5px; font-weight: 600;">TARIKH RASMI:</div>
-            <div style="font-weight: 700; color: #000000;">${formattedDate}</div>
+            <div style="color: #000000; opacity: 0.75; font-size: 11px; font-weight: 700;">NO. RUJUKAN:</div>
+            <div style="font-weight: 800; color: #000000; font-size: 12.5px;">${refNumber}</div>
+            <div style="margin-top: 3px; color: #000000; opacity: 0.75; font-size: 11px; font-weight: 700;">TARIKH RASMI:</div>
+            <div style="font-weight: 700; color: #000000; font-size: 12.5px;">${formattedDate}</div>
           </div>
         </div>
 
@@ -110,23 +110,24 @@ export const generateSinglePageA4OfferLetterHtml = (
           border: 1px solid #cbd5e1;
           border-left: 4px solid #F59E0B;
           border-radius: 8px;
-          padding: 10px 14px;
-          margin-bottom: 12px;
+          padding: 9px 14px;
+          margin-bottom: 10px;
           display: flex;
           justify-content: space-between;
           align-items: center;
+          gap: 12px;
         ">
           <div>
-            <div style="font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #000000; opacity: 0.68;">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #000000; opacity: 0.72;">
               Dikeluarkan Kepada Usahawan:
             </div>
-            <div style="font-size: 14px; font-weight: 800; color: #000000; margin-top: 1px;">
+            <div style="font-size: 15.5px; font-weight: 800; color: #000000; margin-top: 1px;">
               ${booking.applicantName}
             </div>
-            <div style="font-size: 11.5px; font-weight: 700; color: #000000; margin-top: 1px;">
+            <div style="font-size: 13px; font-weight: 700; color: #000000; margin-top: 1px;">
               ${booking.businessName} · <span style="font-weight: 500; color: #000000;">(${booking.businessCategory})</span>
             </div>
-            <div style="font-size: 10.5px; color: #000000; opacity: 0.75; margin-top: 2px;">
+            <div style="font-size: 12px; color: #000000; opacity: 0.78; margin-top: 2px;">
               Emel: ${booking.applicantEmail} &nbsp;·&nbsp; Tel: ${booking.applicantPhone}
             </div>
           </div>
@@ -134,9 +135,9 @@ export const generateSinglePageA4OfferLetterHtml = (
             background: #ecfdf5;
             border: 1px solid #a7f3d0;
             color: #000000;
-            padding: 5px 10px;
+            padding: 6px 11px;
             border-radius: 6px;
-            font-size: 10.5px;
+            font-size: 11.5px;
             font-weight: 800;
             text-align: center;
             white-space: nowrap;
@@ -150,21 +151,21 @@ export const generateSinglePageA4OfferLetterHtml = (
           background: #f0fdf4;
           border: 1.5px solid #86efac;
           border-radius: 8px;
-          padding: 10px 14px;
-          margin-bottom: 12px;
+          padding: 9px 14px;
+          margin-bottom: 10px;
         ">
           <div style="
-            font-size: 12px;
+            font-size: 13.5px;
             font-weight: 800;
             color: #000000;
             margin-bottom: 3px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
           ">
             Surat Tawaran Penempatan Kiosk Niaga Bersubsidi
           </div>
           <div style="
-            font-size: 11.5px;
+            font-size: 13px;
             color: #000000;
             line-height: 1.45;
           ">
@@ -176,12 +177,12 @@ export const generateSinglePageA4OfferLetterHtml = (
 
         <!-- Table of Terms & Placement Particulars -->
         <div style="
-          font-size: 11px;
+          font-size: 12.5px;
           font-weight: 800;
           text-transform: uppercase;
-          letter-spacing: 0.8px;
+          letter-spacing: 0.7px;
           color: #000000;
-          margin-bottom: 6px;
+          margin-bottom: 5px;
         ">
           Jadual Terma & Maklumat Penempatan Kiosk Bersubsidi
         </div>
@@ -189,72 +190,72 @@ export const generateSinglePageA4OfferLetterHtml = (
         <table style="
           width: 100%;
           border-collapse: collapse;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
           border: 1px solid #cbd5e1;
           border-radius: 6px;
           overflow: hidden;
-          font-size: 11px;
+          font-size: 12.5px;
         ">
           <tbody>
             <tr style="background: #ffffff;">
-              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; font-size: 10.5px; font-weight: 700; color: #000000; width: 34%;">
+              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 9px; text-align: left; font-size: 12px; font-weight: 700; color: #000000; width: 34%;">
                 Kod & Nama Premis Kiosk
               </th>
-              <td style="border: 1px solid #cbd5e1; padding: 7px 10px; color: #000000; font-weight: 700;">
+              <td style="border: 1px solid #cbd5e1; padding: 6px 9px; color: #000000; font-weight: 700;">
                 <span style="color: #000000;">${booking.slotCode}</span> — ${booking.slotName}
               </td>
             </tr>
             <tr>
-              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; font-size: 10.5px; font-weight: 700; color: #000000;">
+              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 9px; text-align: left; font-size: 12px; font-weight: 700; color: #000000;">
                 Lokasi Hab Penempatan
               </th>
-              <td style="border: 1px solid #cbd5e1; padding: 7px 10px; color: #000000;">
+              <td style="border: 1px solid #cbd5e1; padding: 6px 9px; color: #000000;">
                 ${booking.hubLocation}, Negeri Kelantan Darul Naim
               </td>
             </tr>
             <tr style="background: #ffffff;">
-              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; font-size: 10.5px; font-weight: 700; color: #000000;">
+              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 9px; text-align: left; font-size: 12px; font-weight: 700; color: #000000;">
                 Kadar Sewa Bersubsidi
               </th>
-              <td style="border: 1px solid #cbd5e1; padding: 7px 10px; color: #000000;">
-                <strong style="color: #000000; font-size: 12px;">RM 150.00 / sebulan</strong>
-                <span style="display: inline-block; margin-left: 8px; background: #ecfdf5; color: #000000; border: 1px solid #a7f3d0; border-radius: 4px; font-size: 9.5px; font-weight: 700; padding: 1px 6px;">
+              <td style="border: 1px solid #cbd5e1; padding: 6px 9px; color: #000000;">
+                <strong style="color: #000000; font-size: 13.5px;">RM 150.00 / sebulan</strong>
+                <span style="display: inline-block; margin-left: 8px; background: #ecfdf5; color: #000000; border: 1px solid #a7f3d0; border-radius: 4px; font-size: 11px; font-weight: 700; padding: 1px 6px;">
                   Subsidi 50% Ditaja Negeri (Asal RM300.00)
                 </span>
               </td>
             </tr>
             <tr>
-              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; font-size: 10.5px; font-weight: 700; color: #000000;">
+              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 9px; text-align: left; font-size: 12px; font-weight: 700; color: #000000;">
                 Tarikh Mula Beroperasi
               </th>
-              <td style="border: 1px solid #cbd5e1; padding: 7px 10px; color: #000000; font-weight: 700;">
+              <td style="border: 1px solid #cbd5e1; padding: 6px 9px; color: #000000; font-weight: 700;">
                 ${formattedStart}
               </td>
             </tr>
             <tr style="background: #fef2f2;">
-              <th style="background: #fee2e2; border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; font-size: 10.5px; font-weight: 800; color: #000000;">
+              <th style="background: #fee2e2; border: 1px solid #cbd5e1; padding: 6px 9px; text-align: left; font-size: 12px; font-weight: 800; color: #000000;">
                 Tarikh Akhir Beroperasi (Tamat Tempoh)
               </th>
-              <td style="border: 1px solid #cbd5e1; padding: 7px 10px; color: #000000;">
-                <strong style="font-size: 12px;">${formattedEnd}</strong>
-                <span style="display: inline-block; margin-left: 8px; background: #ffffff; color: #000000; border: 1px solid #fecaca; border-radius: 4px; font-size: 9.5px; font-weight: 700; padding: 1px 6px;">
+              <td style="border: 1px solid #cbd5e1; padding: 6px 9px; color: #000000;">
+                <strong style="font-size: 13.5px;">${formattedEnd}</strong>
+                <span style="display: inline-block; margin-left: 8px; background: #ffffff; color: #000000; border: 1px solid #fecaca; border-radius: 4px; font-size: 11px; font-weight: 700; padding: 1px 6px;">
                   Tempoh Penuh ${booking.durationMonths} Bulan
                 </span>
               </td>
             </tr>
             <tr>
-              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; font-size: 10.5px; font-weight: 700; color: #000000;">
+              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 9px; text-align: left; font-size: 12px; font-weight: 700; color: #000000;">
                 Tempoh Kontrak Sewaan
               </th>
-              <td style="border: 1px solid #cbd5e1; padding: 7px 10px; color: #000000;">
+              <td style="border: 1px solid #cbd5e1; padding: 6px 9px; color: #000000;">
                 ${booking.durationMonths} Bulan (Bermula ${formattedStart} sehingga ${formattedEnd})
               </td>
             </tr>
             <tr style="background: #ffffff;">
-              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 7px 10px; text-align: left; font-size: 10.5px; font-weight: 700; color: #000000;">
+              <th style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 9px; text-align: left; font-size: 12px; font-weight: 700; color: #000000;">
                 Status Perakuan
               </th>
-              <td style="border: 1px solid #cbd5e1; padding: 7px 10px; color: #000000; font-weight: 800;">
+              <td style="border: 1px solid #cbd5e1; padding: 6px 9px; color: #000000; font-weight: 800;">
                 AKTIF & DILULUSKAN (Sedia Dimeterai Perjanjian Sewa)
               </td>
             </tr>
@@ -266,21 +267,21 @@ export const generateSinglePageA4OfferLetterHtml = (
           background: #fffbeb;
           border: 1px solid #fde68a;
           border-radius: 8px;
-          padding: 10px 14px;
-          margin-bottom: 14px;
+          padding: 9px 14px;
+          margin-bottom: 10px;
         ">
           <div style="
-            font-size: 10.5px;
+            font-size: 12px;
             font-weight: 800;
             color: #000000;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             margin-bottom: 2px;
           ">
             Arahan Penyerahan Kunci & Pengesahan Tapak:
           </div>
           <p style="
-            font-size: 10.5px;
+            font-size: 12px;
             color: #000000;
             line-height: 1.4;
             margin: 0;
@@ -293,8 +294,8 @@ export const generateSinglePageA4OfferLetterHtml = (
       <!-- Bottom Authority & Security Block -->
       <div style="
         border-top: 2px solid #e2e8f0;
-        padding-top: 14px;
-        margin-top: 6px;
+        padding-top: 10px;
+        margin-top: 4px;
       ">
         <div style="
           display: flex;
@@ -311,7 +312,7 @@ export const generateSinglePageA4OfferLetterHtml = (
             border: 1px solid #cbd5e1;
             border-radius: 8px;
             padding: 8px 12px;
-            max-width: 380px;
+            max-width: 390px;
           ">
             <svg style="width: 48px; height: 48px; flex-shrink: 0;" viewBox="0 0 100 100" fill="#1E40AF" xmlns="http://www.w3.org/2000/svg">
               <rect width="100" height="100" fill="#ffffff"/>
@@ -348,13 +349,13 @@ export const generateSinglePageA4OfferLetterHtml = (
               <rect x="84" y="82" width="8" height="8" fill="#1E40AF"/>
             </svg>
             <div>
-              <div style="font-size: 10px; font-weight: 800; color: #000000; text-transform: uppercase;">
+              <div style="font-size: 11.5px; font-weight: 800; color: #000000; text-transform: uppercase;">
                 INTEGRITI KOD QR BERSIJIL
               </div>
-              <div style="font-size: 9px; color: #000000; opacity: 0.72; line-height: 1.3; margin-top: 1px;">
+              <div style="font-size: 11px; color: #000000; opacity: 0.78; line-height: 1.3; margin-top: 1px;">
                 Dokumen ini telah disahkan kriptografi melalui Pangkalan Data KBelia.
               </div>
-              <div style="font-size: 8.5px; font-family: monospace; color: #000000; opacity: 0.65; margin-top: 2px;">
+              <div style="font-size: 11px; font-family: monospace; color: #000000; opacity: 0.72; margin-top: 2px;">
                 KOD: ${refNumber}
               </div>
             </div>
@@ -369,17 +370,17 @@ export const generateSinglePageA4OfferLetterHtml = (
               color: #000000;
               padding: 4px 10px;
               border-radius: 6px;
-              font-size: 9.5px;
+              font-size: 11.5px;
               font-weight: 800;
-              letter-spacing: 0.5px;
+              letter-spacing: 0.4px;
               margin-bottom: 4px;
             ">
               ★ DIMETERAI RASMI UMK KELANTAN ★
             </div>
-            <div style="font-size: 10.5px; font-weight: 800; color: #000000;">
+            <div style="font-size: 12px; font-weight: 800; color: #000000;">
               PENTADBIRAN HAB KAPSUL NIAGA BELIA
             </div>
-            <div style="font-size: 9px; color: #000000; opacity: 0.72; margin-top: 1px;">
+            <div style="font-size: 11px; color: #000000; opacity: 0.78; margin-top: 1px;">
               Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK)
             </div>
           </div>
@@ -387,13 +388,13 @@ export const generateSinglePageA4OfferLetterHtml = (
 
         <!-- Statutory Legal Note -->
         <div style="
-          margin-top: 10px;
+          margin-top: 8px;
           padding-top: 6px;
           border-top: 1px dashed #cbd5e1;
           text-align: center;
-          font-size: 8.5px;
+          font-size: 11px;
           color: #000000;
-          opacity: 0.65;
+          opacity: 0.72;
           line-height: 1.35;
         ">
           Surat tawaran ini merupakan perakuan sah di bawah Akta Tandatangan Digital 1997 dan Akta Perdagangan Elektronik 2006.<br>
@@ -525,7 +526,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
       box-sizing: border-box;
       background: #ffffff;
       color: #000000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Public Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       padding: 12px;
     ">
       <!-- Royal Double Border Frame -->
@@ -564,9 +565,9 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                font-size: 10px;
+                font-size: 12px;
                 font-weight: 800;
-                letter-spacing: 1.5px;
+                letter-spacing: 1.2px;
                 text-transform: uppercase;
                 color: #000000;
                 margin-bottom: 3px;
@@ -575,7 +576,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
                 <span>KERAJAAN NEGERI KELANTAN · UNIVERSITI MALAYSIA KELANTAN (UMK)</span>
               </div>
               <div style="
-                font-size: 18px;
+                font-size: 19px;
                 font-weight: 900;
                 color: #000000;
                 letter-spacing: -0.3px;
@@ -584,9 +585,9 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
                 RINGKASAN RASMI KELULUSAN PERMOHONAN
               </div>
               <div style="
-                font-size: 11px;
+                font-size: 12.5px;
                 color: #000000;
-                opacity: 0.78;
+                opacity: 0.82;
                 margin-top: 4px;
                 line-height: 1.4;
               ">
@@ -598,17 +599,17 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
               background: #fffbeb;
               border: 1px solid #fcd34d;
               border-radius: 8px;
-              padding: 8px 14px;
+              padding: 9px 14px;
               text-align: right;
-              font-size: 10.5px;
+              font-size: 12px;
               font-family: monospace;
-              min-width: 220px;
+              min-width: 230px;
               flex-shrink: 0;
             ">
-              <div><strong style="font-family: sans-serif; color: #000000; font-size: 9.5px;">NO. RUJUKAN:</strong> <span style="color: #000000; font-weight: 800;">${params.reportRef}</span></div>
-              <div style="margin-top: 3px;"><strong style="font-family: sans-serif; color: #000000; font-size: 9.5px;">TARIKH RASMI:</strong> <span style="color: #000000; font-weight: 700;">${params.reportDate}</span></div>
-              <div style="margin-top: 4px;">
-                <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; background: #ecfdf5; color: #000000; border: 1px solid #a7f3d0;">
+              <div><strong style="font-family: sans-serif; color: #000000; font-size: 11px;">NO. RUJUKAN:</strong> <span style="color: #000000; font-weight: 800;">${params.reportRef}</span></div>
+              <div style="margin-top: 3px;"><strong style="font-family: sans-serif; color: #000000; font-size: 11px;">TARIKH RASMI:</strong> <span style="color: #000000; font-weight: 700;">${params.reportDate}</span></div>
+              <div style="margin-top: 5px;">
+                <span style="display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 11.5px; font-weight: 800; background: #ecfdf5; color: #000000; border: 1px solid #a7f3d0;">
                   STATUS: AUDIT SAH DILULUSKAN
                 </span>
               </div>
@@ -622,65 +623,65 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
             gap: 10px;
             margin-bottom: 18px;
           ">
-            <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
-              <span style="font-size: 9.5px; font-weight: 700; color: #000000; opacity: 0.7; text-transform: uppercase; display: block;">Kiosk Diluluskan</span>
-              <span style="font-size: 16px; font-weight: 900; color: #000000;">${approvedBookings.length} Unit</span>
+            <div style="padding: 11px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+              <span style="font-size: 12px; font-weight: 700; color: #000000; opacity: 0.78; text-transform: uppercase; display: block;">Kiosk Diluluskan</span>
+              <span style="font-size: 18px; font-weight: 900; color: #000000;">${approvedBookings.length} Unit</span>
             </div>
-            <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
-              <span style="font-size: 9.5px; font-weight: 700; color: #000000; opacity: 0.7; text-transform: uppercase; display: block;">Nilai Sewaan Kiosk</span>
-              <span style="font-size: 16px; font-weight: 900; color: #000000;">RM${totalKioskSubsidy.toLocaleString()}/bln</span>
+            <div style="padding: 11px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+              <span style="font-size: 12px; font-weight: 700; color: #000000; opacity: 0.78; text-transform: uppercase; display: block;">Nilai Sewaan Kiosk</span>
+              <span style="font-size: 18px; font-weight: 900; color: #000000;">RM${totalKioskSubsidy.toLocaleString()}/bln</span>
             </div>
-            <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
-              <span style="font-size: 9.5px; font-weight: 700; color: #000000; opacity: 0.7; text-transform: uppercase; display: block;">Geran Diluluskan</span>
-              <span style="font-size: 16px; font-weight: 900; color: #000000;">${approvedGrants.length} Penerima</span>
+            <div style="padding: 11px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+              <span style="font-size: 12px; font-weight: 700; color: #000000; opacity: 0.78; text-transform: uppercase; display: block;">Geran Diluluskan</span>
+              <span style="font-size: 18px; font-weight: 900; color: #000000;">${approvedGrants.length} Penerima</span>
             </div>
-            <div style="padding: 10px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
-              <span style="font-size: 9.5px; font-weight: 700; color: #000000; opacity: 0.7; text-transform: uppercase; display: block;">Peruntukan Geran</span>
-              <span style="font-size: 16px; font-weight: 900; color: #000000;">RM${totalGrantAmount.toLocaleString()}</span>
+            <div style="padding: 11px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
+              <span style="font-size: 12px; font-weight: 700; color: #000000; opacity: 0.78; text-transform: uppercase; display: block;">Peruntukan Geran</span>
+              <span style="font-size: 18px; font-weight: 900; color: #000000;">RM${totalGrantAmount.toLocaleString()}</span>
             </div>
           </div>
 
           <!-- Section 1: Kiosk Approvals -->
           <div style="margin-bottom: 20px;">
-            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #000000; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <div style="font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #000000; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
               <span>🏪</span>
               <span>1. Senarai Permohonan Kiosk Kapsul Niaga Yang Diluluskan (${approvedBookings.length})</span>
             </div>
             ${approvedBookings.length === 0 ? `
-              <div style="padding: 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; color: #000000; opacity: 0.72; text-align: center;">
+              <div style="padding: 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; color: #000000; opacity: 0.75; text-align: center;">
                 Tiada rekod kelulusan kiosk aktif buat masa ini.
               </div>
             ` : `
-              <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; border: 1px solid #cbd5e1;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 13px; border: 1px solid #cbd5e1;">
                 <thead>
                   <tr style="background: #f1f5f9; color: #000000; font-weight: 800; border-bottom: 1.5px solid #cbd5e1;">
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 32px;">Bil</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Nama Pemohon & Perniagaan</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left; width: 120px;">No. Kad Pengenalan</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Kod Kiosk & Lokasi Hab</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: right; width: 90px;">Kadar Sewa</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Catatan</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: center; width: 34px;">Bil</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left;">Nama Pemohon & Perniagaan</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left; width: 130px;">No. Kad Pengenalan</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left;">Kod Kiosk & Lokasi Hab</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: right; width: 95px;">Kadar Sewa</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left;">Catatan</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${approvedBookings.map((b, idx) => `
                     <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; font-family: monospace; color: #000000; opacity: 0.72;">${idx + 1}</td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1;">
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: center; font-family: monospace; color: #000000; opacity: 0.75;">${idx + 1}</td>
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1;">
                         <strong style="color: #000000; display: block;">${b.applicantName}</strong>
-                        <span style="color: #000000; opacity: 0.8; font-size: 9.5px; font-weight: 600;">${b.businessName}</span>
+                        <span style="color: #000000; opacity: 0.82; font-size: 12px; font-weight: 600;">${b.businessName}</span>
                       </td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; font-family: monospace; color: #000000;">
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1; font-family: monospace; color: #000000;">
                         ${maskMyKad(b.applicantMyKad || '980101-03-5544')}
                       </td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1;">
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1;">
                         <strong style="font-family: monospace; color: #000000;">${b.slotCode}</strong>
-                        <span style="display: block; font-size: 9.5px; color: #000000; opacity: 0.72;">${b.hubLocation || 'Hab UMK Bachok'}</span>
+                        <span style="display: block; font-size: 12px; color: #000000; opacity: 0.78;">${b.hubLocation || 'Hab UMK Bachok'}</span>
                       </td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: right; font-weight: 800; font-family: monospace; color: #000000;">
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: right; font-weight: 800; font-family: monospace; color: #000000;">
                         RM${b.monthlyRate || 150}
                       </td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #000000; font-size: 9.5px;">
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1; color: #000000; font-size: 12px;">
                         ${b.adminNotes || 'Permohonan diluluskan rasmi.'}
                       </td>
                     </tr>
@@ -692,43 +693,43 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
 
           <!-- Section 2: Grant Approvals -->
           <div style="margin-bottom: 22px;">
-            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #000000; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <div style="font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #000000; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
               <span>🏆</span>
               <span>2. Senarai Permohonan Geran Pemula Belia Yang Diluluskan (${approvedGrants.length})</span>
             </div>
             ${approvedGrants.length === 0 ? `
-              <div style="padding: 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 11px; color: #000000; opacity: 0.72; text-align: center;">
+              <div style="padding: 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; color: #000000; opacity: 0.75; text-align: center;">
                 Tiada rekod kelulusan geran aktif buat masa ini.
               </div>
             ` : `
-              <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; border: 1px solid #cbd5e1;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 13px; border: 1px solid #cbd5e1;">
                 <thead>
                   <tr style="background: #f1f5f9; color: #000000; font-weight: 800; border-bottom: 1.5px solid #cbd5e1;">
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 32px;">Bil</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Nama Pemohon & Perniagaan</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Kategori</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left;">Akaun Bank</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: right; width: 100px;">Peruntukan</th>
-                    <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 90px;">Status Audit</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: center; width: 34px;">Bil</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left;">Nama Pemohon & Perniagaan</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left;">Kategori</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left;">Akaun Bank</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: right; width: 105px;">Peruntukan</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: center; width: 105px;">Status Audit</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${approvedGrants.map((g, idx) => `
                     <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; font-family: monospace; color: #000000; opacity: 0.72;">${idx + 1}</td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1;">
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: center; font-family: monospace; color: #000000; opacity: 0.75;">${idx + 1}</td>
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1;">
                         <strong style="color: #000000; display: block;">${g.applicantName}</strong>
-                        <span style="color: #000000; opacity: 0.8; font-size: 9.5px; font-weight: 600;">${g.businessName}</span>
+                        <span style="color: #000000; opacity: 0.82; font-size: 12px; font-weight: 600;">${g.businessName}</span>
                       </td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #000000;">${g.businessCategory}</td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; font-family: monospace; font-size: 9.5px; color: #000000;">
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1; color: #000000;">${g.businessCategory}</td>
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1; font-family: monospace; font-size: 12px; color: #000000;">
                         ${g.bankName} · ${g.bankAccountNumber || '••••••••'}
                       </td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: right; font-weight: 800; font-family: monospace; color: #000000;">
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: right; font-weight: 800; font-family: monospace; color: #000000;">
                         ${g.amount || g.grantAmount || 'RM3,000'}
                       </td>
-                      <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">
-                        <span style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; background: #ecfdf5; color: #000000; border: 1px solid #a7f3d0;">
+                      <td style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: center;">
+                        <span style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 800; background: #ecfdf5; color: #000000; border: 1px solid #a7f3d0;">
                           ✓ Lulus Audit
                         </span>
                       </td>
@@ -749,9 +750,9 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
             gap: 20px;
           ">
             <div style="flex: 1;">
-              <div style="font-size: 11px; font-weight: 800; color: #000000;">Urusetia Pentadbiran Keusahawanan Belia</div>
-              <div style="font-size: 10px; color: #000000; opacity: 0.8;">Hab Pembangunan Belia Negeri Kelantan bersama UMK</div>
-              <div style="font-size: 9.5px; color: #000000; opacity: 0.68; margin-top: 4px; line-height: 1.35;">
+              <div style="font-size: 12.5px; font-weight: 800; color: #000000;">Urusetia Pentadbiran Keusahawanan Belia</div>
+              <div style="font-size: 12px; color: #000000; opacity: 0.82;">Hab Pembangunan Belia Negeri Kelantan bersama UMK</div>
+              <div style="font-size: 11.5px; color: #000000; opacity: 0.72; margin-top: 4px; line-height: 1.4;">
                 Dokumen ini merupakan salinan audit rasmi bercetak yang dikeluarkan di bawah kelulusan Jawatankuasa Penyelaras Inisiatif Belia Negeri Kelantan.
               </div>
             </div>
@@ -760,8 +761,8 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
             <div style="display: flex; align-items: center; gap: 16px;">
               <!-- Stamp Circular -->
               <div style="
-                width: 76px;
-                height: 76px;
+                width: 96px;
+                height: 96px;
                 border: 2px dashed #1E40AF;
                 border-radius: 50%;
                 display: flex;
@@ -769,26 +770,26 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-                padding: 4px;
+                padding: 6px;
                 color: #000000;
-                font-size: 7.5px;
+                font-size: 10.5px;
                 font-weight: 800;
-                line-height: 1.1;
+                line-height: 1.15;
                 transform: rotate(-5deg);
                 background: #fffbeb;
               ">
-                <div>★ KERAJAAN NEGERI ★</div>
-                <div style="font-size: 8.5px; font-weight: 900; margin: 2px 0;">AUDIT SAH</div>
-                <div>NEGERI KELANTAN</div>
+                <div>★ NEGERI ★</div>
+                <div style="font-size: 12px; font-weight: 900; margin: 2px 0;">AUDIT SAH</div>
+                <div>KELANTAN</div>
               </div>
 
               <!-- Signature -->
-              <div style="text-align: right; min-width: 150px;">
-                <div style="font-size: 9px; font-weight: 700; color: #000000; opacity: 0.7; text-transform: uppercase;">Pengesahan Pentadbir</div>
-                <div style="font-family: Georgia, serif; font-style: italic; font-size: 15px; font-weight: 800; color: #000000; margin: 4px 0;">
+              <div style="text-align: right; min-width: 165px;">
+                <div style="font-size: 11.5px; font-weight: 700; color: #000000; opacity: 0.75; text-transform: uppercase;">Pengesahan Pentadbir</div>
+                <div style="font-family: Georgia, serif; font-style: italic; font-size: 16px; font-weight: 800; color: #000000; margin: 4px 0;">
                   Pentadbir Urusetia Belia
                 </div>
-                <div style="font-size: 8.5px; font-family: monospace; font-weight: 700; color: #000000;">
+                <div style="font-size: 11px; font-family: monospace; font-weight: 700; color: #000000;">
                   SHA256: 9B7E·410A·F39C
                 </div>
               </div>
@@ -802,9 +803,9 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
             border-top: 1px dashed #cbd5e1;
             display: flex;
             justify-content: space-between;
-            font-size: 8.5px;
+            font-size: 11px;
             color: #000000;
-            opacity: 0.65;
+            opacity: 0.72;
             font-family: monospace;
           ">
             <span>DOKUMEN RASMI KERAJAAN NEGERI KELANTAN · TIDAK BOLEH DIUBAH SUAI</span>

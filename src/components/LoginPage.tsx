@@ -230,7 +230,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             <button
               type="button"
               onClick={() => setActiveTab('landing')}
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white transition-colors cursor-pointer group"
+              className="inline-flex items-center gap-1.5 text-sm sm:text-[0.9375rem] font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white transition-colors cursor-pointer group"
             >
               <ChevronLeft className="w-4 h-4 text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white group-hover:-translate-x-0.5 transition-transform" />
               <span>{isEn ? 'Back' : 'Kembali'}</span>
@@ -238,10 +238,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
             {/* Mobile-only brand badge */}
             <div className="lg:hidden flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-xs dark:bg-blue-600">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-xs dark:bg-blue-600">
                 KB
               </div>
-              <span className="font-extrabold text-xs text-black dark:text-white tracking-tight">
+              <span className="font-extrabold text-[0.8125rem] text-black dark:text-white tracking-tight">
                 KBelia
               </span>
             </div>
@@ -249,13 +249,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
           {/* ACTIVE USER SESSION BANNER IF ALREADY LOGGED IN */}
           {user && (
-            <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl flex items-center justify-between text-xs">
+            <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl flex items-center justify-between text-sm">
               <div>
                 <div className="font-bold text-black dark:text-white flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>{isEn ? 'Active Session:' : 'Sesi Aktif:'} {user.email}</span>
                 </div>
-                <div className="text-[11px] text-black dark:text-white/75 mt-0.5">
+                <div className="text-[0.8125rem] text-black dark:text-white/75 mt-0.5">
                   {isEn ? 'Role:' : 'Peranan:'} {isAdmin ? 'Admin KBelia' : isMentor ? 'Mentor UMK' : 'Usahawan Belia'}
                 </div>
               </div>
@@ -263,14 +263,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 <button
                   type="button"
                   onClick={() => setActiveTab(isAdmin ? 'admin' : isMentor ? 'mentor' : 'merchant')}
-                  className="px-3 py-1.5 bg-emerald-700 text-white rounded-lg font-bold text-xs hover:bg-emerald-800 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 bg-emerald-700 text-white rounded-lg font-bold text-sm hover:bg-emerald-800 transition-colors cursor-pointer"
                 >
                   Dashboard &rarr;
                 </button>
                 <button
                   type="button"
                   onClick={() => logout()}
-                  className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-black dark:text-white rounded-lg font-semibold text-xs hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer transition-colors"
+                  className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-black dark:text-white rounded-lg font-semibold text-[0.8125rem] hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer transition-colors"
                 >
                   {isEn ? 'Logout' : 'Log Keluar'}
                 </button>
@@ -288,7 +288,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   ? (isEn ? 'Sign In' : 'Log Masuk') 
                   : (isEn ? 'Create Account' : 'Daftar Akaun Baharu')}
               </h1>
-              <p className="text-xs sm:text-sm lg:text-base text-black/70 dark:text-white/75 mt-2 font-normal leading-relaxed">
+              <p className="text-[0.9375rem] lg:text-base text-black/70 dark:text-white/75 mt-2 font-normal leading-relaxed">
                 {authMode === 'login'
                   ? (isEn 
                       ? 'Enter your email and password to sign in!' 
@@ -303,14 +303,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
             {/* ALERT NOTICES: ERROR & SUCCESS */}
             {authError && (
-              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-black dark:text-white text-xs flex items-start gap-2.5 animate-fade-slide-up">
+              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-black dark:text-white text-sm flex items-start gap-2.5 animate-fade-slide-up">
                 <AlertCircle className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                 <span className="flex-1 leading-relaxed">{authError}</span>
               </div>
             )}
 
             {successMsg && (
-              <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl text-black dark:text-white text-xs flex items-center gap-2.5 animate-fade-slide-up">
+              <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl text-black dark:text-white text-sm flex items-center gap-2.5 animate-fade-slide-up">
                 <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0" />
                 <span className="font-bold flex-1 leading-relaxed">{successMsg}</span>
               </div>
@@ -328,7 +328,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       setActiveRole('user');
                       clearAuthError();
                     }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                    className={`flex-1 py-1.5 px-2 rounded-lg text-[0.8125rem] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
                       activeRole === 'user'
                         ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
                         : 'text-black dark:text-white hover:text-black dark:hover:text-white'
@@ -344,7 +344,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       setActiveRole('mentor');
                       clearAuthError();
                     }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                    className={`flex-1 py-1.5 px-2 rounded-lg text-[0.8125rem] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
                       activeRole === 'mentor'
                         ? 'bg-teal-600 text-white shadow-xs dark:bg-teal-600'
                         : 'text-black dark:text-white hover:text-black dark:hover:text-white'
@@ -360,7 +360,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       setActiveRole('admin');
                       clearAuthError();
                     }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                    className={`flex-1 py-1.5 px-2 rounded-lg text-[0.8125rem] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
                       activeRole === 'admin'
                         ? 'bg-rose-600 text-white shadow-xs dark:bg-rose-600'
                         : 'text-black dark:text-white hover:text-black dark:hover:text-white'
@@ -373,8 +373,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
                 {/* EMAIL INPUT */}
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    {isEn ? 'Email' : 'Emel'}<span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                    {isEn ? 'Email *' : 'Emel *'}
                   </label>
                   <div className="relative">
                     <input
@@ -382,16 +382,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder={isEn ? 'Email' : 'Emel'}
-                      className="w-full px-4 py-3.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium dark:focus:border-blue-500"
+                      placeholder={isEn ? 'Enter email address' : 'Masukkan alamat emel'}
+                      className="w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
 
                 {/* PASSWORD INPUT WITH SHOW/HIDE EYE */}
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    {isEn ? 'Password' : 'Kata Laluan'}<span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                    {isEn ? 'Password *' : 'Kata Laluan *'}
                   </label>
                   <div className="relative">
                     <input
@@ -399,8 +399,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder={isEn ? 'Password' : 'Kata Laluan'}
-                      className="w-full pl-4 pr-11 py-3.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium dark:focus:border-blue-500"
+                      placeholder={isEn ? 'Enter password' : 'Masukkan kata laluan'}
+                      className="w-full pl-4 pr-11 py-3 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium dark:focus:border-blue-500"
                     />
                     <button
                       type="button"
@@ -414,7 +414,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 </div>
 
                 {/* REMEMBER ME & FORGOT PASSWORD ROW */}
-                <div className="flex items-center justify-between text-xs pt-1">
+                <div className="flex items-center justify-between text-sm pt-1">
                   <label className="flex items-center gap-2 text-black dark:text-white/75 cursor-pointer select-none">
                     <input
                       type="checkbox"
@@ -452,7 +452,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-slate-300 dark:border-slate-600"></div>
                       </div>
-                      <span className="relative bg-white dark:bg-slate-900 px-3.5 text-xs text-black/70 dark:text-white/75 font-medium">
+                      <span className="relative bg-white dark:bg-slate-900 px-3.5 text-sm text-black/70 dark:text-white/75 font-medium">
                         {isEn ? 'Or sign in with' : 'Atau log masuk dengan'}
                       </span>
                     </div>
@@ -461,7 +461,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       type="button"
                       onClick={handleGoogleLogin}
                       disabled={isSubmitting}
-                      className="w-full py-3 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60"
+                      className="w-full py-3 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-sm sm:text-[0.9375rem] font-semibold transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60"
                     >
                       <GoogleIcon className="w-4 h-4 shrink-0" />
                       <span>{isEn ? 'Sign in with Google' : 'Log masuk Google'}</span>
@@ -471,7 +471,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
                 {/* BOTTOM TOGGLE TO SIGN UP */}
                 {activeRole === 'user' && (
-                  <div className="pt-2 text-center text-xs text-black/70 dark:text-white/75">
+                  <div className="pt-2 text-center text-sm text-black/70 dark:text-white/75">
                     <span>{isEn ? "Don't have an account? " : "Belum ada akaun? "}</span>
                     <button
                       type="button"
@@ -495,53 +495,53 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 {/* FIRST NAME & LAST NAME */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                      {isEn ? 'First Name' : 'Nama Pertama'}<span className="text-black/70 dark:text-white/75">*</span>
+                    <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                      {isEn ? 'First Name *' : 'Nama Pertama *'}
                     </label>
                     <input
                       type="text"
                       required
                       value={regFirstName}
                       onChange={(e) => setRegFirstName(e.target.value)}
-                      placeholder={isEn ? 'First Name' : 'Nama Pertama'}
-                      className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                      placeholder={isEn ? 'Enter first name' : 'Masukkan nama pertama'}
+                      className="w-full px-3.5 py-2.5 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                      {isEn ? 'Last Name' : 'Nama Terakhir'}<span className="text-black/70 dark:text-white/75">*</span>
+                    <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                      {isEn ? 'Last Name *' : 'Nama Akhir *'}
                     </label>
                     <input
                       type="text"
                       required
                       value={regLastName}
                       onChange={(e) => setRegLastName(e.target.value)}
-                      placeholder={isEn ? 'Last Name' : 'Nama Terakhir'}
-                      className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                      placeholder={isEn ? 'Enter last name' : 'Masukkan nama akhir'}
+                      className="w-full px-3.5 py-2.5 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
 
                 {/* EMAIL */}
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    {isEn ? 'Email' : 'Emel'}<span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                    {isEn ? 'Email *' : 'Emel *'}
                   </label>
                   <input
                     type="email"
                     required
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
-                    placeholder={isEn ? 'Email' : 'Emel'}
-                    className="w-full px-3.5 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                    placeholder={isEn ? 'Enter email address' : 'Masukkan alamat emel'}
+                    className="w-full px-3.5 py-2.5 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                   />
                 </div>
 
                 {/* PASSWORD WITH SHOW/HIDE EYE */}
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white mb-1.5">
-                    {isEn ? 'Password' : 'Kata Laluan'}<span className="text-black/70 dark:text-white/75">*</span>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                    {isEn ? 'Password *' : 'Kata Laluan *'}
                   </label>
                   <div className="relative">
                     <input
@@ -549,8 +549,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       required
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
-                      placeholder={isEn ? 'Password' : 'Kata Laluan'}
-                      className="w-full pl-3.5 pr-11 py-3 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                      placeholder={isEn ? 'Enter password' : 'Masukkan kata laluan'}
+                      className="w-full pl-3.5 pr-11 py-2.5 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
                     />
                     <button
                       type="button"
@@ -566,13 +566,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 {/* DISTRICT & PHONE CHIPS */}
                 <div className="grid grid-cols-2 gap-3 pt-1">
                   <div>
-                    <label className="block text-[11px] font-bold text-black dark:text-white/75 mb-1">
-                      {isEn ? 'District' : 'Jajahan Kelantan'}
+                    <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                      {isEn ? 'District' : 'Jajahan'}
                     </label>
                     <select
                       value={regDistrict}
                       onChange={(e) => setRegDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full px-2.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer dark:focus:border-blue-500"
+                      className="w-full px-3 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer dark:focus:border-blue-500"
                     >
                       {DISTRICT_LIST.map((d) => (
                         <option key={d} value={d}>{d}</option>
@@ -581,22 +581,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-black dark:text-white/75 mb-1">
-                      {isEn ? 'Phone / WhatsApp' : 'No. Telefon'}
+                    <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">
+                      {isEn ? 'Phone Number' : 'Nombor Telefon'}
                     </label>
                     <input
                       type="tel"
                       value={regPhone}
                       onChange={(e) => setRegPhone(e.target.value)}
-                      placeholder={isEn ? 'Phone / WhatsApp' : 'No. Telefon'}
-                      className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                      placeholder={isEn ? 'Enter phone number' : 'Masukkan nombor telefon'}
+                      className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                     />
                   </div>
                 </div>
 
                 {/* TERMS & PRIVACY CHECKBOX */}
                 <div className="pt-1">
-                  <label className="flex items-start gap-2.5 text-xs text-black dark:text-white/75 cursor-pointer select-none">
+                  <label className="flex items-start gap-2.5 text-sm text-black dark:text-white/75 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       required
@@ -653,7 +653,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
+                  className="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white rounded-xl font-bold text-sm sm:text-[0.9375rem] flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
                 >
                   <UserPlus className="w-4 h-4 text-white" />
                   <span>
@@ -664,7 +664,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 </button>
 
                 {/* BOTTOM TOGGLE TO SIGN IN */}
-                <div className="pt-2 text-center text-xs text-black/70 dark:text-white/75">
+                <div className="pt-2 text-center text-sm text-black/70 dark:text-white/75">
                   <span>{isEn ? 'Already have an account? ' : 'Sudah ada akaun? '}</span>
                   <button
                     type="button"
@@ -685,9 +685,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
           {/* BOTTOM ISOLATED DEMO TESTING FOOTER */}
           <div className="w-full pt-4 border-t border-slate-300 dark:border-slate-600 space-y-2.5">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-black/70 dark:text-white/75">
+            <div className="flex items-center justify-between text-[0.8125rem] font-semibold text-black/70 dark:text-white/75">
               <span>{isEn ? 'Isolated Development Demo Mode:' : 'Mod Demo Pembangunan (Sesi Terasing):'}</span>
-              <span className="text-[10px] text-black/70 dark:text-white/75">Ujian Luar Talian</span>
+              <span className="text-[0.8125rem] text-black/70 dark:text-white/75">Ujian Luar Talian</span>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -696,11 +696,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 onClick={handleDemoBelia}
                 className="p-2.5 bg-blue-50 hover:bg-amber-100/80 dark:bg-blue-950/60 dark:hover:bg-blue-600 border border-blue-200 dark:border-blue-800/70 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-black dark:text-white">
+                <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
                   <Store className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Demo Belia</span>
                 </div>
-                <div className="text-[10px] text-black/70 dark:text-white/75 truncate mt-0.5">
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
                   Ahmad Faizul
                 </div>
               </button>
@@ -710,11 +710,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 onClick={handleDemoMentor}
                 className="p-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-black dark:text-white">
+                <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
                   <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Demo Mentor</span>
                 </div>
-                <div className="text-[10px] text-black/70 dark:text-white/75 truncate mt-0.5">
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
                   Dr. Wan Azhar (UMK)
                 </div>
               </button>
@@ -724,17 +724,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 onClick={handleDemoAdmin}
                 className="p-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
               >
-                <div className="flex items-center gap-1.5 font-bold text-xs text-black dark:text-white">
+                <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
                   <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                   <span>Demo Admin</span>
                 </div>
-                <div className="text-[10px] text-black/70 dark:text-white/75 truncate mt-0.5">
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
                   Admin KBelia
                 </div>
               </button>
             </div>
 
-            <div className="text-center text-[10px] text-black/70 dark:text-white/75 pt-1">
+            <div className="text-center text-[0.8125rem] text-black/70 dark:text-white/75 pt-1">
               Hak Cipta Terpelihara © 2026 Portal KBelia Kelantan
             </div>
           </div>
@@ -787,24 +787,24 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             />
 
             {/* Floating Translucent Dark-Glass Geometric Shapes & Wireframes */}
-            <div className="absolute top-[14%] left-[12%] w-16 h-16 rounded-2xl bg-slate-900/55 backdrop-blur-md border border-sky-400/30 shadow-[0_0_28px_rgba(56,189,248,0.12)] animate-login-float-a flex items-center justify-center">
-              <div className="w-6 h-6 rounded-md border border-sky-300/35 rotate-12" />
+            <div className="absolute top-[14%] left-[12%] w-16 h-16 rounded-2xl bg-slate-900/55 backdrop-blur-md border border-blue-400/30 shadow-[0_0_28px_rgba(59,130,246,0.12)] animate-login-float-a flex items-center justify-center">
+              <div className="w-6 h-6 rounded-md border border-blue-300/35 rotate-12" />
             </div>
 
-            <div className="absolute top-[22%] right-[11%] w-12 h-20 rounded-2xl bg-sky-500/10 backdrop-blur-sm border border-sky-400/25 shadow-[0_0_24px_rgba(37,99,235,0.14)] animate-login-float-b" />
+            <div className="absolute top-[22%] right-[11%] w-12 h-20 rounded-2xl bg-blue-500/10 backdrop-blur-sm border border-blue-400/25 shadow-[0_0_24px_rgba(37,99,235,0.14)] animate-login-float-b" />
 
-            <div className="absolute bottom-[22%] left-[14%] w-20 h-12 rounded-2xl bg-slate-900/60 backdrop-blur-md border border-blue-400/25 shadow-[0_0_24px_rgba(56,189,248,0.1)] animate-login-float-c flex items-center justify-around px-2.5">
-              <span className="w-2 h-2 rounded-xs bg-sky-400/70 animate-login-node-glow" />
-              <span className="w-7 h-1 rounded-full bg-sky-400/35" />
+            <div className="absolute bottom-[22%] left-[14%] w-20 h-12 rounded-2xl bg-slate-900/60 backdrop-blur-md border border-blue-400/25 shadow-[0_0_24px_rgba(59,130,246,0.1)] animate-login-float-c flex items-center justify-around px-2.5">
+              <span className="w-2 h-2 rounded-xs bg-blue-400/70 animate-login-node-glow" />
+              <span className="w-7 h-1 rounded-full bg-blue-400/35" />
             </div>
 
-            <div className="absolute bottom-[15%] right-[14%] w-14 h-14 rounded-xl bg-slate-900/45 backdrop-blur-md border border-sky-300/25 animate-login-float-a" style={{ animationDelay: '-2.2s' }}>
-              <div className="w-full h-full rounded-xl border border-dashed border-sky-400/25 scale-75" />
+            <div className="absolute bottom-[15%] right-[14%] w-14 h-14 rounded-xl bg-slate-900/45 backdrop-blur-md border border-blue-300/25 animate-login-float-a" style={{ animationDelay: '-2.2s' }}>
+              <div className="w-full h-full rounded-xl border border-dashed border-blue-400/25 scale-75" />
             </div>
 
             {/* Glowing Architectural Intersection Crosshairs */}
             <div
-              className="absolute top-[36%] left-[26%] w-2.5 h-2.5 rotate-45 border border-sky-400/70 bg-sky-400/25 animate-login-node-glow"
+              className="absolute top-[36%] left-[26%] w-2.5 h-2.5 rotate-45 border border-blue-400/70 bg-blue-400/25 animate-login-node-glow"
               style={{ animationDelay: '-0.8s' }}
             />
             <div
@@ -818,21 +818,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             {/* Orbital Rings + Breathing Halo + KB Emblem */}
             <div className="relative flex items-center justify-center mb-6">
               {/* Soft Breathing Radial Glow */}
-              <div className="absolute w-36 h-36 rounded-full bg-sky-500/20 blur-2xl animate-login-halo-breathe pointer-events-none" />
+              <div className="absolute w-36 h-36 rounded-full bg-blue-500/20 blur-2xl animate-login-halo-breathe pointer-events-none" />
 
               {/* Outer Dashed Rotating Orbit Ring */}
-              <div className="absolute w-28 h-28 rounded-full border border-dashed border-sky-400/35 animate-login-orbit-spin pointer-events-none">
-                <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.9)]" />
+              <div className="absolute w-28 h-28 rounded-full border border-dashed border-blue-400/35 animate-login-orbit-spin pointer-events-none">
+                <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.9)]" />
               </div>
 
               {/* Inner Counter-Rotating Arc Ring */}
-              <div className="absolute w-22 h-22 rounded-full border border-sky-300/20 border-t-sky-400/75 animate-login-orbit-reverse pointer-events-none" />
+              <div className="absolute w-22 h-22 rounded-full border border-blue-300/20 border-t-blue-400/75 animate-login-orbit-reverse pointer-events-none" />
 
               {/* Brand Mark Lockup */}
               <div className="relative flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-900/70 backdrop-blur-md border border-slate-700/80 shadow-xl shadow-slate-950/60">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-sky-500/30 border border-sky-400/40">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-blue-500/30 border border-blue-400/40">
                   <span>K</span>
-                  <span className="text-sky-100 text-base ml-0.5">B</span>
+                  <span className="text-blue-100 text-base ml-0.5">B</span>
                 </div>
                 <span className="text-2xl xl:text-3xl font-black text-white tracking-tight">
                   KBelia
@@ -841,18 +841,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             </div>
 
             {/* SUBTITLE MOTTO */}
-            <p className="text-xs xl:text-sm text-slate-300 font-normal leading-relaxed max-w-xs">
+            <p className="text-[0.9375rem] xl:text-sm text-slate-300 font-normal leading-relaxed max-w-xs">
               {isEn
                 ? 'Official Kelantan Youth Kiosk & Entrepreneurship Portal 2026'
                 : 'Portal Rasmi Kiosk & Keusahawanan Belia Kelantan 2026'}
             </p>
 
             {/* MODERN GLASS STATUS BADGE */}
-            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900/80 backdrop-blur-md border border-sky-400/25 text-sky-100 shadow-lg shadow-slate-950/50 whitespace-nowrap">
-              <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-slate-900/80 backdrop-blur-md border border-blue-400/25 text-white shadow-lg shadow-slate-950/50 whitespace-nowrap">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400 shrink-0" />
               <span>{isEn ? 'Welcome to KBelia' : 'Selamat Datang ke KBelia'}</span>
-              <span aria-hidden="true" className="text-sky-400/60">&middot;</span>
-              <span className="text-sky-300 font-bold tabular-nums">2026</span>
+              <span aria-hidden="true" className="text-blue-400/60">&middot;</span>
+              <span className="text-white font-bold tabular-nums">2026</span>
             </div>
           </div>
 
@@ -862,12 +862,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             onClick={toggleTheme}
             aria-label={isEn ? 'Toggle Light/Dark Mode' : 'Tukar Mod Cerah/Gelap'}
             title={theme === 'dark' ? (isEn ? 'Switch to Light Mode' : 'Tukar ke Mod Cerah') : (isEn ? 'Switch to Dark Mode' : 'Tukar ke Mod Gelap')}
-            className="absolute bottom-6 left-6 w-11 h-11 rounded-full bg-slate-900/85 hover:bg-slate-800 active:scale-95 text-slate-200 border border-slate-700/80 hover:border-sky-400/50 flex items-center justify-center shadow-lg shadow-slate-950/50 backdrop-blur-md transition-all cursor-pointer z-30"
+            className="absolute bottom-6 left-6 w-11 h-11 rounded-full bg-slate-900/85 hover:bg-slate-800 active:scale-95 text-slate-200 border border-slate-700/80 hover:border-blue-400/50 flex items-center justify-center shadow-lg shadow-slate-950/50 backdrop-blur-md transition-all cursor-pointer z-30"
           >
             {theme === 'dark' ? (
               <Sun className="w-5 h-5 text-amber-300" />
             ) : (
-              <Moon className="w-5 h-5 text-sky-300" />
+              <Moon className="w-5 h-5 text-blue-300" />
             )}
           </button>
         </div>
@@ -893,11 +893,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             </div>
 
             <div className="p-6 space-y-4">
-              <p className="text-xs text-black dark:text-white leading-relaxed">
+              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 Untuk keselamatan akaun usahawan berdaftar, sila hubungi pihak Admin KBelia Kelantan atau hantar permohonan ke emel rasmi pentadbir kami:
               </p>
 
-              <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-xs">
+              <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-sm">
                 <div className="font-bold text-black dark:text-white">Admin KBelia Kelantan 2026</div>
                 <div className="text-black dark:text-white/75 mt-0.5">Emel: urusetia@kbelia.kelantan.gov.my</div>
                 <div className="text-black dark:text-white/75">Talian: +60 9-748 1957 (Pusat Pentadbiran Negeri)</div>
@@ -906,7 +906,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={() => setShowForgotModal(false)}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer dark:bg-blue-600"
+                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-colors cursor-pointer dark:bg-blue-600"
               >
                 Faham & Tutup
               </button>

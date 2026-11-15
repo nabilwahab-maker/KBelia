@@ -84,7 +84,7 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
 
   return (
     <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div className="text-xs text-black/70 dark:text-white/75 tabular-nums">
+      <div className="text-sm text-black/75 dark:text-white/80 tabular-nums">
         Menunjukkan <span className="font-bold text-black dark:text-white">{startItem}–{endItem}</span> daripada{' '}
         <span className="font-bold text-black dark:text-white">{totalItems}</span> {itemLabel}
       </div>
@@ -94,9 +94,9 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
           type="button"
           onClick={() => onPageChange(Math.max(1, safePage - 1))}
           disabled={safePage <= 1}
-          className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-45 disabled:cursor-not-allowed inline-flex items-center gap-1 cursor-pointer transition-colors whitespace-nowrap"
+          className="px-3 py-1.5 rounded-lg text-sm font-semibold border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-45 disabled:cursor-not-allowed inline-flex items-center gap-1 cursor-pointer transition-colors whitespace-nowrap"
         >
-          <ChevronLeft className="w-3.5 h-3.5" />
+          <ChevronLeft className="w-4 h-4" />
           <span>Sebelum</span>
         </button>
 
@@ -104,7 +104,7 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
           page === 'ellipsis' ? (
             <span
               key={`ellipsis-${idx}`}
-              className="px-1.5 text-xs text-black/60 dark:text-white/60 select-none"
+              className="px-1.5 text-sm text-black/60 dark:text-white/60 select-none"
             >
               …
             </span>
@@ -114,7 +114,7 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
               type="button"
               onClick={() => onPageChange(page)}
               aria-current={safePage === page ? 'page' : undefined}
-              className={`min-w-[32px] px-2.5 py-1.5 rounded-lg text-xs font-bold border tabular-nums transition-colors cursor-pointer ${
+              className={`min-w-[2.125rem] px-3 py-1.5 rounded-lg text-sm font-bold border tabular-nums transition-colors cursor-pointer ${
                 safePage === page
                   ? `${activeButtonClass} shadow-2xs`
                   : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -129,10 +129,10 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
           type="button"
           onClick={() => onPageChange(Math.min(totalPages, safePage + 1))}
           disabled={safePage >= totalPages}
-          className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-45 disabled:cursor-not-allowed inline-flex items-center gap-1 cursor-pointer transition-colors whitespace-nowrap"
+          className="px-3 py-1.5 rounded-lg text-sm font-semibold border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-45 disabled:cursor-not-allowed inline-flex items-center gap-1 cursor-pointer transition-colors whitespace-nowrap"
         >
           <span>Seterusnya</span>
-          <ChevronRight className="w-3.5 h-3.5" />
+          <ChevronRight className="w-4 h-4" />
         </button>
       </nav>
     </div>
