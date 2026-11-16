@@ -753,7 +753,9 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <div className="ml-3 pl-2.5 border-l border-slate-300 dark:border-zinc-600 space-y-1 pt-0.5 pb-1">
                         {(query ? filteredAdminAccordion : adminAccordionItems).map((item) => {
                           const Icon = item.icon;
-                          const isSubActive = activeTab === 'admin' && adminSubTab === item.id;
+                          const isSubActive =
+                            (activeTab === 'home' && isAdmin && adminSubTab === item.id) ||
+                            (activeTab === 'admin' && adminSubTab === item.id);
                           return (
                             <button
                               key={item.id}
@@ -994,8 +996,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {(query ? filteredMentorAccordion : mentorAccordionItems).map((item) => {
                           const Icon = item.icon;
                           const isSubActive =
-                            ((activeTab === 'home' && isMentor && item.id === 'overview') ||
-                              (activeTab === 'mentor' && mentorSubTab === item.id));
+                            (activeTab === 'home' && isMentor && mentorSubTab === item.id) ||
+                            (activeTab === 'mentor' && mentorSubTab === item.id);
                           return (
                             <button
                               key={item.id}
@@ -1182,7 +1184,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {(query ? filteredYouthAccordion : youthAccordionItems).map((item) => {
                           const Icon = item.icon;
                           const isSubActive =
-                            (activeTab === 'home' && isYouth && item.id === 'overview') ||
+                            (activeTab === 'home' && isYouth && merchantSubTab === item.id) ||
                             (activeTab === 'merchant' && merchantSubTab === item.id);
                           return (
                             <button

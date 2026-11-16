@@ -7,7 +7,7 @@ import {
   Search,
   AlertTriangle
 } from 'lucide-react';
-import { BusinessListing, CapsuleBooking } from '../types';
+import { BusinessListing, CapsuleBooking, GrantApplication, GrantEndorsement } from '../types';
 import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
 import { maskMyKad } from '../utils/securityUtils';
 
@@ -17,6 +17,8 @@ interface PublicVerificationModalProps {
   defaultRefCode?: string;
   bookings?: CapsuleBooking[];
   businesses?: BusinessListing[];
+  grantApplications?: GrantApplication[];
+  grantEndorsements?: GrantEndorsement[];
 }
 
 interface VerifiedRecordState {
@@ -36,7 +38,9 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
   onClose,
   defaultRefCode = '',
   bookings = [],
-  businesses = []
+  businesses = [],
+  grantApplications = [],
+  grantEndorsements = []
 }) => {
   const [inputRef, setInputRef] = useState(defaultRefCode);
   const [verifiedRecord, setVerifiedRecord] = useState<VerifiedRecordState | null>(null);
@@ -48,18 +52,20 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
     // 1. Match against real approved bookings (by booking id, slotCode, KBN-*, or AGR-*)
     const matchedBooking = bookings.find(b => {
       if (b.status !== 'approved') return false;
-      const code = (b.slotCode || '').toUpperCase();
+      const code = (b.slotCode || '').trim().toUpperCase();
       const shortCode = code.replace('CAP-', '');
       const year = new Date(b.createdAt || Date.now()).getFullYear();
       const candidates = [
         b.id.toUpperCase(),
-        code,
-        `KBN-${code}`,
-        `KBN-${code}-${year}-8819`,
-        `KBN-${shortCode}-${year}-8819`,
-        `AGR-${code}-${year}`
+        ...(code ? [
+          code,
+          `KBN-${code}`,
+          `KBN-${code}-${year}-8819`,
+          `KBN-${shortCode}-${year}-8819`,
+          `AGR-${code}-${year}`
+        ] : [])
       ];
-      return candidates.some(c => c === q || q.includes(code));
+      return candidates.some(c => Boolean(c) && c === q);
     });
 
     if (matchedBooking) {
@@ -77,7 +83,62 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
       };
     }
 
-    // 2. Match against approved registered businesses / SSM or certificate reference
+    // 2. Match against approved grants
+    const matchedGrant = grantApplications.find(g => {
+      if (g.status !== 'approved') return false;
+      const gid = (g.id || '').toUpperCase();
+      const candidates = [
+        gid,
+        `GRT-${gid.slice(0, 8)}`,
+        `GRT-${gid.slice(0, 12)}`
+      ];
+      return candidates.some(c => Boolean(c) && c === q);
+    });
+
+    if (matchedGrant) {
+      return {
+        refCode: q,
+        status: 'valid',
+        recipient: `${matchedGrant.applicantName} (${matchedGrant.businessName})`,
+        kioskLocation: matchedGrant.programTitle,
+        district: matchedGrant.businessCategory,
+        rate: `Peruntukan Diluluskan: ${matchedGrant.grantAmount || matchedGrant.amount || 'RM3,000'}`,
+        issueDate: formatDisplayDate(matchedGrant.createdAt),
+        expiryDate: 'Sah Disalurkan',
+        issuer: 'Jawatankuasa Geran Usahawan Belia Kelantan (KBelia)'
+      };
+    }
+
+    // 3. Match against mentor grant endorsements (state + localStorage fallback)
+    let localEndorsements: any[] = [];
+    try {
+      const raw = localStorage.getItem('kbelia_mentor_endorsements_v1');
+      if (raw) localEndorsements = JSON.parse(raw);
+    } catch {
+      // ignore
+    }
+    const allEndorsements = [...grantEndorsements, ...localEndorsements];
+    const matchedEndorsement = allEndorsements.find((e: any) => {
+      const code = (e.endorsementCode || '').toUpperCase();
+      const eid = (e.id || '').toUpperCase();
+      return (code && code === q) || (eid && eid === q);
+    });
+
+    if (matchedEndorsement) {
+      return {
+        refCode: q,
+        status: 'valid',
+        recipient: `${matchedEndorsement.menteeName} (${matchedEndorsement.businessName})`,
+        kioskLocation: matchedEndorsement.grantProgramTitle || 'Surat Perakuan Mentor UMK',
+        district: matchedEndorsement.district || 'Kelantan',
+        rate: `Syor Perakuan: ${matchedEndorsement.recommendedAmount || 'RM3,000'}`,
+        issueDate: formatDisplayDate(matchedEndorsement.issuedAt),
+        expiryDate: 'Sah Perakuan Mentor',
+        issuer: `${matchedEndorsement.mentorName} (${matchedEndorsement.mentorAgency || 'UMK CEED'})`
+      };
+    }
+
+    // 4. Match against approved registered businesses / SSM or certificate reference
     const matchedBusiness = businesses.find(b =>
       b.isApproved && (
         b.id.toUpperCase() === q ||
@@ -99,8 +160,10 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
       };
     }
 
-    // 3. Match standard membership cert code
-    if (q === 'REG-2026-BELIA') {
+    // 5. Match standard membership cert code
+    const currentYear = new Date().getFullYear();
+    if (q === `REG-${currentYear}-BELIA` || q === 'REG-2026-BELIA') {
+      const yr = q.split('-')[1] || String(currentYear);
       return {
         refCode: q,
         status: 'valid',
@@ -108,8 +171,8 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
         kioskLocation: 'Seluruh Jajahan Negeri Kelantan',
         district: 'Negeri Kelantan',
         rate: 'Sijil Keahlian Usahawan Belia Rasmi',
-        issueDate: 'Januari 2026',
-        expiryDate: 'Disember 2026',
+        issueDate: `Januari ${yr}`,
+        expiryDate: `Disember ${yr}`,
         issuer: 'Kerajaan Negeri Kelantan & Universiti Malaysia Kelantan (UMK)'
       };
     }
@@ -133,7 +196,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
       setInputRef(code);
       setVerifiedRecord(code ? performLookup(code) : null);
     }
-  }, [isOpen, defaultRefCode, bookings, businesses]);
+  }, [isOpen, defaultRefCode, bookings, businesses, grantApplications, grantEndorsements]);
 
   if (!isOpen) return null;
 

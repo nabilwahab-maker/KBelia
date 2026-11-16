@@ -18,7 +18,7 @@ import {
   X,
   FileText
 } from 'lucide-react';
-import { KelantanDistrict, MentorProfile, MentorshipRegistration } from '../types';
+import { KelantanDistrict, MentorProfile, MentorshipRegistration, PublishedMentorSlot } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
 interface MentorshipPageProps {
@@ -64,12 +64,38 @@ const TOPIC_OPTIONS_EN = [
   'Supplier Negotiation & Inventory Control'
 ];
 
-const DATE_SLOTS = [
-  { date: '28 Mac 2026 (Sabtu)', time: '10:00 AM - 11:00 AM' },
-  { date: '30 Mac 2026 (Isnin)', time: '11:30 AM - 12:30 PM' },
-  { date: '2 April 2026 (Khamis)', time: '2:30 PM - 3:30 PM' },
-  { date: '5 April 2026 (Ahad)', time: '10:00 AM - 11:00 AM' }
+const DEFAULT_SLOT_TIMES = [
+  '10:00 AM - 11:00 AM',
+  '11:30 AM - 12:30 PM',
+  '2:30 PM - 3:30 PM',
+  '10:00 AM - 11:00 AM'
 ];
+
+const generateUpcomingDateSlots = (isEn: boolean): { date: string; time: string }[] => {
+  const daysMs = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+  const daysEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const monthsMs = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogo', 'Sep', 'Okt', 'Nov', 'Dis'];
+  const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  const results: { date: string; time: string }[] = [];
+  const cursor = new Date();
+  let safety = 0;
+
+  while (results.length < 4 && safety < 21) {
+    cursor.setDate(cursor.getDate() + 1);
+    safety += 1;
+    // Skip Friday (Kelantan weekend) when auto-generating standard slots
+    if (cursor.getDay() === 5) continue;
+    const dayName = isEn ? daysEn[cursor.getDay()] : daysMs[cursor.getDay()];
+    const monthName = isEn ? monthsEn[cursor.getMonth()] : monthsMs[cursor.getMonth()];
+    const dateLabel = `${cursor.getDate()} ${monthName} ${cursor.getFullYear()} (${dayName})`;
+    results.push({
+      date: dateLabel,
+      time: DEFAULT_SLOT_TIMES[results.length] || '10:00 AM - 11:00 AM'
+    });
+  }
+  return results;
+};
 
 export const MentorshipPage: React.FC<MentorshipPageProps> = ({
   mentors,
@@ -121,6 +147,33 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       setDistrict(defaultDistrict);
     }
   }, [defaultEntrepreneurName, defaultBusinessName, defaultPhone, defaultDistrict]);
+
+  useEffect(() => {
+    setSelectedSlotIdx(0);
+  }, [selectedMentor?.id]);
+
+  const availableDateSlots = useMemo(() => {
+    const generated = generateUpcomingDateSlots(isEn);
+    if (!selectedMentor) return generated;
+
+    let localPublished: PublishedMentorSlot[] = [];
+    try {
+      const raw = localStorage.getItem(`kbelia_mentor_published_slots_${selectedMentor.id}`);
+      if (raw) localPublished = JSON.parse(raw);
+    } catch {
+      // ignore
+    }
+
+    const customSlots = [
+      ...(selectedMentor.publishedSlots || []),
+      ...localPublished
+    ].map(s => ({ date: s.date, time: s.time }));
+
+    const combined = [...customSlots, ...generated];
+    return combined.filter((slot, idx, arr) =>
+      arr.findIndex(s => s.date === slot.date && s.time === slot.time) === idx
+    );
+  }, [selectedMentor, isEn]);
 
   // Derive sorted registrations, single active appointment, and history
   const sortedRegistrations = useMemo(() => {
@@ -197,7 +250,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       return;
     }
 
-    const chosenSlot = DATE_SLOTS[selectedSlotIdx] || DATE_SLOTS[0];
+    const chosenSlot = availableDateSlots[selectedSlotIdx] || availableDateSlots[0];
 
     const newRegistration: MentorshipRegistration = {
       id: `mentee-reg-${Date.now()}`,
@@ -644,8 +697,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   onChange={(e) => setSelectedSlotIdx(Number(e.target.value))}
                   className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
                 >
-                  {DATE_SLOTS.map((slot, idx) => (
-                    <option key={slot.date} value={idx}>
+                  {availableDateSlots.map((slot, idx) => (
+                    <option key={`${slot.date}-${slot.time}`} value={idx}>
                       {slot.date} ({slot.time})
                     </option>
                   ))}

@@ -56,6 +56,22 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
 
   const score = calculateScore();
 
+  // Compute dynamic scheme match percentages based on profile & funding inputs
+  const starterMatch = Math.min(
+    99,
+    Math.max(
+      45,
+      score - (fundingNeed > 5000 ? 12 : 0) + (experienceMonths <= 18 ? 4 : 0) + (ssmStatus !== 'none' ? 3 : -10)
+    )
+  );
+  const tekunMatch = Math.min(
+    99,
+    Math.max(
+      42,
+      score - (ssmStatus === 'none' ? 18 : ssmStatus === 'in_progress' ? 8 : 0) + (fundingNeed >= 5000 ? 5 : -6) + (monthlySales >= 3000 ? 4 : -5)
+    )
+  );
+
   const handleRecalculate = () => {
     setIsCalculated(true);
     confetti({ particleCount: 40, spread: 60 });
@@ -402,7 +418,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                   </div>
                 </div>
                 <span className="px-2 py-0.5 rounded-full text-[0.8125rem] font-bold bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white">
-                  96% Padan
+                  {starterMatch}% {isEn ? 'Match' : 'Padan'}
                 </span>
               </div>
               <p className="text-[0.875rem] text-black dark:text-white/75">
@@ -410,7 +426,10 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               </p>
               <button
                 type="button"
-                onClick={() => onOpenGrantModal('Geran Permulaan Usahawan Belia (UMK)', 'RM 3,000')}
+                onClick={() => onOpenGrantModal(
+                  'Geran Permulaan Usahawan Belia (UMK)',
+                  `RM ${Math.min(Math.max(fundingNeed, 1000), 3000).toLocaleString('ms-MY')}`
+                )}
                 className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer dark:bg-emerald-600"
               >
                 <span>{isEn ? 'Apply Grant Now' : 'Mohon Geran Ini'}</span>
@@ -430,7 +449,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                   </div>
                 </div>
                 <span className="px-2 py-0.5 rounded-full text-[0.8125rem] font-bold bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white">
-                  88% Padan
+                  {tekunMatch}% {isEn ? 'Match' : 'Padan'}
                 </span>
               </div>
               <p className="text-[0.875rem] text-black dark:text-white/75">

@@ -29,6 +29,8 @@ import {
   calculateOperationEndDate
 } from '../utils/printUtils';
 import { downloadOfferLetterPdf } from '../utils/pdfGenerator';
+import { loadLocalPortalSettings } from '../services/dataService';
+import { showToast } from './ToastNotification';
 
 interface OfferLetterModalProps {
   booking: CapsuleBooking | null;
@@ -54,8 +56,12 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
   if (!isOpen || !booking) return null;
 
   const matchedSlot = slots.find(s => s.id === booking.slotId || s.code === booking.slotCode);
+  const subsidyRate = Number(loadLocalPortalSettings().portalSubsidyRate ?? 50);
   const monthlyRate = booking.monthlyRate || matchedSlot?.monthlyRate || 150;
-  const marketRate = monthlyRate * 2;
+  const marketRate =
+    subsidyRate > 0 && subsidyRate < 100
+      ? Math.round(monthlyRate / (1 - subsidyRate / 100))
+      : monthlyRate * 2;
 
   const refNumber = `KBN-${booking.slotCode || 'KB01'}-${new Date(booking.createdAt || Date.now()).getFullYear()}-8819`;
   const formattedDate = new Date(booking.createdAt || Date.now()).toLocaleDateString('ms-MY', { 
@@ -67,13 +73,17 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
   const handlePrint = async () => {
     setIsPrinting(true);
     try {
-      const styledDocument = generateOfferLetterOfficialHtml(booking, refNumber, formattedDate);
+      const styledDocument = generateOfferLetterOfficialHtml(booking, refNumber, formattedDate, subsidyRate);
       await openAndPrintDocument(
         styledDocument,
         `Surat_Tawaran_Kiosk_${booking.slotCode || 'KB'}_${refNumber}`
       );
     } catch {
-      window.print();
+      showToast({
+        type: 'error',
+        title: 'Ralat Cetakan',
+        message: 'Gagal membuka halaman cetakan rasmi. Sila gunakan butang Muat Turun Fail (PDF).'
+      });
     } finally {
       setTimeout(() => setIsPrinting(false), 700);
     }
@@ -83,13 +93,18 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
     setIsDownloadingPdf(true);
     try {
       const fileName = `Surat_Tawaran_Kiosk_${booking.slotCode || 'KB'}_${refNumber}.pdf`;
-      const ok = await downloadOfferLetterPdf(booking, refNumber, formattedDate, fileName);
+      const ok = await downloadOfferLetterPdf(booking, refNumber, formattedDate, fileName, subsidyRate);
       if (ok) {
         setIsDownloaded(true);
         setTimeout(() => setIsDownloaded(false), 3500);
       }
     } catch (err) {
       console.error('PDF download error:', err);
+      showToast({
+        type: 'error',
+        title: 'Ralat PDF',
+        message: 'Gagal menjana fail PDF rasmi. Sila cuba sebentar lagi.'
+      });
     } finally {
       setIsDownloadingPdf(false);
     }
@@ -215,7 +230,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
                 <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600">
                   <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">Kadar Sewa Bersubsidi:</span>
                   <span className="font-extrabold text-black dark:text-white/75 text-sm tabular-nums">RM {monthlyRate.toFixed(2)} / bulan</span>
-                  <div className="text-black dark:text-white/75 font-medium">Subsidi 50% Ditaja Negeri (Kadar Asal RM{marketRate})</div>
+                  <div className="text-black dark:text-white/75 font-medium">Subsidi {subsidyRate}% Ditaja Negeri (Kadar Asal RM{marketRate})</div>
                 </div>
 
                 <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600">

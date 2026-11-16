@@ -838,13 +838,16 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 aria-label={`${displayName} - ${roleLabel}`}
                 aria-expanded={profileDropdownOpen}
                 title={`${displayName} - ${roleLabel}`}
-                className="relative w-10 h-10 p-0.5 rounded-xl bg-white dark:bg-slate-800 hover:border-blue-500 dark:hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all border border-slate-300 dark:border-slate-600 cursor-pointer shadow-2xs shrink-0 overflow-hidden group"
+                className="relative inline-flex items-center justify-center w-10 h-10 p-0.5 sm:w-auto sm:h-10 sm:pl-3 sm:pr-0.5 sm:py-0.5 sm:gap-2.5 rounded-xl bg-white dark:bg-slate-800 hover:border-blue-500 dark:hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all border border-slate-300 dark:border-slate-600 cursor-pointer shadow-2xs shrink-0 overflow-hidden group"
               >
+                <span className="hidden sm:inline-block text-sm font-semibold text-black dark:text-white max-w-[140px] lg:max-w-[180px] truncate leading-none">
+                  {displayName}
+                </span>
                 <img
                   src={avatarSrc}
                   alt={displayName}
                   referrerPolicy="no-referrer"
-                  className="w-full h-full rounded-[10px] object-cover group-hover:scale-[1.03] transition-transform duration-150"
+                  className="w-full h-full sm:w-auto sm:h-full sm:aspect-square shrink-0 rounded-[10px] object-cover group-hover:scale-[1.03] transition-transform duration-150"
                 />
               </button>
 

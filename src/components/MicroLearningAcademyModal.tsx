@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   GraduationCap, 
   X, 
   CheckCircle2, 
-  BookOpen, 
   Award, 
-  Clock, 
-  ChevronRight,
-  ShieldCheck,
-  Sparkles
+  Clock
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { showToast } from './ToastNotification';
 
 interface MicroLearningAcademyModalProps {
   isOpen: boolean;
@@ -39,7 +37,7 @@ const COURSES: CourseModule[] = [
       'Simpan sekurang-kurangnya RM150 pada awal bulan untuk sewa kiosk bersubsidi.',
       'Gunakan DuitNow QR untuk mengelakkan ketirisan tunai fizikal.'
     ],
-    isCompleted: true,
+    isCompleted: false,
     badge: 'Lencana Kewangan Bijak UMK'
   },
   {
@@ -76,13 +74,48 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
   isOpen,
   onClose
 }) => {
-  const [courses, setCourses] = useState<CourseModule[]>(COURSES);
-  const [activeCourse, setActiveCourse] = useState<CourseModule>(COURSES[0]);
+  const { user } = useAuth();
+  const storageKey = `kbelia_academy_completed_${user?.uid || 'guest'}`;
+
+  const [completedIds, setCompletedIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [activeCourseId, setActiveCourseId] = useState<string>(COURSES[0].id);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      const saved = localStorage.getItem(storageKey);
+      setCompletedIds(saved ? JSON.parse(saved) : []);
+    } catch {
+      setCompletedIds([]);
+    }
+  }, [isOpen, storageKey]);
+
+  const courses = COURSES.map(c => ({
+    ...c,
+    isCompleted: completedIds.includes(c.id)
+  }));
+  const activeCourse = courses.find(c => c.id === activeCourseId) || courses[0];
 
   if (!isOpen) return null;
 
   const handleCompleteCourse = (courseId: string) => {
-    setCourses(courses.map(c => c.id === courseId ? { ...c, isCompleted: true } : c));
+    if (completedIds.includes(courseId)) return;
+    const next = [...completedIds, courseId];
+    setCompletedIds(next);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+    const course = COURSES.find(c => c.id === courseId);
+    showToast(`Tahniah! ${course?.badge || 'Lencana kursus mikro'} berjaya ditebus dan disimpan.`, 'success');
   };
 
   const completedCount = courses.filter(c => c.isCompleted).length;
@@ -143,7 +176,7 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
               return (
                 <div
                   key={course.id}
-                  onClick={() => setActiveCourse(course)}
+                  onClick={() => setActiveCourseId(course.id)}
                   className={`p-3 rounded-2xl border cursor-pointer transition-all flex items-start justify-between gap-2 ${
                     isSelected
                       ? 'bg-amber-100/70 dark:bg-amber-950/60 border-amber-400 dark:border-amber-600 shadow-sm'

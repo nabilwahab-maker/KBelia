@@ -14,6 +14,7 @@ import {
 import { BusinessListing, BusinessCategory, KelantanDistrict } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { showToast } from './ToastNotification';
 
 interface DirectorySectionProps {
   businesses?: BusinessListing[];
@@ -194,7 +195,9 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             const waGreeting = language === 'en'
               ? `Hello ${biz.businessName}, I saw your business profile on the Kelantan Youth Portal.`
               : `Assalamualaikum ${biz.businessName}, saya melihat perniagaan anda di Portal NiagaBelia Kelantan.`;
-            const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waGreeting)}`;
+            const waLink = cleanPhone
+              ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waGreeting)}`
+              : '#';
 
             return (
               <div
@@ -276,8 +279,19 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
 
                   <a
                     href={waLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target={cleanPhone ? '_blank' : undefined}
+                    rel={cleanPhone ? 'noopener noreferrer' : undefined}
+                    onClick={(e) => {
+                      if (!cleanPhone) {
+                        e.preventDefault();
+                        showToast(
+                          language === 'en'
+                            ? 'This business has not added a WhatsApp number yet.'
+                            : 'Perniagaan ini belum mendaftarkan nombor WhatsApp.',
+                          'warning'
+                        );
+                      }
+                    }}
                     title={language === 'en' ? 'Direct WhatsApp' : 'WhatsApp Terus'}
                     className="interactive-press p-2 bg-indigo-50 hover:bg-amber-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/60 dark:hover:bg-indigo-600 dark:text-indigo-400 dark:border-indigo-800/70 rounded-xl transition-all duration-200 shadow-2xs cursor-pointer flex items-center justify-center"
                   >

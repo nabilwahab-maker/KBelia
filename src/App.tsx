@@ -166,6 +166,11 @@ function MainApp() {
     if (tab === 'academic' && !overrideSubTab) {
       setKioskPageView('browse');
     }
+    if (tab === 'home' && !overrideSubTab) {
+      setAdminSubTab('queue');
+      setMentorSubTab('overview');
+      setMerchantSubTab('overview');
+    }
     setActiveTab(tab);
     triggerSkeletonTransition(tab, overrideSubTab);
   }, [triggerSkeletonTransition]);
@@ -257,7 +262,7 @@ function MainApp() {
   const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
   const [selectedBookingForTenancy, setSelectedBookingForTenancy] = useState<CapsuleBooking | null>(null);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
-  const [verificationRefCode, setVerificationRefCode] = useState('KBN-KB-2026-8819');
+  const [verificationRefCode, setVerificationRefCode] = useState('');
   
   // Quick Counter Interactive Modals
   const [isStatusDocumentsModalOpen, setIsStatusDocumentsModalOpen] = useState(false);
@@ -1591,11 +1596,11 @@ function MainApp() {
         onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
         onSelectMerchantSubTab={(sub) => {
           setMerchantSubTab(sub);
-          navigateWithSkeleton('merchant');
+          navigateWithSkeleton('merchant', sub);
         }}
         onSelectMentorSubTab={(sub) => {
           setMentorSubTab(sub);
-          navigateWithSkeleton('mentor');
+          navigateWithSkeleton('mentor', sub);
         }}
         onOpenBooking={handleOpenNewBooking}
         slots={enrichedSlots}
@@ -1621,17 +1626,17 @@ function MainApp() {
           merchantSubTab={merchantSubTab}
           onSelectMerchantSubTab={(sub) => {
             setMerchantSubTab(sub);
-            navigateWithSkeleton('merchant');
+            navigateWithSkeleton('merchant', sub);
           }}
           adminSubTab={adminSubTab}
           onSelectAdminSubTab={(sub) => {
             setAdminSubTab(sub);
-            navigateWithSkeleton('admin');
+            navigateWithSkeleton('admin', sub);
           }}
           mentorSubTab={mentorSubTab}
           onSelectMentorSubTab={(sub) => {
             setMentorSubTab(sub);
-            navigateWithSkeleton('mentor');
+            navigateWithSkeleton('mentor', sub);
           }}
         />
 
@@ -2304,6 +2309,8 @@ function MainApp() {
         defaultRefCode={verificationRefCode}
         bookings={bookings}
         businesses={businesses}
+        grantApplications={grantApplications}
+        grantEndorsements={grantEndorsements}
         onClose={() => setIsVerificationModalOpen(false)}
       />
 
@@ -2321,7 +2328,10 @@ function MainApp() {
           if (isYouth) navigateWithSkeleton('mentorship');
         }}
         onOpenVerification={(refCode) => {
-          setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');
+          const fallbackRef = myBookings[0]
+            ? `KBN-${myBookings[0].slotCode}-${new Date(myBookings[0].createdAt || Date.now()).getFullYear()}-8819`
+            : `REG-${new Date().getFullYear()}-BELIA`;
+          setVerificationRefCode(refCode || fallbackRef);
           setIsVerificationModalOpen(true);
         }}
         onCancelMentorship={(regId) => {

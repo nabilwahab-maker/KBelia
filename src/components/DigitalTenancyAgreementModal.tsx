@@ -10,9 +10,15 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { CapsuleBooking, CapsuleSlot } from '../types';
-import { signBookingTenancyAgreement } from '../services/dataService';
+import { signBookingTenancyAgreement, loadLocalPortalSettings } from '../services/dataService';
 import { showToast } from './ToastNotification';
-import { openAndPrintDocument, downloadHtmlDocument, formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
+import {
+  openAndPrintDocument,
+  generateTenancyAgreementOfficialHtml,
+  formatDisplayDate,
+  calculateOperationEndDate
+} from '../utils/printUtils';
+import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 
 interface DigitalTenancyAgreementModalProps {
@@ -40,6 +46,8 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
   const [isDownloaded, setIsDownloaded] = useState(false);
   const { confirmDelete } = useConfirmDelete();
 
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
       setIsSigned(Boolean(booking?.tenancySigned));
@@ -50,7 +58,15 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
   if (!isOpen) return null;
 
   const matchedSlot = slots.find(s => s.id === booking.slotId || s.code === booking.slotCode);
+  const subsidyRate = Number(loadLocalPortalSettings().portalSubsidyRate ?? 50);
   const monthlyRate = booking.monthlyRate || matchedSlot?.monthlyRate || 150;
+  const bookingYear = new Date(booking.createdAt || Date.now()).getFullYear();
+  const agreementRefCode = `AGR-${booking.slotCode}-${bookingYear}`;
+  const signedDateDisp = new Date(booking.tenancySignedAt || Date.now()).toLocaleDateString('ms-MY', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
 
   // Drawing Canvas Handlers
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -163,7 +179,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
               PERJANJIAN PENYEWAAN KIOSK KAPSUL USAHAWAN BELIA
             </h4>
             <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-sans">
-              No. Rujukan Perjanjian: AGR-{booking.slotCode}-{new Date().getFullYear()}
+              No. Rujukan Perjanjian: {agreementRefCode}
             </span>
           </div>
 
@@ -247,37 +263,46 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
               <div className="flex flex-wrap justify-center gap-2.5 mt-4">
                 <button
                   type="button"
-                  onClick={() => {
-                    if (agreementRef.current) {
-                      downloadHtmlDocument(
-                        agreementRef.current.innerHTML,
-                        `Perjanjian_Sewa_Kiosk_${booking.slotCode}`,
-                        `Perjanjian Penyewaan Kiosk Kapsul - ${booking.slotCode}`
-                      );
-                      setIsDownloaded(true);
-                      setTimeout(() => setIsDownloaded(false), 2500);
+                  disabled={isDownloadingPdf}
+                  onClick={async () => {
+                    setIsDownloadingPdf(true);
+                    try {
+                      const html = generateTenancyAgreementOfficialHtml(booking, agreementRefCode, signedDateDisp, subsidyRate);
+                      const ok = await downloadHtmlAsPdf(html, `Perjanjian_Sewa_Kiosk_${booking.slotCode}_${agreementRefCode}.pdf`);
+                      if (ok) {
+                        setIsDownloaded(true);
+                        setTimeout(() => setIsDownloaded(false), 2500);
+                      }
+                    } finally {
+                      setIsDownloadingPdf(false);
                     }
                   }}
-                  className="py-2 px-3.5 rounded-xl text-sm font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
-                  title="Muat turun salinan perjanjian"
+                  className="py-2 px-3.5 rounded-xl text-sm font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60"
+                  title="Muat turun salinan PDF rasmi ber-letterhead"
                 >
                   <Download className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                  <span>{isDownloaded ? 'Tersimpan!' : 'Muat Turun Fail'}</span>
+                  <span>{isDownloadingPdf ? 'Menjana PDF...' : isDownloaded ? 'PDF Tersimpan!' : 'Muat Turun PDF'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={async () => {
                     setIsPrinting(true);
-                    if (agreementRef.current) {
+                    try {
+                      const html = generateTenancyAgreementOfficialHtml(booking, agreementRefCode, signedDateDisp, subsidyRate);
                       await openAndPrintDocument(
-                        agreementRef.current.innerHTML,
+                        html,
                         `Perjanjian_Sewa_Kiosk_${booking.slotCode}`
                       );
-                    } else {
-                      window.print();
+                    } catch {
+                      showToast({
+                        type: 'error',
+                        title: 'Ralat Cetakan',
+                        message: 'Gagal membuka tetingkap cetakan rasmi. Sila guna butang Muat Turun PDF.'
+                      });
+                    } finally {
+                      setTimeout(() => setIsPrinting(false), 700);
                     }
-                    setTimeout(() => setIsPrinting(false), 700);
                   }}
                   disabled={isPrinting}
                   className="py-2 px-4 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm dark:bg-rose-600"

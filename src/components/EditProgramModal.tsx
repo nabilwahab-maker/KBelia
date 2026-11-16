@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { X, Save, Loader2, Edit3, AlertCircle, Star } from 'lucide-react';
 import { YouthProgram } from '../types';
 import { saveProgram } from '../services/dataService';
+import { ImageDropzone } from './ImageDropzone';
 
 interface EditProgramModalProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
   const [grantAmount, setGrantAmount] = useState('');
   const [registrationLink, setRegistrationLink] = useState('');
   const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +40,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
       setGrantAmount(program.grantAmount || '');
       setRegistrationLink(program.registrationLink || '');
       setDescription(program.description || '');
+      setImageUrl(program.imageUrl || '');
       setIsFeatured(Boolean(program.isFeatured));
       setError(null);
       setIsSaving(false);
@@ -78,6 +81,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
         grantAmount: grantAmount.trim(),
         registrationLink: registrationLink.trim() || '#',
         description: description.trim(),
+        imageUrl: imageUrl.trim(),
         isFeatured,
         createdAt: program.createdAt
       });
@@ -237,6 +241,15 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Masukkan maklumat dan syarat program"
                 className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <ImageDropzone
+                value={imageUrl}
+                onChange={(val) => setImageUrl(val)}
+                label="Poster Program"
+                aspectRatio="16:9"
               />
             </div>
           </div>

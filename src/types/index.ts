@@ -235,6 +235,14 @@ export interface MaintenanceTicket {
   createdAt: string;
 }
 
+export interface PublishedMentorSlot {
+  id: string;
+  date: string;
+  time: string;
+  mode: 'Bersemuka di Kampus' | 'Google Meet Maya';
+  createdAt: string;
+}
+
 export interface MentorProfile {
   id: string;
   name: string;
@@ -246,6 +254,7 @@ export interface MentorProfile {
   phone: string;
   bio: string;
   availableDays: string;
+  publishedSlots?: PublishedMentorSlot[];
   activeMenteesCount?: number;
   pin?: string;
   lastActive?: string;

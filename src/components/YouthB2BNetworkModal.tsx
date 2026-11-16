@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Network, 
   X, 
   Megaphone, 
   MessageCircle, 
-  MapPin, 
-  Search, 
-  Sparkles,
-  ArrowRight,
-  Filter
+  MapPin
 } from 'lucide-react';
 import { B2BListing, KelantanDistrict } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+import { saveB2BListingRecord, isProductionAuthenticated } from '../services/dataService';
+import { mergeUniqueById, subscribeCrossTabSync, subscribeDemoSyncCollection } from '../services/realtimeSync';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { showToast } from './ToastNotification';
 
 interface YouthB2BNetworkModalProps {
   isOpen: boolean;
@@ -58,34 +60,119 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
   isOpen,
   onClose
 }) => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
+  const { user, userProfile } = useAuth();
   const [listings, setListings] = useState<B2BListing[]>(DEFAULT_B2B);
   const [filterType, setFilterType] = useState<'all' | 'supply' | 'demand'>('all');
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newType, setNewType] = useState<'supply' | 'demand'>('demand');
-  const [newDistrict, setNewDistrict] = useState<KelantanDistrict>('Kota Bharu');
+  const [newDistrict, setNewDistrict] = useState<KelantanDistrict>(
+    (userProfile?.district as KelantanDistrict) || 'Kota Bharu'
+  );
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const prodAuth = isProductionAuthenticated();
+    let prodItems: B2BListing[] = [];
+    let demoSyncItems: B2BListing[] = [];
+    let demoDeletedIds: string[] = [];
+
+    const recompute = () => {
+      let localItems: B2BListing[] = [];
+      try {
+        const saved = localStorage.getItem('kbelia_b2b_listings');
+        if (saved) localItems = JSON.parse(saved);
+      } catch {
+        // ignore
+      }
+      const merged = mergeUniqueById<B2BListing>(
+        [prodItems, demoSyncItems, localItems, DEFAULT_B2B],
+        demoDeletedIds
+      );
+      setListings(merged);
+    };
+
+    recompute();
+    const unsubCrossTab = subscribeCrossTabSync((entity) => {
+      if (entity === 'all' || entity === 'b2b') recompute();
+    });
+
+    let unsubProd = () => {};
+    let unsubDemo = () => {};
+    if (prodAuth) {
+      unsubProd = onSnapshot(
+        collection(db, 'b2b_listings'),
+        (snap) => {
+          prodItems = snap.docs.map(d => ({ id: d.id, ...d.data() } as B2BListing));
+          recompute();
+        },
+        () => {}
+      );
+    } else {
+      unsubDemo = subscribeDemoSyncCollection<B2BListing>('b2b', (items, delIds) => {
+        demoSyncItems = items;
+        demoDeletedIds = delIds;
+        recompute();
+      });
+    }
+
+    return () => {
+      unsubCrossTab();
+      unsubProd();
+      unsubDemo();
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleAddListing = (e: React.FormEvent) => {
+  const handleAddListing = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newTitle.trim() || !newDesc.trim()) return;
+
+    const cleanContact = (userProfile?.phone || '').replace(/[^0-9]/g, '');
+    const formattedWhatsapp = cleanContact
+      ? (cleanContact.startsWith('6') ? cleanContact : `6${cleanContact}`)
+      : '';
+
     const item: B2BListing = {
-      id: Date.now().toString(),
-      authorName: language === 'en' ? 'Your Business' : 'Usahawan Anda',
-      authorBusiness: language === 'en' ? 'Youth Business Kiosk' : 'Kiosk Niaga Belia',
+      id: `b2b-${Date.now()}`,
+      ownerId: user?.uid || 'guest',
+      authorName: userProfile?.fullName || user?.displayName || (language === 'en' ? 'Youth Entrepreneur' : 'Usahawan Belia'),
+      authorBusiness: userProfile?.businessName || (language === 'en' ? 'Youth Business Kiosk' : 'Perniagaan Belia KBelia'),
       district: newDistrict,
       type: newType,
-      title: newTitle,
-      description: newDesc,
-      whatsapp: '60111234567',
+      title: newTitle.trim(),
+      description: newDesc.trim(),
+      whatsapp: formattedWhatsapp,
       date: language === 'en' ? 'Just now' : 'Baru sahaja'
     };
-    setListings([item, ...listings]);
-    setIsAdding(false);
-    setNewTitle('');
-    setNewDesc('');
+
+    try {
+      setSaving(true);
+      const saved = await saveB2BListingRecord(item);
+      setListings(prev => [saved, ...prev.filter(x => x.id !== saved.id)]);
+      setIsAdding(false);
+      setNewTitle('');
+      setNewDesc('');
+      showToast(language === 'en' ? 'B2B listing published!' : 'Siaran padanan B2B berjaya diterbitkan!', 'success');
+    } catch {
+      try {
+        const existing: B2BListing[] = JSON.parse(localStorage.getItem('kbelia_b2b_listings') || '[]');
+        localStorage.setItem('kbelia_b2b_listings', JSON.stringify([item, ...existing.filter(x => x.id !== item.id)]));
+        setListings(prev => [item, ...prev.filter(x => x.id !== item.id)]);
+        setIsAdding(false);
+        setNewTitle('');
+        setNewDesc('');
+        showToast(language === 'en' ? 'B2B listing saved locally.' : 'Siaran padanan B2B berjaya disimpan.', 'success');
+      } catch {
+        showToast(language === 'en' ? 'Failed to save listing.' : 'Gagal menyimpan siaran B2B.', 'error');
+      }
+    } finally {
+      setSaving(false);
+    }
   };
 
   const filtered = listings.filter(l => filterType === 'all' || l.type === filterType);
@@ -240,9 +327,10 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
               </button>
               <button
                 type="submit"
-                className="px-4 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold cursor-pointer transition-colors"
+                disabled={saving}
+                className="px-4 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold cursor-pointer transition-colors"
               >
-                {language === 'en' ? 'Publish Listing' : 'Hantar Siaran'}
+                {saving ? (language === 'en' ? 'Publishing...' : 'Menghantar...') : (language === 'en' ? 'Publish Listing' : 'Hantar Siaran')}
               </button>
             </div>
           </form>
@@ -285,13 +373,24 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
                 </span>
 
                 <a
-                  href={`https://wa.me/${item.whatsapp}?text=${encodeURIComponent(
+                  href={item.whatsapp ? `https://wa.me/${item.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
                     language === 'en'
                       ? `Hi ${item.authorName}, I saw your Ruang Niaga matchmaking post "${item.title}" on the Kelantan Youth Business Portal.`
                       : `Salam ${item.authorName}, saya melihat siaran padanan Ruang Niaga anda "${item.title}" di Portal Niaga Belia Kelantan.`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  )}` : '#'}
+                  target={item.whatsapp ? '_blank' : undefined}
+                  rel={item.whatsapp ? 'noopener noreferrer' : undefined}
+                  onClick={(e) => {
+                    if (!item.whatsapp || !item.whatsapp.replace(/[^0-9]/g, '')) {
+                      e.preventDefault();
+                      showToast(
+                        language === 'en'
+                          ? 'No WhatsApp phone number listed for this entrepreneur.'
+                          : 'Tiada nombor WhatsApp didaftarkan bagi siaran ini.',
+                        'warning'
+                      );
+                    }
+                  }}
                   className="py-1.5 px-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />

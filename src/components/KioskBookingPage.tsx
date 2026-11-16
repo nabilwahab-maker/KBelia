@@ -90,7 +90,14 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
   const { language } = useLanguage();
   const isEn = language === 'en';
 
-  const safeAllSlots = slots || [];
+  const safeAllSlots = useMemo(() => slots || [], [slots]);
+  const availableSlots = useMemo(
+    () =>
+      safeAllSlots.filter((s) =>
+        Boolean(s && s.status === 'available' && !s.currentTenantBusinessName)
+      ),
+    [safeAllSlots]
+  );
   const subsidyRate = portalSettings?.portalSubsidyRate ?? 50;
   const maxLeaseDuration = portalSettings?.maxLeaseDurationMonths ?? 12;
   const isMaintenanceMode = portalSettings?.systemStatus === 'maintenance';
@@ -122,9 +129,13 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
 
   // Form states for inline dedicated booking page
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [selectedSlotId, setSelectedSlotId] = useState<string>(
-    preselectedSlot?.id || (safeAllSlots[0]?.id || '')
-  );
+  const [selectedSlotId, setSelectedSlotId] = useState<string>(() => {
+    const isFree = (s?: CapsuleSlot | null) =>
+      Boolean(s && s.status === 'available' && !s.currentTenantBusinessName);
+    if (preselectedSlot && isFree(preselectedSlot)) return preselectedSlot.id;
+    const firstAvailable = (slots || []).find((s) => isFree(s));
+    return firstAvailable?.id || '';
+  });
   const [businessName, setBusinessName] = useState(userProfile?.businessName || '');
   const [businessCategory, setBusinessCategory] = useState<BusinessCategory>(
     userProfile?.category || 'Makanan & Minuman (F&B)'
@@ -186,25 +197,33 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     }
   }, [view, businessName, businessCategory, phone, icNumber, pitchNotes, selectedSlotId]);
 
-  // Sync preselectedSlot
+  // Sync preselectedSlot when explicitly selected from browse view
   useEffect(() => {
-    const isSlotFree = (s?: CapsuleSlot | null) =>
-      Boolean(s && s.status === 'available' && !s.currentTenantBusinessName);
-
-    if (preselectedSlot && isSlotFree(preselectedSlot)) {
-      setSelectedSlotId(preselectedSlot.id);
-    } else if (safeAllSlots.length > 0) {
-      const current = safeAllSlots.find((s) => s.id === selectedSlotId);
-      if (!isSlotFree(current)) {
-        const firstAvailable = safeAllSlots.find((s) => isSlotFree(s));
-        if (firstAvailable) setSelectedSlotId(firstAvailable.id);
-        else if (safeAllSlots[0]) setSelectedSlotId(safeAllSlots[0].id);
+    if (
+      preselectedSlot &&
+      preselectedSlot.status === 'available' &&
+      !preselectedSlot.currentTenantBusinessName
+    ) {
+      const matched = availableSlots.find((s) => s.id === preselectedSlot.id);
+      if (matched) {
+        setSelectedSlotId(matched.id);
       }
     }
-  }, [preselectedSlot, safeAllSlots]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preselectedSlot]);
+
+  // Keep selectedSlotId synchronized with currently available slots
+  useEffect(() => {
+    setSelectedSlotId((prev) => {
+      if (prev && availableSlots.some((s) => s.id === prev)) {
+        return prev;
+      }
+      return availableSlots[0]?.id || '';
+    });
+  }, [availableSlots]);
 
   const currentSlot =
-    safeAllSlots.find((s) => s && s.id === selectedSlotId) || preselectedSlot || safeAllSlots[0];
+    availableSlots.find((s) => s.id === selectedSlotId) || availableSlots[0] || null;
   const isCurrentSlotAvailable = Boolean(
     currentSlot && currentSlot.status === 'available' && !currentSlot.currentTenantBusinessName
   );
@@ -663,19 +682,21 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                         Lokasi Kiosk *
                       </label>
                       <select
-                        value={selectedSlotId}
+                        value={availableSlots.length > 0 ? selectedSlotId : ''}
                         onChange={(e) => setSelectedSlotId(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-zinc-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 focus:outline-none transition-all cursor-pointer"
                       >
-                        {safeAllSlots.map((s) => {
-                          const isFree = s.status === 'available' && !s.currentTenantBusinessName;
-                          return (
-                            <option key={s.id} value={s.id} disabled={!isFree}>
-                              {s.code} — {s.name} ({s.hubLocation}, {s.district}){' '}
-                              {isFree ? '· [Tersedia]' : '· [Telah Berdaftar - Penuh]'}
+                        {availableSlots.length > 0 ? (
+                          availableSlots.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.code} — {s.name} ({s.hubLocation}, {s.district}) · [Tersedia]
                             </option>
-                          );
-                        })}
+                          ))
+                        ) : (
+                          <option value="" disabled>
+                            Tiada unit kiosk tersedia buat masa ini
+                          </option>
+                        )}
                       </select>
                     </div>
 

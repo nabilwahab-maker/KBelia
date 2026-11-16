@@ -6,6 +6,7 @@ import {
   Trash2,
   Edit3,
   Printer,
+  Download,
   CheckCircle2,
   Store
 } from 'lucide-react';
@@ -18,6 +19,8 @@ import { isProductionAuthenticated, saveCashflowRecord, deleteCashflowRecord } f
 import { mergeUniqueById, subscribeCrossTabSync, subscribeDemoSyncCollection } from '../services/realtimeSync';
 import { EditCashflowModal } from './EditCashflowModal';
 import { showToast } from './ToastNotification';
+import { openAndPrintDocument, generateCashflowStatementOfficialHtml } from '../utils/printUtils';
+import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 
 interface KioskCashflowModalProps {
   isOpen: boolean;
@@ -26,11 +29,22 @@ interface KioskCashflowModalProps {
   businessName?: string;
 }
 
-const DEMO_DEFAULT_SALES: KioskDailySale[] = [
-  { id: 'demo-cf-1', date: '2026-03-24', cashSales: 180, qrSales: 220, expenses: 90, notes: 'Restok cawan biodegradasi & serbuk kopi', createdAt: '2026-03-24T20:00:00Z' },
-  { id: 'demo-cf-2', date: '2026-03-25', cashSales: 150, qrSales: 280, expenses: 40, notes: 'Jualan waktu petang rancak', createdAt: '2026-03-25T20:00:00Z' },
-  { id: 'demo-cf-3', date: '2026-03-26', cashSales: 210, qrSales: 310, expenses: 110, notes: 'Beli bahan mentah segar & ais', createdAt: '2026-03-26T20:00:00Z' }
-];
+const buildRecentIsoDate = (daysAgo: number): string => {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString().slice(0, 10);
+};
+
+const getDemoDefaultSales = (): KioskDailySale[] => {
+  const d2 = buildRecentIsoDate(2);
+  const d1 = buildRecentIsoDate(1);
+  const d0 = buildRecentIsoDate(0);
+  return [
+    { id: 'demo-cf-1', date: d2, cashSales: 180, qrSales: 220, expenses: 90, notes: 'Restok cawan biodegradasi & serbuk kopi', createdAt: `${d2}T20:00:00Z` },
+    { id: 'demo-cf-2', date: d1, cashSales: 150, qrSales: 280, expenses: 40, notes: 'Jualan waktu petang rancak', createdAt: `${d1}T20:00:00Z` },
+    { id: 'demo-cf-3', date: d0, cashSales: 210, qrSales: 310, expenses: 110, notes: 'Beli bahan mentah segar & ais', createdAt: `${d0}T20:00:00Z` }
+  ];
+};
 
 export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
   isOpen,
@@ -74,8 +88,9 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
         if (saved) {
           localItems = JSON.parse(saved);
         } else if (isDemoSession) {
-          localStorage.setItem(storageKey, JSON.stringify(DEMO_DEFAULT_SALES));
-          localItems = DEMO_DEFAULT_SALES;
+          const demoDefaults = getDemoDefaultSales();
+          localStorage.setItem(storageKey, JSON.stringify(demoDefaults));
+          localItems = demoDefaults;
         }
         const scopedDemoSync = demoSyncItems.filter(r => !r.ownerId || r.ownerId === ownerId);
         setSalesRecords(mergeUniqueById<KioskDailySale>([scopedDemoSync, localItems], demoDeletedIds));
@@ -183,7 +198,44 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
   };
 
   const handlePrint = () => {
-    window.print();
+    const html = generateCashflowStatementOfficialHtml({
+      kioskName,
+      businessName,
+      salesRecords,
+      totals: { totalCash, totalQr, totalRevenue, totalExpenses, netProfit },
+      mode: activeTab
+    });
+    const docTitle = activeTab === 'qr'
+      ? `Standee_QR_${businessName.replace(/\s+/g, '_')}`
+      : `Penyata_Aliran_Tunai_${businessName.replace(/\s+/g, '_')}`;
+    void openAndPrintDocument(html, docTitle);
+  };
+
+  const handleDownloadPdf = async () => {
+    const html = generateCashflowStatementOfficialHtml({
+      kioskName,
+      businessName,
+      salesRecords,
+      totals: { totalCash, totalQr, totalRevenue, totalExpenses, netProfit },
+      mode: activeTab
+    });
+    const fileName = activeTab === 'qr'
+      ? `Standee_QR_${businessName.replace(/\s+/g, '_')}`
+      : `Penyata_Aliran_Tunai_${businessName.replace(/\s+/g, '_')}`;
+    const ok = await downloadHtmlAsPdf(html, fileName);
+    if (ok) {
+      showToast({
+        type: 'success',
+        title: 'PDF Berjaya Dimuat Turun',
+        message: activeTab === 'qr' ? 'Paparan QR DuitNow berjaya disimpan sebagai PDF.' : 'Penyata aliran tunai berjaya disimpan sebagai PDF.'
+      });
+    } else {
+      showToast({
+        type: 'error',
+        title: 'Gagal Menjana PDF',
+        message: 'Sila cuba butang Cetak untuk simpan melalui pelayar.'
+      });
+    }
   };
 
   return (
@@ -384,13 +436,22 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                   <h4 className="text-sm font-bold text-black dark:text-white">
                     Sejarah Transaksi Jualan ({salesRecords.length} Hari Direkod)
                   </h4>
-                  <button
-                    type="button"
-                    onClick={handlePrint}
-                    className="text-sm text-black dark:text-white/75 font-bold hover:underline flex items-center gap-1 cursor-pointer print:hidden"
-                  >
-                    <Printer className="w-3.5 h-3.5" /> Cetak Rekod
-                  </button>
+                  <div className="flex items-center gap-3 print:hidden">
+                    <button
+                      type="button"
+                      onClick={handlePrint}
+                      className="text-sm text-black dark:text-white/75 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Printer className="w-3.5 h-3.5" /> Cetak Rekod
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleDownloadPdf()}
+                      className="text-sm text-emerald-700 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Muat Turun PDF
+                    </button>
+                  </div>
                 </div>
 
                 {salesRecords.length === 0 ? (
@@ -479,7 +540,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                 <div>
                   <div className="font-extrabold text-sm text-black uppercase">{businessName}</div>
                   <div className="text-[0.8125rem] font-mono text-black font-semibold">{kioskName}</div>
-                  <div className="text-[0.8125rem] text-black/70 mt-1">Imbas menggunakan mana-mana aplikasi perbankan atau e-dompet (Touch &apos;n Go, GrabPay, MAE, CIMB).</div> </div> </div> <div className="flex items-center justify-center gap-3 print:hidden"> <button type="button" onClick={handlePrint} className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer dark:bg-blue-600" > <Printer className="w-4 h-4" /> <span>Cetak QR</span> </button> </div> </div> )} </div> {/* Footer */} <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0 print:hidden"> <div className="text-[0.8125rem] text-black/70 dark:text-white/75"> {isDemoSession ? 'Mod Demo: Rekod diasingkan daripada pangkalan data pengeluaran.'
+                  <div className="text-[0.8125rem] text-black/70 mt-1">Imbas menggunakan mana-mana aplikasi perbankan atau e-dompet (Touch &apos;n Go, GrabPay, MAE, CIMB).</div> </div> </div> <div className="flex flex-wrap items-center justify-center gap-3 print:hidden"> <button type="button" onClick={handlePrint} className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer dark:bg-blue-600" > <Printer className="w-4 h-4" /> <span>Cetak QR</span> </button> <button type="button" onClick={() => void handleDownloadPdf()} className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer" > <Download className="w-4 h-4" /> <span>Muat Turun PDF</span> </button> </div> </div> )} </div> {/* Footer */} <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0 print:hidden"> <div className="text-[0.8125rem] text-black/70 dark:text-white/75"> {isDemoSession ? 'Mod Demo: Rekod diasingkan daripada pangkalan data pengeluaran.'
               : 'Rekod disegerakkan dengan akaun usahawan anda.'}
           </div>
           <button

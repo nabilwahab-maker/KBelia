@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Store, 
@@ -19,6 +19,8 @@ import {
   Info
 } from 'lucide-react';
 import { CapsuleSlot, BusinessListing, ProductItem } from '../types';
+import { useAuth } from '../context/AuthContext';
+import { loadLocalPortalSettings } from '../services/dataService';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveSlotImage } from '../utils/visualAssets';
@@ -40,29 +42,48 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
   products = [],
   onSelectBusiness
 }) => {
+  const { user } = useAuth();
+  const alertStorageKey = `kbelia_slot_interest_alerts_${user?.uid || 'guest'}`;
   const [interestSaved, setInterestSaved] = useState(false);
+  const subsidyRate = loadLocalPortalSettings().portalSubsidyRate ?? 50;
+
+  useEffect(() => {
+    if (!isOpen || !slot) return;
+    try {
+      const saved: string[] = JSON.parse(localStorage.getItem(alertStorageKey) || '[]');
+      setInterestSaved(saved.includes(slot.id) || saved.includes(slot.code));
+    } catch {
+      setInterestSaved(false);
+    }
+  }, [isOpen, slot?.id, slot?.code, alertStorageKey]);
 
   if (!isOpen || !slot) return null;
 
   // Find matching business profile for the current tenant
   const tenantBusiness = businesses.find(b => 
     (slot.currentTenantBusinessName && b.businessName?.toLowerCase().trim() === slot.currentTenantBusinessName.toLowerCase().trim()) ||
-    (slot.currentTenantId && (b.id === slot.currentTenantId || b.ownerId === slot.currentTenantId)) ||
-    (slot.district === b.district && b.businessName?.toLowerCase().includes('jeli'))
+    (slot.currentTenantId && (b.id === slot.currentTenantId || b.ownerId === slot.currentTenantId))
   ) || null;
 
-  const tenantProducts = products.filter(p => tenantBusiness && p.businessId === tenantBusiness.id);
-
-  const tenantName = tenantBusiness?.ownerName || 'Ahmad Faizul / Usahawan Belia Kelantan';
+  const tenantName = tenantBusiness?.ownerName || 'Penyewa Berdaftar';
   const businessName = slot.currentTenantBusinessName || tenantBusiness?.businessName || 'Perniagaan Belia Berdaftar';
-  const tenantPhone = tenantBusiness?.whatsapp || tenantBusiness?.ownerPhone || '+60123344556';
+  const tenantPhone = tenantBusiness?.whatsapp || tenantBusiness?.ownerPhone || '';
   const cleanPhone = tenantPhone.replace(/[^0-9]/g, '');
 
-  const whatsappHref = `https://wa.me/${cleanPhone || '60123344556'}?text=${encodeURIComponent(
-    `Assalamualaikum/Hai ${businessName}, saya melihat premis kiosk anda di ${slot.name} (${slot.code}) melalui Portal KBelia Kelantan dan berminat untuk membuat pertanyaan mengenai produk / perkhidmatan anda.`
-  )}`;
+  const whatsappHref = cleanPhone
+    ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+        `Assalamualaikum/Hai ${businessName}, saya melihat premis kiosk anda di ${slot.name} (${slot.code}) melalui Portal KBelia Kelantan dan berminat untuk membuat pertanyaan mengenai produk / perkhidmatan anda.`
+      )}`
+    : '#';
 
   const handleSaveInterest = () => {
+    try {
+      const saved: string[] = JSON.parse(localStorage.getItem(alertStorageKey) || '[]');
+      const next = Array.from(new Set([...saved, slot.id, slot.code]));
+      localStorage.setItem(alertStorageKey, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
     setInterestSaved(true);
     showToast({
       title: 'Minat Berjaya Direkodkan',
@@ -221,13 +242,13 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
               <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1">
                 <span className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold">Kategori Perniagaan:</span>
                 <div className="font-bold text-black dark:text-white">{tenantBusiness?.category || 'Makanan & Minuman / Agrotek'}</div>
-                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono">SSM: {tenantBusiness?.ssmNumber || '202403112233 (KT0099881-X)'}</div>
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono">SSM: {tenantBusiness?.ssmNumber || 'Berdaftar / Dalam Pengesahan'}</div>
               </div>
 
               <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1">
                 <span className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold">Perjanjian Sewaan:</span>
                 <div className="font-bold text-black dark:text-white">Tempoh Kontrak 12 Bulan</div>
-                <div className="text-[0.8125rem] text-black dark:text-white/75 font-semibold">Menerima Subsidi Sewa 50% Negeri</div>
+                <div className="text-[0.8125rem] text-black dark:text-white/75 font-semibold">Menerima Subsidi Sewa {subsidyRate}% Negeri</div>
               </div>
 
               <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1">
@@ -252,8 +273,18 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <a
                 href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
+                target={cleanPhone ? '_blank' : undefined}
+                rel={cleanPhone ? 'noopener noreferrer' : undefined}
+                onClick={(e) => {
+                  if (!cleanPhone) {
+                    e.preventDefault();
+                    showToast({
+                      title: 'Nombor WhatsApp Tiada',
+                      message: 'Penyewa ini belum melengkapkan nombor telefon WhatsApp pada profil direktori.',
+                      type: 'warning'
+                    });
+                  }
+                }}
                 className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
               >
                 <MessageCircle className="w-4 h-4" />

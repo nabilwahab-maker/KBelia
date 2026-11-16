@@ -1,12 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Calendar, 
   X, 
   MapPin, 
-  Clock, 
-  ExternalLink, 
-  Sparkles,
-  Users
+  Check
 } from 'lucide-react';
 import { showToast } from './ToastNotification';
 
@@ -17,9 +14,9 @@ interface YouthEventsCalendarModalProps {
 
 const EVENTS = [
   {
-    id: '1',
-    title: 'Karnival Keusahawanan Belia Mega Kelantan 2026',
-    date: '10 - 12 April 2026',
+    id: 'cal-1',
+    title: 'Karnival Keusahawanan Belia Mega Kelantan',
+    date: '18 - 20 Disember 2026',
     time: '9:00 AM - 11:00 PM',
     venue: 'Dataran Stadium Sultan Muhammad IV, Kota Bharu',
     organizer: 'Kerajaan Negeri Kelantan & Universiti Malaysia Kelantan',
@@ -27,9 +24,9 @@ const EVENTS = [
     registrationStatus: 'Buka untuk Peniaga Kiosk'
   },
   {
-    id: '2',
+    id: 'cal-2',
     title: 'Festival Seni Batik, Kraf & Songket Tradisi Pantai Timur',
-    date: '24 - 26 April 2026',
+    date: '15 - 17 Januari 2027',
     time: '10:00 AM - 10:00 PM',
     venue: 'Pusat Kraftangan Pantai Cahaya Bulan (PCB), Kota Bharu',
     organizer: 'Perbadanan Kemajuan Iktisad Negeri Kelantan (PKINK)',
@@ -37,9 +34,9 @@ const EVENTS = [
     registrationStatus: 'Tinggal 8 Tapak'
   },
   {
-    id: '3',
+    id: 'cal-3',
     title: 'Ekspo Agropreneur Belia Gua Musang & Jeli',
-    date: '8 - 9 Mei 2026',
+    date: '12 - 13 Februari 2027',
     time: '8:30 AM - 6:00 PM',
     venue: 'Dewan Sivik Gua Musang',
     organizer: 'Fakulti Agro Sains UMK Jeli & KESEDAR',
@@ -52,7 +49,52 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
   isOpen,
   onClose
 }) => {
+  const [bookedEvents, setBookedEvents] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('kbelia_booked_events');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const syncBooked = () => {
+      try {
+        const saved = localStorage.getItem('kbelia_booked_events');
+        setBookedEvents(saved ? JSON.parse(saved) : []);
+      } catch {
+        // ignore
+      }
+    };
+    syncBooked();
+    window.addEventListener('kbelia_booked_events_updated', syncBooked);
+    return () => window.removeEventListener('kbelia_booked_events_updated', syncBooked);
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const toggleEventBooking = (eventId: string, eventTitle: string) => {
+    const isBooked = bookedEvents.includes(eventId);
+    const updated = isBooked
+      ? bookedEvents.filter(id => id !== eventId)
+      : [...bookedEvents, eventId];
+    setBookedEvents(updated);
+    try {
+      localStorage.setItem('kbelia_booked_events', JSON.stringify(updated));
+      window.dispatchEvent(new Event('kbelia_booked_events_updated'));
+    } catch {
+      // ignore
+    }
+    showToast({
+      type: isBooked ? 'info' : 'success',
+      title: isBooked ? 'Permohonan Tapak Dibatalkan' : 'Permohonan Tapak Direkodkan',
+      message: isBooked
+        ? `Penyertaan tapak bagi ${eventTitle} telah dibatalkan.`
+        : `Pendaftaran tapak bagi ${eventTitle} berjaya direkodkan.`
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
@@ -85,54 +127,58 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
         </div>
 
         <div className="p-6 sm:p-8 pt-5 overflow-y-auto flex-1 flex flex-col gap-4">
-          {EVENTS.map((event) => (
-            <div
-              key={event.id}
-              className="p-4 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-500 transition-all flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70">
-                    {event.date}
-                  </span>
-                  <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
-                    {event.registrationStatus}
-                  </span>
+          {EVENTS.map((event) => {
+            const isBooked = bookedEvents.includes(event.id);
+            return (
+              <div
+                key={event.id}
+                className="p-4 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-500 transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70">
+                      {event.date}
+                    </span>
+                    <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
+                      {isBooked ? 'Berdaftar' : event.registrationStatus}
+                    </span>
+                  </div>
+
+                  <h4 className="text-sm font-bold text-black dark:text-white mb-1">
+                    {event.title}
+                  </h4>
+                  <p className="text-[0.875rem] text-black/70 dark:text-white/75 flex items-center gap-1 mb-2">
+                    <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                    {event.venue}
+                  </p>
+
+                  <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed mb-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
+                    <span className="font-semibold block text-black dark:text-white mb-0.5">Pengisian Utama:</span>
+                    {event.highlights}
+                  </p>
                 </div>
 
-                <h4 className="text-sm font-bold text-black dark:text-white mb-1">
-                  {event.title}
-                </h4>
-                <p className="text-[0.875rem] text-black/70 dark:text-white/75 flex items-center gap-1 mb-2">
-                  <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                  {event.venue}
-                </p>
+                <div className="pt-2 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm gap-3">
+                  <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
+                    Anjuran: {event.organizer}
+                  </span>
 
-                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed mb-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
-                  <span className="font-semibold block text-black dark:text-white mb-0.5">Pengisian Utama:</span>
-                  {event.highlights}
-                </p>
+                  <button
+                    type="button"
+                    onClick={() => toggleEventBooking(event.id, event.title)}
+                    className={`py-1.5 px-3 rounded-lg font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                      isBooked
+                        ? 'bg-emerald-50 text-black border border-emerald-300 dark:bg-emerald-950/50 dark:text-white dark:border-emerald-700'
+                        : 'text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600'
+                    }`}
+                  >
+                    {isBooked && <Check className="w-3.5 h-3.5" />}
+                    <span>{isBooked ? 'Ditempah (Batal)' : 'Mohon Tapak'}</span>
+                  </button>
+                </div>
               </div>
-
-              <div className="pt-2 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm gap-3">
-                <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
-                  Anjuran: {event.organizer}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => showToast({
-                    type: 'info',
-                    title: 'Permohonan Tapak Ekspo',
-                    message: `Pendaftaran tapak bagi ${event.title} dibuka melalui urus setia UMK.`
-                  })}
-                  className="py-1.5 px-3 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer shrink-0 dark:bg-blue-600"
-                >
-                  Mohon Tapak
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

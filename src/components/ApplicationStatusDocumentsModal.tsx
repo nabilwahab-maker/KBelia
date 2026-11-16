@@ -21,7 +21,15 @@ import {
 } from 'lucide-react';
 import { CapsuleBooking, GrantApplication, MentorshipRegistration } from '../types';
 import { showToast } from './ToastNotification';
-import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
+import {
+  formatDisplayDate,
+  calculateOperationEndDate,
+  openAndPrintDocument,
+  generateOfferLetterOfficialHtml,
+  generateTenancyAgreementOfficialHtml
+} from '../utils/printUtils';
+import { downloadOfferLetterPdf, downloadHtmlAsPdf } from '../utils/pdfGenerator';
+import { loadLocalPortalSettings } from '../services/dataService';
 
 interface ApplicationStatusDocumentsModalProps {
   isOpen: boolean;
@@ -55,16 +63,51 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
   // Reference codes derived strictly from active user booking
   const slotCode = userBooking?.slotCode || '';
-  const bookingRef = userBooking ? `KBN-${slotCode.replace('CAP-', '')}-${new Date(userBooking.createdAt || Date.now()).getFullYear()}-8819` : '';
+  const bookingYear = new Date(userBooking?.createdAt || Date.now()).getFullYear();
+  const currentYear = new Date().getFullYear();
+  const bookingRef = userBooking ? `KBN-${slotCode.replace('CAP-', '')}-${bookingYear}-8819` : '';
+  const tenancyRef = userBooking ? `AGR-${slotCode}-${bookingYear}` : '';
   const applicantName = userBooking?.applicantName || '';
   const businessName = userBooking?.businessName || '';
   const hubLocation = userBooking?.hubLocation || '';
+  const subsidyRate = Number(loadLocalPortalSettings().portalSubsidyRate ?? 50);
   const monthlyRate = userBooking?.monthlyRate || 150;
+  const marketRate =
+    subsidyRate > 0 && subsidyRate < 100
+      ? Math.round(monthlyRate / (1 - subsidyRate / 100))
+      : monthlyRate * 2;
+  const formattedIssueDate = userBooking
+    ? new Date(userBooking.createdAt || Date.now()).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
   const userGrant = grantApplications.find(g => g.status !== 'cancelled') || null;
   const userMentorship = mentorshipRegistrations[0] || null;
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async (docType: 'offerLetter' | 'tenancy' = activeTab === 'tenancy' ? 'tenancy' : 'offerLetter') => {
+    if (!userBooking) return;
+    try {
+      const html =
+        docType === 'tenancy'
+          ? generateTenancyAgreementOfficialHtml(userBooking, tenancyRef, formattedIssueDate, subsidyRate)
+          : generateOfferLetterOfficialHtml(userBooking, bookingRef, formattedIssueDate, subsidyRate);
+      await openAndPrintDocument(
+        html,
+        docType === 'tenancy'
+          ? `Perjanjian_Sewa_Kiosk_${slotCode}`
+          : `Surat_Tawaran_Kiosk_${slotCode}`
+      );
+    } catch {
+      showToast({ type: 'error', title: 'Ralat Cetakan', message: 'Gagal membuka pratonton cetakan rasmi.' });
+    }
+  };
+
+  const handleDownloadPdf = async (docType: 'offerLetter' | 'tenancy') => {
+    if (!userBooking) return;
+    if (docType === 'tenancy') {
+      const html = generateTenancyAgreementOfficialHtml(userBooking, tenancyRef, formattedIssueDate, subsidyRate);
+      await downloadHtmlAsPdf(html, `Perjanjian_Sewa_Kiosk_${slotCode}_${tenancyRef}.pdf`);
+    } else {
+      await downloadOfferLetterPdf(userBooking, bookingRef, formattedIssueDate, `Surat_Tawaran_Kiosk_${slotCode}_${bookingRef}.pdf`, subsidyRate);
+    }
   };
 
   return (
@@ -282,7 +325,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     <span>{userGrant.adminNotes || 'Permohonan geran telah direkodkan oleh Pentadbir KBelia.'}</span>
                     <button
                       type="button"
-                      onClick={onOpenGrantModal}
+                      onClick={() => { onClose(); onOpenGrantModal(); }}
                       className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer shrink-0 ml-2"
                     >
                       Mohon Geran
@@ -371,7 +414,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
                       <button
                         type="button"
-                        onClick={onOpenMentorship}
+                        onClick={() => { onClose(); onOpenMentorship(); }}
                         className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
                       >
                         Pilih Mentor
@@ -461,18 +504,28 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             ) : (
             <div className="space-y-4 animate-in fade-in duration-200">
               
-              <div className="flex items-center justify-between pb-2 border-b border-slate-300 dark:border-slate-600">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-300 dark:border-slate-600">
                 <span className="text-sm text-black dark:text-white/75">
                   Surat tawaran rasmi boleh dicetak atau disimpan sebagai rujukan pihak berkuasa tempatan (PBT).
                 </span>
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="px-3.5 py-1.5 rounded-xl text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer dark:bg-indigo-600"
-                >
-                  <Printer className="w-3.5 h-3.5" />
-                  <span>Cetak Dokumen</span>
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadPdf('offerLetter')}
+                    className="px-3 py-1.5 rounded-xl text-sm font-bold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Muat Turun PDF</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handlePrint('offerLetter')}
+                    className="px-3.5 py-1.5 rounded-xl text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer dark:bg-indigo-600"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Cetak Dokumen</span>
+                  </button>
+                </div>
               </div>
 
               {/* Printable Official Document Container (Crisp White for Print) */}
@@ -531,7 +584,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </div>
                     <div className="flex justify-between">
                       <span className="text-black">Kadar Sewaan Bersubsidi:</span>
-                      <span className="font-bold text-black tabular-nums">RM{monthlyRate.toFixed(2)} / Sebulan (Kadar Asal Pasaran: RM{monthlyRate * 2})</span>
+                      <span className="font-bold text-black tabular-nums">RM{monthlyRate.toFixed(2)} / Sebulan (Kadar Asal Pasaran: RM{marketRate})</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-black">Tarikh Mula Operasi:</span>
@@ -555,7 +608,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 {/* Sign-off & Digital Stamp */}
                 <div className="pt-4 border-t border-slate-300 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                   <div>
-                    <div className="text-sm font-bold text-black">Prof. Madya Dr. Wan Azhar</div>
+                    <div className="text-sm font-bold text-black">Pentadbiran Hab Kapsul Niaga Belia / UMK CEED</div>
                     <div className="text-[0.8125rem] text-black">Penyelaras Keusahawanan UMK &amp; Urusetia KBelia Kelantan</div>
                     <div className="text-[0.8125rem] text-black/70 mt-1">Dokumen ditandatangani secara digital mengikut Akta Tandatangan Digital 1997.</div>
                   </div>
@@ -628,17 +681,26 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-[0.8125rem]">
+                <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-2 text-[0.8125rem]">
                   <span className="text-black dark:text-white/75 font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-4 h-4" /> {userBooking.tenancySigned ? 'Perjanjian Disahkan Secara Digital' : 'Sedia Untuk Tandatangan Digital'}
                   </span>
-                  <button
-                    type="button"
-                    onClick={handlePrint}
-                    className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
-                  >
-                    Cetak Salinan &rarr;
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadPdf('tenancy')}
+                      className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
+                    >
+                      Muat Turun PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handlePrint('tenancy')}
+                      className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
+                    >
+                      Cetak Salinan &rarr;
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -660,7 +722,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
               <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 max-w-sm mx-auto font-mono text-[0.8125rem]">
                 <div className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-bold">Kod Hash Rujukan:</div>
-                <div className="font-bold text-black dark:text-white/75 text-sm mt-0.5">{bookingRef || 'REG-2026-BELIA'}</div>
+                <div className="font-bold text-black dark:text-white/75 text-sm mt-0.5">{bookingRef || `REG-${currentYear}-BELIA`}</div>
                 <div className="text-[0.8125rem] text-black dark:text-white/75 mt-1 flex items-center justify-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5" /> SEMAKAN DALAM PANGKALAN DATA NEGERI
                 </div>
@@ -671,7 +733,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   type="button"
                   onClick={() => {
                     onClose();
-                    onOpenVerification(bookingRef || 'REG-2026-BELIA');
+                    onOpenVerification(bookingRef || `REG-${currentYear}-BELIA`);
                   }}
                   className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors cursor-pointer dark:bg-indigo-600"
                 >

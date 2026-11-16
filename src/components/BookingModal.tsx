@@ -89,7 +89,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [hasDraftRestored, setHasDraftRestored] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  // Restore draft if available and reset submission on new open
+  // Restore draft if available (or hydrate from profile) and reset submission on new open
   useEffect(() => {
     if (isOpen) {
       setSubmitted(false);
@@ -104,10 +104,19 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         if (draft.data.phone) setPhone(draft.data.phone);
         if (draft.data.icNumber) setIcNumber(draft.data.icNumber);
         if (draft.data.pitchNotes) setPitchNotes(draft.data.pitchNotes);
+        if (draft.data.selectedSlotId) setSelectedSlotId(draft.data.selectedSlotId);
+        setHasDraftRestored(true);
+      } else if (!draft && !hasDraftRestored && userProfile) {
+        if (!businessName && userProfile.businessName) setBusinessName(userProfile.businessName);
+        if (userProfile.category) setBusinessCategory(userProfile.category);
+        if (!phone && userProfile.phone) setPhone(userProfile.phone);
+        if (!icNumber && userProfile.icNumber) setIcNumber(userProfile.icNumber);
         setHasDraftRestored(true);
       }
+    } else {
+      setHasDraftRestored(false);
     }
-  }, [isOpen, hasDraftRestored]);
+  }, [isOpen, hasDraftRestored, userProfile]);
 
   // Auto-save form draft on change
   useEffect(() => {

@@ -30,6 +30,7 @@ import {
   ShieldCheck,
   XCircle,
   Printer,
+  Download,
   Copy,
   Plus,
   ArrowRight,
@@ -46,16 +47,24 @@ import {
   MentorSubTab, 
   GrantEndorsementLetter, 
   MentoringLogEntry,
-  BusinessListing
+  BusinessListing,
+  PublishedMentorSlot
 } from '../types';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
-import { isProductionAuthenticated, saveGrantEndorsementRecord, saveMentoringLogRecord } from '../services/dataService';
+import {
+  isProductionAuthenticated,
+  saveGrantEndorsementRecord,
+  saveMentoringLogRecord,
+  saveMentorProfileRecord
+} from '../services/dataService';
 import {
   mergeUniqueById,
   subscribeCrossTabSync,
   subscribeDemoSyncCollection
 } from '../services/realtimeSync';
+import { openAndPrintDocument, generateMentorEndorsementOfficialHtml } from '../utils/printUtils';
+import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
@@ -571,7 +580,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
            r.businessName.toLowerCase() === newEndorsementBusinessName.trim().toLowerCase()
     );
 
-    const uniqueCode = `PERAKUAN-UMK-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const currentYear = new Date().getFullYear();
+    const uniqueCode = `PERAKUAN-UMK-${currentYear}-${Math.floor(1000 + Math.random() * 9000)}`;
     const programTitle = newEndorsementGrantType === 'RM3,000' 
       ? 'Geran Permulaan Usahawan Belia Kelantan (RM3,000)'
       : newEndorsementGrantType === 'RM5,000'
@@ -632,13 +642,19 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       return;
     }
 
+    const plusDaysIso = (offsetDays: number) => {
+      const dt = new Date();
+      dt.setDate(dt.getDate() + offsetDays);
+      return dt.toISOString().split('T')[0];
+    };
+
     const actions = [];
     if (newLogTask1.trim()) {
       actions.push({
         id: `act-${Date.now()}-1`,
         task: newLogTask1.trim(),
         completed: false,
-        dueDate: newLogDueDate1 || '2026-04-30'
+        dueDate: newLogDueDate1 || plusDaysIso(7)
       });
     }
     if (newLogTask2.trim()) {
@@ -646,7 +662,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         id: `act-${Date.now()}-2`,
         task: newLogTask2.trim(),
         completed: false,
-        dueDate: newLogDueDate2 || '2026-05-15'
+        dueDate: newLogDueDate2 || plusDaysIso(14)
       });
     }
 
@@ -2612,11 +2628,30 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    const html = generateMentorEndorsementOfficialHtml(selectedEndorsementForView);
+                    void openAndPrintDocument(html, `Perakuan_Geran_${selectedEndorsementForView.endorsementCode}`);
+                  }}
                   className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-black border border-slate-300 hover:border-blue-400/70 text-sm font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  <span>Cetak / PDF</span>
+                  <span>Cetak Rasmi</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const html = generateMentorEndorsementOfficialHtml(selectedEndorsementForView);
+                    const ok = await downloadHtmlAsPdf(html, `Perakuan_Geran_${selectedEndorsementForView.endorsementCode}`);
+                    if (ok) {
+                      triggerToast('Surat perakuan rasmi berjaya dimuat turun sebagai PDF.', 'success');
+                    } else {
+                      triggerToast('Gagal menjana PDF surat perakuan.', 'error');
+                    }
+                  }}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Muat Turun PDF</span>
                 </button>
                 <button
                   type="button"
@@ -3060,8 +3095,48 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <button
                   type="button"
                   onClick={() => {
+                    if (!newSlotDate.trim() || !newSlotTime.trim()) {
+                      triggerToast('Sila masukkan tarikh dan masa sesi bimbingan.', 'warning');
+                      return;
+                    }
+                    const newSlot: PublishedMentorSlot = {
+                      id: `slot-${Date.now()}`,
+                      date: newSlotDate.trim(),
+                      time: newSlotTime.trim(),
+                      mode: newSlotMode,
+                      createdAt: new Date().toISOString()
+                    };
+                    const slotStorageKey = `kbelia_mentor_published_slots_${currentMentor.id}`;
+                    let existingLocal: PublishedMentorSlot[] = [];
+                    try {
+                      const raw = localStorage.getItem(slotStorageKey);
+                      if (raw) existingLocal = JSON.parse(raw);
+                    } catch {
+                      // ignore
+                    }
+                    const mergedSlots = [
+                      newSlot,
+                      ...(currentMentor.publishedSlots || []),
+                      ...existingLocal
+                    ].filter((slot, idx, arr) =>
+                      arr.findIndex(s => s.date === slot.date && s.time === slot.time) === idx
+                    ).slice(0, 50);
+
+                    try {
+                      localStorage.setItem(slotStorageKey, JSON.stringify(mergedSlots));
+                    } catch {
+                      // ignore
+                    }
+
+                    const updatedMentor: MentorProfile = {
+                      ...currentMentor,
+                      publishedSlots: mergedSlots
+                    };
+                    void saveMentorProfileRecord(updatedMentor).catch(console.error);
+                    onUpdateMentor?.(updatedMentor);
+                    setNewSlotDate('');
                     setIsNewSlotModalOpen(false);
-                    showToast('Slot bimbingan baharu berjaya diterbitkan untuk usahawan belia!');
+                    showToast(`Slot bimbingan "${newSlot.date} (${newSlot.time})" berjaya diterbitkan!`);
                   }}
                   className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm cursor-pointer dark:bg-teal-600"
                 >

@@ -242,7 +242,7 @@ service cloud.firestore {
       return data.keys().hasAll(['id', 'title', 'category', 'description']) &&
         data.keys().hasOnly([
           'id', 'title', 'category', 'date', 'location', 'description',
-          'organizer', 'grantAmount', 'registrationLink', 'isFeatured', 'createdAt'
+          'organizer', 'grantAmount', 'registrationLink', 'imageUrl', 'isFeatured', 'createdAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.title, 200) &&
@@ -253,6 +253,7 @@ service cloud.firestore {
         (!('organizer' in data) || validStr(data.organizer, 120)) &&
         (!('grantAmount' in data) || validStr(data.grantAmount, 100)) &&
         (!('registrationLink' in data) || validStr(data.registrationLink, 500)) &&
+        (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
         (!('isFeatured' in data) || data.isFeatured is bool) &&
         (!('createdAt' in data) || validStr(data.createdAt, 50));
     }
@@ -294,7 +295,7 @@ service cloud.firestore {
       return data.keys().hasAll(['id', 'name', 'email', 'agency']) &&
         data.keys().hasOnly([
           'id', 'name', 'title', 'agency', 'expertise', 'avatarUrl',
-          'email', 'phone', 'bio', 'availableDays', 'activeMenteesCount', 'lastActive'
+          'email', 'phone', 'bio', 'availableDays', 'publishedSlots', 'activeMenteesCount', 'lastActive'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.name, 120) &&
@@ -306,6 +307,7 @@ service cloud.firestore {
         (!('phone' in data) || validStr(data.phone, 30)) &&
         (!('bio' in data) || validStr(data.bio, 1500)) &&
         (!('availableDays' in data) || validStr(data.availableDays, 200)) &&
+        (!('publishedSlots' in data) || (data.publishedSlots is list && data.publishedSlots.size() <= 50 && (data.publishedSlots.size() == 0 || data.publishedSlots[0] is map))) &&
         (!('activeMenteesCount' in data) || data.activeMenteesCount is number) &&
         (!('lastActive' in data) || validStr(data.lastActive, 50));
     }
@@ -733,7 +735,7 @@ service cloud.firestore {
           getMentorId() == mentorId &&
           incoming().id == existing().id &&
           incoming().diff(existing()).affectedKeys().hasOnly([
-            'name', 'title', 'agency', 'expertise', 'avatarUrl', 'email', 'phone', 'bio', 'availableDays'
+            'name', 'title', 'agency', 'expertise', 'avatarUrl', 'email', 'phone', 'bio', 'availableDays', 'publishedSlots'
           ])
         )
       );

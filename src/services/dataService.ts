@@ -227,10 +227,15 @@ export async function updateBookingStatus(
         localStorage.setItem('kbelia_demo_slots', JSON.stringify([updatedSlot, ...slotList.filter(s => s.id !== slotId)]));
         await publishDemoSyncRecord('slot', slotId, updatedSlot);
       }
-    } else if (status === 'cancelled' && slotId) {
+    } else if ((status === 'cancelled' || status === 'rejected') && slotId) {
       const slotList: CapsuleSlot[] = JSON.parse(localStorage.getItem('kbelia_demo_slots') || '[]');
       const existingSlot = slotList.find(s => s.id === slotId) || INITIAL_CAPSULE_SLOTS.find(s => s.id === slotId);
-      if (existingSlot && (existingSlot.currentTenantId === (targetBooking?.applicantId || applicantId) || existingSlot.status === 'reserved')) {
+      if (
+        existingSlot &&
+        (existingSlot.currentTenantId === (targetBooking?.applicantId || applicantId) ||
+          existingSlot.status === 'reserved' ||
+          existingSlot.status === 'occupied')
+      ) {
         const releasedSlot: CapsuleSlot = {
           ...existingSlot,
           status: 'available',
@@ -256,6 +261,20 @@ export async function updateBookingStatus(
         },
         { merge: true }
       );
+    } else if ((status === 'cancelled' || status === 'rejected') && slotId) {
+      try {
+        await setDoc(
+          doc(db, 'capsule_slots', slotId),
+          {
+            status: 'available',
+            currentTenantBusinessName: '',
+            currentTenantId: ''
+          },
+          { merge: true }
+        );
+      } catch {
+        // Non-admin youth cancellation relies on derived enrichedSlots when capsule_slots is admin-only
+      }
     }
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, path);
@@ -512,6 +531,7 @@ export async function saveProgram(
     organizer: program.organizer || 'Unit Belia & Keusahawanan Kelantan',
     grantAmount: program.grantAmount || '',
     registrationLink: program.registrationLink || '#',
+    imageUrl: program.imageUrl || '',
     isFeatured: program.isFeatured ?? false,
     createdAt: program.createdAt || new Date().toISOString()
   };

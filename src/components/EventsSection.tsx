@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Calendar, 
   MapPin, 
@@ -44,9 +44,9 @@ interface YouthEvent {
 const SAMPLE_EVENTS: YouthEvent[] = [
   {
     id: 'evt-1',
-    title: 'Karnival Niaga Belia Kelantan 2026 (Zon Timur)',
+    title: 'Karnival Niaga Belia Kelantan (Zon Timur)',
     category: 'karnival',
-    date: '15 - 17 Mei 2026',
+    date: '11 - 13 Disember 2026',
     time: '10.00 PG - 11.00 MLM',
     district: 'Kota Bharu',
     location: 'Dataran Muhammadi & Perkarangan Stadium Sultan Muhammad IV',
@@ -61,7 +61,7 @@ const SAMPLE_EVENTS: YouthEvent[] = [
     id: 'evt-2',
     title: 'Bengkel Pensijilan Halal & Digital Taweez Makanan',
     category: 'bengkel',
-    date: '28 Mei 2026',
+    date: '22 Januari 2027',
     time: '9.00 PG - 4.30 PTG',
     district: 'Bachok',
     location: 'Dewan Keusahawanan Kampus UMK Bachok',
@@ -76,7 +76,7 @@ const SAMPLE_EVENTS: YouthEvent[] = [
     id: 'evt-3',
     title: 'Hari Terbuka Pemadanan Pelabur & Demo Day Belia',
     category: 'pitching',
-    date: '10 Jun 2026',
+    date: '14 Februari 2027',
     time: '9.30 PG - 1.00 PTG',
     district: 'Kota Bharu',
     location: 'Auditorium Hab Digital KB Cyber, Kota Bharu',
@@ -100,12 +100,29 @@ export const EventsSection: React.FC = () => {
     try {
       const saved = localStorage.getItem('kbelia_booked_events');
       if (saved) return JSON.parse(saved);
-    } catch (e) {
+    } catch {
       // ignore
     }
-    return ['evt-1'];
+    return [];
   });
   const [eventToCancel, setEventToCancel] = useState<YouthEvent | null>(null);
+
+  useEffect(() => {
+    const syncBooked = () => {
+      try {
+        const saved = localStorage.getItem('kbelia_booked_events');
+        setBookedEvents(saved ? JSON.parse(saved) : []);
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener('kbelia_booked_events_updated', syncBooked);
+    window.addEventListener('storage', syncBooked);
+    return () => {
+      window.removeEventListener('kbelia_booked_events_updated', syncBooked);
+      window.removeEventListener('storage', syncBooked);
+    };
+  }, []);
 
   const handleBookBooth = (eventId: string, eventTitle: string) => {
     if (bookedEvents.includes(eventId)) {
@@ -116,7 +133,8 @@ export const EventsSection: React.FC = () => {
     setBookedEvents(updated);
     try {
       localStorage.setItem('kbelia_booked_events', JSON.stringify(updated));
-    } catch (e) {
+      window.dispatchEvent(new Event('kbelia_booked_events_updated'));
+    } catch {
       // ignore
     }
     showToast(isEn ? `Successfully registered for: ${eventTitle}` : `Pendaftaran slot gerai bagi: ${eventTitle} berjaya!`);
@@ -127,7 +145,8 @@ export const EventsSection: React.FC = () => {
     setBookedEvents(updated);
     try {
       localStorage.setItem('kbelia_booked_events', JSON.stringify(updated));
-    } catch (e) {
+      window.dispatchEvent(new Event('kbelia_booked_events_updated'));
+    } catch {
       // ignore
     }
     showToast(isEn ? `Registration cancelled for: ${eventTitle}` : `Pendaftaran untuk ${eventTitle} telah dibatalkan.`);
@@ -266,7 +285,7 @@ export const EventsSection: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <Store className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
                       <span>
-                        {evt.boothsAvailable} {isEn ? 'stalls available left' : 'tapak niaga masih kosong'} ({isEn ? 'out of' : 'daripada'} {evt.totalBooths})
+                        {Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0))} {isEn ? 'stalls available left' : 'tapak niaga masih kosong'} ({isEn ? 'out of' : 'daripada'} {evt.totalBooths})
                       </span>
                     </div>
                   </div>

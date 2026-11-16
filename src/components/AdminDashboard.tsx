@@ -421,6 +421,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         grantAmount: progAmount,
         description: progDesc,
         organizer: progOrganizer,
+        imageUrl: progImageUrl,
         isFeatured: true
       });
 
@@ -437,6 +438,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setShowProgramForm(false);
       setProgTitle('');
       setProgDesc('');
+      setProgImageUrl('');
       setMessage({ type: 'success', text: 'Program geran / latihan baharu berjaya diterbitkan!' });
       onRefresh();
     } catch (err) {
@@ -594,35 +596,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             : d === 'Gua Musang' ? 'G. Musang'
             : d;
 
-        const districtChartData = DISTRICTS.map((d, idx) => {
+        const districtChartData = DISTRICTS.map((d) => {
           const districtSlots = safeSlots.filter(s => s.district === d);
           const realOccupied = districtSlots.filter(s => s.status === 'occupied' || s.status === 'reserved').length;
           const realAvailable = districtSlots.filter(s => s.status === 'available').length;
-          const hasRealSlots = districtSlots.length > 0;
           return {
             district: districtShortLabel(d),
             fullName: d,
-            beroperasi: hasRealSlots ? realOccupied : (idx % 2 === 0 ? 1 : 2),
-            tersedia: hasRealSlots ? realAvailable : (idx % 3 === 0 ? 2 : 1)
+            beroperasi: realOccupied,
+            tersedia: realAvailable
           };
         });
 
-        // Pipeline data for Recharts BarChart (real live counts + starter baseline when queue is completely empty)
-        const hasLivePipeline =
-          safeBookings.length > 0 ||
-          approvedBookingsCount > 0 ||
-          (grantApplications || []).length > 0 ||
-          approvedGrantsCount > 0 ||
-          mentorshipRegistrations.length > 0 ||
-          openTicketsCount > 0;
-
+        // Pipeline data for Recharts BarChart (strictly from live application/ticket counts)
         const pipelineChartData = [
-          { label: 'Kapsul Mohon', jumlah: safeBookings.length || (hasLivePipeline ? 0 : 4) },
-          { label: 'Kapsul Lulus', jumlah: approvedBookingsCount || (hasLivePipeline ? 0 : 3) },
-          { label: 'Geran Mohon', jumlah: (grantApplications || []).length || (hasLivePipeline ? 0 : 5) },
-          { label: 'Geran Lulus', jumlah: approvedGrantsCount || (hasLivePipeline ? 0 : 3) },
-          { label: 'Sesi Mentor', jumlah: mentorshipRegistrations.length || (hasLivePipeline ? 0 : 3) },
-          { label: 'Aduan Aktif', jumlah: openTicketsCount || (hasLivePipeline ? 0 : 1) }
+          { label: 'Kapsul Mohon', jumlah: safeBookings.length },
+          { label: 'Kapsul Lulus', jumlah: approvedBookingsCount },
+          { label: 'Geran Mohon', jumlah: (grantApplications || []).length },
+          { label: 'Geran Lulus', jumlah: approvedGrantsCount },
+          { label: 'Sesi Mentor', jumlah: mentorshipRegistrations.length },
+          { label: 'Aduan Aktif', jumlah: openTicketsCount }
         ];
 
         return (

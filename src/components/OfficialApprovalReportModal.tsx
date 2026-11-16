@@ -21,6 +21,7 @@ import {
   generateOfficialApprovalReportHtml 
 } from '../utils/pdfGenerator';
 import { openAndPrintDocument } from '../utils/printUtils';
+import { showToast } from './ToastNotification';
 
 interface OfficialApprovalReportModalProps {
   isOpen: boolean;
@@ -47,7 +48,8 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
 
   const totalKioskSubsidy = approvedBookings.reduce((sum, b) => sum + (b.monthlyRate || 150), 0);
   const totalGrantAmount = approvedGrants.reduce((sum, g) => {
-    const rawVal = g.amount ? parseFloat(g.amount.replace(/[^0-9.]/g, '')) : 3000;
+    const rawStr = g.amount || g.grantAmount || '3000';
+    const rawVal = parseFloat(String(rawStr).replace(/[^0-9.]/g, ''));
     return sum + (isNaN(rawVal) ? 3000 : rawVal);
   }, 0);
 
@@ -94,7 +96,11 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
       });
       await openAndPrintDocument(html, `Laporan_Rasmi_Kelulusan_KBelia_${reportRef.replace(/[^a-zA-Z0-9]/g, '_')}`);
     } catch {
-      window.print();
+      showToast({
+        type: 'error',
+        title: 'Ralat Cetakan',
+        message: 'Gagal membuka tetingkap cetakan rasmi. Sila gunakan pilihan Muat Turun PDF.'
+      });
     } finally {
       setTimeout(() => setIsProcessing(false), 800);
     }
@@ -331,7 +337,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                               <div className="font-bold text-black">{b.applicantName}</div>
                               <div className="text-sm text-black font-semibold">{b.businessName}</div>
                             </td>
-                            <td className="p-2.5 font-mono text-black text-[0.9375rem]">{maskMyKad(b.applicantMyKad || '980101-03-5544')}</td>
+                            <td className="p-2.5 font-mono text-black text-[0.9375rem]">{b.applicantMyKad ? maskMyKad(b.applicantMyKad) : 'Tidak Dinyatakan'}</td>
                             <td className="p-2.5">
                               <span className="font-mono font-bold text-black">{b.slotCode}</span>
                               <span className="block text-sm text-black/75">{b.hubLocation || 'Hab UMK Bachok'}</span>
@@ -388,7 +394,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                               {g.bankName} - {g.bankAccountNumber || '••••••••'}
                             </td>
                             <td className="p-2.5 text-right font-mono font-bold text-black">
-                              {g.amount || 'RM3,000'}
+                              {g.amount || g.grantAmount || 'RM3,000'}
                             </td>
                             <td className="p-2.5 text-center">
                               <span className="inline-flex items-center gap-1 text-[0.8125rem] font-bold text-black bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
@@ -435,7 +441,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
               {/* Legal disclaimer bottom strip */}
               <div className="mt-3 pt-2 border-t border-slate-300 flex flex-wrap items-center justify-between gap-2 text-[0.8125rem] text-black/70 font-mono">
                 <span>DOKUMEN RASMI KERAJAAN NEGERI KELANTAN · SALINAN SAH DIPERAKUI</span>
-                <span>KOD PENGESAHAN: KBN-AUDIT-LULUS-2026</span>
+                <span>KOD PENGESAHAN: KBN-AUDIT-LULUS-{new Date().getFullYear()}</span>
               </div>
             </div>
           </div>

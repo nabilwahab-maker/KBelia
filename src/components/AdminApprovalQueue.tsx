@@ -90,9 +90,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
   // Filter Bookings directly by statusFilter so real-time updates reflect consistently across tabs
   const filteredBookings = bookings.filter((b) => {
-    const matchStatus = statusFilter === 'all' 
-      ? b.status !== 'rejected' 
-      : b.status === statusFilter;
+    const matchStatus = statusFilter === 'all' ? true : b.status === statusFilter;
     const matchSearch = (b.applicantName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
                         (b.businessName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
                         (b.slotCode || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -102,9 +100,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
   // Filter Grants directly by statusFilter
   const filteredGrants = grantApplications.filter((g) => {
-    const matchStatus = statusFilter === 'all' 
-      ? (g.status !== 'rejected' && g.status !== 'cancelled') 
-      : g.status === statusFilter;
+    const matchStatus = statusFilter === 'all' ? true : g.status === statusFilter;
     const matchSearch = (g.applicantName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
                         (g.businessName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
                         (g.programTitle || '').toLowerCase().includes(searchQuery.toLowerCase());

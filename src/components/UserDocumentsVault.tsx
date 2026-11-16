@@ -11,7 +11,14 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { CapsuleBooking, GrantApplication } from '../types';
-import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
+import {
+  formatDisplayDate,
+  calculateOperationEndDate,
+  openAndPrintDocument,
+  generateGrantApprovalOfficialHtml,
+  generateYouthCertificateOfficialHtml
+} from '../utils/printUtils';
+import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 
 interface UserDocumentsVaultProps {
   bookings: CapsuleBooking[];
@@ -19,6 +26,11 @@ interface UserDocumentsVaultProps {
   onViewOfferLetter: (booking: CapsuleBooking) => void;
   onOpenTenancyAgreement?: (booking: CapsuleBooking) => void;
   onOpenVerification?: (refCode?: string) => void;
+  ownerName?: string;
+  ownerEmail?: string;
+  businessName?: string;
+  district?: string;
+  ssmNumber?: string;
 }
 
 export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
@@ -26,10 +38,21 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
   grantApplications,
   onViewOfferLetter,
   onOpenTenancyAgreement,
-  onOpenVerification
+  onOpenVerification,
+  ownerName,
+  ownerEmail,
+  businessName,
+  district,
+  ssmNumber
 }) => {
   const approvedBookings = bookings.filter(b => b.status === 'approved');
   const approvedGrants = grantApplications.filter(g => g.status === 'approved');
+  const certYear = new Date().getFullYear();
+  const certCode = `REG-${certYear}-BELIA`;
+  const resolvedName = ownerName || approvedBookings[0]?.applicantName || approvedGrants[0]?.applicantName || 'Usahawan Belia Kelantan';
+  const resolvedEmail = ownerEmail || approvedBookings[0]?.applicantEmail || approvedGrants[0]?.applicantEmail;
+  const resolvedBusiness = businessName || approvedBookings[0]?.businessName || approvedGrants[0]?.businessName;
+  const resolvedDistrict = district || approvedBookings[0]?.hubLocation || 'Negeri Kelantan';
 
   return (
     <div className="rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-6 md:p-8 shadow-sm">
@@ -149,17 +172,26 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
               </p>
             </div>
 
-            <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between gap-2 print:hidden">
+            <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-2 print:hidden">
               <span className="text-[0.8125rem] text-black dark:text-white/75 font-semibold">
                 {g.adminNotes || 'Diluluskan untuk bayaran geran'}
               </span>
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
-              >
-                <Printer className="w-3.5 h-3.5" /> Cetak
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => downloadHtmlAsPdf(generateGrantApprovalOfficialHtml(g), `Surat_Kelulusan_Geran_${g.id.slice(0, 8).toUpperCase()}.pdf`)}
+                  className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" /> PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openAndPrintDocument(generateGrantApprovalOfficialHtml(g), `Surat_Kelulusan_Geran_${g.id.slice(0, 8).toUpperCase()}`)}
+                  className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" /> Cetak
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -172,7 +204,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                 <Award className="w-3 h-3" /> Sijil Keahlian
               </span>
               <span className="font-mono text-[0.8125rem] font-bold text-black/70 dark:text-white/75">
-                REG-2026-BELIA
+                {certCode}
               </span>
             </div>
 
@@ -184,18 +216,49 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
             </p>
           </div>
 
-          <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center gap-2 print:hidden">
+          <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex flex-wrap items-center gap-2 print:hidden">
             <button
               type="button"
-              onClick={() => window.print()}
+              onClick={() =>
+                openAndPrintDocument(
+                  generateYouthCertificateOfficialHtml({
+                    fullName: resolvedName,
+                    email: resolvedEmail,
+                    businessName: resolvedBusiness,
+                    district: resolvedDistrict,
+                    ssmNumber,
+                    refCode: certCode
+                  }),
+                  `Sijil_Usahawan_Belia_${certCode}`
+                )
+              }
               className="flex-1 py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" /> Cetak Sijil
             </button>
+            <button
+              type="button"
+              onClick={() =>
+                downloadHtmlAsPdf(
+                  generateYouthCertificateOfficialHtml({
+                    fullName: resolvedName,
+                    email: resolvedEmail,
+                    businessName: resolvedBusiness,
+                    district: resolvedDistrict,
+                    ssmNumber,
+                    refCode: certCode
+                  }),
+                  `Sijil_Usahawan_Belia_${certCode}.pdf`
+                )
+              }
+              className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" /> PDF
+            </button>
             {onOpenVerification && (
               <button
                 type="button"
-                onClick={() => onOpenVerification('REG-2026-BELIA')}
+                onClick={() => onOpenVerification(certCode)}
                 className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white/75 bg-rose-50 dark:bg-rose-950/60 hover:bg-amber-100 border border-rose-200 dark:border-rose-800/70 transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <ShieldCheck className="w-3.5 h-3.5" /> Pengesahan QR

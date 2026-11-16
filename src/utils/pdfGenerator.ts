@@ -12,17 +12,21 @@ import { maskMyKad } from './securityUtils';
 export const generateSinglePageA4OfferLetterHtml = (
   booking: CapsuleBooking,
   refNumber: string,
-  formattedDate: string
+  formattedDate: string,
+  subsidyRate: number = 50
 ): string => {
   const formattedStart = formatDisplayDate(booking.startDate);
   const formattedEnd = calculateOperationEndDate(booking.startDate, booking.durationMonths);
+  const monthlyRate = Number(booking.monthlyRate || 150);
+  const safeSubsidy = Math.min(99, Math.max(0, Number(subsidyRate) || 50));
+  const marketRate = safeSubsidy > 0 && safeSubsidy < 100
+    ? Math.round((monthlyRate / (1 - safeSubsidy / 100)) * 100) / 100
+    : monthlyRate * 2;
 
   return `
     <div style="
       width: 794px;
-      height: 1122px;
-      max-height: 1122px;
-      overflow: hidden;
+      min-height: 1122px;
       box-sizing: border-box;
       padding: 24px 34px 18px 34px;
       background: #ffffff;
@@ -218,9 +222,9 @@ export const generateSinglePageA4OfferLetterHtml = (
                 Kadar Sewa Bersubsidi
               </th>
               <td style="border: 1px solid #cbd5e1; padding: 6px 9px; color: #000000;">
-                <strong style="color: #000000; font-size: 13.5px;">RM 150.00 / sebulan</strong>
+                <strong style="color: #000000; font-size: 13.5px;">RM ${monthlyRate.toFixed(2)} / sebulan</strong>
                 <span style="display: inline-block; margin-left: 8px; background: #ecfdf5; color: #000000; border: 1px solid #a7f3d0; border-radius: 4px; font-size: 11px; font-weight: 700; padding: 1px 6px;">
-                  Subsidi 50% Ditaja Negeri (Asal RM300.00)
+                  Subsidi ${safeSubsidy}% Ditaja Negeri (Asal RM${marketRate.toFixed(2)})
                 </span>
               </td>
             </tr>
@@ -413,24 +417,27 @@ export const downloadOfferLetterPdf = async (
   booking: CapsuleBooking,
   refNumber: string,
   formattedDate: string,
-  customFileName?: string
+  customFileName?: string,
+  subsidyRate: number = 50
 ): Promise<boolean> => {
   const fileName = (customFileName || `Surat_Tawaran_Kiosk_${booking.slotCode || 'KB'}_${refNumber}`).replace(/\.pdf$/i, '') + '.pdf';
+  const monthlyRate = Number(booking.monthlyRate || 150);
+  const safeSubsidy = Math.min(99, Math.max(0, Number(subsidyRate) || 50));
 
-  // 1. Create temporary off-screen container with fixed A4 dimensions (794px x 1122px)
+  // 1. Create temporary off-screen container with A4 width (794px) and dynamic height
   const container = document.createElement('div');
   container.style.position = 'fixed';
   container.style.left = '-9999px';
   container.style.top = '0';
   container.style.width = '794px';
-  container.style.height = '1122px';
-  container.style.overflow = 'hidden';
+  container.style.minHeight = '1122px';
   container.style.background = '#ffffff';
   container.style.zIndex = '-99999';
-  container.innerHTML = generateSinglePageA4OfferLetterHtml(booking, refNumber, formattedDate);
+  container.innerHTML = generateSinglePageA4OfferLetterHtml(booking, refNumber, formattedDate, safeSubsidy);
   document.body.appendChild(container);
 
   try {
+    const captureHeight = Math.max(1122, container.scrollHeight);
     // 2. Render to high-definition canvas using scale: 2 for crisp vector-like text
     const canvas = await html2canvas(container, {
       scale: 2,
@@ -439,12 +446,14 @@ export const downloadOfferLetterPdf = async (
       logging: false,
       backgroundColor: '#ffffff',
       width: 794,
-      height: 1122,
+      height: captureHeight,
       windowWidth: 794,
-      windowHeight: 1122
+      windowHeight: captureHeight
     });
 
-    // 3. Create single-page A4 PDF in jsPDF
+    const imgWidth = 210;
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
     const imgData = canvas.toDataURL('image/jpeg', 0.98);
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -453,8 +462,20 @@ export const downloadOfferLetterPdf = async (
       compress: true
     });
 
-    // Standard A4 portrait is 210mm x 297mm. Fit exactly 1 full page.
-    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+    if (imgHeight <= pageHeight + 2) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, Math.min(pageHeight, imgHeight), undefined, 'FAST');
+    } else {
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+      heightLeft -= pageHeight;
+      while (heightLeft > 5) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+        heightLeft -= pageHeight;
+      }
+    }
     pdf.save(fileName);
     return true;
   } catch (err) {
@@ -478,7 +499,7 @@ export const downloadOfferLetterPdf = async (
       fallbackPdf.text(`Perniagaan: ${booking.businessName} (${booking.businessCategory})`, 25, 67);
       fallbackPdf.text(`Premis Kiosk: ${booking.slotCode} - ${booking.slotName}`, 25, 74);
       fallbackPdf.text(`Hab Penempatan: ${booking.hubLocation}`, 25, 81);
-      fallbackPdf.text(`Kadar Sewa: RM 150.00 / bulan (Subsidi 50%)`, 25, 88);
+      fallbackPdf.text(`Kadar Sewa: RM ${monthlyRate.toFixed(2)} / bulan (Subsidi ${safeSubsidy}%)`, 25, 88);
       fallbackPdf.text(`Tarikh Mula Beroperasi: ${formatDisplayDate(booking.startDate)}`, 25, 95);
       fallbackPdf.text(`Tarikh Akhir Beroperasi: ${calculateOperationEndDate(booking.startDate, booking.durationMonths)}`, 25, 102);
       fallbackPdf.text(`Tempoh Kontrak: ${booking.durationMonths} Bulan`, 25, 109);
@@ -672,7 +693,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
                         <span style="color: #000000; opacity: 0.82; font-size: 12px; font-weight: 600;">${b.businessName}</span>
                       </td>
                       <td style="padding: 8px 9px; border: 1px solid #cbd5e1; font-family: monospace; color: #000000;">
-                        ${maskMyKad(b.applicantMyKad || '980101-03-5544')}
+                        ${b.applicantMyKad ? maskMyKad(b.applicantMyKad) : 'Tidak Dinyatakan'}
                       </td>
                       <td style="padding: 8px 9px; border: 1px solid #cbd5e1;">
                         <strong style="font-family: monospace; color: #000000;">${b.slotCode}</strong>
@@ -809,7 +830,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
             font-family: monospace;
           ">
             <span>DOKUMEN RASMI KERAJAAN NEGERI KELANTAN · TIDAK BOLEH DIUBAH SUAI</span>
-            <span>KOD KESELAMATAN: KBN-AUDIT-SEC-2026</span>
+            <span>KOD KESELAMATAN: KBN-AUDIT-SEC-${new Date().getFullYear()}</span>
           </div>
 
         </div>
@@ -907,6 +928,86 @@ export const downloadOfficialApprovalReportPdf = async (
     } catch {
       return false;
     }
+  } finally {
+    if (container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
+  }
+};
+
+/**
+ * Generic PDF generator that takes any complete official letterhead HTML string
+ * (from printUtils.ts) and saves it as a paginated A4 .pdf file.
+ */
+export const downloadHtmlAsPdf = async (
+  htmlContent: string,
+  fileName: string
+): Promise<boolean> => {
+  const safeName = fileName.replace(/\.pdf$/i, '') + '.pdf';
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.width = '820px';
+  container.style.background = '#ffffff';
+  container.style.zIndex = '-99999';
+
+  try {
+    const parser = new DOMParser();
+    const parsed = parser.parseFromString(htmlContent, 'text/html');
+    parsed.querySelectorAll('.screen-toolbar, .no-print, script').forEach((el) => el.remove());
+
+    const styles = Array.from(parsed.querySelectorAll('style'))
+      .map((s) => s.textContent || '')
+      .join('\n');
+
+    const pageNode = parsed.querySelector('.document-page');
+    const bodyHtml = pageNode ? pageNode.outerHTML : parsed.body.innerHTML;
+
+    container.innerHTML = `<style>${styles}\n.document-page{box-shadow:none !important;max-width:800px !important;margin:0 auto !important;}</style>${bodyHtml}`;
+    document.body.appendChild(container);
+
+    const captureHeight = Math.max(1000, container.scrollHeight);
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: 820,
+      height: captureHeight,
+      windowWidth: 820,
+      windowHeight: captureHeight
+    });
+
+    const imgWidth = 210;
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+      compress: true
+    });
+
+    let heightLeft = imgHeight;
+    let position = 0;
+    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 5) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(safeName);
+    return true;
+  } catch (err) {
+    console.error('downloadHtmlAsPdf failed:', err);
+    return false;
   } finally {
     if (container.parentNode) {
       container.parentNode.removeChild(container);

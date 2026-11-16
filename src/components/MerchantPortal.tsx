@@ -26,6 +26,7 @@ import {
   Briefcase,
   Coins,
   Printer,
+  Download,
   Wrench,
   XCircle,
   PenTool,
@@ -62,7 +63,8 @@ import {
   saveProduct, 
   deleteProduct,
   updateBookingStatus,
-  createMaintenanceTicket
+  createMaintenanceTicket,
+  loadLocalPortalSettings
 } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { KioskCashflowTracker } from './KioskCashflowTracker';
@@ -86,7 +88,13 @@ import {
   ResponsiveContainer,
   LabelList
 } from 'recharts';
-import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
+import {
+  formatDisplayDate,
+  calculateOperationEndDate,
+  openAndPrintDocument,
+  generateOfficialReceiptHtml
+} from '../utils/printUtils';
+import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import confetti from 'canvas-confetti';
 
 const DEFAULT_PRODUCT_IMAGE = '/assets/generated/product_kelantan_delights_1793924253401.jpg';
@@ -531,56 +539,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         // Real Mentorship Computation
         const upcomingMentor = safeMentorships.find(m => m.status === 'confirmed' || m.status === 'pending') || safeMentorships[0] || null;
 
-        // Build Chart Bars combining real cashflowRecords + dynamic starter sample baseline
+        // Build Chart Bars strictly from real cashflowRecords
         const now = new Date();
         const pad2 = (n: number) => String(n).padStart(2, '0');
         const toLocalIso = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-
-        const starterDailySample = (() => {
-          const sampleAmounts = [
-            { cash: 180, qr: 210 },
-            { cash: 220, qr: 265 },
-            { cash: 165, qr: 240 },
-            { cash: 250, qr: 310 },
-            { cash: 290, qr: 345 },
-            { cash: 320, qr: 390 },
-            { cash: 275, qr: 360 }
-          ];
-          const records: { date: string; cashSales: number; qrSales: number; isSample: true }[] = [];
-          for (let i = 0; i < 7; i++) {
-            const d = new Date(now);
-            d.setDate(now.getDate() - (6 - i));
-            records.push({
-              date: toLocalIso(d),
-              cashSales: sampleAmounts[i].cash,
-              qrSales: sampleAmounts[i].qr,
-              isSample: true
-            });
-          }
-          // Prior 5 months starter baseline for monthly & quarterly views
-          const monthlyBase = [
-            { cash: 1450, qr: 1850 },
-            { cash: 1620, qr: 2150 },
-            { cash: 1890, qr: 2420 },
-            { cash: 2100, qr: 2780 },
-            { cash: 2350, qr: 3120 }
-          ];
-          for (let m = 1; m <= 5; m++) {
-            const d = new Date(now.getFullYear(), now.getMonth() - m, 15);
-            const idx = 5 - m;
-            records.push({
-              date: toLocalIso(d),
-              cashSales: monthlyBase[idx].cash,
-              qrSales: monthlyBase[idx].qr,
-              isSample: true
-            });
-          }
-          return records;
-        })();
-
-        const realDateSet = new Set(safeCashflow.map(r => (r.date || '').slice(0, 10)).filter(Boolean));
-        const realMonthSet = new Set(safeCashflow.map(r => (r.date || '').slice(0, 7)).filter(Boolean));
-        let usesStarterSample = false;
 
         const chartBars = (() => {
           if (salesPeriod === 'weekly') {
@@ -590,26 +552,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               d.setDate(now.getDate() - (6 - i));
               const iso = toLocalIso(d);
               const dayRecs = safeCashflow.filter(r => (r.date || '').slice(0, 10) === iso);
-              if (dayRecs.length > 0) {
-                const cash = dayRecs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
-                const qr = dayRecs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
-                const value = cash + qr;
-                return {
-                  label: days[d.getDay()],
-                  value,
-                  tx: dayRecs.length,
-                  qr: value > 0 ? Math.round((qr / value) * 100) : 0
-                };
-              }
-              const sample = starterDailySample.find(s => s.date === iso);
-              if (sample) usesStarterSample = true;
-              const cash = sample?.cashSales || 0;
-              const qr = sample?.qrSales || 0;
+              const cash = dayRecs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+              const qr = dayRecs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
               const value = cash + qr;
               return {
                 label: days[d.getDay()],
                 value,
-                tx: sample ? 1 : 0,
+                tx: dayRecs.length,
                 qr: value > 0 ? Math.round((qr / value) * 100) : 0
               };
             });
@@ -620,18 +569,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
               const ym = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
               const recs = safeCashflow.filter(r => (r.date || '').startsWith(ym));
-              const sampleRecs = starterDailySample.filter(s => s.date.startsWith(ym) && !realDateSet.has(s.date));
-              const combined = recs.length > 0
-                ? recs
-                : sampleRecs;
-              if (recs.length === 0 && sampleRecs.length > 0) usesStarterSample = true;
-              const cash = combined.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
-              const qr = combined.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+              const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+              const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
               const value = cash + qr;
               return {
                 label: months[d.getMonth()],
                 value,
-                tx: combined.length,
+                tx: recs.length,
                 qr: value > 0 ? Math.round((qr / value) * 100) : 0
               };
             });
@@ -644,20 +588,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               const dt = new Date(r.date);
               return dt.getFullYear() === now.getFullYear() && dt.getMonth() >= startMonth && dt.getMonth() <= startMonth + 2;
             });
-            const sampleRecs = starterDailySample.filter(s => {
-              const dt = new Date(s.date);
-              const ym = s.date.slice(0, 7);
-              return dt.getFullYear() === now.getFullYear() && dt.getMonth() >= startMonth && dt.getMonth() <= startMonth + 2 && !realMonthSet.has(ym);
-            });
-            const combined = recs.length > 0 ? [...recs, ...sampleRecs] : sampleRecs;
-            if (sampleRecs.length > 0 && recs.length === 0) usesStarterSample = true;
-            const cash = combined.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
-            const qr = combined.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+            const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+            const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
             const value = cash + qr;
             return {
               label: qLabel,
               value,
-              tx: combined.length,
+              tx: recs.length,
               qr: value > 0 ? Math.round((qr / value) * 100) : 0
             };
           });
@@ -1073,9 +1010,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 {/* Footer notes & Cashflow shortcut */}
                 <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex items-center justify-between text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 gap-2">
                   <span className="leading-snug font-medium">
-                    {usesStarterSample
-                      ? 'Gabungan rekod semasa & sampel permulaan sistem'
-                      : 'Buku Tunai Transaksi Sah'}
+                    {safeCashflow.length > 0
+                      ? 'Buku Tunai Transaksi Sah'
+                      : 'Belum ada rekod jualan harian'}
                   </span>
                   <button
                     type="button"
@@ -2296,14 +2233,37 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-2 flex items-center justify-end gap-2.5">
+                  <div className="pt-2 flex flex-wrap items-center justify-end gap-2.5">
                     <button
                       type="button"
-                      onClick={() => window.print()}
+                      onClick={() => {
+                        const receiptRef = `REC-${selectedReceiptBooking.slotCode}-${selectedReceiptBooking.id.substring(0, 8).toUpperCase()}`;
+                        const subsidyRate = loadLocalPortalSettings().portalSubsidyRate ?? 50;
+                        const html = generateOfficialReceiptHtml(selectedReceiptBooking, receiptRef, subsidyRate);
+                        void openAndPrintDocument(html, `Resit_Rasmi_${selectedReceiptBooking.slotCode}`);
+                      }}
                       className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl flex items-center gap-2 shadow-xs cursor-pointer dark:bg-blue-600"
                     >
                       <Printer className="w-4 h-4 text-white" />
                       <span>Cetak Salinan Resit</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const receiptRef = `REC-${selectedReceiptBooking.slotCode}-${selectedReceiptBooking.id.substring(0, 8).toUpperCase()}`;
+                        const subsidyRate = loadLocalPortalSettings().portalSubsidyRate ?? 50;
+                        const html = generateOfficialReceiptHtml(selectedReceiptBooking, receiptRef, subsidyRate);
+                        const ok = await downloadHtmlAsPdf(html, `Resit_Rasmi_${selectedReceiptBooking.slotCode}_${receiptRef}`);
+                        if (ok) {
+                          showToast('Fail PDF resit rasmi berjaya dimuat turun.', 'success');
+                        } else {
+                          showToast('Gagal menjana fail PDF resit. Sila gunakan butang Cetak.', 'error');
+                        }
+                      }}
+                      className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl flex items-center gap-2 shadow-xs cursor-pointer"
+                    >
+                      <Download className="w-4 h-4 text-white" />
+                      <span>Muat Turun PDF</span>
                     </button>
                     <button
                       type="button"
@@ -2482,6 +2442,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           <UserDocumentsVault
             bookings={safeBookings}
             grantApplications={grantApplications}
+            ownerName={userProfile?.fullName || user.displayName || ''}
+            ownerEmail={user.email || userProfile?.email || ''}
+            businessName={myBusiness?.businessName || userProfile?.businessName}
+            district={myBusiness?.district || userProfile?.district}
+            ssmNumber={myBusiness?.ssmNumber || userProfile?.ssmNumber}
             onViewOfferLetter={(b) => onViewOfferLetter && onViewOfferLetter(b)}
             onOpenTenancyAgreement={(b) => onOpenTenancyAgreement && onOpenTenancyAgreement(b)}
             onOpenVerification={(ref) => onOpenVerification && onOpenVerification(ref)}
