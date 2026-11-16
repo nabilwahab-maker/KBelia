@@ -57,6 +57,7 @@ import {
   MerchantSubTab
 } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   saveBusinessListing, 
   saveProduct, 
@@ -97,6 +98,7 @@ import {
 import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { exportProductsToExcel } from '../utils/excelExport';
+import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 import confetti from 'canvas-confetti';
 
 const DEFAULT_PRODUCT_IMAGE = '/assets/generated/product_kelantan_delights_1793924253401.jpg';
@@ -199,6 +201,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   onSelectSubTab
 }) => {
   const { user, userProfile, updateProfileData, openLoginModal } = useAuth();
+  const { language } = useLanguage();
+  const isMs = language === 'ms';
   const { confirmDelete } = useConfirmDelete();
   const safeProducts = myProducts || [];
   const safeBookings = myBookings || [];
@@ -275,6 +279,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const [prodCategoryFilter, setProdCategoryFilter] = useState<string>('Semua');
   const [prodStockFilter, setProdStockFilter] = useState<'all' | 'in_stock' | 'out_of_stock'>('all');
   const [isProdFilterOpen, setIsProdFilterOpen] = useState(false);
+  const [prodSortBy, setProdSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [prodSort, setProdSort] = useState<{
     key: 'name' | 'category' | 'price' | 'inStock' | 'createdAt';
     dir: 'asc' | 'desc';
@@ -324,6 +329,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   // Bookings & Tickets search, filter, sort
   const [bookingSearch, setBookingSearch] = useState('');
   const [bookingStatusFilter, setBookingStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [bookingSortBy, setBookingSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [bookingSort, setBookingSort] = useState<{
     key: 'slotName' | 'hubLocation' | 'startDate' | 'status';
     dir: 'asc' | 'desc';
@@ -331,11 +337,61 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
   const [ticketSearch, setTicketSearch] = useState('');
   const [ticketStatusFilter, setTicketStatusFilter] = useState<'all' | 'received' | 'in_progress' | 'resolved'>('all');
+  const [ticketSortBy, setTicketSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [ticketSort, setTicketSort] = useState<{
     key: 'slotCode' | 'issueCategory' | 'status';
     dir: 'asc' | 'desc';
   }>({ key: 'status', dir: 'asc' });
   const [expandedTicketIds, setExpandedTicketIds] = useState<string[]>([]);
+
+  const productSortOptions = React.useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          { value: 'price_asc', label: 'Harga Produk (Terendah)' },
+          { value: 'price_desc', label: 'Harga Produk (Tertinggi)' },
+          { value: 'stock_first', label: 'Status Stok (Tersedia Dahulu)' }
+        ],
+        false,
+        {
+          asc: 'Nama Produk (A - Z)',
+          desc: 'Nama Produk (Z - A)'
+        }
+      ),
+    []
+  );
+
+  const bookingSortOptions = React.useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          { value: 'status_pending', label: 'Status (Dalam Semakan Dahulu)' },
+          { value: 'start_date_asc', label: 'Tarikh Mula Operasi (Terdekat)' }
+        ],
+        false,
+        {
+          asc: 'Nama Kiosk (A - Z)',
+          desc: 'Nama Kiosk (Z - A)'
+        }
+      ),
+    []
+  );
+
+  const ticketSortOptions = React.useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          { value: 'status_received', label: 'Status (Diterima Dahulu)' },
+          { value: 'category_asc', label: 'Kategori Isu (A - Z)' }
+        ],
+        false,
+        {
+          asc: 'Unit Kiosk (A - Z)',
+          desc: 'Unit Kiosk (Z - A)'
+        }
+      ),
+    []
+  );
 
   const toggleBookingExpand = (id: string) => {
     setExpandedBookingIds((prev) =>
@@ -344,12 +400,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   };
 
   const toggleBookingSort = (key: 'slotName' | 'hubLocation' | 'startDate' | 'status') => {
+    setBookingSortBy('table_column');
     setBookingSort((prev) =>
       prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
     );
   };
 
   const toggleTicketSort = (key: 'slotCode' | 'issueCategory' | 'status') => {
+    setTicketSortBy('table_column');
     setTicketSort((prev) =>
       prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
     );
@@ -380,24 +438,36 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         (b.businessName || '').toLowerCase().includes(q)
       );
     });
-    const dirMult = bookingSort.dir === 'asc' ? 1 : -1;
-    return [...list].sort((a, b) => {
-      if (bookingSort.key === 'slotName') {
-        return `${a.slotCode} ${a.slotName}`.localeCompare(`${b.slotCode} ${b.slotName}`) * dirMult;
+    if (bookingSortBy === 'table_column') {
+      const dirMult = bookingSort.dir === 'asc' ? 1 : -1;
+      return [...list].sort((a, b) => {
+        if (bookingSort.key === 'slotName') {
+          return `${a.slotCode} ${a.slotName}`.localeCompare(`${b.slotCode} ${b.slotName}`) * dirMult;
+        }
+        if (bookingSort.key === 'hubLocation') {
+          return (a.hubLocation || '').localeCompare(b.hubLocation || '') * dirMult;
+        }
+        if (bookingSort.key === 'startDate') {
+          return (a.startDate || '').localeCompare(b.startDate || '') * dirMult;
+        }
+        return ((bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4)) * dirMult;
+      });
+    }
+    return sortRecords(list, {
+      sortBy: bookingSortBy,
+      getName: (b) => `${b.slotCode || ''} ${b.slotName || ''}`.trim(),
+      customCompare: (a, b, mode) => {
+        if (mode === 'status_pending') return (bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4);
+        if (mode === 'start_date_asc') return (a.startDate || '').localeCompare(b.startDate || '');
+        return null;
       }
-      if (bookingSort.key === 'hubLocation') {
-        return (a.hubLocation || '').localeCompare(b.hubLocation || '') * dirMult;
-      }
-      if (bookingSort.key === 'startDate') {
-        return (a.startDate || '').localeCompare(b.startDate || '') * dirMult;
-      }
-      return ((bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4)) * dirMult;
     });
-  }, [activeVisibleBookings, bookingSearch, bookingStatusFilter, bookingSort]);
+  }, [activeVisibleBookings, bookingSearch, bookingStatusFilter, bookingSortBy, bookingSort]);
 
   const bookingsPagination = usePagination(filteredBookings, 7, [
     bookingSearch,
     bookingStatusFilter,
+    bookingSortBy,
     bookingSort.key,
     bookingSort.dir,
     filteredBookings.length
@@ -421,21 +491,33 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         (t.description || '').toLowerCase().includes(q)
       );
     });
-    const dirMult = ticketSort.dir === 'asc' ? 1 : -1;
-    return [...list].sort((a, b) => {
-      if (ticketSort.key === 'slotCode') {
-        return (a.slotCode || '').localeCompare(b.slotCode || '') * dirMult;
+    if (ticketSortBy === 'table_column') {
+      const dirMult = ticketSort.dir === 'asc' ? 1 : -1;
+      return [...list].sort((a, b) => {
+        if (ticketSort.key === 'slotCode') {
+          return (a.slotCode || '').localeCompare(b.slotCode || '') * dirMult;
+        }
+        if (ticketSort.key === 'issueCategory') {
+          return (a.issueCategory || '').localeCompare(b.issueCategory || '') * dirMult;
+        }
+        return ((ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3)) * dirMult;
+      });
+    }
+    return sortRecords(list, {
+      sortBy: ticketSortBy,
+      getName: (t) => t.slotCode || t.kioskName || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'status_received') return (ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3);
+        if (mode === 'category_asc') return (a.issueCategory || '').localeCompare(b.issueCategory || '');
+        return null;
       }
-      if (ticketSort.key === 'issueCategory') {
-        return (a.issueCategory || '').localeCompare(b.issueCategory || '') * dirMult;
-      }
-      return ((ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3)) * dirMult;
     });
-  }, [sortedTickets, ticketSearch, ticketStatusFilter, ticketSort]);
+  }, [sortedTickets, ticketSearch, ticketStatusFilter, ticketSortBy, ticketSort]);
 
   const ticketsPagination = usePagination(filteredTickets, 7, [
     ticketSearch,
     ticketStatusFilter,
+    ticketSortBy,
     ticketSort.key,
     ticketSort.dir,
     filteredTickets.length
@@ -468,34 +550,50 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       return matchSearch && matchCategory && matchStock;
     });
 
-    return [...filtered].sort((a, b) => {
-      const dirMult = prodSort.dir === 'asc' ? 1 : -1;
-      switch (prodSort.key) {
-        case 'name':
-          return a.name.localeCompare(b.name) * dirMult;
-        case 'category':
-          return (a.category || 'Umum').localeCompare(b.category || 'Umum') * dirMult;
-        case 'price':
-          return ((Number(a.price) || 0) - (Number(b.price) || 0)) * dirMult;
-        case 'inStock': {
-          const aVal = a.inStock !== false ? 1 : 0;
-          const bVal = b.inStock !== false ? 1 : 0;
-          return (aVal - bVal) * dirMult;
+    if (prodSortBy === 'table_column') {
+      return [...filtered].sort((a, b) => {
+        const dirMult = prodSort.dir === 'asc' ? 1 : -1;
+        switch (prodSort.key) {
+          case 'name':
+            return a.name.localeCompare(b.name) * dirMult;
+          case 'category':
+            return (a.category || 'Umum').localeCompare(b.category || 'Umum') * dirMult;
+          case 'price':
+            return ((Number(a.price) || 0) - (Number(b.price) || 0)) * dirMult;
+          case 'inStock': {
+            const aVal = a.inStock !== false ? 1 : 0;
+            const bVal = b.inStock !== false ? 1 : 0;
+            return (aVal - bVal) * dirMult;
+          }
+          case 'createdAt':
+          default: {
+            const aTime = new Date(a.updatedAt || a.createdAt || 0).getTime() || 0;
+            const bTime = new Date(b.updatedAt || b.createdAt || 0).getTime() || 0;
+            return (aTime - bTime) * dirMult;
+          }
         }
-        case 'createdAt':
-        default: {
-          const aTime = new Date(a.updatedAt || a.createdAt || 0).getTime() || 0;
-          const bTime = new Date(b.updatedAt || b.createdAt || 0).getTime() || 0;
-          return (aTime - bTime) * dirMult;
+      });
+    }
+
+    return sortRecords(filtered, {
+      sortBy: prodSortBy,
+      getName: (p) => p.name || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'price_asc') return (Number(a.price) || 0) - (Number(b.price) || 0);
+        if (mode === 'price_desc') return (Number(b.price) || 0) - (Number(a.price) || 0);
+        if (mode === 'stock_first') {
+          return (b.inStock !== false ? 1 : 0) - (a.inStock !== false ? 1 : 0);
         }
+        return null;
       }
     });
-  }, [safeProducts, prodSearch, prodCategoryFilter, prodStockFilter, prodSort]);
+  }, [safeProducts, prodSearch, prodCategoryFilter, prodStockFilter, prodSortBy, prodSort]);
 
   const productsPagination = usePagination(filteredSortedProducts, 7, [
     prodSearch,
     prodCategoryFilter,
     prodStockFilter,
+    prodSortBy,
     prodSort.key,
     prodSort.dir,
     filteredSortedProducts.length
@@ -698,6 +796,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   };
 
   const toggleProductSort = (key: 'name' | 'category' | 'price' | 'inStock' | 'createdAt') => {
+    setProdSortBy('table_column');
     setProdSort((prev) =>
       prev.key === key
         ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
@@ -718,12 +817,78 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-emerald-500/12 dark:bg-emerald-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
 
         <div className="relative z-10">
-          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
-            Urus Bisnes &amp; <span className="kbelia-title-shimmer">Kiosk Saya</span>
-          </h1>
-          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
-            Selamat kembali, <span className="font-semibold text-black dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span>
-          </p>
+          {(() => {
+            const merchantDisplayName = userProfile?.fullName || user.displayName || (isMs ? 'Usahawan Belia' : 'Youth Entrepreneur');
+            const headerMap: Record<MerchantSubTab, { prefix: string; accent: string; subtitle: React.ReactNode }> = {
+              overview: {
+                prefix: isMs ? 'Ringkasan & ' : 'Business Overview & ',
+                accent: isMs ? 'Prestasi Bisnes' : 'Performance',
+                subtitle: isMs ? (
+                  <>
+                    Selamat kembali, <span className="font-semibold text-black dark:text-white">{merchantDisplayName}</span> — pantau jualan harian, status kiosk, dan geran anda di satu tempat.
+                  </>
+                ) : (
+                  <>
+                    Welcome back, <span className="font-semibold text-black dark:text-white">{merchantDisplayName}</span> — monitor daily sales, kiosk status, and grants in one place.
+                  </>
+                )
+              },
+              profile: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Profil Kedai' : 'Business Profile',
+                subtitle: isMs
+                  ? 'Kemas kini maklumat perniagaan, nombor SSM, waktu operasi, dan pautan media sosial kedai anda.'
+                  : 'Update your business details, SSM registration, operating hours, and store social links.'
+              },
+              products: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Produk Saya' : 'My Products',
+                subtitle: isMs
+                  ? 'Tambah, kemas kini harga, dan urus senarai produk serta servis yang dipaparkan di direktori awam.'
+                  : 'Add, update pricing, and manage products or services displayed in the public directory.'
+              },
+              bookings: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Kiosk Saya' : 'My Kiosks',
+                subtitle: isMs
+                  ? 'Semak status permohonan tapak kapsul niaga, surat tawaran, perjanjian sewaan, dan aduan selenggara.'
+                  : 'Track capsule kiosk applications, offer letters, tenancy agreements, and maintenance tickets.'
+              },
+              cashflow: {
+                prefix: isMs ? 'Rekod Jualan & ' : 'Sales & ',
+                accent: isMs ? 'Aliran Tunai' : 'Cashflow Tracker',
+                subtitle: isMs
+                  ? 'Catat jualan tunai, kod QR, dan perbelanjaan harian untuk memantau untung bersih perniagaan anda.'
+                  : 'Record cash sales, QR transactions, and daily expenses to track net business profit.'
+              },
+              vault: {
+                prefix: isMs ? 'Peti Dokumen & ' : 'Document Vault & ',
+                accent: isMs ? 'Rekod Rasmi' : 'Official Records',
+                subtitle: isMs
+                  ? 'Muat turun surat tawaran rasmi, perjanjian sewaan digital, dan sijil sokongan perniagaan anda.'
+                  : 'Download official offer letters, digital tenancy agreements, and business endorsement certificates.'
+              },
+              card: {
+                prefix: isMs ? 'Perkongsian ' : 'Share ',
+                accent: isMs ? 'Kad Digital' : 'Digital Card',
+                subtitle: isMs
+                  ? 'Jana pautan kedai, kod QR, dan mesej tempahan pantas WhatsApp untuk dikongsi kepada pelanggan.'
+                  : 'Generate your store link, QR code, and instant WhatsApp order message to share with customers.'
+              }
+            };
+            const currentHeader = headerMap[activeTab] || headerMap.overview;
+            return (
+              <>
+                <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+                  {currentHeader.prefix}
+                  <span className="kbelia-title-shimmer">{currentHeader.accent}</span>
+                </h1>
+                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
+                  {currentHeader.subtitle}
+                </p>
+              </>
+            );
+          })()}
         </div>
       </div>
 
@@ -1984,7 +2149,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       {activeTab === 'products' && (() => {
         const inStockCount = safeProducts.filter((p) => p.inStock !== false).length;
         const activeFilterCount =
-          (prodCategoryFilter !== 'Semua' ? 1 : 0) + (prodStockFilter !== 'all' ? 1 : 0);
+          (prodCategoryFilter !== 'Semua' ? 1 : 0) +
+          (prodStockFilter !== 'all' ? 1 : 0) +
+          (prodSortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
         const pageIds = productsPagination.paginatedItems.map((p) => p.id);
         const allPageSelected =
           pageIds.length > 0 && pageIds.every((id) => selectedProductIds.includes(id));
@@ -2248,6 +2415,29 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
                   {isProdFilterOpen && (
                     <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
+                      <div className="pb-3 border-b border-slate-200 dark:border-zinc-700">
+                        <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                          <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                          <span>Susun Mengikut</span>
+                        </label>
+                        <select
+                          value={prodSortBy === 'table_column' ? '' : prodSortBy}
+                          onChange={(e) => {
+                            if (e.target.value) setProdSortBy(e.target.value);
+                          }}
+                          className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer"
+                        >
+                          {prodSortBy === 'table_column' && (
+                            <option value="">Ikut Lajur Jadual</option>
+                          )}
+                          {productSortOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
                           Kategori
@@ -2299,6 +2489,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           onClick={() => {
                             setProdCategoryFilter('Semua');
                             setProdStockFilter('all');
+                            setProdSortBy(DEFAULT_SORT_VALUE);
                           }}
                           className="text-xs font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
                         >
@@ -2597,8 +2788,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 searchValue={bookingSearch}
                 onSearchChange={setBookingSearch}
                 searchPlaceholder="Cari kod kiosk, nama slot atau lokasi..."
-                filterCount={bookingStatusFilter !== 'all' ? 1 : 0}
-                onResetFilters={() => setBookingStatusFilter('all')}
+                filterCount={(bookingStatusFilter !== 'all' ? 1 : 0) + (bookingSortBy !== DEFAULT_SORT_VALUE ? 1 : 0)}
+                onResetFilters={() => {
+                  setBookingStatusFilter('all');
+                  setBookingSortBy(DEFAULT_SORT_VALUE);
+                }}
+                sortOptions={bookingSortOptions}
+                sortValue={bookingSortBy === 'table_column' ? '' : bookingSortBy}
+                onSortChange={setBookingSortBy}
                 filterContent={
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
@@ -2964,8 +3161,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   searchValue={ticketSearch}
                   onSearchChange={setTicketSearch}
                   searchPlaceholder="Cari kod kiosk, kategori atau aduan..."
-                  filterCount={ticketStatusFilter !== 'all' ? 1 : 0}
-                  onResetFilters={() => setTicketStatusFilter('all')}
+                  filterCount={(ticketStatusFilter !== 'all' ? 1 : 0) + (ticketSortBy !== DEFAULT_SORT_VALUE ? 1 : 0)}
+                  onResetFilters={() => {
+                    setTicketStatusFilter('all');
+                    setTicketSortBy(DEFAULT_SORT_VALUE);
+                  }}
+                  sortOptions={ticketSortOptions}
+                  sortValue={ticketSortBy === 'table_column' ? '' : ticketSortBy}
+                  onSortChange={setTicketSortBy}
                   filterContent={
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">

@@ -95,11 +95,21 @@ import {
 import confetti from 'canvas-confetti';
 import { showToast } from './ToastNotification';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { PortalImage } from './PortalImage';
 import { resolveBookingKioskImage, resolveSlotImage, resolveProgramImage } from '../utils/visualAssets';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
+import {
+  DEFAULT_SORT_VALUE,
+  ToolbarSortOption,
+  buildStandardSortOptions,
+  compareText,
+  getTimestampMs,
+  parseNumericAmount,
+  sortRecords
+} from '../utils/sortUtils';
 
 interface AdminDashboardProps {
   slots: CapsuleSlot[];
@@ -152,6 +162,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onSelectSubTab
 }) => {
   const { user, isAdmin } = useAuth();
+  const { language } = useLanguage();
+  const isMs = language === 'ms';
   const { confirmDelete } = useConfirmDelete();
   const [internalTab, setInternalTab] = useState<AdminSubTab>('queue');
 
@@ -268,6 +280,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     key: 'businessName' | 'category' | 'hubLocation' | 'status';
     dir: 'asc' | 'desc';
   }>({ key: 'status', dir: 'asc' });
+  const [adminBookingSortPreset, setAdminBookingSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [bizSearch, setBizSearch] = useState('');
   const [bizStatusFilter, setBizStatusFilter] = useState<'all' | 'approved' | 'hidden' | 'featured'>('all');
@@ -276,6 +289,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     key: 'businessName' | 'category' | 'district' | 'isApproved';
     dir: 'asc' | 'desc';
   }>({ key: 'businessName', dir: 'asc' });
+  const [bizSortPreset, setBizSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [adminSlotSearch, setAdminSlotSearch] = useState('');
   const [adminSlotStatusFilter, setAdminSlotStatusFilter] = useState<'all' | SlotStatus>('all');
@@ -284,6 +298,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     key: 'name' | 'district' | 'monthlyRate' | 'status';
     dir: 'asc' | 'desc';
   }>({ key: 'name', dir: 'asc' });
+  const [adminSlotSortPreset, setAdminSlotSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [progSearch, setProgSearch] = useState('');
   const [progCategoryFilter, setProgCategoryFilter] = useState<'Semua' | YouthProgram['category']>('Semua');
@@ -291,12 +306,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     key: 'title' | 'category' | 'grantAmount';
     dir: 'asc' | 'desc';
   }>({ key: 'title', dir: 'asc' });
+  const [progSortPreset, setProgSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [mentorListSearch, setMentorListSearch] = useState('');
   const [mentorListSort, setMentorListSort] = useState<{
     key: 'name' | 'agency' | 'menteeCount';
     dir: 'asc' | 'desc';
   }>({ key: 'name', dir: 'asc' });
+  const [mentorListSortPreset, setMentorListSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [mentorshipSearch, setMentorshipSearch] = useState('');
   const [mentorshipStatusFilter, setMentorshipStatusFilter] = useState<'all' | MentorshipRegistration['status']>('all');
@@ -304,6 +321,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     key: 'entrepreneurName' | 'mentorName' | 'preferredDate' | 'status';
     dir: 'asc' | 'desc';
   }>({ key: 'status', dir: 'asc' });
+  const [mentorshipSortPreset, setMentorshipSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
+
+  const adminBookingSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'status_pending', label: 'Status (Menunggu Dahulu)' },
+    { value: 'hub_asc', label: 'Hab Lokasi (A - Z)' },
+    { value: 'category_asc', label: 'Kategori Perniagaan (A - Z)' }
+  ]);
+
+  const bizSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'featured_first', label: 'Perniagaan Pilihan Dahulu' },
+    { value: 'district_asc', label: 'Daerah (A - Z)' },
+    { value: 'category_asc', label: 'Kategori (A - Z)' },
+    { value: 'status_approved', label: 'Status (Aktif Dahulu)' }
+  ]);
+
+  const adminSlotSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'rate_asc', label: 'Kadar Sewa (Terendah)' },
+    { value: 'rate_desc', label: 'Kadar Sewa (Tertinggi)' },
+    { value: 'district_asc', label: 'Daerah (A - Z)' },
+    { value: 'status_available', label: 'Status (Tersedia Dahulu)' }
+  ]);
+
+  const progSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'amount_desc', label: 'Nilai Bantuan (Tertinggi)' },
+    { value: 'category_asc', label: 'Kategori Program (A - Z)' },
+    { value: 'date_asc', label: 'Tarikh Program (Terawal)' }
+  ]);
+
+  const mentorListSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'mentees_desc', label: 'Usahawan Diselia (Tertinggi)' },
+    { value: 'agency_asc', label: 'Agensi (A - Z)' },
+    { value: 'title_asc', label: 'Jawatan (A - Z)' }
+  ]);
+
+  const mentorshipSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'status_pending', label: 'Status (Menunggu Dahulu)' },
+    { value: 'session_date_asc', label: 'Tarikh Sesi (Terawal)' },
+    { value: 'mentor_asc', label: 'Nama Mentor (A - Z)' },
+    { value: 'district_asc', label: 'Daerah (A - Z)' }
+  ]);
 
   const [adminChartMode, setAdminChartMode] = useState<'districts' | 'pipeline'>('districts');
   const [reviewNoteInput, setReviewNoteInput] = useState<{ [bookingId: string]: string }>({});
@@ -677,139 +734,220 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   });
 
   const adminBookingOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2, cancelled: 3 };
-  const sortedBookings = [...filteredBookings].sort((a, b) => {
-    const dirMult = adminBookingSort.dir === 'asc' ? 1 : -1;
-    if (adminBookingSort.key === 'businessName') {
-      return `${a.slotCode} ${a.businessName}`.localeCompare(`${b.slotCode} ${b.businessName}`) * dirMult;
-    }
-    if (adminBookingSort.key === 'category') {
-      return (a.businessCategory || '').localeCompare(b.businessCategory || '') * dirMult;
-    }
-    if (adminBookingSort.key === 'hubLocation') {
-      return (a.hubLocation || '').localeCompare(b.hubLocation || '') * dirMult;
-    }
-    return ((adminBookingOrder[a.status] ?? 4) - (adminBookingOrder[b.status] ?? 4)) * dirMult;
+  const sortedBookings =
+    adminBookingSortPreset === 'table_column'
+      ? [...filteredBookings].sort((a, b) => {
+          const dirMult = adminBookingSort.dir === 'asc' ? 1 : -1;
+          if (adminBookingSort.key === 'businessName') {
+            return `${a.slotCode} ${a.businessName}`.localeCompare(`${b.slotCode} ${b.businessName}`) * dirMult;
+          }
+          if (adminBookingSort.key === 'category') {
+            return (a.businessCategory || '').localeCompare(b.businessCategory || '') * dirMult;
+          }
+          if (adminBookingSort.key === 'hubLocation') {
+            return (a.hubLocation || '').localeCompare(b.hubLocation || '') * dirMult;
+          }
+          return ((adminBookingOrder[a.status] ?? 4) - (adminBookingOrder[b.status] ?? 4)) * dirMult;
+        })
+      : sortRecords(filteredBookings, {
+          sortBy: adminBookingSortPreset,
+          getName: (b) => b.businessName || b.applicantName || b.slotCode || '',
+          customCompare: (a, b, mode) => {
+            if (mode === 'status_pending') return (adminBookingOrder[a.status] ?? 4) - (adminBookingOrder[b.status] ?? 4);
+            if (mode === 'hub_asc') return compareText(a.hubLocation, b.hubLocation);
+            if (mode === 'category_asc') return compareText(a.businessCategory, b.businessCategory);
+            return null;
+          }
+        });
+
+  const baseFilteredBusinesses = safeBusinesses.filter((biz) => {
+    if (bizStatusFilter === 'approved' && !biz.isApproved) return false;
+    if (bizStatusFilter === 'hidden' && biz.isApproved) return false;
+    if (bizStatusFilter === 'featured' && !biz.isFeatured) return false;
+    if (bizDistrictFilter !== 'Semua' && biz.district !== bizDistrictFilter) return false;
+    const q = bizSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (biz.businessName || '').toLowerCase().includes(q) ||
+      (biz.ownerName || '').toLowerCase().includes(q) ||
+      (biz.category || '').toLowerCase().includes(q) ||
+      (biz.district || '').toLowerCase().includes(q)
+    );
   });
 
-  const filteredBusinesses = safeBusinesses
-    .filter((biz) => {
-      if (bizStatusFilter === 'approved' && !biz.isApproved) return false;
-      if (bizStatusFilter === 'hidden' && biz.isApproved) return false;
-      if (bizStatusFilter === 'featured' && !biz.isFeatured) return false;
-      if (bizDistrictFilter !== 'Semua' && biz.district !== bizDistrictFilter) return false;
-      const q = bizSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        (biz.businessName || '').toLowerCase().includes(q) ||
-        (biz.ownerName || '').toLowerCase().includes(q) ||
-        (biz.category || '').toLowerCase().includes(q) ||
-        (biz.district || '').toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const dirMult = bizSort.dir === 'asc' ? 1 : -1;
-      if (bizSort.key === 'category') return (a.category || '').localeCompare(b.category || '') * dirMult;
-      if (bizSort.key === 'district') return (a.district || '').localeCompare(b.district || '') * dirMult;
-      if (bizSort.key === 'isApproved') return ((a.isApproved ? 1 : 0) - (b.isApproved ? 1 : 0)) * dirMult;
-      return (a.businessName || '').localeCompare(b.businessName || '') * dirMult;
-    });
+  const filteredBusinesses =
+    bizSortPreset === 'table_column'
+      ? [...baseFilteredBusinesses].sort((a, b) => {
+          const dirMult = bizSort.dir === 'asc' ? 1 : -1;
+          if (bizSort.key === 'category') return (a.category || '').localeCompare(b.category || '') * dirMult;
+          if (bizSort.key === 'district') return (a.district || '').localeCompare(b.district || '') * dirMult;
+          if (bizSort.key === 'isApproved') return ((a.isApproved ? 1 : 0) - (b.isApproved ? 1 : 0)) * dirMult;
+          return (a.businessName || '').localeCompare(b.businessName || '') * dirMult;
+        })
+      : sortRecords(baseFilteredBusinesses, {
+          sortBy: bizSortPreset,
+          getName: (biz) => biz.businessName || biz.ownerName || '',
+          customCompare: (a, b, mode) => {
+            if (mode === 'featured_first') return (a.isFeatured ? 0 : 1) - (b.isFeatured ? 0 : 1);
+            if (mode === 'district_asc') return compareText(a.district, b.district);
+            if (mode === 'category_asc') return compareText(a.category, b.category);
+            if (mode === 'status_approved') return (a.isApproved ? 0 : 1) - (b.isApproved ? 0 : 1);
+            return null;
+          }
+        });
 
-  const filteredAdminSlots = safeSlots
-    .filter((s) => {
-      if (adminSlotStatusFilter !== 'all' && s.status !== adminSlotStatusFilter) return false;
-      if (adminSlotDistrictFilter !== 'Semua' && s.district !== adminSlotDistrictFilter) return false;
-      const q = adminSlotSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        (s.code || '').toLowerCase().includes(q) ||
-        (s.name || '').toLowerCase().includes(q) ||
-        (s.hubLocation || '').toLowerCase().includes(q) ||
-        (s.district || '').toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const dirMult = adminSlotSort.dir === 'asc' ? 1 : -1;
-      if (adminSlotSort.key === 'district') return (a.district || '').localeCompare(b.district || '') * dirMult;
-      if (adminSlotSort.key === 'monthlyRate') return ((Number(a.monthlyRate) || 0) - (Number(b.monthlyRate) || 0)) * dirMult;
-      if (adminSlotSort.key === 'status') return (a.status || '').localeCompare(b.status || '') * dirMult;
-      return `${a.code} ${a.name}`.localeCompare(`${b.code} ${b.name}`) * dirMult;
-    });
+  const baseFilteredAdminSlots = safeSlots.filter((s) => {
+    if (adminSlotStatusFilter !== 'all' && s.status !== adminSlotStatusFilter) return false;
+    if (adminSlotDistrictFilter !== 'Semua' && s.district !== adminSlotDistrictFilter) return false;
+    const q = adminSlotSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (s.code || '').toLowerCase().includes(q) ||
+      (s.name || '').toLowerCase().includes(q) ||
+      (s.hubLocation || '').toLowerCase().includes(q) ||
+      (s.district || '').toLowerCase().includes(q)
+    );
+  });
 
-  const filteredAdminPrograms = safePrograms
-    .filter((p) => {
-      if (progCategoryFilter !== 'Semua' && p.category !== progCategoryFilter) return false;
-      const q = progSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        (p.title || '').toLowerCase().includes(q) ||
-        (p.category || '').toLowerCase().includes(q) ||
-        (p.description || '').toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const dirMult = progSort.dir === 'asc' ? 1 : -1;
-      if (progSort.key === 'category') return (a.category || '').localeCompare(b.category || '') * dirMult;
-      if (progSort.key === 'grantAmount') {
-        const numA = Number(String(a.grantAmount || '0').replace(/[^0-9.]/g, '')) || 0;
-        const numB = Number(String(b.grantAmount || '0').replace(/[^0-9.]/g, '')) || 0;
-        return (numA - numB) * dirMult;
-      }
-      return (a.title || '').localeCompare(b.title || '') * dirMult;
-    });
+  const slotStatusOrder: Record<string, number> = { available: 0, occupied: 1, maintenance: 2 };
+  const filteredAdminSlots =
+    adminSlotSortPreset === 'table_column'
+      ? [...baseFilteredAdminSlots].sort((a, b) => {
+          const dirMult = adminSlotSort.dir === 'asc' ? 1 : -1;
+          if (adminSlotSort.key === 'district') return (a.district || '').localeCompare(b.district || '') * dirMult;
+          if (adminSlotSort.key === 'monthlyRate') return ((Number(a.monthlyRate) || 0) - (Number(b.monthlyRate) || 0)) * dirMult;
+          if (adminSlotSort.key === 'status') return (a.status || '').localeCompare(b.status || '') * dirMult;
+          return `${a.code} ${a.name}`.localeCompare(`${b.code} ${b.name}`) * dirMult;
+        })
+      : sortRecords(baseFilteredAdminSlots, {
+          sortBy: adminSlotSortPreset,
+          getName: (s) => `${s.code || ''} ${s.name || ''}`.trim(),
+          customCompare: (a, b, mode) => {
+            if (mode === 'rate_asc') return (Number(a.monthlyRate) || 0) - (Number(b.monthlyRate) || 0);
+            if (mode === 'rate_desc') return (Number(b.monthlyRate) || 0) - (Number(a.monthlyRate) || 0);
+            if (mode === 'district_asc') return compareText(a.district, b.district);
+            if (mode === 'status_available') return (slotStatusOrder[a.status] ?? 3) - (slotStatusOrder[b.status] ?? 3);
+            return null;
+          }
+        });
 
-  const filteredAdminMentors = mentors
-    .filter((m) => {
-      const q = mentorListSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        (m.name || '').toLowerCase().includes(q) ||
-        (m.agency || '').toLowerCase().includes(q) ||
-        (m.title || '').toLowerCase().includes(q) ||
-        (m.email || '').toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const dirMult = mentorListSort.dir === 'asc' ? 1 : -1;
-      if (mentorListSort.key === 'agency') return (a.agency || '').localeCompare(b.agency || '') * dirMult;
-      if (mentorListSort.key === 'menteeCount') {
-        const countA = mentorshipRegistrations.filter(r => r.mentorId === a.id).length;
-        const countB = mentorshipRegistrations.filter(r => r.mentorId === b.id).length;
-        return (countA - countB) * dirMult;
-      }
-      return (a.name || '').localeCompare(b.name || '') * dirMult;
-    });
+  const baseFilteredAdminPrograms = safePrograms.filter((p) => {
+    if (progCategoryFilter !== 'Semua' && p.category !== progCategoryFilter) return false;
+    const q = progSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (p.title || '').toLowerCase().includes(q) ||
+      (p.category || '').toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q)
+    );
+  });
+
+  const filteredAdminPrograms =
+    progSortPreset === 'table_column'
+      ? [...baseFilteredAdminPrograms].sort((a, b) => {
+          const dirMult = progSort.dir === 'asc' ? 1 : -1;
+          if (progSort.key === 'category') return (a.category || '').localeCompare(b.category || '') * dirMult;
+          if (progSort.key === 'grantAmount') {
+            const numA = Number(String(a.grantAmount || '0').replace(/[^0-9.]/g, '')) || 0;
+            const numB = Number(String(b.grantAmount || '0').replace(/[^0-9.]/g, '')) || 0;
+            return (numA - numB) * dirMult;
+          }
+          return (a.title || '').localeCompare(b.title || '') * dirMult;
+        })
+      : sortRecords(baseFilteredAdminPrograms, {
+          sortBy: progSortPreset,
+          getName: (p) => p.title || '',
+          customCompare: (a, b, mode) => {
+            if (mode === 'amount_desc') return parseNumericAmount(b.grantAmount) - parseNumericAmount(a.grantAmount);
+            if (mode === 'category_asc') return compareText(a.category, b.category);
+            if (mode === 'date_asc') return getTimestampMs(a.date) - getTimestampMs(b.date);
+            return null;
+          }
+        });
+
+  const baseFilteredAdminMentors = mentors.filter((m) => {
+    const q = mentorListSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (m.name || '').toLowerCase().includes(q) ||
+      (m.agency || '').toLowerCase().includes(q) ||
+      (m.title || '').toLowerCase().includes(q) ||
+      (m.email || '').toLowerCase().includes(q)
+    );
+  });
+
+  const filteredAdminMentors =
+    mentorListSortPreset === 'table_column'
+      ? [...baseFilteredAdminMentors].sort((a, b) => {
+          const dirMult = mentorListSort.dir === 'asc' ? 1 : -1;
+          if (mentorListSort.key === 'agency') return (a.agency || '').localeCompare(b.agency || '') * dirMult;
+          if (mentorListSort.key === 'menteeCount') {
+            const countA = mentorshipRegistrations.filter(r => r.mentorId === a.id).length;
+            const countB = mentorshipRegistrations.filter(r => r.mentorId === b.id).length;
+            return (countA - countB) * dirMult;
+          }
+          return (a.name || '').localeCompare(b.name || '') * dirMult;
+        })
+      : sortRecords(baseFilteredAdminMentors, {
+          sortBy: mentorListSortPreset,
+          getName: (m) => m.name || '',
+          customCompare: (a, b, mode) => {
+            if (mode === 'mentees_desc') {
+              const countA = mentorshipRegistrations.filter(r => r.mentorId === a.id).length;
+              const countB = mentorshipRegistrations.filter(r => r.mentorId === b.id).length;
+              return countB - countA;
+            }
+            if (mode === 'agency_asc') return compareText(a.agency, b.agency);
+            if (mode === 'title_asc') return compareText(a.title, b.title);
+            return null;
+          }
+        });
 
   const mentorStatusOrder: Record<string, number> = { pending: 0, confirmed: 1, completed: 2, cancelled: 3 };
-  const sortedMentorships = [...mentorshipRegistrations]
-    .filter((m) => {
-      if (mentorshipStatusFilter !== 'all' && m.status !== mentorshipStatusFilter) return false;
-      const q = mentorshipSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        (m.entrepreneurName || '').toLowerCase().includes(q) ||
-        (m.businessName || '').toLowerCase().includes(q) ||
-        (m.mentorName || '').toLowerCase().includes(q) ||
-        (m.topic || '').toLowerCase().includes(q) ||
-        (m.district || '').toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const dirMult = mentorshipSort.dir === 'asc' ? 1 : -1;
-      if (mentorshipSort.key === 'entrepreneurName') {
-        return (a.entrepreneurName || '').localeCompare(b.entrepreneurName || '') * dirMult;
-      }
-      if (mentorshipSort.key === 'mentorName') {
-        return (a.mentorName || '').localeCompare(b.mentorName || '') * dirMult;
-      }
-      if (mentorshipSort.key === 'preferredDate') {
-        return (a.preferredDate || '').localeCompare(b.preferredDate || '') * dirMult;
-      }
-      return ((mentorStatusOrder[a.status] ?? 4) - (mentorStatusOrder[b.status] ?? 4)) * dirMult;
-    });
+  const baseFilteredMentorships = mentorshipRegistrations.filter((m) => {
+    if (mentorshipStatusFilter !== 'all' && m.status !== mentorshipStatusFilter) return false;
+    const q = mentorshipSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (m.entrepreneurName || '').toLowerCase().includes(q) ||
+      (m.businessName || '').toLowerCase().includes(q) ||
+      (m.mentorName || '').toLowerCase().includes(q) ||
+      (m.topic || '').toLowerCase().includes(q) ||
+      (m.district || '').toLowerCase().includes(q)
+    );
+  });
+
+  const sortedMentorships =
+    mentorshipSortPreset === 'table_column'
+      ? [...baseFilteredMentorships].sort((a, b) => {
+          const dirMult = mentorshipSort.dir === 'asc' ? 1 : -1;
+          if (mentorshipSort.key === 'entrepreneurName') {
+            return (a.entrepreneurName || '').localeCompare(b.entrepreneurName || '') * dirMult;
+          }
+          if (mentorshipSort.key === 'mentorName') {
+            return (a.mentorName || '').localeCompare(b.mentorName || '') * dirMult;
+          }
+          if (mentorshipSort.key === 'preferredDate') {
+            return (a.preferredDate || '').localeCompare(b.preferredDate || '') * dirMult;
+          }
+          return ((mentorStatusOrder[a.status] ?? 4) - (mentorStatusOrder[b.status] ?? 4)) * dirMult;
+        })
+      : sortRecords(baseFilteredMentorships, {
+          sortBy: mentorshipSortPreset,
+          getName: (m) => `${m.entrepreneurName || ''} ${m.businessName || ''}`.trim(),
+          customCompare: (a, b, mode) => {
+            if (mode === 'status_pending') return (mentorStatusOrder[a.status] ?? 4) - (mentorStatusOrder[b.status] ?? 4);
+            if (mode === 'session_date_asc') return getTimestampMs(a.preferredDate) - getTimestampMs(b.preferredDate);
+            if (mode === 'mentor_asc') return compareText(a.mentorName, b.mentorName);
+            if (mode === 'district_asc') return compareText(a.district, b.district);
+            return null;
+          }
+        });
 
   const adminBookingsPagination = usePagination(sortedBookings, 7, [
     bookingFilter,
     adminBookingSearch,
+    adminBookingSortPreset,
     adminBookingSort.key,
     adminBookingSort.dir,
     sortedBookings.length
@@ -818,6 +956,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     bizSearch,
     bizStatusFilter,
     bizDistrictFilter,
+    bizSortPreset,
     bizSort.key,
     bizSort.dir,
     filteredBusinesses.length
@@ -826,6 +965,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     adminSlotSearch,
     adminSlotStatusFilter,
     adminSlotDistrictFilter,
+    adminSlotSortPreset,
     adminSlotSort.key,
     adminSlotSort.dir,
     filteredAdminSlots.length
@@ -833,12 +973,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const programsPagination = usePagination(filteredAdminPrograms, 7, [
     progSearch,
     progCategoryFilter,
+    progSortPreset,
     progSort.key,
     progSort.dir,
     filteredAdminPrograms.length
   ]);
   const adminMentorsPagination = usePagination(filteredAdminMentors, 7, [
     mentorListSearch,
+    mentorListSortPreset,
     mentorListSort.key,
     mentorListSort.dir,
     filteredAdminMentors.length
@@ -846,6 +988,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const adminMentorshipsPagination = usePagination(sortedMentorships, 7, [
     mentorshipSearch,
     mentorshipStatusFilter,
+    mentorshipSortPreset,
     mentorshipSort.key,
     mentorshipSort.dir,
     sortedMentorships.length
@@ -877,12 +1020,106 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-rose-500/12 dark:bg-rose-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
 
         <div className="relative z-10">
-          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
-            Panel Pengurusan &amp; Kelulusan <span className="kbelia-title-shimmer">Hab KBelia</span>
-          </h1>
-          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 max-w-2xl">
-            Semak dan luluskan permohonan sewaan kapsul, geran pembiayaan, profil usahawan dan program belia.
-          </p>
+          {(() => {
+            const adminHeaderMap: Record<AdminSubTab, { prefix: string; accent: string; subtitle: string }> = {
+              queue: {
+                prefix: isMs ? 'Giliran Semakan & ' : 'Review & ',
+                accent: isMs ? 'Kelulusan' : 'Approval Queue',
+                subtitle: isMs
+                  ? 'Semak dan luluskan permohonan baharu sewaan kapsul niaga, geran pembiayaan, serta pendaftaran mentor.'
+                  : 'Review and approve new capsule kiosk leases, funding grants, and mentor registrations.'
+              },
+              bookings: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Tempahan Kiosk' : 'Kiosk Bookings',
+                subtitle: isMs
+                  ? 'Urus permohonan sewaan ruang kapsul niaga, status kelulusan, dan penempatan usahawan mengikut jajahan.'
+                  : 'Manage capsule kiosk lease requests, approval statuses, and entrepreneur placements across districts.'
+              },
+              businesses: {
+                prefix: isMs ? 'Direktori & Audit ' : 'Entrepreneur Directory & ',
+                accent: isMs ? 'Usahawan' : 'Audit',
+                subtitle: isMs
+                  ? 'Pantau senarai perniagaan belia berdaftar, pengesahan SSM, serta kelulusan paparan direktori awam.'
+                  : 'Monitor registered youth businesses, SSM verification, and public directory listing approvals.'
+              },
+              slots: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Slot Kiosk' : 'Kiosk Slots',
+                subtitle: isMs
+                  ? 'Konfigurasi unit kapsul niaga, kadar sewaan bulanan, kemudahan tapak, dan status kekosongan semasa.'
+                  : 'Configure capsule kiosk units, monthly rental rates, site amenities, and live availability statuses.'
+              },
+              programs: {
+                prefix: isMs ? 'Pengurusan Geran & ' : 'Manage Grants & ',
+                accent: isMs ? 'Inisiatif' : 'Initiatives',
+                subtitle: isMs
+                  ? 'Selenggara senarai program bantuan modal, tarikh tutup permohonan, dan agihan dana belia Kelantan.'
+                  : 'Maintain capital assistance programs, application deadlines, and Kelantan youth fund allocations.'
+              },
+              mentors: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Panel Mentor' : 'Mentor Panel',
+                subtitle: isMs
+                  ? 'Selaras senarai mentor bertauliah, agensi rakan strategik, dan agihan sesi bimbingan usahawan.'
+                  : 'Coordinate certified mentors, strategic agency partners, and entrepreneur coaching assignments.'
+              },
+              news: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Berita Rasmi' : 'Official News',
+                subtitle: isMs
+                  ? 'Terbit, sunting, dan sematkan pengumuman penting serta info terkini untuk komuniti portal.'
+                  : 'Publish, edit, and pin important announcements and latest updates for the portal community.'
+              },
+              b2b: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Ruang Niaga' : 'Ruang Niaga Ads',
+                subtitle: isMs
+                  ? 'Kawal selia iklan bekalan dan permintaan niaga B2B antara usahawan dan pembekal negeri.'
+                  : 'Moderate B2B supply and demand trade listings between youth entrepreneurs and state suppliers.'
+              },
+              events: {
+                prefix: isMs ? 'Pengurusan Acara & ' : 'Manage Events & ',
+                accent: isMs ? 'Tempahan' : 'Bookings',
+                subtitle: isMs
+                  ? 'Atur jadual karnival, bengkel keusahawanan, sesi pitching, dan penyertaan tapak jualan belia.'
+                  : 'Organize carnivals, entrepreneurship workshops, pitching sessions, and youth booth participations.'
+              },
+              users: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Pengguna Portal' : 'Portal Users',
+                subtitle: isMs
+                  ? 'Urus akaun berdaftar, peranan akses (Usahawan, Mentor, Pentadbir), dan status pengesahan pengguna.'
+                  : 'Manage registered accounts, access roles (Entrepreneur, Mentor, Admin), and verification statuses.'
+              },
+              sync: {
+                prefix: isMs ? 'Penyelarasan & ' : 'Database ',
+                accent: isMs ? 'Segerak Data' : 'Data Sync',
+                subtitle: isMs
+                  ? 'Pantau integriti rekod pangkalan data serta penyelarasan status operasi sistem secara langsung.'
+                  : 'Monitor database record integrity and synchronize live portal operational states.'
+              },
+              settings: {
+                prefix: isMs ? 'Pengurusan ' : 'Manage ',
+                accent: isMs ? 'Tetapan Operasi' : 'Operations Settings',
+                subtitle: isMs
+                  ? 'Laras kadar subsidi sewaan, tempoh maksimum pajakan kiosk, maklumat pegawai, dan pengumuman sistem.'
+                  : 'Adjust rental subsidy rates, maximum lease durations, officer contacts, and system announcements.'
+              }
+            };
+            const currentAdminHeader = adminHeaderMap[adminTab] || adminHeaderMap.queue;
+            return (
+              <>
+                <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+                  {currentAdminHeader.prefix}
+                  <span className="kbelia-title-shimmer">{currentAdminHeader.accent}</span>
+                </h1>
+                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 max-w-2xl">
+                  {currentAdminHeader.subtitle}
+                </p>
+              </>
+            );
+          })()}
         </div>
       </div>
 
@@ -1560,8 +1797,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               searchValue={adminBookingSearch}
               onSearchChange={setAdminBookingSearch}
               searchPlaceholder="Cari pemohon, perniagaan atau kod kapsul..."
-              filterCount={bookingFilter !== 'all' ? 1 : 0}
-              onResetFilters={() => setBookingFilter('all')}
+              filterCount={(bookingFilter !== 'all' ? 1 : 0) + (adminBookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
+              onResetFilters={() => {
+                setBookingFilter('all');
+                setAdminBookingSortPreset(DEFAULT_SORT_VALUE);
+              }}
+              sortOptions={
+                adminBookingSortPreset === 'table_column'
+                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...adminBookingSortOptions]
+                  : adminBookingSortOptions
+              }
+              sortValue={adminBookingSortPreset === 'table_column' ? '' : adminBookingSortPreset}
+              onSortChange={(val) => {
+                if (val) setAdminBookingSortPreset(val);
+              }}
               filterContent={
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
@@ -1602,6 +1851,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     onClick={() => {
                       setAdminBookingSearch('');
                       setBookingFilter('all');
+                      setAdminBookingSortPreset(DEFAULT_SORT_VALUE);
                     }}
                     className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                   >
@@ -1618,13 +1868,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 pl-5 pr-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setAdminBookingSortPreset('table_column');
                               setAdminBookingSort((prev) =>
                                 prev.key === 'businessName'
                                   ? { key: 'businessName', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'businessName', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Kapsul &amp; Perniagaan</span>
@@ -1634,13 +1885,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setAdminBookingSortPreset('table_column');
                               setAdminBookingSort((prev) =>
                                 prev.key === 'category'
                                   ? { key: 'category', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'category', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Kategori</span>
@@ -1650,13 +1902,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setAdminBookingSortPreset('table_column');
                               setAdminBookingSort((prev) =>
                                 prev.key === 'hubLocation'
                                   ? { key: 'hubLocation', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'hubLocation', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Pemohon &amp; Lokasi</span>
@@ -1666,13 +1919,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setAdminBookingSortPreset('table_column');
                               setAdminBookingSort((prev) =>
                                 prev.key === 'status'
                                   ? { key: 'status', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'status', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Status</span>
@@ -1909,10 +2163,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               searchValue={bizSearch}
               onSearchChange={setBizSearch}
               searchPlaceholder="Cari nama perniagaan, pemilik atau kategori..."
-              filterCount={(bizStatusFilter !== 'all' ? 1 : 0) + (bizDistrictFilter !== 'Semua' ? 1 : 0)}
+              filterCount={
+                (bizStatusFilter !== 'all' ? 1 : 0) +
+                (bizDistrictFilter !== 'Semua' ? 1 : 0) +
+                (bizSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+              }
               onResetFilters={() => {
                 setBizStatusFilter('all');
                 setBizDistrictFilter('Semua');
+                setBizSortPreset(DEFAULT_SORT_VALUE);
+              }}
+              sortOptions={
+                bizSortPreset === 'table_column'
+                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...bizSortOptions]
+                  : bizSortOptions
+              }
+              sortValue={bizSortPreset === 'table_column' ? '' : bizSortPreset}
+              onSortChange={(val) => {
+                if (val) setBizSortPreset(val);
               }}
               filterContent={
                 <>
@@ -1973,6 +2241,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     setBizSearch('');
                     setBizStatusFilter('all');
                     setBizDistrictFilter('Semua');
+                    setBizSortPreset(DEFAULT_SORT_VALUE);
                   }}
                   className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
@@ -1988,13 +2257,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 pl-5 pr-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setBizSortPreset('table_column');
                               setBizSort((prev) =>
                                 prev.key === 'businessName'
                                   ? { key: 'businessName', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'businessName', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Perniagaan &amp; Pemilik</span>
@@ -2004,13 +2274,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setBizSortPreset('table_column');
                               setBizSort((prev) =>
                                 prev.key === 'category'
                                   ? { key: 'category', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'category', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Kategori</span>
@@ -2020,13 +2291,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setBizSortPreset('table_column');
                               setBizSort((prev) =>
                                 prev.key === 'district'
                                   ? { key: 'district', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'district', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Daerah &amp; SSM</span>
@@ -2037,13 +2309,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setBizSortPreset('table_column');
                               setBizSort((prev) =>
                                 prev.key === 'isApproved'
                                   ? { key: 'isApproved', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'isApproved', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Status</span>
@@ -2338,10 +2611,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               searchValue={adminSlotSearch}
               onSearchChange={setAdminSlotSearch}
               searchPlaceholder="Cari kod kapsul, nama, hab atau daerah..."
-              filterCount={(adminSlotStatusFilter !== 'all' ? 1 : 0) + (adminSlotDistrictFilter !== 'Semua' ? 1 : 0)}
+              filterCount={
+                (adminSlotStatusFilter !== 'all' ? 1 : 0) +
+                (adminSlotDistrictFilter !== 'Semua' ? 1 : 0) +
+                (adminSlotSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+              }
               onResetFilters={() => {
                 setAdminSlotStatusFilter('all');
                 setAdminSlotDistrictFilter('Semua');
+                setAdminSlotSortPreset(DEFAULT_SORT_VALUE);
+              }}
+              sortOptions={
+                adminSlotSortPreset === 'table_column'
+                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...adminSlotSortOptions]
+                  : adminSlotSortOptions
+              }
+              sortValue={adminSlotSortPreset === 'table_column' ? '' : adminSlotSortPreset}
+              onSortChange={(val) => {
+                if (val) setAdminSlotSortPreset(val);
               }}
               filterContent={
                 <>
@@ -2402,6 +2689,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     setAdminSlotSearch('');
                     setAdminSlotStatusFilter('all');
                     setAdminSlotDistrictFilter('Semua');
+                    setAdminSlotSortPreset(DEFAULT_SORT_VALUE);
                   }}
                   className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
@@ -2417,13 +2705,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 pl-5 pr-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setAdminSlotSortPreset('table_column');
                               setAdminSlotSort((prev) =>
                                 prev.key === 'name'
                                   ? { key: 'name', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'name', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Unit Kapsul</span>
@@ -2433,13 +2722,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setAdminSlotSortPreset('table_column');
                               setAdminSlotSort((prev) =>
                                 prev.key === 'district'
                                   ? { key: 'district', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'district', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Lokasi &amp; Daerah</span>
@@ -2449,13 +2739,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setAdminSlotSortPreset('table_column');
                               setAdminSlotSort((prev) =>
                                 prev.key === 'monthlyRate'
                                   ? { key: 'monthlyRate', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'monthlyRate', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Kadar Sewa</span>
@@ -2465,13 +2756,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setAdminSlotSortPreset('table_column');
                               setAdminSlotSort((prev) =>
                                 prev.key === 'status'
                                   ? { key: 'status', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'status', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Status</span>
@@ -2750,8 +3042,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               searchValue={progSearch}
               onSearchChange={setProgSearch}
               searchPlaceholder="Cari tajuk program, kategori atau keterangan..."
-              filterCount={progCategoryFilter !== 'Semua' ? 1 : 0}
-              onResetFilters={() => setProgCategoryFilter('Semua')}
+              filterCount={(progCategoryFilter !== 'Semua' ? 1 : 0) + (progSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
+              onResetFilters={() => {
+                setProgCategoryFilter('Semua');
+                setProgSortPreset(DEFAULT_SORT_VALUE);
+              }}
+              sortOptions={
+                progSortPreset === 'table_column'
+                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...progSortOptions]
+                  : progSortOptions
+              }
+              sortValue={progSortPreset === 'table_column' ? '' : progSortPreset}
+              onSortChange={(val) => {
+                if (val) setProgSortPreset(val);
+              }}
               filterContent={
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
@@ -2783,6 +3087,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   onClick={() => {
                     setProgSearch('');
                     setProgCategoryFilter('Semua');
+                    setProgSortPreset(DEFAULT_SORT_VALUE);
                   }}
                   className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
@@ -2798,13 +3103,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 pl-5 pr-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setProgSortPreset('table_column');
                               setProgSort((prev) =>
                                 prev.key === 'title'
                                   ? { key: 'title', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'title', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Program</span>
@@ -2814,13 +3120,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setProgSortPreset('table_column');
                               setProgSort((prev) =>
                                 prev.key === 'category'
                                   ? { key: 'category', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'category', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Kategori</span>
@@ -2830,13 +3137,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3">
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={() => {
+                              setProgSortPreset('table_column');
                               setProgSort((prev) =>
                                 prev.key === 'grantAmount'
                                   ? { key: 'grantAmount', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                   : { key: 'grantAmount', dir: 'asc' }
-                              )
-                            }
+                              );
+                            }}
                             className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Nilai Bantuan</span>
@@ -2968,6 +3276,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 searchValue={mentorListSearch}
                 onSearchChange={setMentorListSearch}
                 searchPlaceholder="Cari nama mentor, agensi atau jawatan..."
+                filterCount={mentorListSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0}
+                onResetFilters={() => setMentorListSortPreset(DEFAULT_SORT_VALUE)}
+                sortOptions={
+                  mentorListSortPreset === 'table_column'
+                    ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...mentorListSortOptions]
+                    : mentorListSortOptions
+                }
+                sortValue={mentorListSortPreset === 'table_column' ? '' : mentorListSortPreset}
+                onSortChange={(val) => {
+                  if (val) setMentorListSortPreset(val);
+                }}
               />
 
               {filteredAdminMentors.length === 0 ? (
@@ -2983,13 +3302,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <th className="py-3 pl-5 pr-3">
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                setMentorListSortPreset('table_column');
                                 setMentorListSort((prev) =>
                                   prev.key === 'name'
                                     ? { key: 'name', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                     : { key: 'name', dir: 'asc' }
-                                )
-                              }
+                                );
+                              }}
                               className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                             >
                               <span>Mentor</span>
@@ -2999,13 +3319,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <th className="py-3 px-3">
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                setMentorListSortPreset('table_column');
                                 setMentorListSort((prev) =>
                                   prev.key === 'agency'
                                     ? { key: 'agency', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                     : { key: 'agency', dir: 'asc' }
-                                )
-                              }
+                                );
+                              }}
                               className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                             >
                               <span>Agensi &amp; Jawatan</span>
@@ -3015,13 +3336,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <th className="py-3 px-3">
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                setMentorListSortPreset('table_column');
                                 setMentorListSort((prev) =>
                                   prev.key === 'menteeCount'
                                     ? { key: 'menteeCount', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                     : { key: 'menteeCount', dir: 'desc' }
-                                )
-                              }
+                                );
+                              }}
                               className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                             >
                               <span>Usahawan Diselia</span>
@@ -3139,8 +3461,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 searchValue={mentorshipSearch}
                 onSearchChange={setMentorshipSearch}
                 searchPlaceholder="Cari usahawan, perniagaan, mentor atau topik..."
-                filterCount={mentorshipStatusFilter !== 'all' ? 1 : 0}
-                onResetFilters={() => setMentorshipStatusFilter('all')}
+                filterCount={
+                  (mentorshipStatusFilter !== 'all' ? 1 : 0) +
+                  (mentorshipSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+                }
+                onResetFilters={() => {
+                  setMentorshipStatusFilter('all');
+                  setMentorshipSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                sortOptions={
+                  mentorshipSortPreset === 'table_column'
+                    ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...mentorshipSortOptions]
+                    : mentorshipSortOptions
+                }
+                sortValue={mentorshipSortPreset === 'table_column' ? '' : mentorshipSortPreset}
+                onSortChange={(val) => {
+                  if (val) setMentorshipSortPreset(val);
+                }}
                 filterContent={
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
@@ -3183,6 +3520,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       onClick={() => {
                         setMentorshipSearch('');
                         setMentorshipStatusFilter('all');
+                        setMentorshipSortPreset(DEFAULT_SORT_VALUE);
                       }}
                       className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                     >
@@ -3199,13 +3537,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <th className="py-3 pl-5 pr-3">
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                setMentorshipSortPreset('table_column');
                                 setMentorshipSort((prev) =>
                                   prev.key === 'entrepreneurName'
                                     ? { key: 'entrepreneurName', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                     : { key: 'entrepreneurName', dir: 'asc' }
-                                )
-                              }
+                                );
+                              }}
                               className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                             >
                               <span>Usahawan &amp; Perniagaan</span>
@@ -3215,13 +3554,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <th className="py-3 px-3">
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                setMentorshipSortPreset('table_column');
                                 setMentorshipSort((prev) =>
                                   prev.key === 'mentorName'
                                     ? { key: 'mentorName', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                     : { key: 'mentorName', dir: 'asc' }
-                                )
-                              }
+                                );
+                              }}
                               className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                             >
                               <span>Mentor &amp; Topik</span>
@@ -3231,13 +3571,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <th className="py-3 px-3">
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                setMentorshipSortPreset('table_column');
                                 setMentorshipSort((prev) =>
                                   prev.key === 'preferredDate'
                                     ? { key: 'preferredDate', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                     : { key: 'preferredDate', dir: 'asc' }
-                                )
-                              }
+                                );
+                              }}
                               className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                             >
                               <span>Tarikh &amp; Mod</span>
@@ -3247,13 +3588,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <th className="py-3 px-3">
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                setMentorshipSortPreset('table_column');
                                 setMentorshipSort((prev) =>
                                   prev.key === 'status'
                                     ? { key: 'status', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
                                     : { key: 'status', dir: 'asc' }
-                                )
-                              }
+                                );
+                              }}
                               className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                             >
                               <span>Status</span>

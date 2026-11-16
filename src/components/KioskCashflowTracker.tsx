@@ -24,6 +24,7 @@ import { showToast } from './ToastNotification';
 import { EditCashflowModal } from './EditCashflowModal';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { exportSalesToExcel } from '../utils/excelExport';
+import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 
 interface KioskCashflowTrackerProps {
   kioskName?: string;
@@ -79,6 +80,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   const [monthFilter, setMonthFilter] = useState<string>('Semua');
   const [categoryFilter, setCategoryFilter] = useState<SaleCategoryFilter>('all');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [sortConfig, setSortConfig] = useState<{ key: SaleSortKey; dir: 'asc' | 'desc' }>({
     key: 'date',
     dir: 'desc'
@@ -166,6 +168,24 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     return ['Semua', ...Array.from(months).sort((a, b) => b.localeCompare(a))];
   }, [salesRecords]);
 
+  const cashflowSortOptions = useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          { value: 'date_desc', label: 'Tarikh Rekod (Terbaru)' },
+          { value: 'date_asc', label: 'Tarikh Rekod (Terlama)' },
+          { value: 'net_desc', label: 'Untung Bersih (Tertinggi)' },
+          { value: 'total_desc', label: 'Jumlah Jualan (Tertinggi)' }
+        ],
+        false,
+        {
+          asc: 'Catatan / Tajuk (A - Z)',
+          desc: 'Catatan / Tajuk (Z - A)'
+        }
+      ),
+    []
+  );
+
   const filteredSortedSales = useMemo(() => {
     const q = salesSearch.trim().toLowerCase();
     const filtered = salesRecords.filter((r) => {
@@ -185,38 +205,61 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
       return matchesSearch && matchesMonth && matchesCategory;
     });
 
-    const dirMult = sortConfig.dir === 'asc' ? 1 : -1;
-    return [...filtered].sort((a, b) => {
-      switch (sortConfig.key) {
-        case 'cashSales':
-          return (a.cashSales - b.cashSales) * dirMult;
-        case 'qrSales':
-          return (a.qrSales - b.qrSales) * dirMult;
-        case 'expenses':
-          return (a.expenses - b.expenses) * dirMult;
-        case 'net': {
+    if (sortBy === 'table_column') {
+      const dirMult = sortConfig.dir === 'asc' ? 1 : -1;
+      return [...filtered].sort((a, b) => {
+        switch (sortConfig.key) {
+          case 'cashSales':
+            return (a.cashSales - b.cashSales) * dirMult;
+          case 'qrSales':
+            return (a.qrSales - b.qrSales) * dirMult;
+          case 'expenses':
+            return (a.expenses - b.expenses) * dirMult;
+          case 'net': {
+            const netA = (a.cashSales + a.qrSales) - a.expenses;
+            const netB = (b.cashSales + b.qrSales) - b.expenses;
+            return (netA - netB) * dirMult;
+          }
+          case 'date':
+          default:
+            return (a.date || '').localeCompare(b.date || '') * dirMult;
+        }
+      });
+    }
+
+    return sortRecords(filtered, {
+      sortBy,
+      getName: (r) => r.notes || formatSaleDate(r.date) || r.date || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'date_desc') return (b.date || '').localeCompare(a.date || '');
+        if (mode === 'date_asc') return (a.date || '').localeCompare(b.date || '');
+        if (mode === 'net_desc') {
           const netA = (a.cashSales + a.qrSales) - a.expenses;
           const netB = (b.cashSales + b.qrSales) - b.expenses;
-          return (netA - netB) * dirMult;
+          return netB - netA;
         }
-        case 'date':
-        default:
-          return (a.date || '').localeCompare(b.date || '') * dirMult;
+        if (mode === 'total_desc') {
+          return (b.cashSales + b.qrSales) - (a.cashSales + a.qrSales);
+        }
+        return null;
       }
     });
-  }, [salesRecords, salesSearch, monthFilter, categoryFilter, sortConfig]);
+  }, [salesRecords, salesSearch, monthFilter, categoryFilter, sortBy, sortConfig]);
 
   const salesPagination = usePagination(filteredSortedSales, 7, [
     salesRecords.length,
     salesSearch,
     monthFilter,
     categoryFilter,
+    sortBy,
     sortConfig.key,
     sortConfig.dir
   ]);
 
   const activeFilterCount =
-    (monthFilter !== 'Semua' ? 1 : 0) + (categoryFilter !== 'all' ? 1 : 0);
+    (monthFilter !== 'Semua' ? 1 : 0) +
+    (categoryFilter !== 'all' ? 1 : 0) +
+    (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   const pageIds = salesPagination.paginatedItems.map((r) => r.id);
   const allPageSelected =
@@ -237,6 +280,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   };
 
   const toggleSort = (key: SaleSortKey) => {
+    setSortBy('table_column');
     setSortConfig((prev) =>
       prev.key === key
         ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
@@ -594,6 +638,29 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
 
               {isFilterOpen && (
                 <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
+                  <div className="pb-3 border-b border-slate-200 dark:border-zinc-700">
+                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                      <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                      <span>Susun Mengikut</span>
+                    </label>
+                    <select
+                      value={sortBy === 'table_column' ? '' : sortBy}
+                      onChange={(e) => {
+                        if (e.target.value) setSortBy(e.target.value);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer"
+                    >
+                      {sortBy === 'table_column' && (
+                        <option value="">Ikut Lajur Jadual</option>
+                      )}
+                      {cashflowSortOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
                       Bulan / Tempoh
@@ -646,6 +713,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                       onClick={() => {
                         setMonthFilter('Semua');
                         setCategoryFilter('all');
+                        setSortBy(DEFAULT_SORT_VALUE);
                       }}
                       className="text-xs font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
                     >

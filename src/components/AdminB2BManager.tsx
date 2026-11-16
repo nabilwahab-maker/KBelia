@@ -31,6 +31,7 @@ import { b2bKopiSangaiImg, resolveB2BImage } from '../utils/visualAssets';
 import { showToast } from './ToastNotification';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
+import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -65,6 +66,7 @@ export const AdminB2BManager: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'supply' | 'demand'>('all');
   const [districtFilter, setDistrictFilter] = useState<string>('Semua');
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [sortConfig, setSortConfig] = useState<{
     key: 'title' | 'type' | 'district' | 'date';
     dir: 'asc' | 'desc';
@@ -129,7 +131,25 @@ export const AdminB2BManager: React.FC = () => {
     };
   }, [user?.uid, isDemoSession]);
 
+  const b2bSortOptions = useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          { value: 'supply_first', label: 'Jenis Iklan (Membekal Dahulu)' },
+          { value: 'demand_first', label: 'Jenis Iklan (Mencari Dahulu)' },
+          { value: 'district_asc', label: 'Daerah (A - Z)' }
+        ],
+        false,
+        {
+          asc: 'Tajuk Iklan (A - Z)',
+          desc: 'Tajuk Iklan (Z - A)'
+        }
+      ),
+    []
+  );
+
   const toggleSort = (key: 'title' | 'type' | 'district' | 'date') => {
+    setSortBy('table_column');
     setSortConfig((prev) =>
       prev.key === key
         ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
@@ -152,31 +172,48 @@ export const AdminB2BManager: React.FC = () => {
       );
     });
 
-    const dirMult = sortConfig.dir === 'asc' ? 1 : -1;
-    return [...filtered].sort((a, b) => {
-      if (sortConfig.key === 'title') {
-        return a.title.localeCompare(b.title) * dirMult;
+    if (sortBy === 'table_column') {
+      const dirMult = sortConfig.dir === 'asc' ? 1 : -1;
+      return [...filtered].sort((a, b) => {
+        if (sortConfig.key === 'title') {
+          return a.title.localeCompare(b.title) * dirMult;
+        }
+        if (sortConfig.key === 'type') {
+          return a.type.localeCompare(b.type) * dirMult;
+        }
+        if (sortConfig.key === 'district') {
+          return (a.district || '').localeCompare(b.district || '') * dirMult;
+        }
+        return (a.date || '').localeCompare(b.date || '') * dirMult;
+      });
+    }
+
+    return sortRecords(filtered, {
+      sortBy,
+      getName: (item) => item.title || item.authorBusiness || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'supply_first') return (a.type === 'supply' ? 0 : 1) - (b.type === 'supply' ? 0 : 1);
+        if (mode === 'demand_first') return (a.type === 'demand' ? 0 : 1) - (b.type === 'demand' ? 0 : 1);
+        if (mode === 'district_asc') return compareText(a.district, b.district);
+        return null;
       }
-      if (sortConfig.key === 'type') {
-        return a.type.localeCompare(b.type) * dirMult;
-      }
-      if (sortConfig.key === 'district') {
-        return (a.district || '').localeCompare(b.district || '') * dirMult;
-      }
-      return (a.date || '').localeCompare(b.date || '') * dirMult;
     });
-  }, [listings, searchQuery, filterType, districtFilter, sortConfig]);
+  }, [listings, searchQuery, filterType, districtFilter, sortBy, sortConfig]);
 
   const b2bPagination = usePagination(filteredListings, 7, [
     searchQuery,
     filterType,
     districtFilter,
+    sortBy,
     sortConfig.key,
     sortConfig.dir,
     filteredListings.length
   ]);
 
-  const activeFilterCount = (filterType !== 'all' ? 1 : 0) + (districtFilter !== 'Semua' ? 1 : 0);
+  const activeFilterCount =
+    (filterType !== 'all' ? 1 : 0) +
+    (districtFilter !== 'Semua' ? 1 : 0) +
+    (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   if (!isAdmin) return null;
 
@@ -547,6 +584,16 @@ export const AdminB2BManager: React.FC = () => {
           onResetFilters={() => {
             setFilterType('all');
             setDistrictFilter('Semua');
+            setSortBy(DEFAULT_SORT_VALUE);
+          }}
+          sortOptions={
+            sortBy === 'table_column'
+              ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...b2bSortOptions]
+              : b2bSortOptions
+          }
+          sortValue={sortBy === 'table_column' ? '' : sortBy}
+          onSortChange={(val) => {
+            if (val) setSortBy(val);
           }}
           filterContent={
             <>

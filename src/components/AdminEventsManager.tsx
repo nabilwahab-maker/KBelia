@@ -25,6 +25,7 @@ import { resolveEventImage } from '../utils/visualAssets';
 import { ImageDropzone } from './ImageDropzone';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -72,13 +73,48 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
   const [catalogSearch, setCatalogSearch] = useState('');
   const [catalogCategoryFilter, setCatalogCategoryFilter] = useState<'all' | YouthEvent['category']>('all');
   const [catalogDistrictFilter, setCatalogDistrictFilter] = useState<'all' | KelantanDistrict>('all');
+  const [catalogSortPreset, setCatalogSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
   const [catalogSortBy, setCatalogSortBy] = useState<'title' | 'category' | 'district' | 'booths'>('title');
   const [catalogSortDir, setCatalogSortDir] = useState<'asc' | 'desc'>('asc');
 
   const [bookingSearch, setBookingSearch] = useState('');
   const [bookingStatusFilter, setBookingStatusFilter] = useState<'all' | 'booked' | 'cancelled'>('all');
+  const [bookingSortPreset, setBookingSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
   const [bookingSortBy, setBookingSortBy] = useState<'userName' | 'eventTitle' | 'status'>('userName');
   const [bookingSortDir, setBookingSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const catalogSortOptions = useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          { value: 'booths_desc', label: 'Kuota Kosong (Terbanyak)' },
+          { value: 'district_asc', label: 'Daerah (A - Z)' },
+          { value: 'category_asc', label: 'Kategori Acara (A - Z)' }
+        ],
+        false,
+        {
+          asc: 'Tajuk Acara (A - Z)',
+          desc: 'Tajuk Acara (Z - A)'
+        }
+      ),
+    []
+  );
+
+  const bookingSortOptions = useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          { value: 'event_asc', label: 'Tajuk Acara (A - Z)' },
+          { value: 'status_booked', label: 'Status (Ditempah Dahulu)' }
+        ],
+        false,
+        {
+          asc: 'Nama Peserta (A - Z)',
+          desc: 'Nama Peserta (Z - A)'
+        }
+      ),
+    []
+  );
 
   useEffect(() => {
     const unsubEvents = subscribeYouthEvents(setEvents);
@@ -91,19 +127,20 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
 
   const filteredSortedEvents = useMemo(() => {
     const q = catalogSearch.trim().toLowerCase();
-    return events
-      .filter((evt) => {
-        if (catalogCategoryFilter !== 'all' && evt.category !== catalogCategoryFilter) return false;
-        if (catalogDistrictFilter !== 'all' && evt.district !== catalogDistrictFilter) return false;
-        if (!q) return true;
-        return (
-          evt.title.toLowerCase().includes(q) ||
-          evt.location.toLowerCase().includes(q) ||
-          evt.district.toLowerCase().includes(q) ||
-          evt.category.toLowerCase().includes(q)
-        );
-      })
-      .sort((a, b) => {
+    const filtered = events.filter((evt) => {
+      if (catalogCategoryFilter !== 'all' && evt.category !== catalogCategoryFilter) return false;
+      if (catalogDistrictFilter !== 'all' && evt.district !== catalogDistrictFilter) return false;
+      if (!q) return true;
+      return (
+        evt.title.toLowerCase().includes(q) ||
+        evt.location.toLowerCase().includes(q) ||
+        evt.district.toLowerCase().includes(q) ||
+        evt.category.toLowerCase().includes(q)
+      );
+    });
+
+    if (catalogSortPreset === 'table_column') {
+      return [...filtered].sort((a, b) => {
         let cmp = 0;
         if (catalogSortBy === 'category') cmp = a.category.localeCompare(b.category);
         else if (catalogSortBy === 'district') cmp = a.district.localeCompare(b.district);
@@ -111,33 +148,58 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
         else cmp = a.title.localeCompare(b.title);
         return catalogSortDir === 'asc' ? cmp : -cmp;
       });
-  }, [events, catalogSearch, catalogCategoryFilter, catalogDistrictFilter, catalogSortBy, catalogSortDir]);
+    }
+
+    return sortRecords(filtered, {
+      sortBy: catalogSortPreset,
+      getName: (evt) => evt.title || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'booths_desc') return Number(b.boothsAvailable || 0) - Number(a.boothsAvailable || 0);
+        if (mode === 'district_asc') return compareText(a.district, b.district);
+        if (mode === 'category_asc') return compareText(a.category, b.category);
+        return null;
+      }
+    });
+  }, [events, catalogSearch, catalogCategoryFilter, catalogDistrictFilter, catalogSortPreset, catalogSortBy, catalogSortDir]);
 
   const filteredSortedBookings = useMemo(() => {
     const q = bookingSearch.trim().toLowerCase();
-    return eventBookings
-      .filter((b) => {
-        if (bookingStatusFilter !== 'all' && b.status !== bookingStatusFilter) return false;
-        if (!q) return true;
-        return (
-          (b.userName || '').toLowerCase().includes(q) ||
-          b.eventTitle.toLowerCase().includes(q) ||
-          b.userId.toLowerCase().includes(q)
-        );
-      })
-      .sort((a, b) => {
+    const filtered = eventBookings.filter((b) => {
+      if (bookingStatusFilter !== 'all' && b.status !== bookingStatusFilter) return false;
+      if (!q) return true;
+      return (
+        (b.userName || '').toLowerCase().includes(q) ||
+        b.eventTitle.toLowerCase().includes(q) ||
+        b.userId.toLowerCase().includes(q)
+      );
+    });
+
+    if (bookingSortPreset === 'table_column') {
+      return [...filtered].sort((a, b) => {
         let cmp = 0;
         if (bookingSortBy === 'eventTitle') cmp = a.eventTitle.localeCompare(b.eventTitle);
         else if (bookingSortBy === 'status') cmp = a.status.localeCompare(b.status);
         else cmp = (a.userName || '').localeCompare(b.userName || '');
         return bookingSortDir === 'asc' ? cmp : -cmp;
       });
-  }, [eventBookings, bookingSearch, bookingStatusFilter, bookingSortBy, bookingSortDir]);
+    }
+
+    return sortRecords(filtered, {
+      sortBy: bookingSortPreset,
+      getName: (b) => b.userName || b.eventTitle || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'event_asc') return compareText(a.eventTitle, b.eventTitle);
+        if (mode === 'status_booked') return (a.status === 'booked' ? 0 : 1) - (b.status === 'booked' ? 0 : 1);
+        return null;
+      }
+    });
+  }, [eventBookings, bookingSearch, bookingStatusFilter, bookingSortPreset, bookingSortBy, bookingSortDir]);
 
   const catalogPagination = usePagination(filteredSortedEvents, 7, [
     catalogSearch,
     catalogCategoryFilter,
     catalogDistrictFilter,
+    catalogSortPreset,
     catalogSortBy,
     catalogSortDir,
     filteredSortedEvents.length
@@ -146,12 +208,14 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
   const bookingsPagination = usePagination(filteredSortedBookings, 7, [
     bookingSearch,
     bookingStatusFilter,
+    bookingSortPreset,
     bookingSortBy,
     bookingSortDir,
     filteredSortedBookings.length
   ]);
 
   const toggleCatalogSort = (col: 'title' | 'category' | 'district' | 'booths') => {
+    setCatalogSortPreset('table_column');
     if (catalogSortBy === col) {
       setCatalogSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -161,6 +225,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
   };
 
   const toggleBookingSort = (col: 'userName' | 'eventTitle' | 'status') => {
+    setBookingSortPreset('table_column');
     if (bookingSortBy === col) {
       setBookingSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -334,10 +399,24 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             searchValue={catalogSearch}
             onSearchChange={setCatalogSearch}
             searchPlaceholder="Cari tajuk acara, lokasi atau daerah..."
-            filterCount={(catalogCategoryFilter !== 'all' ? 1 : 0) + (catalogDistrictFilter !== 'all' ? 1 : 0)}
+            filterCount={
+              (catalogCategoryFilter !== 'all' ? 1 : 0) +
+              (catalogDistrictFilter !== 'all' ? 1 : 0) +
+              (catalogSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+            }
             onResetFilters={() => {
               setCatalogCategoryFilter('all');
               setCatalogDistrictFilter('all');
+              setCatalogSortPreset(DEFAULT_SORT_VALUE);
+            }}
+            sortOptions={
+              catalogSortPreset === 'table_column'
+                ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...catalogSortOptions]
+                : catalogSortOptions
+            }
+            sortValue={catalogSortPreset === 'table_column' ? '' : catalogSortPreset}
+            onSortChange={(val) => {
+              if (val) setCatalogSortPreset(val);
             }}
             filterContent={
               <>
@@ -523,8 +602,23 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             searchValue={bookingSearch}
             onSearchChange={setBookingSearch}
             searchPlaceholder="Cari nama peserta, acara atau ID..."
-            filterCount={bookingStatusFilter !== 'all' ? 1 : 0}
-            onResetFilters={() => setBookingStatusFilter('all')}
+            filterCount={
+              (bookingStatusFilter !== 'all' ? 1 : 0) +
+              (bookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+            }
+            onResetFilters={() => {
+              setBookingStatusFilter('all');
+              setBookingSortPreset(DEFAULT_SORT_VALUE);
+            }}
+            sortOptions={
+              bookingSortPreset === 'table_column'
+                ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...bookingSortOptions]
+                : bookingSortOptions
+            }
+            sortValue={bookingSortPreset === 'table_column' ? '' : bookingSortPreset}
+            onSortChange={(val) => {
+              if (val) setBookingSortPreset(val);
+            }}
             filterContent={
               <div>
                 <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">

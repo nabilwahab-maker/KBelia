@@ -21,17 +21,24 @@ import {
   Plus,
   Minus,
   RotateCcw,
-  Search,
   MessageCircle,
   Building2,
   CheckCircle2,
   Clock,
   ExternalLink,
   AlertTriangle,
-  Loader2
+  Loader2,
+  Layers
 } from 'lucide-react';
 import { KelantanDistrict, CapsuleSlot } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { ReferenceTableToolbar } from './ReferenceTableKit';
+import {
+  DEFAULT_SORT_VALUE,
+  buildStandardSortOptions,
+  getModifiedTimestamp,
+  sortRecords
+} from '../utils/sortUtils';
 
 interface KelantanDistrictsMapProps {
   slots: CapsuleSlot[];
@@ -176,6 +183,7 @@ interface DistrictStats {
   occupied: number;
   reservedOrMaintenance: number;
   minMonthlyRate: number;
+  latestModifiedMs: number;
   districtSlots: CapsuleSlot[];
 }
 
@@ -317,6 +325,7 @@ const MapCameraController: React.FC<{
 
 interface LiveMapCanvasProps {
   mapTypeId: 'roadmap' | 'terrain' | 'hybrid';
+  visibleDistricts: DistrictGeoData[];
   selectedDistrict: KelantanDistrict;
   infoWindowDistrict: KelantanDistrict | null;
   districtStatsMap: Record<string, DistrictStats>;
@@ -333,6 +342,7 @@ interface LiveMapCanvasProps {
 
 const LiveMapCanvas: React.FC<LiveMapCanvasProps> = ({
   mapTypeId,
+  visibleDistricts,
   selectedDistrict,
   infoWindowDistrict,
   districtStatsMap,
@@ -349,8 +359,8 @@ const LiveMapCanvas: React.FC<LiveMapCanvasProps> = ({
   const apiStatus = useApiLoadingStatus();
 
   const sortedDistricts = useMemo(
-    () => [...KELANTAN_DISTRICTS].sort((a, b) => b.lat - a.lat),
-    []
+    () => [...visibleDistricts].sort((a, b) => b.lat - a.lat),
+    [visibleDistricts]
   );
 
   if (apiStatus === APILoadingStatus.FAILED || apiStatus === APILoadingStatus.AUTH_FAILURE) {
@@ -364,7 +374,7 @@ const LiveMapCanvas: React.FC<LiveMapCanvasProps> = ({
             Paparan Peta Langsung Tidak Dapat Dimuatkan
           </h4>
           <p className="text-sm text-black/75 dark:text-white/80">
-            Anda masih boleh memilih mana-mana jajahan melalui cip di atas untuk menyemak unit kiosk pada panel sisi atau bertukar ke mod senarai.
+            Anda masih boleh memilih mana-mana jajahan melalui menu Penapis di atas untuk menyemak unit kiosk pada panel sisi atau bertukar ke mod senarai.
           </p>
         </div>
         <button
@@ -394,7 +404,7 @@ const LiveMapCanvas: React.FC<LiveMapCanvasProps> = ({
         <MapPin className="w-4 h-4 text-[#EA4335] shrink-0" />
         <span className="font-bold text-black dark:text-white truncate">
           {selectedDistrict === 'Semua Jajahan'
-            ? 'Kelantan, Malaysia (10 Hab Kiosk)'
+            ? `Kelantan, Malaysia (${visibleDistricts.length} Hab Kiosk)`
             : `${selectedDistrict}, Kelantan`}
         </span>
       </div>
@@ -479,9 +489,13 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
   onSelectSlot
 }) => {
   const { language } = useLanguage();
+  const isEn = language === 'en';
   const [viewMode, setViewMode] = useState<'map' | 'grid'>('map');
   const [mapTypeId, setMapTypeId] = useState<'roadmap' | 'terrain' | 'hybrid'>('roadmap');
   const [searchDistrictQuery, setSearchDistrictQuery] = useState('');
+  const [selectedAvailability, setSelectedAvailability] = useState<'all' | 'available' | 'full' | 'expansion'>('all');
+  const [selectedTerrain, setSelectedTerrain] = useState<'all' | 'urban' | 'coastal' | 'green'>('all');
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [infoWindowDistrict, setInfoWindowDistrict] = useState<KelantanDistrict | null>(null);
   const [resetSignal, setResetSignal] = useState(0);
   const [zoomStepSignal, setZoomStepSignal] = useState<{ delta: number; seq: number } | null>(null);
@@ -502,6 +516,10 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
         .map((s) => Number(s.monthlyRate))
         .filter((r) => Number.isFinite(r) && r > 0);
       const minMonthlyRate = rates.length > 0 ? Math.min(...rates) : 150;
+      const latestModifiedMs = districtSlots.reduce(
+        (maxMs, slot) => Math.max(maxMs, getModifiedTimestamp(slot)),
+        0
+      );
 
       record[geo.district] = {
         total: districtSlots.length,
@@ -509,36 +527,109 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
         occupied,
         reservedOrMaintenance,
         minMonthlyRate,
+        latestModifiedMs,
         districtSlots
       };
     });
     return record;
   }, [slots]);
 
+  const mapSortOptions = useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          {
+            value: 'available_desc',
+            label: isEn ? 'Available Units (Most)' : 'Kekosongan Unit (Terbanyak)'
+          },
+          {
+            value: 'rate_asc',
+            label: isEn ? 'Starting Rent (Lowest)' : 'Kadar Sewa (Terendah)'
+          }
+        ],
+        isEn
+      ),
+    [isEn]
+  );
+
+  // Districts matching search query, availability status, and area zone (for map markers)
+  const visibleMapDistricts = useMemo(() => {
+    const q = searchDistrictQuery.trim().toLowerCase();
+    const filtered = KELANTAN_DISTRICTS.filter((d) => {
+      const stats = districtStatsMap[d.district];
+      const matchesSearch =
+        !q ||
+        d.name.toLowerCase().includes(q) ||
+        d.code.toLowerCase().includes(q) ||
+        d.mainHubName.toLowerCase().includes(q) ||
+        d.tagline.toLowerCase().includes(q) ||
+        d.popularNiche.toLowerCase().includes(q);
+
+      const matchesAvailability =
+        selectedAvailability === 'all' ||
+        (selectedAvailability === 'available' && stats.available > 0) ||
+        (selectedAvailability === 'full' && stats.total > 0 && stats.available === 0) ||
+        (selectedAvailability === 'expansion' && stats.total === 0);
+
+      const matchesTerrain =
+        selectedTerrain === 'all' || d.terrainType === selectedTerrain;
+
+      return matchesSearch && matchesAvailability && matchesTerrain;
+    });
+
+    return sortRecords(filtered, {
+      sortBy,
+      getName: (d) => d.name,
+      getModified: (d) => districtStatsMap[d.district]?.latestModifiedMs || 0,
+      customCompare: (a, b, mode) => {
+        const statsA = districtStatsMap[a.district];
+        const statsB = districtStatsMap[b.district];
+        if (mode === 'available_desc') return statsB.available - statsA.available;
+        if (mode === 'rate_asc') return statsA.minMonthlyRate - statsB.minMonthlyRate;
+        return null;
+      }
+    });
+  }, [searchDistrictQuery, selectedAvailability, selectedTerrain, districtStatsMap, sortBy]);
+
+  // Districts displayed in Grid/List view (also respects explicit district filter, showing up to 10 simultaneously)
+  const visibleGridDistricts = useMemo(() => {
+    if (selectedDistrict === 'Semua Jajahan') return visibleMapDistricts;
+    return visibleMapDistricts.filter((d) => d.district === selectedDistrict);
+  }, [visibleMapDistricts, selectedDistrict]);
+
   const activeDistrictData = useMemo(() => {
     if (selectedDistrict !== 'Semua Jajahan') {
       return KELANTAN_DISTRICTS.find((d) => d.district === selectedDistrict) || KELANTAN_DISTRICTS[1];
     }
+    if (visibleMapDistricts.length > 0) {
+      return (
+        visibleMapDistricts.find((d) => d.district === 'Kota Bharu') || visibleMapDistricts[0]
+      );
+    }
     return KELANTAN_DISTRICTS[1]; // Kota Bharu as default detail focus when viewing all Kelantan
-  }, [selectedDistrict]);
+  }, [selectedDistrict, visibleMapDistricts]);
 
   const activeStats = districtStatsMap[activeDistrictData.district];
 
-  const filteredDistrictChips = useMemo(() => {
-    const q = searchDistrictQuery.trim().toLowerCase();
-    if (!q) return KELANTAN_DISTRICTS;
-    return KELANTAN_DISTRICTS.filter(
-      (d) =>
-        d.name.toLowerCase().includes(q) ||
-        d.mainHubName.toLowerCase().includes(q) ||
-        d.tagline.toLowerCase().includes(q) ||
-        d.popularNiche.toLowerCase().includes(q)
-    );
-  }, [searchDistrictQuery]);
+  const activeMapFilterCount =
+    (selectedDistrict !== 'Semua Jajahan' ? 1 : 0) +
+    (selectedAvailability !== 'all' ? 1 : 0) +
+    (selectedTerrain !== 'all' ? 1 : 0) +
+    (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   const handleSelectDistrictWithInfo = (district: KelantanDistrict) => {
     onSelectDistrict(district);
     setInfoWindowDistrict(district === 'Semua Jajahan' ? null : district);
+  };
+
+  const handleResetMapFilters = () => {
+    setSearchDistrictQuery('');
+    setSelectedAvailability('all');
+    setSelectedTerrain('all');
+    setSortBy(DEFAULT_SORT_VALUE);
+    onSelectDistrict('Semua Jajahan');
+    setInfoWindowDistrict(null);
+    setResetSignal((s) => s + 1);
   };
 
   const handleBookHub = (district: KelantanDistrict, specificSlot?: CapsuleSlot) => {
@@ -553,7 +644,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
   };
 
   return (
-    <div className="relative rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 sm:p-7 shadow-xs overflow-hidden w-full min-w-0 transition-colors">
+    <div className="relative rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 sm:p-7 shadow-xs overflow-visible w-full min-w-0 transition-colors">
       {/* 1. Header Bar */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-300 dark:border-slate-600">
         <div>
@@ -642,85 +733,112 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
         </div>
       </div>
 
-      {/* 2. Search & Fast Jajahan Chips */}
-      <div className="mt-4 space-y-3">
-        <div className="flex flex-col sm:flex-row items-center gap-2">
-          <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Cari nama jajahan, hab kiosk atau kategori produk..."
-              value={searchDistrictQuery}
-              onChange={(e) => setSearchDistrictQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors dark:focus:border-blue-400"
-            />
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
-            <button
-              type="button"
-              onClick={() => {
-                onSelectDistrict('Semua Jajahan');
-                setInfoWindowDistrict(null);
-                setResetSignal((s) => s + 1);
-              }}
-              className={`px-3.5 py-2.5 text-sm font-bold rounded-xl transition-all cursor-pointer ${
-                selectedDistrict === 'Semua Jajahan'
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-blue-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
-              }`}
-            >
-              Seluruh Kelantan
-            </button>
-          </div>
-        </div>
-
-        {/* Jajahan Fast Selector Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none text-sm">
-          {filteredDistrictChips.map((geo) => {
-            const isSelected = selectedDistrict === geo.district;
-            const stats = districtStatsMap[geo.district];
-            return (
-              <button
-                key={geo.code}
-                type="button"
-                onClick={() => handleSelectDistrictWithInfo(geo.district)}
-                className={`px-3.5 py-1.5 rounded-full font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
-                  isSelected
-                    ? 'bg-blue-600 text-white shadow-sm ring-2 ring-blue-500/30 dark:ring-blue-400/30'
-                    : 'bg-slate-50 hover:bg-blue-50 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600'
-                }`}
-              >
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    isSelected
-                      ? 'bg-white'
-                      : stats.available > 0
-                        ? 'bg-emerald-500'
-                        : stats.total > 0
-                          ? 'bg-blue-500'
-                          : 'bg-slate-400'
-                  }`}
-                />
-                <span>{geo.name}</span>
-                <span
-                  className={`text-[0.8125rem] px-2 py-0.5 rounded-full tabular-nums ${
-                    isSelected
-                      ? 'bg-blue-700 text-white'
-                      : 'bg-white dark:bg-slate-800 text-black dark:text-white'
-                  }`}
+      {/* 2. Integrated Search Bar & Filter Popover */}
+      <div className="-mx-5 sm:-mx-7 px-1 sm:px-3">
+        <ReferenceTableToolbar
+          searchValue={searchDistrictQuery}
+          onSearchChange={setSearchDistrictQuery}
+          searchPlaceholder={
+            isEn
+              ? 'Search district, kiosk hub or product niche...'
+              : 'Cari nama jajahan, hab kiosk atau kategori produk...'
+          }
+          filterCount={activeMapFilterCount}
+          onResetFilters={handleResetMapFilters}
+          sortOptions={mapSortOptions}
+          sortValue={sortBy}
+          onSortChange={setSortBy}
+          sortLabel={isEn ? 'Sort By' : 'Susun Mengikut'}
+          filterContent={
+            <>
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 shrink-0" />
+                  <span>{isEn ? 'District' : 'Jajahan'}</span>
+                </label>
+                <select
+                  value={selectedDistrict}
+                  onChange={(e) => {
+                    const nextDistrict = e.target.value as KelantanDistrict;
+                    handleSelectDistrictWithInfo(nextDistrict);
+                    if (nextDistrict === 'Semua Jajahan') {
+                      setResetSignal((s) => s + 1);
+                    }
+                  }}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/30"
                 >
-                  {stats.available}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                  <option value="Semua Jajahan">
+                    {isEn ? 'All Kelantan Districts' : 'Semua Jajahan Kelantan'}
+                  </option>
+                  {KELANTAN_DISTRICTS.map((geo) => (
+                    <option key={geo.code} value={geo.district}>
+                      {geo.name} ({geo.code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>{isEn ? 'Availability Status' : 'Status Kekosongan'}</span>
+                </label>
+                <select
+                  value={selectedAvailability}
+                  onChange={(e) =>
+                    setSelectedAvailability(
+                      e.target.value as 'all' | 'available' | 'full' | 'expansion'
+                    )
+                  }
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                >
+                  <option value="all">{isEn ? 'All Statuses' : 'Semua Status'}</option>
+                  <option value="available">
+                    {isEn ? 'Has Available Units' : 'Ada Kekosongan Unit'}
+                  </option>
+                  <option value="full">
+                    {isEn ? 'Fully Occupied' : 'Beroperasi Penuh'}
+                  </option>
+                  <option value="expansion">
+                    {isEn ? 'Expansion Zone' : 'Zon Pengembangan'}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 shrink-0" />
+                  <span>{isEn ? 'Area Zone' : 'Zon Kawasan'}</span>
+                </label>
+                <select
+                  value={selectedTerrain}
+                  onChange={(e) =>
+                    setSelectedTerrain(
+                      e.target.value as 'all' | 'urban' | 'coastal' | 'green'
+                    )
+                  }
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                >
+                  <option value="all">{isEn ? 'All Zones' : 'Semua Zon'}</option>
+                  <option value="urban">
+                    {isEn ? 'Urban & Commercial' : 'Bandar & Komersial'}
+                  </option>
+                  <option value="coastal">
+                    {isEn ? 'Coastal & Campus' : 'Pesisir & Kampus'}
+                  </option>
+                  <option value="green">
+                    {isEn ? 'Agro & Eco-Tourism' : 'Agro & Eko-Pelancongan'}
+                  </option>
+                </select>
+              </div>
+            </>
+          }
+        />
       </div>
 
       {/* 3. Main Embedded Google Maps + Side Detail Panel */}
       {viewMode === 'map' ? (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch mt-4 w-full min-w-0">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch mt-5 w-full min-w-0">
           {/* Left Column: Live Google Map (7 Cols) */}
           <div className="xl:col-span-7 flex flex-col w-full min-w-0">
             <div className="relative w-full rounded-3xl overflow-hidden border border-slate-300 dark:border-slate-600 shadow-md bg-slate-100 dark:bg-slate-900 flex flex-col">
@@ -733,6 +851,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                 >
                   <LiveMapCanvas
                     mapTypeId={mapTypeId}
+                    visibleDistricts={visibleMapDistricts}
                     selectedDistrict={selectedDistrict}
                     infoWindowDistrict={infoWindowDistrict}
                     districtStatsMap={districtStatsMap}
@@ -985,60 +1104,83 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
           </div>
         </div>
       ) : (
-        /* Grid View Mode: 10 Jajahan Cards */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-3.5 mt-5 w-full min-w-0">
-          {KELANTAN_DISTRICTS.map((geo) => {
-            const isSelected = selectedDistrict === geo.district;
-            const stats = districtStatsMap[geo.district];
+        /* Grid View Mode: Filtered Jajahan Cards (all up to 10 shown simultaneously) */
+        visibleGridDistricts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-3.5 mt-5 w-full min-w-0">
+            {visibleGridDistricts.map((geo) => {
+              const isSelected = selectedDistrict === geo.district;
+              const stats = districtStatsMap[geo.district];
 
-            return (
-              <div
-                key={geo.code}
-                onClick={() => {
-                  handleSelectDistrictWithInfo(geo.district);
-                  setViewMode('map');
-                }}
-                className={`cursor-pointer rounded-2xl p-4 transition-all duration-200 border flex flex-col justify-between ${
-                  isSelected
-                    ? 'bg-blue-50/80 dark:bg-blue-950/50 border-blue-500 shadow-sm -translate-y-0.5'
-                    : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-slate-500'
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/75 dark:text-white/80">
-                      {geo.code}
+              return (
+                <div
+                  key={geo.code}
+                  onClick={() => {
+                    handleSelectDistrictWithInfo(geo.district);
+                    setViewMode('map');
+                  }}
+                  className={`cursor-pointer rounded-2xl p-4 transition-all duration-200 border flex flex-col justify-between ${
+                    isSelected
+                      ? 'bg-blue-50/80 dark:bg-blue-950/50 border-blue-500 shadow-sm -translate-y-0.5'
+                      : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-slate-500'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/75 dark:text-white/80">
+                        {geo.code}
+                      </span>
+                      <span
+                        className={`text-[0.8125rem] font-bold tabular-nums px-2 py-0.5 rounded-full ${
+                          stats.available > 0
+                            ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
+                            : 'bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-300'
+                        }`}
+                      >
+                        {stats.available} kosong
+                      </span>
+                    </div>
+                    <h4 className="text-base font-bold text-black dark:text-white mb-1">
+                      {geo.name}
+                    </h4>
+                    <p className="text-sm text-black/75 dark:text-white/80 line-clamp-2 mb-3">
+                      {geo.mainHubName}
+                    </p>
+                  </div>
+
+                  <div className="pt-2.5 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm">
+                    <span className="text-black/75 dark:text-white/80 font-medium">
+                      RM{stats.minMonthlyRate} /bln
                     </span>
-                    <span
-                      className={`text-[0.8125rem] font-bold tabular-nums px-2 py-0.5 rounded-full ${
-                        stats.available > 0
-                          ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
-                          : 'bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-300'
-                      }`}
-                    >
-                      {stats.available} kosong
+                    <span className="font-bold text-blue-700 dark:text-blue-400 inline-flex items-center gap-0.5">
+                      Lihat di Peta <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
-                  <h4 className="text-base font-bold text-black dark:text-white mb-1">
-                    {geo.name}
-                  </h4>
-                  <p className="text-sm text-black/75 dark:text-white/80 line-clamp-2 mb-3">
-                    {geo.mainHubName}
-                  </p>
                 </div>
-
-                <div className="pt-2.5 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm">
-                  <span className="text-black/75 dark:text-white/80 font-medium">
-                    RM{stats.minMonthlyRate} /bln
-                  </span>
-                  <span className="font-bold text-blue-700 dark:text-blue-400 inline-flex items-center gap-0.5">
-                    Lihat di Peta <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="mt-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/70 p-8 text-center space-y-3">
+            <div className="w-11 h-11 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center mx-auto text-slate-500">
+              <MapPin className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-base font-bold text-black dark:text-white">
+                Tiada Jajahan Sepadan Ditemui
+              </h4>
+              <p className="text-sm text-black/70 dark:text-white/75 max-w-md mx-auto">
+                Tiada hab jajahan memenuhi kata kunci carian atau penapis yang dipilih. Cuba ubah kriteria penapis atau set semula ke paparan penuh.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleResetMapFilters}
+              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer"
+            >
+              Set Semula Penapis
+            </button>
+          </div>
+        )
       )}
     </div>
   );

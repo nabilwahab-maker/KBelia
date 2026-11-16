@@ -20,6 +20,7 @@ import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 
 interface AdminNewsManagerProps {
   newsItems: PortalNews[];
@@ -51,8 +52,26 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [categoryFilter, setCategoryFilter] = useState<'all' | NewsCategory>('all');
   const [pinnedFilter, setPinnedFilter] = useState<'all' | 'pinned' | 'normal'>('all');
+  const [sortPreset, setSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'category'>('date');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+
+  const newsSortOptions = useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          { value: 'pinned_first', label: 'Sorotan Dipin Dahulu' },
+          { value: 'status_published', label: 'Status (Disiar Dahulu)' },
+          { value: 'category_asc', label: 'Kategori (A - Z)' }
+        ],
+        false,
+        {
+          asc: 'Tajuk Berita (A - Z)',
+          desc: 'Tajuk Berita (Z - A)'
+        }
+      ),
+    []
+  );
 
   const stats = useMemo(() => {
     const published = newsItems.filter(n => n.status === 'published').length;
@@ -63,20 +82,21 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
 
   const filteredList = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return newsItems
-      .filter(item => {
-        if (statusFilter !== 'all' && item.status !== statusFilter) return false;
-        if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
-        if (pinnedFilter === 'pinned' && !item.isPinned) return false;
-        if (pinnedFilter === 'normal' && item.isPinned) return false;
-        if (!q) return true;
-        return (
-          item.title.toLowerCase().includes(q) ||
-          item.summary.toLowerCase().includes(q) ||
-          item.category.toLowerCase().includes(q)
-        );
-      })
-      .sort((a, b) => {
+    const filtered = newsItems.filter(item => {
+      if (statusFilter !== 'all' && item.status !== statusFilter) return false;
+      if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
+      if (pinnedFilter === 'pinned' && !item.isPinned) return false;
+      if (pinnedFilter === 'normal' && item.isPinned) return false;
+      if (!q) return true;
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.summary.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q)
+      );
+    });
+
+    if (sortPreset === 'table_column') {
+      return [...filtered].sort((a, b) => {
         if (sortBy === 'title') {
           const cmp = a.title.localeCompare(b.title);
           return sortDir === 'asc' ? cmp : -cmp;
@@ -89,13 +109,26 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
         const diff = new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime();
         return sortDir === 'asc' ? -diff : diff;
       });
-  }, [newsItems, searchQuery, statusFilter, categoryFilter, pinnedFilter, sortBy, sortDir]);
+    }
+
+    return sortRecords(filtered, {
+      sortBy: sortPreset,
+      getName: (item) => item.title || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'pinned_first') return (a.isPinned === b.isPinned ? 0 : a.isPinned ? -1 : 1);
+        if (mode === 'status_published') return (a.status === 'published' ? 0 : 1) - (b.status === 'published' ? 0 : 1);
+        if (mode === 'category_asc') return compareText(a.category, b.category);
+        return null;
+      }
+    });
+  }, [newsItems, searchQuery, statusFilter, categoryFilter, pinnedFilter, sortPreset, sortBy, sortDir]);
 
   const newsPagination = usePagination(filteredList, 7, [
     searchQuery,
     statusFilter,
     categoryFilter,
     pinnedFilter,
+    sortPreset,
     sortBy,
     sortDir,
     filteredList.length
@@ -104,9 +137,11 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
   const activeFilterCount =
     (statusFilter !== 'all' ? 1 : 0) +
     (categoryFilter !== 'all' ? 1 : 0) +
-    (pinnedFilter !== 'all' ? 1 : 0);
+    (pinnedFilter !== 'all' ? 1 : 0) +
+    (sortPreset !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   const toggleSort = (col: 'date' | 'title' | 'category') => {
+    setSortPreset('table_column');
     if (sortBy === col) {
       setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -490,6 +525,16 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
             setStatusFilter('all');
             setCategoryFilter('all');
             setPinnedFilter('all');
+            setSortPreset(DEFAULT_SORT_VALUE);
+          }}
+          sortOptions={
+            sortPreset === 'table_column'
+              ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...newsSortOptions]
+              : newsSortOptions
+          }
+          sortValue={sortPreset === 'table_column' ? '' : sortPreset}
+          onSortChange={(val) => {
+            if (val) setSortPreset(val);
           }}
           filterContent={
             <>

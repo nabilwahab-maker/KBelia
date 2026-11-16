@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, SlidersHorizontal, MoreHorizontal, X } from 'lucide-react';
+import { Search, SlidersHorizontal, MoreHorizontal, X, ArrowUpDown } from 'lucide-react';
+import { ToolbarSortOption } from '../utils/sortUtils';
 
 interface ReferenceTableToolbarProps {
   searchValue: string;
@@ -8,6 +9,10 @@ interface ReferenceTableToolbarProps {
   filterCount?: number;
   onResetFilters?: () => void;
   filterContent?: React.ReactNode;
+  sortOptions?: ToolbarSortOption[];
+  sortValue?: string;
+  onSortChange?: (val: string) => void;
+  sortLabel?: string;
   rightSlot?: React.ReactNode;
 }
 
@@ -18,10 +23,16 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
   filterCount = 0,
   onResetFilters,
   filterContent,
+  sortOptions,
+  sortValue,
+  onSortChange,
+  sortLabel = 'Susun Mengikut',
   rightSlot
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
+  const hasSortControl = Boolean(sortOptions && sortOptions.length > 0 && sortValue !== undefined && onSortChange);
+  const hasPopoverBody = Boolean(filterContent || hasSortControl);
 
   useEffect(() => {
     if (!isFilterOpen) return;
@@ -69,7 +80,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
       <div className="flex flex-wrap items-center justify-end gap-2">
         {rightSlot}
 
-        {filterContent && (
+        {hasPopoverBody && (
           <div className="relative" ref={filterRef}>
             <button
               type="button"
@@ -87,7 +98,28 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
 
             {isFilterOpen && (
               <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-40 space-y-3.5 text-left">
+                {hasSortControl && sortOptions && onSortChange && (
+                  <div className={filterContent ? 'pb-3 border-b border-slate-200 dark:border-zinc-700' : ''}>
+                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                      <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                      <span>{sortLabel}</span>
+                    </label>
+                    <select
+                      value={sortValue}
+                      onChange={(e) => onSortChange(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    >
+                      {sortOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 {filterContent}
+
                 <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between">
                   {onResetFilters ? (
                     <button

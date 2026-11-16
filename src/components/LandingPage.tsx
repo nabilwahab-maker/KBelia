@@ -10,7 +10,6 @@ import {
   ShieldCheck, 
   ChevronRight, 
   ChevronLeft,
-  ChevronDown, 
   LogIn, 
   Globe, 
   Clock,
@@ -29,7 +28,6 @@ import {
   X,
   ExternalLink,
   Briefcase,
-  HelpCircle,
   Check,
   Shield,
   Layers,
@@ -38,13 +36,12 @@ import {
   Moon
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
-import { CapsuleSlot, BusinessListing, YouthProgram, KelantanDistrict } from '../types';
+import { CapsuleSlot, BusinessListing, YouthProgram } from '../types';
 import { INITIAL_CAPSULE_SLOTS } from '../data/seedData';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useScrollReveal } from '../hooks/useMotion';
-import { KelantanDistrictsMap } from './KelantanDistrictsMap';
 
 const RevealBlock: React.FC<{
   children: React.ReactNode;
@@ -81,19 +78,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   programs,
   onSelectSlot,
   onSelectBusiness,
-  onOpenNewBooking,
   onOpenGrantModal
 }) => {
   const { userProfile, openLoginModal } = useAuth();
   const { language, setLanguage } = useLanguage();
   const { theme, isDark, toggleTheme } = useTheme();
   const isBM = language === 'ms';
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [legalModalType, setLegalModalType] = useState<'privacy' | 'terms' | null>(null);
-  const [selectedMapDistrict, setSelectedMapDistrict] = useState<KelantanDistrict>('Semua Jajahan');
 
   const navigateToPage = (tab: UMKTab) => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -190,38 +184,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     }
   ];
 
-  // All FAQs including checklist additions
-  const faqs = [
-    {
-      q: 'Siapakah yang layak menyewa Kiosk KBelia?',
-      a: 'Warganegara Malaysia berumur 18 hingga 40 tahun di Kelantan layak memohon, dengan keutamaan kepada usahawan belia baharu.'
-    },
-    {
-      q: 'Berapakah kadar sewaan harian dan tempoh minimum?',
-      a: 'Kadar sewa bermula RM12 hingga RM25 sehari mengikut daerah dan jenis kiosk, dengan tempoh fleksibel dari 3 hari hingga 3 bulan.'
-    },
-    {
-      q: 'Bagaimanakah cara mendaftar produk dalam Direktori Usahawan?',
-      a: 'Daftar akaun percuma dan lengkapkan profil di Portal Usahawan untuk memaparkan katalog produk anda.'
-    },
-    {
-      q: 'Adakah pemohon geran perlu mempunyai kedai tetap?',
-      a: 'Tidak semestinya. Geran ini terbuka kepada usahawan dari rumah, kiosk bergerak, dan jualan dalam talian yang mempunyai pelan perniagaan.'
-    },
-    {
-      q: 'Bagaimanakah proses semakan Geran Permulaan KBelia?',
-      a: 'Permohonan disemak secara digital dalam tempoh 7–14 hari bekerja dan status boleh dipantau terus dalam papan pemuka.'
-    },
-    {
-      q: 'Bolehkah saya mendapatkan bimbingan mentor secara percuma?',
-      a: 'Ya, semua usahawan berdaftar layak menyertai sesi bimbingan mentor dan bengkel keusahawanan secara percuma.'
-    },
-    {
-      q: 'Adakah portal ini membantu pendaftaran SSM dan lesen?',
-      a: 'Ya. Panduan daftar SSM, pensijilan Halal JAKIM, dan permohonan lesen PBT seluruh Kelantan tersedia di dalam portal.'
-    }
-  ];
-
   const activeSlideData = heroSlides[currentSlide];
 
   return (
@@ -252,7 +214,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <a href="#kiosk" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</a>
             <a href="#direktori" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Direktori Usahawan' : 'Directory'}</a>
             <a href="#inisiatif" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Inisiatif Teras' : 'Initiatives'}</a>
-            <a href="#faq" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Soalan Lazim' : 'FAQ'}</a>
           </nav>
 
           {/* Actions: Mod Gelap/Cerah, Penukar Bahasa (BM|EN), Butang Daftar, Butang Log Masuk */}
@@ -510,9 +471,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         {/* Marquee Track Container */}
         <div className="relative w-full overflow-hidden mask-[linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
-          <div className="animate-marquee-left flex gap-4 py-2">
-            {/* Duplicated for seamless infinite looping */}
-            {[...movingPhotoCards, ...movingPhotoCards].map((card, idx) => (
+          <div className="animate-marquee-left flex gap-4 pr-4 py-2">
+            {/* Duplicated for seamless infinite looping across wide viewports */}
+            {[...movingPhotoCards, ...movingPhotoCards, ...movingPhotoCards, ...movingPhotoCards].map((card, idx) => (
               <div
                 key={`marquee-${idx}`}
                 onClick={() => {
@@ -1142,19 +1103,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             })()}
           </RevealBlock>
 
-          <RevealBlock delayMs={120} className="mt-10">
-            <KelantanDistrictsMap
-              slots={slots}
-              selectedDistrict={selectedMapDistrict}
-              onSelectDistrict={setSelectedMapDistrict}
-              onSelectSlot={onSelectSlot}
-              onOpenBookingForDistrict={(_district, slot) => {
-                if (slot) onSelectSlot(slot);
-                else onOpenNewBooking();
-              }}
-            />
-          </RevealBlock>
-
         </div>
       </section>
 
@@ -1219,61 +1167,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
               </div>
             ))}
-          </RevealBlock>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 9. SOALAN LAZIM (FAQ) */}
-      {/* ========================================================================= */}
-      <section id="faq" className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
-        <div className="max-w-5xl w-full mx-auto px-4 sm:px-8 lg:px-12">
-          
-          <RevealBlock className="text-center space-y-2.5 mb-10">
-            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-              <HelpCircle className="w-3.5 h-3.5" />
-              <span>Bantuan & Panduan</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-              Soalan Lazim
-            </h2>
-            <p className="text-[0.9375rem] text-black dark:text-white/75">
-              Jawapan pantas mengenai permohonan kiosk, geran, mentor, dan direktori.
-            </p>
-          </RevealBlock>
-
-          <RevealBlock delayMs={80} className="space-y-3">
-            {faqs.map((faq, index) => {
-              const isOpen = activeFaq === index;
-              return (
-                <div 
-                  key={index}
-                  className="kbelia-glass-card rounded-2xl overflow-hidden transition-colors hover:border-blue-400/70 dark:hover:border-blue-400/70"
-                >
-                  <button
-                    type="button"
-                    aria-expanded={isOpen}
-                    onClick={() => setActiveFaq(isOpen ? null : index)}
-                    className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-black dark:text-white hover:bg-amber-50/50 dark:hover:bg-zinc-900/60 transition-colors cursor-pointer"
-                  >
-                    <span>{faq.q}</span>
-                    <ChevronDown className={`w-4 h-4 text-black/70 dark:text-white/75 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-black dark:text-white' : ''}`} />
-                  </button>
-                  <div
-                    className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
-                      isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-                    }`}
-                  >
-                    <div className="overflow-hidden">
-                      <div className="px-4 pb-5 sm:px-5 sm:pb-5 text-sm sm:text-[0.9375rem] text-black dark:text-white leading-relaxed border-t border-slate-300 dark:border-zinc-600 pt-3 bg-white dark:bg-zinc-900">
-                        {faq.a}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
           </RevealBlock>
 
         </div>
@@ -1382,9 +1275,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </li>
               <li>
                 <a href="#ciri-utama" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Ciri-Ciri Utama</a>
-              </li>
-              <li>
-                <a href="#faq" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Soalan Lazim (FAQ)</a>
               </li>
             </ul>
           </div>

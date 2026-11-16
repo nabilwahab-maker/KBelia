@@ -74,6 +74,16 @@ import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { resolveMenteeVisuals } from '../utils/visualAssets';
 import {
+  DEFAULT_SORT_VALUE,
+  ToolbarSortOption,
+  buildStandardSortOptions,
+  compareText,
+  getModifiedTimestamp,
+  getTimestampMs,
+  parseNumericAmount,
+  sortRecords
+} from '../utils/sortUtils';
+import {
   BarChart,
   Bar,
   XAxis,
@@ -394,32 +404,72 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const [overviewDistrictFilter, setOverviewDistrictFilter] = useState<'all' | KelantanDistrict>('all');
   const [overviewSortBy, setOverviewSortBy] = useState<'status' | 'name' | 'district'>('status');
   const [overviewSortDir, setOverviewSortDir] = useState<'asc' | 'desc'>('asc');
+  const [overviewSortPreset, setOverviewSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled'>('all');
   const [modeFilter, setModeFilter] = useState<'all' | 'Bersemuka di Kampus' | 'Google Meet Maya'>('all');
   const [applicationsSortBy, setApplicationsSortBy] = useState<'status' | 'name' | 'date'>('status');
   const [applicationsSortDir, setApplicationsSortDir] = useState<'asc' | 'desc'>('asc');
+  const [applicationsSortPreset, setApplicationsSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [scheduleSearch, setScheduleSearch] = useState('');
   const [scheduleModeFilter, setScheduleModeFilter] = useState<'all' | 'Bersemuka di Kampus' | 'Google Meet Maya'>('all');
   const [scheduleSortBy, setScheduleSortBy] = useState<'date' | 'name'>('date');
   const [scheduleSortDir, setScheduleSortDir] = useState<'asc' | 'desc'>('asc');
+  const [scheduleSortPreset, setScheduleSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [actionPlansSearch, setActionPlansSearch] = useState('');
   const [actionPlansDistrictFilter, setActionPlansDistrictFilter] = useState<'all' | KelantanDistrict>('all');
   const [actionPlansSortBy, setActionPlansSortBy] = useState<'name' | 'topic'>('name');
   const [actionPlansSortDir, setActionPlansSortDir] = useState<'asc' | 'desc'>('asc');
+  const [actionPlansSortPreset, setActionPlansSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [endorsementsSearch, setEndorsementsSearch] = useState('');
   const [endorsementsGrantFilter, setEndorsementsGrantFilter] = useState<'all' | 'RM3,000' | 'RM5,000' | 'RM10,000'>('all');
   const [endorsementsSortBy, setEndorsementsSortBy] = useState<'date' | 'name'>('date');
   const [endorsementsSortDir, setEndorsementsSortDir] = useState<'asc' | 'desc'>('desc');
+  const [endorsementsSortPreset, setEndorsementsSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [logsSearch, setLogsSearch] = useState('');
   const [logsStatusFilter, setLogsStatusFilter] = useState<'all' | 'done' | 'pending'>('all');
   const [logsSortBy, setLogsSortBy] = useState<'date' | 'name'>('date');
   const [logsSortDir, setLogsSortDir] = useState<'asc' | 'desc'>('desc');
+  const [logsSortPreset, setLogsSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
+
+  const overviewSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'status_pending', label: 'Status (Menunggu Dahulu)' },
+    { value: 'district_asc', label: 'Daerah (A - Z)' },
+    { value: 'topic_asc', label: 'Topik Bimbingan (A - Z)' }
+  ]);
+
+  const applicationsSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'status_pending', label: 'Status (Menunggu Dahulu)' },
+    { value: 'session_date_asc', label: 'Tarikh Sesi (Terawal)' },
+    { value: 'district_asc', label: 'Daerah (A - Z)' }
+  ]);
+
+  const scheduleSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'session_date_asc', label: 'Tarikh Sesi (Terawal)' },
+    { value: 'session_date_desc', label: 'Tarikh Sesi (Terakhir)' },
+    { value: 'district_asc', label: 'Daerah (A - Z)' }
+  ]);
+
+  const actionPlansSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'topic_asc', label: 'Topik Bimbingan (A - Z)' },
+    { value: 'district_asc', label: 'Daerah (A - Z)' }
+  ]);
+
+  const endorsementsSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'amount_desc', label: 'Jumlah Geran (Tertinggi)' },
+    { value: 'district_asc', label: 'Daerah (A - Z)' }
+  ]);
+
+  const logsSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
+    { value: 'session_desc', label: 'Tarikh Sesi (Terbaru)' },
+    { value: 'progress_asc', label: 'Tugasan Belum Selesai Dahulu' },
+    { value: 'topic_asc', label: 'Topik Bimbingan (A - Z)' }
+  ]);
 
   // Modals state
   const [selectedMenteeForNotes, setSelectedMenteeForNotes] = useState<MentorshipRegistration | null>(null);
@@ -480,142 +530,218 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   ).sort() as KelantanDistrict[];
 
   // Overview table: matches search + filter + sort
-  const overviewRegistrations = mentorRegistrations
-    .filter(r => {
-      if (overviewStatusFilter !== 'all' && r.status !== overviewStatusFilter) return false;
-      if (overviewDistrictFilter !== 'all' && r.district !== overviewDistrictFilter) return false;
-      const q = overviewSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        r.entrepreneurName.toLowerCase().includes(q) ||
-        r.businessName.toLowerCase().includes(q) ||
-        r.topic.toLowerCase().includes(q) ||
-        r.district.toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      let cmp = 0;
-      if (overviewSortBy === 'name') cmp = a.entrepreneurName.localeCompare(b.entrepreneurName);
-      else if (overviewSortBy === 'district') cmp = a.district.localeCompare(b.district);
-      else cmp = statusOrderWeight(a.status) - statusOrderWeight(b.status);
-      return overviewSortDir === 'asc' ? cmp : -cmp;
-    });
+  const baseOverviewRegistrations = mentorRegistrations.filter(r => {
+    if (overviewStatusFilter !== 'all' && r.status !== overviewStatusFilter) return false;
+    if (overviewDistrictFilter !== 'all' && r.district !== overviewDistrictFilter) return false;
+    const q = overviewSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      r.entrepreneurName.toLowerCase().includes(q) ||
+      r.businessName.toLowerCase().includes(q) ||
+      r.topic.toLowerCase().includes(q) ||
+      r.district.toLowerCase().includes(q)
+    );
+  });
+
+  const overviewRegistrations =
+    overviewSortPreset === 'table_column'
+      ? [...baseOverviewRegistrations].sort((a, b) => {
+          let cmp = 0;
+          if (overviewSortBy === 'name') cmp = a.entrepreneurName.localeCompare(b.entrepreneurName);
+          else if (overviewSortBy === 'district') cmp = a.district.localeCompare(b.district);
+          else cmp = statusOrderWeight(a.status) - statusOrderWeight(b.status);
+          return overviewSortDir === 'asc' ? cmp : -cmp;
+        })
+      : sortRecords(baseOverviewRegistrations, {
+          sortBy: overviewSortPreset,
+          getName: (r) => `${r.entrepreneurName || ''} ${r.businessName || ''}`.trim(),
+          customCompare: (a, b, mode) => {
+            if (mode === 'status_pending') return statusOrderWeight(a.status) - statusOrderWeight(b.status);
+            if (mode === 'district_asc') return compareText(a.district, b.district);
+            if (mode === 'topic_asc') return compareText(a.topic, b.topic);
+            return null;
+          }
+        });
 
   // Permohonan Bimbingan: 'all' shows active (pending + confirmed); 'completed' shows completed
-  const filteredRegistrations = mentorRegistrations
-    .filter(r => {
-      const q = searchQuery.trim().toLowerCase();
-      const matchesSearch =
-        !q ||
-        r.entrepreneurName.toLowerCase().includes(q) ||
-        r.businessName.toLowerCase().includes(q) ||
-        r.topic.toLowerCase().includes(q) ||
-        r.district.toLowerCase().includes(q);
+  const baseFilteredRegistrations = mentorRegistrations.filter(r => {
+    const q = searchQuery.trim().toLowerCase();
+    const matchesSearch =
+      !q ||
+      r.entrepreneurName.toLowerCase().includes(q) ||
+      r.businessName.toLowerCase().includes(q) ||
+      r.topic.toLowerCase().includes(q) ||
+      r.district.toLowerCase().includes(q);
 
-      const matchesStatus =
-        statusFilter === 'all'
-          ? r.status === 'pending' || r.status === 'confirmed'
-          : r.status === statusFilter;
-      const matchesMode = modeFilter === 'all' || r.mode === modeFilter;
+    const matchesStatus =
+      statusFilter === 'all'
+        ? r.status === 'pending' || r.status === 'confirmed'
+        : r.status === statusFilter;
+    const matchesMode = modeFilter === 'all' || r.mode === modeFilter;
 
-      return matchesSearch && matchesStatus && matchesMode;
-    })
-    .sort((a, b) => {
-      let cmp = 0;
-      if (applicationsSortBy === 'name') cmp = a.entrepreneurName.localeCompare(b.entrepreneurName);
-      else if (applicationsSortBy === 'date') cmp = (a.preferredDate || '').localeCompare(b.preferredDate || '');
-      else cmp = statusOrderWeight(a.status) - statusOrderWeight(b.status);
-      return applicationsSortDir === 'asc' ? cmp : -cmp;
-    });
+    return matchesSearch && matchesStatus && matchesMode;
+  });
+
+  const filteredRegistrations =
+    applicationsSortPreset === 'table_column'
+      ? [...baseFilteredRegistrations].sort((a, b) => {
+          let cmp = 0;
+          if (applicationsSortBy === 'name') cmp = a.entrepreneurName.localeCompare(b.entrepreneurName);
+          else if (applicationsSortBy === 'date') cmp = (a.preferredDate || '').localeCompare(b.preferredDate || '');
+          else cmp = statusOrderWeight(a.status) - statusOrderWeight(b.status);
+          return applicationsSortDir === 'asc' ? cmp : -cmp;
+        })
+      : sortRecords(baseFilteredRegistrations, {
+          sortBy: applicationsSortPreset,
+          getName: (r) => `${r.entrepreneurName || ''} ${r.businessName || ''}`.trim(),
+          customCompare: (a, b, mode) => {
+            if (mode === 'status_pending') return statusOrderWeight(a.status) - statusOrderWeight(b.status);
+            if (mode === 'session_date_asc') return getTimestampMs(a.preferredDate) - getTimestampMs(b.preferredDate);
+            if (mode === 'district_asc') return compareText(a.district, b.district);
+            return null;
+          }
+        });
 
   const confirmedScheduleSessions = mentorRegistrations.filter(m => m.status === 'confirmed');
-  const filteredScheduleSessions = confirmedScheduleSessions
-    .filter(m => {
-      const inferredMode = m.meetingLink ? 'Google Meet Maya' : (m.mode || 'Bersemuka di Kampus');
-      if (scheduleModeFilter !== 'all' && inferredMode !== scheduleModeFilter && m.mode !== scheduleModeFilter) {
-        return false;
-      }
-      const q = scheduleSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        m.entrepreneurName.toLowerCase().includes(q) ||
-        m.businessName.toLowerCase().includes(q) ||
-        m.topic.toLowerCase().includes(q) ||
-        (m.preferredDate || '').toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const cmp =
-        scheduleSortBy === 'name'
-          ? a.entrepreneurName.localeCompare(b.entrepreneurName)
-          : (a.preferredDate || '').localeCompare(b.preferredDate || '');
-      return scheduleSortDir === 'asc' ? cmp : -cmp;
-    });
+  const baseScheduleSessions = confirmedScheduleSessions.filter(m => {
+    const inferredMode = m.meetingLink ? 'Google Meet Maya' : (m.mode || 'Bersemuka di Kampus');
+    if (scheduleModeFilter !== 'all' && inferredMode !== scheduleModeFilter && m.mode !== scheduleModeFilter) {
+      return false;
+    }
+    const q = scheduleSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      m.entrepreneurName.toLowerCase().includes(q) ||
+      m.businessName.toLowerCase().includes(q) ||
+      m.topic.toLowerCase().includes(q) ||
+      (m.preferredDate || '').toLowerCase().includes(q)
+    );
+  });
+
+  const filteredScheduleSessions =
+    scheduleSortPreset === 'table_column'
+      ? [...baseScheduleSessions].sort((a, b) => {
+          const cmp =
+            scheduleSortBy === 'name'
+              ? a.entrepreneurName.localeCompare(b.entrepreneurName)
+              : (a.preferredDate || '').localeCompare(b.preferredDate || '');
+          return scheduleSortDir === 'asc' ? cmp : -cmp;
+        })
+      : sortRecords(baseScheduleSessions, {
+          sortBy: scheduleSortPreset,
+          getName: (m) => `${m.entrepreneurName || ''} ${m.businessName || ''}`.trim(),
+          customCompare: (a, b, mode) => {
+            if (mode === 'session_date_asc') return getTimestampMs(a.preferredDate) - getTimestampMs(b.preferredDate);
+            if (mode === 'session_date_desc') return getTimestampMs(b.preferredDate) - getTimestampMs(a.preferredDate);
+            if (mode === 'district_asc') return compareText(a.district, b.district);
+            return null;
+          }
+        });
 
   const actionPlanMentees = mentorRegistrations.filter(m => Boolean(m.mentorActionPlan));
-  const filteredActionPlanMentees = actionPlanMentees
-    .filter(m => {
-      if (actionPlansDistrictFilter !== 'all' && m.district !== actionPlansDistrictFilter) return false;
-      const q = actionPlansSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        m.entrepreneurName.toLowerCase().includes(q) ||
-        m.businessName.toLowerCase().includes(q) ||
-        m.topic.toLowerCase().includes(q) ||
-        (m.mentorActionPlan || '').toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const cmp =
-        actionPlansSortBy === 'topic'
-          ? a.topic.localeCompare(b.topic)
-          : a.entrepreneurName.localeCompare(b.entrepreneurName);
-      return actionPlansSortDir === 'asc' ? cmp : -cmp;
-    });
+  const baseActionPlanMentees = actionPlanMentees.filter(m => {
+    if (actionPlansDistrictFilter !== 'all' && m.district !== actionPlansDistrictFilter) return false;
+    const q = actionPlansSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      m.entrepreneurName.toLowerCase().includes(q) ||
+      m.businessName.toLowerCase().includes(q) ||
+      m.topic.toLowerCase().includes(q) ||
+      (m.mentorActionPlan || '').toLowerCase().includes(q)
+    );
+  });
 
-  const filteredEndorsements = mentorEndorsements
-    .filter(e => {
-      if (endorsementsGrantFilter !== 'all' && e.recommendedAmount !== endorsementsGrantFilter) return false;
-      const q = endorsementsSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        e.menteeName.toLowerCase().includes(q) ||
-        e.businessName.toLowerCase().includes(q) ||
-        e.endorsementCode.toLowerCase().includes(q) ||
-        e.district.toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const cmp =
-        endorsementsSortBy === 'name'
-          ? a.menteeName.localeCompare(b.menteeName)
-          : (a.issuedAt || '').localeCompare(b.issuedAt || '');
-      return endorsementsSortDir === 'asc' ? cmp : -cmp;
-    });
+  const filteredActionPlanMentees =
+    actionPlansSortPreset === 'table_column'
+      ? [...baseActionPlanMentees].sort((a, b) => {
+          const cmp =
+            actionPlansSortBy === 'topic'
+              ? a.topic.localeCompare(b.topic)
+              : a.entrepreneurName.localeCompare(b.entrepreneurName);
+          return actionPlansSortDir === 'asc' ? cmp : -cmp;
+        })
+      : sortRecords(baseActionPlanMentees, {
+          sortBy: actionPlansSortPreset,
+          getName: (m) => `${m.entrepreneurName || ''} ${m.businessName || ''}`.trim(),
+          customCompare: (a, b, mode) => {
+            if (mode === 'topic_asc') return compareText(a.topic, b.topic);
+            if (mode === 'district_asc') return compareText(a.district, b.district);
+            return null;
+          }
+        });
 
-  const filteredLogs = mentorLogs
-    .filter(l => {
-      const totalTasks = l.actionItems?.length || 0;
-      const doneTasks = l.actionItems?.filter(a => a.completed).length || 0;
-      const allDone = totalTasks > 0 && doneTasks === totalTasks;
-      if (logsStatusFilter === 'done' && !allDone) return false;
-      if (logsStatusFilter === 'pending' && allDone) return false;
-      const q = logsSearch.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        l.menteeName.toLowerCase().includes(q) ||
-        l.businessName.toLowerCase().includes(q) ||
-        l.topic.toLowerCase().includes(q) ||
-        l.sessionDate.toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const cmp =
-        logsSortBy === 'name'
-          ? a.menteeName.localeCompare(b.menteeName)
-          : (a.sessionDate || '').localeCompare(b.sessionDate || '');
-      return logsSortDir === 'asc' ? cmp : -cmp;
-    });
+  const baseEndorsements = mentorEndorsements.filter(e => {
+    if (endorsementsGrantFilter !== 'all' && e.recommendedAmount !== endorsementsGrantFilter) return false;
+    const q = endorsementsSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      e.menteeName.toLowerCase().includes(q) ||
+      e.businessName.toLowerCase().includes(q) ||
+      e.endorsementCode.toLowerCase().includes(q) ||
+      e.district.toLowerCase().includes(q)
+    );
+  });
+
+  const filteredEndorsements =
+    endorsementsSortPreset === 'table_column'
+      ? [...baseEndorsements].sort((a, b) => {
+          const cmp =
+            endorsementsSortBy === 'name'
+              ? a.menteeName.localeCompare(b.menteeName)
+              : (a.issuedAt || '').localeCompare(b.issuedAt || '');
+          return endorsementsSortDir === 'asc' ? cmp : -cmp;
+        })
+      : sortRecords(baseEndorsements, {
+          sortBy: endorsementsSortPreset,
+          getName: (e) => `${e.menteeName || ''} ${e.businessName || ''}`.trim(),
+          getModified: (e) => getModifiedTimestamp(e) || getTimestampMs(e.issuedAt),
+          customCompare: (a, b, mode) => {
+            if (mode === 'amount_desc') return parseNumericAmount(b.recommendedAmount) - parseNumericAmount(a.recommendedAmount);
+            if (mode === 'district_asc') return compareText(a.district, b.district);
+            return null;
+          }
+        });
+
+  const baseLogs = mentorLogs.filter(l => {
+    const totalTasks = l.actionItems?.length || 0;
+    const doneTasks = l.actionItems?.filter(a => a.completed).length || 0;
+    const allDone = totalTasks > 0 && doneTasks === totalTasks;
+    if (logsStatusFilter === 'done' && !allDone) return false;
+    if (logsStatusFilter === 'pending' && allDone) return false;
+    const q = logsSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      l.menteeName.toLowerCase().includes(q) ||
+      l.businessName.toLowerCase().includes(q) ||
+      l.topic.toLowerCase().includes(q) ||
+      l.sessionDate.toLowerCase().includes(q)
+    );
+  });
+
+  const filteredLogs =
+    logsSortPreset === 'table_column'
+      ? [...baseLogs].sort((a, b) => {
+          const cmp =
+            logsSortBy === 'name'
+              ? a.menteeName.localeCompare(b.menteeName)
+              : (a.sessionDate || '').localeCompare(b.sessionDate || '');
+          return logsSortDir === 'asc' ? cmp : -cmp;
+        })
+      : sortRecords(baseLogs, {
+          sortBy: logsSortPreset,
+          getName: (l) => `${l.menteeName || ''} ${l.businessName || ''}`.trim(),
+          getModified: (l) => getModifiedTimestamp(l) || getTimestampMs(l.sessionDate),
+          customCompare: (a, b, mode) => {
+            if (mode === 'session_desc') return getTimestampMs(b.sessionDate) - getTimestampMs(a.sessionDate);
+            if (mode === 'progress_asc') {
+              const aPending = (a.actionItems?.filter(i => !i.completed).length || 0);
+              const bPending = (b.actionItems?.filter(i => !i.completed).length || 0);
+              return bPending - aPending;
+            }
+            if (mode === 'topic_asc') return compareText(a.topic, b.topic);
+            return null;
+          }
+        });
 
   // Calculate statistics for this mentor
   const totalMentees = mentorRegistrations.length;
@@ -627,12 +753,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const totalLogbookCount = mentorLogs.length;
 
   // Unconditional 7-item pagination hooks across MentorPortal lists
-  const overviewPagination = usePagination(overviewRegistrations, 7, [overviewSearch, overviewStatusFilter, overviewDistrictFilter, overviewSortBy, overviewSortDir, currentMentor.id]);
-  const applicationsPagination = usePagination(filteredRegistrations, 7, [searchQuery, statusFilter, modeFilter, applicationsSortBy, applicationsSortDir, currentMentor.id]);
-  const schedulePagination = usePagination(filteredScheduleSessions, 7, [scheduleSearch, scheduleModeFilter, scheduleSortBy, scheduleSortDir, currentMentor.id, filteredScheduleSessions.length]);
-  const actionPlansPagination = usePagination(filteredActionPlanMentees, 7, [actionPlansSearch, actionPlansDistrictFilter, actionPlansSortBy, actionPlansSortDir, currentMentor.id, filteredActionPlanMentees.length]);
-  const endorsementsPagination = usePagination(filteredEndorsements, 7, [endorsementsSearch, endorsementsGrantFilter, endorsementsSortBy, endorsementsSortDir, currentMentor.id, filteredEndorsements.length]);
-  const logsPagination = usePagination(filteredLogs, 7, [logsSearch, logsStatusFilter, logsSortBy, logsSortDir, currentMentor.id, filteredLogs.length]);
+  const overviewPagination = usePagination(overviewRegistrations, 7, [overviewSearch, overviewStatusFilter, overviewDistrictFilter, overviewSortPreset, overviewSortBy, overviewSortDir, currentMentor.id]);
+  const applicationsPagination = usePagination(filteredRegistrations, 7, [searchQuery, statusFilter, modeFilter, applicationsSortPreset, applicationsSortBy, applicationsSortDir, currentMentor.id]);
+  const schedulePagination = usePagination(filteredScheduleSessions, 7, [scheduleSearch, scheduleModeFilter, scheduleSortPreset, scheduleSortBy, scheduleSortDir, currentMentor.id, filteredScheduleSessions.length]);
+  const actionPlansPagination = usePagination(filteredActionPlanMentees, 7, [actionPlansSearch, actionPlansDistrictFilter, actionPlansSortPreset, actionPlansSortBy, actionPlansSortDir, currentMentor.id, filteredActionPlanMentees.length]);
+  const endorsementsPagination = usePagination(filteredEndorsements, 7, [endorsementsSearch, endorsementsGrantFilter, endorsementsSortPreset, endorsementsSortBy, endorsementsSortDir, currentMentor.id, filteredEndorsements.length]);
+  const logsPagination = usePagination(filteredLogs, 7, [logsSearch, logsStatusFilter, logsSortPreset, logsSortBy, logsSortDir, currentMentor.id, filteredLogs.length]);
 
   const showToast = (msg: string) => {
     setIsSuccessToast(msg);
@@ -903,13 +1029,63 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-cyan-500/12 dark:bg-cyan-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
 
         <div className="relative z-10 space-y-1">
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
-            Selamat Kembali, <span className="kbelia-title-shimmer">{currentMentor.name}</span>
-          </h1>
-          
-          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
-            {currentMentor.title} &middot; <span className="font-semibold text-black dark:text-white">{currentMentor.agency}</span>
-          </p>
+          {(() => {
+            const mentorHeaderMap: Record<MentorSubTab, { prefix: string; accent: string; subtitle: React.ReactNode }> = {
+              overview: {
+                prefix: !isEn ? 'Ringkasan & ' : 'Mentorship ',
+                accent: !isEn ? 'Prestasi Bimbingan' : 'Performance',
+                subtitle: !isEn ? (
+                  <>
+                    Selamat kembali, <span className="font-semibold text-black dark:text-white">{currentMentor.name}</span> ({currentMentor.agency}) — pantau statistik mentee, sesi aktif, dan perakuan geran.
+                  </>
+                ) : (
+                  <>
+                    Welcome back, <span className="font-semibold text-black dark:text-white">{currentMentor.name}</span> ({currentMentor.agency}) — monitor mentee stats, active sessions, and grant endorsements.
+                  </>
+                )
+              },
+              sessions: {
+                prefix: !isEn ? 'Pengurusan ' : 'Manage ',
+                accent: !isEn ? 'Sesi Bimbingan' : 'Coaching Sessions',
+                subtitle: !isEn
+                  ? 'Semak permintaan konsultasi klinik keusahawanan, sahkan tarikh temujanji, dan kongsi pautan mesyuarat.'
+                  : 'Review entrepreneurship clinic requests, confirm appointment slots, and share meeting links.'
+              },
+              endorsements: {
+                prefix: !isEn ? 'Pengeluaran ' : 'Issue ',
+                accent: !isEn ? 'Perakuan Geran' : 'Grant Endorsements',
+                subtitle: !isEn
+                  ? 'Nilai kesediaan perniagaan mentee dan keluarkan surat perakuan rasmi untuk menyokong permohonan geran.'
+                  : 'Evaluate mentee business readiness and issue official endorsement letters for grant applications.'
+              },
+              logbook: {
+                prefix: !isEn ? 'Jurnal & ' : 'Session ',
+                accent: !isEn ? 'Rekod Sesi' : 'Logbook & Notes',
+                subtitle: !isEn
+                  ? 'Catat minit perbincangan bimbingan, pelan tindakan susulan, dan kemajuan pencapaian mentee anda.'
+                  : 'Record coaching discussion minutes, follow-up action plans, and mentee progress milestones.'
+              },
+              profile: {
+                prefix: !isEn ? 'Pengurusan ' : 'Manage ',
+                accent: !isEn ? 'Profil & Jadual' : 'Profile & Schedule',
+                subtitle: !isEn
+                  ? 'Kemas kini kepakaran bimbingan, bio agensi, hari kelapangan, dan slot masa sesi klinik mentor.'
+                  : 'Update coaching expertise, agency bio, available days, and mentor clinic time slots.'
+              }
+            };
+            const currentMentorHeader = mentorHeaderMap[currentSubTab] || mentorHeaderMap.overview;
+            return (
+              <>
+                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
+                  {currentMentorHeader.prefix}
+                  <span className="kbelia-title-shimmer">{currentMentorHeader.accent}</span>
+                </h1>
+                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
+                  {currentMentorHeader.subtitle}
+                </p>
+              </>
+            );
+          })()}
         </div>
 
         <div className="relative z-10 flex flex-wrap items-center gap-2.5 shrink-0">
@@ -1360,10 +1536,24 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   searchValue={overviewSearch}
                   onSearchChange={setOverviewSearch}
                   searchPlaceholder="Cari usahawan, perniagaan, topik atau daerah..."
-                  filterCount={(overviewStatusFilter !== 'all' ? 1 : 0) + (overviewDistrictFilter !== 'all' ? 1 : 0)}
+                  filterCount={
+                    (overviewStatusFilter !== 'all' ? 1 : 0) +
+                    (overviewDistrictFilter !== 'all' ? 1 : 0) +
+                    (overviewSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+                  }
                   onResetFilters={() => {
                     setOverviewStatusFilter('all');
                     setOverviewDistrictFilter('all');
+                    setOverviewSortPreset(DEFAULT_SORT_VALUE);
+                  }}
+                  sortOptions={
+                    overviewSortPreset === 'table_column'
+                      ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...overviewSortOptions]
+                      : overviewSortOptions
+                  }
+                  sortValue={overviewSortPreset === 'table_column' ? '' : overviewSortPreset}
+                  onSortChange={(val) => {
+                    if (val) setOverviewSortPreset(val);
                   }}
                   filterContent={
                     <>
@@ -1414,6 +1604,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <button
                               type="button"
                               onClick={() => {
+                                setOverviewSortPreset('table_column');
                                 if (overviewSortBy === 'name') setOverviewSortDir(p => p === 'asc' ? 'desc' : 'asc');
                                 else { setOverviewSortBy('name'); setOverviewSortDir('asc'); }
                               }}
@@ -1427,6 +1618,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <button
                               type="button"
                               onClick={() => {
+                                setOverviewSortPreset('table_column');
                                 if (overviewSortBy === 'district') setOverviewSortDir(p => p === 'asc' ? 'desc' : 'asc');
                                 else { setOverviewSortBy('district'); setOverviewSortDir('asc'); }
                               }}
@@ -1443,6 +1635,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <button
                               type="button"
                               onClick={() => {
+                                setOverviewSortPreset('table_column');
                                 if (overviewSortBy === 'status') setOverviewSortDir(p => p === 'asc' ? 'desc' : 'asc');
                                 else { setOverviewSortBy('status'); setOverviewSortDir('asc'); }
                               }}
@@ -1596,10 +1789,24 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 searchValue={searchQuery}
                 onSearchChange={setSearchQuery}
                 searchPlaceholder="Cari usahawan, perniagaan, topik atau daerah..."
-                filterCount={(statusFilter !== 'all' ? 1 : 0) + (modeFilter !== 'all' ? 1 : 0)}
+                filterCount={
+                  (statusFilter !== 'all' ? 1 : 0) +
+                  (modeFilter !== 'all' ? 1 : 0) +
+                  (applicationsSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+                }
                 onResetFilters={() => {
                   setStatusFilter('all');
                   setModeFilter('all');
+                  setApplicationsSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                sortOptions={
+                  applicationsSortPreset === 'table_column'
+                    ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...applicationsSortOptions]
+                    : applicationsSortOptions
+                }
+                sortValue={applicationsSortPreset === 'table_column' ? '' : applicationsSortPreset}
+                onSortChange={(val) => {
+                  if (val) setApplicationsSortPreset(val);
                 }}
                 filterContent={
                   <>
@@ -1659,6 +1866,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
+                              setApplicationsSortPreset('table_column');
                               if (applicationsSortBy === 'name') setApplicationsSortDir(p => p === 'asc' ? 'desc' : 'asc');
                               else { setApplicationsSortBy('name'); setApplicationsSortDir('asc'); }
                             }}
@@ -1672,6 +1880,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
+                              setApplicationsSortPreset('table_column');
                               if (applicationsSortBy === 'date') setApplicationsSortDir(p => p === 'asc' ? 'desc' : 'asc');
                               else { setApplicationsSortBy('date'); setApplicationsSortDir('asc'); }
                             }}
@@ -1688,6 +1897,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
+                              setApplicationsSortPreset('table_column');
                               if (applicationsSortBy === 'status') setApplicationsSortDir(p => p === 'asc' ? 'desc' : 'asc');
                               else { setApplicationsSortBy('status'); setApplicationsSortDir('asc'); }
                             }}
@@ -1960,8 +2170,20 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 searchValue={scheduleSearch}
                 onSearchChange={setScheduleSearch}
                 searchPlaceholder="Cari usahawan, topik atau tarikh sesi..."
-                filterCount={scheduleModeFilter !== 'all' ? 1 : 0}
-                onResetFilters={() => setScheduleModeFilter('all')}
+                filterCount={(scheduleModeFilter !== 'all' ? 1 : 0) + (scheduleSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
+                onResetFilters={() => {
+                  setScheduleModeFilter('all');
+                  setScheduleSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                sortOptions={
+                  scheduleSortPreset === 'table_column'
+                    ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...scheduleSortOptions]
+                    : scheduleSortOptions
+                }
+                sortValue={scheduleSortPreset === 'table_column' ? '' : scheduleSortPreset}
+                onSortChange={(val) => {
+                  if (val) setScheduleSortPreset(val);
+                }}
                 filterContent={
                   <div>
                     <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
@@ -1995,6 +2217,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
+                              setScheduleSortPreset('table_column');
                               if (scheduleSortBy === 'name') setScheduleSortDir(p => p === 'asc' ? 'desc' : 'asc');
                               else { setScheduleSortBy('name'); setScheduleSortDir('asc'); }
                             }}
@@ -2008,6 +2231,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
+                              setScheduleSortPreset('table_column');
                               if (scheduleSortBy === 'date') setScheduleSortDir(p => p === 'asc' ? 'desc' : 'asc');
                               else { setScheduleSortBy('date'); setScheduleSortDir('asc'); }
                             }}
@@ -2223,8 +2447,23 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 searchValue={actionPlansSearch}
                 onSearchChange={setActionPlansSearch}
                 searchPlaceholder="Cari usahawan, topik atau kandungan nota..."
-                filterCount={actionPlansDistrictFilter !== 'all' ? 1 : 0}
-                onResetFilters={() => setActionPlansDistrictFilter('all')}
+                filterCount={
+                  (actionPlansDistrictFilter !== 'all' ? 1 : 0) +
+                  (actionPlansSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+                }
+                onResetFilters={() => {
+                  setActionPlansDistrictFilter('all');
+                  setActionPlansSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                sortOptions={
+                  actionPlansSortPreset === 'table_column'
+                    ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...actionPlansSortOptions]
+                    : actionPlansSortOptions
+                }
+                sortValue={actionPlansSortPreset === 'table_column' ? '' : actionPlansSortPreset}
+                onSortChange={(val) => {
+                  if (val) setActionPlansSortPreset(val);
+                }}
                 filterContent={
                   <div>
                     <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
@@ -2259,6 +2498,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
+                              setActionPlansSortPreset('table_column');
                               if (actionPlansSortBy === 'name') setActionPlansSortDir(p => p === 'asc' ? 'desc' : 'asc');
                               else { setActionPlansSortBy('name'); setActionPlansSortDir('asc'); }
                             }}
@@ -2272,6 +2512,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
+                              setActionPlansSortPreset('table_column');
                               if (actionPlansSortBy === 'topic') setActionPlansSortDir(p => p === 'asc' ? 'desc' : 'asc');
                               else { setActionPlansSortBy('topic'); setActionPlansSortDir('asc'); }
                             }}
@@ -2456,8 +2697,23 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 searchValue={endorsementsSearch}
                 onSearchChange={setEndorsementsSearch}
                 searchPlaceholder="Cari nama usahawan, kod perakuan atau daerah..."
-                filterCount={endorsementsGrantFilter !== 'all' ? 1 : 0}
-                onResetFilters={() => setEndorsementsGrantFilter('all')}
+                filterCount={
+                  (endorsementsGrantFilter !== 'all' ? 1 : 0) +
+                  (endorsementsSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+                }
+                onResetFilters={() => {
+                  setEndorsementsGrantFilter('all');
+                  setEndorsementsSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                sortOptions={
+                  endorsementsSortPreset === 'table_column'
+                    ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...endorsementsSortOptions]
+                    : endorsementsSortOptions
+                }
+                sortValue={endorsementsSortPreset === 'table_column' ? '' : endorsementsSortPreset}
+                onSortChange={(val) => {
+                  if (val) setEndorsementsSortPreset(val);
+                }}
                 filterContent={
                   <div>
                     <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
@@ -2490,6 +2746,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
+                              setEndorsementsSortPreset('table_column');
                               if (endorsementsSortBy === 'name') setEndorsementsSortDir(p => p === 'asc' ? 'desc' : 'asc');
                               else { setEndorsementsSortBy('name'); setEndorsementsSortDir('asc'); }
                             }}
@@ -2509,6 +2766,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
+                              setEndorsementsSortPreset('table_column');
                               if (endorsementsSortBy === 'date') setEndorsementsSortDir(p => p === 'asc' ? 'desc' : 'asc');
                               else { setEndorsementsSortBy('date'); setEndorsementsSortDir('desc'); }
                             }}
@@ -2625,8 +2883,20 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               searchValue={logsSearch}
               onSearchChange={setLogsSearch}
               searchPlaceholder="Cari usahawan, topik atau tarikh sesi..."
-              filterCount={logsStatusFilter !== 'all' ? 1 : 0}
-              onResetFilters={() => setLogsStatusFilter('all')}
+              filterCount={(logsStatusFilter !== 'all' ? 1 : 0) + (logsSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
+              onResetFilters={() => {
+                setLogsStatusFilter('all');
+                setLogsSortPreset(DEFAULT_SORT_VALUE);
+              }}
+              sortOptions={
+                logsSortPreset === 'table_column'
+                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...logsSortOptions]
+                  : logsSortOptions
+              }
+              sortValue={logsSortPreset === 'table_column' ? '' : logsSortPreset}
+              onSortChange={(val) => {
+                if (val) setLogsSortPreset(val);
+              }}
               filterContent={
                 <div>
                   <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
@@ -2658,6 +2928,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         <button
                           type="button"
                           onClick={() => {
+                            setLogsSortPreset('table_column');
                             if (logsSortBy === 'name') setLogsSortDir(p => p === 'asc' ? 'desc' : 'asc');
                             else { setLogsSortBy('name'); setLogsSortDir('asc'); }
                           }}
@@ -2674,6 +2945,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         <button
                           type="button"
                           onClick={() => {
+                            setLogsSortPreset('table_column');
                             if (logsSortBy === 'date') setLogsSortDir(p => p === 'asc' ? 'desc' : 'asc');
                             else { setLogsSortBy('date'); setLogsSortDir('desc'); }
                           }}

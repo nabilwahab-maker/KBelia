@@ -601,8 +601,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     },
     {
       id: 'products',
-      label: isMs ? 'Katalog' : 'Catalog',
-      keywords: 'katalog produk barangan servis catalog products',
+      label: isMs ? 'Produk Saya' : 'My Products',
+      keywords: 'produk saya katalog barangan servis my products catalog',
       icon: ShoppingBag
     },
     {

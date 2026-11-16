@@ -22,6 +22,7 @@ import { PortalImage } from './PortalImage';
 import { resolveB2BImage } from '../utils/visualAssets';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 
 export const B2BMarketSection: React.FC = () => {
   const { language } = useLanguage();
@@ -103,31 +104,59 @@ export const B2BMarketSection: React.FC = () => {
   const [filterType, setFilterType] = useState<'all' | 'supply' | 'demand'>('all');
   const [filterDistrict, setFilterDistrict] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
 
-  const filteredListings = listings.filter((item) => {
-    const matchType = filterType === 'all' || item.type === filterType;
-    const matchDist = filterDistrict === 'all' || item.district === filterDistrict;
-    const q = searchQuery.trim().toLowerCase();
-    const matchSearch =
-      !q ||
-      item.title.toLowerCase().includes(q) ||
-      item.description.toLowerCase().includes(q) ||
-      item.authorBusiness.toLowerCase().includes(q) ||
-      item.authorName.toLowerCase().includes(q) ||
-      item.district.toLowerCase().includes(q);
-    return matchType && matchDist && matchSearch;
-  });
+  const sortOptions = buildStandardSortOptions(
+    [
+      { value: 'supply_first', label: isEn ? 'Type (Supplying First)' : 'Jenis (Membekal Dahulu)' },
+      { value: 'demand_first', label: isEn ? 'Type (Seeking First)' : 'Jenis (Mencari Dahulu)' },
+      { value: 'district_asc', label: isEn ? 'District (A - Z)' : 'Daerah (A - Z)' }
+    ],
+    isEn,
+    {
+      asc: isEn ? 'Ad Title (A - Z)' : 'Tajuk Iklan (A - Z)',
+      desc: isEn ? 'Ad Title (Z - A)' : 'Tajuk Iklan (Z - A)'
+    }
+  );
+
+  const filteredListings = sortRecords(
+    listings.filter((item) => {
+      const matchType = filterType === 'all' || item.type === filterType;
+      const matchDist = filterDistrict === 'all' || item.district === filterDistrict;
+      const q = searchQuery.trim().toLowerCase();
+      const matchSearch =
+        !q ||
+        item.title.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q) ||
+        item.authorBusiness.toLowerCase().includes(q) ||
+        item.authorName.toLowerCase().includes(q) ||
+        item.district.toLowerCase().includes(q);
+      return matchType && matchDist && matchSearch;
+    }),
+    {
+      sortBy,
+      getName: (item) => item.title || item.authorBusiness || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'supply_first') return (a.type === 'supply' ? 0 : 1) - (b.type === 'supply' ? 0 : 1);
+        if (mode === 'demand_first') return (a.type === 'demand' ? 0 : 1) - (b.type === 'demand' ? 0 : 1);
+        if (mode === 'district_asc') return compareText(a.district, b.district);
+        return null;
+      }
+    }
+  );
 
   const pagination = usePagination(filteredListings, 7, [
     searchQuery,
     filterType,
     filterDistrict,
+    sortBy,
     filteredListings.length
   ]);
 
   const activeFilterCount =
     (filterType !== 'all' ? 1 : 0) +
-    (filterDistrict !== 'all' ? 1 : 0);
+    (filterDistrict !== 'all' ? 1 : 0) +
+    (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   return (
     <div className="w-full space-y-4">
@@ -173,7 +202,12 @@ export const B2BMarketSection: React.FC = () => {
           onResetFilters={() => {
             setFilterType('all');
             setFilterDistrict('all');
+            setSortBy(DEFAULT_SORT_VALUE);
           }}
+          sortOptions={sortOptions}
+          sortValue={sortBy}
+          onSortChange={setSortBy}
+          sortLabel={isEn ? 'Sort By' : 'Susun Mengikut'}
           filterContent={
             <>
               <div>

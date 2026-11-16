@@ -23,6 +23,7 @@ import { PortalImage } from './PortalImage';
 import { resolveEventImage } from '../utils/visualAssets';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 
 const MONTH_MAP: Record<string, number> = {
   januari: 0, january: 0, jan: 0,
@@ -79,6 +80,7 @@ export const EventsSection: React.FC = () => {
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'available' | 'full' | 'ended'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [bookedEvents, setBookedEvents] = useState<string[]>(() => {
     if (!user?.uid) return [];
     return loadLocalEventBookings(user.uid)
@@ -168,44 +170,77 @@ export const EventsSection: React.FC = () => {
     }
   };
 
-  const filteredEvents = events.filter((evt) => {
-    const isBooked = bookedEvents.includes(evt.id);
-    const remaining = Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0));
-    const ended = isEventEnded(evt.date);
-    const full = !ended && remaining <= 0;
+  const sortOptions = buildStandardSortOptions(
+    [
+      { value: 'event_date_asc', label: isEn ? 'Event Date (Nearest)' : 'Tarikh Acara (Terdekat)' },
+      { value: 'booths_desc', label: isEn ? 'Open Booths (Most)' : 'Tapak Kosong (Terbanyak)' }
+    ],
+    isEn,
+    {
+      asc: isEn ? 'Event Title (A - Z)' : 'Tajuk Acara (A - Z)',
+      desc: isEn ? 'Event Title (Z - A)' : 'Tajuk Acara (Z - A)'
+    }
+  );
 
-    const matchCat = selectedCategory === 'all' || evt.category === selectedCategory;
-    const matchDist = selectedDistrict === 'all' || evt.district === selectedDistrict;
-    const matchAvailability =
-      availabilityFilter === 'all'
-        ? true
-        : availabilityFilter === 'ended'
-        ? ended
-        : availabilityFilter === 'full'
-        ? full
-        : !ended && remaining > 0;
-    const q = searchQuery.trim().toLowerCase();
-    const matchSearch =
-      !q ||
-      evt.title.toLowerCase().includes(q) ||
-      evt.location.toLowerCase().includes(q) ||
-      evt.organizer.toLowerCase().includes(q) ||
-      evt.district.toLowerCase().includes(q);
-    return matchCat && matchDist && matchAvailability && matchSearch;
-  });
+  const filteredEvents = sortRecords(
+    events.filter((evt) => {
+      const isBooked = bookedEvents.includes(evt.id);
+      const remaining = Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0));
+      const ended = isEventEnded(evt.date);
+      const full = !ended && remaining <= 0;
+
+      const matchCat = selectedCategory === 'all' || evt.category === selectedCategory;
+      const matchDist = selectedDistrict === 'all' || evt.district === selectedDistrict;
+      const matchAvailability =
+        availabilityFilter === 'all'
+          ? true
+          : availabilityFilter === 'ended'
+          ? ended
+          : availabilityFilter === 'full'
+          ? full
+          : !ended && remaining > 0;
+      const q = searchQuery.trim().toLowerCase();
+      const matchSearch =
+        !q ||
+        evt.title.toLowerCase().includes(q) ||
+        evt.location.toLowerCase().includes(q) ||
+        evt.organizer.toLowerCase().includes(q) ||
+        evt.district.toLowerCase().includes(q);
+      return matchCat && matchDist && matchAvailability && matchSearch;
+    }),
+    {
+      sortBy,
+      getName: (evt) => evt.title || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'event_date_asc') {
+          const da = parseEventEndDate(a.date)?.getTime() || Number.MAX_SAFE_INTEGER;
+          const db = parseEventEndDate(b.date)?.getTime() || Number.MAX_SAFE_INTEGER;
+          return da - db;
+        }
+        if (mode === 'booths_desc') {
+          const remA = isEventEnded(a.date) ? -1 : Math.max(0, a.boothsAvailable - (bookedEvents.includes(a.id) ? 1 : 0));
+          const remB = isEventEnded(b.date) ? -1 : Math.max(0, b.boothsAvailable - (bookedEvents.includes(b.id) ? 1 : 0));
+          return remB - remA;
+        }
+        return null;
+      }
+    }
+  );
 
   const pagination = usePagination(filteredEvents, 7, [
     searchQuery,
     selectedCategory,
     selectedDistrict,
     availabilityFilter,
+    sortBy,
     filteredEvents.length
   ]);
 
   const activeFilterCount =
     (selectedCategory !== 'all' ? 1 : 0) +
     (selectedDistrict !== 'all' ? 1 : 0) +
-    (availabilityFilter !== 'all' ? 1 : 0);
+    (availabilityFilter !== 'all' ? 1 : 0) +
+    (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   return (
     <div className="w-full space-y-4">
@@ -256,7 +291,12 @@ export const EventsSection: React.FC = () => {
             setSelectedCategory('all');
             setSelectedDistrict('all');
             setAvailabilityFilter('all');
+            setSortBy(DEFAULT_SORT_VALUE);
           }}
+          sortOptions={sortOptions}
+          sortValue={sortBy}
+          onSortChange={setSortBy}
+          sortLabel={isEn ? 'Sort By' : 'Susun Mengikut'}
           filterContent={
             <>
               <div>

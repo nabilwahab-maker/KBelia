@@ -19,6 +19,7 @@ import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { showToast } from './ToastNotification';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
+import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -51,6 +52,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
   const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all');
   const [districtFilter, setDistrictFilter] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [sortConfig, setSortConfig] = useState<{ key: 'fullName' | 'role' | 'district'; dir: 'asc' | 'desc' }>({
     key: 'fullName',
     dir: 'asc'
@@ -83,6 +85,17 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
     [portalUsers]
   );
 
+  const userSortOptions = useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          { value: 'role_asc', label: 'Peranan Akaun (A - Z)' },
+          { value: 'district_asc', label: 'Daerah (A - Z)' }
+        ]
+      ),
+    []
+  );
+
   const filteredUsers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     const filtered = nonAdminUsers.filter((u) => {
@@ -97,30 +110,47 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       );
     });
 
-    const dirMult = sortConfig.dir === 'asc' ? 1 : -1;
-    return [...filtered].sort((a, b) => {
-      if (sortConfig.key === 'role') {
-        return (ROLE_LABELS[a.role] || '').localeCompare(ROLE_LABELS[b.role] || '') * dirMult;
+    if (sortBy === 'table_column') {
+      const dirMult = sortConfig.dir === 'asc' ? 1 : -1;
+      return [...filtered].sort((a, b) => {
+        if (sortConfig.key === 'role') {
+          return (ROLE_LABELS[a.role] || '').localeCompare(ROLE_LABELS[b.role] || '') * dirMult;
+        }
+        if (sortConfig.key === 'district') {
+          return (a.district || 'Kota Bharu').localeCompare(b.district || 'Kota Bharu') * dirMult;
+        }
+        return (a.fullName || '').localeCompare(b.fullName || '') * dirMult;
+      });
+    }
+
+    return sortRecords(filtered, {
+      sortBy,
+      getName: (u) => u.fullName || u.email || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'role_asc') return compareText(ROLE_LABELS[a.role], ROLE_LABELS[b.role]);
+        if (mode === 'district_asc') return compareText(a.district || 'Kota Bharu', b.district || 'Kota Bharu');
+        return null;
       }
-      if (sortConfig.key === 'district') {
-        return (a.district || 'Kota Bharu').localeCompare(b.district || 'Kota Bharu') * dirMult;
-      }
-      return (a.fullName || '').localeCompare(b.fullName || '') * dirMult;
     });
-  }, [nonAdminUsers, roleFilter, districtFilter, searchQuery, sortConfig]);
+  }, [nonAdminUsers, roleFilter, districtFilter, searchQuery, sortBy, sortConfig]);
 
   const pagination = usePagination(filteredUsers, 7, [
     roleFilter,
     districtFilter,
     searchQuery,
+    sortBy,
     sortConfig.key,
     sortConfig.dir,
     filteredUsers.length
   ]);
 
-  const activeFilterCount = (roleFilter !== 'all' ? 1 : 0) + (districtFilter !== 'Semua' ? 1 : 0);
+  const activeFilterCount =
+    (roleFilter !== 'all' ? 1 : 0) +
+    (districtFilter !== 'Semua' ? 1 : 0) +
+    (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   const toggleSort = (key: 'fullName' | 'role' | 'district') => {
+    setSortBy('table_column');
     setSortConfig((prev) =>
       prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
     );
@@ -270,6 +300,16 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
           onResetFilters={() => {
             setRoleFilter('all');
             setDistrictFilter('Semua');
+            setSortBy(DEFAULT_SORT_VALUE);
+          }}
+          sortOptions={
+            sortBy === 'table_column'
+              ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...userSortOptions]
+              : userSortOptions
+          }
+          sortValue={sortBy === 'table_column' ? '' : sortBy}
+          onSortChange={(val) => {
+            if (val) setSortBy(val);
           }}
           filterContent={
             <>

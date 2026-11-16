@@ -35,6 +35,13 @@ import {
 } from '../types';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
+import {
+  DEFAULT_SORT_VALUE,
+  buildStandardSortOptions,
+  compareText,
+  getModifiedTimestamp,
+  sortRecords
+} from '../utils/sortUtils';
 
 export type ReportUserTypeKey = 'all' | 'usahawan' | 'mentor' | 'komuniti';
 
@@ -50,6 +57,7 @@ interface UserTypeReportRecord {
   statusLabel: string;
   statusTone: 'emerald' | 'blue' | 'amber' | 'indigo';
   detailLine: string;
+  modifiedMs: number;
 }
 
 interface UserTypeReportSectionProps {
@@ -93,6 +101,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
 }) => {
   const [selectedType, setSelectedType] = useState<ReportUserTypeKey>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
   const [chartMode, setChartMode] = useState<'bar' | 'donut'>('bar');
 
@@ -160,7 +169,12 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         metricDisplay,
         statusLabel,
         statusTone,
-        detailLine: `Kategori: ${biz.category} · No. SSM: ${biz.ssmNumber || 'Dalam Proses'} · Telefon: ${biz.ownerPhone || biz.whatsapp || '-'}`
+        detailLine: `Kategori: ${biz.category} · No. SSM: ${biz.ssmNumber || 'Dalam Proses'} · Telefon: ${biz.ownerPhone || biz.whatsapp || '-'}`,
+        modifiedMs: Math.max(
+          getModifiedTimestamp(biz),
+          latestBooking ? getModifiedTimestamp(latestBooking) : 0,
+          latestGrant ? getModifiedTimestamp(latestGrant) : 0
+        )
       });
     });
 
@@ -180,7 +194,8 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         metricDisplay: `RM ${(b.monthlyRate || 150).toLocaleString('ms-MY')}/bln`,
         statusLabel: b.status === 'approved' ? 'Diluluskan' : b.status === 'pending' ? 'Dalam Semakan' : 'Ditolak',
         statusTone: b.status === 'approved' ? 'emerald' : b.status === 'pending' ? 'amber' : 'indigo',
-        detailLine: `Kategori: ${b.businessCategory} · Tarikh Mula: ${b.startDate || '-'} · Telefon: ${b.applicantPhone || '-'}`
+        detailLine: `Kategori: ${b.businessCategory} · Tarikh Mula: ${b.startDate || '-'} · Telefon: ${b.applicantPhone || '-'}`,
+        modifiedMs: getModifiedTimestamp(b)
       });
     });
 
@@ -199,7 +214,8 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         metricDisplay: g.amount || g.grantAmount || 'RM 3,000',
         statusLabel: g.status === 'approved' ? 'Diluluskan' : g.status === 'pending' ? 'Dalam Semakan' : 'Ditolak',
         statusTone: g.status === 'approved' ? 'emerald' : g.status === 'pending' ? 'amber' : 'indigo',
-        detailLine: `Kategori: ${g.businessCategory} · Bank: ${g.bankName || '-'}`
+        detailLine: `Kategori: ${g.businessCategory} · Bank: ${g.bankName || '-'}`,
+        modifiedMs: getModifiedTimestamp(g)
       });
     });
 
@@ -223,7 +239,8 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         metricDisplay: `${assignedSessions.length} Sesi (${completedSessions} Selesai)`,
         statusLabel: m.availableDays ? 'Mentor' : 'Jadual Penuh',
         statusTone: m.availableDays ? 'emerald' : 'amber',
-        detailLine: `Jadual: ${m.availableDays || 'Waktu Pejabat'} · Hubungan: ${m.email || m.phone}`
+        detailLine: `Jadual: ${m.availableDays || 'Waktu Pejabat'} · Hubungan: ${m.email || m.phone}`,
+        modifiedMs: getModifiedTimestamp(m)
       });
     });
 
@@ -240,7 +257,8 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         metricDisplay: `${post.replyCount || 0} Balasan · ${post.helpfulCount || 0} Sokong`,
         statusLabel: post.status === 'resolved' ? 'Terjawab' : 'Aktif',
         statusTone: post.status === 'resolved' ? 'emerald' : 'blue',
-        detailLine: post.content.slice(0, 160) + (post.content.length > 160 ? '...' : '')
+        detailLine: post.content.slice(0, 160) + (post.content.length > 160 ? '...' : ''),
+        modifiedMs: getModifiedTimestamp(post)
       });
     });
 
@@ -286,9 +304,18 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
     [countsByType, totalCount]
   );
 
+  const reportSortOptions = useMemo(
+    () =>
+      buildStandardSortOptions([
+        { value: 'type_asc', label: 'Jenis Pengguna (A - Z)' },
+        { value: 'location_asc', label: 'Daerah / Agensi (A - Z)' }
+      ]),
+    []
+  );
+
   const filteredRecords = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return consolidatedRecords.filter((rec) => {
+    const filtered = consolidatedRecords.filter((rec) => {
       const matchType = selectedType === 'all' || rec.userType === selectedType;
       const matchQuery =
         !q ||
@@ -299,9 +326,25 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         rec.userTypeLabel.toLowerCase().includes(q);
       return matchType && matchQuery;
     });
-  }, [consolidatedRecords, selectedType, searchQuery]);
 
-  const pagination = usePagination(filteredRecords, 6, [selectedType, searchQuery, filteredRecords.length]);
+    return sortRecords(filtered, {
+      sortBy,
+      getName: (rec) => rec.displayName || '',
+      getModified: (rec) => rec.modifiedMs,
+      customCompare: (a, b, mode) => {
+        if (mode === 'type_asc') return compareText(a.userTypeLabel, b.userTypeLabel);
+        if (mode === 'location_asc') return compareText(a.locationOrAgency, b.locationOrAgency);
+        return null;
+      }
+    });
+  }, [consolidatedRecords, selectedType, searchQuery, sortBy]);
+
+  const pagination = usePagination(filteredRecords, 6, [
+    selectedType,
+    searchQuery,
+    sortBy,
+    filteredRecords.length
+  ]);
 
   const activeDonutFocus =
     selectedType === 'all'
@@ -609,8 +652,14 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             searchPlaceholder="Cari nama, perniagaan atau daerah..."
-            filterCount={selectedType !== 'all' ? 1 : 0}
-            onResetFilters={() => setSelectedType('all')}
+            filterCount={(selectedType !== 'all' ? 1 : 0) + (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0)}
+            onResetFilters={() => {
+              setSelectedType('all');
+              setSortBy(DEFAULT_SORT_VALUE);
+            }}
+            sortOptions={reportSortOptions}
+            sortValue={sortBy}
+            onSortChange={setSortBy}
             filterContent={
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">

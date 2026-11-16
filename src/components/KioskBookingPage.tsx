@@ -25,7 +25,6 @@ import {
   PortalSettings
 } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
 import { createCapsuleBooking, updateBookingStatus } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast } from './ToastNotification';
@@ -87,8 +86,6 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
   onOpenTenancyAgreement
 }) => {
   const { user, userProfile, openLoginModal } = useAuth();
-  const { language } = useLanguage();
-  const isEn = language === 'en';
 
   const safeAllSlots = useMemo(() => slots || [], [slots]);
   const availableSlots = useMemo(
@@ -388,62 +385,6 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
 
   return (
     <div className="w-full space-y-4">
-      {/* Top Page View Switcher (Separate Browse / Book / Manage & Cancel Pages) */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 dark:bg-zinc-950 rounded-xl border border-slate-300 dark:border-zinc-600">
-          <button
-            type="button"
-            onClick={() => onChangeView('browse')}
-            className={`px-3.5 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer flex items-center gap-2 ${
-              view === 'browse'
-                ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
-                : 'text-black dark:text-white hover:bg-white dark:hover:bg-zinc-800'
-            }`}
-          >
-            <Building2 className="w-4 h-4 shrink-0" />
-            <span>{isEn ? 'Kiosk Directory' : 'Senarai Kiosk'}</span>
-          </button>
-
-          <button
-            type="button"
-            disabled={hasActiveBooking}
-            onClick={() => {
-              if (!hasActiveBooking) onChangeView('book');
-            }}
-            className={`px-3.5 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2 ${
-              hasActiveBooking
-                ? 'text-black/45 dark:text-white/45 cursor-not-allowed'
-                : view === 'book'
-                ? 'bg-blue-600 text-white shadow-xs cursor-pointer dark:bg-blue-600'
-                : 'text-black dark:text-white hover:bg-white dark:hover:bg-zinc-800 cursor-pointer'
-            }`}
-            title={
-              hasActiveBooking
-                ? 'Butang dikunci kerana anda sudah mempunyai 1 tempahan kiosk aktif'
-                : 'Buka halaman borang tempahan kiosk'
-            }
-          >
-            {hasActiveBooking ? <Lock className="w-4 h-4 shrink-0" /> : <Store className="w-4 h-4 shrink-0" />}
-            <span>{isEn ? 'Book Kiosk' : 'Tempah Kiosk'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setIsConfirmingCancel(false);
-              onChangeView('manage');
-            }}
-            className={`px-3.5 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer flex items-center gap-2 ${
-              view === 'manage'
-                ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
-                : 'text-black dark:text-white hover:bg-white dark:hover:bg-zinc-800'
-            }`}
-          >
-            <FileText className="w-4 h-4 shrink-0" />
-            <span>{isEn ? 'Manage Booking' : 'Urus Tempahan'}</span>
-          </button>
-        </div>
-      </div>
 
       {/* ================================================================= */}
       {/* VIEW 1: SENARAI KIOSK (BROWSE)                                    */}

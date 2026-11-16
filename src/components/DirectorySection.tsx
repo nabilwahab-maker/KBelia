@@ -12,6 +12,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { showToast } from './ToastNotification';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 
 interface DirectorySectionProps {
   businesses?: BusinessListing[];
@@ -57,32 +58,60 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua Kategori');
   const [selectedDistrict, setSelectedDistrict] = useState<KelantanDistrict>('Semua Jajahan');
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
 
   const handleRegister = onOpenRegister || onRegisterBusiness || (() => {});
 
-  const filteredBusinesses = (businesses || []).filter((biz) => {
-    const q = (searchQuery || '').trim().toLowerCase();
-    const matchesSearch = !q || 
-      (biz.businessName || '').toLowerCase().includes(q) ||
-      (biz.tagline || '').toLowerCase().includes(q) ||
-      (biz.description || '').toLowerCase().includes(q);
-    
-    const matchesCat = selectedCategory === 'Semua Kategori' || biz.category === selectedCategory;
-    const matchesDist = selectedDistrict === 'Semua Jajahan' || biz.district === selectedDistrict;
+  const sortOptions = buildStandardSortOptions(
+    [
+      { value: 'rating_desc', label: language === 'en' ? 'Rating (Highest)' : 'Penilaian (Tertinggi)' },
+      { value: 'featured_first', label: language === 'en' ? 'Featured & SSM Verified' : 'Pilihan Utama & Disahkan SSM' }
+    ],
+    language === 'en'
+  );
 
-    return matchesSearch && matchesCat && matchesDist && biz.isApproved !== false;
-  });
+  const filteredBusinesses = sortRecords(
+    (businesses || []).filter((biz) => {
+      const q = (searchQuery || '').trim().toLowerCase();
+      const matchesSearch = !q || 
+        (biz.businessName || '').toLowerCase().includes(q) ||
+        (biz.tagline || '').toLowerCase().includes(q) ||
+        (biz.description || '').toLowerCase().includes(q);
+      
+      const matchesCat = selectedCategory === 'Semua Kategori' || biz.category === selectedCategory;
+      const matchesDist = selectedDistrict === 'Semua Jajahan' || biz.district === selectedDistrict;
+
+      return matchesSearch && matchesCat && matchesDist && biz.isApproved !== false;
+    }),
+    {
+      sortBy,
+      getName: (biz) => biz.businessName || biz.ownerName || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'rating_desc') {
+          return Number(b.rating || 0) - Number(a.rating || 0);
+        }
+        if (mode === 'featured_first') {
+          const scoreA = (a.isFeatured ? 2 : 0) + (a.ssmNumber ? 1 : 0);
+          const scoreB = (b.isFeatured ? 2 : 0) + (b.ssmNumber ? 1 : 0);
+          return scoreB - scoreA;
+        }
+        return null;
+      }
+    }
+  );
 
   const pagination = usePagination(filteredBusinesses, 7, [
     searchQuery,
     selectedCategory,
     selectedDistrict,
+    sortBy,
     filteredBusinesses.length
   ]);
 
   const activeFilterCount =
     (selectedCategory !== 'Semua Kategori' ? 1 : 0) +
-    (selectedDistrict !== 'Semua Jajahan' ? 1 : 0);
+    (selectedDistrict !== 'Semua Jajahan' ? 1 : 0) +
+    (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   return (
     <div className="w-full space-y-4">
@@ -151,7 +180,12 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
           onResetFilters={() => {
             setSelectedCategory('Semua Kategori');
             setSelectedDistrict('Semua Jajahan');
+            setSortBy(DEFAULT_SORT_VALUE);
           }}
+          sortOptions={sortOptions}
+          sortValue={sortBy}
+          onSortChange={setSortBy}
+          sortLabel={language === 'en' ? 'Sort By' : 'Susun Mengikut'}
           filterContent={
             <>
               <div>
