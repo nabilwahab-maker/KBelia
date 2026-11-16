@@ -702,8 +702,8 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     </div>
 
                     {currentSlot && (
-                      <div className="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row gap-4 items-stretch">
-                        <div className="w-full sm:w-48 shrink-0 aspect-[4/3] sm:aspect-auto sm:min-h-[152px] rounded-xl overflow-hidden border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900">
+                      <div className="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row gap-4 items-start h-fit">
+                        <div className="w-full sm:w-48 shrink-0 aspect-[4/3] sm:h-36 rounded-xl overflow-hidden border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900">
                           <PortalImage
                             src={resolveSlotImage(currentSlot)}
                             alt={`Reka bentuk kiosk ${currentSlot.name}`}

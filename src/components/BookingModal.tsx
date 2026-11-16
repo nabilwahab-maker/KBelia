@@ -483,8 +483,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </div>
 
                   {currentSlot && (
-                    <div className="p-4 sm:p-4.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row gap-4 items-stretch">
-                      <div className="w-full sm:w-44 shrink-0 aspect-[4/3] sm:aspect-auto sm:min-h-[148px] rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">
+                    <div className="p-4 sm:p-4.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row gap-4 items-start h-fit">
+                      <div className="w-full sm:w-44 shrink-0 aspect-[4/3] sm:h-32 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">
                         <PortalImage
                           src={resolveSlotImage(currentSlot)}
                           alt={`Reka bentuk kiosk ${currentSlot.name}`}

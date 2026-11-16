@@ -347,6 +347,26 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
         </div>
       </div>
 
+      {/* Ringkasan Statistik Ringkas */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Certified Mentors' : 'Mentor Bertauliah'}</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{mentors.length}</span>
+        </div>
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Active Session' : 'Temu Janji Aktif'}</span>
+          <span className="text-lg font-black text-teal-700 dark:text-teal-400 tabular-nums">{activeSession ? 1 : 0}</span>
+        </div>
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Session History' : 'Sejarah Sesi'}</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{sessionHistory.length}</span>
+        </div>
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Shown' : 'Dipaparkan'}</span>
+          <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{filteredMentors.length}</span>
+        </div>
+      </div>
+
       {/* ================================================================= */}
       {/* SECTION 1 (TOP): ACTIVE APPOINTMENT MANAGEMENT CARD               */}
       {/* ================================================================= */}
@@ -857,7 +877,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 overflow-hidden flex flex-col divide-y divide-slate-200 dark:divide-zinc-700 h-fit">
             {filteredMentors.map((mentor) => {
               const isCurrentBookedMentor = activeSession?.mentorId === mentor.id;
               const isSelectedForForm = selectedMentor?.id === mentor.id && !hasActiveSession;
@@ -866,73 +886,58 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               return (
                 <div
                   key={mentor.id}
-                  className={`p-5 rounded-2xl border bg-white dark:bg-zinc-900 flex flex-col justify-between gap-4 transition-colors ${
+                  className={`p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 transition-colors hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 ${
                     isCurrentBookedMentor || isSelectedForForm
-                      ? 'border-teal-500 dark:border-teal-500'
-                      : 'border-slate-300 dark:border-zinc-600'
+                      ? 'bg-teal-50/40 dark:bg-teal-950/20'
+                      : ''
                   }`}
                 >
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3.5">
-                      {!showFallbackAvatar ? (
-                        <img
-                          src={mentor.avatarUrl}
-                          alt={mentor.name}
-                          referrerPolicy="no-referrer"
-                          onError={() =>
-                            setBrokenAvatarIds((prev) => ({ ...prev, [mentor.id]: true }))
-                          }
-                          className="w-12 h-12 rounded-xl object-cover border border-slate-300 dark:border-zinc-600 shrink-0"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-center justify-center text-sm font-black text-black dark:text-white shrink-0">
-                          {getInitials(mentor.name)}
-                        </div>
-                      )}
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    {!showFallbackAvatar ? (
+                      <img
+                        src={mentor.avatarUrl}
+                        alt={mentor.name}
+                        referrerPolicy="no-referrer"
+                        onError={() =>
+                          setBrokenAvatarIds((prev) => ({ ...prev, [mentor.id]: true }))
+                        }
+                        className="w-16 h-16 rounded-lg object-cover border border-slate-300 dark:border-zinc-600 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-center justify-center text-base font-black text-black dark:text-white shrink-0">
+                        {getInitials(mentor.name)}
+                      </div>
+                    )}
 
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70 truncate">
-                          {mentor.agency}
-                        </div>
-                        <h3 className="text-sm sm:text-base font-extrabold text-black dark:text-white leading-snug">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h3 className="text-sm sm:text-base font-extrabold text-black dark:text-white truncate">
                           {mentor.name}
                         </h3>
-                        <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-0.5 leading-snug">
-                          {mentor.title}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="text-[0.9375rem] text-black/80 dark:text-white/80 leading-relaxed">
-                      {mentor.bio}
-                    </p>
-
-                    <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 space-y-1.5 text-sm">
-                      <div className="text-black/75 dark:text-white/75 flex items-center gap-1.5 tabular-nums">
-                        <Clock className="w-3.5 h-3.5 shrink-0" />
-                        <span>{mentor.availableDays}</span>
-                      </div>
-                      <div className="text-black/70 dark:text-white/70 leading-relaxed">
-                        <span className="font-semibold text-black dark:text-white">
-                          {isEn ? 'Expertise: ' : 'Kepakaran: '}
+                        <span
+                          className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 tabular-nums ${
+                            isCurrentBookedMentor
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-black dark:text-white'
+                              : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800 text-black dark:text-white'
+                          }`}
+                        >
+                          {isCurrentBookedMentor
+                            ? (isEn ? 'Active' : 'Aktif')
+                            : `${mentor.activeMenteesCount ?? 0} ${isEn ? 'mentees' : 'usahawan'}`}
                         </span>
-                        {mentor.expertise.join(' · ')}
                       </div>
+                      <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                        {mentor.title} · {mentor.agency} · {mentor.availableDays} · {mentor.expertise.join(', ')}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between gap-3">
-                    <span className="text-[0.8125rem] font-medium text-black/65 dark:text-white/65 tabular-nums">
-                      {isEn
-                        ? `${mentor.activeMenteesCount ?? 0} active mentees`
-                        : `${mentor.activeMenteesCount ?? 0} usahawan dibimbing`}
-                    </span>
-
+                  <div className="shrink-0 self-end sm:self-center">
                     {isCurrentBookedMentor ? (
                       <button
                         type="button"
                         disabled
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-black dark:text-white text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-black dark:text-white text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>{isEn ? 'Active Mentor' : 'Mentor Aktif Anda'}</span>
@@ -942,7 +947,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                         type="button"
                         disabled
                         aria-disabled="true"
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black/50 dark:text-white/50 text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black/50 dark:text-white/50 text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
                       >
                         <Lock className="w-3.5 h-3.5" />
                         <span>{isEn ? 'Limit Reached' : 'Had Penuh'}</span>
@@ -951,7 +956,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                       <button
                         type="button"
                         onClick={() => handleSelectMentor(mentor)}
-                        className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                           isSelectedForForm
                             ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
                             : 'bg-teal-600 hover:bg-teal-700 text-white'

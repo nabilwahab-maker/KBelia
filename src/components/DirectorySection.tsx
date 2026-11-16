@@ -113,6 +113,26 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
         ) : null}
       </div>
 
+      {/* Ringkasan Statistik Ringkas */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Jumlah Usahawan</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{(businesses || []).filter(b => b.isApproved !== false).length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">SSM Disahkan</span>
+          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{(businesses || []).filter(b => b.isApproved !== false && Boolean(b.ssmNumber)).length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Jajahan Aktif</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{new Set((businesses || []).filter(b => b.isApproved !== false).map(b => b.district).filter(Boolean)).size}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Hasil Carian</span>
+          <span className="text-lg font-black text-indigo-700 dark:text-indigo-400 tabular-nums">{filteredBusinesses.length}</span>
+        </div>
+      </div>
+
       {/* Search & Filter Controls */}
       <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-4 transition-colors">
         <div className="grid md:grid-cols-12 gap-3">
@@ -180,15 +200,15 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
         </div>
       </div>
 
-      {/* Businesses Grid */}
+      {/* Senarai Menegak Usahawan */}
       {filteredBusinesses.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600">
+        <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 h-fit">
           <Store className="w-12 h-12 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <h3 className="text-base font-bold text-black dark:text-white">{t('no_businesses_found')}</h3>
           <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">{t('no_businesses_desc')}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
           {filteredBusinesses.map((biz) => {
             const rawPhone = biz.whatsapp || biz.ownerPhone || '';
             const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
@@ -203,75 +223,46 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
               <div
                 key={biz.id}
                 id={`business-card-${biz.id}`}
-                className="interactive-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 hover:border-blue-400/70 dark:hover:border-blue-400/70 overflow-hidden shadow-xs flex flex-col justify-between group cursor-pointer"
+                onClick={() => onSelectBusiness(biz)}
+                className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors cursor-pointer"
               >
-                {/* Banner & Logo */}
-                <div>
-                  <div className="relative h-36 bg-slate-100 dark:bg-slate-900 overflow-hidden">
-                    <img
-                      src={biz.bannerUrl || '/assets/generated/banner_kelantan_landmark_1793924253242.jpg'}
-                      alt={biz.businessName}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <img
+                    src={biz.logoUrl || biz.bannerUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
+                    alt={biz.businessName}
+                    className="w-16 h-16 rounded-lg object-cover shrink-0 border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900"
+                  />
 
-                    {/* Category kicker */}
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md text-[0.8125rem] font-semibold bg-slate-900/80 backdrop-blur-xs text-white">
-                      {biz.category}
-                    </div>
-
-                    {/* Verified SSM mark */}
-                    <div className="absolute top-3 right-3 flex items-center gap-1">
-                      {biz.ssmNumber && (
-                        <div className="px-2 py-0.5 rounded-md text-[0.8125rem] font-bold bg-white text-black shadow-xs flex items-center gap-1">
-                          <ShieldCheck className="w-3 h-3 text-black dark:text-white" />
-                          <span>SSM Sah</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Logo avatar floating */}
-                    <img
-                      src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
-                      alt={biz.businessName}
-                      className="absolute -bottom-3 left-4 w-12 h-12 rounded-lg border-2 border-white dark:border-slate-600 shadow-sm object-cover bg-white dark:bg-slate-900"
-                    />
-                  </div>
-
-                  {/* Content Info */}
-                  <div className="pt-4 p-5 space-y-2.5">
-                    <div>
-                      <h3 className="font-bold text-black dark:text-white text-base group-hover:text-black dark:group-hover:text-white transition-colors">
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h3 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
                         {biz.businessName}
                       </h3>
-                      
-                      <p className="text-[0.9375rem] text-black dark:text-white/75 font-medium line-clamp-1 mt-0.5">
-                        {biz.tagline}
-                      </p>
+                      {biz.ssmNumber ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-300 dark:border-emerald-700 shrink-0">
+                          <ShieldCheck className="w-3 h-3" />
+                          <span>SSM Sah</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-slate-100 dark:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 shrink-0">
+                          Aktif
+                        </span>
+                      )}
                     </div>
-
-                    <p className="text-[0.9375rem] text-black dark:text-white line-clamp-2 leading-relaxed">
-                      {biz.description}
+                    <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                      {biz.category} · {biz.district}, Kelantan · ★ {biz.rating || 5.0}{biz.tagline ? ` · ${biz.tagline}` : ''}
                     </p>
-
-                    <div className="flex items-center justify-between text-sm text-black/70 dark:text-white/75 pt-1">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
-                        <span>{biz.district}, Kelantan</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-black dark:text-white font-semibold text-sm tabular-nums">
-                        <Star className="w-3.5 h-3.5 fill-amber-400 text-black/70 dark:text-white/75" />
-                        <span>{biz.rating || 5.0}</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
-                {/* Footer Buttons */}
-                <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600 flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                   <button
-                    onClick={() => onSelectBusiness(biz)}
-                    className="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs dark:bg-indigo-600"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectBusiness(biz);
+                    }}
+                    className="py-2 px-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs shrink-0"
                   >
                     <span>{language === 'en' ? 'View Profile & Catalog' : 'Katalog & Profil'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -282,6 +273,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                     target={cleanPhone ? '_blank' : undefined}
                     rel={cleanPhone ? 'noopener noreferrer' : undefined}
                     onClick={(e) => {
+                      e.stopPropagation();
                       if (!cleanPhone) {
                         e.preventDefault();
                         showToast(
@@ -293,12 +285,11 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                       }
                     }}
                     title={language === 'en' ? 'Direct WhatsApp' : 'WhatsApp Terus'}
-                    className="interactive-press p-2 bg-indigo-50 hover:bg-amber-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/60 dark:hover:bg-indigo-600 dark:text-indigo-400 dark:border-indigo-800/70 rounded-xl transition-all duration-200 shadow-2xs cursor-pointer flex items-center justify-center"
+                    className="p-2 bg-indigo-50 hover:bg-amber-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/60 dark:hover:bg-indigo-600 dark:text-indigo-400 dark:border-indigo-800/70 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center shrink-0"
                   >
                     <MessageCircle className="w-4 h-4" />
                   </a>
                 </div>
-
               </div>
             );
           })}

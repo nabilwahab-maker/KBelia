@@ -697,38 +697,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
       </div>
 
-      {/* Quick Admin Module Navigation Strip */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-        {(
-          [
-            { id: 'queue', label: 'Kelulusan' },
-            { id: 'bookings', label: 'Tempahan Kiosk' },
-            { id: 'businesses', label: 'Usahawan & Produk' },
-            { id: 'slots', label: 'Slot Kiosk' },
-            { id: 'programs', label: 'Program & Geran' },
-            { id: 'mentors', label: 'Panel Mentor' },
-            { id: 'events', label: 'Acara & Tempahan' },
-            { id: 'users', label: 'Urus Pengguna' },
-            { id: 'news', label: 'Berita' },
-            { id: 'b2b', label: 'Ruang Niaga' },
-            { id: 'settings', label: 'Tetapan' }
-          ] as { id: AdminSubTab; label: string }[]
-        ).map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setAdminTab(tab.id)}
-            className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-bold whitespace-nowrap transition-all cursor-pointer border ${
-              adminTab === tab.id || (adminTab === 'sync' && tab.id === 'queue')
-                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                : 'bg-white dark:bg-zinc-900 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
       {/* 4 Compact Summary KPI Cards */}
       {(() => {
         const approvedBookingsCount = safeBookings.filter(b => b && b.status === 'approved').length;
@@ -768,6 +736,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           { label: 'Sesi Mentor', jumlah: mentorshipRegistrations.length },
           { label: 'Aduan Aktif', jumlah: openTicketsCount }
         ];
+
+        const bookingApprovalRate = safeBookings.length > 0 ? Math.round((approvedBookingsCount / safeBookings.length) * 100) : 0;
+        const totalGrantsCount = (grantApplications || []).length;
+        const grantApprovalRate = totalGrantsCount > 0 ? Math.round((approvedGrantsCount / totalGrantsCount) * 100) : 0;
+        const activeDistrictsCount = districtChartData.filter(d => d.beroperasi > 0).length;
+        const availableDistricts = districtChartData.filter(d => d.tersedia > 0);
 
         return (
           <>
@@ -821,163 +795,319 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             {/* Asymmetric Bento Analytics Section inside Queue / Overview */}
             {adminTab === 'queue' && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
                 
-                {/* Left Bento (7 Cols): Interactive Recharts Analytics */}
-                <div className="lg:col-span-7 min-w-0 h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col">
-                  <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="w-5 h-5 text-black dark:text-white/80" />
-                        <h3 className="text-base font-bold text-black dark:text-white">
-                          Analitik Infrastruktur &amp; Permohonan Negeri
-                        </h3>
+                {/* Left Bento Stack (7 Cols): Compact Chart Card + Separate Standalone Metrics/Availability Card Below */}
+                <div className="lg:col-span-7 min-w-0 flex flex-col gap-4 h-fit">
+                  {/* KOTAK 1: Compact Chart Card (Natural tight height, zero stretching) */}
+                  <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col h-fit">
+                    <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <BarChart3 className="w-5 h-5 text-black dark:text-white/80" />
+                          <h3 className="text-base font-bold text-black dark:text-white">
+                            Analitik Infrastruktur &amp; Permohonan Negeri
+                          </h3>
+                        </div>
+                        <p className="text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
+                          Statistik langsung hab kapsul seluruh Kelantan dan aliran kelulusan
+                        </p>
                       </div>
-                      <p className="text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
-                        Statistik langsung hab kapsul seluruh Kelantan dan aliran kelulusan
-                      </p>
+
+                      <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600 self-start sm:self-auto">
+                        <button
+                          type="button"
+                          onClick={() => setAdminChartMode('districts')}
+                          className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                            adminChartMode === 'districts'
+                              ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                              : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                          }`}
+                        >
+                          Kapsul Seluruh Kelantan
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAdminChartMode('pipeline')}
+                          className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                            adminChartMode === 'pipeline'
+                              ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
+                              : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                          }`}
+                        >
+                          Aliran Permohonan
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600 self-start sm:self-auto">
-                      <button
-                        type="button"
-                        onClick={() => setAdminChartMode('districts')}
-                        className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                          adminChartMode === 'districts'
-                            ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                        }`}
-                      >
-                        Kapsul Seluruh Kelantan
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setAdminChartMode('pipeline')}
-                        className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                          adminChartMode === 'pipeline'
-                            ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
-                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                        }`}
-                      >
-                        Aliran Permohonan
-                      </button>
+                    <div className="p-0 pt-2 pb-1 min-w-0">
+                      <div className="relative h-[235px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                        <div className="absolute inset-0">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 600, height: 235 }}>
+                          {adminChartMode === 'districts' ? (
+                            <BarChart
+                              data={districtChartData}
+                              barCategoryGap="8%"
+                              barGap={3}
+                              margin={{ top: 18, right: 4, left: 0, bottom: 2 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                              <XAxis dataKey="district" height={24} tickMargin={4} tick={{ fontSize: 11.5, fontWeight: 600 }} interval={0} padding={{ left: 0, right: 0 }} axisLine={false} tickLine={false} />
+                              <YAxis width={24} tickMargin={2} domain={[0, (dataMax: number) => Math.max(dataMax, 1)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                              <Tooltip
+                                cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
+                                content={({ active, payload }) => {
+                                  if (active && payload && payload.length) {
+                                    const d = payload[0].payload as { fullName: string; beroperasi: number; tersedia: number };
+                                    return (
+                                      <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                        <div className="font-bold text-white mb-1">{d.fullName}</div>
+                                        <div className="text-white/90">Beroperasi / Ditempah: {d.beroperasi}</div>
+                                        <div className="text-white/90">Slot Kosong Sedia: {d.tersedia}</div>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                }}
+                              />
+                              <Bar
+                                dataKey="beroperasi"
+                                name="Beroperasi"
+                                fill="#2563EB"
+                                radius={[5, 5, 0, 0]}
+                                maxBarSize={64}
+                                minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                                isAnimationActive={false}
+                              >
+                                <LabelList
+                                  dataKey="beroperasi"
+                                  position="top"
+                                  formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
+                                  className="fill-slate-900 dark:fill-slate-100 font-mono"
+                                  style={{ fontSize: 11.5, fontWeight: 700 }}
+                                />
+                              </Bar>
+                              <Bar
+                                dataKey="tersedia"
+                                name="Tersedia"
+                                fill="#10B981"
+                                radius={[5, 5, 0, 0]}
+                                maxBarSize={64}
+                                minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                                isAnimationActive={false}
+                              >
+                                <LabelList
+                                  dataKey="tersedia"
+                                  position="top"
+                                  formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
+                                  className="fill-slate-900 dark:fill-slate-100 font-mono"
+                                  style={{ fontSize: 11.5, fontWeight: 700 }}
+                                />
+                              </Bar>
+                            </BarChart>
+                          ) : (
+                            <BarChart
+                              data={pipelineChartData}
+                              barCategoryGap="10%"
+                              margin={{ top: 18, right: 4, left: 0, bottom: 2 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                              <XAxis dataKey="label" height={24} tickMargin={4} tick={{ fontSize: 12, fontWeight: 600 }} interval={0} padding={{ left: 0, right: 0 }} axisLine={false} tickLine={false} />
+                              <YAxis width={24} tickMargin={2} domain={[0, (dataMax: number) => Math.max(dataMax, 1)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                              <Tooltip
+                                cursor={{ fill: 'rgba(79, 70, 229, 0.10)' }}
+                                content={({ active, payload }) => {
+                                  if (active && payload && payload.length) {
+                                    const d = payload[0].payload as { label: string; jumlah: number };
+                                    return (
+                                      <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                        <div className="text-white/80 text-[0.8125rem]">{d.label}</div>
+                                        <div className="font-bold text-white">{d.jumlah} Rekod</div>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                }}
+                              />
+                              <Bar
+                                dataKey="jumlah"
+                                name="Jumlah Rekod"
+                                fill="#4F46E5"
+                                radius={[6, 6, 0, 0]}
+                                maxBarSize={110}
+                                minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                                isAnimationActive={false}
+                              >
+                                <LabelList
+                                  dataKey="jumlah"
+                                  position="top"
+                                  formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '0')}
+                                  className="fill-slate-900 dark:fill-slate-100 font-mono"
+                                  style={{ fontSize: 12.5, fontWeight: 700 }}
+                                />
+                              </Bar>
+                            </BarChart>
+                          )}
+                        </ResponsiveContainer>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="px-5 py-3 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex flex-wrap items-center justify-between gap-2 text-sm">
+                      {adminChartMode === 'districts' ? (
+                        <>
+                          <div className="flex flex-wrap items-center gap-4">
+                            <span className="inline-flex items-center gap-1.5 font-semibold text-black dark:text-white">
+                              <span className="w-3 h-3 rounded-xs bg-blue-600 shrink-0" />
+                              <span>Beroperasi / Ditempah</span>
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 font-semibold text-black dark:text-white">
+                              <span className="w-3 h-3 rounded-xs bg-emerald-500 shrink-0" />
+                              <span>Slot Tersedia</span>
+                            </span>
+                          </div>
+                          <span className="font-mono font-bold tabular-nums text-black/80 dark:text-white/85">
+                            {occupiedSlotsCount + availableSlotsCount} Unit Kapsul
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2 font-semibold text-black dark:text-white">
+                            <span className="w-3 h-3 rounded-xs bg-indigo-600 shrink-0" />
+                            <span>Jumlah Rekod Aliran Semasa</span>
+                          </div>
+                          <span className="font-mono font-bold tabular-nums text-black/80 dark:text-white/85">
+                            {pipelineChartData.reduce((sum, item) => sum + item.jumlah, 0)} Jumlah Aktiviti
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
 
-                  <div className="p-5 flex-1 min-w-0">
-                    <div className="h-80 min-h-[320px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                      <ResponsiveContainer width="100%" height={320} minWidth={0} initialDimension={{ width: 520, height: 320 }}>
-                        {adminChartMode === 'districts' ? (
-                          <BarChart
-                            data={districtChartData}
-                            barCategoryGap="16%"
-                            barGap={3}
-                            margin={{ top: 24, right: 12, left: -4, bottom: 8 }}
+                  {/* KOTAK 2: Separate Standalone Card Outside & Below Chart Box */}
+                  <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden p-4 flex flex-col gap-3 h-fit">
+                    {/* Baris 1: 3 Kolum Metrik Prestasi */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
+                        <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/75">
+                          Kadar Lulus Kapsul
+                        </div>
+                        <div className="mt-1 flex items-baseline justify-between gap-2">
+                          <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
+                            {bookingApprovalRate}%
+                          </span>
+                          <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
+                            {approvedBookingsCount}/{safeBookings.length}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
+                        <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/75">
+                          Kadar Lulus Geran
+                        </div>
+                        <div className="mt-1 flex items-baseline justify-between gap-2">
+                          <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
+                            {grantApprovalRate}%
+                          </span>
+                          <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
+                            {approvedGrantsCount}/{totalGrantsCount}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
+                        <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/75">
+                          Liputan Daerah Aktif
+                        </div>
+                        <div className="mt-1 flex items-baseline justify-between gap-2">
+                          <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
+                            {activeDistrictsCount}/10
+                          </span>
+                          <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
+                            {occupiedSlotsCount} unit aktif
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Baris 2: 2 Kolum Operasi Daerah & Tindakan Segera */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-start">
+                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col gap-2 h-fit">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-bold text-black dark:text-white">
+                            Daerah Ada Kekosongan ({availableSlotsCount})
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setAdminTab('slots')}
+                            className="text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
                           >
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                            <XAxis dataKey="district" tick={{ fontSize: 11.5, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
-                            <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
-                            <Tooltip
-                              cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
-                              content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                  const d = payload[0].payload as { fullName: string; beroperasi: number; tersedia: number };
-                                  return (
-                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                      <div className="font-bold text-white mb-1">{d.fullName}</div>
-                                      <div className="text-white/90">Beroperasi / Ditempah: {d.beroperasi}</div>
-                                      <div className="text-white/90">Slot Kosong Sedia: {d.tersedia}</div>
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              }}
-                            />
-                            <Bar
-                              dataKey="beroperasi"
-                              name="Beroperasi"
-                              fill="#2563EB"
-                              radius={[5, 5, 0, 0]}
-                              maxBarSize={28}
-                              minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                              isAnimationActive={false}
-                            >
-                              <LabelList
-                                dataKey="beroperasi"
-                                position="top"
-                                formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
-                                className="fill-slate-900 dark:fill-slate-100 font-mono"
-                                style={{ fontSize: 11.5, fontWeight: 700 }}
-                              />
-                            </Bar>
-                            <Bar
-                              dataKey="tersedia"
-                              name="Tersedia"
-                              fill="#10B981"
-                              radius={[5, 5, 0, 0]}
-                              maxBarSize={28}
-                              minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                              isAnimationActive={false}
-                            >
-                              <LabelList
-                                dataKey="tersedia"
-                                position="top"
-                                formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
-                                className="fill-slate-900 dark:fill-slate-100 font-mono"
-                                style={{ fontSize: 11.5, fontWeight: 700 }}
-                              />
-                            </Bar>
-                          </BarChart>
+                            <span>Urus Slot</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {availableDistricts.length > 0 ? (
+                          <div className="flex flex-wrap gap-1.5">
+                            {availableDistricts.map((d) => (
+                              <button
+                                key={d.fullName}
+                                type="button"
+                                onClick={() => setAdminTab('slots')}
+                                className="px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:border-emerald-500 dark:hover:border-emerald-500 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                              >
+                                <span>{d.fullName}</span>
+                                <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
+                                  {d.tersedia}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
                         ) : (
-                          <BarChart
-                            data={pipelineChartData}
-                            barCategoryGap="20%"
-                            margin={{ top: 24, right: 12, left: -4, bottom: 8 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                            <XAxis dataKey="label" tick={{ fontSize: 12, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
-                            <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
-                            <Tooltip
-                              cursor={{ fill: 'rgba(79, 70, 229, 0.10)' }}
-                              content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                  const d = payload[0].payload as { label: string; jumlah: number };
-                                  return (
-                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                      <div className="text-white/80 text-[0.8125rem]">{d.label}</div>
-                                      <div className="font-bold text-white">{d.jumlah} Rekod</div>
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              }}
-                            />
-                            <Bar
-                              dataKey="jumlah"
-                              name="Jumlah Rekod"
-                              fill="#4F46E5"
-                              radius={[6, 6, 0, 0]}
-                              maxBarSize={52}
-                              minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                              isAnimationActive={false}
-                            >
-                              <LabelList
-                                dataKey="jumlah"
-                                position="top"
-                                formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '0')}
-                                className="fill-slate-900 dark:fill-slate-100 font-mono"
-                                style={{ fontSize: 12.5, fontWeight: 700 }}
-                              />
-                            </Bar>
-                          </BarChart>
+                          <p className="text-[0.8125rem] text-black/75 dark:text-white/80">
+                            Kesemua 10 jajahan telah penuh ditempah buat masa ini.
+                          </p>
                         )}
-                      </ResponsiveContainer>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col gap-2 h-fit">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-bold text-black dark:text-white">
+                            Pengisian &amp; Tindakan Semakan
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setAdminTab('bookings')}
+                            className="text-[0.8125rem] font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
+                          >
+                            <span>Semak</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-[0.8125rem] text-black/80 dark:text-white/85">
+                            <span>Kadar Pengisian Keseluruhan</span>
+                            <span className="font-mono font-bold text-black dark:text-white tabular-nums">{occupancyRate}%</span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-zinc-800 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-blue-600 dark:bg-blue-500 transition-all duration-300"
+                              style={{ width: `${Math.min(100, Math.max(0, occupancyRate))}%` }}
+                            />
+                          </div>
+                          <p className="text-[0.8125rem] text-black/75 dark:text-white/80 tabular-nums">
+                            {pendingBookingsCount + pendingGrantsCount} permohonan menunggu tindakan pegawai.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Right Bento (5 Cols): Ringkasan Tindakan & Barisan Semakan */}
-                <div className="lg:col-span-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 shadow-sm overflow-hidden flex flex-col justify-between">
+                <div className="lg:col-span-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 shadow-sm overflow-hidden flex flex-col h-fit">
                   <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Activity className="w-4 h-4 text-black dark:text-white/75" />
@@ -990,7 +1120,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </span>
                   </div>
 
-                  <div className="p-5 space-y-3 flex-1">
+                  <div className="p-5 space-y-3">
                     <button
                       type="button"
                       onClick={() => setAdminTab('bookings')}
@@ -1259,15 +1389,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <h4 className="font-bold text-black dark:text-white text-sm">Tiada Permohonan Dalam Kategori Ini</h4>
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-xs transition-colors">
+            <div className="space-y-3 h-fit">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-xs transition-colors h-fit">
                 {adminBookingsPagination.paginatedItems.map((b) => {
                   const isExpanded = expandedAdminBookingIds.includes(b.id);
                   return (
                     <div key={b.id} className="p-3.5 sm:p-4 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
-                          <div className="w-16 h-12 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                        <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
                             <PortalImage
                               src={resolveBookingKioskImage(b, safeSlots)}
                               alt={`Reka bentuk kiosk ${b.slotName}`}
@@ -1278,14 +1408,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </div>
 
                           <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 font-mono text-[0.8125rem] font-bold">
-                                {b.slotCode}
+                            <div className="flex items-center gap-2 min-w-0">
+                              <h4 className="text-sm sm:text-base font-extrabold text-black dark:text-white truncate">
+                                {b.slotCode} · {b.businessName}
+                              </h4>
+                              <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white shrink-0">
+                                {b.businessCategory}
                               </span>
-                              <h4 className="text-sm font-extrabold text-black dark:text-white truncate">{b.businessName}</h4>
-                              <span className="text-sm text-black/70 dark:text-white/75 font-semibold">({b.businessCategory})</span>
                             </div>
-                            <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1 truncate tabular-nums">
+                            <p className="text-sm text-black/70 dark:text-white/75 mt-0.5 truncate tabular-nums">
                               {b.applicantName} · {b.slotName} ({b.hubLocation}) · {b.durationMonths} bln
                             </p>
                           </div>
@@ -1462,53 +1593,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </button>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs transition-colors">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-black dark:text-white">
-                <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 text-[0.8125rem] uppercase tracking-wider text-black/75 dark:text-white/80 font-bold">
-                  <tr>
-                    <th className="p-4">Perniagaan &amp; Pemilik</th>
-                    <th className="p-4">Kategori &amp; Jajahan</th>
-                    <th className="p-4">SSM</th>
-                    <th className="p-4">Status &amp; Pilihan</th>
-                    <th className="p-4 text-right">Tindakan</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-300 dark:divide-slate-600">
-                  {businessesPagination.paginatedItems.map((biz) => {
-                    const bizProductCount = products.filter(p => p.businessId === biz.id).length;
-                    return (
-                    <tr key={biz.id} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
-                            alt=""
-                            className="w-10 h-10 rounded-xl object-cover border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900"
-                          />
-                          <div>
-                            <div className="font-extrabold text-black dark:text-white text-sm sm:text-base">{biz.businessName}</div>
-                            <div className="text-sm text-black/75 dark:text-white/75">{biz.ownerName} ({biz.ownerEmail})</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className="font-semibold text-black dark:text-white">{biz.category}</span>
-                        <div className="text-sm text-black/75 dark:text-white/75">{biz.district}</div>
-                      </td>
-                      <td className="p-4">
-                        {biz.ssmNumber ? (
-                          <span className="font-mono text-sm sm:text-[0.9375rem] text-black dark:text-white/85 font-semibold">{biz.ssmNumber}</span>
-                        ) : (
-                          <span className="text-black/70 dark:text-white/75 italic">Tiada</span>
-                        )}
-                      </td>
-                      <td className="p-4">
-                        <div className="flex flex-wrap items-center gap-1.5">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs transition-colors h-fit">
+            <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-700">
+              {businessesPagination.paginatedItems.map((biz) => {
+                const bizProductCount = products.filter(p => p.businessId === biz.id).length;
+                return (
+                  <div
+                    key={biz.id}
+                    className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <img
+                        src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
+                        alt={biz.businessName}
+                        className="w-16 h-16 rounded-lg object-cover border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 shrink-0"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h4 className="font-extrabold text-black dark:text-white text-sm sm:text-base truncate">
+                            {biz.businessName}
+                          </h4>
                           <button
                             type="button"
                             onClick={() => handleToggleApprovedBusiness(biz)}
-                            className={`px-2.5 py-1 rounded-lg font-bold text-[0.8125rem] border cursor-pointer ${
+                            className={`px-2 py-0.5 rounded font-bold text-[0.75rem] border cursor-pointer shrink-0 ${
                               biz.isApproved
                                 ? 'bg-emerald-100 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-black dark:text-white'
                                 : 'bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black/70 dark:text-white/70'
@@ -1516,73 +1624,75 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           >
                             {biz.isApproved ? 'Aktif' : 'Tersembunyi'}
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => handleToggleFeatured(biz)}
-                            className={`px-2.5 py-1 rounded-lg font-bold text-[0.8125rem] flex items-center gap-1 transition-colors cursor-pointer ${
-                              biz.isFeatured
-                                ? 'bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white border border-amber-300 dark:border-amber-800'
-                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
-                            }`}
-                          >
-                            <Sparkles className="w-3 h-3 text-black dark:text-white/75" />
-                            <span>{biz.isFeatured ? 'Pilihan' : 'Jadikan Pilihan'}</span>
-                          </button>
                         </div>
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="inline-flex items-center justify-end gap-1.5 shrink-0">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setManagingProductsBusiness(biz);
-                            }}
-                            className="px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
-                            title={`Urus Produk ${biz.businessName}`}
-                          >
-                            <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
-                            <span>Produk ({bizProductCount})</span>
-                          </button>
-                          <button
-                            type="button"
-                            id={`btn-edit-business-${biz.id}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsCreatingBusiness(false);
-                              setEditingBusiness(biz);
-                            }}
-                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
-                            title={`Edit Perniagaan ${biz.businessName}`}
-                          >
-                            <Edit3 className="w-3.5 h-3.5 shrink-0" />
-                            <span>Edit</span>
-                          </button>
-                          <button
-                            type="button"
-                            id={`btn-delete-business-${biz.id}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              confirmDelete({
-                                itemName: biz.businessName,
-                                itemType: 'Senarai Perniagaan',
-                                onConfirm: () => handleDeleteBusiness(biz.id, biz.businessName)
-                              });
-                            }}
-                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
-                            title={`Padam Perniagaan ${biz.businessName}`}
-                          >
-                            <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                            <span>Padam</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );})}
-                </tbody>
-              </table>
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
+                          {biz.ownerName} · {biz.category} · {biz.district} · SSM: {biz.ssmNumber || 'Tiada'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleFeatured(biz)}
+                        className={`px-2.5 py-1.5 rounded-lg font-bold text-[0.8125rem] flex items-center gap-1 transition-colors cursor-pointer whitespace-nowrap ${
+                          biz.isFeatured
+                            ? 'bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white border border-amber-300 dark:border-amber-800'
+                            : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
+                        }`}
+                      >
+                        <Sparkles className="w-3 h-3 text-black dark:text-white/75" />
+                        <span>{biz.isFeatured ? 'Pilihan' : 'Jadikan Pilihan'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setManagingProductsBusiness(biz);
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
+                        title={`Urus Produk ${biz.businessName}`}
+                      >
+                        <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+                        <span>Produk ({bizProductCount})</span>
+                      </button>
+                      <button
+                        type="button"
+                        id={`btn-edit-business-${biz.id}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsCreatingBusiness(false);
+                          setEditingBusiness(biz);
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
+                        title={`Edit Perniagaan ${biz.businessName}`}
+                      >
+                        <Edit3 className="w-3.5 h-3.5 shrink-0" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        id={`btn-delete-business-${biz.id}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          confirmDelete({
+                            itemName: biz.businessName,
+                            itemType: 'Senarai Perniagaan',
+                            onConfirm: () => handleDeleteBusiness(biz.id, biz.businessName)
+                          });
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
+                        title={`Padam Perniagaan ${biz.businessName}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                        <span>Padam</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="px-4 pb-3">
+            <div className="px-4 pb-3 border-t border-slate-200 dark:border-slate-700">
               <PaginationBar
                 currentPage={businessesPagination.currentPage}
                 totalItems={businessesPagination.totalItems}
@@ -1762,111 +1872,92 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           )}
 
-          {/* Slots Table */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs transition-colors">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-black dark:text-white">
-                <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 text-[0.8125rem] uppercase tracking-wider text-black/75 dark:text-white/80 font-bold">
-                  <tr>
-                    <th className="p-4">Kod & Nama Kapsul</th>
-                    <th className="p-4">Hab & Jajahan</th>
-                    <th className="p-4">Kadar Sewaan</th>
-                    <th className="p-4">Status & Penyewa</th>
-                    <th className="p-4 text-right">Tindakan</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-300 dark:divide-slate-600">
-                  {slotsPagination.paginatedItems.map((s) => (
-                    <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-16 h-12 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
-                            <PortalImage
-                              src={resolveSlotImage(s)}
-                              alt={s.name}
-                              fallbackType="kiosk"
-                              fallbackLabel={s.code}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div>
-                            <div className="font-mono font-bold text-black dark:text-white">{s.code}</div>
-                            <div className="font-semibold text-black dark:text-white text-sm">{s.name}</div>
-                            <div className="text-sm text-black/70 dark:text-white/75">{s.size}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="font-medium text-black dark:text-white">{s.hubLocation}</div>
-                        <div className="text-sm text-black/75 dark:text-white/75">{s.district}</div>
-                      </td>
-                      <td className="p-4">
-                        <span className="font-extrabold text-black dark:text-white/85">RM{s.monthlyRate}/bln</span>
-                      </td>
-                      <td className="p-4">
-                        <select
-                          aria-label={`Tukar status slot ${s.code}`}
-                          value={s.status}
-                          onChange={(e) => handleDirectSlotStatusChange(s, e.target.value as SlotStatus)}
-                          className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
-                            s.status === 'available'
-                              ? 'bg-emerald-100 border-emerald-300 dark:bg-emerald-950/80 dark:border-emerald-800 text-black dark:text-white'
-                              : s.status === 'occupied'
-                                ? 'bg-indigo-100 border-indigo-300 dark:bg-indigo-600 dark:border-indigo-500 text-black dark:text-white'
-                                : 'bg-amber-100 border-amber-300 dark:bg-amber-950/80 dark:border-amber-800 text-black dark:text-white'
-                          }`}
-                        >
-                          <option value="available">Tersedia (available)</option>
-                          <option value="occupied">Beroperasi (occupied)</option>
-                          <option value="reserved">Ditempah (reserved)</option>
-                          <option value="maintenance">Selenggara (maintenance)</option>
-                        </select>
-                        {s.currentTenantBusinessName && (
-                          <div className="text-sm text-black dark:text-white/80 mt-1 font-semibold">
-                            {s.currentTenantBusinessName}
-                          </div>
-                        )}
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="inline-flex items-center justify-end gap-2 shrink-0">
-                          <button
-                            type="button"
-                            id={`btn-edit-slot-${s.id}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingSlot(s);
-                            }}
-                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
-                            title="Edit Slot Kiosk"
-                          >
-                            <Edit3 className="w-3.5 h-3.5 shrink-0" />
-                            <span>Edit</span>
-                          </button>
-                          <button
-                            type="button"
-                            id={`btn-delete-slot-${s.id}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              confirmDelete({
-                                itemName: `${s.code} · ${s.name}`,
-                                itemType: 'Slot Kiosk',
-                                onConfirm: () => handleDeleteSlot(s.id)
-                              });
-                            }}
-                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
-                            title="Padam Slot"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                            <span>Padam</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* Slots List View */}
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs transition-colors h-fit">
+            <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-700">
+              {slotsPagination.paginatedItems.map((s) => (
+                <div
+                  key={s.id}
+                  className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                      <PortalImage
+                        src={resolveSlotImage(s)}
+                        alt={s.name}
+                        fallbackType="kiosk"
+                        fallbackLabel={s.code}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h4 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
+                          {s.code} · {s.name}
+                        </h4>
+                        <span className="px-2 py-0.5 rounded text-[0.75rem] font-bold bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white shrink-0 tabular-nums">
+                          RM{s.monthlyRate}/bln
+                        </span>
+                      </div>
+                      <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
+                        {s.hubLocation} ({s.district}) · {s.size}{s.currentTenantBusinessName ? ` · Penyewa: ${s.currentTenantBusinessName}` : ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-end gap-2 shrink-0">
+                    <select
+                      aria-label={`Tukar status slot ${s.code}`}
+                      value={s.status}
+                      onChange={(e) => handleDirectSlotStatusChange(s, e.target.value as SlotStatus)}
+                      className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
+                        s.status === 'available'
+                          ? 'bg-emerald-100 border-emerald-300 dark:bg-emerald-950/80 dark:border-emerald-800 text-black dark:text-white'
+                          : s.status === 'occupied'
+                            ? 'bg-indigo-100 border-indigo-300 dark:bg-indigo-600 dark:border-indigo-500 text-black dark:text-white'
+                            : 'bg-amber-100 border-amber-300 dark:bg-amber-950/80 dark:border-amber-800 text-black dark:text-white'
+                      }`}
+                    >
+                      <option value="available">Tersedia (available)</option>
+                      <option value="occupied">Beroperasi (occupied)</option>
+                      <option value="reserved">Ditempah (reserved)</option>
+                      <option value="maintenance">Selenggara (maintenance)</option>
+                    </select>
+                    <button
+                      type="button"
+                      id={`btn-edit-slot-${s.id}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingSlot(s);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
+                      title="Edit Slot Kiosk"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 shrink-0" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      id={`btn-delete-slot-${s.id}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        confirmDelete({
+                          itemName: `${s.code} · ${s.name}`,
+                          itemType: 'Slot Kiosk',
+                          onConfirm: () => handleDeleteSlot(s.id)
+                        });
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
+                      title="Padam Slot"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                      <span>Padam</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="px-4 pb-3">
+            <div className="px-4 pb-3 border-t border-slate-200 dark:border-slate-700">
               <PaginationBar
                 currentPage={slotsPagination.currentPage}
                 totalItems={slotsPagination.totalItems}
@@ -2030,79 +2121,81 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           )}
 
-          <div className="space-y-3">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {programsPagination.paginatedItems.map((p) => (
-              <div
-                key={p.id}
-                className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs overflow-hidden flex flex-col justify-between transition-colors"
-              >
-                <div className="h-36 w-full overflow-hidden bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600">
-                  <PortalImage
-                    src={resolveProgramImage(p)}
-                    alt={p.title}
-                    fallbackType="program"
-                    fallbackLabel={p.category}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-5 space-y-2.5 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 rounded text-[0.8125rem] font-bold">
-                      {p.category}
-                    </span>
-                    <div className="inline-flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        id={`btn-edit-prog-${p.id}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingProgram(p);
-                        }}
-                        className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer"
-                        title="Edit Program"
-                      >
-                        <Edit3 className="w-3.5 h-3.5 shrink-0" />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        type="button"
-                        id={`btn-delete-prog-${p.id}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          confirmDelete({
-                            itemName: p.title,
-                            itemType: 'Program & Geran',
-                            onConfirm: () => handleDeleteProg(p.id)
-                          });
-                        }}
-                        className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer"
-                        title="Padam Program"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                        <span>Padam</span>
-                      </button>
+          <div className="space-y-3 h-fit">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs overflow-hidden flex flex-col divide-y divide-slate-200 dark:divide-slate-700 transition-colors h-fit">
+              {programsPagination.paginatedItems.map((p) => (
+                <div
+                  key={p.id}
+                  className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 shrink-0">
+                      <PortalImage
+                        src={resolveProgramImage(p)}
+                        alt={p.title}
+                        fallbackType="program"
+                        fallbackLabel={p.category}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h4 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
+                          {p.title}
+                        </h4>
+                        <span className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 rounded text-[0.75rem] font-bold shrink-0">
+                          {p.category}
+                        </span>
+                      </div>
+                      <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5">
+                        {p.grantAmount ? `Bantuan: ${p.grantAmount} · ` : ''}{p.description}
+                      </p>
                     </div>
                   </div>
-                  <h4 className="font-bold text-black dark:text-white text-sm">{p.title}</h4>
-                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75 line-clamp-2">{p.description}</p>
-                  {p.grantAmount && (
-                    <div className="text-sm font-bold text-black dark:text-white bg-slate-50 dark:bg-emerald-600 border border-slate-300 dark:border-amber-400/40 p-2 rounded-lg">
-                      Bantuan: {p.grantAmount}
-                    </div>
-                  )}
+
+                  <div className="inline-flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    <button
+                      type="button"
+                      id={`btn-edit-prog-${p.id}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingProgram(p);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer"
+                      title="Edit Program"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 shrink-0" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      id={`btn-delete-prog-${p.id}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        confirmDelete({
+                          itemName: p.title,
+                          itemType: 'Program & Geran',
+                          onConfirm: () => handleDeleteProg(p.id)
+                        });
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer"
+                      title="Padam Program"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                      <span>Padam</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <PaginationBar
-            currentPage={programsPagination.currentPage}
-            totalItems={programsPagination.totalItems}
-            itemsPerPage={5}
-            onPageChange={programsPagination.setCurrentPage}
-            itemLabel="program"
-            accent="rose"
-          />
+              ))}
+            </div>
+            <PaginationBar
+              currentPage={programsPagination.currentPage}
+              totalItems={programsPagination.totalItems}
+              itemsPerPage={5}
+              onPageChange={programsPagination.setCurrentPage}
+              itemLabel="program"
+              accent="rose"
+            />
           </div>
         </div>
       )}
@@ -2143,55 +2236,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs overflow-hidden flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
               {mentors.map((m) => {
                 const menteeCount = mentorshipRegistrations.filter(r => r.mentorId === m.id).length;
                 return (
-                  <div 
+                  <div
                     key={m.id}
-                    className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs flex flex-col justify-between space-y-3 hover:border-blue-400/70 transition-colors"
+                    className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors"
                   >
-                    <div className="space-y-2.5">
-                      <div className="flex items-center gap-3">
-                        <img 
-                          src={m.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg'} 
-                          alt={m.name}
-                          className="w-11 h-11 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0" 
-                        />
-                        <div className="min-w-0 flex-1">
-                          <h5 className="font-bold text-sm text-black dark:text-white leading-snug break-words">
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <img
+                        src={m.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg'}
+                        alt={m.name}
+                        className="w-16 h-16 rounded-lg object-cover border border-slate-300 dark:border-slate-600 shrink-0"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h5 className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
                             {m.name}
                           </h5>
-                          <div className="text-sm text-black dark:text-white/75 font-semibold leading-snug break-words">
-                            {m.agency.split('(')[0].trim()}
-                          </div>
+                          <span className="px-2 py-0.5 rounded text-[0.75rem] font-bold bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 text-black dark:text-white shrink-0 tabular-nums">
+                            {menteeCount} Usahawan
+                          </span>
                         </div>
-                      </div>
-
-                      <div className="text-sm text-black dark:text-white/80 leading-relaxed break-words">
-                        {m.title}
-                      </div>
-
-                      <div className="pt-2 border-t border-slate-300 dark:border-slate-600 space-y-1.5 text-sm">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-black/70 dark:text-white/75">Usahawan Berdaftar:</span>
-                          <span className="font-bold text-black dark:text-white/85 tabular-nums">{menteeCount} Usahawan</span>
-                        </div>
-                        <div className="flex items-start justify-between gap-2">
-                          <span className="text-black/70 dark:text-white/75 shrink-0">Emel:</span>
-                          <span className="font-mono text-[0.8125rem] text-black dark:text-white break-all text-right">{m.email}</span>
-                        </div>
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5">
+                          {m.agency.split('(')[0].trim()} · {m.title} · {m.email}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="inline-flex items-center gap-2 shrink-0 self-end sm:self-center">
                       <button
                         type="button"
                         onClick={() => {
                           setIsCreatingMentor(false);
                           setSelectedMentorForEdit(m);
                         }}
-                        className="col-span-2 py-2 px-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                        className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 rounded-lg text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                         <span>Edit</span>
@@ -2205,7 +2286,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             onConfirm: () => handleDeleteMentor(m)
                           })
                         }
-                        className="py-2 px-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-200 dark:border-rose-800/70 rounded-xl text-sm font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                        className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-200 dark:border-rose-800/70 rounded-lg text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 transition-colors cursor-pointer whitespace-nowrap"
                         title={`Padam Mentor ${m.name}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -2218,8 +2299,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </div>
 
-          {/* Mentee List Table */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs overflow-hidden">
+          {/* Mentee List View */}
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs overflow-hidden h-fit">
             <div className="p-4 sm:p-5 border-b border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h4 className="text-base font-bold text-black dark:text-white">
@@ -2240,107 +2321,88 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-slate-50 dark:bg-slate-900 text-black/75 dark:text-white/80 border-b border-slate-300 dark:border-slate-600 text-[0.8125rem] uppercase tracking-wider font-bold">
-                  <tr>
-                    <th className="py-3.5 px-4">Usahawan &amp; Perniagaan</th>
-                    <th className="py-3.5 px-4">Mentor Ditugaskan</th>
-                    <th className="py-3.5 px-4">Topik Bimbingan</th>
-                    <th className="py-3.5 px-4">Jajahan</th>
-                    <th className="py-3.5 px-4">Tarikh &amp; Mod</th>
-                    <th className="py-3.5 px-4">Status</th>
-                    <th className="py-3.5 px-4 text-right">Tindakan</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-300 dark:divide-slate-600 text-black dark:text-white">
-                  {sortedMentorships.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="text-center py-8 text-black/70 dark:text-white/75">
-                        Tiada pendaftaran bimbingan ditemui.
-                      </td>
-                    </tr>
-                  ) : (
-                    adminMentorshipsPagination.paginatedItems.map((m) => (
-                      <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
-                        <td className="py-3.5 px-4">
-                          <div className="font-bold text-black dark:text-white">{m.entrepreneurName}</div>
-                          <div className="text-sm text-black dark:text-white/80 font-semibold">{m.businessName}</div>
-                          <div className="text-sm text-black/70 dark:text-white/75">{m.entrepreneurPhone}</div>
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <div className="font-semibold text-black dark:text-white">{m.mentorName}</div>
-                        </td>
-                        <td className="py-3.5 px-4 max-w-xs">
-                          <div className="font-medium text-black dark:text-white">{m.topic}</div>
-                          {m.challenges && (
-                            <div className="text-sm text-black/70 dark:text-white/75 leading-relaxed break-words mt-0.5">{m.challenges}</div>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          <span className="font-medium text-black dark:text-white/85">{m.district}</span>
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          <div className="font-semibold text-black dark:text-white">{m.preferredDate}</div>
-                          <div className="text-sm text-black/70 dark:text-white/75">{m.mode}</div>
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap">
-                          <select
-                            aria-label={`Status sesi ${m.entrepreneurName}`}
-                            value={m.status}
-                            onChange={(e) => handleDirectMentorshipStatus(m, e.target.value as MentorshipRegistration['status'])}
-                            className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
-                              m.status === 'confirmed'
-                                ? 'bg-indigo-100 border-indigo-300 text-black dark:bg-indigo-600 dark:border-indigo-500 dark:text-white'
-                                : m.status === 'completed'
-                                  ? 'bg-emerald-100 border-emerald-300 text-black dark:bg-emerald-950 dark:border-emerald-800 dark:text-white'
-                                  : m.status === 'cancelled'
-                                    ? 'bg-slate-200 border-slate-300 text-black dark:bg-slate-700 dark:border-slate-600 dark:text-white'
-                                    : 'bg-amber-100 border-amber-300 text-black dark:bg-amber-950 dark:border-amber-800 dark:text-white'
-                            }`}
-                          >
-                            <option value="pending">Menunggu</option>
-                            <option value="confirmed">Disahkan</option>
-                            <option value="completed">Selesai</option>
-                            <option value="cancelled">Dibatalkan</option>
-                          </select>
-                        </td>
-                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                          <div className="inline-flex items-center justify-end gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setIsCreatingMentorship(false);
-                                setEditingMentorship(m);
-                              }}
-                              className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1 cursor-pointer"
-                            >
-                              <Edit3 className="w-3.5 h-3.5" />
-                              <span>Edit</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                confirmDelete({
-                                  itemName: `${m.entrepreneurName} (${m.topic})`,
-                                  itemType: 'Sesi Bimbingan Mentor',
-                                  onConfirm: () => handleDeleteMentorship(m)
-                                })
-                              }
-                              className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1 cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              <span>Padam</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+            <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-700 text-black dark:text-white">
+              {sortedMentorships.length === 0 ? (
+                <div className="text-center py-8 text-sm text-black/70 dark:text-white/75">
+                  Tiada pendaftaran bimbingan ditemui.
+                </div>
+              ) : (
+                adminMentorshipsPagination.paginatedItems.map((m) => (
+                  <div
+                    key={m.id}
+                    className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <div className="w-16 h-16 rounded-lg shrink-0 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-700 dark:text-indigo-300">
+                        <UserCheck className="w-6 h-6" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h5 className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
+                            {m.entrepreneurName} · {m.businessName}
+                          </h5>
+                          <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white shrink-0">
+                            {m.district}
+                          </span>
+                        </div>
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
+                          Mentor: {m.mentorName} · {m.topic} · {m.preferredDate} ({m.mode})
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-end gap-2 shrink-0">
+                      <select
+                        aria-label={`Status sesi ${m.entrepreneurName}`}
+                        value={m.status}
+                        onChange={(e) => handleDirectMentorshipStatus(m, e.target.value as MentorshipRegistration['status'])}
+                        className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
+                          m.status === 'confirmed'
+                            ? 'bg-indigo-100 border-indigo-300 text-black dark:bg-indigo-600 dark:border-indigo-500 dark:text-white'
+                            : m.status === 'completed'
+                              ? 'bg-emerald-100 border-emerald-300 text-black dark:bg-emerald-950 dark:border-emerald-800 dark:text-white'
+                              : m.status === 'cancelled'
+                                ? 'bg-slate-200 border-slate-300 text-black dark:bg-slate-700 dark:border-slate-600 dark:text-white'
+                                : 'bg-amber-100 border-amber-300 text-black dark:bg-amber-950 dark:border-amber-800 dark:text-white'
+                        }`}
+                      >
+                        <option value="pending">Menunggu</option>
+                        <option value="confirmed">Disahkan</option>
+                        <option value="completed">Selesai</option>
+                        <option value="cancelled">Dibatalkan</option>
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsCreatingMentorship(false);
+                          setEditingMentorship(m);
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          confirmDelete({
+                            itemName: `${m.entrepreneurName} (${m.topic})`,
+                            itemType: 'Sesi Bimbingan Mentor',
+                            onConfirm: () => handleDeleteMentorship(m)
+                          })
+                        }
+                        className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Padam</span>
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-            <div className="px-4 pb-3">
+            <div className="px-4 pb-3 border-t border-slate-200 dark:border-slate-700">
               <PaginationBar
                 currentPage={adminMentorshipsPagination.currentPage}
                 totalItems={adminMentorshipsPagination.totalItems}

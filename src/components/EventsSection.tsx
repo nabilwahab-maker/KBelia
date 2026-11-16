@@ -137,6 +137,26 @@ export const EventsSection: React.FC = () => {
         </div>
       </div>
 
+      {/* Ringkasan Statistik Ringkas */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Total Events' : 'Jumlah Acara'}</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{events.length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Your Bookings' : 'Slot Ditempah'}</span>
+          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{bookedEvents.length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Stalls Open' : 'Tapak Kosong'}</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{events.reduce((sum, e) => sum + Math.max(0, e.boothsAvailable - (bookedEvents.includes(e.id) ? 1 : 0)), 0)}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Matching Results' : 'Dipaparkan'}</span>
+          <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{filteredEvents.length}</span>
+        </div>
+      </div>
+
       {/* Filter Bar */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="relative w-full md:w-72">
@@ -185,123 +205,107 @@ export const EventsSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Events Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredEvents.map((evt) => {
-          const isBooked = bookedEvents.includes(evt.id);
+      {/* Senarai Menegak Acara */}
+      {filteredEvents.length === 0 ? (
+        <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 h-fit">
+          <Calendar className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
+          <p className="text-sm font-bold text-black dark:text-white">
+            {isEn ? 'No events match your filter' : 'Tiada acara sepadan ditemui'}
+          </p>
+        </div>
+      ) : (
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
+          {filteredEvents.map((evt) => {
+            const isBooked = bookedEvents.includes(evt.id);
 
-          return (
-            <div
-              key={evt.id}
-              className="bg-white dark:bg-slate-800 rounded-3xl p-4 sm:p-5 border border-slate-300 dark:border-slate-600 shadow-xs flex flex-col sm:flex-row gap-4 items-stretch hover:shadow-md hover:border-blue-400/70 transition-all relative"
-            >
-              <div className="w-full sm:w-44 md:w-48 shrink-0 aspect-[4/3] sm:aspect-auto sm:min-h-[180px] rounded-2xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
-                <PortalImage
-                  src={resolveEventImage(evt.category, evt.imageUrl)}
-                  alt={evt.title}
-                  fallbackType="event"
-                  fallbackLabel={evt.category}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <div className="flex-1 min-w-0 flex flex-col justify-between">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-1 rounded-full text-[0.8125rem] font-extrabold uppercase tracking-wider bg-amber-50 text-black dark:bg-amber-950/60 dark:text-white border border-amber-200 dark:border-amber-800/70">
-                      {evt.category}
-                    </span>
-                    <span className="text-[0.8125rem] font-bold text-black dark:text-white/75 text-right">
-                      {evt.fee}
-                    </span>
+            return (
+              <div
+                key={evt.id}
+                className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
+              >
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                    <PortalImage
+                      src={resolveEventImage(evt.category, evt.imageUrl)}
+                      alt={evt.title}
+                      fallbackType="event"
+                      fallbackLabel={evt.category}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
 
-                  <div>
-                    <h3 className="text-base font-extrabold text-black dark:text-white leading-snug">
-                      {evt.title}
-                    </h3>
-                    <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-medium mt-0.5">
-                      {isEn ? 'Organized by:' : 'Anjuran:'} {evt.organizer}
-                    </div>
-                  </div>
-
-                  <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed line-clamp-2">
-                    {evt.description}
-                  </p>
-
-                  <div className="space-y-1.5 pt-2 text-sm text-black/70 dark:text-white/75">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                      <span className="font-semibold text-black dark:text-white">{evt.date}</span>
-                      <span className="text-black/35 dark:text-white/35">•</span>
-                      <span>{evt.time}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                      <span className="truncate">{evt.location} ({evt.district})</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Store className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                      <span>
-                        {Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0))} {isEn ? 'stalls available left' : 'tapak niaga masih kosong'} ({isEn ? 'out of' : 'daripada'} {evt.totalBooths})
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                        {evt.title}
+                      </h3>
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${
+                          isBooked
+                            ? 'bg-emerald-50 text-black border-emerald-300 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-700'
+                            : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/60 dark:text-white dark:border-amber-800/70'
+                        }`}
+                      >
+                        {isBooked ? (isEn ? 'Booked' : 'Berdaftar') : evt.category}
                       </span>
                     </div>
+                    <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                      {evt.date} · {evt.location} ({evt.district}) · {Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0))}/{evt.totalBooths} tapak · {evt.fee}
+                    </p>
                   </div>
                 </div>
 
-              {/* Action Buttons */}
-              <div className="pt-4 mt-4 border-t border-slate-300 dark:border-slate-600 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => !isBooked && handleBookBooth(evt.id, evt.title)}
-                  disabled={isBooked}
-                  className={`flex-1 py-2 px-3 text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 ${
-                    isBooked
-                      ? 'bg-emerald-50 text-black border border-emerald-300 dark:bg-emerald-950/40 dark:text-white dark:border-emerald-800 shadow-2xs cursor-default'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer dark:bg-blue-600'
-                  }`}
-                >
-                  {isBooked ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                      <span>{isEn ? 'Booked & Registered' : 'Slot Ditempah (Berdaftar)'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Store className="w-3.5 h-3.5" />
-                      <span>{isEn ? 'Book Stall / RSVP' : 'Tempah Slot Gerai'}</span>
-                    </>
-                  )}
-                </button>
-
-                {/* Butang Batal di sebelah Booked and Register */}
-                {isBooked && (
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                   <button
                     type="button"
-                    onClick={() => setEventToCancel(evt)}
-                    className="py-2 px-3 text-sm font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-black border border-rose-200 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-white dark:border-rose-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs shrink-0"
-                    title={isEn ? "Cancel event registration" : "Batal pendaftaran acara ini"}
+                    onClick={() => !isBooked && handleBookBooth(evt.id, evt.title)}
+                    disabled={isBooked}
+                    className={`py-2 px-3.5 text-sm font-bold rounded-lg transition-colors inline-flex items-center gap-1.5 shrink-0 ${
+                      isBooked
+                        ? 'bg-emerald-50 text-black border border-emerald-300 dark:bg-emerald-950/40 dark:text-white dark:border-emerald-800 cursor-default'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
+                    }`}
                   >
-                    <XCircle className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                    <span>{isEn ? 'Cancel' : 'Batal'}</span>
+                    {isBooked ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>{isEn ? 'Booked' : 'Ditempah'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Store className="w-3.5 h-3.5" />
+                        <span>{isEn ? 'Book Stall' : 'Tempah Slot Gerai'}</span>
+                      </>
+                    )}
                   </button>
-                )}
 
-                <a
-                  href={`https://wa.me/${evt.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(evt.title)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 transition-colors"
-                  title="WhatsApp Penganjur"
-                >
-                  <MessageCircle className="w-4 h-4 text-black dark:text-white/75" />
-                </a>
+                  {isBooked && (
+                    <button
+                      type="button"
+                      onClick={() => setEventToCancel(evt)}
+                      className="py-2 px-3 text-sm font-bold rounded-lg bg-rose-50 hover:bg-rose-100 text-black border border-rose-200 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-white dark:border-rose-800 transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0"
+                      title={isEn ? 'Cancel event registration' : 'Batal pendaftaran acara ini'}
+                    >
+                      <XCircle className="w-3.5 h-3.5" />
+                      <span>{isEn ? 'Cancel' : 'Batal'}</span>
+                    </button>
+                  )}
+
+                  <a
+                    href={`https://wa.me/${evt.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(evt.title)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 transition-colors shrink-0"
+                    title="WhatsApp Penganjur"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                  </a>
+                </div>
               </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Confirmation Modal for Cancelling Event Registration */}
       {eventToCancel && (

@@ -210,6 +210,26 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
         )}
       </div>
 
+      {/* Ringkasan Statistik Ringkas */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Jumlah Kiosk</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{(slots || []).length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Tersedia</span>
+          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{(slots || []).filter(s => s.status === 'available').length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Disewa / Tempah</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{(slots || []).filter(s => s.status !== 'available').length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Subsidi Negeri</span>
+          <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{subsidyRate}%</span>
+        </div>
+      </div>
+
       {/* Live Google Maps Kiosk Hub Explorer */}
       <KelantanDistrictsMap
         slots={slots}
@@ -375,35 +395,60 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
         </div>
       </div>
 
-      {/* Grid of Slots */}
+      {/* Senarai Menegak Kiosk */}
       {filteredSlots.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600">
+        <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 h-fit">
           <Building2 className="w-12 h-12 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <h3 className="text-base font-bold text-black dark:text-white">Tiada Kiosk Dijumpai</h3>
           <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">Cuba tukar pilihan lokasi atau status kiosk.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
           {filteredSlots.map((slot) => {
-            // Check active bookings associated with this slot
             const slotBookings = (bookings || []).filter(b => 
               (b.slotId === slot.id || (slot.code && b.slotCode === slot.code)) &&
               b.status !== 'rejected' && b.status !== 'cancelled'
             );
 
-            // Check if current user has an application/registration for this slot
             const myBooking = user ? (bookings || []).find(b => 
               (b.applicantId === user.uid || (user.email && b.applicantEmail?.toLowerCase() === user.email.toLowerCase())) &&
               (b.slotId === slot.id || (slot.code && b.slotCode === slot.code)) &&
               b.status !== 'rejected' && b.status !== 'cancelled'
             ) : null;
 
-            // Slot is registered if it has an assigned tenant, is occupied/reserved/maintenance, or has active bookings
             const isOccupiedOrTenant = slot.status === 'occupied' || Boolean(slot.currentTenantBusinessName);
             const isReserved = slot.status === 'reserved' || (slotBookings.some(b => b.status === 'pending') && slot.status === 'available');
             const isMaintenance = slot.status === 'maintenance';
             const isRegistered = isOccupiedOrTenant || isReserved || isMaintenance || slotBookings.length > 0;
             const isAvailable = slot.status === 'available' && !isRegistered;
+
+            const statusTag = myBooking ? (
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold text-white shrink-0 ${
+                myBooking.status === 'approved' ? 'bg-emerald-600' : 'bg-amber-600'
+              }`}>
+                {myBooking.status === 'approved' ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                <span>{myBooking.status === 'approved' ? 'Diluluskan' : 'Disemak'}</span>
+              </span>
+            ) : isOccupiedOrTenant ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-slate-100 dark:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 shrink-0">
+                <Lock className="w-3 h-3" />
+                <span>Telah Berdaftar</span>
+              </span>
+            ) : isReserved ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-300 dark:border-amber-700 shrink-0">
+                <Clock className="w-3 h-3" />
+                <span>Dalam Tempahan</span>
+              </span>
+            ) : isMaintenance ? (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-rose-50 dark:bg-rose-950/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 shrink-0">
+                Penyelenggaraan
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-300 dark:border-emerald-700 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>Tersedia</span>
+              </span>
+            );
 
             return (
               <div
@@ -418,220 +463,101 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                     onSelectSlot(slot);
                   }
                 }}
-                className={`interactive-card bg-white dark:bg-slate-800 rounded-2xl border overflow-hidden shadow-xs flex flex-col group cursor-pointer transition-all ${
-                  myBooking 
-                    ? 'border-emerald-500/70 ring-1 ring-emerald-500/20' 
-                    : isRegistered 
-                      ? 'border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500' 
-                      : 'border-slate-300 dark:border-slate-600 hover:border-blue-400/70'
+                className={`p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 cursor-pointer transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-700/40 ${
+                  myBooking ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : ''
                 }`}
               >
-                {/* 1. Gambar Kad Berkadar Tetap (H-48) di Atas - Bersih Tanpa Teks Bertindih */}
-                <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                  <PortalImage
-                    src={resolveSlotImage(slot)}
-                    alt={slot.name}
-                    fallbackType="kiosk"
-                    fallbackLabel={slot.code}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                  />
-                  
-                  {/* Top Left: Code Badge */}
-                  <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 bg-slate-900/80 backdrop-blur-xs text-white text-[0.8125rem] font-mono font-bold rounded-lg border border-white/15 shadow-xs">
-                      {slot.code}
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 shrink-0">
+                    <PortalImage
+                      src={resolveSlotImage(slot)}
+                      alt={slot.name}
+                      fallbackType="kiosk"
+                      fallbackLabel={slot.code}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h3 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
+                        {slot.code} · {slot.name}
+                      </h3>
+                      {statusTag}
+                    </div>
+                    <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                      {slot.hubLocation} ({slot.district}) · Saiz {slot.size} · RM{slot.monthlyRate}/bln (Subsidi {subsidyRate}%)
+                      {slot.currentTenantBusinessName ? ` · Penyewa: ${slot.currentTenantBusinessName}` : ''}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${slot.hubLocation}, ${slot.district}, Kelantan`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1 px-2.5 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-xs font-bold text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors shrink-0"
+                    title={language === 'en' ? 'Open in Google Maps' : 'Buka lokasi di Google Maps'}
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>GPS</span>
+                  </a>
+
+                  {myBooking ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onViewTenantDetail) onViewTenantDetail(slot);
+                      }}
+                      className="py-2 px-3.5 rounded-lg text-sm font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs shrink-0"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Permohonan Anda</span>
+                    </button>
+                  ) : isRegistered ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onViewTenantDetail) onViewTenantDetail(slot);
+                      }}
+                      className="py-2 px-3.5 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer bg-slate-50 hover:bg-slate-100 text-black dark:bg-slate-900 dark:hover:bg-slate-700 dark:text-white border border-slate-300 dark:border-slate-600 shrink-0"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Lihat Penyewa</span>
+                    </button>
+                  ) : isReadOnly ? (
+                    <span className="py-2 px-3.5 rounded-lg text-sm font-semibold bg-slate-50 dark:bg-slate-900 text-black dark:text-white border border-slate-300 dark:border-slate-600 inline-flex items-center gap-1.5 shrink-0">
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Status Tersedia</span>
                     </span>
-                  </div>
-
-                  {/* Top Right: Status Badge (Dynamic & Accurate) */}
-                  <div className="absolute top-3 right-3">
-                    {myBooking ? (
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold text-white shadow-xs ${
-                        myBooking.status === 'approved' ? 'bg-emerald-600' : 'bg-amber-600'
-                      }`}>
-                        {myBooking.status === 'approved' ? (
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                        ) : (
-                          <Clock className="w-3.5 h-3.5" />
-                        )}
-                        <span>Pendaftaran Anda ({myBooking.status === 'approved' ? 'Diluluskan' : 'Disemak'})</span>
-                      </span>
-                    ) : isOccupiedOrTenant ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-slate-900/85 text-white border border-white/15 shadow-xs backdrop-blur-xs">
-                        <Lock className="w-3 h-3 text-white/90" />
-                        <span>Telah Berdaftar</span>
-                      </span>
-                    ) : isReserved ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-amber-600/95 text-white border border-amber-500/50 shadow-xs">
-                        <Clock className="w-3 h-3" />
-                        <span>Dalam Tempahan</span>
-                      </span>
-                    ) : isMaintenance ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-rose-700 text-white shadow-xs">
-                        Penyelenggaraan
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-white dark:bg-slate-800 text-black dark:text-white/75 border border-emerald-200 dark:border-emerald-800/60 shadow-xs">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span>Tersedia untuk Belia</span>
-                      </span>
-                    )}
-                  </div>
+                  ) : hasActiveBooking ? (
+                    <button
+                      type="button"
+                      disabled
+                      onClick={(e) => e.stopPropagation()}
+                      className="py-2 px-3.5 rounded-lg text-sm font-bold inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900 text-black/55 dark:text-white/55 border border-slate-300 dark:border-slate-600 cursor-not-allowed shrink-0"
+                    >
+                      <Lock className="w-3.5 h-3.5 shrink-0" />
+                      <span>Sudah Ditempah</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectSlot(slot);
+                      }}
+                      className="py-2 px-3.5 rounded-lg text-sm font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm shrink-0"
+                    >
+                      <span>Mohon Kiosk</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
-
-                {/* 2. Info Teratur di Bawah - Berhierarki & Bebas Pertindihan */}
-                <div className="p-5 flex-1 flex flex-col justify-between gap-4">
-                  <div className="space-y-3.5">
-                    {/* Price & Subsidy Header */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-black dark:text-white text-base group-hover:text-black dark:group-hover:text-white transition-colors duration-200 leading-snug">
-                          {slot.name}
-                        </h3>
-                        <div className="flex items-center justify-between gap-1.5 text-sm text-black/70 dark:text-white/75 mt-1">
-                          <div className="flex items-center gap-1.5 truncate">
-                            <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                            <span className="truncate font-medium">{slot.hubLocation} ({slot.district})</span>
-                          </div>
-                          <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${slot.hubLocation}, ${slot.district}, Kelantan`)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[0.8125rem] font-bold text-black dark:text-white/75 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors shrink-0"
-                            title={language === 'en' ? 'Open in Google Maps' : 'Buka lokasi di Google Maps'}
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            <span>GPS</span>
-                          </a>
-                        </div>
-                      </div>
-
-                      {/* Pricing Block */}
-                      <div className="text-right shrink-0">
-                        <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75 block mb-0.5">
-                          Subsidi {subsidyRate}%
-                        </span>
-                        <div>
-                          <span className="text-lg font-bold text-black dark:text-white tabular-nums">RM{slot.monthlyRate}</span>
-                          <span className="text-sm text-black/70 dark:text-white/75">/bln</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Specifications Bar (Size & Jajahan) */}
-                    <div className="py-2 px-3 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm">
-                      <span className="text-black/70 dark:text-white/75">
-                        Saiz: <strong className="text-black dark:text-white font-semibold">{slot.size}</strong>
-                      </span>
-                      <span className="text-black/70 dark:text-white/75">
-                        Jajahan: <strong className="text-black dark:text-white font-semibold">{slot.district}</strong>
-                      </span>
-                    </div>
-
-                    {/* Registration / Occupancy Status Card */}
-                    {myBooking ? (
-                      <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-lg flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-black dark:text-white font-medium min-w-0">
-                          <ShieldCheck className="w-4 h-4 text-black dark:text-white shrink-0" />
-                          <span className="truncate">Permohonan Anda: {myBooking.businessName || 'Didaftarkan'}</span>
-                        </div>
-                        <span className="text-[0.8125rem] font-bold uppercase px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900 text-black dark:text-white shrink-0">
-                          {myBooking.status === 'approved' ? 'Aktif' : 'Semakan'}
-                        </span>
-                      </div>
-                    ) : isRegistered ? (
-                      <div className="p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <Store className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0" />
-                          <div className="min-w-0">
-                            <span className="text-[0.8125rem] text-black/70 dark:text-white/75 block font-normal">Status Pengisian:</span>
-                            <span className="text-sm font-semibold text-black dark:text-white truncate block">
-                              {slot.currentTenantBusinessName ? `Dioperasi oleh: ${slot.currentTenantBusinessName}` : 'Pendaftaran Penuh / Beroperasi'}
-                            </span>
-                          </div>
-                        </div>
-                        <span className="text-[0.8125rem] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-black dark:text-white shrink-0 ml-2">
-                          Telah Berdaftar
-                        </span>
-                      </div>
-                    ) : null}
-
-                    {/* Amenities list */}
-                    <div className="space-y-1.5">
-                      <span className="text-[0.8125rem] font-semibold text-black dark:text-white">Kemudahan Termasuk:</span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {(slot.amenities || []).map((amenity, idx) => (
-                          <span
-                            key={idx}
-                            className="text-[0.8125rem] font-medium bg-slate-50 dark:bg-slate-900 text-black dark:text-white border border-slate-300 dark:border-slate-600 px-2 py-0.5 rounded-md"
-                          >
-                            {amenity}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Primary CTA Button: Registered Slots Strictly CANNOT Be Applied For */}
-                  <div className="pt-3 border-t border-slate-300 dark:border-slate-600">
-                    {myBooking ? (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (onViewTenantDetail) onViewTenantDetail(slot);
-                        }}
-                        className="w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Permohonan Anda</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    ) : isRegistered ? (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (onViewTenantDetail) onViewTenantDetail(slot);
-                        }}
-                        className="w-full py-2.5 px-4 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer bg-slate-50 hover:bg-slate-100 text-black dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-slate-300 dark:border-slate-600"
-                      >
-                        <Lock className="w-3.5 h-3.5 text-black/70 dark:text-white/75 shrink-0" />
-                        <span>Lihat Penyewa</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
-                      </button>
-                    ) : isReadOnly ? (
-                      <div className="w-full py-2.5 px-4 rounded-lg text-sm font-semibold text-center bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 flex items-center justify-center gap-2">
-                        <Eye className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                        <span>Status Tersedia</span>
-                      </div>
-                    ) : hasActiveBooking ? (
-                      <button
-                        type="button"
-                        disabled
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-900 text-black/55 dark:text-white/55 border border-slate-300 dark:border-slate-600 cursor-not-allowed"
-                      >
-                        <Lock className="w-3.5 h-3.5 shrink-0" />
-                        <span>Sudah Ditempah</span>
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectSlot(slot);
-                        }}
-                        className="w-full py-2.5 px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm dark:bg-blue-600"
-                      >
-                        <span>Mohon Kiosk</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
               </div>
             );
           })}

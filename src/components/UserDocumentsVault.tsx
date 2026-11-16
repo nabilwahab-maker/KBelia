@@ -54,9 +54,12 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
   const resolvedBusiness = businessName || approvedBookings[0]?.businessName || approvedGrants[0]?.businessName;
   const resolvedDistrict = district || approvedBookings[0]?.hubLocation || 'Negeri Kelantan';
 
+  const totalDocsCount = approvedBookings.length + approvedGrants.length + 1;
+
   return (
-    <div className="rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-6 md:p-8 shadow-sm">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-slate-300 dark:border-slate-600">
+    <div className="rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-6 md:p-8 shadow-sm space-y-5 h-fit">
+      {/* (a) Tajuk Utama */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-300 dark:border-slate-600">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold tracking-wider uppercase text-black dark:text-white/75">
@@ -74,52 +77,73 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+      {/* (b) Jalur Statistik Ringkas */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit">
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-2.5 h-fit">
+          <p className="text-xs font-medium text-black/65 dark:text-white/70">Jumlah Dokumen</p>
+          <p className="text-lg font-extrabold font-mono tabular-nums text-black dark:text-white">{totalDocsCount}</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-2.5 h-fit">
+          <p className="text-xs font-medium text-black/65 dark:text-white/70">Surat Kiosk</p>
+          <p className="text-lg font-extrabold font-mono tabular-nums text-emerald-700 dark:text-emerald-400">{approvedBookings.length}</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-2.5 h-fit">
+          <p className="text-xs font-medium text-black/65 dark:text-white/70">Kelulusan Geran</p>
+          <p className="text-lg font-extrabold font-mono tabular-nums text-blue-700 dark:text-blue-400">{approvedGrants.length}</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-2.5 h-fit">
+          <p className="text-xs font-medium text-black/65 dark:text-white/70">Sijil Keahlian</p>
+          <p className="text-lg font-extrabold font-mono tabular-nums text-amber-700 dark:text-amber-400">1</p>
+        </div>
+      </div>
+
+      {/* (d) Senarai Menegak Dokumen Rasmi */}
+      <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden h-fit">
         {/* Document 1: Kiosk Offer Letter */}
         {approvedBookings.length > 0 ? (
           approvedBookings.map((b) => (
-            <div 
+            <div
               key={b.id}
-              className="rounded-2xl p-5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-sm flex flex-col justify-between"
+              className="p-4 hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-emerald-50 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-200 dark:border-emerald-800">
-                    <ShieldCheck className="w-3 h-3" /> Surat Tawaran Rasmi
-                  </span>
-                  <span className="font-mono text-[0.8125rem] font-bold text-black/70 dark:text-white/75">
-                    {b.slotCode}
-                  </span>
+              <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                <div className="w-16 h-16 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-7 h-7" />
                 </div>
 
-                <h4 className="text-base font-bold text-black dark:text-white mb-1">
-                  Surat Tawaran Kiosk Bersubsidi
-                </h4>
-                <p className="text-[0.9375rem] text-black dark:text-white/75 mb-2">
-                  {b.businessName} · {b.hubLocation} (Sewa RM{b.monthlyRate || 150}/bulan disubsidi negeri).
-                </p>
-                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mb-4 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-300 dark:border-slate-600 flex items-center justify-between">
-                  <span>Mula: <strong className="text-black dark:text-white">{formatDisplayDate(b.startDate)}</strong></span>
-                  <span>Akhir: <strong className="text-black dark:text-white/75">{calculateOperationEndDate(b.startDate, b.durationMonths)}</strong></span>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <h4 className="text-sm font-bold text-black dark:text-white truncate">
+                      Surat Tawaran Kiosk Bersubsidi · {b.slotCode}
+                    </h4>
+                    <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-200 dark:border-emerald-800">
+                      Surat Tawaran Rasmi
+                    </span>
+                  </div>
+                  <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                    {b.businessName} · {b.hubLocation} · RM{b.monthlyRate || 150}/bln · {formatDisplayDate(b.startDate)} – {calculateOperationEndDate(b.startDate, b.durationMonths)}
+                  </p>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex flex-wrap gap-2 print:hidden">
+              <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 print:hidden">
                 <button
                   type="button"
                   onClick={() => onViewOfferLetter(b)}
-                  className="flex-1 py-1.5 px-3 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer dark:bg-indigo-600"
+                  className="py-1.5 px-3 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer dark:bg-indigo-600 whitespace-nowrap"
                 >
-                  <Eye className="w-3.5 h-3.5" /> Buka & Cetak
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Buka & Cetak</span>
                 </button>
 
                 {onOpenTenancyAgreement && (
                   <button
                     type="button"
                     onClick={() => onOpenTenancyAgreement(b)}
-                    className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
+                    className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1 cursor-pointer whitespace-nowrap"
                   >
-                    <FileText className="w-3.5 h-3.5 text-black dark:text-white" /> Perjanjian Sewa
+                    <FileText className="w-3.5 h-3.5 text-black dark:text-white" />
+                    <span>Perjanjian Sewa</span>
                   </button>
                 )}
 
@@ -127,7 +151,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                   <button
                     type="button"
                     onClick={() => onOpenVerification(`KBN-${b.slotCode}`)}
-                    className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer"
+                    className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer shrink-0"
                     title="Semak Kod QR Integriti"
                   >
                     <QrCode className="w-4 h-4" />
@@ -137,14 +161,25 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
             </div>
           ))
         ) : (
-          <div className="rounded-2xl p-6 border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center text-center">
-            <FileText className="w-8 h-8 text-black/70 dark:text-white mb-2" />
-            <h5 className="text-sm font-bold text-black dark:text-white">
-              Tiada Surat Tawaran Kiosk Lagi
-            </h5>
-            <p className="text-[0.875rem] text-black/70 dark:text-white/75 max-w-xs mt-0.5">
-              Sebaik sahaja permohonan kiosk anda diluluskan oleh Pentadbir KBelia, surat tawaran rasmi akan disimpan di sini secara automatik.
-            </p>
+          <div className="p-4 bg-slate-50/60 dark:bg-slate-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3.5 min-w-0 flex-1">
+              <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black/60 dark:text-white/65 flex items-center justify-center shrink-0">
+                <FileText className="w-7 h-7" />
+              </div>
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex items-center gap-2 min-w-0">
+                  <h5 className="text-sm font-bold text-black dark:text-white truncate">
+                    Surat Tawaran Kiosk Bersubsidi
+                  </h5>
+                  <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-slate-100 dark:bg-slate-800 text-black/75 dark:text-white/80 border border-slate-300 dark:border-slate-600">
+                    Belum Tersedia
+                  </span>
+                </div>
+                <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                  Akan disimpan automatik selepas permohonan kiosk anda diluluskan oleh Pentadbir KBelia.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -152,71 +187,72 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
         {approvedGrants.map((g) => (
           <div
             key={g.id}
-            className="rounded-2xl p-5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-sm flex flex-col justify-between"
+            className="p-4 hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
           >
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-emerald-50 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-200 dark:border-emerald-800">
-                  <CheckCircle2 className="w-3 h-3" /> Kelulusan Geran ({g.grantAmount})
-                </span>
-                <span className="font-mono text-[0.8125rem] font-bold text-black/70 dark:text-white/75">
-                  {g.id.slice(0, 12).toUpperCase()}
-                </span>
+            <div className="flex items-center gap-3.5 min-w-0 flex-1">
+              <div className="w-16 h-16 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-7 h-7" />
               </div>
 
-              <h4 className="text-base font-bold text-black dark:text-white mb-1">
-                {g.programTitle}
-              </h4>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mb-4">
-                {g.businessName} · Bank Penerima: {g.bankName} ({g.bankAccountNumber})
-              </p>
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex items-center gap-2 min-w-0">
+                  <h4 className="text-sm font-bold text-black dark:text-white truncate">
+                    {g.programTitle} · {g.id.slice(0, 12).toUpperCase()}
+                  </h4>
+                  <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-200 dark:border-emerald-800">
+                    Kelulusan ({g.grantAmount})
+                  </span>
+                </div>
+                <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                  {g.businessName} · {g.bankName} ({g.bankAccountNumber}) · {g.adminNotes || 'Diluluskan untuk bayaran geran'}
+                </p>
+              </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-2 print:hidden">
-              <span className="text-[0.8125rem] text-black dark:text-white/75 font-semibold">
-                {g.adminNotes || 'Diluluskan untuk bayaran geran'}
-              </span>
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => downloadHtmlAsPdf(generateGrantApprovalOfficialHtml(g), `Surat_Kelulusan_Geran_${g.id.slice(0, 8).toUpperCase()}.pdf`)}
-                  className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" /> PDF
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openAndPrintDocument(generateGrantApprovalOfficialHtml(g), `Surat_Kelulusan_Geran_${g.id.slice(0, 8).toUpperCase()}`)}
-                  className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Printer className="w-3.5 h-3.5" /> Cetak
-                </button>
-              </div>
+            <div className="flex items-center justify-end gap-2 shrink-0 print:hidden">
+              <button
+                type="button"
+                onClick={() => downloadHtmlAsPdf(generateGrantApprovalOfficialHtml(g), `Surat_Kelulusan_Geran_${g.id.slice(0, 8).toUpperCase()}.pdf`)}
+                className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>PDF</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => openAndPrintDocument(generateGrantApprovalOfficialHtml(g), `Surat_Kelulusan_Geran_${g.id.slice(0, 8).toUpperCase()}`)}
+                className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Cetak</span>
+              </button>
             </div>
           </div>
         ))}
 
         {/* Document 2: Certificate of Youth Entrepreneurship */}
-        <div className="rounded-2xl p-5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70">
-                <Award className="w-3 h-3" /> Sijil Keahlian
-              </span>
-              <span className="font-mono text-[0.8125rem] font-bold text-black/70 dark:text-white/75">
-                {certCode}
-              </span>
+        <div className="p-4 hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3.5 min-w-0 flex-1">
+            <div className="w-16 h-16 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+              <Award className="w-7 h-7" />
             </div>
 
-            <h4 className="text-base font-bold text-black dark:text-white mb-1">
-              Sijil Pendaftaran Usahawan Belia Kelantan
-            </h4>
-            <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mb-4">
-              Pengesahan penyertaan rasmi dalam program pemerkasaan keusahawanan universiti dan kerajaan negeri.
-            </p>
+            <div className="min-w-0 flex-1 space-y-1">
+              <div className="flex items-center gap-2 min-w-0">
+                <h4 className="text-sm font-bold text-black dark:text-white truncate">
+                  Sijil Pendaftaran Usahawan Belia Kelantan · {certCode}
+                </h4>
+                <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70">
+                  Sijil Keahlian
+                </span>
+              </div>
+              <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                {resolvedName}{resolvedBusiness ? ` · ${resolvedBusiness}` : ''} · Pengesahan penyertaan rasmi program keusahawanan UMK &amp; negeri
+              </p>
+            </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex flex-wrap items-center gap-2 print:hidden">
+          <div className="flex flex-wrap items-center justify-end gap-2 shrink-0 print:hidden">
             <button
               type="button"
               onClick={() =>
@@ -232,9 +268,10 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                   `Sijil_Usahawan_Belia_${certCode}`
                 )
               }
-              className="flex-1 py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+              className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
-              <Printer className="w-3.5 h-3.5" /> Cetak Sijil
+              <Printer className="w-3.5 h-3.5" />
+              <span>Cetak Sijil</span>
             </button>
             <button
               type="button"
@@ -251,17 +288,19 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                   `Sijil_Usahawan_Belia_${certCode}.pdf`
                 )
               }
-              className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 hover:bg-slate-100 border border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
-              <Download className="w-3.5 h-3.5" /> PDF
+              <Download className="w-3.5 h-3.5" />
+              <span>PDF</span>
             </button>
             {onOpenVerification && (
               <button
                 type="button"
                 onClick={() => onOpenVerification(certCode)}
-                className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white/75 bg-rose-50 dark:bg-rose-950/60 hover:bg-amber-100 border border-rose-200 dark:border-rose-800/70 transition-colors flex items-center gap-1 cursor-pointer"
+                className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white/75 bg-rose-50 dark:bg-rose-950/60 hover:bg-amber-100 border border-rose-200 dark:border-rose-800/70 transition-colors flex items-center gap-1 cursor-pointer whitespace-nowrap"
               >
-                <ShieldCheck className="w-3.5 h-3.5" /> Pengesahan QR
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Pengesahan QR</span>
               </button>
             )}
           </div>

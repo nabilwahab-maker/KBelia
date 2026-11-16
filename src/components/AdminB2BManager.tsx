@@ -5,8 +5,6 @@ import {
   Edit3,
   Trash2,
   Search,
-  MapPin,
-  MessageCircle,
   Sparkles,
   X,
   Save
@@ -542,106 +540,83 @@ export const AdminB2BManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Existing Listings Grid */}
+      {/* Existing Listings List */}
       {filteredListings.length === 0 ? (
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 py-14 text-center">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 py-14 text-center h-fit">
           <Megaphone className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <p className="text-sm font-bold text-black dark:text-white">
             Tiada iklan Ruang Niaga sepadan dengan carian anda
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {b2bPagination.paginatedItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white dark:bg-zinc-900 rounded-xl border border-slate-300 dark:border-zinc-600 shadow-xs overflow-hidden flex flex-col justify-between"
-            >
-              <div>
-                <div className="aspect-4/3 w-full bg-slate-100 dark:bg-slate-950 overflow-hidden border-b border-slate-300 dark:border-zinc-700">
-                  <PortalImage
-                    src={resolveB2BImage(item)}
-                    alt={item.title}
-                    fallbackType="b2b"
-                    fallbackLabel={item.authorBusiness}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                <div className="p-4 space-y-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[0.8125rem] font-semibold border ${
-                        item.type === 'supply'
-                          ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-900/40'
-                          : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800/40'
-                      }`}
-                    >
-                      {item.type === 'supply' ? 'Membekal (Tawaran)' : 'Mencari Bekalan'}
-                    </span>
-                    <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono">
-                      {item.date}
-                    </span>
+        <div className="space-y-3 h-fit">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 shadow-xs overflow-hidden flex flex-col divide-y divide-slate-200 dark:divide-zinc-700 h-fit">
+            {b2bPagination.paginatedItems.map((item) => (
+              <div
+                key={item.id}
+                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-zinc-950/60 transition-colors"
+              >
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-300 dark:border-zinc-700">
+                    <PortalImage
+                      src={resolveB2BImage(item)}
+                      alt={item.title}
+                      fallbackType="b2b"
+                      fallbackLabel={item.authorBusiness}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
 
-                  <div>
-                    <h4 className="text-sm font-bold text-black dark:text-white leading-snug">
-                      {item.title}
-                    </h4>
-                    <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-medium mt-0.5">
-                      <span className="font-semibold text-black dark:text-white">{item.authorBusiness}</span>
-                      <span> · </span>
-                      <span>{item.authorName}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h4 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                        {item.title}
+                      </h4>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[0.75rem] font-semibold border shrink-0 ${
+                          item.type === 'supply'
+                            ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-900/40'
+                            : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800/40'
+                        }`}
+                      >
+                        {item.type === 'supply' ? 'Membekal' : 'Mencari'}
+                      </span>
                     </div>
-                  </div>
-
-                  <p className="text-[0.9375rem] text-black/80 dark:text-white/80 leading-relaxed line-clamp-2">
-                    {item.description}
-                  </p>
-
-                  <div className="flex items-center justify-between text-[0.8125rem] text-black/70 dark:text-white/75 pt-1">
-                    <span className="inline-flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 shrink-0" />
-                      {item.district}
-                    </span>
-                    <span className="inline-flex items-center gap-1 font-mono">
-                      <MessageCircle className="w-3.5 h-3.5 shrink-0" />
-                      +{item.whatsapp}
-                    </span>
+                    <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
+                      {item.authorBusiness} · {item.district} · +{item.whatsapp} · {item.date}
+                    </p>
                   </div>
                 </div>
-              </div>
 
-              <div className="px-4 py-3 border-t border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-950 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleOpenEdit(item)}
-                  className="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-800 text-black dark:text-white text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Edit</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(item)}
-                  className="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 hover:bg-rose-100 text-black dark:text-white text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Padam</span>
-                </button>
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEdit(item)}
+                    className="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-800 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(item)}
+                    className="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 hover:bg-rose-100 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Padam</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        <PaginationBar
-          currentPage={b2bPagination.currentPage}
-          totalItems={b2bPagination.totalItems}
-          itemsPerPage={5}
-          onPageChange={b2bPagination.setCurrentPage}
-          itemLabel="iklan"
-          accent="teal"
-        />
+            ))}
+          </div>
+          <PaginationBar
+            currentPage={b2bPagination.currentPage}
+            totalItems={b2bPagination.totalItems}
+            itemsPerPage={5}
+            onPageChange={b2bPagination.setCurrentPage}
+            itemLabel="iklan"
+            accent="teal"
+          />
         </div>
       )}
     </div>

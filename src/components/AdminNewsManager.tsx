@@ -258,20 +258,20 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
       </div>
 
       {/* Compact Stats Row (Single-elevation, Tabular numerals) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 h-fit">
           <div className="text-sm text-black/70 dark:text-white/75 font-medium">Jumlah Artikel</div>
           <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.total}</div>
         </div>
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 h-fit">
           <div className="text-sm text-black/70 dark:text-white/75 font-medium">Sedang Disiar</div>
           <div className="text-xl font-black text-black dark:text-white/75 tabular-nums mt-0.5">{stats.published}</div>
         </div>
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 h-fit">
           <div className="text-sm text-black/70 dark:text-white/75 font-medium">Draf Admin</div>
           <div className="text-xl font-black text-black dark:text-white/75 tabular-nums mt-0.5">{stats.draft}</div>
         </div>
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
+        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 h-fit">
           <div className="text-sm text-black/70 dark:text-white/75 font-medium">Berita Utama Dipin</div>
           <div className="text-xl font-black text-black dark:text-white/75 tabular-nums mt-0.5">{stats.pinned}</div>
         </div>
@@ -495,14 +495,14 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 flex flex-col divide-y divide-slate-200 dark:divide-zinc-700 overflow-hidden h-fit">
           {filteredList.map(item => (
             <div
               key={item.id}
-              className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors"
+              className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-zinc-950/60 transition-colors"
             >
-              <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                <div className="w-20 h-14 sm:w-24 sm:h-16 rounded-xl bg-slate-100 dark:bg-zinc-800 overflow-hidden shrink-0 border border-slate-300 dark:border-zinc-600">
+              <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-zinc-800 overflow-hidden shrink-0 border border-slate-300 dark:border-zinc-600">
                   {item.imageUrl ? (
                     <img
                       src={item.imageUrl}
@@ -517,28 +517,23 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                   )}
                 </div>
 
-                <div className="min-w-0 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2 text-[0.8125rem] font-medium text-black/70 dark:text-white/75 tabular-nums">
-                    <span className="font-semibold text-black dark:text-white/75">{item.category}</span>
-                    <span aria-hidden="true">·</span>
-                    <span className={item.status === 'published' ? 'text-black dark:text-white/75 font-semibold' : 'text-black dark:text-white/75 font-semibold'}>
-                      {item.status === 'published' ? 'Disiar' : 'Draf (Admin)'}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <h4 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                      {item.title}
+                    </h4>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[0.75rem] font-bold shrink-0 border ${
+                        item.status === 'published'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
+                          : 'bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800 text-black dark:text-white'
+                      }`}
+                    >
+                      {item.status === 'published' ? 'Disiar' : 'Draf'}
                     </span>
-                    {item.isPinned && (
-                      <>
-                        <span aria-hidden="true">·</span>
-                        <span className="text-black dark:text-white font-semibold">Berita Utama Dipin</span>
-                      </>
-                    )}
-                    <span aria-hidden="true">·</span>
-                    <span>{formatDate(item.publishedAt || item.updatedAt)}</span>
                   </div>
-
-                  <h4 className="text-sm font-bold text-black dark:text-white line-clamp-1">
-                    {item.title}
-                  </h4>
-                  <p className="text-[0.9375rem] text-black dark:text-white/75 line-clamp-2">
-                    {item.summary}
+                  <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
+                    {item.category}{item.isPinned ? ' · Dipin' : ''} · {formatDate(item.publishedAt || item.updatedAt)} · {item.summary}
                   </p>
                 </div>
               </div>
@@ -564,7 +559,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                   onClick={() => handleQuickToggleStatus(item)}
                   className={`px-2.5 py-1.5 rounded-lg border text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                     item.status === 'published'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border-emerald-200 dark:border-emerald-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border-emerald-200 dark:border-emerald-800 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
                       : 'bg-amber-50 dark:bg-amber-950/50 text-black dark:text-white border-amber-200 dark:border-amber-800 hover:bg-emerald-50 hover:text-black dark:hover:text-white'
                   }`}
                   title={item.status === 'published' ? 'Tukar kepada Draf' : 'Siarkan Sekarang'}

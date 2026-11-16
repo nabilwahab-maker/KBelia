@@ -426,6 +426,26 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
         </div>
       </div>
 
+      {/* Ringkasan Statistik Ringkas */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-700 h-fit">
+          <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block">Jumlah Topik</span>
+          <span className="text-lg font-black text-slate-900 dark:text-white tabular-nums">{posts.length}</span>
+        </div>
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-700 h-fit">
+          <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block">Terjawab</span>
+          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{posts.filter(p => p.status === 'resolved').length}</span>
+        </div>
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-700 h-fit">
+          <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block">Belum Terjawab</span>
+          <span className="text-lg font-black text-amber-700 dark:text-amber-400 tabular-nums">{posts.filter(p => p.status !== 'resolved').length}</span>
+        </div>
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-700 h-fit">
+          <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block">Jumlah Balasan</span>
+          <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{replies.length}</span>
+        </div>
+      </div>
+
       {/* Filter, Search & Sort Toolbar */}
       <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-slate-200/80 dark:border-zinc-800 space-y-3.5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -568,8 +588,8 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
           </div>
         </div>
       ) : (
-        /* Structured Forum Topic Feed */
-        <div className="space-y-3.5">
+        /* Structured Minimalist Forum Topic List */
+        <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-zinc-800 h-fit">
           {filteredPosts.map(post => {
             const hasVoted = post.helpfulUserIds.includes(currentUserId);
             const totalReplies = getReplyCount(post);
@@ -579,108 +599,83 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
               <article
                 key={post.id}
                 onClick={() => setSelectedPostId(post.id)}
-                className={`group rounded-2xl bg-white dark:bg-zinc-900 border p-5 sm:p-6 transition-colors cursor-pointer space-y-3 ${
-                  post.isPinned
-                    ? 'border-blue-300/90 dark:border-blue-800/80'
-                    : 'border-slate-200/80 dark:border-zinc-800 hover:border-blue-300 dark:hover:border-blue-700'
+                className={`p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 transition-colors cursor-pointer hover:bg-slate-50/80 dark:hover:bg-zinc-800/60 ${
+                  post.isPinned ? 'bg-blue-50/35 dark:bg-blue-950/15' : ''
                 }`}
               >
-                {/* Unboxed Inline Metadata Row (Zero-Pill Discipline) */}
-                <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500 dark:text-zinc-400">
-                  <div className="flex flex-wrap items-center gap-2 tabular-nums">
-                    {post.isPinned && (
-                      <>
-                        <span className="inline-flex items-center gap-1 font-bold text-blue-700 dark:text-blue-400">
-                          <Pin className="w-3.5 h-3.5" />
-                          <span>Topik Dipin</span>
-                        </span>
-                        <span aria-hidden="true">·</span>
-                      </>
-                    )}
-                    <span className="font-bold text-blue-700 dark:text-blue-400">{post.category}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{post.district}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{formatDate(post.createdAt)}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>
-                      <strong className="font-semibold text-slate-800 dark:text-zinc-200">{post.authorName}</strong>{' '}
-                      ({ROLE_LABEL[post.authorRole]})
-                    </span>
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className={`w-16 h-16 rounded-lg border flex flex-col items-center justify-center shrink-0 ${
+                    post.isPinned
+                      ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-300'
+                      : post.status === 'resolved'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                      : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 text-slate-600 dark:text-zinc-300'
+                  }`}>
+                    {post.isPinned ? <Pin className="w-4 h-4" /> : <MessagesSquare className="w-4 h-4" />}
+                    <span className="text-[0.6875rem] font-bold tabular-nums mt-0.5">{totalReplies} bls</span>
                   </div>
 
-                  <span
-                    className={`inline-flex items-center gap-1 font-bold text-[0.8125rem] whitespace-nowrap px-2.5 py-0.5 rounded-md border ${
-                      post.status === 'resolved'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
-                        : 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800 text-black dark:text-white'
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
+                        {post.title}
+                      </h2>
+                      <span
+                        className={`inline-flex items-center gap-1 font-bold text-xs whitespace-nowrap px-2 py-0.5 rounded-md border shrink-0 ${
+                          post.status === 'resolved'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
+                            : 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800 text-black dark:text-white'
+                        }`}
+                      >
+                        {post.status === 'resolved' ? 'Terjawab' : 'Belum Terjawab'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-600 dark:text-zinc-300 truncate tabular-nums">
+                      {post.category} · {post.district} · {post.authorName} ({ROLE_LABEL[post.authorRole]}) · {formatDate(post.createdAt)} · {post.content}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <button
+                    type="button"
+                    onClick={(e) => handleToggleHelpful(e, post)}
+                    className={`px-2.5 py-2 rounded-lg border text-xs font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer tabular-nums ${
+                      hasVoted
+                        ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800 text-black dark:text-white'
+                        : 'bg-slate-50 dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800'
                     }`}
                   >
-                    {post.status === 'resolved' && <CheckCircle2 className="w-3.5 h-3.5" />}
-                    <span>{post.status === 'resolved' ? 'Terjawab' : 'Menunggu Jawapan'}</span>
-                  </span>
-                </div>
+                    <ThumbsUp className="w-3.5 h-3.5" />
+                    <span>{post.helpfulCount || 0}</span>
+                  </button>
 
-                {/* Title & Excerpt */}
-                <div className="space-y-1.5">
-                  <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight text-balance group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
-                    {post.title}
-                  </h2>
-                  <p className="text-[0.9375rem] text-slate-600 dark:text-zinc-300 leading-relaxed line-clamp-2">
-                    {post.content}
-                  </p>
-                </div>
-
-                {/* Action Footer */}
-                <div className="pt-3 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex flex-wrap items-center gap-2">
+                  {isAdmin && (
                     <button
                       type="button"
-                      onClick={(e) => handleToggleHelpful(e, post)}
-                      className={`px-3 py-1.5 rounded-lg border text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer tabular-nums ${
-                        hasVoted
-                          ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800 text-black dark:text-white'
-                          : 'bg-slate-50 dark:bg-zinc-950 border-slate-200 dark:border-zinc-800 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800'
-                      }`}
+                      onClick={(e) => handleAdminPinToggle(e, post)}
+                      className="p-2 rounded-lg border border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-zinc-400 hover:text-blue-700 dark:hover:text-blue-400 cursor-pointer"
+                      title={post.isPinned ? 'Nyahpin Topik' : 'Pin Topik di Atas'}
                     >
-                      <ThumbsUp className="w-3.5 h-3.5" />
-                      <span>Bermanfaat · {post.helpfulCount || 0}</span>
+                      <Pin className="w-3.5 h-3.5" />
                     </button>
+                  )}
 
-                    <span className="px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-zinc-950 border border-slate-200/80 dark:border-zinc-800 text-sm font-semibold text-slate-600 dark:text-zinc-300 inline-flex items-center gap-1.5 tabular-nums">
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      <span>{totalReplies} balasan</span>
-                    </span>
-                  </div>
+                  {canManagePost && (
+                    <button
+                      type="button"
+                      onClick={(e) => handleTogglePostStatus(e, post)}
+                      className="p-2 rounded-lg border border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 cursor-pointer"
+                      title={post.status === 'resolved' ? 'Buka Semula Topik' : 'Tanda Sudah Terjawab'}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
 
-                  <div className="flex items-center gap-2">
-                    {isAdmin && (
-                      <button
-                        type="button"
-                        onClick={(e) => handleAdminPinToggle(e, post)}
-                        className="p-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-zinc-400 hover:text-blue-700 dark:hover:text-blue-400 cursor-pointer"
-                        title={post.isPinned ? 'Nyahpin Topik' : 'Pin Topik di Atas'}
-                      >
-                        <Pin className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-
-                    {canManagePost && (
-                      <button
-                        type="button"
-                        onClick={(e) => handleTogglePostStatus(e, post)}
-                        className="p-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 cursor-pointer"
-                        title={post.status === 'resolved' ? 'Buka Semula Topik' : 'Tanda Sudah Terjawab'}
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-
-                    <span className="inline-flex items-center gap-1 text-sm font-bold text-blue-700 dark:text-blue-400 whitespace-nowrap">
-                      <span>Lihat Perbincangan</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
-                  </div>
+                  <span className="py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1 whitespace-nowrap">
+                    <span>Lihat</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
                 </div>
               </article>
             );

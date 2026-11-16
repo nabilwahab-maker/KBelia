@@ -3,7 +3,6 @@ import {
   Users,
   Store,
   GraduationCap,
-  Shield,
   MessageSquare,
   Search,
   PieChart as PieChartIcon,
@@ -39,7 +38,7 @@ import {
 } from '../types';
 import { PaginationBar, usePagination } from './PaginationBar';
 
-export type ReportUserTypeKey = 'all' | 'usahawan' | 'mentor' | 'pentadbir' | 'komuniti';
+export type ReportUserTypeKey = 'all' | 'usahawan' | 'mentor' | 'komuniti';
 
 interface UserTypeReportRecord {
   id: string;
@@ -61,9 +60,9 @@ interface UserTypeReportSectionProps {
   grantApplications: GrantApplication[];
   mentors: MentorProfile[];
   mentorshipRegistrations: MentorshipRegistration[];
-  maintenanceTickets: MaintenanceTicket[];
-  programs: YouthProgram[];
-  newsItems: PortalNews[];
+  maintenanceTickets?: MaintenanceTicket[];
+  programs?: YouthProgram[];
+  newsItems?: PortalNews[];
   communityPosts: CommunityPost[];
   portalSettings?: PortalSettings;
 }
@@ -79,11 +78,6 @@ const USER_TYPE_COLORS: Record<Exclude<ReportUserTypeKey, 'all'>, { fill: string
     label: 'Panel Mentor',
     badgeBg: 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70'
   },
-  pentadbir: {
-    fill: '#4F46E5',
-    label: 'Pentadbir Negeri',
-    badgeBg: 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800/70'
-  },
   komuniti: {
     fill: '#D97706',
     label: 'Komuniti & Awam',
@@ -97,11 +91,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
   grantApplications = [],
   mentors = [],
   mentorshipRegistrations = [],
-  maintenanceTickets = [],
-  programs = [],
-  newsItems = [],
-  communityPosts = [],
-  portalSettings
+  communityPosts = []
 }) => {
   const [selectedType, setSelectedType] = useState<ReportUserTypeKey>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -239,26 +229,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
       });
     });
 
-    // 3. Pentadbir Negeri
-    const approvedBookingsCount = bookings.filter((b) => b.status === 'approved').length;
-    const approvedGrantsCount = grantApplications.filter((g) => g.status === 'approved').length;
-    const resolvedTicketsCount = maintenanceTickets.filter((t) => t.status === 'resolved').length;
-
-    records.push({
-      id: 'usr-adm-lead',
-      displayName: portalSettings?.adminOfficerName || 'Pegawai Pentadbir Utama KBelia',
-      secondaryEntity: 'Unit Keusahawanan Belia Negeri & UMK',
-      userType: 'pentadbir',
-      userTypeLabel: 'Pentadbir Negeri',
-      locationOrAgency: 'Pejabat Pentadbiran Negeri Kelantan',
-      activitySummary: `${approvedBookingsCount + approvedGrantsCount} Kelulusan · ${programs.length} Program · ${newsItems.length} Hebahan`,
-      metricDisplay: `${resolvedTicketsCount}/${maintenanceTickets.length} Aduan Selesai`,
-      statusLabel: portalSettings?.systemStatus === 'maintenance' ? 'Selenggara' : 'Beroperasi',
-      statusTone: 'indigo',
-      detailLine: `Telefon Pentadbiran: ${portalSettings?.adminHelpdeskPhone || '+6011-23456789'} · Subsidi Sewa: ${portalSettings?.portalSubsidyRate ?? 50}%`
-    });
-
-    // 4. Komuniti & Pelawat Awam
+    // 3. Komuniti & Pelawat Awam
     communityPosts.forEach((post) => {
       records.push({
         id: `usr-com-${post.id}`,
@@ -282,18 +253,13 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
     grantApplications,
     mentors,
     mentorshipRegistrations,
-    maintenanceTickets,
-    programs,
-    newsItems,
-    communityPosts,
-    portalSettings
+    communityPosts
   ]);
 
   const countsByType = useMemo(() => {
     const counts = {
       usahawan: 0,
       mentor: 0,
-      pentadbir: 0,
       komuniti: 0
     };
     consolidatedRecords.forEach((r) => {
@@ -314,8 +280,6 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             ? 'Usahawan'
             : key === 'mentor'
             ? 'Mentor'
-            : key === 'pentadbir'
-            ? 'Pentadbir'
             : 'Komuniti',
         count: countsByType[key],
         percentage: Math.round((countsByType[key] / totalCount) * 100),
@@ -362,7 +326,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             </h3>
           </div>
           <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
-            Susunan bersepadu rekod Usahawan Belia, Panel Mentor, Pentadbir Negeri, dan Komuniti Awam
+            Susunan bersepadu rekod Usahawan Belia, Panel Mentor, dan Komuniti Awam
           </p>
         </div>
         <span className="text-sm font-mono font-bold px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black dark:text-white tabular-nums self-start sm:self-auto">
@@ -371,10 +335,10 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
       </div>
 
       <div className="p-5 sm:p-6 space-y-6">
-        {/* Top Row: 4 User-Type Summary Cards + Clean Percentage Donut Chart */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-          {/* Left 7 Cols: 4 User Type Cards */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Top Row: 3 User-Type Summary Cards + Clean Percentage Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* Left 7 Cols: 3 User Type Cards */}
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <button
               type="button"
               onClick={() => setSelectedType(selectedType === 'usahawan' ? 'all' : 'usahawan')}
@@ -433,34 +397,6 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
 
             <button
               type="button"
-              onClick={() => setSelectedType(selectedType === 'pentadbir' ? 'all' : 'pentadbir')}
-              className={`p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
-                selectedType === 'pentadbir'
-                  ? 'bg-indigo-50/90 dark:bg-indigo-950/40 border-indigo-600 ring-1 ring-indigo-500/40'
-                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-indigo-50/40 dark:hover:bg-zinc-800/70'
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Pentadbir Negeri</span>
-                <div className="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0">
-                  <Shield className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums">
-                  {countsByType.pentadbir}
-                </span>
-                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {Math.round((countsByType.pentadbir / totalCount) * 100)}%
-                </span>
-              </div>
-              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
-                {programs.length} program · {newsItems.length} berita · {maintenanceTickets.length} aduan
-              </p>
-            </button>
-
-            <button
-              type="button"
               onClick={() => setSelectedType(selectedType === 'komuniti' ? 'all' : 'komuniti')}
               className={`p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
                 selectedType === 'komuniti'
@@ -489,7 +425,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
           </div>
 
           {/* Right 5 Cols: BarChart Default + Donut Toggle for User Types */}
-          <div className="lg:col-span-5 min-w-0 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 p-4 sm:p-5 flex flex-col justify-between">
+          <div className="lg:col-span-5 min-w-0 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 p-4 sm:p-5 flex flex-col justify-between h-fit">
             <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-700">
               <div className="flex items-center gap-2">
                 {chartMode === 'bar' ? (
@@ -682,7 +618,6 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                 { id: 'all', label: `Semua (${consolidatedRecords.length})` },
                 { id: 'usahawan', label: `Usahawan (${countsByType.usahawan})` },
                 { id: 'mentor', label: `Mentor (${countsByType.mentor})` },
-                { id: 'pentadbir', label: `Pentadbir (${countsByType.pentadbir})` },
                 { id: 'komuniti', label: `Komuniti (${countsByType.komuniti})` }
               ] as const
             ).map((tab) => (

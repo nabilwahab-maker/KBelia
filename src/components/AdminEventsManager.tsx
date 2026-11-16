@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   Calendar,
-  MapPin,
-  Store,
   Plus,
   Edit3,
   Trash2,
@@ -238,135 +236,136 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
       </div>
 
       {subView === 'catalog' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {events.map((evt) => (
-            <div
-              key={evt.id}
-              className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col justify-between"
-            >
-              <div>
-                <div className="h-40 w-full bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 overflow-hidden">
-                  <PortalImage
-                    src={resolveEventImage(evt.category, evt.imageUrl)}
-                    alt={evt.title}
-                    fallbackType="event"
-                    fallbackLabel={evt.category}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-4 space-y-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-[0.75rem] font-extrabold uppercase bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-black dark:text-white">
-                      {evt.category}
-                    </span>
-                    <span className="text-sm font-bold text-black dark:text-white/80 tabular-nums">{evt.fee}</span>
-                  </div>
-                  <h4 className="font-bold text-base text-black dark:text-white leading-snug">{evt.title}</h4>
-                  <p className="text-sm text-black/75 dark:text-white/80 line-clamp-2">{evt.description}</p>
-                  <div className="text-sm text-black/70 dark:text-white/75 space-y-1 pt-1">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 shrink-0" />
-                      <span>{evt.date} · {evt.time}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">{evt.location} ({evt.district})</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 tabular-nums">
-                      <Store className="w-3.5 h-3.5 shrink-0" />
-                      <span>{evt.boothsAvailable} kosong drpd {evt.totalBooths} tapak</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => openEditEvent(evt)}
-                  className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Edit</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    confirmDelete({
-                      itemName: evt.title,
-                      itemType: 'Acara Belia',
-                      onConfirm: () => handleDeleteEvent(evt)
-                    })
-                  }
-                  className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Padam</span>
-                </button>
-              </div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
+          {events.length === 0 ? (
+            <div className="p-10 text-center text-sm text-black/70 dark:text-white/75">
+              Tiada acara usahawan belia direkodkan.
             </div>
-          ))}
+          ) : (
+            events.map((evt) => (
+              <div
+                key={evt.id}
+                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors"
+              >
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 overflow-hidden shrink-0">
+                    <PortalImage
+                      src={resolveEventImage(evt.category, evt.imageUrl)}
+                      alt={evt.title}
+                      fallbackType="event"
+                      fallbackLabel={evt.category}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h4 className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
+                        {evt.title}
+                      </h4>
+                      <span className="px-2 py-0.5 rounded text-[0.75rem] font-bold uppercase shrink-0 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-black dark:text-white">
+                        {evt.category}
+                      </span>
+                    </div>
+                    <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
+                      {evt.date} · {evt.location} ({evt.district}) · {evt.boothsAvailable}/{evt.totalBooths} tapak · {evt.fee}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <button
+                    type="button"
+                    onClick={() => openEditEvent(evt)}
+                    className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      confirmDelete({
+                        itemName: evt.title,
+                        itemType: 'Acara Belia',
+                        onConfirm: () => handleDeleteEvent(evt)
+                      })
+                    }
+                    className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Padam</span>
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-black dark:text-white">
-              <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 text-[0.8125rem] uppercase tracking-wider text-black/75 dark:text-white/80 font-bold">
-                <tr>
-                  <th className="p-4">Peserta</th>
-                  <th className="p-4">Nama Acara</th>
-                  <th className="p-4">Status Tempahan</th>
-                  <th className="p-4 text-right">Tindakan</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                {eventBookings.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="p-10 text-center text-black/70 dark:text-white/75">
-                      Belum ada rekod tempahan tapak acara diterima.
-                    </td>
-                  </tr>
-                ) : (
-                  eventBookings.map((b) => (
-                    <tr key={b.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-900/40">
-                      <td className="p-4">
-                        <div className="font-bold text-black dark:text-white">{b.userName || 'Usahawan Belia'}</div>
-                        <div className="text-[0.8125rem] font-mono text-black/65 dark:text-white/65">{b.userId}</div>
-                      </td>
-                      <td className="p-4 font-semibold text-black dark:text-white">{b.eventTitle}</td>
-                      <td className="p-4">
-                        <select
-                          aria-label={`Tukar status tempahan ${b.eventTitle}`}
-                          value={b.status}
-                          onChange={(e) => handleBookingStatusChange(b, e.target.value as 'booked' | 'cancelled')}
-                          className="px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
-                        >
-                          <option value="booked">Ditempah (Aktif)</option>
-                          <option value="cancelled">Dibatalkan</option>
-                        </select>
-                      </td>
-                      <td className="p-4 text-right">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            confirmDelete({
-                              itemName: `${b.userName || 'Peserta'} — ${b.eventTitle}`,
-                              itemType: 'Tempahan Tapak Acara',
-                              onConfirm: () => handleDeleteBooking(b)
-                            })
-                          }
-                          className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Padam</span>
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
+          {eventBookings.length === 0 ? (
+            <div className="p-10 text-center text-sm text-black/70 dark:text-white/75">
+              Belum ada rekod tempahan tapak acara diterima.
+            </div>
+          ) : (
+            eventBookings.map((b) => (
+              <div
+                key={b.id}
+                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors"
+              >
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="w-16 h-16 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-700 dark:text-indigo-300 shrink-0">
+                    <Users className="w-6 h-6" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h4 className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
+                        {b.userName || 'Usahawan Belia'}
+                      </h4>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[0.75rem] font-bold shrink-0 border ${
+                          b.status === 'booked'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
+                            : 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-black dark:text-white'
+                        }`}
+                      >
+                        {b.status === 'booked' ? 'Ditempah' : 'Dibatalkan'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5">
+                      {b.eventTitle} · ID: {b.userId}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <select
+                    aria-label={`Tukar status tempahan ${b.eventTitle}`}
+                    value={b.status}
+                    onChange={(e) => handleBookingStatusChange(b, e.target.value as 'booked' | 'cancelled')}
+                    className="px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
+                  >
+                    <option value="booked">Ditempah (Aktif)</option>
+                    <option value="cancelled">Dibatalkan</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      confirmDelete({
+                        itemName: `${b.userName || 'Peserta'} — ${b.eventTitle}`,
+                        itemType: 'Tempahan Tapak Acara',
+                        onConfirm: () => handleDeleteBooking(b)
+                      })
+                    }
+                    className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Padam</span>
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 

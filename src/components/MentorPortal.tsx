@@ -907,13 +907,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           </div>
 
           {/* Asymmetric Bento Grid (lg:grid-cols-12): Left Analytics + Temujanji, Right Perakuan Geran */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
               
               {/* Left Span (7 Cols): Interactive Recharts Analytics + Temujanji Terdekat */}
-              <div className="lg:col-span-7 min-w-0 space-y-5">
+              <div className="lg:col-span-7 min-w-0 space-y-5 h-fit">
 
                 {/* Interactive Recharts District & Endorsement Distribution */}
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-slate-300 dark:border-zinc-700 shadow-sm min-w-0">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-slate-300 dark:border-zinc-700 shadow-sm min-w-0 h-fit">
                   <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-600 mb-4">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-black dark:text-white/80" />
@@ -926,8 +926,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     </span>
                   </div>
 
-                  <div className="h-80 min-h-[320px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                    <ResponsiveContainer width="100%" height={320} minWidth={0} initialDimension={{ width: 520, height: 320 }}>
+                  <div className="h-[260px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                    <ResponsiveContainer width="100%" height={260} minWidth={0} initialDimension={{ width: 520, height: 260 }}>
                       <BarChart
                         data={mentorChartData}
                         barCategoryGap="16%"
@@ -993,7 +993,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
 
                 {/* Temujanji Terdekat & Tindakan Segera */}
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col justify-between">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col h-fit">
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
                     <div className="flex items-center gap-2">
@@ -1129,7 +1129,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
 
               {/* Right Span (5 Cols): Status Perakuan Geran & Dana Benih */}
-              <div className="lg:col-span-5 h-full bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col justify-between">
+              <div className="lg:col-span-5 h-fit bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col">
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
                     <div className="flex items-center gap-2">
@@ -1236,69 +1236,38 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 text-[0.8125rem] font-semibold text-black/70 dark:text-white/75">
-                      <th className="py-3 px-4">Usahawan & Perniagaan</th>
-                      <th className="py-3 px-4">Jajahan</th>
-                      <th className="py-3 px-4">Kategori</th>
-                      <th className="py-3 px-4">Status Sesi</th>
-                      <th className="py-3 px-4">Status Geran</th>
-                      <th className="py-3 px-4 text-right">Tindakan</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-300 dark:divide-slate-600">
-                    {overviewPagination.paginatedItems.map((mentee) => {
-                      const hasEndorsement = mentorEndorsements.some(e => e.menteeName.toLowerCase() === mentee.entrepreneurName.toLowerCase());
-                      const visuals = resolveMenteeVisuals(
-                        {
-                          applicantId: mentee.applicantId,
-                          entrepreneurName: mentee.entrepreneurName,
-                          businessName: mentee.businessName,
-                          category: mentee.businessCategory
-                        },
-                        businesses
-                      );
-                      return (
-                        <tr 
-                          key={mentee.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
-                        >
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-3">
-                              <div className="relative w-12 h-10 shrink-0">
-                                <div className="w-full h-full rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
-                                  <PortalImage
-                                    src={visuals.businessUrl}
-                                    alt={mentee.businessName}
-                                    fallbackType="business"
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-white dark:border-slate-900 shadow-xs absolute -bottom-1 -right-1 bg-white dark:bg-slate-800">
-                                  <PortalImage
-                                    src={visuals.avatarUrl}
-                                    alt={mentee.entrepreneurName}
-                                    fallbackType="avatar"
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              </div>
-                              <div className="min-w-0">
-                                <div className="font-bold text-black dark:text-white">{mentee.entrepreneurName}</div>
-                                <div className="text-[0.8125rem] text-black/70 dark:text-white/75">{mentee.businessName}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-3 px-4 text-black dark:text-white font-medium">
-                            {mentee.district}
-                          </td>
-                          <td className="py-3 px-4 text-black/70 dark:text-white/75">
-                            {mentee.topic}
-                          </td>
-                          <td className="py-3 px-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[0.8125rem] font-semibold ${
+              <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
+                {overviewPagination.paginatedItems.map((mentee) => {
+                  const hasEndorsement = mentorEndorsements.some(e => e.menteeName.toLowerCase() === mentee.entrepreneurName.toLowerCase());
+                  const visuals = resolveMenteeVisuals(
+                    {
+                      applicantId: mentee.applicantId,
+                      entrepreneurName: mentee.entrepreneurName,
+                      businessName: mentee.businessName,
+                      category: mentee.businessCategory
+                    },
+                    businesses
+                  );
+                  return (
+                    <div
+                      key={mentee.id}
+                      className="p-3.5 sm:px-5 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    >
+                      <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                        <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 shrink-0">
+                          <PortalImage
+                            src={visuals.businessUrl}
+                            alt={mentee.businessName}
+                            fallbackType="business"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1 space-y-0.5">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <h4 className="text-sm font-bold text-black dark:text-white truncate">
+                              {mentee.entrepreneurName} · {mentee.businessName}
+                            </h4>
+                            <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
                               mentee.status === 'confirmed'
                                 ? 'bg-amber-100 text-black dark:bg-teal-600 dark:text-white'
                                 : mentee.status === 'completed'
@@ -1307,40 +1276,30 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             }`}>
                               {mentee.status === 'confirmed' ? 'Disahkan' : mentee.status === 'completed' ? 'Selesai' : 'Menunggu'}
                             </span>
-                          </td>
-                          <td className="py-3 px-4">
-                            {hasEndorsement ? (
-                              <span className="inline-flex items-center gap-1 text-[0.8125rem] font-semibold text-black dark:text-white/75">
-                                <Award className="w-3.5 h-3.5" />
-                                <span>Diperaku</span>
-                              </span>
-                            ) : (
-                              <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
-                                Belum
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            <button
-                              type="button"
-                              onClick={() => handleSubTabChange('sessions')}
-                              className="px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-semibold transition-all cursor-pointer whitespace-nowrap"
-                            >
-                              Buka Sesi
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                    {overviewRegistrations.length === 0 && (
-                      <tr>
-                        <td colSpan={6} className="py-8 text-center text-[0.9375rem] text-black/70 dark:text-white/75">
-                          Tiada rekod usahawan mentee dijumpai.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                          </div>
+                          <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                            {mentee.district} · {mentee.topic} · {hasEndorsement ? 'Geran Diperaku' : 'Belum Diperaku'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleSubTabChange('sessions')}
+                          className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap"
+                        >
+                          Buka Sesi
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {overviewRegistrations.length === 0 && (
+                  <div className="py-8 text-center text-[0.9375rem] text-black/70 dark:text-white/75">
+                    Tiada rekod usahawan mentee dijumpai.
+                  </div>
+                )}
               </div>
               {overviewRegistrations.length > 5 && (
                 <div className="px-4 pb-4">
@@ -1477,66 +1436,41 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                           >
                             <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                              <div className="relative w-14 h-11 sm:w-16 sm:h-12 shrink-0">
-                                <div className="w-full h-full rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
-                                  <PortalImage
-                                    src={visuals.businessUrl}
-                                    alt={mentee.businessName}
-                                    fallbackType="business"
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border-2 border-white dark:border-slate-900 shadow-sm absolute -bottom-1.5 -right-1.5 bg-white dark:bg-slate-800">
-                                  <PortalImage
-                                    src={visuals.avatarUrl}
-                                    alt={mentee.entrepreneurName}
-                                    fallbackType="avatar"
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
+                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 shrink-0">
+                                <PortalImage
+                                  src={visuals.businessUrl}
+                                  alt={mentee.businessName}
+                                  fallbackType="business"
+                                  className="w-full h-full object-cover"
+                                />
                               </div>
 
                               <div className="min-w-0 flex-1 space-y-0.5">
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                                  <h4 className="text-sm font-bold text-black dark:text-white leading-snug">
-                                    {mentee.entrepreneurName}
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <h4 className="text-sm font-bold text-black dark:text-white truncate">
+                                    {mentee.entrepreneurName} · {mentee.businessName}
                                   </h4>
-                                  <span className="text-black/35 dark:text-white/35 text-sm">&middot;</span>
-                                  <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">
-                                    {mentee.businessName}
+                                  <span
+                                    className={`shrink-0 inline-flex items-center text-xs font-bold px-2 py-0.5 rounded-md border whitespace-nowrap ${
+                                      isCompleted
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/70 text-black dark:text-white border-emerald-200 dark:border-emerald-800'
+                                        : isConfirmed
+                                        ? 'bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border-teal-200 dark:border-teal-800/70'
+                                        : isPending
+                                        ? 'bg-amber-50 dark:bg-amber-950/70 text-black dark:text-white border-amber-200 dark:border-amber-800'
+                                        : 'bg-rose-50 dark:bg-rose-950/70 text-black dark:text-white border-rose-200 dark:border-rose-800'
+                                    }`}
+                                  >
+                                    {isCompleted ? 'Selesai' : isConfirmed ? 'Disahkan' : isPending ? 'Menunggu' : 'Dibatalkan'}
                                   </span>
                                 </div>
-                                <p className="text-[0.875rem] text-black/70 dark:text-white/75 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 leading-relaxed">
-                                  <span>{mentee.district || 'Kelantan'}</span>
-                                  <span>&middot;</span>
-                                  <span>{mentee.businessCategory || 'Perniagaan Belia'}</span>
-                                  <span>&middot;</span>
-                                  <span className="font-medium text-black dark:text-white">{mentee.topic}</span>
-                                  {mentee.preferredDate && (
-                                    <>
-                                      <span>&middot;</span>
-                                      <span className="tabular-nums">{mentee.preferredDate} ({mentee.preferredTime || '10:00 AM'})</span>
-                                    </>
-                                  )}
+                                <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                                  {mentee.district || 'Kelantan'} · {mentee.businessCategory || 'Perniagaan Belia'} · {mentee.topic}{mentee.preferredDate ? ` · ${mentee.preferredDate} (${mentee.preferredTime || '10:00 AM'})` : ''}
                                 </p>
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pl-17 sm:pl-0">
-                              <span
-                                className={`inline-flex items-center text-[0.8125rem] font-bold px-2.5 py-1 rounded-lg border whitespace-nowrap ${
-                                  isCompleted
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/70 text-black dark:text-white border-emerald-200 dark:border-emerald-800'
-                                    : isConfirmed
-                                    ? 'bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border-teal-200 dark:border-teal-800/70'
-                                    : isPending
-                                    ? 'bg-amber-50 dark:bg-amber-950/70 text-black dark:text-white border-amber-200 dark:border-amber-800'
-                                    : 'bg-rose-50 dark:bg-rose-950/70 text-black dark:text-white border-rose-200 dark:border-rose-800'
-                                }`}
-                              >
-                                {isCompleted ? 'Selesai' : isConfirmed ? 'Disahkan' : isPending ? 'Menunggu' : 'Dibatalkan'}
-                              </span>
-
+                            <div className="flex items-center justify-end gap-2 shrink-0">
                               <button
                                 type="button"
                                 onClick={(e) => {
@@ -1726,48 +1660,31 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                           >
                             <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                              <div className="relative w-14 h-11 shrink-0">
-                                <div className="w-full h-full rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
-                                  <PortalImage
-                                    src={visuals.businessUrl}
-                                    alt={mentee.businessName}
-                                    fallbackType="business"
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <div className="w-7 h-7 rounded-full overflow-hidden border-2 border-white dark:border-slate-900 shadow-sm absolute -bottom-1.5 -right-1.5 bg-white dark:bg-slate-800">
-                                  <PortalImage
-                                    src={visuals.avatarUrl}
-                                    alt={mentee.entrepreneurName}
-                                    fallbackType="avatar"
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
+                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 shrink-0">
+                                <PortalImage
+                                  src={visuals.businessUrl}
+                                  alt={mentee.businessName}
+                                  fallbackType="business"
+                                  className="w-full h-full object-cover"
+                                />
                               </div>
 
                               <div className="min-w-0 flex-1 space-y-0.5">
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                                  <h4 className="text-sm font-bold text-black dark:text-white">
-                                    {mentee.entrepreneurName}
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <h4 className="text-sm font-bold text-black dark:text-white truncate">
+                                    {mentee.entrepreneurName} · {mentee.businessName}
                                   </h4>
-                                  <span className="text-black/35 dark:text-white/35 text-sm">&middot;</span>
-                                  <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">
-                                    {mentee.businessName}
+                                  <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
+                                    {mentee.meetingLink ? 'Google Meet' : 'Bersemuka'}
                                   </span>
                                 </div>
-                                <p className="text-[0.875rem] text-black/70 dark:text-white/75 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 tabular-nums">
-                                  <span className="font-semibold text-black dark:text-white">
-                                    {mentee.preferredDate || 'Akan Ditetapkan'} &middot; {mentee.preferredTime || '10:00 AM'}
-                                  </span>
-                                  <span>&middot;</span>
-                                  <span>{mentee.meetingLink ? 'Google Meet Maya' : 'Bilik Bimbingan UMK CEED'}</span>
-                                  <span>&middot;</span>
-                                  <span>{mentee.district || 'Kelantan'}</span>
+                                <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                                  {mentee.preferredDate || 'Akan Ditetapkan'} · {mentee.preferredTime || '10:00 AM'} · {mentee.meetingLink ? 'Google Meet Maya' : 'Bilik Bimbingan UMK CEED'} · {mentee.district || 'Kelantan'}
                                 </p>
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pl-17 sm:pl-0">
+                            <div className="flex items-center justify-end gap-2 shrink-0">
                               {mentee.meetingLink && (
                                 <a
                                   href={mentee.meetingLink}
@@ -1916,46 +1833,31 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                           >
                             <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                              <div className="relative w-14 h-11 shrink-0">
-                                <div className="w-full h-full rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800">
-                                  <PortalImage
-                                    src={visuals.businessUrl}
-                                    alt={mentee.businessName}
-                                    fallbackType="business"
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <div className="w-7 h-7 rounded-full overflow-hidden border-2 border-white dark:border-slate-900 shadow-sm absolute -bottom-1.5 -right-1.5 bg-white dark:bg-slate-800">
-                                  <PortalImage
-                                    src={visuals.avatarUrl}
-                                    alt={mentee.entrepreneurName}
-                                    fallbackType="avatar"
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
+                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 shrink-0">
+                                <PortalImage
+                                  src={visuals.businessUrl}
+                                  alt={mentee.businessName}
+                                  fallbackType="business"
+                                  className="w-full h-full object-cover"
+                                />
                               </div>
 
                               <div className="min-w-0 flex-1 space-y-0.5">
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                                  <h4 className="text-sm font-bold text-black dark:text-white">
-                                    {mentee.entrepreneurName}
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <h4 className="text-sm font-bold text-black dark:text-white truncate">
+                                    {mentee.entrepreneurName} · {mentee.businessName}
                                   </h4>
-                                  <span className="text-black/35 dark:text-white/35 text-sm">&middot;</span>
-                                  <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">
-                                    {mentee.businessName}
+                                  <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70">
+                                    Tersimpan
                                   </span>
                                 </div>
-                                <p className="text-[0.875rem] text-black/70 dark:text-white/75 flex flex-wrap items-center gap-x-1.5">
-                                  <span>{mentee.topic}</span>
-                                  <span>&middot;</span>
-                                  <span>{mentee.district || 'Kelantan'}</span>
-                                  <span>&middot;</span>
-                                  <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Tersimpan</span>
+                                <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                                  {mentee.topic} · {mentee.district || 'Kelantan'}
                                 </p>
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-end gap-2 shrink-0 pl-17 sm:pl-0">
+                            <div className="flex items-center justify-end gap-2 shrink-0">
                               <button
                                 type="button"
                                 onClick={(e) => {
@@ -2064,61 +1966,44 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
             ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden h-fit">
                 {endorsementsPagination.paginatedItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-4 space-y-3 hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all shadow-2xs flex flex-col justify-between"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 px-2 py-0.5 rounded">
-                        {item.endorsementCode}
-                      </span>
-                      <span className="text-[0.8125rem] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-black dark:bg-emerald-950/70 dark:text-white flex items-center gap-1">
-                        <Check className="w-3 h-3" />
-                        <span>Disahkan Rasmi</span>
-                      </span>
-                    </div>
-
-                    <div>
-                      <h5 className="text-sm font-bold text-black dark:text-white">
-                        {item.menteeName}
-                      </h5>
-                      <p className="text-[0.875rem] text-black/70 dark:text-white/75">
-                        {item.businessName} &middot; <span className="font-medium text-black dark:text-white">{item.district}</span>
-                      </p>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/40 space-y-1">
-                      <div className="text-[0.8125rem] uppercase font-bold text-black dark:text-white">
-                        {item.grantProgramTitle}
+                  <div
+                    key={item.id}
+                    className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <div className="w-16 h-16 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+                        <Award className="w-7 h-7" />
                       </div>
-                      <div className="text-base font-black text-black dark:text-white/75">
-                        {item.recommendedAmount}
+
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h5 className="text-sm font-bold text-black dark:text-white truncate">
+                            {item.menteeName} · {item.endorsementCode}
+                          </h5>
+                          <span className="shrink-0 text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-black dark:bg-emerald-950/70 dark:text-white inline-flex items-center gap-1">
+                            <Check className="w-3 h-3" />
+                            <span>Disahkan Rasmi</span>
+                          </span>
+                        </div>
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                          {item.grantProgramTitle} ({item.recommendedAmount}) · {item.businessName} · {item.district} · {item.issuedAt}
+                        </p>
                       </div>
                     </div>
 
-                    <p className="text-[0.875rem] text-black dark:text-white line-clamp-3 leading-relaxed italic bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-300 dark:border-slate-600">
-                      "{item.justification}"
-                    </p>
+                    <div className="flex items-center justify-end shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedEndorsementForView(item)}
+                        className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-teal-600 whitespace-nowrap"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                        <span>Cetak Surat</span>
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between gap-2">
-                    <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
-                      Tarikh: {item.issuedAt}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() => setSelectedEndorsementForView(item)}
-                      className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-[0.8125rem] rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-teal-600"
-                    >
-                      <Printer className="w-3.5 h-3.5" />
-                      <span>Cetak Surat</span>
-                    </button>
-                  </div>
-                </div>
                 ))}
               </div>
               <PaginationBar
@@ -2193,56 +2078,37 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           className="p-4 sm:p-5 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
                           <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                            <div className="relative w-14 h-11 sm:w-16 sm:h-12 shrink-0">
-                              <div className="w-full h-full rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
-                                <PortalImage
-                                  src={visuals.businessUrl}
-                                  alt={log.businessName}
-                                  fallbackType="business"
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-sm absolute -bottom-1.5 -right-1.5 bg-white dark:bg-slate-900">
-                                <PortalImage
-                                  src={visuals.avatarUrl}
-                                  alt={log.menteeName}
-                                  fallbackType="avatar"
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
+                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                              <PortalImage
+                                src={visuals.businessUrl}
+                                alt={log.businessName}
+                                fallbackType="business"
+                                className="w-full h-full object-cover"
+                              />
                             </div>
 
                             <div className="min-w-0 flex-1 space-y-0.5">
-                              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                                <h4 className="text-sm font-bold text-black dark:text-white">
-                                  {log.menteeName}
+                              <div className="flex items-center gap-2 min-w-0">
+                                <h4 className="text-sm font-bold text-black dark:text-white truncate">
+                                  {log.menteeName} · {log.businessName}
                                 </h4>
-                                <span className="text-black/35 dark:text-white/35 text-sm">&middot;</span>
-                                <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">
-                                  {log.businessName}
+                                <span
+                                  className={`shrink-0 text-xs font-bold tabular-nums px-2 py-0.5 rounded-md border whitespace-nowrap ${
+                                    totalTasks > 0 && doneTasks === totalTasks
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
+                                      : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70 text-black dark:text-white'
+                                  }`}
+                                >
+                                  {totalTasks > 0 ? `${doneTasks}/${totalTasks} Tugasan` : 'Direkodkan'}
                                 </span>
                               </div>
-                              <p className="text-[0.875rem] text-black/70 dark:text-white/75 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                                <span className="font-mono tabular-nums">{log.sessionDate}</span>
-                                <span>&middot;</span>
-                                <span className="font-medium text-black dark:text-white">{log.topic}</span>
+                              <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                                <span className="font-mono tabular-nums">{log.sessionDate}</span> · {log.topic}
                               </p>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pl-17 sm:pl-0">
-                            {totalTasks > 0 && (
-                              <span
-                                className={`text-[0.8125rem] font-bold tabular-nums px-2.5 py-1 rounded-lg border whitespace-nowrap ${
-                                  doneTasks === totalTasks
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
-                                    : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70 text-black dark:text-white'
-                                }`}
-                              >
-                                {doneTasks}/{totalTasks} Tugasan
-                              </span>
-                            )}
-
+                          <div className="flex items-center justify-end gap-2 shrink-0">
                             <button
                               type="button"
                               onClick={(e) => {

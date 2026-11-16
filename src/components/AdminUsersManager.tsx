@@ -5,9 +5,6 @@ import {
   Plus,
   Edit3,
   Trash2,
-  ShieldCheck,
-  GraduationCap,
-  Store,
   X,
   Save,
   Loader2,
@@ -77,9 +74,14 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
     return () => unsub();
   }, [isAdmin]);
 
+  const nonAdminUsers = useMemo(
+    () => portalUsers.filter((u) => u.role !== 'admin'),
+    [portalUsers]
+  );
+
   const filteredUsers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return portalUsers.filter((u) => {
+    return nonAdminUsers.filter((u) => {
       if (roleFilter !== 'all' && u.role !== roleFilter) return false;
       if (!q) return true;
       return (
@@ -89,18 +91,17 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
         (u.district || '').toLowerCase().includes(q)
       );
     });
-  }, [portalUsers, roleFilter, searchQuery]);
+  }, [nonAdminUsers, roleFilter, searchQuery]);
 
   const pagination = usePagination(filteredUsers, 6, [roleFilter, searchQuery, filteredUsers.length]);
 
   const counts = useMemo(
     () => ({
-      all: portalUsers.length,
-      user: portalUsers.filter((u) => u.role === 'user').length,
-      mentor: portalUsers.filter((u) => u.role === 'mentor').length,
-      admin: portalUsers.filter((u) => u.role === 'admin').length
+      all: nonAdminUsers.length,
+      user: nonAdminUsers.filter((u) => u.role === 'user').length,
+      mentor: nonAdminUsers.filter((u) => u.role === 'mentor').length
     }),
-    [portalUsers]
+    [nonAdminUsers]
   );
 
   const isCurrentActiveUser = (target: UserProfile) => {
@@ -151,10 +152,11 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       return;
     }
 
-    if (editingUser && isCurrentActiveUser(editingUser) && role !== 'admin') {
-      setFormError('Anda tidak boleh menurunkan peranan akaun pentadbir yang sedang log masuk.');
-      return;
-    }
+    const effectiveRole: UserRole = editingUser
+      ? editingUser.role
+      : role === 'mentor'
+      ? 'mentor'
+      : 'user';
 
     setIsSaving(true);
     try {
@@ -165,12 +167,12 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
         email: email.trim(),
         phone: phone.trim(),
         district,
-        role,
+        role: effectiveRole,
         businessName: businessName.trim(),
         ssmNumber: ssmNumber.trim(),
         institution: institution.trim(),
         designation: designation.trim(),
-        mentorId: role === 'mentor' ? mentorId.trim() || editingUser?.mentorId || 'mentor-1' : undefined
+        mentorId: effectiveRole === 'mentor' ? mentorId.trim() || editingUser?.mentorId || 'mentor-1' : undefined
       });
       showToast(
         editingUser ? 'Maklumat akaun pengguna berjaya dikemas kini!' : 'Akaun pengguna baharu berjaya ditambah!',
@@ -183,24 +185,6 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       setFormError('Gagal menyimpan maklumat akaun pengguna. Sila cuba lagi.');
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  const handleDirectRoleChange = async (target: UserProfile, nextRole: UserRole) => {
-    if (isCurrentActiveUser(target) && nextRole !== 'admin') {
-      showToast('Akaun pentadbir yang sedang aktif tidak boleh ditukar peranan.', 'warning');
-      return;
-    }
-    try {
-      await savePortalUserRecord({
-        ...target,
-        role: nextRole,
-        mentorId: nextRole === 'mentor' ? target.mentorId || 'mentor-1' : target.mentorId
-      });
-      showToast(`Peranan ${target.fullName} ditukar kepada ${ROLE_LABELS[nextRole]}.`, 'success');
-      onRefresh?.();
-    } catch {
-      showToast('Gagal menukar peranan pengguna.', 'error');
     }
   };
 
@@ -231,7 +215,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
             Pengurusan Akaun &amp; Profil Pengguna Portal
           </h3>
           <p className="text-[0.9375rem] text-black/75 dark:text-white/80 max-w-2xl">
-            Tambah akaun baharu, kemas kini maklumat profil, tukar tahap peranan (Belia / Mentor / Admin) atau padam akaun.
+            Tambah akaun pengguna baharu (Usahawan Belia / Mentor), kemas kini maklumat profil, atau padam akaun pengguna portal.
           </p>
         </div>
 
@@ -246,13 +230,12 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       </div>
 
       {/* Role Filter & Search Bar */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 h-fit">
         <div className="flex flex-wrap items-center gap-2">
           {([
             { id: 'all', label: `Semua (${counts.all})` },
             { id: 'user', label: `Usahawan Belia (${counts.user})` },
-            { id: 'mentor', label: `Mentor (${counts.mentor})` },
-            { id: 'admin', label: `Pentadbir (${counts.admin})` }
+            { id: 'mentor', label: `Mentor (${counts.mentor})` }
           ] as const).map((tab) => (
             <button
               key={tab.id}
@@ -281,136 +264,88 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-black dark:text-white">
-            <thead className="bg-slate-50 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 text-[0.8125rem] uppercase tracking-wider text-black/75 dark:text-white/80 font-bold">
-              <tr>
-                <th className="p-4">Profil Pengguna</th>
-                <th className="p-4">Maklumat Hubungan</th>
-                <th className="p-4">Organisasi / Perniagaan</th>
-                <th className="p-4">Peranan Akaun</th>
-                <th className="p-4 text-right">Tindakan</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-              {pagination.paginatedItems.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="p-10 text-center text-black/70 dark:text-white/75">
-                    Tiada rekod akaun pengguna sepadan dengan tapisan semasa.
-                  </td>
-                </tr>
-              ) : (
-                pagination.paginatedItems.map((u) => {
-                  const isSelf = isCurrentActiveUser(u);
-                  return (
-                    <tr key={u.userId} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors">
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={u.avatarUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg'}
-                            alt={u.fullName}
-                            className="w-10 h-10 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0"
-                          />
-                          <div className="min-w-0">
-                            <div className="font-bold text-black dark:text-white flex items-center gap-1.5">
-                              <span className="truncate">{u.fullName}</span>
-                              {isSelf && (
-                                <span className="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-[0.75rem] font-bold">
-                                  Anda
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-[0.8125rem] font-mono text-black/65 dark:text-white/65 truncate">
-                              ID: {u.userId}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="p-4">
-                        <div className="font-mono text-sm text-black dark:text-white">{u.email}</div>
-                        <div className="text-sm text-black/70 dark:text-white/75 tabular-nums">
-                          {u.phone || 'Tiada telefon'} · {u.district || 'Kota Bharu'}
-                        </div>
-                      </td>
-
-                      <td className="p-4">
-                        {u.role === 'user' ? (
-                          <div>
-                            <div className="font-semibold text-black dark:text-white flex items-center gap-1.5">
-                              <Store className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                              <span>{u.businessName || 'Belum daftar perniagaan'}</span>
-                            </div>
-                            {u.ssmNumber && (
-                              <div className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75">{u.ssmNumber}</div>
-                            )}
-                          </div>
-                        ) : u.role === 'mentor' ? (
-                          <div className="font-semibold text-black dark:text-white flex items-center gap-1.5">
-                            <GraduationCap className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                            <span>{u.institution || 'UMK / Agensi Bimbingan'}</span>
-                          </div>
-                        ) : (
-                          <div className="font-semibold text-black dark:text-white flex items-center gap-1.5">
-                            <ShieldCheck className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                            <span>{u.designation || 'Pentadbir Portal KBelia'}</span>
-                          </div>
-                        )}
-                      </td>
-
-                      <td className="p-4">
-                        <select
-                          aria-label={`Tukar peranan ${u.fullName}`}
-                          value={u.role}
-                          disabled={isSelf}
-                          onChange={(e) => handleDirectRoleChange(u, e.target.value as UserRole)}
-                          className="px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+      {/* Users List View */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs h-fit">
+        <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-700">
+          {pagination.paginatedItems.length === 0 ? (
+            <div className="p-10 text-center text-sm text-black/70 dark:text-white/75">
+              Tiada rekod akaun pengguna sepadan dengan tapisan semasa.
+            </div>
+          ) : (
+            pagination.paginatedItems.map((u) => {
+              const isSelf = isCurrentActiveUser(u);
+              const orgLabel =
+                u.role === 'user'
+                  ? u.businessName || 'Belum daftar perniagaan'
+                  : u.role === 'mentor'
+                  ? u.institution || 'UMK / Agensi Bimbingan'
+                  : u.designation || 'Pentadbir Portal KBelia';
+              return (
+                <div
+                  key={u.userId}
+                  className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    <img
+                      src={u.avatarUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg'}
+                      alt={u.fullName}
+                      className="w-16 h-16 rounded-lg object-cover border border-slate-300 dark:border-slate-600 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
+                          {u.fullName}
+                          {isSelf ? ' (Anda)' : ''}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded text-[0.75rem] font-bold border shrink-0 ${
+                            u.role === 'mentor'
+                              ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70 text-black dark:text-white'
+                              : 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70 text-black dark:text-white'
+                          }`}
                         >
-                          <option value="user">Usahawan Belia</option>
-                          <option value="mentor">Mentor Bertauliah</option>
-                          <option value="admin">Pentadbir Sistem</option>
-                        </select>
-                      </td>
+                          {ROLE_LABELS[u.role] || 'Usahawan Belia'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
+                        {u.email} · {u.phone || 'Tiada telefon'} · {u.district || 'Kota Bharu'} · {orgLabel}
+                      </p>
+                    </div>
+                  </div>
 
-                      <td className="p-4 text-right">
-                        <div className="inline-flex items-center justify-end gap-2 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => openEditModal(u)}
-                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                            <span>Edit</span>
-                          </button>
-                          <button
-                            type="button"
-                            disabled={isSelf}
-                            onClick={() =>
-                              confirmDelete({
-                                itemName: `${u.fullName} (${u.email})`,
-                                itemType: 'Akaun Pengguna',
-                                description: 'Akaun yang dipadam akan dikeluarkan daripada senarai pengguna aktif portal.',
-                                onConfirm: () => handleDeleteUser(u)
-                              })
-                            }
-                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                            title={isSelf ? 'Akaun aktif sendiri tidak boleh dipadam' : `Padam ${u.fullName}`}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span>Padam</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                  <div className="inline-flex items-center justify-end gap-2 shrink-0 self-end sm:self-center">
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(u)}
+                      className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isSelf}
+                      onClick={() =>
+                        confirmDelete({
+                          itemName: `${u.fullName} (${u.email})`,
+                          itemType: 'Akaun Pengguna',
+                          description: 'Akaun yang dipadam akan dikeluarkan daripada senarai pengguna aktif portal.',
+                          onConfirm: () => handleDeleteUser(u)
+                        })
+                      }
+                      className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      title={isSelf ? 'Akaun aktif sendiri tidak boleh dipadam' : `Padam ${u.fullName}`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Padam</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-3 border-t border-slate-200 dark:border-slate-700">
           <PaginationBar
             currentPage={pagination.currentPage}
             totalItems={pagination.totalItems}
@@ -516,18 +451,23 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
 
                 <div>
                   <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Peranan Akaun</label>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value as UserRole)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
-                  >
-                    <option value="user">Usahawan Belia</option>
-                    <option value="mentor">Mentor Bertauliah</option>
-                    <option value="admin">Pentadbir Sistem</option>
-                  </select>
+                  {editingUser ? (
+                    <div className="w-full px-3.5 py-2.5 rounded-xl text-sm font-bold bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white">
+                      {ROLE_LABELS[editingUser.role] || 'Usahawan Belia'}
+                    </div>
+                  ) : (
+                    <select
+                      value={role === 'mentor' ? 'mentor' : 'user'}
+                      onChange={(e) => setRole(e.target.value as UserRole)}
+                      className="w-full px-3.5 py-2.5 rounded-xl text-sm font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
+                    >
+                      <option value="user">Usahawan Belia</option>
+                      <option value="mentor">Mentor Bertauliah</option>
+                    </select>
+                  )}
                 </div>
 
-                {role === 'user' && (
+                {(editingUser ? editingUser.role : role) === 'user' && (
                   <>
                     <div>
                       <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Nama Perniagaan</label>
@@ -552,7 +492,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                   </>
                 )}
 
-                {role === 'mentor' && (
+                {(editingUser ? editingUser.role : role) === 'mentor' && (
                   <>
                     <div>
                       <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Institusi / Agensi</label>
@@ -575,19 +515,6 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                       />
                     </div>
                   </>
-                )}
-
-                {role === 'admin' && (
-                  <div>
-                    <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Jawatan Pentadbiran</label>
-                    <input
-                      type="text"
-                      value={designation}
-                      onChange={(e) => setDesignation(e.target.value)}
-                      placeholder="Pegawai Penyelaras Negeri"
-                      className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
-                    />
-                  </div>
                 )}
               </div>
 

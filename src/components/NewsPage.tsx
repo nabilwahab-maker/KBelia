@@ -181,6 +181,26 @@ export const NewsPage: React.FC<NewsPageProps> = ({
         )}
       </div>
 
+      {/* Ringkasan Statistik Ringkas */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Jumlah Berita</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{roleScopedNews.length}</span>
+        </div>
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Sorotan Utama</span>
+          <span className="text-lg font-black text-amber-700 dark:text-amber-400 tabular-nums">{roleScopedNews.filter(n => n.isPinned).length}</span>
+        </div>
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Kategori</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{NEWS_CATEGORIES.length}</span>
+        </div>
+        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Dipaparkan</span>
+          <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{filteredNews.length}</span>
+        </div>
+      </div>
+
       {/* Filter & Search Toolbar */}
       <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-slate-300 dark:border-zinc-600 space-y-3.5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -288,24 +308,23 @@ export const NewsPage: React.FC<NewsPageProps> = ({
           {featuredArticle && (
             <article
               onClick={() => setSelectedArticle(featuredArticle)}
-              className="group rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-xs hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-colors cursor-pointer grid grid-cols-1 lg:grid-cols-12 items-stretch"
+              className="group rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-xs hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-colors cursor-pointer grid grid-cols-1 lg:grid-cols-12 items-start h-fit"
             >
-              <div className="lg:col-span-6 relative aspect-16/10 lg:aspect-auto lg:min-h-[300px] bg-slate-100 dark:bg-zinc-800 overflow-hidden">
+              <div className="lg:col-span-5 relative aspect-16/9 bg-slate-100 dark:bg-zinc-800 overflow-hidden">
                 <NewsImage
                   src={featuredArticle.imageUrl}
                   alt={featuredArticle.title}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent pointer-events-none" />
-                <div className="absolute bottom-3.5 left-4 right-4 flex items-center justify-between text-sm font-semibold text-white/95">
+                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-sm font-semibold text-white/95">
                   <span>Berita Utama</span>
                   <span className="tabular-nums">{formatReadableDate(featuredArticle.publishedAt || featuredArticle.updatedAt)}</span>
                 </div>
               </div>
 
-              <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between gap-5">
-                <div className="space-y-3">
-                  {/* Unboxed inline metadata */}
+              <div className="lg:col-span-7 p-5 sm:p-6 flex flex-col justify-between gap-4 h-fit">
+                <div className="space-y-2.5">
                   <div className="flex flex-wrap items-center gap-2 text-sm text-black/70 dark:text-white/75 tabular-nums">
                     <span className="font-bold text-black dark:text-white/75">{featuredArticle.category}</span>
                     <span aria-hidden="true">·</span>
@@ -318,16 +337,16 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                     )}
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance group-hover:text-black dark:group-hover:text-white transition-colors">
+                  <h2 className="text-lg sm:text-xl font-black text-black dark:text-white tracking-tight text-balance group-hover:text-black dark:group-hover:text-white transition-colors">
                     {featuredArticle.title}
                   </h2>
 
-                  <p className="text-sm text-black dark:text-white leading-relaxed line-clamp-4">
+                  <p className="text-sm text-black dark:text-white leading-relaxed line-clamp-3">
                     {featuredArticle.summary}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-300 dark:border-zinc-600">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-300 dark:border-zinc-600">
                   <span className="inline-flex items-center gap-2 text-sm font-bold text-black dark:text-white/75 group-hover:translate-x-0.5 transition-transform">
                     <span>Baca Artikel Penuh</span>
                     <ArrowRight className="w-4 h-4" />
@@ -358,78 +377,70 @@ export const NewsPage: React.FC<NewsPageProps> = ({
             </article>
           )}
 
-          {/* Grid of Regular Articles */}
+          {/* Senarai Menegak Berita */}
           {gridArticles.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+            <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-zinc-700 h-fit">
               {gridArticles.map(article => (
                 <article
                   key={article.id}
                   onClick={() => setSelectedArticle(article)}
-                  className="group rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 overflow-hidden flex flex-col justify-between hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-colors cursor-pointer"
+                  className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
                 >
-                  <div>
-                    <div className="aspect-16/9 bg-slate-100 dark:bg-zinc-800 overflow-hidden relative">
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 overflow-hidden shrink-0">
                       <NewsImage
                         src={article.imageUrl}
                         alt={article.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                        className="w-full h-full object-cover"
                       />
-                      {isAdmin && article.status === 'draft' && (
-                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-amber-950/85 text-white text-[0.8125rem] font-bold">
-                          Draf Admin
-                        </div>
-                      )}
                     </div>
 
-                    <div className="p-5 space-y-2.5">
-                      {/* Unboxed inline metadata (Zero-pill discipline) */}
-                      <div className="flex flex-wrap items-center gap-2 text-sm text-black/70 dark:text-white/75 tabular-nums">
-                        <span className="font-semibold text-black dark:text-white/75">{article.category}</span>
-                        <span aria-hidden="true">·</span>
-                        <span>{formatReadableDate(article.publishedAt || article.updatedAt)}</span>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                          {article.title}
+                        </h3>
+                        {isAdmin && article.status === 'draft' ? (
+                          <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-black dark:text-white text-xs font-bold shrink-0">
+                            Draf
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-md bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black dark:text-white text-xs font-semibold shrink-0">
+                            {article.category}
+                          </span>
+                        )}
                       </div>
-
-                      <h3 className="text-base font-bold text-black dark:text-white leading-snug line-clamp-2 group-hover:text-black dark:group-hover:text-white transition-colors">
-                        {article.title}
-                      </h3>
-
-                      <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed line-clamp-3">
-                        {article.summary}
+                      <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                        {formatReadableDate(article.publishedAt || article.updatedAt)} · {article.authorName} · {article.summary}
                       </p>
                     </div>
                   </div>
 
-                  <div className="px-5 py-3.5 border-t border-slate-300 dark:border-zinc-600 flex items-center justify-between gap-2 text-sm">
-                    <span className="text-black/70 dark:text-white/75 truncate">
-                      {article.authorName}
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    {isAdmin && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={(e) => handleAdminQuickPinToggle(e, article)}
+                          className="p-2 rounded-lg border border-slate-300 dark:border-zinc-600 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
+                          title={article.isPinned ? 'Nyahpin Berita' : 'Pin Berita Utama'}
+                        >
+                          <Pin className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => handleAdminQuickStatusToggle(e, article)}
+                          className="p-2 rounded-lg border border-slate-300 dark:border-zinc-600 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
+                          title={article.status === 'published' ? 'Tukar kepada Draf' : 'Siarkan Berita'}
+                        >
+                          {article.status === 'published' ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                        </button>
+                      </>
+                    )}
+                    <span className="py-2 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 whitespace-nowrap">
+                      <span>Baca</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </span>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      {isAdmin && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={(e) => handleAdminQuickPinToggle(e, article)}
-                            className="p-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
-                            title={article.isPinned ? 'Nyahpin Berita' : 'Pin Berita Utama'}
-                          >
-                            <Pin className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => handleAdminQuickStatusToggle(e, article)}
-                            className="p-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
-                            title={article.status === 'published' ? 'Tukar kepada Draf' : 'Siarkan Berita'}
-                          >
-                            {article.status === 'published' ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                          </button>
-                        </>
-                      )}
-                      <span className="inline-flex items-center gap-1 font-bold text-black dark:text-white/75 whitespace-nowrap">
-                        <span>Baca</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
                   </div>
                 </article>
               ))}

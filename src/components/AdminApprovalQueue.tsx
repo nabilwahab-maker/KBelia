@@ -538,10 +538,10 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* TAB 0: 3-COLUMN OVERVIEW MATCHING WIREFRAME */}
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-start">
           
           {/* Kolum 1: Permohonan Sewa Kiosk */}
-          <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col justify-between">
+          <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col h-fit">
             <div>
               <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
                 <div className="flex items-center gap-2">
@@ -641,7 +641,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           </div>
 
           {/* Kolum 2: Permohonan Dana & Geran Belia */}
-          <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col justify-between">
+          <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col h-fit">
             <div>
               <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
                 <div className="flex items-center gap-2">
@@ -741,7 +741,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           </div>
 
           {/* Kolum 3: Kawalan Fasiliti Kiosk & Tindakan Pantas */}
-          <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col justify-between">
+          <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col h-fit">
             <div>
               <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
                 <div className="flex items-center gap-2">
@@ -832,7 +832,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* Filter & Search Bar */}
       {(activeTab === 'kiosks' || activeTab === 'grants') && (
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-600 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-600 mb-6 h-fit">
           <div className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-black/70 dark:text-white/75" />
             <input
@@ -889,15 +889,15 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             </div>
           ) : (
             <>
-              <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+              <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden h-fit">
                 {bookingsPagination.paginatedItems.map((booking) => {
                   const isActioning = actionLoading === booking.id;
                   const isExpanded = expandedKioskIds.includes(booking.id);
                   return (
                     <div key={booking.id} className="p-3.5 sm:p-4 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
-                          <div className="w-16 h-12 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                        <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
                             <PortalImage
                               src={resolveBookingKioskImage(booking, slots)}
                               alt={`Reka bentuk kiosk ${booking.slotName}`}
@@ -908,20 +908,16 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           </div>
 
                           <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-1.5 text-[0.8125rem]">
-                              <span className="font-mono font-bold text-black dark:text-white/85">
-                                {booking.slotCode}
-                              </span>
-                              <span className="text-black/35 dark:text-white/35">·</span>
-                              <span className="font-semibold text-black/75 dark:text-white/75 truncate">
-                                {booking.hubLocation}
+                            <div className="flex items-center gap-2 min-w-0">
+                              <h4 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                                {booking.slotCode} · {booking.businessName} — {booking.applicantName}
+                              </h4>
+                              <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white shrink-0">
+                                {booking.businessCategory}
                               </span>
                             </div>
-                            <h4 className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white truncate mt-0.5">
-                              {booking.businessName} — {booking.applicantName}
-                            </h4>
-                            <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5 truncate tabular-nums">
-                              {booking.businessCategory} · {booking.durationMonths} bln · Mula {formatDisplayDate(booking.startDate)}
+                            <p className="text-sm text-black/70 dark:text-white/75 mt-0.5 truncate tabular-nums">
+                              {booking.hubLocation} · {booking.durationMonths} bln · Mula {formatDisplayDate(booking.startDate)}
                             </p>
                           </div>
                         </div>
@@ -1069,29 +1065,30 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             </div>
           ) : (
             <>
-              <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+              <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden h-fit">
                 {grantsPagination.paginatedItems.map((grant) => {
                   const isActioning = actionLoading === grant.id;
                   const isExpanded = expandedGrantIds.includes(grant.id);
                   return (
                     <div key={grant.id} className="p-3.5 sm:p-4 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-1.5 text-sm mb-0.5">
-                            <span className="font-bold text-black dark:text-white/85 tabular-nums">
-                              {grant.grantAmount}
-                            </span>
-                            <span className="text-black/35 dark:text-white/35">·</span>
-                            <span className="font-semibold text-black/80 dark:text-white/80 truncate">
-                              {grant.programTitle}
-                            </span>
+                        <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                          <div className="w-16 h-16 rounded-lg shrink-0 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
+                            <Coins className="w-6 h-6" />
                           </div>
-                          <h4 className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white truncate">
-                            {grant.businessName} — {grant.applicantName}
-                          </h4>
-                          <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5 truncate">
-                            {grant.businessCategory} · SSM: {grant.ssmNumber || 'Dikecualikan'}
-                          </p>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <h4 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                                {grant.businessName} — {grant.applicantName}
+                              </h4>
+                              <span className="px-2 py-0.5 rounded text-[0.75rem] font-bold bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-black dark:text-white shrink-0 tabular-nums">
+                                {grant.grantAmount}
+                              </span>
+                            </div>
+                            <p className="text-sm text-black/70 dark:text-white/75 mt-0.5 truncate">
+                              {grant.programTitle} · {grant.businessCategory} · SSM: {grant.ssmNumber || 'Dikecualikan'}
+                            </p>
+                          </div>
                         </div>
 
                         <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0">
@@ -1232,14 +1229,14 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
       {activeTab === 'facility' && (
         <div className="space-y-6">
           <div className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden h-fit">
               {facilitySlotsPagination.paginatedItems.map((slot) => (
                 <div 
                   key={slot.id}
-                  className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 overflow-hidden flex flex-col justify-between"
+                  className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors"
                 >
-                  <div>
-                    <div className="h-32 w-full overflow-hidden bg-slate-100 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600">
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 shrink-0">
                       <PortalImage
                         src={resolveSlotImage(slot)}
                         alt={slot.name}
@@ -1248,12 +1245,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white/75">
-                          {slot.code}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-md text-[0.8125rem] font-bold uppercase tracking-wider ${
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h4 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                          {slot.code} · {slot.name}
+                        </h4>
+                        <span className={`px-2 py-0.5 rounded text-[0.75rem] font-bold uppercase shrink-0 ${
                           slot.status === 'available'
                             ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
                             : slot.status === 'maintenance'
@@ -1263,23 +1260,20 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           {slot.status === 'available' ? 'Tersedia' : slot.status === 'maintenance' ? 'Dalam Pembaikan' : 'Diduduki'}
                         </span>
                       </div>
-                      <h4 className="text-sm font-bold text-black dark:text-white mb-1">
-                        {slot.name}
-                      </h4>
-                      <p className="text-[0.9375rem] text-black/70 dark:text-white/75 tabular-nums">
+                      <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
                         {slot.hubLocation} ({slot.district}) · RM{slot.monthlyRate}/bln
                       </p>
                     </div>
                   </div>
 
                   {/* Status Toggle & Admin Edit/Delete Controls */}
-                  <div className="px-4 pb-4 pt-3 border-t border-slate-300 dark:border-slate-600 space-y-2">
+                  <div className="flex flex-wrap items-center justify-end gap-2 shrink-0">
                     {onUpdateSlotStatus && (
-                      <div className="flex items-center gap-1.5">
+                      <div className="inline-flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => onUpdateSlotStatus(slot.id, 'available')}
-                          className={`flex-1 py-1 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
                             slot.status === 'available'
                               ? 'bg-emerald-600 text-white'
                               : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-emerald-50 border border-slate-300 dark:border-slate-600'
@@ -1290,7 +1284,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         <button
                           type="button"
                           onClick={() => onUpdateSlotStatus(slot.id, 'maintenance')}
-                          className={`flex-1 py-1 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
                             slot.status === 'maintenance'
                               ? 'bg-amber-600 text-white'
                               : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
@@ -1301,7 +1295,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         <button
                           type="button"
                           onClick={() => onUpdateSlotStatus(slot.id, 'occupied')}
-                          className={`flex-1 py-1 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
                             slot.status === 'occupied'
                               ? 'bg-slate-700 text-white'
                               : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
@@ -1311,30 +1305,28 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         </button>
                       </div>
                     )}
-                    <div className="grid grid-cols-2 gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => setEditingSlot(slot)}
-                        className="py-1.5 px-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center justify-center gap-1 cursor-pointer"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          confirmDelete({
-                            itemName: `${slot.code} · ${slot.name}`,
-                            itemType: 'Slot Kiosk',
-                            onConfirm: () => handleDeleteSlotRecord(slot)
-                          })
-                        }
-                        className="py-1.5 px-2.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center justify-center gap-1 cursor-pointer"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        <span>Padam</span>
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingSlot(slot)}
+                      className="py-1.5 px-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        confirmDelete({
+                          itemName: `${slot.code} · ${slot.name}`,
+                          itemType: 'Slot Kiosk',
+                          onConfirm: () => handleDeleteSlotRecord(slot)
+                        })
+                      }
+                      className="py-1.5 px-2.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Padam</span>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -1380,21 +1372,29 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
+                <div className="rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden h-fit">
                   {ticketsPagination.paginatedItems.map((ticket) => {
                     const isExpanded = expandedTicketIds.includes(ticket.id);
                     return (
                       <div key={ticket.id} className="p-3.5 sm:p-4 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white/80">{ticket.slotCode}</span>
-                              <span className="text-sm font-bold text-black dark:text-white">{ticket.kioskName}</span>
-                              <span className="text-sm text-black/70 dark:text-white/75">· {ticket.issueCategory}</span>
+                          <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                            <div className="w-16 h-16 rounded-lg shrink-0 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-700 dark:text-amber-300">
+                              <Wrench className="w-6 h-6" />
                             </div>
-                            <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5 truncate">
-                              Pelapor: {ticket.reporterName} · {ticket.description}
-                            </p>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <h4 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                                  {ticket.slotCode} · {ticket.kioskName}
+                                </h4>
+                                <span className="px-2 py-0.5 rounded text-[0.75rem] font-semibold bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white shrink-0">
+                                  {ticket.issueCategory}
+                                </span>
+                              </div>
+                              <p className="text-sm text-black/70 dark:text-white/75 mt-0.5 truncate">
+                                Pelapor: {ticket.reporterName} · {ticket.description}
+                              </p>
+                            </div>
                           </div>
 
                           <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0">

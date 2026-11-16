@@ -130,6 +130,26 @@ export const B2BMarketSection: React.FC = () => {
         </p>
       </div>
 
+      {/* Ringkasan Statistik Ringkas */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Total Ads' : 'Jumlah Iklan'}</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">{listings.length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Supplying' : 'Membekal'}</span>
+          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{listings.filter(l => l.type === 'supply').length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Seeking' : 'Mencari'}</span>
+          <span className="text-lg font-black text-amber-700 dark:text-amber-400 tabular-nums">{listings.filter(l => l.type === 'demand').length}</span>
+        </div>
+        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Filtered' : 'Dipaparkan'}</span>
+          <span className="text-lg font-black text-teal-700 dark:text-teal-400 tabular-nums">{filteredListings.length}</span>
+        </div>
+      </div>
+
       {/* Control Bar */}
       <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="relative w-full md:w-72">
@@ -202,84 +222,64 @@ export const B2BMarketSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Listings Grid */}
+      {/* Senarai Menegak Ruang Niaga */}
       {filteredListings.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 py-14 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 py-12 text-center h-fit">
           <Megaphone className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
           <p className="text-sm font-bold text-black dark:text-white">
             {isEn ? 'No Ruang Niaga listings match your filter' : 'Tiada iklan Ruang Niaga sepadan dengan carian anda'}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
           {filteredListings.map((item) => (
             <div
               key={item.id}
-              className="bg-white dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-600 hover:border-teal-500/70 shadow-xs overflow-hidden flex flex-col justify-between group transition-colors"
+              className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
             >
-              <div>
-                <div className="aspect-4/3 w-full bg-slate-100 dark:bg-slate-900 overflow-hidden border-b border-slate-300 dark:border-slate-600">
+              <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 overflow-hidden border border-slate-300 dark:border-slate-600 shrink-0">
                   <PortalImage
                     src={resolveB2BImage(item)}
                     alt={item.title}
                     fallbackType="b2b"
                     fallbackLabel={item.authorBusiness}
-                    className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
                 </div>
 
-                <div className="p-5 space-y-3">
-                  <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                      {item.title}
+                    </h3>
                     <span
-                      className={`px-2 py-0.5 rounded text-[0.8125rem] font-semibold border ${
+                      className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${
                         item.type === 'supply'
-                          ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-900/40'
-                          : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800/40'
+                          ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-800'
+                          : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800'
                       }`}
                     >
                       {item.type === 'supply'
-                        ? (isEn ? 'Supplying / Wholesale' : 'Membekal (Tawaran)')
-                        : (isEn ? 'Seeking Supply' : 'Mencari Bekalan')}
-                    </span>
-                    <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono tabular-nums">
-                      {item.date}
+                        ? (isEn ? 'Supplying' : 'Membekal')
+                        : (isEn ? 'Seeking' : 'Mencari')}
                     </span>
                   </div>
-
-                  <div>
-                    <h3 className="text-sm font-bold text-black dark:text-white leading-snug">
-                      {item.title}
-                    </h3>
-                    <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-medium mt-0.5 flex items-center gap-1.5">
-                      <span className="font-semibold text-black dark:text-white">{item.authorBusiness}</span>
-                      <span>·</span>
-                      <span>{item.authorName}</span>
-                    </div>
-                  </div>
-
-                  <p className="text-[0.9375rem] text-black/85 dark:text-white/85 leading-relaxed line-clamp-3">
-                    {item.description}
+                  <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                    {item.authorBusiness} ({item.authorName}) · {item.district} · {item.date} · {item.description}
                   </p>
-
-                  <div className="flex items-center gap-1.5 text-sm text-black/70 dark:text-white/75 pt-1">
-                    <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                    <span>{item.district}</span>
-                  </div>
                 </div>
               </div>
 
-              {/* Direct WhatsApp Call to Action */}
-              <div className="px-5 pb-5 pt-3 border-t border-slate-200 dark:border-slate-700">
-                <a
-                  href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20Ruang%20Niaga%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-lg shadow-xs transition-colors flex items-center justify-center gap-2 dark:bg-teal-600"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>
-                </a>
-              </div>
+              <a
+                href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20Ruang%20Niaga%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2 px-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-lg shadow-xs transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 self-end sm:self-center"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>
+              </a>
             </div>
           ))}
         </div>

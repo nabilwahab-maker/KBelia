@@ -108,7 +108,7 @@ const ProductRowThumbnail: React.FC<{ src?: string; alt: string }> = ({ src, alt
 
   if (!src || hasError) {
     return (
-      <div className="w-20 h-20 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex items-center justify-center shrink-0 text-black/40 dark:text-white/40">
+      <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex items-center justify-center shrink-0 text-black/40 dark:text-white/40">
         <ShoppingBag className="w-6 h-6" />
       </div>
     );
@@ -120,7 +120,7 @@ const ProductRowThumbnail: React.FC<{ src?: string; alt: string }> = ({ src, alt
       alt={alt}
       referrerPolicy="no-referrer"
       onError={() => setHasError(true)}
-      className="w-20 h-20 rounded-xl object-cover bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 shrink-0"
+      className="w-16 h-16 rounded-lg object-cover bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 shrink-0"
     />
   );
 };
@@ -776,6 +776,78 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           });
         }
 
+        // Aggregate real pending approval requests across Kiosk, Grant, Mentorship & Maintenance
+        const pendingApprovalItems: {
+          id: string;
+          category: string;
+          title: string;
+          subtitle: string;
+          statusLabel: string;
+          dateLabel: string;
+          createdAt: string;
+          actionLabel: string;
+          onAction?: () => void;
+        }[] = [
+          ...safeBookings
+            .filter((b) => b.status === 'pending')
+            .map((b) => ({
+              id: `booking-${b.id}`,
+              category: 'Sewaan Kiosk',
+              title: `${b.slotCode} · ${b.hubLocation}`,
+              subtitle: `${b.businessName} · Tempoh ${b.durationMonths} bln`,
+              statusLabel: 'Menunggu Kelulusan',
+              dateLabel: b.createdAt ? formatDisplayDate(b.createdAt.split('T')[0]) : 'Baharu',
+              createdAt: b.createdAt || '',
+              actionLabel: 'Lihat Kiosk',
+              onAction: () => setActiveTab('bookings')
+            })),
+          ...grantApplications
+            .filter((g) => g.status === 'pending')
+            .map((g) => ({
+              id: `grant-${g.id}`,
+              category: 'Geran Belia',
+              title: g.programTitle,
+              subtitle: `${g.businessName} · ${g.grantAmount || g.amount || 'Dalam Semakan'}`,
+              statusLabel: 'Dalam Semakan',
+              dateLabel: g.createdAt ? formatDisplayDate(g.createdAt.split('T')[0]) : 'Baharu',
+              createdAt: g.createdAt || '',
+              actionLabel: 'Lihat Geran',
+              onAction: () => setActiveTab('vault')
+            })),
+          ...safeMentorships
+            .filter((m) => m.status === 'pending')
+            .map((m) => ({
+              id: `mentor-${m.id}`,
+              category: 'Klinik Mentor',
+              title: m.topic,
+              subtitle: `${m.mentorName} · ${m.preferredDate} (${m.preferredTime})`,
+              statusLabel: 'Menunggu Sesi',
+              dateLabel: m.createdAt ? formatDisplayDate(m.createdAt.split('T')[0]) : m.preferredDate || 'Dijadualkan',
+              createdAt: m.createdAt || '',
+              actionLabel: 'Buka Klinik',
+              onAction: onOpenMentorshipClinic
+            })),
+          ...safeTickets
+            .filter((t) => t.status === 'received' || t.status === 'in_progress')
+            .map((t) => ({
+              id: `ticket-${t.id}`,
+              category: 'Tiket Fasiliti',
+              title: `${t.slotCode}: ${t.issueCategory}`,
+              subtitle: `${t.kioskName} · ${t.description}`,
+              statusLabel: t.status === 'in_progress' ? 'Sedang Diproses' : 'Diterima',
+              dateLabel: t.createdAt ? formatDisplayDate(t.createdAt.split('T')[0]) : 'Baharu',
+              createdAt: t.createdAt || '',
+              actionLabel: 'Semak Tiket',
+              onAction: () => setActiveTab('bookings')
+            }))
+        ].sort((a, b) => {
+          const tsA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const tsB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return (Number.isNaN(tsB) ? 0 : tsB) - (Number.isNaN(tsA) ? 0 : tsA);
+        });
+
+        const topPendingApprovals = pendingApprovalItems.slice(0, 3);
+
         return (
         <div className="space-y-6">
           
@@ -871,260 +943,395 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           </div>
 
           {/* Asymmetric Bento Grid (lg:grid-cols-12) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
             
-            {/* Left Bento Span (7 Cols): Carta Recharts Analitik Jualan Interaktif */}
-            <div className="lg:col-span-7 min-w-0 h-full rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col">
-              
-              {/* Card Header */}
-              <div className="border-b border-slate-300 dark:border-zinc-600 py-4.5 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-black dark:text-white/75" />
-                    <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                      Analitik Aliran Jualan Kiosk
-                    </h4>
-                  </div>
-                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-                    Transaksi tunai &amp; DuitNow QR (data sebenar &amp; asas sampel)
-                  </p>
-                </div>
-
-                {/* Chart Mode + Period Selector Tabs */}
-                <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-                  <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
-                    <button
-                      type="button"
-                      onClick={() => setChartMode('bar')}
-                      className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
-                        chartMode === 'bar'
-                          ? 'bg-slate-800 dark:bg-zinc-700 text-white'
-                          : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
-                      }`}
-                    >
-                      Bar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setChartMode('area')}
-                      className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
-                        chartMode === 'area'
-                          ? 'bg-slate-800 dark:bg-zinc-700 text-white'
-                          : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
-                      }`}
-                    >
-                      Grafik
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
-                    <button
-                      type="button"
-                      onClick={() => setSalesPeriod('weekly')}
-                      className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                        salesPeriod === 'weekly'
-                          ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                          : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                      }`}
-                    >
-                      Mingguan
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSalesPeriod('monthly')}
-                      className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                        salesPeriod === 'monthly'
-                          ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                          : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                      }`}
-                    >
-                      Bulanan
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSalesPeriod('quarterly')}
-                      className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                        salesPeriod === 'quarterly'
-                          ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                          : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                      }`}
-                    >
-                      Suku
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Chart Content Area */}
-              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between min-w-0">
+            {/* Left Bento Span (7 Cols): Compact Chart Card + Separate Pending Approvals Card Below */}
+            <div className="lg:col-span-7 min-w-0 flex flex-col gap-4 h-fit">
+              {/* KOTAK 1: Carta Recharts Analitik Jualan Interaktif (Padat & Seimbang) */}
+              <div className="rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-fit">
                 
-                {/* Metric Strip */}
-                <div className="grid grid-cols-3 gap-2 pb-4 mb-4 border-b border-slate-300 dark:border-zinc-600 text-center">
+                {/* Card Header */}
+                <div className="border-b border-slate-300 dark:border-zinc-600 py-4 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Terkumpul</span>
-                    <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
-                      RM {periodTotal.toLocaleString()}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-black dark:text-white/75" />
+                      <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
+                        Analitik Aliran Jualan Kiosk
+                      </h4>
+                    </div>
+                    <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
+                      Transaksi tunai &amp; DuitNow QR (data sebenar &amp; asas sampel)
+                    </p>
                   </div>
-                  <div>
-                    <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Purata/Tempoh</span>
-                    <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
-                      RM {periodAvg.toLocaleString()}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Puncak</span>
-                    <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white/85">
-                      RM {periodMax.toLocaleString()}
-                    </span>
+
+                  {/* Chart Mode + Period Selector Tabs */}
+                  <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                    <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
+                      <button
+                        type="button"
+                        onClick={() => setChartMode('bar')}
+                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
+                          chartMode === 'bar'
+                            ? 'bg-slate-800 dark:bg-zinc-700 text-white'
+                            : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
+                        }`}
+                      >
+                        Bar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setChartMode('area')}
+                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
+                          chartMode === 'area'
+                            ? 'bg-slate-800 dark:bg-zinc-700 text-white'
+                            : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
+                        }`}
+                      >
+                        Grafik
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
+                      <button
+                        type="button"
+                        onClick={() => setSalesPeriod('weekly')}
+                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                          salesPeriod === 'weekly'
+                            ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                        }`}
+                      >
+                        Mingguan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSalesPeriod('monthly')}
+                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                          salesPeriod === 'monthly'
+                            ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                        }`}
+                      >
+                        Bulanan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSalesPeriod('quarterly')}
+                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                          salesPeriod === 'quarterly'
+                            ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                        }`}
+                      >
+                        Suku
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* Interactive Recharts Chart */}
-                <div className="relative pt-2 pb-2 min-w-0">
-                  <div className="h-80 min-h-[320px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                    <ResponsiveContainer width="100%" height={320} minWidth={0} initialDimension={{ width: 520, height: 320 }}>
-                      {chartMode === 'area' ? (
-                        <AreaChart data={chartBars} margin={{ top: 24, right: 16, left: 4, bottom: 4 }}>
-                          <defs>
-                            <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#10B981" stopOpacity={0.38} />
-                              <stop offset="100%" stopColor="#2563EB" stopOpacity={0.04} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                          <XAxis
-                            dataKey="label"
-                            tick={{ fontSize: 12.5, fontWeight: 600 }}
-                            interval={0}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <YAxis
-                            domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
-                            allowDecimals={false}
-                            tick={{ fontSize: 12.5, fontWeight: 500 }}
-                            axisLine={false}
-                            tickLine={false}
-                            tickFormatter={(val) => `RM${val}`}
-                          />
-                          <Tooltip
-                            content={({ active, payload }) => {
-                              if (active && payload && payload.length) {
-                                const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
-                                return (
-                                  <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                    <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
-                                    <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                    <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
-                                  </div>
-                                );
-                              }
-                              return null;
-                            }}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="value"
-                            stroke="#10B981"
-                            strokeWidth={2.5}
-                            fill="url(#beliaSalesGradient)"
-                            isAnimationActive={false}
-                            dot={{ r: 4, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
-                            activeDot={{ r: 6, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
-                          />
-                        </AreaChart>
-                      ) : (
-                        <BarChart
-                          data={chartBars}
-                          barCategoryGap="16%"
-                          margin={{ top: 26, right: 16, left: 4, bottom: 4 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                          <XAxis
-                            dataKey="label"
-                            tick={{ fontSize: 12.5, fontWeight: 600 }}
-                            interval={0}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <YAxis
-                            domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
-                            allowDecimals={false}
-                            tick={{ fontSize: 12.5, fontWeight: 500 }}
-                            axisLine={false}
-                            tickLine={false}
-                            tickFormatter={(val) => `RM${val}`}
-                          />
-                          <Tooltip
-                            cursor={{ fill: 'rgba(37, 99, 235, 0.12)' }}
-                            content={({ active, payload }) => {
-                              if (active && payload && payload.length) {
-                                const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
-                                return (
-                                  <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                    <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
-                                    <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                    <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
-                                  </div>
-                                );
-                              }
-                              return null;
-                            }}
-                          />
-                          <Bar
-                            dataKey="value"
-                            fill="#2563EB"
-                            radius={[6, 6, 0, 0]}
-                            maxBarSize={56}
-                            minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
-                            isAnimationActive={false}
-                          >
-                            <LabelList
-                              dataKey="value"
-                              position="top"
-                              formatter={(val: unknown) => {
-                                const num = Number(val);
-                                return num > 0 ? `RM${num.toLocaleString()}` : '';
-                              }}
-                              className="fill-slate-900 dark:fill-slate-100 font-mono"
-                              style={{ fontSize: 12, fontWeight: 700 }}
+                {/* Compact Chart Content Area */}
+                <div className="p-4 sm:p-5 flex flex-col gap-3 min-w-0">
+                  
+                  {/* Metric Strip */}
+                  <div className="grid grid-cols-3 gap-2 pb-3 border-b border-slate-300 dark:border-zinc-600 text-center">
+                    <div>
+                      <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Terkumpul</span>
+                      <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
+                        RM {periodTotal.toLocaleString()}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Purata/Tempoh</span>
+                      <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
+                        RM {periodAvg.toLocaleString()}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Puncak</span>
+                      <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white/85">
+                        RM {periodMax.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Interactive Compact Recharts Chart */}
+                  <div className="relative h-[235px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                    <div className="absolute inset-0">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 520, height: 235 }}>
+                        {chartMode === 'area' ? (
+                          <AreaChart data={chartBars} margin={{ top: 18, right: 8, left: 0, bottom: 2 }}>
+                            <defs>
+                              <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#10B981" stopOpacity={0.38} />
+                                <stop offset="100%" stopColor="#2563EB" stopOpacity={0.04} />
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                            <XAxis
+                              dataKey="label"
+                              height={24}
+                              tickMargin={4}
+                              tick={{ fontSize: 12, fontWeight: 600 }}
+                              interval={0}
+                              axisLine={false}
+                              tickLine={false}
                             />
-                          </Bar>
-                        </BarChart>
-                      )}
-                    </ResponsiveContainer>
+                            <YAxis
+                              width={48}
+                              tickMargin={2}
+                              domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
+                              allowDecimals={false}
+                              tick={{ fontSize: 12, fontWeight: 500 }}
+                              axisLine={false}
+                              tickLine={false}
+                              tickFormatter={(val) => `RM${val}`}
+                            />
+                            <Tooltip
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
+                                  return (
+                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                      <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
+                                      <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
+                                      <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                            <Area
+                              type="monotone"
+                              dataKey="value"
+                              stroke="#10B981"
+                              strokeWidth={2.5}
+                              fill="url(#beliaSalesGradient)"
+                              isAnimationActive={false}
+                              dot={{ r: 4, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
+                              activeDot={{ r: 6, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
+                            />
+                          </AreaChart>
+                        ) : (
+                          <BarChart
+                            data={chartBars}
+                            barCategoryGap="16%"
+                            margin={{ top: 18, right: 8, left: 0, bottom: 2 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                            <XAxis
+                              dataKey="label"
+                              height={24}
+                              tickMargin={4}
+                              tick={{ fontSize: 12, fontWeight: 600 }}
+                              interval={0}
+                              axisLine={false}
+                              tickLine={false}
+                            />
+                            <YAxis
+                              width={48}
+                              tickMargin={2}
+                              domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
+                              allowDecimals={false}
+                              tick={{ fontSize: 12, fontWeight: 500 }}
+                              axisLine={false}
+                              tickLine={false}
+                              tickFormatter={(val) => `RM${val}`}
+                            />
+                            <Tooltip
+                              cursor={{ fill: 'rgba(37, 99, 235, 0.12)' }}
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
+                                  return (
+                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                      <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
+                                      <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
+                                      <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                            <Bar
+                              dataKey="value"
+                              fill="#2563EB"
+                              radius={[6, 6, 0, 0]}
+                              maxBarSize={56}
+                              minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
+                              isAnimationActive={false}
+                            >
+                              <LabelList
+                                dataKey="value"
+                                position="top"
+                                formatter={(val: unknown) => {
+                                  const num = Number(val);
+                                  return num > 0 ? `RM${num.toLocaleString()}` : '';
+                                }}
+                                className="fill-slate-900 dark:fill-slate-100 font-mono"
+                                style={{ fontSize: 11.5, fontWeight: 700 }}
+                              />
+                            </Bar>
+                          </BarChart>
+                        )}
+                      </ResponsiveContainer>
+                    </div>
                   </div>
-                </div>
 
-                {/* Footer notes & Cashflow shortcut */}
-                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 gap-2">
-                  <span className="leading-snug font-medium">
-                    {safeCashflow.length > 0
-                      ? isHistoricalAnchor
-                        ? `Julat rekod terkini: ${chartRangeLabel}`
-                        : `Buku Tunai Transaksi Sah · ${chartRangeLabel}`
-                      : 'Belum ada rekod jualan harian direkodkan'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('cashflow')}
-                    className="text-black dark:text-white/75 hover:underline font-bold flex items-center gap-1 cursor-pointer shrink-0"
-                  >
-                    <span>Buka Rekod</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
+                  {/* Footer notes & Cashflow shortcut */}
+                  <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between text-sm text-black/75 dark:text-white/80 gap-2">
+                    <span className="leading-snug font-medium">
+                      {safeCashflow.length > 0
+                        ? isHistoricalAnchor
+                          ? `Julat rekod terkini: ${chartRangeLabel}`
+                          : `Buku Tunai Transaksi Sah · ${chartRangeLabel}`
+                        : 'Belum ada rekod jualan harian direkodkan'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('cashflow')}
+                      className="text-black dark:text-white/75 hover:underline font-bold flex items-center gap-1 cursor-pointer shrink-0"
+                    >
+                      <span>Buka Rekod</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
                 </div>
 
               </div>
 
+              {/* KOTAK 2: Kad Ringkasan 3 Permohonan Terkini Menunggu Kelulusan (Di Luar & Di Bawah Kotak Graf) */}
+              <div className="rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-fit">
+                <div className="border-b border-slate-300 dark:border-zinc-600 py-4 px-5 sm:px-6 flex items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                      <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
+                        Permohonan Menunggu Kelulusan
+                      </h4>
+                    </div>
+                    <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
+                      Ringkasan 3 permohonan terkini dalam semakan pentadbir &amp; mentor
+                    </p>
+                  </div>
+
+                  <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 shrink-0 tabular-nums">
+                    {pendingApprovalItems.length} Menunggu
+                  </span>
+                </div>
+
+                <div className="p-4 sm:p-5 flex flex-col gap-3 h-fit">
+                  {topPendingApprovals.length === 0 ? (
+                    <div className="p-5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col items-center justify-center text-center gap-2.5 h-fit">
+                      <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+                      <div>
+                        <p className="text-sm sm:text-base font-bold text-black dark:text-white">
+                          Tiada Permohonan Menunggu Kelulusan
+                        </p>
+                        <p className="text-sm text-black/70 dark:text-white/75 mt-1 max-w-md leading-relaxed">
+                          Semua permohonan sewaan kiosk, geran belia, dan sesi klinik mentor anda telah selesai diproses atau sedia untuk permohonan baharu.
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => (onOpenBookingModal ? onOpenBookingModal() : setActiveTab('bookings'))}
+                          className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer"
+                        >
+                          Mohon Kiosk
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('vault')}
+                          className="px-3 py-1.5 rounded-lg text-sm font-semibold text-black dark:text-white bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                        >
+                          Mohon Geran
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5 h-fit">
+                      {topPendingApprovals.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={item.onAction}
+                          disabled={!item.onAction}
+                          className={`w-full text-left p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+                            item.onAction
+                              ? 'cursor-pointer hover:border-blue-500/70 dark:hover:border-blue-400/70'
+                              : 'cursor-default'
+                          }`}
+                        >
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-[0.75rem] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+                                {item.category}
+                              </span>
+                              <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
+                              <span className="font-mono text-[0.75rem] text-black/65 dark:text-white/70 tabular-nums">
+                                {item.dateLabel}
+                              </span>
+                              <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-800/70 text-[0.75rem] font-bold text-black dark:text-amber-200">
+                                {item.statusLabel}
+                              </span>
+                            </div>
+                            <h5 className="text-sm font-bold text-black dark:text-white leading-snug truncate">
+                              {item.title}
+                            </h5>
+                            <p className="text-[0.8125rem] text-black/75 dark:text-white/75 truncate">
+                              {item.subtitle}
+                            </p>
+                          </div>
+
+                          {item.onAction && (
+                            <span className="inline-flex items-center gap-1 text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 shrink-0 self-start sm:self-center">
+                              <span>{item.actionLabel}</span>
+                              <ChevronRight className="w-3.5 h-3.5" />
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Footer Summary & Quick Links */}
+                  <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2 text-sm">
+                    <span className="text-black/75 dark:text-white/75 font-medium">
+                      {pendingApprovalItems.length > 0
+                        ? `Memaparkan ${topPendingApprovals.length} daripada ${pendingApprovalItems.length} permohonan menunggu`
+                        : 'Pantauan status permohonan semasa secara langsung'}
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('bookings')}
+                        className="font-bold text-black dark:text-white hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>Urus Kiosk</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('vault')}
+                        className="font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <span>Dokumen &amp; Geran</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Right Bento Span (5 Cols): Penjejak Permohonan + Ringkasan Aktiviti */}
             <div className="lg:col-span-5 space-y-5 sm:space-y-6">
 
             {/* Card A: Stepper Penjejak Permohonan Berperingkat */}
-            <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col">
+            <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-fit">
               
               {/* Card Header */}
               <div className="border-b border-slate-300 dark:border-slate-600 py-4.5 px-5 sm:px-6 flex items-center justify-between">
@@ -1146,7 +1353,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               </div>
 
               {/* Stepper Timeline Body */}
-              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div className="p-5 sm:p-6 flex flex-col space-y-4 h-fit">
                 
                 {/* 5-Step Vertical Stepper */}
                 <div className="space-y-3">
@@ -1246,7 +1453,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {/* Card B: Pusat Notifikasi & Tindakan Segera Usahawan */}
-            <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col">
+            <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-fit">
               
               {/* Card Header */}
               <div className="border-b border-slate-300 dark:border-slate-600 py-4.5 px-5 sm:px-6 flex items-center justify-between">
@@ -1264,7 +1471,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               </div>
 
               {/* Live Alert Items */}
-              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-3">
+              <div className="p-5 sm:p-6 flex flex-col space-y-3 h-fit">
                 <div className="space-y-3">
                   {liveAlerts.length === 0 ? (
                     <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-2 text-center">
@@ -1729,7 +1936,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-2xs">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-2xs h-fit">
                 {productsPagination.paginatedItems.map((prod) => {
                   const isAvailable = prod.inStock !== false;
                   const isConfirmingDelete = pendingDeleteProdId === prod.id;
@@ -1746,17 +1953,21 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       <div className="flex items-center gap-3.5 flex-1 min-w-0">
                         <ProductRowThumbnail src={prod.imageUrl} alt={prod.name} />
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
+                        <div className="flex-1 min-w-0 space-y-0.5">
+                          <div className="flex items-center gap-2 min-w-0">
                             <h5 className="font-bold text-sm text-black dark:text-white truncate">
                               {prod.name}
                             </h5>
-                            <span className="text-sm font-medium text-black/65 dark:text-white/70 whitespace-nowrap">
-                              · {prod.category || 'Umum'}
+                            <span className={`shrink-0 px-2 py-0.5 rounded-md text-xs font-bold border ${
+                              isAvailable
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
+                                : 'bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800 text-black dark:text-white'
+                            }`}>
+                              {isAvailable ? 'Stok Tersedia' : 'Habis'}
                             </span>
                           </div>
-                          <p className="text-[0.9375rem] text-black/70 dark:text-white/75 truncate mt-0.5">
-                            {prod.description?.trim() ? prod.description : 'Tiada penerangan produk ditambah.'}
+                          <p className="text-sm text-black/70 dark:text-white/75 truncate">
+                            {prod.category || 'Umum'} · {prod.description?.trim() ? prod.description : 'Tiada penerangan produk ditambah.'}
                           </p>
                         </div>
                       </div>
@@ -1920,7 +2131,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-xs">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-xs h-fit">
                 {bookingsPagination.paginatedItems.map((b) => {
                   const matchedSlot = safeSlots.find(
                     (s) => (b.slotId && s.id === b.slotId) || (b.slotCode && s.code === b.slotCode)
@@ -1931,8 +2142,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   return (
                     <div key={b.id} className="p-3.5 sm:p-4 transition-colors hover:bg-slate-50/70 dark:hover:bg-slate-900/40">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
-                          <div className="w-16 h-12 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                        <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
                             <PortalImage
                               src={kioskImg}
                               alt={`Rupa bentuk kiosk ${b.slotName}`}
@@ -1942,16 +2153,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             />
                           </div>
 
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="font-mono text-[0.8125rem] font-bold px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70">
-                                {b.slotCode}
-                              </span>
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <div className="flex items-center gap-2 min-w-0">
                               <h4 className="font-bold text-black dark:text-white text-sm truncate">
-                                {b.slotName}
+                                {b.slotCode} · {b.slotName}
                               </h4>
                             </div>
-                            <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1 truncate">
+                            <p className="text-sm text-black/70 dark:text-white/75 truncate">
                               {b.hubLocation}
                               {matchedSlot?.size ? ` · ${matchedSlot.size}` : ''}
                               {' · '}<span className="tabular-nums">{b.durationMonths} bln</span>
@@ -2172,7 +2380,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
           {/* Existing Maintenance Tickets List */}
           {sortedTickets.length > 0 && (
-            <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-300 dark:border-slate-600 space-y-3">
+            <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-300 dark:border-slate-600 space-y-3 h-fit">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
                   <Wrench className="w-4 h-4 text-black dark:text-white" />
@@ -2188,24 +2396,31 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   </button>
                 )}
               </div>
-              <div className="rounded-xl border border-slate-200 dark:border-slate-700 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden bg-slate-50/70 dark:bg-slate-900">
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden bg-slate-50/70 dark:bg-slate-900 h-fit">
                 {ticketsPagination.paginatedItems.map((t) => (
-                  <div key={t.id} className="p-3 flex items-start justify-between gap-3 text-sm">
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      <div className="font-bold text-black dark:text-white leading-snug break-words">
-                        {t.slotCode} · {t.issueCategory}
+                  <div key={t.id} className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <div className="w-16 h-16 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+                        <Wrench className="w-6 h-6" />
                       </div>
-                      <p className="text-[0.875rem] text-black/70 dark:text-white/75 leading-relaxed break-words">{t.description}</p>
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-bold text-black dark:text-white truncate">
+                            {t.slotCode} · {t.issueCategory}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 ${
+                            t.status === 'resolved'
+                              ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
+                              : t.status === 'in_progress'
+                              ? 'bg-amber-100 text-black dark:bg-blue-600 dark:text-white'
+                              : 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
+                          }`}>
+                            {t.status === 'resolved' ? 'Selesai' : t.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate">{t.description}</p>
+                      </div>
                     </div>
-                    <span className={`px-2 py-0.5 rounded-full text-[0.8125rem] font-bold shrink-0 ${
-                      t.status === 'resolved'
-                        ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
-                        : t.status === 'in_progress'
-                        ? 'bg-amber-100 text-black dark:bg-blue-600 dark:text-white'
-                        : 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
-                    }`}>
-                      {t.status === 'resolved' ? 'Selesai' : t.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
-                    </span>
                   </div>
                 ))}
               </div>
