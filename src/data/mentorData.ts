@@ -16,7 +16,8 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     phone: '60199887711',
     bio: 'Berpengalaman lebih 15 tahun membimbing usahawan belia dan pelajar IPT di Pantai Timur mencapai jualan 6 angka melalui saluran digital.',
     availableDays: 'Setiap Isnin & Rabu (10:00 AM - 1:00 PM)',
-    activeMenteesCount: 3
+    activeMenteesCount: 3,
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'mentor-2',
@@ -33,7 +34,8 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     phone: '60129876543',
     bio: 'Pemenang Anugerah Usahawanita Inovatif Kelantan dan panel bimbingan INSKEN yang telah mengeksport produk kraf ke 8 negara.',
     availableDays: 'Setiap Selasa & Khamis (2:30 PM - 5:00 PM)',
-    activeMenteesCount: 2
+    activeMenteesCount: 2,
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'mentor-3',
@@ -50,7 +52,8 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     phone: '60139123456',
     bio: 'Akauntan berpengalaman membantu usahawan mikro menyediakan rekod tunai dan kertas kerja pembiayaan perniagaan sehingga RM50,000.',
     availableDays: 'Setiap Rabu & Sabtu (11:00 AM - 3:00 PM)',
-    activeMenteesCount: 2
+    activeMenteesCount: 2,
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'mentor-4',
@@ -67,7 +70,8 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     phone: '60145556677',
     bio: 'Pakar pensijilan makanan dan pembangunan produk asas tani membantu usahawan mikro luar bandar menembusi pasaran pasar raya.',
     availableDays: 'Setiap Ahad & Khamis (9:30 AM - 12:30 PM)',
-    activeMenteesCount: 1
+    activeMenteesCount: 1,
+    updatedAt: '2026-03-01T08:00:00.000Z'
   }
 ];
 

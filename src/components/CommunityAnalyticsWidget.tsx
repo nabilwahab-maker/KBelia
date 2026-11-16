@@ -301,8 +301,8 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
                 </span>
               </div>
 
-              <div className="relative h-64 sm:h-72 w-full min-w-0 my-2">
-                <ResponsiveContainer width="100%" height={272} minWidth={0}>
+              <div className="relative h-64 sm:h-72 min-h-[272px] w-full min-w-0 my-2">
+                <ResponsiveContainer width="100%" height={272} minWidth={0} initialDimension={{ width: 420, height: 272 }}>
                   <PieChart>
                     <Pie
                       data={SECTOR_BREAKDOWN}
@@ -315,6 +315,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
                       paddingAngle={2}
                       strokeWidth={2}
                       stroke="#FFFFFF"
+                      isAnimationActive={false}
                       onClick={(_, index) => {
                         if (SECTOR_BREAKDOWN[index]) {
                           setActiveSector(SECTOR_BREAKDOWN[index]);
@@ -438,8 +439,8 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
             </span>
           </div>
 
-          <div className="h-80 w-full min-w-0 rounded-xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-600 p-4 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-            <ResponsiveContainer width="100%" height={288} minWidth={0}>
+          <div className="h-80 min-h-[320px] w-full min-w-0 rounded-xl bg-slate-50/70 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-600 p-4 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+            <ResponsiveContainer width="100%" height={288} minWidth={0} initialDimension={{ width: 640, height: 288 }}>
               <BarChart
                 data={quarterlyData}
                 barCategoryGap="18%"
@@ -455,6 +456,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
                 />
                 <YAxis
                   yAxisId="left"
+                  domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
                   tick={{ fontSize: 12.5, fontWeight: 500 }}
                   axisLine={false}
                   tickLine={false}
@@ -463,6 +465,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
                 <YAxis
                   yAxisId="right"
                   orientation="right"
+                  domain={[0, (dataMax: number) => Math.max(dataMax, 20)]}
                   allowDecimals={false}
                   tick={{ fontSize: 12.5, fontWeight: 500 }}
                   axisLine={false}

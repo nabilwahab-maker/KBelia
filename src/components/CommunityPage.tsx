@@ -29,8 +29,7 @@ import {
   toggleCommunityHelpfulRecord,
   saveCommunityReplyRecord,
   deleteCommunityReplyRecord,
-  markAcceptedCommunityReplyRecord,
-  restoreDefaultDemoCommunity
+  markAcceptedCommunityReplyRecord
 } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast } from './ToastNotification';
@@ -88,7 +87,9 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [confirmDeletePostId, setConfirmDeletePostId] = useState<string | null>(null);
   const [confirmDeleteReplyId, setConfirmDeleteReplyId] = useState<string | null>(null);
-  const [isRestoringDemo, setIsRestoringDemo] = useState(false);
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editReplyDraft, setEditReplyDraft] = useState('');
+  const [isSavingReplyEdit, setIsSavingReplyEdit] = useState(false);
 
   // Live selected post from props so votes/replies update instantaneously
   const selectedPost = useMemo(
@@ -346,6 +347,38 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
     }
   };
 
+  const handleStartEditReply = (reply: CommunityReply) => {
+    setEditingReplyId(reply.id);
+    setEditReplyDraft(reply.content);
+    setConfirmDeleteReplyId(null);
+  };
+
+  const handleCancelEditReply = () => {
+    setEditingReplyId(null);
+    setEditReplyDraft('');
+  };
+
+  const handleSaveEditReply = async (reply: CommunityReply) => {
+    if (!selectedPost) return;
+    const trimmed = editReplyDraft.trim();
+    if (!trimmed) {
+      showToast('Teks balasan tidak boleh kosong.', 'warning');
+      return;
+    }
+    setIsSavingReplyEdit(true);
+    try {
+      await saveCommunityReplyRecord({ ...reply, content: trimmed }, selectedPost);
+      setEditingReplyId(null);
+      setEditReplyDraft('');
+      showToast('Balasan berjaya dikemas kini.', 'success');
+      onRefresh();
+    } catch {
+      showToast('Gagal mengemas kini balasan.', 'error');
+    } finally {
+      setIsSavingReplyEdit(false);
+    }
+  };
+
   const handleMarkAccepted = async (reply: CommunityReply) => {
     if (!selectedPost) return;
     if (!isAdmin && selectedPost.authorId !== currentUserId) return;
@@ -360,19 +393,6 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
       onRefresh();
     } catch {
       showToast('Gagal mengemaskini jawapan disahkan.', 'error');
-    }
-  };
-
-  const handleRestoreDemo = async () => {
-    setIsRestoringDemo(true);
-    try {
-      await restoreDefaultDemoCommunity();
-      showToast('Topik contoh Komuniti berjaya dipulihkan.', 'success');
-      onRefresh();
-    } catch {
-      showToast('Gagal memulihkan topik contoh.', 'error');
-    } finally {
-      setIsRestoringDemo(false);
     }
   };
 
@@ -393,18 +413,6 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
           <div className="flex items-center gap-2">
-            {isAdmin && (
-              <button
-                type="button"
-                onClick={handleRestoreDemo}
-                disabled={isRestoringDemo}
-                className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-60"
-                title="Pulihkan topik perbincangan demo"
-              >
-                <RotateCcw className={`w-3.5 h-3.5 ${isRestoringDemo ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">Pulih Demo</span>
-              </button>
-            )}
             <button
               id="btn-community-new-post"
               type="button"
@@ -1001,11 +1009,41 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
                             )}
                           </div>
 
-                          <p className="text-[0.9375rem] text-slate-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
-                            {reply.content}
-                          </p>
+                          {editingReplyId === reply.id ? (
+                            <div className="space-y-2">
+                              <textarea
+                                rows={3}
+                                maxLength={3000}
+                                value={editReplyDraft}
+                                onChange={(e) => setEditReplyDraft(e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl text-sm bg-white dark:bg-zinc-900 border border-blue-400 dark:border-blue-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-y"
+                              />
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  type="button"
+                                  disabled={isSavingReplyEdit}
+                                  onClick={handleCancelEditReply}
+                                  className="px-3 py-1 rounded-lg border border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-slate-600 dark:text-zinc-300 cursor-pointer"
+                                >
+                                  Batal
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={isSavingReplyEdit || !editReplyDraft.trim()}
+                                  onClick={() => handleSaveEditReply(reply)}
+                                  className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold cursor-pointer disabled:opacity-50"
+                                >
+                                  {isSavingReplyEdit ? 'Menyimpan...' : 'Simpan'}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-[0.9375rem] text-slate-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">
+                              {reply.content}
+                            </p>
+                          )}
 
-                          {(canAccept || canDeleteReply) && (
+                          {(canAccept || canDeleteReply) && editingReplyId !== reply.id && (
                             <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
                               {canAccept && (
                                 <button
@@ -1015,6 +1053,17 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
                                 >
                                   <CheckCircle2 className="w-3 h-3" />
                                   <span>{isAccepted ? 'Nyahaktif Jawapan Disahkan' : 'Tanda Jawapan Disahkan'}</span>
+                                </button>
+                              )}
+
+                              {canDeleteReply && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEditReply(reply)}
+                                  className="px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800/70 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer"
+                                >
+                                  <Edit3 className="w-3 h-3" />
+                                  <span>Sunting</span>
                                 </button>
                               )}
 

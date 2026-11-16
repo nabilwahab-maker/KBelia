@@ -23,7 +23,7 @@ import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 interface MentorProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  mentor: MentorProfile;
+  mentor: MentorProfile | null;
   onSave: (updatedMentor: MentorProfile) => void;
   isAdminEditing?: boolean;
 }
@@ -35,15 +35,16 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
   onSave,
   isAdminEditing = false
 }) => {
-  const [name, setName] = useState(mentor.name);
-  const [title, setTitle] = useState(mentor.title);
-  const [agency, setAgency] = useState(mentor.agency);
-  const [phone, setPhone] = useState(mentor.phone);
-  const [email, setEmail] = useState(mentor.email);
-  const [avatarUrl, setAvatarUrl] = useState(mentor.avatarUrl || '');
-  const [availableDays, setAvailableDays] = useState(mentor.availableDays);
-  const [bio, setBio] = useState(mentor.bio);
-  const [expertise, setExpertise] = useState<string[]>(mentor.expertise || []);
+  const isCreating = !mentor;
+  const [name, setName] = useState(mentor?.name || '');
+  const [title, setTitle] = useState(mentor?.title || '');
+  const [agency, setAgency] = useState(mentor?.agency || 'Universiti Malaysia Kelantan (UMK)');
+  const [phone, setPhone] = useState(mentor?.phone || '');
+  const [email, setEmail] = useState(mentor?.email || '');
+  const [avatarUrl, setAvatarUrl] = useState(mentor?.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg');
+  const [availableDays, setAvailableDays] = useState(mentor?.availableDays || 'Ahad & Selasa (9:00 PG - 1:00 PTG)');
+  const [bio, setBio] = useState(mentor?.bio || '');
+  const [expertise, setExpertise] = useState<string[]>(mentor?.expertise || []);
   const [newExpertiseInput, setNewExpertiseInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
@@ -51,15 +52,15 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setName(mentor.name);
-      setTitle(mentor.title);
-      setAgency(mentor.agency);
-      setPhone(mentor.phone);
-      setEmail(mentor.email);
-      setAvatarUrl(mentor.avatarUrl || '');
-      setAvailableDays(mentor.availableDays);
-      setBio(mentor.bio);
-      setExpertise(mentor.expertise || []);
+      setName(mentor?.name || '');
+      setTitle(mentor?.title || '');
+      setAgency(mentor?.agency || 'Universiti Malaysia Kelantan (UMK)');
+      setPhone(mentor?.phone || '');
+      setEmail(mentor?.email || '');
+      setAvatarUrl(mentor?.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg');
+      setAvailableDays(mentor?.availableDays || 'Ahad & Selasa (9:00 PG - 1:00 PTG)');
+      setBio(mentor?.bio || '');
+      setExpertise(mentor?.expertise || []);
       setSuccessToast(null);
     }
   }, [isOpen, mentor]);
@@ -84,26 +85,29 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
     setIsSaving(true);
 
     const updatedProfile: MentorProfile = {
-      ...mentor,
+      ...(mentor || {}),
+      id: mentor?.id || `mentor-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
       name: name.trim(),
       title: title.trim(),
       agency: agency.trim(),
       phone: phone.trim(),
       email: email.trim(),
-      avatarUrl: avatarUrl.trim() || mentor.avatarUrl,
+      avatarUrl: avatarUrl.trim() || mentor?.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg',
       availableDays: availableDays.trim(),
       bio: bio.trim(),
-      expertise: expertise.length > 0 ? expertise : ['Bimbingan Keusahawanan', 'Pemasaran']
+      expertise: expertise.length > 0 ? expertise : ['Bimbingan Keusahawanan', 'Pemasaran'],
+      activeMenteesCount: mentor?.activeMenteesCount ?? 0,
+      updatedAt: new Date().toISOString()
     };
 
     setTimeout(() => {
       onSave(updatedProfile);
       setIsSaving(false);
-      setSuccessToast('Profil mentor berjaya dikemas kini!');
+      setSuccessToast(isCreating ? 'Mentor baharu berjaya didaftarkan!' : 'Profil mentor berjaya dikemas kini!');
       setTimeout(() => {
         onClose();
-      }, 700);
-    }, 300);
+      }, 600);
+    }, 250);
   };
 
   return (
@@ -118,7 +122,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white tracking-tight">
-                {isAdminEditing ? 'Edit Profil Mentor' : 'Edit Profil Saya (Mentor)'}
+                {isCreating ? 'Tambah Mentor Baharu' : isAdminEditing ? 'Edit Profil Mentor' : 'Edit Profil Saya (Mentor)'}
               </h3>
               <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
                 Info bimbingan, waktu temu janji dan maklumat perhubungan rasmi UMK

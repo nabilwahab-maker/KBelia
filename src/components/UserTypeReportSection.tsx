@@ -309,6 +309,14 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
       (Object.keys(USER_TYPE_COLORS) as Array<Exclude<ReportUserTypeKey, 'all'>>).map((key) => ({
         key,
         name: USER_TYPE_COLORS[key].label,
+        shortLabel:
+          key === 'usahawan'
+            ? 'Usahawan'
+            : key === 'mentor'
+            ? 'Mentor'
+            : key === 'pentadbir'
+            ? 'Pentadbir'
+            : 'Komuniti',
         count: countsByType[key],
         percentage: Math.round((countsByType[key] / totalCount) * 100),
         color: USER_TYPE_COLORS[key].fill
@@ -519,24 +527,17 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
               </div>
             </div>
 
-            <div className="relative h-60 w-full min-w-0 my-1 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-              <ResponsiveContainer width="100%" height={240} minWidth={0}>
+            <div className="relative h-60 min-h-[240px] w-full min-w-0 my-1 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+              <ResponsiveContainer width="100%" height={240} minWidth={0} initialDimension={{ width: 420, height: 240 }}>
                 {chartMode === 'bar' ? (
                   <BarChart
-                    data={donutChartData.map(d => ({
-                      ...d,
-                      shortLabel:
-                        d.key === 'usahawan' ? 'Usahawan'
-                          : d.key === 'mentor' ? 'Mentor'
-                          : d.key === 'pentadbir' ? 'Pentadbir'
-                          : 'Komuniti'
-                    }))}
+                    data={donutChartData}
                     barCategoryGap="22%"
-                    margin={{ top: 24, right: 8, left: -18, bottom: 4 }}
+                    margin={{ top: 24, right: 12, left: -4, bottom: 6 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
                     <XAxis dataKey="shortLabel" tick={{ fontSize: 12, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
-                    <YAxis allowDecimals={false} tick={{ fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                    <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} />
                     <Tooltip
                       cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
                       content={({ active, payload }) => {
@@ -556,8 +557,10 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                     />
                     <Bar
                       dataKey="count"
+                      fill="#2563EB"
                       radius={[6, 6, 0, 0]}
                       maxBarSize={46}
+                      minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
                       isAnimationActive={false}
                       onClick={(data) => {
                         const clickedKey = (data as unknown as { key?: Exclude<ReportUserTypeKey, 'all'> })?.key;

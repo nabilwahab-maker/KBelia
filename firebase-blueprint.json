@@ -37,7 +37,8 @@
         "expertise": { "type": "string", "maxLength": 300 },
         "designation": { "type": "string", "maxLength": 150 },
         "institution": { "type": "string", "maxLength": 150 },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["userId", "fullName", "email", "role"]
     },
@@ -72,7 +73,8 @@
         "capsuleSlotId": { "type": "string", "maxLength": 128 },
         "rating": { "type": "number" },
         "reviewsCount": { "type": "number" },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "ownerId", "businessName", "category", "district"]
     },
@@ -93,8 +95,9 @@
         "amenities": { "type": "array" },
         "currentTenantBusinessName": { "type": "string", "maxLength": 150 },
         "currentTenantId": { "type": "string", "maxLength": 128 },
-        "imageUrl": { "type": "string", "maxLength": 500 },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "imageUrl": { "type": "string", "maxLength": 900000 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "code", "name", "hubLocation", "district", "monthlyRate", "status"]
     },
@@ -124,7 +127,8 @@
         "tenancySigned": { "type": "boolean" },
         "tenancySignedAt": { "type": "string", "maxLength": 50 },
         "tenancySignatureName": { "type": "string", "maxLength": 120 },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "slotId", "applicantId", "applicantName", "businessName", "status"]
     },
@@ -151,7 +155,8 @@
         "fundPurpose": { "type": "string", "maxLength": 2000 },
         "status": { "type": "string", "enum": ["pending", "approved", "rejected", "cancelled"] },
         "adminNotes": { "type": "string", "maxLength": 1000 },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "programTitle", "applicantId", "applicantName", "businessName", "status"]
     },
@@ -167,9 +172,10 @@
         "price": { "type": "number" },
         "description": { "type": "string", "maxLength": 1000 },
         "category": { "type": "string", "maxLength": 60 },
-        "imageUrl": { "type": "string", "maxLength": 500 },
+        "imageUrl": { "type": "string", "maxLength": 900000 },
         "inStock": { "type": "boolean" },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "businessId", "ownerId", "name", "price"]
     },
@@ -189,7 +195,8 @@
         "registrationLink": { "type": "string", "maxLength": 500 },
         "imageUrl": { "type": "string", "maxLength": 900000 },
         "isFeatured": { "type": "boolean" },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "title", "category", "description"]
     },
@@ -206,7 +213,8 @@
         "qrSales": { "type": "number" },
         "expenses": { "type": "number" },
         "notes": { "type": "string", "maxLength": 500 },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "ownerId", "date", "cashSales", "qrSales", "expenses"]
     },
@@ -225,7 +233,8 @@
         "description": { "type": "string", "maxLength": 1500 },
         "status": { "type": "string", "enum": ["received", "in_progress", "resolved"] },
         "adminNotes": { "type": "string", "maxLength": 1000 },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "ownerId", "slotCode", "issueCategory", "description", "status"]
     },
@@ -239,14 +248,15 @@
         "title": { "type": "string", "maxLength": 180 },
         "agency": { "type": "string", "maxLength": 150 },
         "expertise": { "type": "array" },
-        "avatarUrl": { "type": "string", "maxLength": 500 },
+        "avatarUrl": { "type": "string", "maxLength": 900000 },
         "email": { "type": "string", "maxLength": 120 },
         "phone": { "type": "string", "maxLength": 30 },
         "bio": { "type": "string", "maxLength": 1500 },
         "availableDays": { "type": "string", "maxLength": 200 },
         "publishedSlots": { "type": "array" },
         "activeMenteesCount": { "type": "number" },
-        "lastActive": { "type": "string", "maxLength": 50 }
+        "lastActive": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "name", "email", "agency"]
     },
@@ -274,7 +284,8 @@
         "notes": { "type": "string", "maxLength": 2000 },
         "mentorActionPlan": { "type": "string", "maxLength": 3000 },
         "meetingLink": { "type": "string", "maxLength": 500 },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "mentorId", "entrepreneurName", "businessName", "status"]
     },
@@ -300,7 +311,8 @@
         "justification": { "type": "string", "maxLength": 2000 },
         "businessReadinessRemark": { "type": "string", "maxLength": 1000 },
         "status": { "type": "string", "enum": ["active", "revoked"] },
-        "issuedAt": { "type": "string", "maxLength": 50 }
+        "issuedAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "endorsementCode", "mentorId", "menteeName", "businessName", "status"]
     },
@@ -317,7 +329,8 @@
         "topic": { "type": "string", "maxLength": 200 },
         "minutes": { "type": "string", "maxLength": 3000 },
         "actionItems": { "type": "array" },
-        "createdAt": { "type": "string", "maxLength": 50 }
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "mentorId", "menteeName", "topic", "minutes"]
     },
@@ -336,7 +349,8 @@
         "description": { "type": "string", "maxLength": 1500 },
         "whatsapp": { "type": "string", "maxLength": 30 },
         "imageUrl": { "type": "string", "maxLength": 900000 },
-        "date": { "type": "string", "maxLength": 50 }
+        "date": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "authorName", "authorBusiness", "type", "title"]
     },
@@ -355,7 +369,8 @@
         "targetUserId": { "type": "string", "maxLength": 128 },
         "timestamp": { "type": "string", "maxLength": 60 },
         "isRead": { "type": "boolean" },
-        "actionTab": { "type": "string", "maxLength": 40 }
+        "actionTab": { "type": "string", "maxLength": 40 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "title", "message", "category", "targetRole"]
     },
@@ -445,7 +460,7 @@
         "id": { "type": "string", "maxLength": 128 },
         "entityType": {
           "type": "string",
-          "enum": ["booking", "grant", "ticket", "session", "endorsement", "log", "cashflow", "notification", "business", "product", "slot", "program", "b2b", "news", "community_post", "community_reply", "mentor", "settings", "deleted"]
+          "enum": ["booking", "grant", "ticket", "session", "endorsement", "log", "cashflow", "notification", "business", "product", "slot", "program", "b2b", "news", "community_post", "community_reply", "mentor", "settings", "event_booking", "event", "user_account", "deleted"]
         },
         "actorId": { "type": "string", "maxLength": 128 },
         "scope": { "type": "string", "enum": ["demo"] },
@@ -454,6 +469,46 @@
         "updatedAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["id", "entityType", "actorId", "scope", "payload", "updatedAt"]
+    },
+    "EventBooking": {
+      "title": "EventBooking",
+      "description": "Pendaftaran tapak acara dan karnival usahawan belia",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "eventId": { "type": "string", "maxLength": 128 },
+        "eventTitle": { "type": "string", "maxLength": 200 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "userName": { "type": "string", "maxLength": 120 },
+        "status": { "type": "string", "enum": ["booked", "cancelled"] },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "eventId", "eventTitle", "userId", "status"]
+    },
+    "YouthEvent": {
+      "title": "YouthEvent",
+      "description": "Acara, karnival, bengkel dan ekspo keusahawanan belia Kelantan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "category": { "type": "string", "enum": ["karnival", "bengkel", "pitching", "expo"] },
+        "date": { "type": "string", "maxLength": 100 },
+        "time": { "type": "string", "maxLength": 100 },
+        "district": { "type": "string", "maxLength": 50 },
+        "location": { "type": "string", "maxLength": 200 },
+        "organizer": { "type": "string", "maxLength": 150 },
+        "boothsAvailable": { "type": "number" },
+        "totalBooths": { "type": "number" },
+        "fee": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "whatsappContact": { "type": "string", "maxLength": 30 },
+        "imageUrl": { "type": "string", "maxLength": 900000 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "title", "category", "date", "district", "location", "organizer"]
     }
   },
   "firestore": {
@@ -540,6 +595,14 @@
     "/demo_sync/{syncId}": {
       "schema": { "$ref": "#/entities/DemoSyncRecord" },
       "description": "Saluran penyelarasan masa nyata sandbox mod demo tanpa PII sensitif"
+    },
+    "/event_bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/EventBooking" },
+      "description": "Rekod pendaftaran acara dan karnival usahawan belia"
+    },
+    "/youth_events/{eventId}": {
+      "schema": { "$ref": "#/entities/YouthEvent" },
+      "description": "Senarai acara, karnival, bengkel dan ekspo keusahawanan belia Kelantan"
     }
   }
 }

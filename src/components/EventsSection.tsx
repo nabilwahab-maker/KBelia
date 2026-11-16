@@ -18,142 +18,100 @@ import {
   AlertTriangle,
   X
 } from 'lucide-react';
-import { KelantanDistrict } from '../types';
+import { KelantanDistrict, YouthEvent } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+import {
+  INITIAL_YOUTH_EVENTS,
+  loadLocalEventBookings,
+  saveEventBookingRecord,
+  subscribeEventBookings,
+  subscribeYouthEvents
+} from '../services/dataService';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveEventImage } from '../utils/visualAssets';
 
-interface YouthEvent {
-  id: string;
-  title: string;
-  category: 'karnival' | 'bengkel' | 'pitching' | 'expo';
-  date: string;
-  time: string;
-  district: KelantanDistrict;
-  location: string;
-  organizer: string;
-  boothsAvailable: number;
-  totalBooths: number;
-  fee: string;
-  description: string;
-  whatsappContact: string;
-  imageUrl?: string;
-}
-
-const SAMPLE_EVENTS: YouthEvent[] = [
-  {
-    id: 'evt-1',
-    title: 'Karnival Niaga Belia Kelantan (Zon Timur)',
-    category: 'karnival',
-    date: '11 - 13 Disember 2026',
-    time: '10.00 PG - 11.00 MLM',
-    district: 'Kota Bharu',
-    location: 'Dataran Muhammadi & Perkarangan Stadium Sultan Muhammad IV',
-    organizer: 'Pihak Penganjur Belia & Sukan Kelantan',
-    boothsAvailable: 8,
-    totalBooths: 40,
-    fee: 'Percuma (Tajaan Penuh Penganjur)',
-    description: 'Peluang jualan mega terbuka untuk 40 usahawan makanan tradisi, batik kontemporari, dan kraf belia dengan sasaran 20,000 pengunjung.',
-    whatsappContact: '601120508890'
-  },
-  {
-    id: 'evt-2',
-    title: 'Bengkel Pensijilan Halal & Digital Taweez Makanan',
-    category: 'bengkel',
-    date: '22 Januari 2027',
-    time: '9.00 PG - 4.30 PTG',
-    district: 'Bachok',
-    location: 'Dewan Keusahawanan Kampus UMK Bachok',
-    organizer: 'Institut Penyelidikan & Pengurusan Halal (IHRAM) UMK',
-    boothsAvailable: 15,
-    totalBooths: 60,
-    fee: 'RM30 (Sijil & Modul)',
-    description: 'Panduan langkah demi langkah memohon sijil Halal JAKIM untuk premis makanan, kiosk kapsul, dan produk bungkusan sejuk beku.',
-    whatsappContact: '60199887766'
-  },
-  {
-    id: 'evt-3',
-    title: 'Hari Terbuka Pemadanan Pelabur & Demo Day Belia',
-    category: 'pitching',
-    date: '14 Februari 2027',
-    time: '9.30 PG - 1.00 PTG',
-    district: 'Kota Bharu',
-    location: 'Auditorium Hab Digital KB Cyber, Kota Bharu',
-    organizer: 'Pusat Keusahawanan Universiti Malaysia Kelantan (UMK)',
-    boothsAvailable: 4,
-    totalBooths: 12,
-    fee: 'Percuma (Atas Jemputan)',
-    description: 'Sesi pembentangan 5-minit pitch di hadapan panel geran permulaan MARA, TEKUN, dan pelabur untuk pembiayaan sehingga RM50,000.',
-    whatsappContact: '60133445566'
-  }
-];
-
 export const EventsSection: React.FC = () => {
   const { language } = useLanguage();
+  const { user, userProfile, isAdmin, openLoginModal } = useAuth();
   const isEn = language === 'en';
 
+  const [events, setEvents] = useState<YouthEvent[]>(INITIAL_YOUTH_EVENTS);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [bookedEvents, setBookedEvents] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_booked_events');
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return [];
+    if (!user?.uid) return [];
+    return loadLocalEventBookings(user.uid)
+      .filter(b => b.status === 'booked')
+      .map(b => b.eventId);
   });
   const [eventToCancel, setEventToCancel] = useState<YouthEvent | null>(null);
 
   useEffect(() => {
-    const syncBooked = () => {
-      try {
-        const saved = localStorage.getItem('kbelia_booked_events');
-        setBookedEvents(saved ? JSON.parse(saved) : []);
-      } catch {
-        // ignore
-      }
-    };
-    window.addEventListener('kbelia_booked_events_updated', syncBooked);
-    window.addEventListener('storage', syncBooked);
-    return () => {
-      window.removeEventListener('kbelia_booked_events_updated', syncBooked);
-      window.removeEventListener('storage', syncBooked);
-    };
+    const unsubEvents = subscribeYouthEvents(setEvents);
+    return () => unsubEvents();
   }, []);
 
-  const handleBookBooth = (eventId: string, eventTitle: string) => {
+  useEffect(() => {
+    if (!user?.uid) {
+      setBookedEvents([]);
+      return;
+    }
+    const unsub = subscribeEventBookings(user.uid, isAdmin, (records) => {
+      const ids = records
+        .filter(b => b.userId === user.uid && b.status === 'booked')
+        .map(b => b.eventId);
+      setBookedEvents(ids);
+    });
+    return () => unsub();
+  }, [user?.uid, isAdmin]);
+
+  const handleBookBooth = async (eventId: string, eventTitle: string) => {
+    if (!user?.uid) {
+      openLoginModal();
+      return;
+    }
     if (bookedEvents.includes(eventId)) {
       showToast(isEn ? 'You have already registered for this event!' : 'Anda telah pun berdaftar untuk acara ini!');
       return;
     }
-    const updated = [...bookedEvents, eventId];
-    setBookedEvents(updated);
+    setBookedEvents(prev => [...prev, eventId]);
     try {
-      localStorage.setItem('kbelia_booked_events', JSON.stringify(updated));
-      window.dispatchEvent(new Event('kbelia_booked_events_updated'));
+      await saveEventBookingRecord(
+        eventId,
+        eventTitle,
+        user.uid,
+        userProfile?.fullName || user.displayName || 'Usahawan Belia',
+        'booked'
+      );
+      showToast(isEn ? `Successfully registered for: ${eventTitle}` : `Pendaftaran slot gerai bagi: ${eventTitle} berjaya!`);
     } catch {
-      // ignore
+      showToast(isEn ? 'Failed to register booth. Please try again.' : 'Gagal mendaftar slot gerai. Sila cuba lagi.');
     }
-    showToast(isEn ? `Successfully registered for: ${eventTitle}` : `Pendaftaran slot gerai bagi: ${eventTitle} berjaya!`);
   };
 
-  const handleCancelBooking = (eventId: string, eventTitle: string) => {
-    const updated = bookedEvents.filter(id => id !== eventId);
-    setBookedEvents(updated);
+  const handleCancelBooking = async (eventId: string, eventTitle: string) => {
+    if (!user?.uid) return;
+    setBookedEvents(prev => prev.filter(id => id !== eventId));
     try {
-      localStorage.setItem('kbelia_booked_events', JSON.stringify(updated));
-      window.dispatchEvent(new Event('kbelia_booked_events_updated'));
+      await saveEventBookingRecord(
+        eventId,
+        eventTitle,
+        user.uid,
+        userProfile?.fullName || user.displayName || 'Usahawan Belia',
+        'cancelled'
+      );
+      showToast(isEn ? `Registration cancelled for: ${eventTitle}` : `Pendaftaran untuk ${eventTitle} telah dibatalkan.`);
     } catch {
-      // ignore
+      showToast(isEn ? 'Failed to cancel registration.' : 'Gagal membatalkan pendaftaran acara.');
+    } finally {
+      setEventToCancel(null);
     }
-    showToast(isEn ? `Registration cancelled for: ${eventTitle}` : `Pendaftaran untuk ${eventTitle} telah dibatalkan.`);
-    setEventToCancel(null);
   };
 
-  const filteredEvents = SAMPLE_EVENTS.filter((evt) => {
+  const filteredEvents = events.filter((evt) => {
     const matchCat = selectedCategory === 'all' || evt.category === selectedCategory;
     const matchDist = selectedDistrict === 'all' || evt.district === selectedDistrict;
     const matchSearch = !searchQuery || 

@@ -34,6 +34,7 @@ export interface UserProfile {
   designation?: string;
   institution?: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export type BusinessCategory = 
@@ -85,6 +86,7 @@ export interface BusinessListing {
   rating?: number;
   reviewsCount?: number;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export type SlotStatus = 'available' | 'occupied' | 'maintenance' | 'reserved';
@@ -104,6 +106,7 @@ export interface CapsuleSlot {
   currentTenantId?: string;
   imageUrl?: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export type BookingStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
@@ -131,6 +134,7 @@ export interface CapsuleBooking {
   tenancySignedAt?: string;
   tenancySignatureName?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface ProductItem {
@@ -144,6 +148,7 @@ export interface ProductItem {
   imageUrl: string;
   inStock: boolean;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface YouthProgram {
@@ -159,6 +164,7 @@ export interface YouthProgram {
   imageUrl?: string;
   isFeatured?: boolean;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface GrantApplication {
@@ -181,6 +187,7 @@ export interface GrantApplication {
   status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   adminNotes?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface DistrictSummary {
@@ -205,6 +212,7 @@ export interface KioskDailySale {
   expenses: number;
   notes?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface B2BListing {
@@ -219,6 +227,7 @@ export interface B2BListing {
   whatsapp: string;
   imageUrl?: string;
   date: string;
+  updatedAt?: string;
 }
 
 export interface MaintenanceTicket {
@@ -233,6 +242,7 @@ export interface MaintenanceTicket {
   status: 'received' | 'in_progress' | 'resolved';
   adminNotes?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface PublishedMentorSlot {
@@ -258,6 +268,7 @@ export interface MentorProfile {
   activeMenteesCount?: number;
   pin?: string;
   lastActive?: string;
+  updatedAt?: string;
 }
 
 export interface MentorshipRegistration {
@@ -281,6 +292,7 @@ export interface MentorshipRegistration {
   mentorActionPlan?: string;
   meetingLink?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface MentorSession {
@@ -309,6 +321,7 @@ export interface YouthNotification {
   timestamp: string;
   isRead: boolean;
   actionTab?: string;
+  updatedAt?: string;
 }
 
 export interface PortalSettings {
@@ -345,6 +358,8 @@ export type AdminSubTab =
   | 'slots'       // Pengurusan Kapsul
   | 'programs'    // Geran & Inisiatif
   | 'mentors'     // Bimbingan Mentor
+  | 'events'      // Acara & Tempahan Karnival
+  | 'users'       // Urus Pengguna Portal
   | 'news'        // Pengurusan Berita Rasmi
   | 'b2b'         // Ruang Niaga & Iklan Bergambar
   | 'sync'        // Segerak Pangkalan Data
@@ -441,6 +456,7 @@ export interface GrantEndorsementLetter {
   businessReadinessRemark: string;
   issuedAt: string;
   status: 'active' | 'revoked';
+  updatedAt?: string;
 }
 
 export type GrantEndorsement = GrantEndorsementLetter;
@@ -455,5 +471,36 @@ export interface MentoringLogEntry {
   minutes: string;
   actionItems: { id: string; task: string; completed: boolean; dueDate: string }[];
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface EventBooking {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  userId: string;
+  userName?: string;
+  status: 'booked' | 'cancelled';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface YouthEvent {
+  id: string;
+  title: string;
+  category: 'karnival' | 'bengkel' | 'pitching' | 'expo';
+  date: string;
+  time: string;
+  district: KelantanDistrict;
+  location: string;
+  organizer: string;
+  boothsAvailable: number;
+  totalBooths: number;
+  fee: string;
+  description: string;
+  whatsappContact: string;
+  imageUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 

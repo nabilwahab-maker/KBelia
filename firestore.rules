@@ -63,7 +63,7 @@ service cloud.firestore {
           'businessStage', 'businessHours', 'businessAddress', 'businessStatus', 'facebook',
           'instagram', 'tiktok', 'bankName', 'bankAccountNumber', 'bankAccountHolder',
           'notifyWhatsApp', 'notifyEmail', 'hidePhonePublic', 'department', 'expertise',
-          'designation', 'institution', 'createdAt'
+          'designation', 'institution', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.userId, 128) &&
         validStr(data.fullName, 120) &&
@@ -97,7 +97,8 @@ service cloud.firestore {
         (!('expertise' in data) || validStr(data.expertise, 300)) &&
         (!('designation' in data) || validStr(data.designation, 150)) &&
         (!('institution' in data) || validStr(data.institution, 150)) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidBusiness(data) {
@@ -107,7 +108,7 @@ service cloud.firestore {
           'tagline', 'category', 'district', 'description', 'ssmNumber', 'whatsapp',
           'facebook', 'instagram', 'tiktok', 'logoUrl', 'bannerUrl', 'bankName',
           'bankAccountNumber', 'businessHours', 'businessAddress', 'isApproved',
-          'isFeatured', 'capsuleSlotId', 'rating', 'reviewsCount', 'createdAt'
+          'isFeatured', 'capsuleSlotId', 'rating', 'reviewsCount', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.ownerId, 128) &&
@@ -135,7 +136,8 @@ service cloud.firestore {
         (!('capsuleSlotId' in data) || validStr(data.capsuleSlotId, 128)) &&
         (!('rating' in data) || data.rating is number) &&
         (!('reviewsCount' in data) || data.reviewsCount is number) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidCapsuleSlot(data) {
@@ -143,7 +145,7 @@ service cloud.firestore {
         data.keys().hasOnly([
           'id', 'code', 'name', 'hubLocation', 'district', 'size', 'monthlyRate',
           'dailyRate', 'status', 'amenities', 'currentTenantBusinessName',
-          'currentTenantId', 'imageUrl', 'createdAt'
+          'currentTenantId', 'imageUrl', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.code, 30) &&
@@ -158,7 +160,8 @@ service cloud.firestore {
         (!('currentTenantBusinessName' in data) || validStr(data.currentTenantBusinessName, 150)) &&
         (!('currentTenantId' in data) || validStr(data.currentTenantId, 128)) &&
         (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidCapsuleBooking(data) {
@@ -168,7 +171,7 @@ service cloud.firestore {
           'applicantName', 'applicantEmail', 'applicantPhone', 'applicantMyKad',
           'businessName', 'businessCategory', 'durationMonths', 'startDate',
           'monthlyRate', 'pitchNotes', 'status', 'adminNotes', 'tenancySigned',
-          'tenancySignedAt', 'tenancySignatureName', 'createdAt'
+          'tenancySignedAt', 'tenancySignatureName', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.slotId, 128) &&
@@ -191,7 +194,8 @@ service cloud.firestore {
         (!('tenancySigned' in data) || data.tenancySigned is bool) &&
         (!('tenancySignedAt' in data) || validStr(data.tenancySignedAt, 50)) &&
         (!('tenancySignatureName' in data) || validStr(data.tenancySignatureName, 120)) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidGrantApplication(data) {
@@ -200,7 +204,7 @@ service cloud.firestore {
           'id', 'programId', 'programTitle', 'grantAmount', 'amount', 'applicantId',
           'applicantName', 'applicantEmail', 'applicantPhone', 'businessName',
           'businessCategory', 'district', 'ssmNumber', 'bankName',
-          'bankAccountNumber', 'fundPurpose', 'status', 'adminNotes', 'createdAt'
+          'bankAccountNumber', 'fundPurpose', 'status', 'adminNotes', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.programTitle, 200) &&
@@ -220,12 +224,13 @@ service cloud.firestore {
         (!('bankAccountNumber' in data) || validStr(data.bankAccountNumber, 40)) &&
         (!('fundPurpose' in data) || validStr(data.fundPurpose, 2000)) &&
         (!('adminNotes' in data) || validStr(data.adminNotes, 1000)) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidProduct(data) {
       return data.keys().hasAll(['id', 'businessId', 'ownerId', 'name', 'price']) &&
-        data.keys().hasOnly(['id', 'businessId', 'ownerId', 'name', 'price', 'description', 'category', 'imageUrl', 'inStock', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'businessId', 'ownerId', 'name', 'price', 'description', 'category', 'imageUrl', 'inStock', 'createdAt', 'updatedAt']) &&
         validStr(data.id, 128) &&
         validStr(data.businessId, 128) &&
         validStr(data.ownerId, 128) &&
@@ -235,14 +240,15 @@ service cloud.firestore {
         (!('category' in data) || validStr(data.category, 60)) &&
         (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
         (!('inStock' in data) || data.inStock is bool) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidProgram(data) {
       return data.keys().hasAll(['id', 'title', 'category', 'description']) &&
         data.keys().hasOnly([
           'id', 'title', 'category', 'date', 'location', 'description',
-          'organizer', 'grantAmount', 'registrationLink', 'imageUrl', 'isFeatured', 'createdAt'
+          'organizer', 'grantAmount', 'registrationLink', 'imageUrl', 'isFeatured', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.title, 200) &&
@@ -255,12 +261,13 @@ service cloud.firestore {
         (!('registrationLink' in data) || validStr(data.registrationLink, 500)) &&
         (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
         (!('isFeatured' in data) || data.isFeatured is bool) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidCashflow(data) {
       return data.keys().hasAll(['id', 'ownerId', 'date', 'cashSales', 'qrSales', 'expenses']) &&
-        data.keys().hasOnly(['id', 'ownerId', 'businessName', 'date', 'cashSales', 'qrSales', 'expenses', 'notes', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'ownerId', 'businessName', 'date', 'cashSales', 'qrSales', 'expenses', 'notes', 'createdAt', 'updatedAt']) &&
         validStr(data.id, 128) &&
         validStr(data.ownerId, 128) &&
         validStr(data.date, 30) &&
@@ -269,14 +276,15 @@ service cloud.firestore {
         data.expenses is number &&
         (!('businessName' in data) || validStr(data.businessName, 150)) &&
         (!('notes' in data) || validStr(data.notes, 500)) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidMaintenanceTicket(data) {
       return data.keys().hasAll(['id', 'ownerId', 'slotCode', 'issueCategory', 'description', 'status']) &&
         data.keys().hasOnly([
           'id', 'ownerId', 'slotCode', 'kioskName', 'reporterName',
-          'reporterPhone', 'issueCategory', 'description', 'status', 'adminNotes', 'createdAt'
+          'reporterPhone', 'issueCategory', 'description', 'status', 'adminNotes', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.ownerId, 128) &&
@@ -288,14 +296,15 @@ service cloud.firestore {
         (!('reporterName' in data) || validStr(data.reporterName, 120)) &&
         (!('reporterPhone' in data) || validStr(data.reporterPhone, 30)) &&
         (!('adminNotes' in data) || validStr(data.adminNotes, 1000)) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidMentorProfile(data) {
       return data.keys().hasAll(['id', 'name', 'email', 'agency']) &&
         data.keys().hasOnly([
           'id', 'name', 'title', 'agency', 'expertise', 'avatarUrl',
-          'email', 'phone', 'bio', 'availableDays', 'publishedSlots', 'activeMenteesCount', 'lastActive'
+          'email', 'phone', 'bio', 'availableDays', 'publishedSlots', 'activeMenteesCount', 'lastActive', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.name, 120) &&
@@ -309,7 +318,8 @@ service cloud.firestore {
         (!('availableDays' in data) || validStr(data.availableDays, 200)) &&
         (!('publishedSlots' in data) || (data.publishedSlots is list && data.publishedSlots.size() <= 50 && (data.publishedSlots.size() == 0 || data.publishedSlots[0] is map))) &&
         (!('activeMenteesCount' in data) || data.activeMenteesCount is number) &&
-        (!('lastActive' in data) || validStr(data.lastActive, 50));
+        (!('lastActive' in data) || validStr(data.lastActive, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidMentorSession(data) {
@@ -318,7 +328,7 @@ service cloud.firestore {
           'id', 'applicantId', 'mentorId', 'mentorName', 'entrepreneurName',
           'entrepreneurPhone', 'entrepreneurEmail', 'businessName', 'district',
           'businessCategory', 'topic', 'challenges', 'preferredDate', 'preferredTime',
-          'mode', 'status', 'notes', 'mentorActionPlan', 'meetingLink', 'createdAt'
+          'mode', 'status', 'notes', 'mentorActionPlan', 'meetingLink', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.mentorId, 128) &&
@@ -339,7 +349,8 @@ service cloud.firestore {
         (!('notes' in data) || validStr(data.notes, 2000)) &&
         (!('mentorActionPlan' in data) || validStr(data.mentorActionPlan, 3000)) &&
         (!('meetingLink' in data) || validStr(data.meetingLink, 500)) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidGrantEndorsement(data) {
@@ -349,7 +360,7 @@ service cloud.firestore {
           'mentorDesignation', 'menteeId', 'menteeName', 'menteePhone',
           'businessName', 'businessCategory', 'district', 'recommendedAmount',
           'grantProgramTitle', 'justification', 'businessReadinessRemark',
-          'issuedAt', 'status'
+          'issuedAt', 'status', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.endorsementCode, 80) &&
@@ -368,14 +379,15 @@ service cloud.firestore {
         (!('grantProgramTitle' in data) || validStr(data.grantProgramTitle, 200)) &&
         (!('justification' in data) || validStr(data.justification, 2000)) &&
         (!('businessReadinessRemark' in data) || validStr(data.businessReadinessRemark, 1000)) &&
-        (!('issuedAt' in data) || validStr(data.issuedAt, 50));
+        (!('issuedAt' in data) || validStr(data.issuedAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidMentoringLog(data) {
       return data.keys().hasAll(['id', 'mentorId', 'menteeName', 'topic', 'minutes']) &&
         data.keys().hasOnly([
           'id', 'mentorId', 'menteeName', 'businessName', 'sessionDate',
-          'topic', 'minutes', 'actionItems', 'createdAt'
+          'topic', 'minutes', 'actionItems', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.mentorId, 128) &&
@@ -385,12 +397,13 @@ service cloud.firestore {
         (!('businessName' in data) || validStr(data.businessName, 150)) &&
         (!('sessionDate' in data) || validStr(data.sessionDate, 50)) &&
         (!('actionItems' in data) || (data.actionItems is list && data.actionItems.size() <= 30 && (data.actionItems.size() == 0 || data.actionItems[0] is map))) &&
-        (!('createdAt' in data) || validStr(data.createdAt, 50));
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidB2BListing(data) {
       return data.keys().hasAll(['id', 'authorName', 'authorBusiness', 'type', 'title']) &&
-        data.keys().hasOnly(['id', 'ownerId', 'authorName', 'authorBusiness', 'district', 'type', 'title', 'description', 'whatsapp', 'imageUrl', 'date']) &&
+        data.keys().hasOnly(['id', 'ownerId', 'authorName', 'authorBusiness', 'district', 'type', 'title', 'description', 'whatsapp', 'imageUrl', 'date', 'updatedAt']) &&
         validStr(data.id, 128) &&
         validStr(data.authorName, 120) &&
         validStr(data.authorBusiness, 150) &&
@@ -401,14 +414,15 @@ service cloud.firestore {
         (!('description' in data) || validStr(data.description, 1500)) &&
         (!('whatsapp' in data) || validStr(data.whatsapp, 30)) &&
         (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
-        (!('date' in data) || validStr(data.date, 50));
+        (!('date' in data) || validStr(data.date, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidNotification(data) {
       return data.keys().hasAll(['id', 'title', 'message', 'category', 'targetRole']) &&
         data.keys().hasOnly([
           'id', 'title', 'message', 'category', 'sender', 'senderRole',
-          'targetRole', 'targetUserId', 'timestamp', 'isRead', 'actionTab'
+          'targetRole', 'targetUserId', 'timestamp', 'isRead', 'actionTab', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.title, 180) &&
@@ -420,7 +434,8 @@ service cloud.firestore {
         (!('targetUserId' in data) || validStr(data.targetUserId, 128)) &&
         (!('timestamp' in data) || validStr(data.timestamp, 60)) &&
         (!('isRead' in data) || data.isRead is bool) &&
-        (!('actionTab' in data) || validStr(data.actionTab, 40));
+        (!('actionTab' in data) || validStr(data.actionTab, 40)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
     function isValidPortalSettings(data) {
@@ -513,6 +528,46 @@ service cloud.firestore {
         (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
 
+    function isValidEventBooking(data) {
+      return data.keys().hasAll(['id', 'eventId', 'eventTitle', 'userId', 'status']) &&
+        data.keys().hasOnly([
+          'id', 'eventId', 'eventTitle', 'userId', 'userName', 'status', 'createdAt', 'updatedAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        validStr(data.eventId, 128) &&
+        data.eventTitle is string && data.eventTitle.size() >= 1 && data.eventTitle.size() <= 200 &&
+        validStr(data.userId, 128) &&
+        data.status in ['booked', 'cancelled'] &&
+        (!('userName' in data) || validStr(data.userName, 120)) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
+    }
+
+    function isValidYouthEvent(data) {
+      return data.keys().hasAll(['id', 'title', 'category', 'date', 'district', 'location', 'organizer']) &&
+        data.keys().hasOnly([
+          'id', 'title', 'category', 'date', 'time', 'district', 'location',
+          'organizer', 'boothsAvailable', 'totalBooths', 'fee', 'description',
+          'whatsappContact', 'imageUrl', 'createdAt', 'updatedAt'
+        ]) &&
+        validStr(data.id, 128) &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.category in ['karnival', 'bengkel', 'pitching', 'expo'] &&
+        validStr(data.date, 100) &&
+        validStr(data.district, 50) &&
+        validStr(data.location, 200) &&
+        validStr(data.organizer, 150) &&
+        (!('time' in data) || validStr(data.time, 100)) &&
+        (!('boothsAvailable' in data) || data.boothsAvailable is number) &&
+        (!('totalBooths' in data) || data.totalBooths is number) &&
+        (!('fee' in data) || validStr(data.fee, 100)) &&
+        (!('description' in data) || validStr(data.description, 2000)) &&
+        (!('whatsappContact' in data) || validStr(data.whatsappContact, 30)) &&
+        (!('imageUrl' in data) || validStr(data.imageUrl, 900000)) &&
+        (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
+        (!('updatedAt' in data) || validStr(data.updatedAt, 50));
+    }
+
     function isValidDemoSync(data) {
       return data.keys().hasAll(['id', 'entityType', 'actorId', 'scope', 'payload', 'updatedAt']) &&
         data.keys().hasOnly(['id', 'entityType', 'actorId', 'scope', 'payload', 'deleted', 'updatedAt']) &&
@@ -520,7 +575,8 @@ service cloud.firestore {
         data.entityType in [
           'booking', 'grant', 'ticket', 'session', 'endorsement', 'log', 'cashflow',
           'notification', 'business', 'product', 'slot', 'program', 'b2b', 'news',
-          'community_post', 'community_reply', 'mentor', 'settings', 'deleted'
+          'community_post', 'community_reply', 'mentor', 'settings', 'event_booking',
+          'event', 'user_account', 'deleted'
         ] &&
         validStr(data.actorId, 128) &&
         data.scope == 'demo' &&
@@ -598,7 +654,7 @@ service cloud.firestore {
             'category', 'district', 'description', 'ssmNumber', 'whatsapp',
             'facebook', 'instagram', 'tiktok', 'logoUrl', 'bannerUrl',
             'bankName', 'bankAccountNumber', 'businessHours', 'businessAddress',
-            'capsuleSlotId'
+            'capsuleSlotId', 'updatedAt'
           ])
         )
       );
@@ -630,13 +686,13 @@ service cloud.firestore {
           existing().applicantId == request.auth.uid &&
           incoming().applicantId == existing().applicantId &&
           incoming().status == existing().status &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['tenancySigned', 'tenancySignedAt', 'tenancySignatureName', 'pitchNotes', 'applicantPhone'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['tenancySigned', 'tenancySignedAt', 'tenancySignatureName', 'pitchNotes', 'applicantPhone', 'updatedAt'])
         ) || (
           existing().applicantId == request.auth.uid &&
           incoming().applicantId == existing().applicantId &&
           existing().status in ['pending', 'approved'] &&
           incoming().status == 'cancelled' &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes', 'updatedAt'])
         )
       );
       allow delete: if isAdmin() && isValidId(bookingId);
@@ -658,7 +714,7 @@ service cloud.firestore {
           incoming().applicantId == existing().applicantId &&
           existing().status == 'pending' &&
           incoming().status == 'cancelled' &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes', 'updatedAt'])
         )
       );
       allow delete: if isAdmin() && isValidId(grantId);
@@ -675,7 +731,7 @@ service cloud.firestore {
         isAdmin() || (
           existing().ownerId == request.auth.uid &&
           incoming().ownerId == existing().ownerId &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'price', 'description', 'category', 'imageUrl', 'inStock'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'price', 'description', 'category', 'imageUrl', 'inStock', 'updatedAt'])
         )
       );
       allow delete: if isSignedIn() && isValidId(productId) && (
@@ -702,7 +758,7 @@ service cloud.firestore {
         isAdmin() || (
           existing().ownerId == request.auth.uid &&
           incoming().ownerId == existing().ownerId &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['businessName', 'date', 'cashSales', 'qrSales', 'expenses', 'notes'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['businessName', 'date', 'cashSales', 'qrSales', 'expenses', 'notes', 'updatedAt'])
         )
       );
       allow delete: if isSignedIn() && isValidId(recordId) && (
@@ -735,7 +791,7 @@ service cloud.firestore {
           getMentorId() == mentorId &&
           incoming().id == existing().id &&
           incoming().diff(existing()).affectedKeys().hasOnly([
-            'name', 'title', 'agency', 'expertise', 'avatarUrl', 'email', 'phone', 'bio', 'availableDays', 'publishedSlots'
+            'name', 'title', 'agency', 'expertise', 'avatarUrl', 'email', 'phone', 'bio', 'availableDays', 'publishedSlots', 'updatedAt'
           ])
         )
       );
@@ -766,14 +822,14 @@ service cloud.firestore {
           existing().mentorId == getMentorId() &&
           incoming().mentorId == existing().mentorId &&
           incoming().get('applicantId', '') == existing().get('applicantId', '') &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'notes', 'mentorActionPlan', 'meetingLink'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'notes', 'mentorActionPlan', 'meetingLink', 'updatedAt'])
         ) || (
           'applicantId' in existing() &&
           existing().applicantId == request.auth.uid &&
           incoming().mentorId == existing().mentorId &&
           incoming().get('applicantId', '') == existing().get('applicantId', '') &&
           incoming().status == 'cancelled' &&
-          incoming().diff(existing()).affectedKeys().hasOnly(['status'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
         )
       );
       allow delete: if isAdmin() && isValidId(sessionId);
@@ -798,7 +854,7 @@ service cloud.firestore {
           existing().mentorId == getMentorId() &&
           incoming().mentorId == existing().mentorId &&
           incoming().diff(existing()).affectedKeys().hasOnly([
-            'status', 'justification', 'businessReadinessRemark', 'recommendedAmount', 'grantProgramTitle'
+            'status', 'justification', 'businessReadinessRemark', 'recommendedAmount', 'grantProgramTitle', 'updatedAt'
           ])
         )
       );
@@ -820,20 +876,33 @@ service cloud.firestore {
           existing().mentorId == getMentorId() &&
           incoming().mentorId == existing().mentorId &&
           incoming().diff(existing()).affectedKeys().hasOnly([
-            'menteeName', 'businessName', 'sessionDate', 'topic', 'minutes', 'actionItems'
+            'menteeName', 'businessName', 'sessionDate', 'topic', 'minutes', 'actionItems', 'updatedAt'
           ])
         )
       );
       allow delete: if isAdmin() && isValidId(logId);
     }
 
-    // 15. B2B Listings Collection (Admin Publish & Image Control Only)
+    // 15. B2B Listings Collection (Admin + Signed-In Youth Owner Control)
     match /b2b_listings/{listingId} {
       allow get: if isValidId(listingId);
       allow list: if true;
-      allow create: if isAdmin() && isValidId(listingId) && isValidB2BListing(incoming());
-      allow update: if isAdmin() && isValidId(listingId) && isValidB2BListing(incoming());
-      allow delete: if isAdmin() && isValidId(listingId);
+      allow create: if isSignedIn() && isValidId(listingId) && isValidB2BListing(incoming()) && (
+        isAdmin() || ('ownerId' in incoming() && incoming().ownerId == request.auth.uid)
+      );
+      allow update: if isSignedIn() && isValidId(listingId) && isValidB2BListing(incoming()) && (
+        isAdmin() || (
+          'ownerId' in existing() &&
+          existing().ownerId == request.auth.uid &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'authorName', 'authorBusiness', 'district', 'type', 'title', 'description', 'whatsapp', 'imageUrl', 'date', 'updatedAt'
+          ])
+        )
+      );
+      allow delete: if isSignedIn() && isValidId(listingId) && (
+        isAdmin() || ('ownerId' in existing() && existing().ownerId == request.auth.uid)
+      );
     }
 
     // 16. Notifications Collection (Role & Target User Isolated + Query Enforced)
@@ -873,7 +942,7 @@ service cloud.firestore {
       );
       allow update: if isSignedIn() && isValidId(notifId) && isValidNotification(incoming()) && (
         isAdmin() || (
-          incoming().diff(existing()).affectedKeys().hasOnly(['isRead']) && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['isRead', 'updatedAt']) && (
             existing().get('targetUserId', '') == request.auth.uid ||
             (
               existing().get('targetUserId', '') == '' &&
@@ -988,7 +1057,27 @@ service cloud.firestore {
       );
     }
 
-    // 21. Demo Sandbox Sync Collection (Non-PII Real-Time Sync for Demo Sessions)
+    // 21. Event Bookings Collection (User Own Bookings + Admin Oversight)
+    match /event_bookings/{bookingId} {
+      allow get: if isValidId(bookingId) && (isAdmin() || (isSignedIn() && existing().userId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(bookingId) && isValidEventBooking(incoming()) && (
+        isAdmin() || incoming().userId == request.auth.uid
+      );
+      allow update: if isSignedIn() && isValidId(bookingId) && isValidEventBooking(incoming()) && (
+        isAdmin() || (
+          existing().userId == request.auth.uid &&
+          incoming().userId == existing().userId &&
+          incoming().eventId == existing().eventId &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+        )
+      );
+      allow delete: if isSignedIn() && isValidId(bookingId) && (
+        isAdmin() || existing().userId == request.auth.uid
+      );
+    }
+
+    // 22. Demo Sandbox Sync Collection (Non-PII Real-Time Sync for Demo & Real Cross-Account Visibility)
     match /demo_sync/{syncId} {
       allow get: if isValidId(syncId) && (isAdmin() || (isSignedIn() && existing().scope == 'demo'));
       allow list: if isAdmin() || (isSignedIn() && existing().scope == 'demo');
@@ -998,11 +1087,20 @@ service cloud.firestore {
         incoming().scope == 'demo' &&
         existing().scope == 'demo' &&
         incoming().id == existing().id &&
+        incoming().actorId == request.auth.uid &&
         incoming().diff(existing()).affectedKeys().hasOnly(['payload', 'updatedAt', 'deleted', 'actorId']);
       allow delete: if isSignedIn() && isValidId(syncId) && (isAdmin() || existing().actorId == request.auth.uid);
     }
 
-    // 22. Test connection doc (read-only ping)
+    // 23. Youth Events Collection (Public Read; Admin Full CRUD)
+    match /youth_events/{eventId} {
+      allow get: if isValidId(eventId);
+      allow list: if true;
+      allow create, update: if isAdmin() && isValidId(eventId) && isValidYouthEvent(incoming());
+      allow delete: if isAdmin() && isValidId(eventId);
+    }
+
+    // 24. Test connection doc (read-only ping)
     match /test/{docId} {
       allow get: if isValidId(docId);
       allow write: if isAdmin() && isValidId(docId);

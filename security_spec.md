@@ -30,3 +30,5 @@
 13. Non-admin (Belia/Mentor) attempting to `get`/`list` a `draft` document or write/delete `/portal_news/{newsId}`.
 14. Non-admin attempting to set `isPinned: true`, spoof another user's `authorId`/`authorRole`, or edit/delete another user's `/community_posts/{postId}` or `/community_replies/{replyId}`.
 15. Creating a `/community_replies/{replyId}` referencing a non-existent `postId` or pre-marking `isAccepted: true` as a non-author.
+16. Creating or updating `/event_bookings/{bookingId}` with another user's `userId` or reading another user's private event booking record without Admin privilege.
+17. Writing unmasked PII or invalid entity types into `/demo_sync/{syncId}` or spoofing `actorId` on update.

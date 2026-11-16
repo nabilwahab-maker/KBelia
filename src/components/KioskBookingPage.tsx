@@ -365,7 +365,8 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
         'Tempahan dibatalkan oleh usahawan.',
         activeBooking.slotId,
         activeBooking.businessName,
-        activeBooking.applicantId
+        activeBooking.applicantId,
+        activeBooking
       );
       setIsConfirmingCancel(false);
       showToast({

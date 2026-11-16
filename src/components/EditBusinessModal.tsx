@@ -28,6 +28,7 @@ const DISTRICTS: KelantanDistrict[] = [
 interface EditBusinessModalProps {
   isOpen: boolean;
   business: BusinessListing | null;
+  isCreating?: boolean;
   onClose: () => void;
   onSaved: (updated: BusinessListing) => void;
 }
@@ -35,6 +36,7 @@ interface EditBusinessModalProps {
 export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
   isOpen,
   business,
+  isCreating = false,
   onClose,
   onSaved
 }) => {
@@ -55,7 +57,8 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isOpen && business) {
+    if (!isOpen) return;
+    if (business) {
       setBusinessName(business.businessName || '');
       setOwnerName(business.ownerName || '');
       setOwnerPhone(business.ownerPhone || '');
@@ -69,10 +72,24 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
       setDescription(business.description || '');
       setIsApproved(business.isApproved !== false);
       setIsFeatured(Boolean(business.isFeatured));
-      setError(null);
-      setIsSaving(false);
+    } else if (isCreating) {
+      setBusinessName('');
+      setOwnerName('');
+      setOwnerPhone('');
+      setWhatsapp('');
+      setCategory('Makanan & Minuman (F&B)');
+      setDistrict('Kota Bharu');
+      setSsmNumber('');
+      setBusinessHours('9.00 PG - 6.00 PTG');
+      setBusinessAddress('');
+      setTagline('');
+      setDescription('');
+      setIsApproved(true);
+      setIsFeatured(false);
     }
-  }, [isOpen, business]);
+    setError(null);
+    setIsSaving(false);
+  }, [isOpen, business, isCreating]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -83,7 +100,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isSaving, onClose]);
 
-  if (!isOpen || !business) return null;
+  if (!isOpen || (!business && !isCreating)) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,11 +115,12 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
     try {
       setIsSaving(true);
       const updated = await saveBusinessListing({
-        ...business,
-        id: business.id,
-        ownerId: business.ownerId,
+        ...(business || {}),
+        id: business?.id,
+        ownerId: business?.ownerId || `admin-owner-${Date.now()}`,
+        ownerEmail: business?.ownerEmail || 'urusetia@kbelia.kelantan.gov.my',
         businessName: trimmedName,
-        ownerName: ownerName.trim() || business.ownerName,
+        ownerName: ownerName.trim() || business?.ownerName || 'Usahawan Belia',
         ownerPhone: ownerPhone.trim(),
         whatsapp: whatsapp.trim() || ownerPhone.trim(),
         category,
@@ -145,7 +163,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
             </div>
             <div className="min-w-0">
               <h3 id="edit-business-modal-title" className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
-                Edit Maklumat Perniagaan
+                {business ? 'Edit Maklumat Perniagaan' : 'Tambah Perniagaan Baharu'}
               </h3>
               <p className="text-[0.875rem] text-black/70 dark:text-white/75 truncate">
                 Ubah suai nama kedai, kategori, lokasi, nombor telefon dan status paparan.

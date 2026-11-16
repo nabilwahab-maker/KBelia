@@ -8,7 +8,12 @@ import {
 import { KioskDailySale } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
-import { isProductionAuthenticated, saveCashflowRecord, deleteCashflowRecord } from '../services/dataService';
+import {
+  getDeletedIds,
+  saveCashflowRecord,
+  deleteCashflowRecord,
+  getSeededDemoCashflowRecords
+} from '../services/dataService';
 import { mergeUniqueById, subscribeCrossTabSync, subscribeDemoSyncCollection } from '../services/realtimeSync';
 import { showToast } from './ToastNotification';
 import { EditCashflowModal } from './EditCashflowModal';
@@ -18,12 +23,6 @@ interface KioskCashflowTrackerProps {
   kioskName?: string;
   records?: KioskDailySale[];
 }
-
-const DEMO_SAMPLE_SALES: KioskDailySale[] = [
-  { id: 'demo-cf-1', date: '2026-03-24', cashSales: 180, qrSales: 220, expenses: 90, notes: 'Restok cawan & serbuk kopi', createdAt: '2026-03-24T20:00:00Z' },
-  { id: 'demo-cf-2', date: '2026-03-25', cashSales: 150, qrSales: 280, expenses: 40, notes: 'Jualan waktu petang rancak', createdAt: '2026-03-25T20:00:00Z' },
-  { id: 'demo-cf-3', date: '2026-03-26', cashSales: 210, qrSales: 310, expenses: 110, notes: 'Beli bahan mentah segar', createdAt: '2026-03-26T20:00:00Z' }
-];
 
 export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   kioskName = 'Kiosk Kapsul KBelia',
@@ -47,27 +46,17 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   const salesPagination = usePagination(salesRecords, 5, [salesRecords.length]);
 
   useEffect(() => {
-    const prodAuth = isProductionAuthenticated();
-    if (externalRecords && prodAuth && !isDemoSession) {
-      setSalesRecords(externalRecords);
-      return;
-    }
-
     let demoSyncItems: KioskDailySale[] = [];
     let demoDeletedIds: string[] = [];
 
     const loadAndMergeLocal = () => {
       try {
-        const savedRaw = localStorage.getItem(storageKey);
-        let localItems: KioskDailySale[] = [];
-        if (savedRaw) {
-          localItems = JSON.parse(savedRaw);
-        } else if (isDemoSession) {
-          localStorage.setItem(storageKey, JSON.stringify(DEMO_SAMPLE_SALES));
-          localItems = DEMO_SAMPLE_SALES;
-        }
+        const localItems = getSeededDemoCashflowRecords(ownerId, isDemoSession);
+        const deleted = [...getDeletedIds(), ...demoDeletedIds];
+        const scopedExternal = (externalRecords || []).filter(r => !r.ownerId || r.ownerId === ownerId);
         const scopedDemoSync = demoSyncItems.filter(r => !r.ownerId || r.ownerId === ownerId);
-        setSalesRecords(mergeUniqueById<KioskDailySale>([scopedDemoSync, localItems], demoDeletedIds));
+        const scopedLocal = localItems.filter(r => !r.ownerId || r.ownerId === ownerId);
+        setSalesRecords(mergeUniqueById<KioskDailySale>([scopedExternal, scopedDemoSync, scopedLocal], deleted));
       } catch {
         setSalesRecords([]);
       }
@@ -78,7 +67,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     const handleSync = () => loadAndMergeLocal();
     window.addEventListener('kbelia_cashflow_updated', handleSync);
     const unsubCrossTab = subscribeCrossTabSync((entity) => {
-      if (entity === 'all' || entity === 'cashflow') {
+      if (entity === 'all' || entity === 'cashflow' || entity === 'deleted') {
         loadAndMergeLocal();
       }
     });

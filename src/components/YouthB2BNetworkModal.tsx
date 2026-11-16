@@ -7,9 +7,10 @@ import {
   MapPin
 } from 'lucide-react';
 import { B2BListing, KelantanDistrict } from '../types';
+import { INITIAL_B2B_LISTINGS } from '../data/b2bData';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { saveB2BListingRecord, isProductionAuthenticated } from '../services/dataService';
+import { getDeletedIds, saveB2BListingRecord } from '../services/dataService';
 import { mergeUniqueById, subscribeCrossTabSync, subscribeDemoSyncCollection } from '../services/realtimeSync';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -20,49 +21,13 @@ interface YouthB2BNetworkModalProps {
   onClose: () => void;
 }
 
-const DEFAULT_B2B: B2BListing[] = [
-  {
-    id: '1',
-    authorName: 'Nik Faris',
-    authorBusiness: 'Kopi Tok Bali Kiosk',
-    district: 'Pasir Puteh',
-    type: 'demand',
-    title: 'Mencari Pembekal Biji Kopi Robusta Tempatan',
-    description: 'Kami memerlukan 15-20kg biji kopi sangai setiap minggu untuk bekalan 2 kiosk di pantai peranginan.',
-    whatsapp: '60123456781',
-    date: 'Hari ini'
-  },
-  {
-    id: '2',
-    authorName: 'Siti Sarah',
-    authorBusiness: 'Agro Kelulut Jeli',
-    district: 'Jeli',
-    type: 'supply',
-    title: 'Membekal Madu Kelulut Asli Tulen Gred Eksport',
-    description: 'Sedia membekal madu kelulut dalam botol 100ml / 250ml dengan harga borong istimewa kepada peniaga kiosk belia UMK.',
-    whatsapp: '60123456782',
-    date: 'Semalam'
-  },
-  {
-    id: '3',
-    authorName: 'Wan Ammar',
-    authorBusiness: 'Warisan Serunding Kg Laut',
-    district: 'Tumpat',
-    type: 'supply',
-    title: 'Membekal Serunding Daging & Ayam Pek Mini Kiosk',
-    description: 'Pek kedap udara mudah dipamerkan di rak kiosk. Tahan 6 bulan, disahkan Halal.',
-    whatsapp: '60123456783',
-    date: '2 hari lepas'
-  }
-];
-
 export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
   isOpen,
   onClose
 }) => {
   const { language } = useLanguage();
   const { user, userProfile } = useAuth();
-  const [listings, setListings] = useState<B2BListing[]>(DEFAULT_B2B);
+  const [listings, setListings] = useState<B2BListing[]>(INITIAL_B2B_LISTINGS);
   const [filterType, setFilterType] = useState<'all' | 'supply' | 'demand'>('all');
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -75,7 +40,6 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    const prodAuth = isProductionAuthenticated();
     let prodItems: B2BListing[] = [];
     let demoSyncItems: B2BListing[] = [];
     let demoDeletedIds: string[] = [];
@@ -88,36 +52,35 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
       } catch {
         // ignore
       }
+      const deleted = [...getDeletedIds(), ...demoDeletedIds];
       const merged = mergeUniqueById<B2BListing>(
-        [prodItems, demoSyncItems, localItems, DEFAULT_B2B],
-        demoDeletedIds
+        [prodItems, demoSyncItems, localItems, INITIAL_B2B_LISTINGS],
+        deleted
       );
       setListings(merged);
     };
 
     recompute();
     const unsubCrossTab = subscribeCrossTabSync((entity) => {
-      if (entity === 'all' || entity === 'b2b') recompute();
+      if (entity === 'all' || entity === 'b2b' || entity === 'deleted') recompute();
     });
 
-    let unsubProd = () => {};
-    let unsubDemo = () => {};
-    if (prodAuth) {
-      unsubProd = onSnapshot(
-        collection(db, 'b2b_listings'),
-        (snap) => {
-          prodItems = snap.docs.map(d => ({ id: d.id, ...d.data() } as B2BListing));
-          recompute();
-        },
-        () => {}
-      );
-    } else {
-      unsubDemo = subscribeDemoSyncCollection<B2BListing>('b2b', (items, delIds) => {
-        demoSyncItems = items;
-        demoDeletedIds = delIds;
+    const unsubProd = onSnapshot(
+      collection(db, 'b2b_listings'),
+      (snap) => {
+        prodItems = snap.docs.map(d => ({ id: d.id, ...d.data() } as B2BListing));
         recompute();
-      });
-    }
+      },
+      () => {
+        recompute();
+      }
+    );
+
+    const unsubDemo = subscribeDemoSyncCollection<B2BListing>('b2b', (items, delIds) => {
+      demoSyncItems = items;
+      demoDeletedIds = delIds;
+      recompute();
+    });
 
     return () => {
       unsubCrossTab();

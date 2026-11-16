@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   onSnapshot,
   query,
   setDoc,
@@ -27,6 +28,9 @@ export type SyncEntityType =
   | 'community_reply'
   | 'mentor'
   | 'settings'
+  | 'event_booking'
+  | 'event'
+  | 'user_account'
   | 'deleted';
 
 export interface DemoSyncDoc<T = Record<string, unknown>> {
@@ -160,18 +164,40 @@ export async function publishDemoSyncRecord<T extends Record<string, any>>(
   if (!auth.currentUser) return;
 
   const syncId = sanitizeSyncId(`${entityType}__${recordId}`);
+  const syncRef = doc(db, 'demo_sync', syncId);
+  const cleanedPayload = stripSensitiveDemoFields(payload);
+
+  let mergedPayload = cleanedPayload;
+  if (!deleted && Object.keys(cleanedPayload).length <= 8) {
+    try {
+      const existingSnap = await getDoc(syncRef);
+      if (existingSnap.exists()) {
+        const prevPayload = existingSnap.data()?.payload;
+        if (prevPayload && typeof prevPayload === 'object') {
+          mergedPayload = { ...prevPayload, ...cleanedPayload };
+        }
+      }
+    } catch {
+      // proceed with incoming payload
+    }
+  }
+
+  const now = new Date().toISOString();
   const docData: DemoSyncDoc<Record<string, any>> = {
     id: syncId,
     entityType,
     actorId: auth.currentUser.uid,
     scope: 'demo',
-    payload: stripSensitiveDemoFields(payload),
+    payload: {
+      ...mergedPayload,
+      ...(!deleted ? { updatedAt: (mergedPayload as any).updatedAt || now } : {})
+    },
     deleted,
-    updatedAt: new Date().toISOString()
+    updatedAt: now
   };
 
   try {
-    await setDoc(doc(db, 'demo_sync', syncId), docData, { merge: true });
+    await setDoc(syncRef, docData, { merge: true });
   } catch (err) {
     // Graceful fallback: cross-tab BroadcastChannel + localStorage remains active even if rules/anonymous auth aren't deployed yet
     console.debug(`Demo sync Firestore write fallback (${entityType}):`, err);
@@ -199,7 +225,11 @@ export function subscribeDemoSyncCollection<T extends { id: string }>(
         if (data.deleted) {
           deletedIds.push(rawId);
         } else {
-          items.push({ ...(data.payload as any), id: rawId } as T);
+          items.push({
+            ...(data.payload as any),
+            id: rawId,
+            updatedAt: (data.payload as any).updatedAt || data.updatedAt
+          } as T);
         }
       });
       onUpdate(items, deletedIds);
@@ -210,22 +240,34 @@ export function subscribeDemoSyncCollection<T extends { id: string }>(
   );
 }
 
+function getRecordTimestampMs(item: any): number {
+  if (!item || typeof item !== 'object') return 0;
+  const candidate = item.updatedAt || item.syncedAt || item.issuedAt || item.createdAt;
+  if (typeof candidate !== 'string' || !candidate) return 0;
+  const parsed = Date.parse(candidate);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 /**
- * Deterministic merge where earlier arrays take higher priority than later arrays.
+ * Timestamp-aware deterministic merge across Demo & Real streams:
+ * newer updatedAt/createdAt always wins regardless of source array order;
+ * earlier arrays break ties when timestamps match or are absent.
  */
 export function mergeUniqueById<T extends { id: string }>(
   arraysInPriorityOrder: T[][],
   deletedIds: string[] = []
 ): T[] {
   const deletedSet = new Set(deletedIds);
-  const map = new Map<string, T>();
+  const map = new Map<string, { item: T; ts: number }>();
   for (const list of arraysInPriorityOrder) {
     for (const item of list) {
       if (!item?.id || deletedSet.has(item.id)) continue;
-      if (!map.has(item.id)) {
-        map.set(item.id, item);
+      const incomingTs = getRecordTimestampMs(item);
+      const existing = map.get(item.id);
+      if (!existing || incomingTs > existing.ts) {
+        map.set(item.id, { item, ts: incomingTs });
       }
     }
   }
-  return Array.from(map.values());
+  return Array.from(map.values()).map((entry) => entry.item);
 }

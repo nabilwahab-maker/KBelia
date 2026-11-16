@@ -53,6 +53,7 @@ import {
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import {
+  getDeletedIds,
   isProductionAuthenticated,
   saveGrantEndorsementRecord,
   saveMentoringLogRecord,
@@ -114,7 +115,8 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     justification: 'Usahawan menunjukkan komitmen tinggi dengan rekod jualan tunai konsisten melebihi RM4,200 sebulan. Penggunaan mesin retort pembungkusan akan memanjangkan jangka hayat sambal dan sedia dipasarkan di Kiosk Belia KB Sentral.',
     businessReadinessRemark: 'Telah menghadiri 3 sesi bimbingan penuh dan mematuhi piawaian pembungkusan label produk UMK CEED.',
     issuedAt: '2026-03-28',
-    status: 'active'
+    status: 'active',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'end-2',
@@ -134,7 +136,8 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     justification: 'Inovasi sistem POS dan inventori awan yang dibangunkan telah diuji oleh 5 peniaga kapsul niaga UMK dengan maklum balas positif. Geran disyorkan bagi menaik taraf server awan dan perlesenan keselamatan.',
     businessReadinessRemark: 'Model Ruang Niaga yang mampan dengan unjuran pulangan modal dalam tempoh 4 bulan.',
     issuedAt: '2026-04-02',
-    status: 'active'
+    status: 'active',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'end-3',
@@ -154,7 +157,8 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     justification: 'Mempunyai keunikan rekaan moden kontemporari yang menarik minat pasaran belia dan pelancong. Dana diperlukan bagi pembelian benang emas berkualiti tinggi dan pemasaran TikTok Live berpusat.',
     businessReadinessRemark: 'Dokumen pendaftaran SSM dan penyata akaun bank syarikat lengkap dan teratur.',
     issuedAt: '2026-04-06',
-    status: 'active'
+    status: 'active',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   }
 ];
 
@@ -172,7 +176,8 @@ const INITIAL_LOGS: MentoringLogEntry[] = [
       { id: 'act-2', task: 'Ubah suai grafik label mengikut format Peraturan Makanan 1985', completed: true, dueDate: '2026-04-05' },
       { id: 'act-3', task: 'Hantar 5 sampel untuk ujian ketahanan haba di Makmal Makanan UMK', completed: false, dueDate: '2026-04-15' }
     ],
-    createdAt: '2026-03-25T14:30:00Z'
+    createdAt: '2026-03-25T14:30:00Z',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'log-2',
@@ -186,7 +191,8 @@ const INITIAL_LOGS: MentoringLogEntry[] = [
       { id: 'act-4', task: 'Buka akaun semasa Maybank Islamic atas nama Kelantan Tech Solution', completed: true, dueDate: '2026-04-04' },
       { id: 'act-5', task: 'Aktifkan integrasi DuitNow QR khusus bisnes untuk terimaan yuran langganan', completed: false, dueDate: '2026-04-10' }
     ],
-    createdAt: '2026-04-01T11:00:00Z'
+    createdAt: '2026-04-01T11:00:00Z',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'log-3',
@@ -200,7 +206,8 @@ const INITIAL_LOGS: MentoringLogEntry[] = [
       { id: 'act-6', task: 'Sediakan formula penetapan harga (Cost Sheet) terperinci', completed: true, dueDate: '2026-04-08' },
       { id: 'act-7', task: 'Jalankan sesi ujian rasa (blind taste test) bersama 20 mahasiswa UMK', completed: false, dueDate: '2026-04-14' }
     ],
-    createdAt: '2026-04-05T16:00:00Z'
+    createdAt: '2026-04-05T16:00:00Z',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   }
 ];
 
@@ -302,22 +309,31 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
     let prodEndorsements: GrantEndorsementLetter[] = [];
     let demoSyncEndorsements: GrantEndorsementLetter[] = [];
+    let demoDeletedEnds: string[] = [];
     let prodLogs: MentoringLogEntry[] = [];
     let demoSyncLogs: MentoringLogEntry[] = [];
+    let demoDeletedLogs: string[] = [];
 
     const recomputeMentorData = () => {
+      const baseDeleted = getDeletedIds();
       const localEnds = readLocalList<GrantEndorsementLetter>('kbelia_mentor_endorsements_v1', INITIAL_ENDORSEMENTS);
       const localLogs = readLocalList<MentoringLogEntry>('kbelia_mentor_logs_v1', INITIAL_LOGS);
 
-      const mergedEnds = prodAuth
-        ? mergeUniqueById<GrantEndorsementLetter>([prodEndorsements, demoSyncEndorsements])
-        : mergeUniqueById<GrantEndorsementLetter>([demoSyncEndorsements, localEnds, INITIAL_ENDORSEMENTS]);
+      const mergedEnds = mergeUniqueById<GrantEndorsementLetter>(
+        prodAuth
+          ? [prodEndorsements, demoSyncEndorsements, localEnds, INITIAL_ENDORSEMENTS]
+          : [demoSyncEndorsements, localEnds, INITIAL_ENDORSEMENTS],
+        [...baseDeleted, ...demoDeletedEnds]
+      );
       mergedEnds.sort((a, b) => (b.issuedAt || '').localeCompare(a.issuedAt || ''));
       setEndorsements(mergedEnds.filter(e => e.mentorId === currentMentor.id));
 
-      const mergedLogs = prodAuth
-        ? mergeUniqueById<MentoringLogEntry>([prodLogs, demoSyncLogs])
-        : mergeUniqueById<MentoringLogEntry>([demoSyncLogs, localLogs, INITIAL_LOGS]);
+      const mergedLogs = mergeUniqueById<MentoringLogEntry>(
+        prodAuth
+          ? [prodLogs, demoSyncLogs, localLogs, INITIAL_LOGS]
+          : [demoSyncLogs, localLogs, INITIAL_LOGS],
+        [...baseDeleted, ...demoDeletedLogs]
+      );
       mergedLogs.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
       setLogEntries(mergedLogs.filter(l => l.mentorId === currentMentor.id));
     };
@@ -325,7 +341,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     recomputeMentorData();
 
     const unsubCrossTab = subscribeCrossTabSync((entity) => {
-      if (['all', 'endorsement', 'log'].includes(entity)) {
+      if (['all', 'endorsement', 'log', 'deleted'].includes(entity)) {
         recomputeMentorData();
       }
     });
@@ -353,13 +369,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       );
     }
 
-    const unsubDemoEnds = subscribeDemoSyncCollection<GrantEndorsementLetter>('endorsement', (items) => {
+    const unsubDemoEnds = subscribeDemoSyncCollection<GrantEndorsementLetter>('endorsement', (items, delIds) => {
       demoSyncEndorsements = items;
+      demoDeletedEnds = delIds;
       recomputeMentorData();
     });
 
-    const unsubDemoLogs = subscribeDemoSyncCollection<MentoringLogEntry>('log', (items) => {
+    const unsubDemoLogs = subscribeDemoSyncCollection<MentoringLogEntry>('log', (items, delIds) => {
       demoSyncLogs = items;
+      demoDeletedLogs = delIds;
       recomputeMentorData();
     });
 
@@ -908,17 +926,17 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     </span>
                   </div>
 
-                  <div className="h-80 w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                    <ResponsiveContainer width="100%" height={320} minWidth={0}>
+                  <div className="h-80 min-h-[320px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                    <ResponsiveContainer width="100%" height={320} minWidth={0} initialDimension={{ width: 520, height: 320 }}>
                       <BarChart
                         data={mentorChartData}
                         barCategoryGap="16%"
                         barGap={4}
-                        margin={{ top: 24, right: 12, left: -12, bottom: 4 }}
+                        margin={{ top: 24, right: 12, left: -4, bottom: 6 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
                         <XAxis dataKey="district" tick={{ fontSize: 12.5, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
-                        <YAxis allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                        <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
                         <Tooltip
                           cursor={{ fill: 'rgba(13, 148, 136, 0.12)' }}
                           content={({ active, payload }) => {
@@ -935,7 +953,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             return null;
                           }}
                         />
-                        <Bar dataKey="sesi" name="Sesi Bimbingan" fill="#0D9488" radius={[6, 6, 0, 0]} maxBarSize={38} isAnimationActive={false}>
+                        <Bar
+                          dataKey="sesi"
+                          name="Sesi Bimbingan"
+                          fill="#0D9488"
+                          radius={[6, 6, 0, 0]}
+                          maxBarSize={38}
+                          minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                          isAnimationActive={false}
+                        >
                           <LabelList
                             dataKey="sesi"
                             position="top"
@@ -944,7 +970,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             style={{ fontSize: 12, fontWeight: 700 }}
                           />
                         </Bar>
-                        <Bar dataKey="perakuan" name="Perakuan Geran" fill="#F59E0B" radius={[6, 6, 0, 0]} maxBarSize={38} isAnimationActive={false}>
+                        <Bar
+                          dataKey="perakuan"
+                          name="Perakuan Geran"
+                          fill="#F59E0B"
+                          radius={[6, 6, 0, 0]}
+                          maxBarSize={38}
+                          minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                          isAnimationActive={false}
+                        >
                           <LabelList
                             dataKey="perakuan"
                             position="top"

@@ -34,7 +34,9 @@ import {
   Activity,
   Newspaper,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Plus,
+  ShoppingBag
 } from 'lucide-react';
 import { 
   BusinessListing, 
@@ -50,7 +52,9 @@ import {
   PortalSettings,
   GrantApplication,
   PortalNews,
-  CommunityPost
+  CommunityPost,
+  ProductItem,
+  BookingStatus
 } from '../types';
 import { 
   updateBookingStatus, 
@@ -64,11 +68,18 @@ import {
   updateGrantApplicationStatus,
   updateMaintenanceTicketStatus,
   savePortalSettingsRecord,
-  loadLocalPortalSettings
+  loadLocalPortalSettings,
+  deleteCapsuleBooking,
+  deleteMentorProfileRecord,
+  deleteMentorshipRegistrationRecord,
+  saveMentorshipRegistrationRecord
 } from '../services/dataService';
 import { AdminApprovalQueue } from './AdminApprovalQueue';
 import { AdminNewsManager } from './AdminNewsManager';
 import { AdminB2BManager } from './AdminB2BManager';
+import { AdminUsersManager } from './AdminUsersManager';
+import { AdminEventsManager } from './AdminEventsManager';
+import { EditBookingModal, EditMentorshipModal, ManageBusinessProductsModal } from './AdminEditModals';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { EditBusinessModal } from './EditBusinessModal';
 import { EditSlotModal } from './EditSlotModal';
@@ -100,6 +111,7 @@ import { PaginationBar, usePagination } from './PaginationBar';
 interface AdminDashboardProps {
   slots: CapsuleSlot[];
   businesses: BusinessListing[];
+  products?: ProductItem[];
   bookings: CapsuleBooking[];
   programs: YouthProgram[];
   grantApplications?: GrantApplication[];
@@ -131,6 +143,7 @@ const DISTRICTS: KelantanDistrict[] = [
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   slots = [],
   businesses = [],
+  products = [],
   bookings = [],
   programs = [],
   grantApplications = [],
@@ -165,9 +178,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const [selectedMentorForEdit, setSelectedMentorForEdit] = useState<MentorProfile | null>(null);
+  const [isCreatingMentor, setIsCreatingMentor] = useState(false);
   const [editingBusiness, setEditingBusiness] = useState<BusinessListing | null>(null);
+  const [isCreatingBusiness, setIsCreatingBusiness] = useState(false);
+  const [managingProductsBusiness, setManagingProductsBusiness] = useState<BusinessListing | null>(null);
   const [editingSlot, setEditingSlot] = useState<CapsuleSlot | null>(null);
   const [editingProgram, setEditingProgram] = useState<YouthProgram | null>(null);
+  const [editingBooking, setEditingBooking] = useState<CapsuleBooking | null>(null);
+  const [isCreatingBooking, setIsCreatingBooking] = useState(false);
+  const [editingMentorship, setEditingMentorship] = useState<MentorshipRegistration | null>(null);
+  const [isCreatingMentorship, setIsCreatingMentorship] = useState(false);
 
   const resolvedInitialSettings = portalSettings || loadLocalPortalSettings();
 
@@ -295,7 +315,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         notes, 
         booking.slotId, 
         booking.businessName, 
-        booking.applicantId
+        booking.applicantId,
+        booking
       );
       confetti({ particleCount: 50 });
       setMessage({ type: 'success', text: `Permohonan bagi ${booking.businessName} berjaya diluluskan!` });
@@ -323,7 +344,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     const reason = reviewNoteInput[booking.id] || booking.adminNotes || 'Maaf, permohonan tidak dapat diluluskan kerana kekosongan slot tidak mencukupi atau kriteria perniagaan belum lengkap.';
     try {
       setLoading(true);
-      await updateBookingStatus(booking.id, 'rejected', reason);
+      await updateBookingStatus(
+        booking.id,
+        'rejected',
+        reason,
+        booking.slotId,
+        booking.businessName,
+        booking.applicantId,
+        booking
+      );
       setMessage({ type: 'success', text: `Permohonan ${booking.businessName} ditolak.` });
       emitAdminOrMentorNotification({
         title: `Status Permohonan Kiosk: ${booking.slotCode}`,
@@ -473,6 +502,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  // Toggle Business Approval / Directory Visibility
+  const handleToggleApprovedBusiness = async (biz: BusinessListing) => {
+    try {
+      await saveBusinessListing({
+        ...biz,
+        isApproved: !biz.isApproved
+      });
+      showToast(
+        !biz.isApproved
+          ? `${biz.businessName} kini dipaparkan dalam direktori.`
+          : `${biz.businessName} disembunyikan daripada direktori awam.`,
+        'info'
+      );
+      onRefresh();
+    } catch {
+      showToast('Gagal menukar status paparan perniagaan.', 'error');
+    }
+  };
+
   // Delete Business
   const handleDeleteBusiness = async (id: string, name?: string) => {
     try {
@@ -482,6 +530,77 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     } catch (err) {
       console.error(err);
       setMessage({ type: 'error', text: 'Gagal memadam penyenaraian perniagaan.' });
+    }
+  };
+
+  const handleDirectAdminBookingStatus = async (booking: CapsuleBooking, nextStatus: BookingStatus) => {
+    try {
+      setLoading(true);
+      await updateBookingStatus(
+        booking.id,
+        nextStatus,
+        booking.adminNotes || '',
+        booking.slotId,
+        booking.businessName,
+        booking.applicantId,
+        booking
+      );
+      showToast(`Status tempahan ${booking.businessName} ditukar.`, 'success');
+      onRefresh();
+    } catch {
+      showToast('Gagal menukar status tempahan.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAdminBooking = async (booking: CapsuleBooking) => {
+    try {
+      await deleteCapsuleBooking(booking);
+      showToast(`Permohonan sewaan ${booking.businessName} telah dipadam.`, 'info');
+      onRefresh();
+    } catch {
+      showToast('Gagal memadam permohonan sewaan.', 'error');
+    }
+  };
+
+  const handleDirectSlotStatusChange = async (slot: CapsuleSlot, nextStatus: SlotStatus) => {
+    try {
+      await saveCapsuleSlot({ ...slot, status: nextStatus });
+      showToast(`Status slot ${slot.code} dikemas kini.`, 'success');
+      onRefresh();
+    } catch {
+      showToast('Gagal menukar status slot kiosk.', 'error');
+    }
+  };
+
+  const handleDeleteMentor = async (mentor: MentorProfile) => {
+    try {
+      await deleteMentorProfileRecord(mentor.id);
+      showToast(`Profil mentor ${mentor.name} telah dipadam.`, 'info');
+      onRefresh();
+    } catch {
+      showToast('Gagal memadam profil mentor.', 'error');
+    }
+  };
+
+  const handleDirectMentorshipStatus = async (reg: MentorshipRegistration, nextStatus: MentorshipRegistration['status']) => {
+    try {
+      await saveMentorshipRegistrationRecord({ ...reg, status: nextStatus });
+      showToast(`Status sesi bimbingan ${reg.entrepreneurName} dikemas kini.`, 'success');
+      onRefresh();
+    } catch {
+      showToast('Gagal menukar status sesi bimbingan.', 'error');
+    }
+  };
+
+  const handleDeleteMentorship = async (reg: MentorshipRegistration) => {
+    try {
+      await deleteMentorshipRegistrationRecord(reg.id);
+      showToast(`Sesi bimbingan ${reg.entrepreneurName} telah dipadam.`, 'info');
+      onRefresh();
+    } catch {
+      showToast('Gagal memadam sesi bimbingan.', 'error');
     }
   };
 
@@ -576,6 +695,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <Database className="w-4 h-4 text-white" />
           <span>{loading ? 'Sync...' : 'Sync'}</span>
         </button>
+      </div>
+
+      {/* Quick Admin Module Navigation Strip */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+        {(
+          [
+            { id: 'queue', label: 'Kelulusan' },
+            { id: 'bookings', label: 'Tempahan Kiosk' },
+            { id: 'businesses', label: 'Usahawan & Produk' },
+            { id: 'slots', label: 'Slot Kiosk' },
+            { id: 'programs', label: 'Program & Geran' },
+            { id: 'mentors', label: 'Panel Mentor' },
+            { id: 'events', label: 'Acara & Tempahan' },
+            { id: 'users', label: 'Urus Pengguna' },
+            { id: 'news', label: 'Berita' },
+            { id: 'b2b', label: 'Ruang Niaga' },
+            { id: 'settings', label: 'Tetapan' }
+          ] as { id: AdminSubTab; label: string }[]
+        ).map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setAdminTab(tab.id)}
+            className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-bold whitespace-nowrap transition-all cursor-pointer border ${
+              adminTab === tab.id || (adminTab === 'sync' && tab.id === 'queue')
+                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                : 'bg-white dark:bg-zinc-900 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* 4 Compact Summary KPI Cards */}
@@ -714,18 +865,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
 
                   <div className="p-5 flex-1 min-w-0">
-                    <div className="h-80 w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                      <ResponsiveContainer width="100%" height={320} minWidth={0}>
+                    <div className="h-80 min-h-[320px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                      <ResponsiveContainer width="100%" height={320} minWidth={0} initialDimension={{ width: 520, height: 320 }}>
                         {adminChartMode === 'districts' ? (
                           <BarChart
                             data={districtChartData}
                             barCategoryGap="16%"
                             barGap={3}
-                            margin={{ top: 24, right: 10, left: -14, bottom: 6 }}
+                            margin={{ top: 24, right: 12, left: -4, bottom: 8 }}
                           >
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
                             <XAxis dataKey="district" tick={{ fontSize: 11.5, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
-                            <YAxis allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                            <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
                             <Tooltip
                               cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
                               content={({ active, payload }) => {
@@ -742,7 +893,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 return null;
                               }}
                             />
-                            <Bar dataKey="beroperasi" name="Beroperasi" fill="#2563EB" radius={[5, 5, 0, 0]} maxBarSize={28} isAnimationActive={false}>
+                            <Bar
+                              dataKey="beroperasi"
+                              name="Beroperasi"
+                              fill="#2563EB"
+                              radius={[5, 5, 0, 0]}
+                              maxBarSize={28}
+                              minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                              isAnimationActive={false}
+                            >
                               <LabelList
                                 dataKey="beroperasi"
                                 position="top"
@@ -751,7 +910,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 style={{ fontSize: 11.5, fontWeight: 700 }}
                               />
                             </Bar>
-                            <Bar dataKey="tersedia" name="Tersedia" fill="#10B981" radius={[5, 5, 0, 0]} maxBarSize={28} isAnimationActive={false}>
+                            <Bar
+                              dataKey="tersedia"
+                              name="Tersedia"
+                              fill="#10B981"
+                              radius={[5, 5, 0, 0]}
+                              maxBarSize={28}
+                              minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                              isAnimationActive={false}
+                            >
                               <LabelList
                                 dataKey="tersedia"
                                 position="top"
@@ -765,11 +932,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <BarChart
                             data={pipelineChartData}
                             barCategoryGap="20%"
-                            margin={{ top: 24, right: 12, left: -12, bottom: 6 }}
+                            margin={{ top: 24, right: 12, left: -4, bottom: 8 }}
                           >
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
                             <XAxis dataKey="label" tick={{ fontSize: 12, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
-                            <YAxis allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                            <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
                             <Tooltip
                               cursor={{ fill: 'rgba(79, 70, 229, 0.10)' }}
                               content={({ active, payload }) => {
@@ -785,11 +952,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 return null;
                               }}
                             />
-                            <Bar dataKey="jumlah" name="Jumlah Rekod" fill="#4F46E5" radius={[6, 6, 0, 0]} maxBarSize={52} isAnimationActive={false}>
+                            <Bar
+                              dataKey="jumlah"
+                              name="Jumlah Rekod"
+                              fill="#4F46E5"
+                              radius={[6, 6, 0, 0]}
+                              maxBarSize={52}
+                              minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                              isAnimationActive={false}
+                            >
                               <LabelList
                                 dataKey="jumlah"
                                 position="top"
-                                formatter={(val: unknown) => String(Number(val) || 0)}
+                                formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '0')}
                                 className="fill-slate-900 dark:fill-slate-100 font-mono"
                                 style={{ fontSize: 12.5, fontWeight: 700 }}
                               />
@@ -961,7 +1136,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* TAB 0: ADVANCED 1-CLICK APPROVAL QUEUE & AUDIT EXPORTS */}
-      {adminTab === 'queue' && (
+      {(adminTab === 'queue' || adminTab === 'sync') && (
         <AdminApprovalQueue
           bookings={safeBookings}
           grantApplications={grantApplications || []}
@@ -977,7 +1152,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           }}
           onApproveGrant={async (gId, notes) => {
             const targetGrant = (grantApplications || []).find(g => g.id === gId);
-            await updateGrantApplicationStatus(gId, 'approved', notes);
+            await updateGrantApplicationStatus(gId, 'approved', notes, targetGrant);
             if (targetGrant) {
               emitAdminOrMentorNotification({
                 title: `Geran Belia Diluluskan: ${targetGrant.grantAmount}`,
@@ -995,7 +1170,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           }}
           onRejectGrant={async (gId, notes) => {
             const targetGrant = (grantApplications || []).find(g => g.id === gId);
-            await updateGrantApplicationStatus(gId, 'rejected', notes);
+            await updateGrantApplicationStatus(gId, 'rejected', notes, targetGrant);
             if (targetGrant) {
               emitAdminOrMentorNotification({
                 title: `Status Permohonan Geran: ${targetGrant.businessName}`,
@@ -1019,7 +1194,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           }}
           onUpdateTicketStatus={async (ticketId, status, adminNotes) => {
             const targetTicket = (maintenanceTickets || []).find(t => t.id === ticketId);
-            await updateMaintenanceTicketStatus(ticketId, status, adminNotes);
+            await updateMaintenanceTicketStatus(ticketId, status, adminNotes, targetTicket);
             if (targetTicket?.ownerId) {
               const statusText = status === 'resolved' ? 'Diselesaikan' : status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima';
               emitAdminOrMentorNotification({
@@ -1049,7 +1224,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Semak cadangan perniagaan dan sahkan kelulusan peruntukan kiosk.</p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm font-bold text-black/70 dark:text-white/75">Tapis:</span>
               {(['pending', 'approved', 'rejected', 'all'] as const).map((filter) => (
                 <button
@@ -1064,6 +1239,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   {filter === 'pending' ? 'Menunggu' : filter === 'approved' ? 'Diluluskan' : filter === 'rejected' ? 'Ditolak' : 'Semua'}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingBooking(null);
+                  setIsCreatingBooking(true);
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Tambah Permohonan</span>
+              </button>
             </div>
           </div>
 
@@ -1105,27 +1291,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-                          {b.status === 'pending' && (
-                            <span className="px-2.5 py-1 rounded-full text-[0.8125rem] font-bold bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white border border-amber-300 dark:border-amber-800 whitespace-nowrap">
-                              Menunggu Kelulusan
-                            </span>
-                          )}
-                          {b.status === 'approved' && (
-                            <span className="px-2.5 py-1 rounded-full text-[0.8125rem] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-300 dark:border-emerald-800 whitespace-nowrap">
-                              Diluluskan
-                            </span>
-                          )}
-                          {b.status === 'rejected' && (
-                            <span className="px-2.5 py-1 rounded-full text-[0.8125rem] font-bold bg-rose-100 dark:bg-rose-950/80 text-black dark:text-white border border-rose-300 dark:border-rose-800 whitespace-nowrap">
-                              Ditolak
-                            </span>
-                          )}
-                          {b.status === 'cancelled' && (
-                            <span className="px-2.5 py-1 rounded-full text-[0.8125rem] font-bold bg-slate-100 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-600 whitespace-nowrap">
-                              Dibatalkan
-                            </span>
-                          )}
+                        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0">
+                          <select
+                            aria-label={`Status permohonan ${b.businessName}`}
+                            disabled={loading}
+                            value={b.status}
+                            onChange={(e) => handleDirectAdminBookingStatus(b, e.target.value as BookingStatus)}
+                            className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
+                              b.status === 'approved'
+                                ? 'bg-emerald-100 border-emerald-300 text-black dark:bg-emerald-950/80 dark:border-emerald-800 dark:text-white'
+                                : b.status === 'rejected'
+                                  ? 'bg-rose-100 border-rose-300 text-black dark:bg-rose-950/80 dark:border-rose-800 dark:text-white'
+                                  : b.status === 'cancelled'
+                                    ? 'bg-slate-100 border-slate-300 text-black dark:bg-zinc-800 dark:border-zinc-600 dark:text-white'
+                                    : 'bg-amber-100 border-amber-300 text-black dark:bg-amber-950/80 dark:border-amber-800 dark:text-white'
+                            }`}
+                          >
+                            <option value="pending">Menunggu Kelulusan</option>
+                            <option value="approved">Diluluskan</option>
+                            <option value="rejected">Ditolak</option>
+                            <option value="cancelled">Dibatalkan</option>
+                          </select>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsCreatingBooking(false);
+                              setEditingBooking(b);
+                            }}
+                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: `${b.businessName} (${b.slotCode})`,
+                                itemType: 'Permohonan Sewaan Kiosk',
+                                onConfirm: () => handleDeleteAdminBooking(b)
+                              })
+                            }
+                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Padam</span>
+                          </button>
 
                           <button
                             type="button"
@@ -1231,11 +1444,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* TAB 2: BUSINESSES DIRECTORY MANAGEMENT */}
       {adminTab === 'businesses' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-lg font-bold text-black dark:text-white">Senarai Kedai &amp; Usahawan</h3>
-              <p className="text-sm text-black/75 dark:text-white/80">Urus, edit atau padam senarai perniagaan belia dalam direktori portal.</p>
+              <p className="text-sm text-black/75 dark:text-white/80">Urus, tambah, edit, kawal produk atau padam senarai perniagaan belia dalam direktori portal.</p>
             </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingBusiness(null);
+                setIsCreatingBusiness(true);
+              }}
+              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tambah Perniagaan</span>
+            </button>
           </div>
 
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs transition-colors">
@@ -1246,12 +1470,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <th className="p-4">Perniagaan &amp; Pemilik</th>
                     <th className="p-4">Kategori &amp; Jajahan</th>
                     <th className="p-4">SSM</th>
-                    <th className="p-4">Kedai Pilihan</th>
+                    <th className="p-4">Status &amp; Pilihan</th>
                     <th className="p-4 text-right">Tindakan</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300 dark:divide-slate-600">
-                  {businessesPagination.paginatedItems.map((biz) => (
+                  {businessesPagination.paginatedItems.map((biz) => {
+                    const bizProductCount = products.filter(p => p.businessId === biz.id).length;
+                    return (
                     <tr key={biz.id} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -1278,28 +1504,55 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         )}
                       </td>
                       <td className="p-4">
-                        <button
-                          onClick={() => handleToggleFeatured(biz)}
-                          className={`px-3 py-1.5 rounded-lg font-bold text-sm flex items-center gap-1.5 transition-colors cursor-pointer ${
-                            biz.isFeatured
-                              ? 'bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white border border-amber-300 dark:border-amber-800'
-                              : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
-                          }`}
-                        >
-                          <Sparkles className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                          <span>{biz.isFeatured ? 'Pilihan (Ya)' : 'Jadikan Pilihan'}</span>
-                        </button>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleApprovedBusiness(biz)}
+                            className={`px-2.5 py-1 rounded-lg font-bold text-[0.8125rem] border cursor-pointer ${
+                              biz.isApproved
+                                ? 'bg-emerald-100 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-black dark:text-white'
+                                : 'bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black/70 dark:text-white/70'
+                            }`}
+                          >
+                            {biz.isApproved ? 'Aktif' : 'Tersembunyi'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleFeatured(biz)}
+                            className={`px-2.5 py-1 rounded-lg font-bold text-[0.8125rem] flex items-center gap-1 transition-colors cursor-pointer ${
+                              biz.isFeatured
+                                ? 'bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white border border-amber-300 dark:border-amber-800'
+                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
+                            }`}
+                          >
+                            <Sparkles className="w-3 h-3 text-black dark:text-white/75" />
+                            <span>{biz.isFeatured ? 'Pilihan' : 'Jadikan Pilihan'}</span>
+                          </button>
+                        </div>
                       </td>
                       <td className="p-4 text-right">
-                        <div className="inline-flex items-center justify-end gap-2 shrink-0">
+                        <div className="inline-flex items-center justify-end gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setManagingProductsBusiness(biz);
+                            }}
+                            className="px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
+                            title={`Urus Produk ${biz.businessName}`}
+                          >
+                            <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+                            <span>Produk ({bizProductCount})</span>
+                          </button>
                           <button
                             type="button"
                             id={`btn-edit-business-${biz.id}`}
                             onClick={(e) => {
                               e.stopPropagation();
+                              setIsCreatingBusiness(false);
                               setEditingBusiness(biz);
                             }}
-                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
+                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
                             title={`Edit Perniagaan ${biz.businessName}`}
                           >
                             <Edit3 className="w-3.5 h-3.5 shrink-0" />
@@ -1316,7 +1569,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 onConfirm: () => handleDeleteBusiness(biz.id, biz.businessName)
                               });
                             }}
-                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
+                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0 transition-colors cursor-pointer shadow-2xs"
                             title={`Padam Perniagaan ${biz.businessName}`}
                           >
                             <Trash2 className="w-3.5 h-3.5 shrink-0" />
@@ -1325,7 +1578,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  );})}
                 </tbody>
               </table>
             </div>
@@ -1551,12 +1804,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <span className="font-extrabold text-black dark:text-white/85">RM{s.monthlyRate}/bln</span>
                       </td>
                       <td className="p-4">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold capitalize ${
-                          s.status === 'available' ? 'bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white' :
-                          s.status === 'occupied' ? 'bg-amber-100 dark:bg-indigo-600 text-black dark:text-white' : 'bg-amber-100 dark:bg-amber-950/80 text-black dark:text-white'
-                        }`}>
-                          {s.status}
-                        </span>
+                        <select
+                          aria-label={`Tukar status slot ${s.code}`}
+                          value={s.status}
+                          onChange={(e) => handleDirectSlotStatusChange(s, e.target.value as SlotStatus)}
+                          className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
+                            s.status === 'available'
+                              ? 'bg-emerald-100 border-emerald-300 dark:bg-emerald-950/80 dark:border-emerald-800 text-black dark:text-white'
+                              : s.status === 'occupied'
+                                ? 'bg-indigo-100 border-indigo-300 dark:bg-indigo-600 dark:border-indigo-500 text-black dark:text-white'
+                                : 'bg-amber-100 border-amber-300 dark:bg-amber-950/80 dark:border-amber-800 text-black dark:text-white'
+                          }`}
+                        >
+                          <option value="available">Tersedia (available)</option>
+                          <option value="occupied">Beroperasi (occupied)</option>
+                          <option value="reserved">Ditempah (reserved)</option>
+                          <option value="maintenance">Selenggara (maintenance)</option>
+                        </select>
                         {s.currentTenantBusinessName && (
                           <div className="text-sm text-black dark:text-white/80 mt-1 font-semibold">
                             {s.currentTenantBusinessName}
@@ -1861,12 +2125,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* Mentor Management Grid */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <h4 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
                 <GraduationCap className="w-4 h-4 text-black dark:text-white/75" />
                 <span>Senarai Mentor ({mentors.length})</span>
               </h4>
-              <span className="text-sm text-black/70 dark:text-white/75">Tekan &quot;Edit Profil Mentor&quot; untuk ubah suai maklumat</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedMentorForEdit(null);
+                  setIsCreatingMentor(true);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah Mentor Baharu</span>
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
@@ -1910,14 +2184,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setSelectedMentorForEdit(m)}
-                      className="w-full py-2 px-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>Edit Profil Mentor</span>
-                    </button>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsCreatingMentor(false);
+                          setSelectedMentorForEdit(m);
+                        }}
+                        className="col-span-2 py-2 px-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          confirmDelete({
+                            itemName: m.name,
+                            itemType: 'Profil Mentor',
+                            onConfirm: () => handleDeleteMentor(m)
+                          })
+                        }
+                        className="py-2 px-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-200 dark:border-rose-800/70 rounded-xl text-sm font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                        title={`Padam Mentor ${m.name}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Padam</span>
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -1926,29 +2220,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* Mentee List Table */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs overflow-hidden">
-            <div className="p-4 sm:p-5 border-b border-slate-300 dark:border-slate-600 flex items-center justify-between">
-              <h4 className="text-base font-bold text-black dark:text-white">
-                Senarai Usahawan Berdaftar Mengikut Mentor
-              </h4>
-              <span className="text-sm sm:text-[0.9375rem] text-black/70 dark:text-white/75">Seluruh Kelantan</span>
+            <div className="p-4 sm:p-5 border-b border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h4 className="text-base font-bold text-black dark:text-white">
+                  Senarai Usahawan Berdaftar Mengikut Mentor
+                </h4>
+                <span className="text-sm text-black/70 dark:text-white/75">Seluruh Kelantan · Urus jadual, status dan rekod sesi</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingMentorship(null);
+                  setIsCreatingMentorship(true);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah Sesi Bimbingan</span>
+              </button>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-slate-50 dark:bg-slate-900 text-black/75 dark:text-white/80 border-b border-slate-300 dark:border-slate-600 text-[0.8125rem] uppercase tracking-wider font-bold">
                   <tr>
-                    <th className="py-3.5 px-4">Usahawan & Perniagaan</th>
+                    <th className="py-3.5 px-4">Usahawan &amp; Perniagaan</th>
                     <th className="py-3.5 px-4">Mentor Ditugaskan</th>
                     <th className="py-3.5 px-4">Topik Bimbingan</th>
                     <th className="py-3.5 px-4">Jajahan</th>
-                    <th className="py-3.5 px-4">Tarikh & Mod</th>
+                    <th className="py-3.5 px-4">Tarikh &amp; Mod</th>
                     <th className="py-3.5 px-4">Status</th>
+                    <th className="py-3.5 px-4 text-right">Tindakan</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300 dark:divide-slate-600 text-black dark:text-white">
                   {sortedMentorships.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-8 text-black/70 dark:text-white/75">
+                      <td colSpan={7} className="text-center py-8 text-black/70 dark:text-white/75">
                         Tiada pendaftaran bimbingan ditemui.
                       </td>
                     </tr>
@@ -1977,15 +2285,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <div className="text-sm text-black/70 dark:text-white/75">{m.mode}</div>
                         </td>
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <span className={`px-2.5 py-1 rounded-full text-[0.8125rem] font-bold ${
-                            m.status === 'confirmed'
-                              ? 'bg-amber-100 text-black dark:bg-indigo-600 dark:text-white'
-                              : m.status === 'completed'
-                              ? 'bg-emerald-100 text-black dark:bg-emerald-950 dark:text-white'
-                              : 'bg-amber-100 text-black dark:bg-amber-950 dark:text-white'
-                          }`}>
-                            {m.status === 'confirmed' ? 'Disahkan' : m.status === 'completed' ? 'Selesai' : 'Menunggu'}
-                          </span>
+                          <select
+                            aria-label={`Status sesi ${m.entrepreneurName}`}
+                            value={m.status}
+                            onChange={(e) => handleDirectMentorshipStatus(m, e.target.value as MentorshipRegistration['status'])}
+                            className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
+                              m.status === 'confirmed'
+                                ? 'bg-indigo-100 border-indigo-300 text-black dark:bg-indigo-600 dark:border-indigo-500 dark:text-white'
+                                : m.status === 'completed'
+                                  ? 'bg-emerald-100 border-emerald-300 text-black dark:bg-emerald-950 dark:border-emerald-800 dark:text-white'
+                                  : m.status === 'cancelled'
+                                    ? 'bg-slate-200 border-slate-300 text-black dark:bg-slate-700 dark:border-slate-600 dark:text-white'
+                                    : 'bg-amber-100 border-amber-300 text-black dark:bg-amber-950 dark:border-amber-800 dark:text-white'
+                            }`}
+                          >
+                            <option value="pending">Menunggu</option>
+                            <option value="confirmed">Disahkan</option>
+                            <option value="completed">Selesai</option>
+                            <option value="cancelled">Dibatalkan</option>
+                          </select>
+                        </td>
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <div className="inline-flex items-center justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsCreatingMentorship(false);
+                                setEditingMentorship(m);
+                              }}
+                              className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1 cursor-pointer"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Edit</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                confirmDelete({
+                                  itemName: `${m.entrepreneurName} (${m.topic})`,
+                                  itemType: 'Sesi Bimbingan Mentor',
+                                  onConfirm: () => handleDeleteMentorship(m)
+                                })
+                              }
+                              className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1 cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Padam</span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -2021,6 +2368,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {adminTab === 'b2b' && (
         <div className="animate-in fade-in duration-200">
           <AdminB2BManager />
+        </div>
+      )}
+
+      {/* TAB: EVENTS & BOOKINGS MANAGEMENT (ADMIN ONLY) */}
+      {adminTab === 'events' && (
+        <div className="animate-in fade-in duration-200">
+          <AdminEventsManager onRefresh={onRefresh} />
+        </div>
+      )}
+
+      {/* TAB: USER ACCOUNT MANAGEMENT (ADMIN ONLY) */}
+      {adminTab === 'users' && (
+        <div className="animate-in fade-in duration-200">
+          <AdminUsersManager onRefresh={onRefresh} />
         </div>
       )}
 
@@ -2291,28 +2652,82 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       )}
 
-      {selectedMentorForEdit && (
+      {(selectedMentorForEdit || isCreatingMentor) && (
         <MentorProfileEditModal
-          isOpen={Boolean(selectedMentorForEdit)}
-          onClose={() => setSelectedMentorForEdit(null)}
-          mentor={selectedMentorForEdit}
+          isOpen={Boolean(selectedMentorForEdit) || isCreatingMentor}
+          onClose={() => {
+            setSelectedMentorForEdit(null);
+            setIsCreatingMentor(false);
+          }}
+          mentor={isCreatingMentor ? null : selectedMentorForEdit}
           isAdminEditing={true}
           onSave={(updated) => {
             onUpdateMentor?.(updated);
             setSelectedMentorForEdit(null);
+            setIsCreatingMentor(false);
+            showToast(isCreatingMentor ? 'Mentor baharu berjaya didaftarkan!' : 'Profil mentor berjaya dikemas kini!', 'success');
+            onRefresh();
           }}
         />
       )}
 
       <EditBusinessModal
-        isOpen={Boolean(editingBusiness)}
-        business={editingBusiness}
-        onClose={() => setEditingBusiness(null)}
-        onSaved={() => {
+        isOpen={Boolean(editingBusiness) || isCreatingBusiness}
+        business={isCreatingBusiness ? null : editingBusiness}
+        isCreating={isCreatingBusiness}
+        onClose={() => {
           setEditingBusiness(null);
-          showToast('Maklumat perniagaan berjaya dikemas kini!', 'success');
+          setIsCreatingBusiness(false);
+        }}
+        onSaved={() => {
+          const created = isCreatingBusiness;
+          setEditingBusiness(null);
+          setIsCreatingBusiness(false);
+          showToast(created ? 'Perniagaan baharu berjaya ditambah!' : 'Maklumat perniagaan berjaya dikemas kini!', 'success');
           onRefresh();
         }}
+      />
+
+      <EditBookingModal
+        isOpen={Boolean(editingBooking) || isCreatingBooking}
+        booking={isCreatingBooking ? null : editingBooking}
+        slots={safeSlots}
+        onClose={() => {
+          setEditingBooking(null);
+          setIsCreatingBooking(false);
+        }}
+        onSaved={() => {
+          const created = isCreatingBooking;
+          setEditingBooking(null);
+          setIsCreatingBooking(false);
+          showToast(created ? 'Permohonan kiosk baharu ditambah!' : 'Permohonan kiosk dikemas kini!', 'success');
+          onRefresh();
+        }}
+      />
+
+      <EditMentorshipModal
+        isOpen={Boolean(editingMentorship) || isCreatingMentorship}
+        registration={isCreatingMentorship ? null : editingMentorship}
+        mentors={mentors}
+        onClose={() => {
+          setEditingMentorship(null);
+          setIsCreatingMentorship(false);
+        }}
+        onSaved={() => {
+          const created = isCreatingMentorship;
+          setEditingMentorship(null);
+          setIsCreatingMentorship(false);
+          showToast(created ? 'Sesi bimbingan baharu ditambah!' : 'Sesi bimbingan dikemas kini!', 'success');
+          onRefresh();
+        }}
+      />
+
+      <ManageBusinessProductsModal
+        isOpen={Boolean(managingProductsBusiness)}
+        business={managingProductsBusiness}
+        products={products}
+        onClose={() => setManagingProductsBusiness(null)}
+        onRefresh={onRefresh}
       />
 
       <EditSlotModal

@@ -257,6 +257,34 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
               <button
                 type="button"
+                onClick={() => {
+                  setActiveTab('admin');
+                  if (onSelectAdminSubTab) onSelectAdminSubTab('events');
+                }}
+                title={isMs ? 'Acara & Tempahan' : 'Events & Bookings'}
+                className={`${miniBtnBase} ${
+                  activeTab === 'admin' && adminSubTab === 'events' ? miniBtnActive : miniBtnIdle
+                }`}
+              >
+                <Calendar className="w-5 h-5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('admin');
+                  if (onSelectAdminSubTab) onSelectAdminSubTab('users');
+                }}
+                title={isMs ? 'Urus Pengguna' : 'User Management'}
+                className={`${miniBtnBase} ${
+                  activeTab === 'admin' && adminSubTab === 'users' ? miniBtnActive : miniBtnIdle
+                }`}
+              >
+                <Users className="w-5 h-5" />
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setActiveTab('settings')}
                 title={t('nav_settings')}
                 className={`${miniBtnBase} ${activeTab === 'settings' ? miniBtnActive : miniBtnIdle}`}
@@ -505,6 +533,18 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
       label: isMs ? 'Ruang Niaga' : 'Ruang Niaga',
       keywords: 'ruang niaga iklan pembekal gambar b2b ads admin',
       icon: Megaphone
+    },
+    {
+      id: 'events',
+      label: isMs ? 'Acara & Tempahan' : 'Events & Bookings',
+      keywords: 'acara karnival ekspo bengkel tempahan peserta events',
+      icon: Calendar
+    },
+    {
+      id: 'users',
+      label: isMs ? 'Urus Pengguna' : 'User Management',
+      keywords: 'pengguna akaun profil ahli peranan user management users',
+      icon: Users
     },
     {
       id: 'sync',

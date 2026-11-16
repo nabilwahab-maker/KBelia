@@ -539,65 +539,141 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         // Real Mentorship Computation
         const upcomingMentor = safeMentorships.find(m => m.status === 'confirmed' || m.status === 'pending') || safeMentorships[0] || null;
 
-        // Build Chart Bars strictly from real cashflowRecords
+        // Build Chart Bars strictly from real cashflowRecords with auto-anchor to latest record range
         const now = new Date();
         const pad2 = (n: number) => String(n).padStart(2, '0');
         const toLocalIso = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+        const parseLocalDate = (raw?: string): Date | null => {
+          if (!raw) return null;
+          const m = raw.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+          if (m) {
+            return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+          }
+          const dt = new Date(raw);
+          return Number.isNaN(dt.getTime()) ? null : new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+        };
+        const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogo', 'Sep', 'Okt', 'Nov', 'Dis'];
+        const days = ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'];
+
+        const datedCashflow = safeCashflow
+          .map((r) => ({ record: r, parsedDate: parseLocalDate(r.date) }))
+          .filter((item): item is { record: KioskDailySale; parsedDate: Date } => item.parsedDate !== null);
+
+        const latestRecordDate = datedCashflow.reduce<Date | null>(
+          (latest, item) => (!latest || item.parsedDate.getTime() > latest.getTime() ? item.parsedDate : latest),
+          null
+        );
+
+        const formatShortDate = (d: Date) => `${d.getDate()} ${months[d.getMonth()]}`;
+
+        let isHistoricalAnchor = false;
+        let chartRangeLabel = '';
 
         const chartBars = (() => {
           if (salesPeriod === 'weekly') {
-            const days = ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'];
-            return Array.from({ length: 7 }, (_, i) => {
-              const d = new Date(now);
-              d.setDate(now.getDate() - (6 - i));
-              const iso = toLocalIso(d);
-              const dayRecs = safeCashflow.filter(r => (r.date || '').slice(0, 10) === iso);
-              const cash = dayRecs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
-              const qr = dayRecs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
-              const value = cash + qr;
-              return {
-                label: days[d.getDay()],
-                value,
-                tx: dayRecs.length,
-                qr: value > 0 ? Math.round((qr / value) * 100) : 0
-              };
-            });
+            const buildWeekly = (anchor: Date, includeDateLabel: boolean) =>
+              Array.from({ length: 7 }, (_, i) => {
+                const d = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate() - (6 - i));
+                const iso = toLocalIso(d);
+                const dayRecs = datedCashflow
+                  .filter((item) => toLocalIso(item.parsedDate) === iso)
+                  .map((item) => item.record);
+                const cash = dayRecs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+                const qr = dayRecs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+                const value = cash + qr;
+                return {
+                  label: includeDateLabel ? `${days[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}` : days[d.getDay()],
+                  fullDate: `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`,
+                  value,
+                  tx: dayRecs.length,
+                  qr: value > 0 ? Math.round((qr / value) * 100) : 0
+                };
+              });
+
+            const currentWeekBars = buildWeekly(now, false);
+            const currentWeekHasRecords = currentWeekBars.some((b) => b.tx > 0);
+            if (!currentWeekHasRecords && latestRecordDate) {
+              isHistoricalAnchor = true;
+              const startD = new Date(
+                latestRecordDate.getFullYear(),
+                latestRecordDate.getMonth(),
+                latestRecordDate.getDate() - 6
+              );
+              chartRangeLabel = `${formatShortDate(startD)} – ${formatShortDate(latestRecordDate)} ${latestRecordDate.getFullYear()}`;
+              return buildWeekly(latestRecordDate, true);
+            }
+            const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+            chartRangeLabel = `${formatShortDate(weekStart)} – ${formatShortDate(now)} ${now.getFullYear()}`;
+            return currentWeekBars;
           }
+
           if (salesPeriod === 'monthly') {
-            const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogo', 'Sep', 'Okt', 'Nov', 'Dis'];
-            return Array.from({ length: 6 }, (_, i) => {
-              const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
-              const ym = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
-              const recs = safeCashflow.filter(r => (r.date || '').startsWith(ym));
+            const buildMonthly = (anchor: Date, includeYear: boolean) =>
+              Array.from({ length: 6 }, (_, i) => {
+                const d = new Date(anchor.getFullYear(), anchor.getMonth() - (5 - i), 1);
+                const ym = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
+                const recs = datedCashflow
+                  .filter((item) => {
+                    const itemYm = `${item.parsedDate.getFullYear()}-${pad2(item.parsedDate.getMonth() + 1)}`;
+                    return itemYm === ym;
+                  })
+                  .map((item) => item.record);
+                const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
+                const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+                const value = cash + qr;
+                const shortYear = String(d.getFullYear()).slice(-2);
+                return {
+                  label: includeYear ? `${months[d.getMonth()]} '${shortYear}` : months[d.getMonth()],
+                  fullDate: `${months[d.getMonth()]} ${d.getFullYear()}`,
+                  value,
+                  tx: recs.length,
+                  qr: value > 0 ? Math.round((qr / value) * 100) : 0
+                };
+              });
+
+            const currentMonthBars = buildMonthly(now, false);
+            const currentMonthHasRecords = currentMonthBars.some((b) => b.tx > 0);
+            if (!currentMonthHasRecords && latestRecordDate) {
+              isHistoricalAnchor = true;
+              const startM = new Date(latestRecordDate.getFullYear(), latestRecordDate.getMonth() - 5, 1);
+              chartRangeLabel = `${months[startM.getMonth()]} ${startM.getFullYear()} – ${months[latestRecordDate.getMonth()]} ${latestRecordDate.getFullYear()}`;
+              return buildMonthly(latestRecordDate, startM.getFullYear() !== latestRecordDate.getFullYear());
+            }
+            const startCurrentM = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+            chartRangeLabel = `${months[startCurrentM.getMonth()]} – ${months[now.getMonth()]} ${now.getFullYear()}`;
+            return currentMonthBars;
+          }
+
+          const buildQuarterly = (targetYear: number) =>
+            [0, 1, 2, 3].map((qIdx) => {
+              const qLabel = `S${qIdx + 1}`;
+              const startMonth = qIdx * 3;
+              const recs = datedCashflow
+                .filter((item) => {
+                  const dt = item.parsedDate;
+                  return dt.getFullYear() === targetYear && dt.getMonth() >= startMonth && dt.getMonth() <= startMonth + 2;
+                })
+                .map((item) => item.record);
               const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
               const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
               const value = cash + qr;
               return {
-                label: months[d.getMonth()],
+                label: qLabel,
+                fullDate: `Suku ${qIdx + 1} ${targetYear}`,
                 value,
                 tx: recs.length,
                 qr: value > 0 ? Math.round((qr / value) * 100) : 0
               };
             });
+
+          const currentQuarterBars = buildQuarterly(now.getFullYear());
+          if (!currentQuarterBars.some((b) => b.tx > 0) && latestRecordDate) {
+            isHistoricalAnchor = true;
+            chartRangeLabel = `Tahun ${latestRecordDate.getFullYear()}`;
+            return buildQuarterly(latestRecordDate.getFullYear());
           }
-          return [0, 1, 2, 3].map((qIdx) => {
-            const qLabel = `S${qIdx + 1}`;
-            const startMonth = qIdx * 3;
-            const recs = safeCashflow.filter(r => {
-              if (!r.date) return false;
-              const dt = new Date(r.date);
-              return dt.getFullYear() === now.getFullYear() && dt.getMonth() >= startMonth && dt.getMonth() <= startMonth + 2;
-            });
-            const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
-            const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
-            const value = cash + qr;
-            return {
-              label: qLabel,
-              value,
-              tx: recs.length,
-              qr: value > 0 ? Math.round((qr / value) * 100) : 0
-            };
-          });
+          chartRangeLabel = `Tahun ${now.getFullYear()}`;
+          return currentQuarterBars;
         })();
 
         const periodTotal = chartBars.reduce((s, b) => s + b.value, 0);
@@ -906,10 +982,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
                 {/* Interactive Recharts Chart */}
                 <div className="relative pt-2 pb-2 min-w-0">
-                  <div className="h-80 w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                    <ResponsiveContainer width="100%" height={320} minWidth={0}>
+                  <div className="h-80 min-h-[320px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                    <ResponsiveContainer width="100%" height={320} minWidth={0} initialDimension={{ width: 520, height: 320 }}>
                       {chartMode === 'area' ? (
-                        <AreaChart data={chartBars} margin={{ top: 20, right: 14, left: -4, bottom: 4 }}>
+                        <AreaChart data={chartBars} margin={{ top: 24, right: 16, left: 4, bottom: 4 }}>
                           <defs>
                             <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
                               <stop offset="0%" stopColor="#10B981" stopOpacity={0.38} />
@@ -919,12 +995,15 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
                           <XAxis
                             dataKey="label"
-                            tick={{ fontSize: 13.5, fontWeight: 600 }}
+                            tick={{ fontSize: 12.5, fontWeight: 600 }}
+                            interval={0}
                             axisLine={false}
                             tickLine={false}
                           />
                           <YAxis
-                            tick={{ fontSize: 13.5, fontWeight: 500 }}
+                            domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
+                            allowDecimals={false}
+                            tick={{ fontSize: 12.5, fontWeight: 500 }}
                             axisLine={false}
                             tickLine={false}
                             tickFormatter={(val) => `RM${val}`}
@@ -932,10 +1011,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           <Tooltip
                             content={({ active, payload }) => {
                               if (active && payload && payload.length) {
-                                const d = payload[0].payload as { label: string; value: number; tx: number; qr: number };
+                                const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
                                 return (
                                   <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                    <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.label}</div>
+                                    <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
                                     <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
                                     <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
                                   </div>
@@ -951,24 +1030,28 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             strokeWidth={2.5}
                             fill="url(#beliaSalesGradient)"
                             isAnimationActive={false}
-                            activeDot={{ r: 5, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
+                            dot={{ r: 4, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
+                            activeDot={{ r: 6, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
                           />
                         </AreaChart>
                       ) : (
                         <BarChart
                           data={chartBars}
                           barCategoryGap="16%"
-                          margin={{ top: 26, right: 14, left: -4, bottom: 4 }}
+                          margin={{ top: 26, right: 16, left: 4, bottom: 4 }}
                         >
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
                           <XAxis
                             dataKey="label"
-                            tick={{ fontSize: 13.5, fontWeight: 600 }}
+                            tick={{ fontSize: 12.5, fontWeight: 600 }}
+                            interval={0}
                             axisLine={false}
                             tickLine={false}
                           />
                           <YAxis
-                            tick={{ fontSize: 13.5, fontWeight: 500 }}
+                            domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
+                            allowDecimals={false}
+                            tick={{ fontSize: 12.5, fontWeight: 500 }}
                             axisLine={false}
                             tickLine={false}
                             tickFormatter={(val) => `RM${val}`}
@@ -977,10 +1060,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             cursor={{ fill: 'rgba(37, 99, 235, 0.12)' }}
                             content={({ active, payload }) => {
                               if (active && payload && payload.length) {
-                                const d = payload[0].payload as { label: string; value: number; tx: number; qr: number };
+                                const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
                                 return (
                                   <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                    <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.label}</div>
+                                    <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
                                     <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
                                     <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
                                   </div>
@@ -989,7 +1072,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                               return null;
                             }}
                           />
-                          <Bar dataKey="value" fill="#2563EB" radius={[6, 6, 0, 0]} maxBarSize={56} isAnimationActive={false}>
+                          <Bar
+                            dataKey="value"
+                            fill="#2563EB"
+                            radius={[6, 6, 0, 0]}
+                            maxBarSize={56}
+                            minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
+                            isAnimationActive={false}
+                          >
                             <LabelList
                               dataKey="value"
                               position="top"
@@ -1008,11 +1098,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 </div>
 
                 {/* Footer notes & Cashflow shortcut */}
-                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex items-center justify-between text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 gap-2">
+                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 gap-2">
                   <span className="leading-snug font-medium">
                     {safeCashflow.length > 0
-                      ? 'Buku Tunai Transaksi Sah'
-                      : 'Belum ada rekod jualan harian'}
+                      ? isHistoricalAnchor
+                        ? `Julat rekod terkini: ${chartRangeLabel}`
+                        : `Buku Tunai Transaksi Sah · ${chartRangeLabel}`
+                      : 'Belum ada rekod jualan harian direkodkan'}
                   </span>
                   <button
                     type="button"
@@ -2025,7 +2117,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                         'Tempahan dibatalkan oleh usahawan.',
                                         b.slotId,
                                         b.businessName,
-                                        b.applicantId
+                                        b.applicantId,
+                                        b
                                       );
                                       showToast({
                                         type: 'info',

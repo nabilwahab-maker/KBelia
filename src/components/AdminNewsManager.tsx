@@ -8,7 +8,6 @@ import {
   Eye,
   EyeOff,
   Search,
-  RotateCcw,
   Save,
   X,
   Send
@@ -17,8 +16,7 @@ import { NewsCategory, NewsStatus, PortalNews } from '../types';
 import { NEWS_CATEGORIES } from '../data/newsData';
 import {
   savePortalNewsRecord,
-  deletePortalNewsRecord,
-  restoreDefaultDemoNews
+  deletePortalNewsRecord
 } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { ImageDropzone } from './ImageDropzone';
@@ -216,16 +214,6 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
     }
   };
 
-  const handleRestoreDemo = async () => {
-    try {
-      await restoreDefaultDemoNews();
-      showToast('Set berita demo asal berjaya dipulihkan.', 'success');
-      onRefresh();
-    } catch {
-      showToast('Gagal memulihkan berita demo.', 'error');
-    }
-  };
-
   const formatDate = (iso?: string) => {
     if (!iso) return 'Belum disiar';
     try {
@@ -257,15 +245,6 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-          <button
-            type="button"
-            onClick={handleRestoreDemo}
-            className="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap shrink-0"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Pulihkan Berita Demo</span>
-          </button>
-
           <button
             id="btn-admin-add-news"
             type="button"
@@ -504,7 +483,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
           <Newspaper className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
           <p className="text-sm font-bold text-black dark:text-white">Tiada artikel ditemui</p>
           <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-            Cipta berita baharu atau pulihkan set berita demo asal untuk mula mengurus kandungan.
+            Cipta berita baharu untuk mula mengurus kandungan portal.
           </p>
           <button
             type="button"

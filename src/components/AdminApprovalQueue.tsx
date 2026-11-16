@@ -21,19 +21,35 @@ import {
   LayoutDashboard,
   Award,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Edit3,
+  Trash2,
+  Plus
 } from 'lucide-react';
-import { CapsuleBooking, GrantApplication, CapsuleSlot, KelantanDistrict, YouthProgram, MaintenanceTicket } from '../types';
+import { CapsuleBooking, GrantApplication, CapsuleSlot, KelantanDistrict, YouthProgram, MaintenanceTicket, BookingStatus } from '../types';
 import { maskMyKad } from '../utils/securityUtils';
 import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
 import { OfficialApprovalReportModal } from './OfficialApprovalReportModal';
-import { saveCapsuleSlot, saveProgram } from '../services/dataService';
+import {
+  saveCapsuleSlot,
+  saveProgram,
+  deleteCapsuleSlot,
+  deleteCapsuleBooking,
+  deleteGrantApplication,
+  updateBookingStatus,
+  updateGrantApplicationStatus,
+  updateMaintenanceTicketStatus,
+  deleteMaintenanceTicket
+} from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { ImageDropzone } from './ImageDropzone';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveBookingKioskImage, resolveSlotImage } from '../utils/visualAssets';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { useConfirmDelete } from '../context/ConfirmDeleteContext';
+import { EditSlotModal } from './EditSlotModal';
+import { EditBookingModal, EditGrantModal, EditMaintenanceTicketModal } from './AdminEditModals';
 
 interface AdminApprovalQueueProps {
   bookings: CapsuleBooking[];
@@ -62,11 +78,21 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   onUpdateTicketStatus,
   onRefresh
 }) => {
+  const { confirmDelete } = useConfirmDelete();
   const [activeTab, setActiveTab] = useState<'overview' | 'kiosks' | 'grants' | 'facility' | 'audit'>('overview');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [adminNoteInput, setAdminNoteInput] = useState<{ [key: string]: string }>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Admin Edit / Create Modals
+  const [editingBooking, setEditingBooking] = useState<CapsuleBooking | null>(null);
+  const [showCreateBooking, setShowCreateBooking] = useState(false);
+  const [editingGrant, setEditingGrant] = useState<GrantApplication | null>(null);
+  const [showCreateGrant, setShowCreateGrant] = useState(false);
+  const [editingSlot, setEditingSlot] = useState<CapsuleSlot | null>(null);
+  const [editingTicket, setEditingTicket] = useState<MaintenanceTicket | null>(null);
+  const [showCreateTicket, setShowCreateTicket] = useState(false);
 
   // Reject Confirmation Modal State: "Adakah anda ingin tolak? Ya / Tidak"
   const [rejectModalData, setRejectModalData] = useState<{
@@ -183,6 +209,93 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
   const handleCancelReject = () => {
     setRejectModalData(null);
+  };
+
+  const handleDirectBookingStatus = async (booking: CapsuleBooking, nextStatus: BookingStatus) => {
+    setActionLoading(booking.id);
+    try {
+      await updateBookingStatus(
+        booking.id,
+        nextStatus,
+        booking.adminNotes || '',
+        booking.slotId,
+        booking.businessName,
+        booking.applicantId,
+        booking
+      );
+      showToast(`Status permohonan ${booking.businessName} ditukar kepada ${nextStatus}.`, 'success');
+      onRefresh?.();
+    } catch {
+      showToast('Gagal menukar status permohonan kiosk.', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteBookingRecord = async (booking: CapsuleBooking) => {
+    try {
+      await deleteCapsuleBooking(booking);
+      showToast(`Permohonan ${booking.businessName} telah dipadam.`, 'info');
+      onRefresh?.();
+    } catch {
+      showToast('Gagal memadam permohonan kiosk.', 'error');
+    }
+  };
+
+  const handleDirectGrantStatus = async (grant: GrantApplication, nextStatus: GrantApplication['status']) => {
+    setActionLoading(grant.id);
+    try {
+      await updateGrantApplicationStatus(grant.id, nextStatus, grant.adminNotes || '', grant);
+      showToast(`Status permohonan geran ${grant.businessName} dikemas kini.`, 'success');
+      onRefresh?.();
+    } catch {
+      showToast('Gagal menukar status permohonan geran.', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteGrantRecord = async (grant: GrantApplication) => {
+    try {
+      await deleteGrantApplication(grant.id);
+      showToast(`Permohonan geran ${grant.businessName} telah dipadam.`, 'info');
+      onRefresh?.();
+    } catch {
+      showToast('Gagal memadam permohonan geran.', 'error');
+    }
+  };
+
+  const handleDirectTicketStatus = async (ticket: MaintenanceTicket, nextStatus: MaintenanceTicket['status']) => {
+    setActionLoading(ticket.id);
+    try {
+      await updateMaintenanceTicketStatus(ticket.id, nextStatus, ticket.adminNotes, ticket);
+      showToast(`Status tiket aduan ${ticket.slotCode} dikemas kini.`, 'success');
+      onRefresh?.();
+    } catch {
+      showToast('Gagal menukar status tiket aduan.', 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteTicketRecord = async (ticket: MaintenanceTicket) => {
+    try {
+      await deleteMaintenanceTicket(ticket.id);
+      showToast(`Tiket aduan ${ticket.slotCode} telah dipadam.`, 'info');
+      onRefresh?.();
+    } catch {
+      showToast('Gagal memadam tiket aduan.', 'error');
+    }
+  };
+
+  const handleDeleteSlotRecord = async (slot: CapsuleSlot) => {
+    try {
+      await deleteCapsuleSlot(slot.id);
+      showToast(`Slot kiosk ${slot.code} telah dipadam.`, 'info');
+      onRefresh?.();
+    } catch {
+      showToast('Gagal memadam slot kiosk.', 'error');
+    }
   };
 
   // State for Official Approval Report Modal
@@ -465,22 +578,49 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         <span className="px-2 py-0.5 rounded text-[0.8125rem] font-bold bg-amber-100 text-black dark:bg-amber-950/80 dark:text-white">Menunggu</span>
                       </div>
 
-                      <div className="flex items-center justify-end gap-2 pt-1.5 border-t border-slate-300 dark:border-slate-600">
-                        <button
-                          type="button"
-                          onClick={() => setRejectModalData({ type: 'kiosk', id: b.id, name: b.applicantName, business: b.businessName, slotOrProgram: b.slotCode })}
-                          className="px-2.5 py-1 rounded text-[0.8125rem] font-semibold text-black dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
-                        >
-                          Tolak
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleApproveBooking(b.id)}
-                          className="px-3 py-1 rounded text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-1"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Luluskan</span>
-                        </button>
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-300 dark:border-slate-600">
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setEditingBooking(b)}
+                            className="p-1.5 rounded-lg border border-blue-200 dark:border-blue-800/70 bg-blue-50 dark:bg-blue-950/40 text-black dark:text-white hover:bg-blue-100 cursor-pointer"
+                            title="Edit Permohonan"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: `${b.businessName} (${b.slotCode})`,
+                                itemType: 'Permohonan Kiosk',
+                                onConfirm: () => handleDeleteBookingRecord(b)
+                              })
+                            }
+                            className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-800/70 bg-rose-50 dark:bg-rose-950/40 text-black dark:text-white hover:bg-rose-100 cursor-pointer"
+                            title="Padam Permohonan"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setRejectModalData({ type: 'kiosk', id: b.id, name: b.applicantName, business: b.businessName, slotOrProgram: b.slotCode })}
+                            className="px-2.5 py-1 rounded text-[0.8125rem] font-semibold text-black dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
+                          >
+                            Tolak
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleApproveBooking(b.id)}
+                            className="px-3 py-1 rounded text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-1"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Luluskan</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -538,22 +678,49 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         <span className="px-2 py-0.5 rounded text-[0.8125rem] font-bold bg-amber-100 text-black dark:bg-amber-950/80 dark:text-white">Menunggu</span>
                       </div>
 
-                      <div className="flex items-center justify-end gap-2 pt-1.5 border-t border-slate-300 dark:border-slate-600">
-                        <button
-                          type="button"
-                          onClick={() => setRejectModalData({ type: 'grant', id: g.id, name: g.applicantName, business: g.businessName, slotOrProgram: g.programTitle })}
-                          className="px-2.5 py-1 rounded text-[0.8125rem] font-semibold text-black dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
-                        >
-                          Tolak
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleApproveGrant(g.id)}
-                          className="px-3 py-1 rounded text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-1"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Luluskan</span>
-                        </button>
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-300 dark:border-slate-600">
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setEditingGrant(g)}
+                            className="p-1.5 rounded-lg border border-blue-200 dark:border-blue-800/70 bg-blue-50 dark:bg-blue-950/40 text-black dark:text-white hover:bg-blue-100 cursor-pointer"
+                            title="Edit Permohonan Geran"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: `${g.businessName} (${g.programTitle})`,
+                                itemType: 'Permohonan Geran',
+                                onConfirm: () => handleDeleteGrantRecord(g)
+                              })
+                            }
+                            className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-800/70 bg-rose-50 dark:bg-rose-950/40 text-black dark:text-white hover:bg-rose-100 cursor-pointer"
+                            title="Padam Permohonan Geran"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setRejectModalData({ type: 'grant', id: g.id, name: g.applicantName, business: g.businessName, slotOrProgram: g.programTitle })}
+                            className="px-2.5 py-1 rounded text-[0.8125rem] font-semibold text-black dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
+                          >
+                            Tolak
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleApproveGrant(g.id)}
+                            className="px-3 py-1 rounded text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-1"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Luluskan</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -677,7 +844,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             />
           </div>
 
-          <div className="flex items-center gap-1.5 self-end sm:self-auto">
+          <div className="flex flex-wrap items-center gap-1.5 self-end sm:self-auto">
             {(['all', 'pending', 'approved', 'rejected'] as const).map((st) => (
               <button
                 key={st}
@@ -692,6 +859,23 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 {st === 'all' ? 'Semua' : st === 'pending' ? 'Menunggu' : st === 'approved' ? 'Lulus' : 'Ditolak'}
               </button>
             ))}
+
+            <button
+              type="button"
+              onClick={() => {
+                if (activeTab === 'kiosks') {
+                  setEditingBooking(null);
+                  setShowCreateBooking(true);
+                } else {
+                  setEditingGrant(null);
+                  setShowCreateGrant(true);
+                }
+              }}
+              className="ml-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold inline-flex items-center gap-1 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>{activeTab === 'kiosks' ? 'Tambah Permohonan' : 'Tambah Geran'}</span>
+            </button>
           </div>
         </div>
       )}
@@ -742,16 +926,51 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-                          <span className={`px-2.5 py-1 rounded-full text-[0.8125rem] font-bold uppercase tracking-wider whitespace-nowrap ${
-                            booking.status === 'approved'
-                              ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
-                              : booking.status === 'rejected'
-                                ? 'bg-rose-100 text-black dark:bg-rose-950/60 dark:text-white'
-                                : 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
-                          }`}>
-                            {booking.status === 'approved' ? 'Diluluskan' : booking.status === 'rejected' ? 'Ditolak' : 'Menunggu Semakan'}
-                          </span>
+                        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0">
+                          <select
+                            aria-label={`Tukar status ${booking.businessName}`}
+                            disabled={isActioning}
+                            value={booking.status}
+                            onChange={(e) => handleDirectBookingStatus(booking, e.target.value as BookingStatus)}
+                            className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
+                              booking.status === 'approved'
+                                ? 'bg-emerald-100 border-emerald-300 text-black dark:bg-emerald-950/60 dark:border-emerald-800 dark:text-white'
+                                : booking.status === 'rejected'
+                                  ? 'bg-rose-100 border-rose-300 text-black dark:bg-rose-950/60 dark:border-rose-800 dark:text-white'
+                                  : booking.status === 'cancelled'
+                                    ? 'bg-slate-200 border-slate-300 text-black dark:bg-slate-700 dark:border-slate-600 dark:text-white'
+                                    : 'bg-amber-100 border-amber-300 text-black dark:bg-amber-950/60 dark:border-amber-800 dark:text-white'
+                            }`}
+                          >
+                            <option value="pending">Menunggu Semakan</option>
+                            <option value="approved">Diluluskan</option>
+                            <option value="rejected">Ditolak</option>
+                            <option value="cancelled">Dibatalkan</option>
+                          </select>
+
+                          <button
+                            type="button"
+                            onClick={() => setEditingBooking(booking)}
+                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: `${booking.businessName} (${booking.slotCode})`,
+                                itemType: 'Permohonan Kiosk',
+                                onConfirm: () => handleDeleteBookingRecord(booking)
+                              })
+                            }
+                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Padam</span>
+                          </button>
 
                           <button
                             type="button"
@@ -875,18 +1094,51 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           </p>
                         </div>
 
-                        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-                          <span className={`px-2.5 py-1 rounded-full text-[0.8125rem] font-bold uppercase tracking-wider whitespace-nowrap ${
-                            grant.status === 'approved'
-                              ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
-                              : grant.status === 'rejected'
-                                ? 'bg-rose-100 text-black dark:bg-rose-950/60 dark:text-white'
-                                : grant.status === 'cancelled'
-                                  ? 'bg-slate-200 text-black dark:bg-slate-700 dark:text-white'
-                                  : 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
-                          }`}>
-                            {grant.status === 'approved' ? 'Diluluskan' : grant.status === 'rejected' ? 'Ditolak' : grant.status === 'cancelled' ? 'Dibatalkan' : 'Menunggu Semakan'}
-                          </span>
+                        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0">
+                          <select
+                            aria-label={`Tukar status geran ${grant.businessName}`}
+                            disabled={isActioning}
+                            value={grant.status}
+                            onChange={(e) => handleDirectGrantStatus(grant, e.target.value as GrantApplication['status'])}
+                            className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
+                              grant.status === 'approved'
+                                ? 'bg-emerald-100 border-emerald-300 text-black dark:bg-emerald-950/60 dark:border-emerald-800 dark:text-white'
+                                : grant.status === 'rejected'
+                                  ? 'bg-rose-100 border-rose-300 text-black dark:bg-rose-950/60 dark:border-rose-800 dark:text-white'
+                                  : grant.status === 'cancelled'
+                                    ? 'bg-slate-200 border-slate-300 text-black dark:bg-slate-700 dark:border-slate-600 dark:text-white'
+                                    : 'bg-amber-100 border-amber-300 text-black dark:bg-amber-950/60 dark:border-amber-800 dark:text-white'
+                            }`}
+                          >
+                            <option value="pending">Menunggu Semakan</option>
+                            <option value="approved">Diluluskan</option>
+                            <option value="rejected">Ditolak</option>
+                            <option value="cancelled">Dibatalkan</option>
+                          </select>
+
+                          <button
+                            type="button"
+                            onClick={() => setEditingGrant(grant)}
+                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: `${grant.businessName} (${grant.programTitle})`,
+                                itemType: 'Permohonan Geran',
+                                onConfirm: () => handleDeleteGrantRecord(grant)
+                              })
+                            }
+                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Padam</span>
+                          </button>
 
                           <button
                             type="button"
@@ -1020,44 +1272,70 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                     </div>
                   </div>
 
-                  {/* Status Toggle Controls */}
-                  {onUpdateSlotStatus && (
-                    <div className="px-4 pb-4 pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center gap-1.5">
+                  {/* Status Toggle & Admin Edit/Delete Controls */}
+                  <div className="px-4 pb-4 pt-3 border-t border-slate-300 dark:border-slate-600 space-y-2">
+                    {onUpdateSlotStatus && (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => onUpdateSlotStatus(slot.id, 'available')}
+                          className={`flex-1 py-1 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                            slot.status === 'available'
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-emerald-50 border border-slate-300 dark:border-slate-600'
+                          }`}
+                        >
+                          Buka
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onUpdateSlotStatus(slot.id, 'maintenance')}
+                          className={`flex-1 py-1 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                            slot.status === 'maintenance'
+                              ? 'bg-amber-600 text-white'
+                              : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
+                          }`}
+                        >
+                          Baiki
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onUpdateSlotStatus(slot.id, 'occupied')}
+                          className={`flex-1 py-1 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                            slot.status === 'occupied'
+                              ? 'bg-slate-700 text-white'
+                              : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
+                          }`}
+                        >
+                          Isi
+                        </button>
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-1.5">
                       <button
                         type="button"
-                        onClick={() => onUpdateSlotStatus(slot.id, 'available')}
-                        className={`flex-1 py-1 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                          slot.status === 'available'
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-emerald-50 border border-slate-300 dark:border-slate-600'
-                        }`}
+                        onClick={() => setEditingSlot(slot)}
+                        className="py-1.5 px-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center justify-center gap-1 cursor-pointer"
                       >
-                        Buka
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
                       </button>
                       <button
                         type="button"
-                        onClick={() => onUpdateSlotStatus(slot.id, 'maintenance')}
-                        className={`flex-1 py-1 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                          slot.status === 'maintenance'
-                            ? 'bg-amber-600 text-white'
-                            : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
-                        }`}
+                        onClick={() =>
+                          confirmDelete({
+                            itemName: `${slot.code} · ${slot.name}`,
+                            itemType: 'Slot Kiosk',
+                            onConfirm: () => handleDeleteSlotRecord(slot)
+                          })
+                        }
+                        className="py-1.5 px-2.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center justify-center gap-1 cursor-pointer"
                       >
-                        Baiki
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onUpdateSlotStatus(slot.id, 'occupied')}
-                        className={`flex-1 py-1 rounded-lg text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                          slot.status === 'occupied'
-                            ? 'bg-slate-700 text-white'
-                            : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600'
-                        }`}
-                      >
-                        Isi
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Padam</span>
                       </button>
                     </div>
-                  )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -1073,16 +1351,27 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
           {/* Aduan & Tiket Penyelenggaraan Penyewa */}
           <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-5 space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h4 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
                   <Wrench className="w-4 h-4 text-black dark:text-white/75" />
                   <span>Tiket Aduan Penyelenggaraan Penyewa ({sortedTickets.length})</span>
                 </h4>
                 <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-                  Kemas kini status baik pulih aduan kerosakan teknikal daripada usahawan kapsul.
+                  Kemas kini status baik pulih, sunting atau padam aduan kerosakan teknikal.
                 </p>
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingTicket(null);
+                  setShowCreateTicket(true);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Tambah Tiket Aduan</span>
+              </button>
             </div>
 
             {sortedTickets.length === 0 ? (
@@ -1108,16 +1397,48 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             </p>
                           </div>
 
-                          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-                            <span className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold uppercase whitespace-nowrap ${
-                              ticket.status === 'resolved'
-                                ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
-                                : ticket.status === 'in_progress'
-                                  ? 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
-                                  : 'bg-amber-100 text-black dark:bg-indigo-600 dark:text-white'
-                            }`}>
-                              {ticket.status === 'resolved' ? 'Selesai' : ticket.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
-                            </span>
+                          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0">
+                            <select
+                              aria-label={`Tukar status aduan ${ticket.slotCode}`}
+                              disabled={actionLoading === ticket.id}
+                              value={ticket.status}
+                              onChange={(e) => handleDirectTicketStatus(ticket, e.target.value as MaintenanceTicket['status'])}
+                              className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold border cursor-pointer ${
+                                ticket.status === 'resolved'
+                                  ? 'bg-emerald-100 border-emerald-300 text-black dark:bg-emerald-950/60 dark:border-emerald-800 dark:text-white'
+                                  : ticket.status === 'in_progress'
+                                    ? 'bg-amber-100 border-amber-300 text-black dark:bg-amber-950/60 dark:border-amber-800 dark:text-white'
+                                    : 'bg-indigo-50 border-indigo-200 text-black dark:bg-indigo-600 dark:border-indigo-500 dark:text-white'
+                              }`}
+                            >
+                              <option value="received">Diterima</option>
+                              <option value="in_progress">Sedang Dibaiki</option>
+                              <option value="resolved">Selesai</option>
+                            </select>
+
+                            <button
+                              type="button"
+                              onClick={() => setEditingTicket(ticket)}
+                              className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Edit</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                confirmDelete({
+                                  itemName: `${ticket.slotCode} · ${ticket.issueCategory}`,
+                                  itemType: 'Tiket Aduan Fasiliti',
+                                  onConfirm: () => handleDeleteTicketRecord(ticket)
+                                })
+                              }
+                              className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Padam</span>
+                            </button>
 
                             <button
                               type="button"
@@ -1569,6 +1890,65 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           </div>
         </div>
       )}
+
+      {/* ADMIN EDIT / CREATE MODALS FOR APPROVAL QUEUE */}
+      <EditBookingModal
+        isOpen={Boolean(editingBooking) || showCreateBooking}
+        booking={showCreateBooking ? null : editingBooking}
+        slots={slots}
+        onClose={() => {
+          setEditingBooking(null);
+          setShowCreateBooking(false);
+        }}
+        onSaved={() => {
+          showToast(showCreateBooking ? 'Permohonan kiosk baharu ditambah!' : 'Permohonan kiosk dikemas kini!', 'success');
+          setEditingBooking(null);
+          setShowCreateBooking(false);
+          onRefresh?.();
+        }}
+      />
+
+      <EditGrantModal
+        isOpen={Boolean(editingGrant) || showCreateGrant}
+        grant={showCreateGrant ? null : editingGrant}
+        onClose={() => {
+          setEditingGrant(null);
+          setShowCreateGrant(false);
+        }}
+        onSaved={() => {
+          showToast(showCreateGrant ? 'Permohonan geran baharu ditambah!' : 'Permohonan geran dikemas kini!', 'success');
+          setEditingGrant(null);
+          setShowCreateGrant(false);
+          onRefresh?.();
+        }}
+      />
+
+      <EditMaintenanceTicketModal
+        isOpen={Boolean(editingTicket) || showCreateTicket}
+        ticket={showCreateTicket ? null : editingTicket}
+        slots={slots}
+        onClose={() => {
+          setEditingTicket(null);
+          setShowCreateTicket(false);
+        }}
+        onSaved={() => {
+          showToast(showCreateTicket ? 'Tiket aduan baharu ditambah!' : 'Tiket aduan dikemas kini!', 'success');
+          setEditingTicket(null);
+          setShowCreateTicket(false);
+          onRefresh?.();
+        }}
+      />
+
+      <EditSlotModal
+        isOpen={Boolean(editingSlot)}
+        slot={editingSlot}
+        onClose={() => setEditingSlot(null)}
+        onSaved={() => {
+          showToast('Maklumat slot kiosk berjaya dikemas kini!', 'success');
+          setEditingSlot(null);
+          onRefresh?.();
+        }}
+      />
     </div>
   );
 };

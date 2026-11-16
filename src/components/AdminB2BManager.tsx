@@ -80,22 +80,23 @@ export const AdminB2BManager: React.FC = () => {
 
     let firestoreItems: B2BListing[] = [];
     let demoSyncItems: B2BListing[] = [];
+    let demoDeletedIds: string[] = [];
 
     const recompute = () => {
-      const deletedSet = new Set(getDeletedIds());
+      const deleted = [...getDeletedIds(), ...demoDeletedIds];
       const localItems = loadLocalB2B();
       const prodAuth = isProductionAuthenticated();
       const lists = prodAuth
         ? [firestoreItems, demoSyncItems, localItems, INITIAL_B2B_LISTINGS]
         : [demoSyncItems, localItems, firestoreItems, INITIAL_B2B_LISTINGS];
-      const merged = mergeUniqueById<B2BListing>(lists).filter((x) => !deletedSet.has(x.id));
+      const merged = mergeUniqueById<B2BListing>(lists, deleted);
       setListings(merged);
     };
 
     recompute();
 
     const unsubCrossTab = subscribeCrossTabSync((entity) => {
-      if (entity === 'all' || entity === 'b2b') {
+      if (entity === 'all' || entity === 'b2b' || entity === 'deleted') {
         recompute();
       }
     });
@@ -113,8 +114,9 @@ export const AdminB2BManager: React.FC = () => {
       }
     );
 
-    const unsubDemo = subscribeDemoSyncCollection<B2BListing>('b2b', (items) => {
+    const unsubDemo = subscribeDemoSyncCollection<B2BListing>('b2b', (items, delIds) => {
       demoSyncItems = items;
+      demoDeletedIds = delIds;
       recompute();
     });
 

@@ -6,94 +6,88 @@ import {
   Check
 } from 'lucide-react';
 import { showToast } from './ToastNotification';
+import { useAuth } from '../context/AuthContext';
+import {
+  INITIAL_YOUTH_EVENTS,
+  loadLocalEventBookings,
+  saveEventBookingRecord,
+  subscribeEventBookings,
+  subscribeYouthEvents
+} from '../services/dataService';
+import { YouthEvent } from '../types';
 
 interface YouthEventsCalendarModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const EVENTS = [
-  {
-    id: 'cal-1',
-    title: 'Karnival Keusahawanan Belia Mega Kelantan',
-    date: '18 - 20 Disember 2026',
-    time: '9:00 AM - 11:00 PM',
-    venue: 'Dataran Stadium Sultan Muhammad IV, Kota Bharu',
-    organizer: 'Kerajaan Negeri Kelantan & Universiti Malaysia Kelantan',
-    highlights: '100+ Kiosk Usahawan Muda, Klinik Pembiayaan TEKUN & Pitching Geran Tunai',
-    registrationStatus: 'Buka untuk Peniaga Kiosk'
-  },
-  {
-    id: 'cal-2',
-    title: 'Festival Seni Batik, Kraf & Songket Tradisi Pantai Timur',
-    date: '15 - 17 Januari 2027',
-    time: '10:00 AM - 10:00 PM',
-    venue: 'Pusat Kraftangan Pantai Cahaya Bulan (PCB), Kota Bharu',
-    organizer: 'Perbadanan Kemajuan Iktisad Negeri Kelantan (PKINK)',
-    highlights: 'Pameran fesyen belia, bengkel canting batik percuma & jualan langsung',
-    registrationStatus: 'Tinggal 8 Tapak'
-  },
-  {
-    id: 'cal-3',
-    title: 'Ekspo Agropreneur Belia Gua Musang & Jeli',
-    date: '12 - 13 Februari 2027',
-    time: '8:30 AM - 6:00 PM',
-    venue: 'Dewan Sivik Gua Musang',
-    organizer: 'Fakulti Agro Sains UMK Jeli & KESEDAR',
-    highlights: 'Pameran dron pertanian, jualan anak benih madu kelulut & teknologi baja moden',
-    registrationStatus: 'Kemasukan Percuma'
-  }
-];
-
 export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> = ({
   isOpen,
   onClose
 }) => {
+  const { user, userProfile, isAdmin, openLoginModal } = useAuth();
+  const [events, setEvents] = useState<YouthEvent[]>(INITIAL_YOUTH_EVENTS);
   const [bookedEvents, setBookedEvents] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('kbelia_booked_events');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+    if (!user?.uid) return [];
+    return loadLocalEventBookings(user.uid)
+      .filter(b => b.status === 'booked')
+      .map(b => b.eventId);
   });
 
   useEffect(() => {
     if (!isOpen) return;
-    const syncBooked = () => {
-      try {
-        const saved = localStorage.getItem('kbelia_booked_events');
-        setBookedEvents(saved ? JSON.parse(saved) : []);
-      } catch {
-        // ignore
-      }
-    };
-    syncBooked();
-    window.addEventListener('kbelia_booked_events_updated', syncBooked);
-    return () => window.removeEventListener('kbelia_booked_events_updated', syncBooked);
+    const unsubEvents = subscribeYouthEvents(setEvents);
+    return () => unsubEvents();
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !user?.uid) {
+      if (!user?.uid) setBookedEvents([]);
+      return;
+    }
+    const unsub = subscribeEventBookings(user.uid, isAdmin, (records) => {
+      const ids = records
+        .filter(b => b.userId === user.uid && b.status === 'booked')
+        .map(b => b.eventId);
+      setBookedEvents(ids);
+    });
+    return () => unsub();
+  }, [isOpen, user?.uid, isAdmin]);
 
   if (!isOpen) return null;
 
-  const toggleEventBooking = (eventId: string, eventTitle: string) => {
-    const isBooked = bookedEvents.includes(eventId);
-    const updated = isBooked
-      ? bookedEvents.filter(id => id !== eventId)
-      : [...bookedEvents, eventId];
-    setBookedEvents(updated);
-    try {
-      localStorage.setItem('kbelia_booked_events', JSON.stringify(updated));
-      window.dispatchEvent(new Event('kbelia_booked_events_updated'));
-    } catch {
-      // ignore
+  const toggleEventBooking = async (eventId: string, eventTitle: string) => {
+    if (!user?.uid) {
+      openLoginModal();
+      return;
     }
-    showToast({
-      type: isBooked ? 'info' : 'success',
-      title: isBooked ? 'Permohonan Tapak Dibatalkan' : 'Permohonan Tapak Direkodkan',
-      message: isBooked
-        ? `Penyertaan tapak bagi ${eventTitle} telah dibatalkan.`
-        : `Pendaftaran tapak bagi ${eventTitle} berjaya direkodkan.`
-    });
+    const isBooked = bookedEvents.includes(eventId);
+    const nextStatus = isBooked ? 'cancelled' : 'booked';
+    setBookedEvents(prev =>
+      isBooked ? prev.filter(id => id !== eventId) : [...prev, eventId]
+    );
+    try {
+      await saveEventBookingRecord(
+        eventId,
+        eventTitle,
+        user.uid,
+        userProfile?.fullName || user.displayName || 'Usahawan Belia',
+        nextStatus
+      );
+      showToast({
+        type: isBooked ? 'info' : 'success',
+        title: isBooked ? 'Permohonan Tapak Dibatalkan' : 'Permohonan Tapak Direkodkan',
+        message: isBooked
+          ? `Penyertaan tapak bagi ${eventTitle} telah dibatalkan.`
+          : `Pendaftaran tapak bagi ${eventTitle} berjaya direkodkan.`
+      });
+    } catch {
+      showToast({
+        type: 'error',
+        title: 'Ralat Tempahan Acara',
+        message: 'Gagal mengemaskini penyertaan tapak acara. Sila cuba lagi.'
+      });
+    }
   };
 
   return (
@@ -127,7 +121,7 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
         </div>
 
         <div className="p-6 sm:p-8 pt-5 overflow-y-auto flex-1 flex flex-col gap-4">
-          {EVENTS.map((event) => {
+          {events.map((event) => {
             const isBooked = bookedEvents.includes(event.id);
             return (
               <div
@@ -140,7 +134,7 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
                       {event.date}
                     </span>
                     <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
-                      {isBooked ? 'Berdaftar' : event.registrationStatus}
+                      {isBooked ? 'Berdaftar' : `${event.boothsAvailable} Tapak Kosong`}
                     </span>
                   </div>
 
@@ -149,12 +143,12 @@ export const YouthEventsCalendarModal: React.FC<YouthEventsCalendarModalProps> =
                   </h4>
                   <p className="text-[0.875rem] text-black/70 dark:text-white/75 flex items-center gap-1 mb-2">
                     <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                    {event.venue}
+                    {event.location} ({event.district})
                   </p>
 
                   <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed mb-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                     <span className="font-semibold block text-black dark:text-white mb-0.5">Pengisian Utama:</span>
-                    {event.highlights}
+                    {event.description}
                   </p>
                 </div>
 

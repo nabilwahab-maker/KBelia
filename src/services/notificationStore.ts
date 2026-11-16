@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   onSnapshot,
   query,
   setDoc,
@@ -31,7 +32,8 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     targetUserId: '',
     timestamp: 'Baru sahaja',
     isRead: false,
-    actionTab: 'academic'
+    actionTab: 'academic',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'notif-youth-2',
@@ -44,7 +46,8 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     targetUserId: '',
     timestamp: '1 hari lepas',
     isRead: false,
-    actionTab: 'ceed'
+    actionTab: 'ceed',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'notif-mentor-1',
@@ -57,7 +60,8 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     targetUserId: '',
     timestamp: '2 jam lepas',
     isRead: false,
-    actionTab: 'mentor'
+    actionTab: 'mentor',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'notif-mentor-2',
@@ -70,7 +74,8 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     targetUserId: '',
     timestamp: '2 hari lepas',
     isRead: true,
-    actionTab: 'mentor'
+    actionTab: 'mentor',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'notif-admin-1',
@@ -83,7 +88,8 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     targetUserId: '',
     timestamp: '10 minit lepas',
     isRead: false,
-    actionTab: 'admin'
+    actionTab: 'admin',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'notif-admin-2',
@@ -96,7 +102,8 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     targetUserId: '',
     timestamp: '3 jam lepas',
     isRead: true,
-    actionTab: 'admin'
+    actionTab: 'admin',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   }
 ];
 
@@ -133,6 +140,27 @@ export interface NotificationPayload {
   senderName?: string;
   type?: string;
   actionTab?: string;
+}
+
+async function setNotifWithFallback(notifRef: ReturnType<typeof doc>, data: Record<string, any>, merge = false) {
+  try {
+    if (merge) {
+      await setDoc(notifRef, data, { merge: true });
+    } else {
+      await setDoc(notifRef, data);
+    }
+  } catch (err: any) {
+    if (err?.code === 'permission-denied' && 'updatedAt' in data && Object.keys(data).length > 1) {
+      const { updatedAt: _omit, ...rest } = data;
+      if (merge) {
+        await setDoc(notifRef, rest, { merge: true });
+      } else {
+        await setDoc(notifRef, rest);
+      }
+      return;
+    }
+    console.warn('Firestore notification write fallback:', err?.message || err);
+  }
 }
 
 export function emitAdminOrMentorNotification(
@@ -176,6 +204,7 @@ export function emitAdminOrMentorNotification(
     }
   }
 
+  const now = new Date().toISOString();
   const current = getStoredNotifications();
   const newNotif: YouthNotification = {
     id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -188,19 +217,17 @@ export function emitAdminOrMentorNotification(
     targetUserId,
     timestamp: 'Baru sahaja',
     isRead: false,
-    actionTab: targetTab
+    actionTab: targetTab,
+    updatedAt: now
   };
 
   const updated = [newNotif, ...current.filter((n) => n.id !== newNotif.id).slice(0, 39)];
   saveNotifications(updated);
 
   if (isProductionAuthenticated()) {
-    setDoc(doc(db, 'notifications', newNotif.id), newNotif).catch((err) => {
-      console.warn('Firestore notification write fallback:', err?.message || err);
-    });
-  } else {
-    void publishDemoSyncRecord('notification', newNotif.id, newNotif);
+    void setNotifWithFallback(doc(db, 'notifications', newNotif.id), newNotif, false);
   }
+  void publishDemoSyncRecord('notification', newNotif.id, newNotif);
 
   return newNotif;
 }
@@ -209,13 +236,28 @@ export async function markNotificationReadStatus(
   notifId: string,
   allCurrent: YouthNotification[]
 ): Promise<YouthNotification[]> {
-  const updated = allCurrent.map((n) => (n.id === notifId ? { ...n, isRead: true } : n));
+  const now = new Date().toISOString();
+  const updated = allCurrent.map((n) => (n.id === notifId ? { ...n, isRead: true, updatedAt: now } : n));
   saveNotifications(updated);
 
   const target = updated.find((n) => n.id === notifId);
-  if (isProductionAuthenticated() && !notifId.startsWith('notif-youth-') && !notifId.startsWith('notif-mentor-') && !notifId.startsWith('notif-admin-')) {
-    setDoc(doc(db, 'notifications', notifId), { isRead: true }, { merge: true }).catch(() => {});
-  } else if (target && !isProductionAuthenticated()) {
+  if (
+    isProductionAuthenticated() &&
+    !notifId.startsWith('notif-youth-') &&
+    !notifId.startsWith('notif-mentor-') &&
+    !notifId.startsWith('notif-admin-')
+  ) {
+    try {
+      const ref = doc(db, 'notifications', notifId);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        await setNotifWithFallback(ref, { isRead: true, updatedAt: now }, true);
+      }
+    } catch {
+      // ignore
+    }
+  }
+  if (target) {
     void publishDemoSyncRecord('notification', notifId, target);
   }
   return updated;
@@ -225,16 +267,29 @@ export async function markAllNotificationsReadStatus(
   activeIds: Set<string>,
   allCurrent: YouthNotification[]
 ): Promise<YouthNotification[]> {
-  const updated = allCurrent.map((n) => (activeIds.has(n.id) ? { ...n, isRead: true } : n));
+  const now = new Date().toISOString();
+  const updated = allCurrent.map((n) => (activeIds.has(n.id) ? { ...n, isRead: true, updatedAt: now } : n));
   saveNotifications(updated);
 
   for (const item of updated) {
     if (!activeIds.has(item.id)) continue;
-    if (isProductionAuthenticated() && !item.id.startsWith('notif-youth-') && !item.id.startsWith('notif-mentor-') && !item.id.startsWith('notif-admin-')) {
-      setDoc(doc(db, 'notifications', item.id), { isRead: true }, { merge: true }).catch(() => {});
-    } else if (!isProductionAuthenticated()) {
-      void publishDemoSyncRecord('notification', item.id, item);
+    if (
+      isProductionAuthenticated() &&
+      !item.id.startsWith('notif-youth-') &&
+      !item.id.startsWith('notif-mentor-') &&
+      !item.id.startsWith('notif-admin-')
+    ) {
+      try {
+        const ref = doc(db, 'notifications', item.id);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          await setNotifWithFallback(ref, { isRead: true, updatedAt: now }, true);
+        }
+      } catch {
+        // ignore
+      }
     }
+    void publishDemoSyncRecord('notification', item.id, item);
   }
   return updated;
 }
@@ -331,8 +386,8 @@ export function subscribeNotifications(
     }
   }
 
-  // Subscribe to demo_sync notifications for Demo accounts and Admins monitoring sandbox submissions
-  if (isDemoSession || isAdmin || uid) {
+  // Subscribe to demo_sync notifications for ALL signed-in accounts (Demo & Real) for bidirectional alerts
+  if (isDemoSession || isAdmin || uid || auth.currentUser) {
     unsubDemoSync = subscribeDemoSyncCollection<YouthNotification>('notification', (items) => {
       demoSyncItems = items;
       emitMerged();

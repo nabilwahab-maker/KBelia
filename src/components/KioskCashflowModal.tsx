@@ -15,7 +15,13 @@ import { auth, db } from '../lib/firebase';
 import { KioskDailySale } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
-import { isProductionAuthenticated, saveCashflowRecord, deleteCashflowRecord } from '../services/dataService';
+import {
+  getDeletedIds,
+  isProductionAuthenticated,
+  saveCashflowRecord,
+  deleteCashflowRecord,
+  getSeededDemoCashflowRecords
+} from '../services/dataService';
 import { mergeUniqueById, subscribeCrossTabSync, subscribeDemoSyncCollection } from '../services/realtimeSync';
 import { EditCashflowModal } from './EditCashflowModal';
 import { showToast } from './ToastNotification';
@@ -28,23 +34,6 @@ interface KioskCashflowModalProps {
   kioskName?: string;
   businessName?: string;
 }
-
-const buildRecentIsoDate = (daysAgo: number): string => {
-  const d = new Date();
-  d.setDate(d.getDate() - daysAgo);
-  return d.toISOString().slice(0, 10);
-};
-
-const getDemoDefaultSales = (): KioskDailySale[] => {
-  const d2 = buildRecentIsoDate(2);
-  const d1 = buildRecentIsoDate(1);
-  const d0 = buildRecentIsoDate(0);
-  return [
-    { id: 'demo-cf-1', date: d2, cashSales: 180, qrSales: 220, expenses: 90, notes: 'Restok cawan biodegradasi & serbuk kopi', createdAt: `${d2}T20:00:00Z` },
-    { id: 'demo-cf-2', date: d1, cashSales: 150, qrSales: 280, expenses: 40, notes: 'Jualan waktu petang rancak', createdAt: `${d1}T20:00:00Z` },
-    { id: 'demo-cf-3', date: d0, cashSales: 210, qrSales: 310, expenses: 110, notes: 'Beli bahan mentah segar & ais', createdAt: `${d0}T20:00:00Z` }
-  ];
-};
 
 export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
   isOpen,
@@ -78,22 +67,17 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
     let demoDeletedIds: string[] = [];
 
     const recompute = () => {
-      if (prodAuth) {
-        setSalesRecords(prodItems);
-        return;
-      }
       try {
-        const saved = localStorage.getItem(storageKey);
-        let localItems: KioskDailySale[] = [];
-        if (saved) {
-          localItems = JSON.parse(saved);
-        } else if (isDemoSession) {
-          const demoDefaults = getDemoDefaultSales();
-          localStorage.setItem(storageKey, JSON.stringify(demoDefaults));
-          localItems = demoDefaults;
-        }
+        const localItems = getSeededDemoCashflowRecords(ownerId, isDemoSession);
+        const deleted = [...getDeletedIds(), ...demoDeletedIds];
         const scopedDemoSync = demoSyncItems.filter(r => !r.ownerId || r.ownerId === ownerId);
-        setSalesRecords(mergeUniqueById<KioskDailySale>([scopedDemoSync, localItems], demoDeletedIds));
+        const scopedLocal = localItems.filter(r => !r.ownerId || r.ownerId === ownerId);
+        setSalesRecords(
+          mergeUniqueById<KioskDailySale>(
+            prodAuth ? [prodItems, scopedDemoSync, scopedLocal] : [scopedDemoSync, scopedLocal],
+            deleted
+          )
+        );
       } catch {
         setSalesRecords([]);
       }
@@ -104,11 +88,10 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
     const handleSync = () => recompute();
     window.addEventListener('kbelia_cashflow_updated', handleSync);
     const unsubCrossTab = subscribeCrossTabSync((entity) => {
-      if (entity === 'all' || entity === 'cashflow') recompute();
+      if (entity === 'all' || entity === 'cashflow' || entity === 'deleted') recompute();
     });
 
     let unsubProd = () => {};
-    let unsubDemoSync = () => {};
     if (prodAuth && auth.currentUser) {
       unsubProd = onSnapshot(
         query(collection(db, 'cashflow_records'), where('ownerId', '==', auth.currentUser.uid)),
@@ -118,13 +101,13 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
         },
         (err) => console.debug('Cashflow modal listener notice:', err?.message || err)
       );
-    } else {
-      unsubDemoSync = subscribeDemoSyncCollection<KioskDailySale>('cashflow', (items, delIds) => {
-        demoSyncItems = items;
-        demoDeletedIds = delIds;
-        recompute();
-      });
     }
+
+    const unsubDemoSync = subscribeDemoSyncCollection<KioskDailySale>('cashflow', (items, delIds) => {
+      demoSyncItems = items;
+      demoDeletedIds = delIds;
+      recompute();
+    });
 
     return () => {
       window.removeEventListener('kbelia_cashflow_updated', handleSync);

@@ -56,7 +56,8 @@ import {
   loadLocalDemoCommunityReplies,
   saveMentorshipRegistrationRecord,
   saveMentorProfileRecord,
-  updateGrantApplicationStatus
+  updateGrantApplicationStatus,
+  getSeededDemoCashflowRecords
 } from './services/dataService';
 import { emitAdminOrMentorNotification } from './services/notificationStore';
 import {
@@ -331,7 +332,11 @@ function MainApp() {
     if (!isAdmin && (!isMentor || updated.id !== userProfile?.mentorId)) {
       return;
     }
-    setMentors(prev => prev.map(m => m.id === updated.id ? updated : m));
+    setMentors(prev =>
+      prev.some(m => m.id === updated.id)
+        ? prev.map(m => (m.id === updated.id ? updated : m))
+        : [updated, ...prev]
+    );
     saveMentorProfileRecord(updated).catch(() => {});
   };
 
@@ -414,7 +419,25 @@ function MainApp() {
     let demoSyncSettings: PortalSettings | null = null;
 
     const recomputeSettings = () => {
-      if (isProductionAuthenticated() && remoteSettings) {
+      const toTime = (s?: PortalSettings | null) => {
+        if (!s?.updatedAt) return 0;
+        const t = new Date(s.updatedAt).getTime();
+        return Number.isNaN(t) ? 0 : t;
+      };
+      const prodAuth = isProductionAuthenticated();
+      if (remoteSettings && demoSyncSettings) {
+        const remoteTs = toTime(remoteSettings);
+        const demoTs = toTime(demoSyncSettings);
+        const winner =
+          remoteTs > demoTs
+            ? remoteSettings
+            : demoTs > remoteTs
+            ? demoSyncSettings
+            : prodAuth
+            ? remoteSettings
+            : demoSyncSettings;
+        setPortalSettings({ ...DEFAULT_PORTAL_SETTINGS, ...winner });
+      } else if (remoteSettings) {
         setPortalSettings({ ...DEFAULT_PORTAL_SETTINGS, ...remoteSettings });
       } else if (demoSyncSettings) {
         setPortalSettings({ ...DEFAULT_PORTAL_SETTINGS, ...demoSyncSettings });
@@ -849,7 +872,7 @@ function MainApp() {
     let unsubPosts = () => {};
     let unsubReplies = () => {};
 
-    if (user && isProductionAuthenticated()) {
+    if (auth.currentUser) {
       setIsCommunityLoading(true);
       unsubPosts = onSnapshot(
         collection(db, 'community_posts'),
@@ -921,20 +944,22 @@ function MainApp() {
 
     let firestoreMentors: MentorProfile[] = [];
     let demoSyncMentors: MentorProfile[] = [];
+    let demoSyncDeleted: string[] = [];
 
     const recomputeMentors = () => {
       const localMentors = loadLocalMentors();
+      const deleted = [...getDeletedIds(), ...demoSyncDeleted];
       const prodAuth = isProductionAuthenticated();
       const priorityLists = prodAuth
         ? [firestoreMentors, demoSyncMentors, localMentors, INITIAL_MENTOR_PROFILES]
         : [demoSyncMentors, localMentors, firestoreMentors, INITIAL_MENTOR_PROFILES];
-      setMentors(mergeUniqueById<MentorProfile>(priorityLists));
+      setMentors(mergeUniqueById<MentorProfile>(priorityLists, deleted));
     };
 
     recomputeMentors();
 
     const unsubCrossTab = subscribeCrossTabSync((entity) => {
-      if (entity === 'all' || entity === 'mentor') {
+      if (entity === 'all' || entity === 'mentor' || entity === 'deleted') {
         recomputeMentors();
       }
     });
@@ -955,8 +980,9 @@ function MainApp() {
       }
     );
 
-    const unsubDemoMentors = subscribeDemoSyncCollection<MentorProfile>('mentor', (items) => {
+    const unsubDemoMentors = subscribeDemoSyncCollection<MentorProfile>('mentor', (items, delIds) => {
       demoSyncMentors = items;
+      demoSyncDeleted = delIds;
       recomputeMentors();
     });
 
@@ -973,16 +999,22 @@ function MainApp() {
 
     let prodBookings: CapsuleBooking[] = [];
     let demoSyncBookings: CapsuleBooking[] = [];
+    let demoSyncDeletedBookings: string[] = [];
     let prodGrants: GrantApplication[] = [];
     let demoSyncGrants: GrantApplication[] = [];
+    let demoSyncDeletedGrants: string[] = [];
     let prodTickets: MaintenanceTicket[] = [];
     let demoSyncTickets: MaintenanceTicket[] = [];
+    let demoSyncDeletedTickets: string[] = [];
     let prodCashflow: KioskDailySale[] = [];
     let demoSyncCashflow: KioskDailySale[] = [];
+    let demoSyncDeletedCashflow: string[] = [];
     let prodSessions: MentorshipRegistration[] = [];
     let demoSyncSessions: MentorshipRegistration[] = [];
+    let demoSyncDeletedSessions: string[] = [];
     let prodEndorsements: GrantEndorsement[] = [];
     let demoSyncEndorsements: GrantEndorsement[] = [];
+    let demoSyncDeletedEndorsements: string[] = [];
 
     const readLocalArray = <T,>(key: string, fallback: T[] = []): T[] => {
       try {
@@ -994,7 +1026,14 @@ function MainApp() {
     };
 
     const recomputeProtectedState = () => {
-      const deleted = getDeletedIds();
+      const baseDeleted = getDeletedIds();
+      const bookingDeleted = [...baseDeleted, ...demoSyncDeletedBookings];
+      const grantDeleted = [...baseDeleted, ...demoSyncDeletedGrants];
+      const ticketDeleted = [...baseDeleted, ...demoSyncDeletedTickets];
+      const cashflowDeleted = [...baseDeleted, ...demoSyncDeletedCashflow];
+      const sessionDeleted = [...baseDeleted, ...demoSyncDeletedSessions];
+      const endorsementDeleted = [...baseDeleted, ...demoSyncDeletedEndorsements];
+
       const demoBookingsLocal = readLocalArray<CapsuleBooking>('kbelia_demo_bookings');
       const demoGrantsLocal = readLocalArray<GrantApplication>('kbelia_demo_grants');
       const demoTicketsLocal = readLocalArray<MaintenanceTicket>('kbelia_demo_maintenance_tickets');
@@ -1017,63 +1056,78 @@ function MainApp() {
         setGrantApplications([]);
         setMaintenanceTickets([]);
         setCashflowRecords([]);
-        const mentorSessionSource = prodAuth
-          ? mergeUniqueById<MentorshipRegistration>([prodSessions, demoSyncSessions], deleted)
-          : mergeUniqueById<MentorshipRegistration>([demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS], deleted);
+        const mentorSessionSource = mergeUniqueById<MentorshipRegistration>(
+          prodAuth
+            ? [prodSessions, demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS]
+            : [demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS],
+          sessionDeleted
+        ).filter(r => !userProfile?.mentorId || r.mentorId === userProfile.mentorId);
         setMentorshipRegistrations(mentorSessionSource);
-        const mentorEndSource = prodAuth
-          ? mergeUniqueById<GrantEndorsement>([prodEndorsements, demoSyncEndorsements], deleted)
-          : mergeUniqueById<GrantEndorsement>([demoSyncEndorsements, demoEndorsementsLocal], deleted);
+
+        const mentorEndSource = mergeUniqueById<GrantEndorsement>(
+          prodAuth
+            ? [prodEndorsements, demoSyncEndorsements, demoEndorsementsLocal]
+            : [demoSyncEndorsements, demoEndorsementsLocal],
+          endorsementDeleted
+        ).filter(e => !userProfile?.mentorId || e.mentorId === userProfile.mentorId);
         setGrantEndorsements(mentorEndSource);
         return;
       }
 
       if (isAdmin) {
         // Admin sees governance queues across BOTH production & Demo/sandbox real-time streams
-        setBookings(mergeUniqueById<CapsuleBooking>([prodBookings, demoSyncBookings, demoBookingsLocal], deleted));
-        setGrantApplications(mergeUniqueById<GrantApplication>([prodGrants, demoSyncGrants, demoGrantsLocal], deleted));
-        setMaintenanceTickets(mergeUniqueById<MaintenanceTicket>([prodTickets, demoSyncTickets, demoTicketsLocal], deleted));
+        setBookings(mergeUniqueById<CapsuleBooking>([prodBookings, demoSyncBookings, demoBookingsLocal], bookingDeleted));
+        setGrantApplications(mergeUniqueById<GrantApplication>([prodGrants, demoSyncGrants, demoGrantsLocal], grantDeleted));
+        setMaintenanceTickets(mergeUniqueById<MaintenanceTicket>([prodTickets, demoSyncTickets, demoTicketsLocal], ticketDeleted));
         setCashflowRecords([]); // Privacy isolation: personal daily cashflow belongs strictly to owner
         setMentorshipRegistrations(
           mergeUniqueById<MentorshipRegistration>(
             [prodSessions, demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS],
-            deleted
+            sessionDeleted
           )
         );
         setGrantEndorsements(
-          mergeUniqueById<GrantEndorsement>([prodEndorsements, demoSyncEndorsements, demoEndorsementsLocal], deleted)
+          mergeUniqueById<GrantEndorsement>([prodEndorsements, demoSyncEndorsements, demoEndorsementsLocal], endorsementDeleted)
         );
         return;
       }
 
-      // Youth Entrepreneur: strictly scoped to own UID
-      const allDemoBookings = mergeUniqueById<CapsuleBooking>([demoSyncBookings, demoBookingsLocal], deleted)
+      // Youth Entrepreneur: strictly scoped to own UID across BOTH production & Demo/sandbox real-time streams
+      const allDemoBookings = mergeUniqueById<CapsuleBooking>([demoSyncBookings, demoBookingsLocal], bookingDeleted)
         .filter(b => b.applicantId === user.uid);
-      setBookings(prodAuth ? mergeUniqueById<CapsuleBooking>([prodBookings, allDemoBookings], deleted) : allDemoBookings);
+      setBookings(prodAuth ? mergeUniqueById<CapsuleBooking>([prodBookings, allDemoBookings], bookingDeleted) : allDemoBookings);
 
-      const allDemoGrants = mergeUniqueById<GrantApplication>([demoSyncGrants, demoGrantsLocal], deleted)
+      const allDemoGrants = mergeUniqueById<GrantApplication>([demoSyncGrants, demoGrantsLocal], grantDeleted)
         .filter(g => g.applicantId === user.uid || (user.email && g.applicantEmail?.toLowerCase() === user.email.toLowerCase()));
-      setGrantApplications(prodAuth ? mergeUniqueById<GrantApplication>([prodGrants, allDemoGrants], deleted) : allDemoGrants);
+      setGrantApplications(prodAuth ? mergeUniqueById<GrantApplication>([prodGrants, allDemoGrants], grantDeleted) : allDemoGrants);
 
-      const allDemoTickets = mergeUniqueById<MaintenanceTicket>([demoSyncTickets, demoTicketsLocal], deleted)
+      const allDemoTickets = mergeUniqueById<MaintenanceTicket>([demoSyncTickets, demoTicketsLocal], ticketDeleted)
         .filter(t => t.ownerId === user.uid);
-      setMaintenanceTickets(prodAuth ? mergeUniqueById<MaintenanceTicket>([prodTickets, allDemoTickets], deleted) : allDemoTickets);
+      setMaintenanceTickets(prodAuth ? mergeUniqueById<MaintenanceTicket>([prodTickets, allDemoTickets], ticketDeleted) : allDemoTickets);
 
-      const cfLocal = readLocalArray<KioskDailySale>(`kbelia_cashflow_records_${user.uid}`);
-      const scopedDemoCashflow = mergeUniqueById<KioskDailySale>([demoSyncCashflow, cfLocal], deleted)
+      const cfLocal = getSeededDemoCashflowRecords(user.uid, Boolean(user.isDemo));
+      const scopedDemoCashflow = mergeUniqueById<KioskDailySale>([demoSyncCashflow, cfLocal], cashflowDeleted)
         .filter(r => !r.ownerId || r.ownerId === user.uid);
-      setCashflowRecords(prodAuth ? prodCashflow : scopedDemoCashflow);
+      setCashflowRecords(
+        prodAuth
+          ? mergeUniqueById<KioskDailySale>([prodCashflow, scopedDemoCashflow], cashflowDeleted)
+          : scopedDemoCashflow
+      );
 
-      const youthSessionsSource = prodAuth
-        ? mergeUniqueById<MentorshipRegistration>([prodSessions, demoSyncSessions], deleted)
-        : mergeUniqueById<MentorshipRegistration>([demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS], deleted)
-            .filter(r => r.applicantId === user.uid || (user.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()));
+      const youthSessionsSource = mergeUniqueById<MentorshipRegistration>(
+        prodAuth
+          ? [prodSessions, demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS]
+          : [demoSyncSessions, demoSessionsLocal, INITIAL_MENTORSHIP_REGISTRATIONS],
+        sessionDeleted
+      ).filter(r => r.applicantId === user.uid || (user.email && r.entrepreneurEmail?.toLowerCase() === user.email.toLowerCase()));
       setMentorshipRegistrations(youthSessionsSource);
 
-      const youthEndSource = prodAuth
-        ? mergeUniqueById<GrantEndorsement>([prodEndorsements, demoSyncEndorsements], deleted)
-        : mergeUniqueById<GrantEndorsement>([demoSyncEndorsements, demoEndorsementsLocal], deleted)
-            .filter(e => e.menteeId === user.uid);
+      const youthEndSource = mergeUniqueById<GrantEndorsement>(
+        prodAuth
+          ? [prodEndorsements, demoSyncEndorsements, demoEndorsementsLocal]
+          : [demoSyncEndorsements, demoEndorsementsLocal],
+        endorsementDeleted
+      ).filter(e => e.menteeId === user.uid);
       setGrantEndorsements(youthEndSource);
     };
 
@@ -1233,33 +1287,39 @@ function MainApp() {
     let unsubDemoSessions = () => {};
     let unsubDemoEndorsements = () => {};
 
-    if (!prodAuth || isAdmin) {
+    if (auth.currentUser || user) {
       if (!isMentor) {
-        unsubDemoBookings = subscribeDemoSyncCollection<CapsuleBooking>('booking', (items) => {
+        unsubDemoBookings = subscribeDemoSyncCollection<CapsuleBooking>('booking', (items, delIds) => {
           demoSyncBookings = items;
+          demoSyncDeletedBookings = delIds;
           recomputeProtectedState();
         });
-        unsubDemoGrants = subscribeDemoSyncCollection<GrantApplication>('grant', (items) => {
+        unsubDemoGrants = subscribeDemoSyncCollection<GrantApplication>('grant', (items, delIds) => {
           demoSyncGrants = items;
+          demoSyncDeletedGrants = delIds;
           recomputeProtectedState();
         });
-        unsubDemoTickets = subscribeDemoSyncCollection<MaintenanceTicket>('ticket', (items) => {
+        unsubDemoTickets = subscribeDemoSyncCollection<MaintenanceTicket>('ticket', (items, delIds) => {
           demoSyncTickets = items;
+          demoSyncDeletedTickets = delIds;
           recomputeProtectedState();
         });
         if (!isAdmin) {
-          unsubDemoCashflow = subscribeDemoSyncCollection<KioskDailySale>('cashflow', (items) => {
+          unsubDemoCashflow = subscribeDemoSyncCollection<KioskDailySale>('cashflow', (items, delIds) => {
             demoSyncCashflow = items;
+            demoSyncDeletedCashflow = delIds;
             recomputeProtectedState();
           });
         }
       }
-      unsubDemoSessions = subscribeDemoSyncCollection<MentorshipRegistration>('session', (items) => {
+      unsubDemoSessions = subscribeDemoSyncCollection<MentorshipRegistration>('session', (items, delIds) => {
         demoSyncSessions = items;
+        demoSyncDeletedSessions = delIds;
         recomputeProtectedState();
       });
-      unsubDemoEndorsements = subscribeDemoSyncCollection<GrantEndorsement>('endorsement', (items) => {
+      unsubDemoEndorsements = subscribeDemoSyncCollection<GrantEndorsement>('endorsement', (items, delIds) => {
         demoSyncEndorsements = items;
+        demoSyncDeletedEndorsements = delIds;
         recomputeProtectedState();
       });
     }
@@ -1474,7 +1534,7 @@ function MainApp() {
 
   const handleCancelGrantApplication = async (grant: GrantApplication) => {
     try {
-      await updateGrantApplicationStatus(grant.id, 'cancelled', 'Permohonan geran dibatalkan oleh pemohon.');
+      await updateGrantApplicationStatus(grant.id, 'cancelled', 'Permohonan geran dibatalkan oleh pemohon.', grant);
       triggerRefresh();
       showToast({
         type: 'info',
@@ -1677,6 +1737,7 @@ function MainApp() {
                   <AdminDashboard
                     slots={enrichedSlots}
                     businesses={businesses}
+                    products={products}
                     bookings={bookings}
                     programs={programs}
                     grantApplications={grantApplications}
@@ -2007,6 +2068,7 @@ function MainApp() {
                 <AdminDashboard
                   slots={enrichedSlots}
                   businesses={businesses}
+                  products={products}
                   bookings={bookings}
                   programs={programs}
                   grantApplications={grantApplications}

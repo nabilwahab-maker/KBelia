@@ -18,7 +18,8 @@ export const INITIAL_B2B_LISTINGS: B2BListing[] = [
       'Memerlukan bekalan tetap 15-20kg biji kopi gred premium setiap minggu untuk operasi kiosk belia.',
     whatsapp: '60123456781',
     imageUrl: b2bKopiSangaiImg,
-    date: 'Hari ini'
+    date: 'Hari ini',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'b2b-2',
@@ -32,7 +33,8 @@ export const INITIAL_B2B_LISTINGS: B2BListing[] = [
       'Sedia membekal pek borong sambal bilis dan pes masakan Pantai Timur dengan margin 35% kepada pengusaha kiosk.',
     whatsapp: '60123456782',
     imageUrl: b2bSambalPesImg,
-    date: 'Semalam'
+    date: 'Semalam',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'b2b-3',
@@ -46,6 +48,7 @@ export const INITIAL_B2B_LISTINGS: B2BListing[] = [
       'Menerima tempahan borong apron kiosk, baju seragam pasukan niaga dan cenderamata batik Kelantan.',
     whatsapp: '60123456783',
     imageUrl: b2bBatikSeragamImg,
-    date: '2 hari lepas'
+    date: '2 hari lepas',
+    updatedAt: '2026-03-01T08:00:00.000Z'
   }
 ];

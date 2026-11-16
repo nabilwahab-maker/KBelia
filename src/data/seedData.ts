@@ -22,7 +22,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     currentTenantBusinessName: "D'Kelate Artisan Coffee & Pastry",
     currentTenantId: 'demo-tenant-1',
     imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'cap-kb-01',
@@ -38,7 +38,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     currentTenantBusinessName: 'Batik Belia Kontemporari',
     currentTenantId: 'demo-tenant-2',
     imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'cap-jeli-01',
@@ -52,7 +52,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     status: 'available',
     amenities: ['Chiller & Ruang Simpanan Sejuk', 'Palam Kuasa 13A', 'WiFi Komuniti', 'Rak Paparan Buluh Moden', 'Bantuan Logistik'],
     imageUrl: kioskAgrotekImg,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   // +3 Demo Capsule Slots Tambahan
   {
@@ -67,7 +67,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     status: 'available',
     amenities: ['Rak Pameran Seni Kraf', 'Lampu Spotlight Galeri', 'Palam Elektrik 13A', 'WiFi Komuniti', 'Kunci Pintar'],
     imageUrl: kioskKrafBatikImg,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'cap-kb-02',
@@ -83,7 +83,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     currentTenantBusinessName: 'Studio Belia Multimedia KB',
     currentTenantId: 'demo-tenant-3',
     imageUrl: '/assets/generated/kiosk_modular_kbelia_1793924253417.jpg',
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'cap-pm-01',
@@ -97,7 +97,7 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
     status: 'available',
     amenities: ['Saluran Air & Sinki Keluli', 'Palam Kuasa Heavy Duty', 'Kaunter Servis Hadapan', 'Ekzos Pengudaraan'],
     imageUrl: kioskKulinariImg,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   }
 ];
 
@@ -124,7 +124,7 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     capsuleSlotId: 'cap-umk-01',
     rating: 4.9,
     reviewsCount: 42,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'biz-02',
@@ -148,7 +148,7 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     capsuleSlotId: 'cap-kb-01',
     rating: 4.8,
     reviewsCount: 38,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'biz-03',
@@ -172,7 +172,7 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     capsuleSlotId: 'cap-kb-02',
     rating: 5.0,
     reviewsCount: 19,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   }
 ];
 
@@ -187,7 +187,7 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
     category: 'Minuman Kopi',
     imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
     inStock: true,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'prod-02',
@@ -199,7 +199,7 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
     category: 'Tekstil & Fesyen',
     imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
     inStock: true,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'prod-03',
@@ -211,7 +211,7 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
     category: 'Perkhidmatan Media',
     imageUrl: '/assets/generated/product_kelantan_delights_1793924253401.jpg',
     inStock: true,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   // +3 Demo Products Tambahan
   {
@@ -224,7 +224,7 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
     category: 'Pastri & Kuih Tradisi',
     imageUrl: '/assets/generated/akok_kelantan_tradisi.jpg',
     inStock: true,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'prod-05',
@@ -236,7 +236,7 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
     category: 'Makanan Sedia Masak',
     imageUrl: '/assets/generated/keropok_lekor_kelantan.jpg',
     inStock: true,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'prod-06',
@@ -248,7 +248,7 @@ export const INITIAL_PRODUCTS: ProductItem[] = [
     category: 'Kraf & Cenderamata',
     imageUrl: '/assets/generated/wau_bulan_kelantan.jpg',
     inStock: true,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   }
 ];
 
@@ -265,7 +265,7 @@ export const INITIAL_PROGRAMS: YouthProgram[] = [
     registrationLink: '#',
     imageUrl: programGeranInkubasiImg,
     isFeatured: true,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'prog-02',
@@ -279,7 +279,7 @@ export const INITIAL_PROGRAMS: YouthProgram[] = [
     registrationLink: '#',
     imageUrl: acaraKarnivalBeliaImg,
     isFeatured: true,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'prog-03',
@@ -293,6 +293,6 @@ export const INITIAL_PROGRAMS: YouthProgram[] = [
     registrationLink: '#',
     imageUrl: programGeranInkubasiImg,
     isFeatured: false,
-    createdAt: new Date().toISOString()
+    createdAt: '2026-03-01T08:00:00.000Z'
   }
 ];
