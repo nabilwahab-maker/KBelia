@@ -129,7 +129,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
               <ShieldCheck className="w-6 h-6 text-black dark:text-white/75" />
             </div>
             <div>
-              <div className="text-[0.8125rem] uppercase tracking-widest text-black dark:text-white/75 font-bold">Dokumen Sah Bertauliah</div>
+              <div className="text-[0.8125rem] uppercase tracking-widest text-black dark:text-white/75 font-bold">Dokumen Sah Rasmi</div>
               <h3 className="font-extrabold text-sm sm:text-base text-black dark:text-white leading-tight">Surat Tawaran Penempatan Kiosk Belia</h3>
             </div>
           </div>

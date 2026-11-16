@@ -404,7 +404,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     logout: 'Log Out',
     active_session: 'Active KBelia Session',
     admin_officer: 'Secretariat Admin',
-    mentor_expert: 'Accredited Mentor',
+    mentor_expert: 'Mentor',
     youth_merchant: 'Youth Entrepreneur',
     logout_confirm_title: 'Do you want to log out?',
     logout_confirm_desc: 'Your active session will be ended and you will be returned directly to the login screen.',
@@ -660,7 +660,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     tab_directory_desc: 'Discover and support local products and services by Kelantan youth.',
     tab_grants_title: 'Grants & Assistance',
     tab_grants_heading: 'Youth Seed Funding & Coaching Programs',
-    tab_grants_desc: 'Apply for seed grants, enterprise training, and accredited mentorship.',
+    tab_grants_desc: 'Apply for seed grants, enterprise training, and mentorship.',
 
     // Kiosks
     kiosk_title: 'Modular Kiosks & Commercial Pods',

@@ -341,8 +341,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
           </h1>
           <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed">
             {isEn
-              ? 'Choose one certified UMK or agency mentor at a time to schedule your 1-on-1 session.'
-              : 'Pilih seorang penasihat bertauliah UMK atau agensi pada satu masa untuk menempah slot anda.'}
+              ? 'Choose one UMK or agency mentor at a time to schedule your 1-on-1 session.'
+              : 'Pilih seorang penasihat UMK atau agensi pada satu masa untuk menempah slot anda.'}
           </p>
         </div>
       </div>
@@ -350,7 +350,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       {/* Ringkasan Statistik Ringkas */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
         <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Certified Mentors' : 'Mentor Bertauliah'}</span>
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Mentors' : 'Mentor'}</span>
           <span className="text-lg font-black text-black dark:text-white tabular-nums">{mentors.length}</span>
         </div>
         <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
@@ -794,7 +794,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               id="mentor-list-heading"
               className="text-base sm:text-lg font-extrabold text-black dark:text-white"
             >
-              {isEn ? 'Certified Mentor Directory' : 'Senarai Mentor Bertauliah'}
+              {isEn ? 'Mentor Directory' : 'Senarai Mentor'}
             </h2>
             <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
               {isEn

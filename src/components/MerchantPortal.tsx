@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { 
   Store, 
-  Trash2, 
-  Edit3, 
   Building2, 
   CheckCircle2, 
   Clock, 
@@ -24,7 +22,6 @@ import {
   MapPin,
   Check,
   Briefcase,
-  Coins,
   Printer,
   Download,
   Wrench,
@@ -39,10 +36,12 @@ import {
   FileCheck,
   Activity,
   ChevronRight,
-  ChevronDown,
-  ChevronUp,
   Loader2,
-  Lock
+  Search,
+  SlidersHorizontal,
+  ArrowUpDown,
+  MoreHorizontal,
+  Plus
 } from 'lucide-react';
 import { 
   BusinessListing, 
@@ -75,6 +74,7 @@ import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveBookingKioskImage } from '../utils/visualAssets';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { SaaSKpiCard } from './SaaSKpiCard';
 import {
   AreaChart,
@@ -95,21 +95,29 @@ import {
   generateOfficialReceiptHtml
 } from '../utils/printUtils';
 import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
+import { useConfirmDelete } from '../context/ConfirmDeleteContext';
+import { exportProductsToExcel } from '../utils/excelExport';
 import confetti from 'canvas-confetti';
 
 const DEFAULT_PRODUCT_IMAGE = '/assets/generated/product_kelantan_delights_1793924253401.jpg';
 
-const ProductRowThumbnail: React.FC<{ src?: string; alt: string }> = ({ src, alt }) => {
+const ProductRowThumbnail: React.FC<{ src?: string; alt: string; compact?: boolean }> = ({
+  src,
+  alt,
+  compact = false
+}) => {
   const [hasError, setHasError] = useState(false);
 
   React.useEffect(() => {
     setHasError(false);
   }, [src]);
 
+  const sizeClass = compact ? 'w-10 h-10 rounded-lg' : 'w-16 h-16 rounded-lg';
+
   if (!src || hasError) {
     return (
-      <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex items-center justify-center shrink-0 text-black/40 dark:text-white/40">
-        <ShoppingBag className="w-6 h-6" />
+      <div className={`${sizeClass} bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shrink-0 text-black/40 dark:text-white/40`}>
+        <ShoppingBag className={compact ? 'w-4 h-4' : 'w-6 h-6'} />
       </div>
     );
   }
@@ -120,7 +128,7 @@ const ProductRowThumbnail: React.FC<{ src?: string; alt: string }> = ({ src, alt
       alt={alt}
       referrerPolicy="no-referrer"
       onError={() => setHasError(true)}
-      className="w-16 h-16 rounded-lg object-cover bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 shrink-0"
+      className={`${sizeClass} object-cover bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shrink-0`}
     />
   );
 };
@@ -191,6 +199,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   onSelectSubTab
 }) => {
   const { user, userProfile, updateProfileData, openLoginModal } = useAuth();
+  const { confirmDelete } = useConfirmDelete();
   const safeProducts = myProducts || [];
   const safeBookings = myBookings || [];
   const safeSlots = slots || [];
@@ -258,9 +267,20 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const [prodImageUrl, setProdImageUrl] = useState(DEFAULT_PRODUCT_IMAGE);
   const [prodInStock, setProdInStock] = useState(true);
   const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
-  const [pendingDeleteProdId, setPendingDeleteProdId] = useState<string | null>(null);
-  const [deletingProdId, setDeletingProdId] = useState<string | null>(null);
   const [togglingStockId, setTogglingStockId] = useState<string | null>(null);
+  const [duplicatingProdId, setDuplicatingProdId] = useState<string | null>(null);
+
+  // Products Catalog Search, Filter, Sort, Selection & Row Menu State
+  const [prodSearch, setProdSearch] = useState('');
+  const [prodCategoryFilter, setProdCategoryFilter] = useState<string>('Semua');
+  const [prodStockFilter, setProdStockFilter] = useState<'all' | 'in_stock' | 'out_of_stock'>('all');
+  const [isProdFilterOpen, setIsProdFilterOpen] = useState(false);
+  const [prodSort, setProdSort] = useState<{
+    key: 'name' | 'category' | 'price' | 'inStock' | 'createdAt';
+    dir: 'asc' | 'desc';
+  }>({ key: 'createdAt', dir: 'desc' });
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [openProductMenuId, setOpenProductMenuId] = useState<string | null>(null);
 
   // Booking action states
   const [selectedReceiptBooking, setSelectedReceiptBooking] = useState<CapsuleBooking | null>(null);
@@ -276,28 +296,210 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [expandedBookingIds, setExpandedBookingIds] = useState<string[]>([]);
 
+  React.useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      if (!target.closest('[data-prod-menu]')) {
+        setOpenProductMenuId(null);
+      }
+      if (!target.closest('[data-prod-filter]')) {
+        setIsProdFilterOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpenProductMenuId(null);
+        setIsProdFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Bookings & Tickets search, filter, sort
+  const [bookingSearch, setBookingSearch] = useState('');
+  const [bookingStatusFilter, setBookingStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [bookingSort, setBookingSort] = useState<{
+    key: 'slotName' | 'hubLocation' | 'startDate' | 'status';
+    dir: 'asc' | 'desc';
+  }>({ key: 'status', dir: 'asc' });
+
+  const [ticketSearch, setTicketSearch] = useState('');
+  const [ticketStatusFilter, setTicketStatusFilter] = useState<'all' | 'received' | 'in_progress' | 'resolved'>('all');
+  const [ticketSort, setTicketSort] = useState<{
+    key: 'slotCode' | 'issueCategory' | 'status';
+    dir: 'asc' | 'desc';
+  }>({ key: 'status', dir: 'asc' });
+  const [expandedTicketIds, setExpandedTicketIds] = useState<string[]>([]);
+
   const toggleBookingExpand = (id: string) => {
     setExpandedBookingIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
+  const toggleBookingSort = (key: 'slotName' | 'hubLocation' | 'startDate' | 'status') => {
+    setBookingSort((prev) =>
+      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
+    );
+  };
+
+  const toggleTicketSort = (key: 'slotCode' | 'issueCategory' | 'status') => {
+    setTicketSort((prev) =>
+      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
+    );
+  };
+
   const hasActiveKioskBooking = safeBookings.some(
     (b) => b.status === 'pending' || b.status === 'approved'
   );
-  const bookingOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2, cancelled: 3 };
-  const sortedBookings = [...safeBookings].sort(
-    (a, b) => (bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4)
+  const hasCancelledKioskBooking = safeBookings.some(
+    (b) => b.status === 'cancelled'
   );
-  const bookingsPagination = usePagination(sortedBookings, 5, [sortedBookings.length]);
+  const bookingOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2, cancelled: 3 };
+  const activeVisibleBookings = React.useMemo(() => {
+    return [...safeBookings]
+      .filter((b) => b.status !== 'cancelled')
+      .sort((a, b) => (bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4));
+  }, [safeBookings]);
+
+  const filteredBookings = React.useMemo(() => {
+    const q = bookingSearch.trim().toLowerCase();
+    const list = activeVisibleBookings.filter((b) => {
+      if (bookingStatusFilter !== 'all' && b.status !== bookingStatusFilter) return false;
+      if (!q) return true;
+      return (
+        (b.slotCode || '').toLowerCase().includes(q) ||
+        (b.slotName || '').toLowerCase().includes(q) ||
+        (b.hubLocation || '').toLowerCase().includes(q) ||
+        (b.businessName || '').toLowerCase().includes(q)
+      );
+    });
+    const dirMult = bookingSort.dir === 'asc' ? 1 : -1;
+    return [...list].sort((a, b) => {
+      if (bookingSort.key === 'slotName') {
+        return `${a.slotCode} ${a.slotName}`.localeCompare(`${b.slotCode} ${b.slotName}`) * dirMult;
+      }
+      if (bookingSort.key === 'hubLocation') {
+        return (a.hubLocation || '').localeCompare(b.hubLocation || '') * dirMult;
+      }
+      if (bookingSort.key === 'startDate') {
+        return (a.startDate || '').localeCompare(b.startDate || '') * dirMult;
+      }
+      return ((bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4)) * dirMult;
+    });
+  }, [activeVisibleBookings, bookingSearch, bookingStatusFilter, bookingSort]);
+
+  const bookingsPagination = usePagination(filteredBookings, 7, [
+    bookingSearch,
+    bookingStatusFilter,
+    bookingSort.key,
+    bookingSort.dir,
+    filteredBookings.length
+  ]);
 
   const ticketOrder: Record<string, number> = { received: 0, in_progress: 1, resolved: 2 };
-  const sortedTickets = [...safeTickets].sort(
-    (a, b) => (ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3)
-  );
-  const ticketsPagination = usePagination(sortedTickets, 5, [sortedTickets.length]);
+  const sortedTickets = React.useMemo(() => {
+    return [...safeTickets].sort(
+      (a, b) => (ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3)
+    );
+  }, [safeTickets]);
 
-  const productsPagination = usePagination(safeProducts, 5, [safeProducts.length]);
+  const filteredTickets = React.useMemo(() => {
+    const q = ticketSearch.trim().toLowerCase();
+    const list = sortedTickets.filter((t) => {
+      if (ticketStatusFilter !== 'all' && t.status !== ticketStatusFilter) return false;
+      if (!q) return true;
+      return (
+        (t.slotCode || '').toLowerCase().includes(q) ||
+        (t.issueCategory || '').toLowerCase().includes(q) ||
+        (t.description || '').toLowerCase().includes(q)
+      );
+    });
+    const dirMult = ticketSort.dir === 'asc' ? 1 : -1;
+    return [...list].sort((a, b) => {
+      if (ticketSort.key === 'slotCode') {
+        return (a.slotCode || '').localeCompare(b.slotCode || '') * dirMult;
+      }
+      if (ticketSort.key === 'issueCategory') {
+        return (a.issueCategory || '').localeCompare(b.issueCategory || '') * dirMult;
+      }
+      return ((ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3)) * dirMult;
+    });
+  }, [sortedTickets, ticketSearch, ticketStatusFilter, ticketSort]);
+
+  const ticketsPagination = usePagination(filteredTickets, 7, [
+    ticketSearch,
+    ticketStatusFilter,
+    ticketSort.key,
+    ticketSort.dir,
+    filteredTickets.length
+  ]);
+
+  const productCategories = React.useMemo(() => {
+    const set = new Set<string>();
+    safeProducts.forEach((p) => {
+      const cat = (p.category || 'Umum').trim();
+      if (cat) set.add(cat);
+    });
+    return ['Semua', ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [safeProducts]);
+
+  const filteredSortedProducts = React.useMemo(() => {
+    const q = prodSearch.trim().toLowerCase();
+    const filtered = safeProducts.filter((p) => {
+      const cat = (p.category || 'Umum').trim();
+      const matchSearch =
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        cat.toLowerCase().includes(q) ||
+        (p.description || '').toLowerCase().includes(q);
+      const matchCategory = prodCategoryFilter === 'Semua' || cat === prodCategoryFilter;
+      const isAvail = p.inStock !== false;
+      const matchStock =
+        prodStockFilter === 'all' ||
+        (prodStockFilter === 'in_stock' && isAvail) ||
+        (prodStockFilter === 'out_of_stock' && !isAvail);
+      return matchSearch && matchCategory && matchStock;
+    });
+
+    return [...filtered].sort((a, b) => {
+      const dirMult = prodSort.dir === 'asc' ? 1 : -1;
+      switch (prodSort.key) {
+        case 'name':
+          return a.name.localeCompare(b.name) * dirMult;
+        case 'category':
+          return (a.category || 'Umum').localeCompare(b.category || 'Umum') * dirMult;
+        case 'price':
+          return ((Number(a.price) || 0) - (Number(b.price) || 0)) * dirMult;
+        case 'inStock': {
+          const aVal = a.inStock !== false ? 1 : 0;
+          const bVal = b.inStock !== false ? 1 : 0;
+          return (aVal - bVal) * dirMult;
+        }
+        case 'createdAt':
+        default: {
+          const aTime = new Date(a.updatedAt || a.createdAt || 0).getTime() || 0;
+          const bTime = new Date(b.updatedAt || b.createdAt || 0).getTime() || 0;
+          return (aTime - bTime) * dirMult;
+        }
+      }
+    });
+  }, [safeProducts, prodSearch, prodCategoryFilter, prodStockFilter, prodSort]);
+
+  const productsPagination = usePagination(filteredSortedProducts, 7, [
+    prodSearch,
+    prodCategoryFilter,
+    prodStockFilter,
+    prodSort.key,
+    prodSort.dir,
+    filteredSortedProducts.length
+  ]);
 
   if (!user) {
     return (
@@ -412,9 +614,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
   const handleDeleteProd = async (id: string) => {
     try {
-      setDeletingProdId(id);
       await deleteProduct(id);
-      setPendingDeleteProdId(null);
+      setSelectedProductIds((prev) => prev.filter((item) => item !== id));
+      setOpenProductMenuId(null);
       setMessage({ type: 'success', text: 'Produk telah dipadam dari katalog.' });
       showToast('Produk telah dipadam dari katalog.', 'success');
       onRefresh();
@@ -422,8 +624,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       console.error(err);
       setMessage({ type: 'error', text: 'Gagal memadam produk. Sila cuba lagi.' });
       showToast('Gagal memadam produk. Sila cuba lagi.', 'error');
-    } finally {
-      setDeletingProdId(null);
     }
   };
 
@@ -443,10 +643,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         imageUrl: prod.imageUrl,
         inStock: nextInStock
       });
+      setOpenProductMenuId(null);
       showToast(
         nextInStock
           ? `${prod.name} ditanda sebagai stok tersedia.`
-          : `${prod.name} ditanda sebagai kehabisan stok.`,
+          : `${prod.name} ditanda sebagai habis stok.`,
         'success'
       );
       onRefresh();
@@ -456,6 +657,52 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     } finally {
       setTogglingStockId(null);
     }
+  };
+
+  const handleDuplicateProduct = async (prod: ProductItem) => {
+    if (!myBusiness) return;
+    try {
+      setDuplicatingProdId(prod.id);
+      await saveProduct({
+        businessId: prod.businessId || myBusiness.id,
+        ownerId: user.uid,
+        name: `${prod.name} (Salinan)`,
+        price: Number(prod.price) || 0,
+        category: prod.category || 'Umum',
+        description: prod.description || '',
+        imageUrl: prod.imageUrl || DEFAULT_PRODUCT_IMAGE,
+        inStock: prod.inStock !== false
+      });
+      setOpenProductMenuId(null);
+      showToast(`"${prod.name}" berjaya diduplikasi.`, 'success');
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      showToast('Gagal menduplikasi produk.', 'error');
+    } finally {
+      setDuplicatingProdId(null);
+    }
+  };
+
+  const handleExportProducts = () => {
+    const targetList =
+      selectedProductIds.length > 0
+        ? filteredSortedProducts.filter((p) => selectedProductIds.includes(p.id))
+        : filteredSortedProducts;
+    if (targetList.length === 0) {
+      showToast('Tiada produk untuk dieksport ke Excel.', 'info');
+      return;
+    }
+    exportProductsToExcel(targetList, myBusiness?.businessName);
+    showToast(`${targetList.length} rekod produk dieksport ke fail Excel (.xlsx).`, 'success');
+  };
+
+  const toggleProductSort = (key: 'name' | 'category' | 'price' | 'inStock' | 'createdAt') => {
+    setProdSort((prev) =>
+      prev.key === key
+        ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
+        : { key, dir: key === 'createdAt' ? 'desc' : 'asc' }
+    );
   };
 
   return (
@@ -477,25 +724,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
             Selamat kembali, <span className="font-semibold text-black dark:text-white">{userProfile?.fullName || user.displayName || 'Usahawan Belia'}</span>
           </p>
-        </div>
-
-        <div className="relative z-10 flex flex-wrap items-center gap-2.5 shrink-0">
-          <button
-            type="button"
-            onClick={() => setActiveTab('cashflow')}
-            className="py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer interactive-press dark:bg-emerald-600"
-          >
-            <Coins className="w-4 h-4 text-white" />
-            <span>Rekod Jualan Tunai</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('products')}
-            className="py-2.5 px-4 rounded-xl text-sm font-semibold text-black dark:text-white bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-700 transition-all flex items-center gap-2 cursor-pointer interactive-press"
-          >
-            <ShoppingBag className="w-4 h-4 text-black dark:text-white/75" />
-            <span>Daftar Produk ({safeProducts.length})</span>
-          </button>
         </div>
       </div>
 
@@ -866,9 +1094,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 SSM: {myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Belum Didaftarkan'}
               </span>
             </div>
-            <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 self-start sm:self-auto">
-              {primaryBooking ? `Slot ${primaryBooking.slotCode}` : 'Akaun Berdaftar'}
-            </span>
           </div>
 
           {/* 4 Compact Summary KPI Metric Cards */}
@@ -1237,7 +1462,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                         <button
                           type="button"
-                          onClick={() => (onOpenBookingModal ? onOpenBookingModal() : setActiveTab('bookings'))}
+                          onClick={() => (onOpenBookingTab ? onOpenBookingTab() : onOpenBookingModal ? onOpenBookingModal() : setActiveTab('bookings'))}
                           className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer"
                         >
                           Mohon Kiosk
@@ -1758,26 +1983,64 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       {/* Tab 2: Products */}
       {activeTab === 'products' && (() => {
         const inStockCount = safeProducts.filter((p) => p.inStock !== false).length;
+        const activeFilterCount =
+          (prodCategoryFilter !== 'Semua' ? 1 : 0) + (prodStockFilter !== 'all' ? 1 : 0);
+        const pageIds = productsPagination.paginatedItems.map((p) => p.id);
+        const allPageSelected =
+          pageIds.length > 0 && pageIds.every((id) => selectedProductIds.includes(id));
+
+        const toggleSelectAllOnPage = () => {
+          if (allPageSelected) {
+            setSelectedProductIds((prev) => prev.filter((id) => !pageIds.includes(id)));
+          } else {
+            setSelectedProductIds((prev) => Array.from(new Set([...prev, ...pageIds])));
+          }
+        };
+
+        const toggleSelectRow = (id: string) => {
+          setSelectedProductIds((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+          );
+        };
+
         return (
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-5">
+          {/* Header Row: Title + Subtitle left | Export (.xlsx) + Daftar Produk right */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-base font-bold text-black dark:text-white">Katalog Menu & Produk Anda</h3>
-              <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-0.5">
+              <h3 className="text-lg font-bold text-black dark:text-white tracking-tight">
+                Katalog Menu &amp; Produk Anda
+              </h3>
+              <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
                 {safeProducts.length > 0
                   ? `${safeProducts.length} produk disenaraikan · ${inStockCount} stok tersedia`
-                  : 'Pelanggan boleh membuat pesanan terus melalui WhatsApp.'}
+                  : 'Urus senarai menu, pantau stok dan eksport rekod ke Excel.'}
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setShowAddProduct(!showAddProduct)}
-              className="min-h-[40px] py-2.5 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-[0.9375rem] font-semibold flex items-center justify-center gap-2 whitespace-nowrap shrink-0 shadow-sm cursor-pointer transition-all"
-            >
-              <ShoppingBag className="w-4 h-4 shrink-0" />
-              <span>Daftar Produk Baharu</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={handleExportProducts}
+                className="min-h-[40px] py-2 px-4 rounded-xl bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-black dark:text-white text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
+              >
+                <Download className="w-4 h-4 shrink-0" />
+                <span>
+                  {selectedProductIds.length > 0
+                    ? `Eksport (${selectedProductIds.length})`
+                    : 'Eksport'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowAddProduct(!showAddProduct)}
+                className="min-h-[40px] py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 shadow-xs cursor-pointer transition-all"
+              >
+                <Plus className="w-4 h-4 shrink-0" />
+                <span>Daftar Produk</span>
+              </button>
+            </div>
           </div>
 
           {/* Add Product Form Box */}
@@ -1927,146 +2190,366 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           )}
 
-          {/* Compact List of Products */}
-          {safeProducts.length === 0 ? (
-            <div className="p-8 text-center bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
-              <ShoppingBag className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-2" />
-              <h4 className="text-sm font-bold text-black dark:text-white">Belum Ada Produk Disenaraikan</h4>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">Tekan butang di atas untuk memasukkan produk pertama anda.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-2xs h-fit">
-                {productsPagination.paginatedItems.map((prod) => {
-                  const isAvailable = prod.inStock !== false;
-                  const isConfirmingDelete = pendingDeleteProdId === prod.id;
-                  const isDeletingThis = deletingProdId === prod.id;
-                  const isTogglingStock = togglingStockId === prod.id;
-                  const formattedPrice = `RM ${Number(prod.price || 0).toFixed(2)}`;
+          {/* Reference-Style Product Table Card: Search + Filter Toolbar -> Sortable Table -> Compact Pagination */}
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+            {/* Search & Filter Toolbar */}
+            <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-700">
+              <div className="relative w-full sm:w-72">
+                <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={prodSearch}
+                  onChange={(e) => setProdSearch(e.target.value)}
+                  placeholder="Cari produk atau kategori..."
+                  className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                />
+                {prodSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setProdSearch('')}
+                    aria-label="Kosongkan carian"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
 
-                  return (
-                    <div
-                      key={prod.id}
-                      className="px-4 py-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-3 transition-colors"
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {selectedProductIds.length > 0 && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/70 text-xs font-semibold text-black dark:text-white">
+                    <span className="tabular-nums">{selectedProductIds.length} dipilih</span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProductIds([])}
+                      className="text-blue-700 dark:text-blue-300 hover:underline cursor-pointer font-bold"
                     >
-                      {/* Left: Compact Thumbnail & Details */}
-                      <div className="flex items-center gap-3.5 flex-1 min-w-0">
-                        <ProductRowThumbnail src={prod.imageUrl} alt={prod.name} />
+                      Kosongkan
+                    </button>
+                  </div>
+                )}
 
-                        <div className="flex-1 min-w-0 space-y-0.5">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <h5 className="font-bold text-sm text-black dark:text-white truncate">
-                              {prod.name}
-                            </h5>
-                            <span className={`shrink-0 px-2 py-0.5 rounded-md text-xs font-bold border ${
-                              isAvailable
-                                ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
-                                : 'bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800 text-black dark:text-white'
-                            }`}>
-                              {isAvailable ? 'Stok Tersedia' : 'Habis'}
-                            </span>
-                          </div>
-                          <p className="text-sm text-black/70 dark:text-white/75 truncate">
-                            {prod.category || 'Umum'} · {prod.description?.trim() ? prod.description : 'Tiada penerangan produk ditambah.'}
-                          </p>
-                        </div>
+                <div className="relative" data-prod-filter>
+                  <button
+                    type="button"
+                    onClick={() => setIsProdFilterOpen((prev) => !prev)}
+                    aria-expanded={isProdFilterOpen}
+                    className={`min-h-[38px] px-3.5 py-2 rounded-xl border text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${
+                      activeFilterCount > 0
+                        ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-black dark:text-white'
+                        : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
+                    }`}
+                  >
+                    <SlidersHorizontal className="w-4 h-4 shrink-0" />
+                    <span>
+                      Penapis{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                    </span>
+                  </button>
+
+                  {isProdFilterOpen && (
+                    <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                          Kategori
+                        </label>
+                        <select
+                          value={prodCategoryFilter}
+                          onChange={(e) => setProdCategoryFilter(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer"
+                        >
+                          {productCategories.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
-                      {/* Right: Price & Compact Action Controls (Status Stok, Edit, Padam -> Ya / Tidak) */}
-                      <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2 sm:gap-2.5 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-200 dark:border-slate-700">
-                        <div className="text-sm sm:text-base font-extrabold font-mono tabular-nums text-black dark:text-white whitespace-nowrap mr-1">
-                          {formattedPrice}
-                        </div>
-
-                        {isConfirmingDelete ? (
-                          <div
-                            role="group"
-                            aria-label={`Sahkan padam ${prod.name}`}
-                            className="inline-flex items-center gap-2 bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-700 rounded-xl px-3 py-1.5"
-                          >
-                            <span className="text-sm font-bold text-black dark:text-white whitespace-nowrap">
-                              Padam item ini?
-                            </span>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                          Status Stok
+                        </label>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {(
+                            [
+                              { id: 'all', label: 'Semua' },
+                              { id: 'in_stock', label: 'Tersedia' },
+                              { id: 'out_of_stock', label: 'Habis' }
+                            ] as const
+                          ).map((opt) => (
                             <button
+                              key={opt.id}
                               type="button"
-                              disabled={isDeletingThis}
-                              onClick={() => handleDeleteProd(prod.id)}
-                              className="min-h-[32px] px-3.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold inline-flex items-center gap-1 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-60"
-                            >
-                              {isDeletingThis && <Loader2 className="w-3 h-3 animate-spin" />}
-                              <span>Ya</span>
-                            </button>
-                            <button
-                              type="button"
-                              disabled={isDeletingThis}
-                              onClick={() => setPendingDeleteProdId(null)}
-                              className="min-h-[32px] px-3.5 py-1 rounded-lg bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-sm font-bold whitespace-nowrap transition-colors cursor-pointer disabled:opacity-60"
-                            >
-                              Tidak
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex flex-wrap items-center gap-2 shrink-0">
-                            <button
-                              type="button"
-                              disabled={isTogglingStock}
-                              onClick={() => handleToggleProductStock(prod)}
-                              title="Tukar status stok produk"
-                              className={`min-h-[36px] px-3 py-1.5 rounded-xl border text-sm font-semibold inline-flex items-center gap-1.5 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-60 ${
-                                isAvailable
-                                  ? 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/70 border-emerald-300 dark:border-emerald-700 text-black dark:text-white'
-                                  : 'bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/70 border-rose-300 dark:border-rose-700 text-black dark:text-white'
+                              onClick={() => setProdStockFilter(opt.id)}
+                              className={`px-2 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
+                                prodStockFilter === opt.id
+                                  ? 'bg-blue-600 text-white border-blue-600'
+                                  : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
                               }`}
                             >
-                              {isTogglingStock ? (
-                                <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
-                              ) : isAvailable ? (
-                                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                              ) : (
-                                <XCircle className="w-3.5 h-3.5 shrink-0" />
-                              )}
-                              <span>{isAvailable ? 'Stok Tersedia' : 'Kehabisan Stok'}</span>
+                              {opt.label}
                             </button>
+                          ))}
+                        </div>
+                      </div>
 
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setPendingDeleteProdId(null);
-                                setEditingProduct(prod);
-                              }}
-                              title={`Edit ${prod.name}`}
-                              className="min-h-[36px] px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer"
-                            >
-                              <Edit3 className="w-3.5 h-3.5 shrink-0" />
-                              <span>Edit</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => setPendingDeleteProdId(prod.id)}
-                              title={`Padam ${prod.name}`}
-                              className="min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 dark:bg-slate-700 dark:hover:bg-rose-950/70 border border-slate-300 dark:border-slate-600 text-black dark:text-white text-sm font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                              <span>Padam</span>
-                            </button>
-                          </div>
-                        )}
+                      <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProdCategoryFilter('Semua');
+                            setProdStockFilter('all');
+                          }}
+                          className="text-xs font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
+                        >
+                          Set Semula
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsProdFilterOpen(false)}
+                          className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+                        >
+                          Tutup
+                        </button>
                       </div>
                     </div>
-                  );
-                })}
+                  )}
+                </div>
               </div>
-              <PaginationBar
-                currentPage={productsPagination.currentPage}
-                totalItems={productsPagination.totalItems}
-                itemsPerPage={5}
-                onPageChange={productsPagination.setCurrentPage}
-                itemLabel="produk"
-                accent="blue"
-              />
             </div>
-          )}
+
+            {safeProducts.length === 0 ? (
+              <div className="p-10 text-center">
+                <ShoppingBag className="w-10 h-10 text-black/30 dark:text-white/30 mx-auto mb-2" />
+                <h4 className="text-sm font-bold text-black dark:text-white">
+                  Belum Ada Produk Disenaraikan
+                </h4>
+                <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
+                  Tekan butang Daftar Produk di atas untuk memasukkan item pertama anda.
+                </p>
+              </div>
+            ) : filteredSortedProducts.length === 0 ? (
+              <div className="p-10 text-center space-y-2">
+                <Search className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
+                <h4 className="text-sm font-bold text-black dark:text-white">
+                  Tiada Produk Padan Dengan Carian / Penapis
+                </h4>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProdSearch('');
+                    setProdCategoryFilter('Semua');
+                    setProdStockFilter('all');
+                  }}
+                  className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                >
+                  Set Semula Carian &amp; Penapis
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                        <th className="py-3 pl-4 pr-2 w-10">
+                          <input
+                            type="checkbox"
+                            checked={allPageSelected}
+                            onChange={toggleSelectAllOnPage}
+                            aria-label="Pilih semua produk pada halaman ini"
+                            className="w-4 h-4 rounded border-slate-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                          />
+                        </th>
+                        <th className="py-3 px-3">
+                          <button
+                            type="button"
+                            onClick={() => toggleProductSort('name')}
+                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                          >
+                            <span>Produk</span>
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-3">
+                          <button
+                            type="button"
+                            onClick={() => toggleProductSort('category')}
+                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                          >
+                            <span>Kategori</span>
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-3">
+                          <button
+                            type="button"
+                            onClick={() => toggleProductSort('price')}
+                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                          >
+                            <span>Harga</span>
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-3">
+                          <button
+                            type="button"
+                            onClick={() => toggleProductSort('inStock')}
+                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                          >
+                            <span>Stok</span>
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-3">
+                          <button
+                            type="button"
+                            onClick={() => toggleProductSort('createdAt')}
+                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                          >
+                            <span>Tarikh</span>
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                          </button>
+                        </th>
+                        <th className="py-3 pl-2 pr-4 w-12 text-right">
+                          <span className="sr-only">Tindakan</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                      {productsPagination.paginatedItems.map((prod) => {
+                        const isAvailable = prod.inStock !== false;
+                        const isChecked = selectedProductIds.includes(prod.id);
+                        const isMenuOpen = openProductMenuId === prod.id;
+                        const formattedPrice = `RM ${Number(prod.price || 0).toFixed(2)}`;
+                        const dateStr = formatDisplayDate(
+                          (prod.updatedAt || prod.createdAt || '').slice(0, 10)
+                        );
+
+                        return (
+                          <tr
+                            key={prod.id}
+                            className={`transition-colors ${
+                              isChecked
+                                ? 'bg-blue-50/40 dark:bg-blue-950/20'
+                                : 'hover:bg-slate-50/80 dark:hover:bg-zinc-800/50'
+                            }`}
+                          >
+                            <td className="py-3.5 pl-4 pr-2">
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => toggleSelectRow(prod.id)}
+                                aria-label={`Pilih ${prod.name}`}
+                                className="w-4 h-4 rounded border-slate-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                              />
+                            </td>
+                            <td className="py-3.5 px-3">
+                              <div className="flex items-center gap-3 min-w-[200px]">
+                                <ProductRowThumbnail src={prod.imageUrl} alt={prod.name} compact />
+                                <span className="font-semibold text-black dark:text-white truncate max-w-[260px]">
+                                  {prod.name}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
+                              {prod.category || 'Umum'}
+                            </td>
+                            <td className="py-3.5 px-3 font-mono font-bold text-black dark:text-white tabular-nums whitespace-nowrap">
+                              {formattedPrice}
+                            </td>
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <span
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                  isAvailable
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70'
+                                    : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70'
+                                }`}
+                              >
+                                {isAvailable ? 'Stok Tersedia' : 'Habis Stok'}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-3 text-black/70 dark:text-white/75 tabular-nums whitespace-nowrap">
+                              {dateStr || '-'}
+                            </td>
+                            <td className="py-3.5 pl-2 pr-4 text-right relative" data-prod-menu>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setOpenProductMenuId(isMenuOpen ? null : prod.id)
+                                }
+                                aria-expanded={isMenuOpen}
+                                aria-label={`Tindakan untuk ${prod.name}`}
+                                className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-black/60 dark:text-white/65 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
+                              >
+                                <MoreHorizontal className="w-4 h-4" />
+                              </button>
+
+                              {isMenuOpen && (
+                                <div className="absolute right-4 mt-1 w-44 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-30 text-left">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setOpenProductMenuId(null);
+                                      setEditingProduct(prod);
+                                    }}
+                                    className="w-full px-3.5 py-2 text-sm font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-left cursor-pointer transition-colors"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={duplicatingProdId === prod.id}
+                                    onClick={() => handleDuplicateProduct(prod)}
+                                    className="w-full px-3.5 py-2 text-sm font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-left cursor-pointer transition-colors disabled:opacity-50"
+                                  >
+                                    {duplicatingProdId === prod.id ? 'Menduplikasi...' : 'Duplikasi'}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={togglingStockId === prod.id}
+                                    onClick={() => handleToggleProductStock(prod)}
+                                    className="w-full px-3.5 py-2 text-sm font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-left cursor-pointer transition-colors disabled:opacity-50"
+                                  >
+                                    {isAvailable ? 'Tanda Habis Stok' : 'Tanda Stok Tersedia'}
+                                  </button>
+                                  <div className="my-1 border-t border-slate-200 dark:border-zinc-700" />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setOpenProductMenuId(null);
+                                      confirmDelete({
+                                        itemName: prod.name,
+                                        itemType: 'Produk Katalog',
+                                        onConfirm: () => handleDeleteProd(prod.id)
+                                      });
+                                    }}
+                                    className="w-full px-3.5 py-2 text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-left cursor-pointer transition-colors"
+                                  >
+                                    Padam
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                <PaginationBar
+                  variant="compact"
+                  currentPage={productsPagination.currentPage}
+                  totalItems={productsPagination.totalItems}
+                  itemsPerPage={7}
+                  onPageChange={productsPagination.setCurrentPage}
+                  itemLabel="produk"
+                  accent="blue"
+                />
+              </>
+            )}
+          </div>
         </div>
         );
       })()}
@@ -2083,306 +2566,384 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   : 'Status semakan dan kelulusan kiosk oleh pihak pengurusan (0 / 1 aktif).'}
               </p>
             </div>
-
-            {hasActiveKioskBooking ? (
-              <button
-                type="button"
-                disabled
-                title="Hanya 1 tempahan kiosk aktif dibenarkan pada satu masa"
-                className="px-4 py-2 bg-slate-200 dark:bg-zinc-800 text-black/60 dark:text-white/60 border border-slate-300 dark:border-zinc-600 text-sm font-bold rounded-xl flex items-center gap-1.5 cursor-not-allowed self-start sm:self-auto"
-              >
-                <Lock className="w-4 h-4" />
-                <span>Sudah Ditempah</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  if (onOpenBookingModal) {
-                    onOpenBookingModal();
-                  } else if (onOpenBookingTab) {
-                    onOpenBookingTab();
-                  }
-                }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-bold rounded-xl flex items-center gap-1.5 shadow-xs transition-all cursor-pointer interactive-press dark:bg-blue-600 self-start sm:self-auto"
-              >
-                <Building2 className="w-4 h-4" />
-                <span>Mohon Kiosk</span>
-              </button>
-            )}
           </div>
 
-          {safeBookings.length === 0 ? (
+          {activeVisibleBookings.length === 0 ? (
             <div className="p-8 text-center bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
               <Building2 className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-2" />
-              <h4 className="text-sm font-bold text-black dark:text-white">Tiada Permohonan Kiosk</h4>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5 mb-4">Anda belum memohon sewaan slot kiosk belia.</p>
+              <h4 className="text-sm font-bold text-black dark:text-white">
+                {hasCancelledKioskBooking ? 'Tiada Permohonan Kiosk Aktif' : 'Tiada Permohonan Kiosk'}
+              </h4>
+              <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5 mb-4 max-w-md mx-auto">
+                {hasCancelledKioskBooking
+                  ? 'Permohonan terdahulu anda telah dibatalkan. Pilih unit kiosk baharu di halaman Tempahan Kiosk untuk memohon semula.'
+                  : 'Anda belum memohon sewaan slot kiosk belia. Pilih unit kiosk yang tersedia di halaman Tempahan Kiosk.'}
+              </p>
               <button
                 type="button"
                 onClick={() => {
-                  if (onOpenBookingModal) onOpenBookingModal();
-                  else if (onOpenBookingTab) onOpenBookingTab();
+                  if (onOpenBookingTab) onOpenBookingTab();
+                  else if (onOpenBookingModal) onOpenBookingModal();
                 }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors cursor-pointer interactive-press dark:bg-blue-600"
               >
                 <Building2 className="w-4 h-4" />
-                <span>Mohon Kiosk</span>
+                <span>{hasCancelledKioskBooking ? 'Mohon Semula Kiosk' : 'Mohon Kiosk'}</span>
               </button>
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-xs h-fit">
-                {bookingsPagination.paginatedItems.map((b) => {
-                  const matchedSlot = safeSlots.find(
-                    (s) => (b.slotId && s.id === b.slotId) || (b.slotCode && s.code === b.slotCode)
-                  );
-                  const kioskImg = resolveBookingKioskImage(b, safeSlots);
-                  const isExpanded = expandedBookingIds.includes(b.id);
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+              <ReferenceTableToolbar
+                searchValue={bookingSearch}
+                onSearchChange={setBookingSearch}
+                searchPlaceholder="Cari kod kiosk, nama slot atau lokasi..."
+                filterCount={bookingStatusFilter !== 'all' ? 1 : 0}
+                onResetFilters={() => setBookingStatusFilter('all')}
+                filterContent={
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                      Status Permohonan
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {([
+                        { id: 'all', label: 'Semua' },
+                        { id: 'pending', label: 'Dalam Semakan' },
+                        { id: 'approved', label: 'Diluluskan' },
+                        { id: 'rejected', label: 'Tidak Berjaya' }
+                      ] as const).map((opt) => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setBookingStatusFilter(opt.id)}
+                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                            bookingStatusFilter === opt.id
+                              ? 'bg-blue-600 border-blue-600 text-white'
+                              : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                }
+              />
 
-                  return (
-                    <div key={b.id} className="p-3.5 sm:p-4 transition-colors hover:bg-slate-50/70 dark:hover:bg-slate-900/40">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
-                            <PortalImage
-                              src={kioskImg}
-                              alt={`Rupa bentuk kiosk ${b.slotName}`}
-                              fallbackType="kiosk"
-                              fallbackLabel={b.slotCode}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-
-                          <div className="min-w-0 flex-1 space-y-1">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <h4 className="font-bold text-black dark:text-white text-sm truncate">
-                                {b.slotCode} · {b.slotName}
-                              </h4>
-                            </div>
-                            <p className="text-sm text-black/70 dark:text-white/75 truncate">
-                              {b.hubLocation}
-                              {matchedSlot?.size ? ` · ${matchedSlot.size}` : ''}
-                              {' · '}<span className="tabular-nums">{b.durationMonths} bln</span>
-                              {' · '}<span className="tabular-nums">{formatDisplayDate(b.startDate)}</span>
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-                          {b.status === 'pending' && (
-                            <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/80 text-black dark:text-white rounded-full text-[0.8125rem] font-bold flex items-center gap-1 border border-amber-200 dark:border-amber-800 whitespace-nowrap">
-                              <Clock className="w-3 h-3" />
-                              Dalam Semakan
-                            </span>
-                          )}
-                          {b.status === 'approved' && (
-                            <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/80 text-black dark:text-white rounded-full text-[0.8125rem] font-bold flex items-center gap-1 border border-emerald-200 dark:border-emerald-800 whitespace-nowrap">
-                              <CheckCircle2 className="w-3 h-3" />
-                              Diluluskan
-                            </span>
-                          )}
-                          {b.status === 'rejected' && (
-                            <span className="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/80 text-black dark:text-white rounded-full text-[0.8125rem] font-bold flex items-center gap-1 border border-rose-200 dark:border-rose-800 whitespace-nowrap">
-                              <AlertCircle className="w-3 h-3" />
-                              Tidak Berjaya
-                            </span>
-                          )}
-                          {b.status === 'cancelled' && (
-                            <span className="px-2.5 py-1 bg-slate-100 dark:bg-zinc-800 text-black dark:text-white rounded-full text-[0.8125rem] font-bold flex items-center gap-1 border border-slate-300 dark:border-zinc-600 whitespace-nowrap">
-                              <XCircle className="w-3 h-3" />
-                              Dibatalkan
-                            </span>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => toggleBookingExpand(b.id)}
-                            aria-expanded={isExpanded}
-                            className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                          >
-                            <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
-                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                          </button>
-                        </div>
-                      </div>
-
-                      {isExpanded && (
-                        <div className="mt-3.5 pt-3.5 border-t border-slate-200 dark:border-slate-700 space-y-3 animate-in fade-in duration-150">
-                          <div className="text-sm text-black/75 dark:text-white/80 flex flex-wrap items-center gap-x-3 gap-y-1 tabular-nums">
-                            <span>Tempoh Operasi: <strong className="text-black dark:text-white">{b.durationMonths} Bulan</strong></span>
-                            <span>·</span>
-                            <span>Mula: <strong className="text-black dark:text-white">{formatDisplayDate(b.startDate)}</strong></span>
-                            <span>·</span>
-                            <span>Akhir: <strong className="text-black dark:text-white">{calculateOperationEndDate(b.startDate, b.durationMonths)}</strong></span>
-                          </div>
-
-                          {b.adminNotes && (
-                            <div className="text-sm text-black dark:text-white bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-300 dark:border-slate-600">
-                              <span className="font-bold text-black dark:text-white block mb-0.5">Catatan Pentadbir:</span>
-                              <p>{b.adminNotes}</p>
-                            </div>
-                          )}
-
-                          {/* ACTION BUTTONS TOOLBAR */}
-                          <div className="pt-1 flex flex-wrap items-center gap-2 text-sm">
+              {filteredBookings.length === 0 ? (
+                <div className="py-12 px-6 text-center space-y-2">
+                  <Building2 className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
+                  <p className="text-sm font-bold text-black dark:text-white">
+                    Tiada permohonan sepadan dengan carian atau penapis.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBookingSearch('');
+                      setBookingStatusFilter('all');
+                    }}
+                    className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  >
+                    Set Semula Carian &amp; Penapis
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                          <th className="py-3 pl-5 pr-3">
                             <button
                               type="button"
-                              onClick={() => setSelectedReceiptBooking(b)}
-                              className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                              title="Cetak atau muat turun resit bayaran rasmi"
+                              onClick={() => toggleBookingSort('slotName')}
+                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
                             >
-                              <Printer className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                              <span>Resit Rasmi Bayaran</span>
+                              <span>Kiosk</span>
+                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
                             </button>
-
-                            {b.status === 'approved' && onViewOfferLetter && (
-                              <button
-                                type="button"
-                                onClick={() => onViewOfferLetter(b)}
-                                className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs dark:bg-indigo-600"
-                              >
-                                <FileText className="w-3.5 h-3.5 text-white" />
-                                <span>Surat Tawaran</span>
-                              </button>
-                            )}
-
-                            {b.status === 'approved' && onOpenTenancyAgreement && (
-                              <button
-                                type="button"
-                                onClick={() => onOpenTenancyAgreement(b)}
-                                className="px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-black dark:text-white font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                              >
-                                <PenTool className="w-3.5 h-3.5 text-black dark:text-white" />
-                                <span>Perjanjian Sewa Kiosk</span>
-                              </button>
-                            )}
-
-                            {b.status === 'approved' && onOpenVerification && (
-                              <button
-                                type="button"
-                                onClick={() => onOpenVerification(`KBN-${b.slotCode}`)}
-                                className="px-3 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-amber-100 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                              >
-                                <QrCode className="w-3.5 h-3.5 text-black dark:text-white" />
-                                <span>Sahkan Lesen QR</span>
-                              </button>
-                            )}
-
-                            <a
-                              href={`https://wa.me/601120508890?text=${encodeURIComponent(`Salam Admin KBelia Kelantan, saya ingin bertanya mengenai permohonan kiosk slot ${b.slotCode} (${b.slotName}) bagi perniagaan ${b.businessName}.`)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 text-black dark:text-white font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                            >
-                              <MessageCircle className="w-3.5 h-3.5 text-black dark:text-white" />
-                              <span>WhatsApp Pentadbir</span>
-                            </a>
-
+                          </th>
+                          <th className="py-3 px-3">
                             <button
                               type="button"
-                              onClick={() => {
+                              onClick={() => toggleBookingSort('hubLocation')}
+                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            >
+                              <span>Lokasi &amp; Saiz</span>
+                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                            </button>
+                          </th>
+                          <th className="py-3 px-3">
+                            <button
+                              type="button"
+                              onClick={() => toggleBookingSort('startDate')}
+                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            >
+                              <span>Tempoh &amp; Mula</span>
+                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                            </button>
+                          </th>
+                          <th className="py-3 px-3">
+                            <button
+                              type="button"
+                              onClick={() => toggleBookingSort('status')}
+                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            >
+                              <span>Status</span>
+                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                            </button>
+                          </th>
+                          <th className="py-3 pl-2 pr-5 w-12 text-right">
+                            <span className="sr-only">Tindakan</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                        {bookingsPagination.paginatedItems.map((b) => {
+                          const matchedSlot = safeSlots.find(
+                            (s) => (b.slotId && s.id === b.slotId) || (b.slotCode && s.code === b.slotCode)
+                          );
+                          const kioskImg = resolveBookingKioskImage(b, safeSlots);
+                          const isExpanded = expandedBookingIds.includes(b.id);
+
+                          const actionItems = [
+                            {
+                              label: isExpanded ? 'Tutup Butiran' : 'Lihat Butiran',
+                              onClick: () => toggleBookingExpand(b.id)
+                            },
+                            {
+                              label: 'Resit Rasmi Bayaran',
+                              onClick: () => setSelectedReceiptBooking(b)
+                            },
+                            ...(b.status === 'approved' && onViewOfferLetter
+                              ? [
+                                  {
+                                    label: 'Surat Tawaran',
+                                    tone: 'accent' as const,
+                                    onClick: () => onViewOfferLetter(b)
+                                  }
+                                ]
+                              : []),
+                            ...(b.status === 'approved' && onOpenTenancyAgreement
+                              ? [
+                                  {
+                                    label: 'Perjanjian Sewa Kiosk',
+                                    onClick: () => onOpenTenancyAgreement(b)
+                                  }
+                                ]
+                              : []),
+                            ...(b.status === 'approved' && onOpenVerification
+                              ? [
+                                  {
+                                    label: 'Sahkan Lesen QR',
+                                    onClick: () => onOpenVerification(`KBN-${b.slotCode}`)
+                                  }
+                                ]
+                              : []),
+                            {
+                              label: 'Aduan Kiosk',
+                              onClick: () => {
                                 setMaintenanceComplaintBooking(b);
                                 setComplaintSuccess(null);
                                 setComplaintNotes('');
-                              }}
-                              className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                              title="Lapor kerosakan lampu/elektrik/pintu kiosk"
-                            >
-                              <Wrench className="w-3.5 h-3.5 text-black dark:text-white" />
-                              <span>Aduan Kiosk</span>
-                            </button>
-
-                            {(b.status === 'pending' || b.status === 'approved') && inlineCancelBookingId !== b.id && (
-                              <button
-                                type="button"
-                                onClick={() => setInlineCancelBookingId(b.id)}
-                                className="px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 border border-rose-200 dark:border-rose-800 text-black dark:text-white font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ml-auto"
-                              >
-                                <XCircle className="w-3.5 h-3.5 text-black dark:text-white" />
-                                <span>Batalkan Tempahan</span>
-                              </button>
-                            )}
-                          </div>
-
-                          {(b.status === 'pending' || b.status === 'approved') && inlineCancelBookingId === b.id && (
-                            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                              <div className="text-sm text-black dark:text-white">
-                                <span className="font-bold">Sahkan pembatalan tempahan slot {b.slotCode}?</span>{' '}
-                                <span className="text-black/75 dark:text-white/75">
-                                  Slot ini akan dilepaskan dan anda boleh memilih kiosk lain selepas pembatalan.
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 shrink-0">
-                                <button
-                                  type="button"
-                                  disabled={cancellingBooking}
-                                  onClick={async () => {
-                                    try {
-                                      setCancellingBooking(true);
-                                      await updateBookingStatus(
-                                        b.id,
-                                        'cancelled',
-                                        'Tempahan dibatalkan oleh usahawan.',
-                                        b.slotId,
-                                        b.businessName,
-                                        b.applicantId,
-                                        b
+                              }
+                            },
+                            ...(b.status === 'pending' || b.status === 'approved'
+                              ? [
+                                  {
+                                    label: 'Batalkan Tempahan',
+                                    tone: 'danger' as const,
+                                    dividerBefore: true,
+                                    onClick: () => {
+                                      setExpandedBookingIds((prev) =>
+                                        prev.includes(b.id) ? prev : [...prev, b.id]
                                       );
-                                      showToast({
-                                        type: 'info',
-                                        title: 'Tempahan Kiosk Dibatalkan',
-                                        message: `Tempahan slot ${b.slotCode} telah dibatalkan. Anda kini boleh memohon unit kiosk lain.`
-                                      });
-                                      setInlineCancelBookingId(null);
-                                      onRefresh();
-                                    } catch {
-                                      showToast({
-                                        type: 'error',
-                                        title: 'Ralat Pembatalan',
-                                        message: 'Gagal membatalkan tempahan. Sila cuba lagi.'
-                                      });
-                                    } finally {
-                                      setCancellingBooking(false);
+                                      setInlineCancelBookingId(b.id);
                                     }
-                                  }}
-                                  className="px-3.5 py-2 rounded-lg text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 cursor-pointer"
-                                >
-                                  {cancellingBooking ? 'Memproses...' : 'Ya, Batalkan'}
-                                </button>
-                                <button
-                                  type="button"
-                                  disabled={cancellingBooking}
-                                  onClick={() => setInlineCancelBookingId(null)}
-                                  className="px-3.5 py-2 rounded-lg text-sm font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
-                                >
-                                  Kekalkan
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                                  }
+                                ]
+                              : [])
+                          ];
 
-              <PaginationBar
-                currentPage={bookingsPagination.currentPage}
-                totalItems={bookingsPagination.totalItems}
-                itemsPerPage={5}
-                onPageChange={bookingsPagination.setCurrentPage}
-                itemLabel="sewaan kiosk"
-                accent="blue"
-              />
+                          return (
+                            <React.Fragment key={b.id}>
+                              <tr className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                                <td className="py-3.5 pl-5 pr-3">
+                                  <div className="flex items-center gap-3 min-w-[200px]">
+                                    <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
+                                      <PortalImage
+                                        src={kioskImg}
+                                        alt={`Rupa bentuk kiosk ${b.slotName}`}
+                                        fallbackType="kiosk"
+                                        fallbackLabel={b.slotCode}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="font-semibold text-black dark:text-white truncate max-w-[240px]">
+                                        {b.slotCode} · {b.slotName}
+                                      </p>
+                                      <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[240px]">
+                                        {b.businessName}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="py-3.5 px-3">
+                                  <p className="text-black dark:text-white font-medium whitespace-nowrap">
+                                    {b.hubLocation}
+                                  </p>
+                                  <p className="text-xs text-black/60 dark:text-white/65 whitespace-nowrap">
+                                    {matchedSlot?.size || 'Unit Kiosk Belia'}
+                                  </p>
+                                </td>
+                                <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
+                                  <p className="font-medium text-black dark:text-white">{b.durationMonths} Bulan</p>
+                                  <p className="text-xs text-black/60 dark:text-white/65">
+                                    Mula {formatDisplayDate(b.startDate)}
+                                  </p>
+                                </td>
+                                <td className="py-3.5 px-3 whitespace-nowrap">
+                                  {b.status === 'pending' && (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70">
+                                      <Clock className="w-3 h-3" />
+                                      Dalam Semakan
+                                    </span>
+                                  )}
+                                  {b.status === 'approved' && (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70">
+                                      <CheckCircle2 className="w-3 h-3" />
+                                      Diluluskan
+                                    </span>
+                                  )}
+                                  {b.status === 'rejected' && (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70">
+                                      <AlertCircle className="w-3 h-3" />
+                                      Tidak Berjaya
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-3.5 pl-2 pr-5 text-right">
+                                  <RowActionMenu
+                                    ariaLabel={`Tindakan untuk ${b.slotCode}`}
+                                    items={actionItems}
+                                  />
+                                </td>
+                              </tr>
+
+                              {isExpanded && (
+                                <tr className="bg-slate-50/70 dark:bg-zinc-950/60">
+                                  <td colSpan={5} className="px-5 py-4 space-y-3">
+                                    <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-black/75 dark:text-white/80 tabular-nums">
+                                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                        <span>Tempoh Operasi: <strong className="text-black dark:text-white">{b.durationMonths} Bulan</strong></span>
+                                        <span>·</span>
+                                        <span>Mula: <strong className="text-black dark:text-white">{formatDisplayDate(b.startDate)}</strong></span>
+                                        <span>·</span>
+                                        <span>Akhir: <strong className="text-black dark:text-white">{calculateOperationEndDate(b.startDate, b.durationMonths)}</strong></span>
+                                      </div>
+
+                                      <a
+                                        href={`https://wa.me/601120508890?text=${encodeURIComponent(`Salam Admin KBelia Kelantan, saya ingin bertanya mengenai permohonan kiosk slot ${b.slotCode} (${b.slotName}) bagi perniagaan ${b.businessName}.`)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 text-black dark:text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                                      >
+                                        <MessageCircle className="w-3.5 h-3.5" />
+                                        <span>WhatsApp Pentadbir</span>
+                                      </a>
+                                    </div>
+
+                                    {b.adminNotes && (
+                                      <div className="text-sm text-black dark:text-white bg-white dark:bg-zinc-900 p-3 rounded-xl border border-slate-200 dark:border-zinc-700">
+                                        <span className="font-bold block mb-0.5">Catatan Pentadbir:</span>
+                                        <p>{b.adminNotes}</p>
+                                      </div>
+                                    )}
+
+                                    {(b.status === 'pending' || b.status === 'approved') && inlineCancelBookingId === b.id && (
+                                      <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                        <div className="text-sm text-black dark:text-white">
+                                          <span className="font-bold">Sahkan pembatalan tempahan slot {b.slotCode}?</span>{' '}
+                                          <span className="text-black/75 dark:text-white/75">
+                                            Slot ini akan dilepaskan dan anda boleh memilih kiosk lain selepas pembatalan.
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                          <button
+                                            type="button"
+                                            disabled={cancellingBooking}
+                                            onClick={async () => {
+                                              try {
+                                                setCancellingBooking(true);
+                                                await updateBookingStatus(
+                                                  b.id,
+                                                  'cancelled',
+                                                  'Tempahan dibatalkan oleh usahawan.',
+                                                  b.slotId,
+                                                  b.businessName,
+                                                  b.applicantId,
+                                                  b
+                                                );
+                                                showToast({
+                                                  type: 'info',
+                                                  title: 'Tempahan Kiosk Dibatalkan',
+                                                  message: `Tempahan slot ${b.slotCode} telah dibatalkan. Anda kini boleh memohon unit kiosk lain.`
+                                                });
+                                                setInlineCancelBookingId(null);
+                                                onRefresh();
+                                              } catch {
+                                                showToast({
+                                                  type: 'error',
+                                                  title: 'Ralat Pembatalan',
+                                                  message: 'Gagal membatalkan tempahan. Sila cuba lagi.'
+                                                });
+                                              } finally {
+                                                setCancellingBooking(false);
+                                              }
+                                            }}
+                                            className="px-3.5 py-2 rounded-lg text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 cursor-pointer"
+                                          >
+                                            {cancellingBooking ? 'Memproses...' : 'Ya, Batalkan'}
+                                          </button>
+                                          <button
+                                            type="button"
+                                            disabled={cancellingBooking}
+                                            onClick={() => setInlineCancelBookingId(null)}
+                                            className="px-3.5 py-2 rounded-lg text-sm font-semibold text-black dark:text-white bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                          >
+                                            Kekalkan
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </td>
+                                </tr>
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <PaginationBar
+                    currentPage={bookingsPagination.currentPage}
+                    totalItems={bookingsPagination.totalItems}
+                    itemsPerPage={7}
+                    onPageChange={bookingsPagination.setCurrentPage}
+                    itemLabel="sewaan kiosk"
+                    accent="blue"
+                  />
+                </>
+              )}
             </div>
           )}
 
           {/* Existing Maintenance Tickets List */}
           {sortedTickets.length > 0 && (
-            <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-300 dark:border-slate-600 space-y-3 h-fit">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
+            <div className="space-y-3 pt-2">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h4 className="text-base font-bold text-black dark:text-white flex items-center gap-2">
                   <Wrench className="w-4 h-4 text-black dark:text-white" />
                   <span>Tiket Aduan Fasiliti Anda ({sortedTickets.length})</span>
                 </h4>
@@ -2390,48 +2951,201 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <button
                     type="button"
                     onClick={onOpenMaintenanceModal}
-                    className="text-sm font-semibold text-black dark:text-white/75 hover:underline cursor-pointer"
+                    className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
                   >
-                    + Aduan Baharu
+                    <Plus className="w-4 h-4" />
+                    <span>Aduan Baharu</span>
                   </button>
                 )}
               </div>
-              <div className="rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden bg-slate-50/70 dark:bg-slate-900 h-fit">
-                {ticketsPagination.paginatedItems.map((t) => (
-                  <div key={t.id} className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-16 h-16 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
-                        <Wrench className="w-6 h-6" />
-                      </div>
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="font-bold text-black dark:text-white truncate">
-                            {t.slotCode} · {t.issueCategory}
-                          </span>
-                          <span className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 ${
-                            t.status === 'resolved'
-                              ? 'bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white'
-                              : t.status === 'in_progress'
-                              ? 'bg-amber-100 text-black dark:bg-blue-600 dark:text-white'
-                              : 'bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white'
-                          }`}>
-                            {t.status === 'resolved' ? 'Selesai' : t.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
-                          </span>
-                        </div>
-                        <p className="text-sm text-black/70 dark:text-white/75 truncate">{t.description}</p>
+
+              <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+                <ReferenceTableToolbar
+                  searchValue={ticketSearch}
+                  onSearchChange={setTicketSearch}
+                  searchPlaceholder="Cari kod kiosk, kategori atau aduan..."
+                  filterCount={ticketStatusFilter !== 'all' ? 1 : 0}
+                  onResetFilters={() => setTicketStatusFilter('all')}
+                  filterContent={
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                        Status Aduan
+                      </label>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {([
+                          { id: 'all', label: 'Semua' },
+                          { id: 'received', label: 'Diterima' },
+                          { id: 'in_progress', label: 'Sedang Dibaiki' },
+                          { id: 'resolved', label: 'Selesai' }
+                        ] as const).map((opt) => (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => setTicketStatusFilter(opt.id)}
+                            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                              ticketStatusFilter === opt.id
+                                ? 'bg-blue-600 border-blue-600 text-white'
+                                : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
                       </div>
                     </div>
+                  }
+                />
+
+                {filteredTickets.length === 0 ? (
+                  <div className="py-10 px-6 text-center space-y-2">
+                    <Wrench className="w-8 h-8 text-black/30 dark:text-white/30 mx-auto" />
+                    <p className="text-sm font-bold text-black dark:text-white">
+                      Tiada tiket aduan sepadan dengan carian anda.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTicketSearch('');
+                        setTicketStatusFilter('all');
+                      }}
+                      className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                    >
+                      Set Semula Carian &amp; Penapis
+                    </button>
                   </div>
-                ))}
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-left border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                            <th className="py-3 pl-5 pr-3">
+                              <button
+                                type="button"
+                                onClick={() => toggleTicketSort('slotCode')}
+                                className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                              >
+                                <span>Unit Kiosk</span>
+                                <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                              </button>
+                            </th>
+                            <th className="py-3 px-3">
+                              <button
+                                type="button"
+                                onClick={() => toggleTicketSort('issueCategory')}
+                                className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                              >
+                                <span>Kategori &amp; Keterangan</span>
+                                <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                              </button>
+                            </th>
+                            <th className="py-3 px-3">
+                              <button
+                                type="button"
+                                onClick={() => toggleTicketSort('status')}
+                                className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                              >
+                                <span>Status</span>
+                                <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                              </button>
+                            </th>
+                            <th className="py-3 pl-2 pr-5 w-12 text-right">
+                              <span className="sr-only">Tindakan</span>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                          {ticketsPagination.paginatedItems.map((t) => {
+                            const isTicketExpanded = expandedTicketIds.includes(t.id);
+                            return (
+                              <React.Fragment key={t.id}>
+                                <tr className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                                  <td className="py-3.5 pl-5 pr-3 whitespace-nowrap">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+                                        <Wrench className="w-4 h-4" />
+                                      </div>
+                                      <span className="font-semibold text-black dark:text-white">{t.slotCode}</span>
+                                    </div>
+                                  </td>
+                                  <td className="py-3.5 px-3">
+                                    <p className="font-medium text-black dark:text-white truncate max-w-[260px]">
+                                      {t.issueCategory}
+                                    </p>
+                                    <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[300px]">
+                                      {t.description}
+                                    </p>
+                                  </td>
+                                  <td className="py-3.5 px-3 whitespace-nowrap">
+                                    <span
+                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                        t.status === 'resolved'
+                                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
+                                          : t.status === 'in_progress'
+                                          ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/70'
+                                          : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
+                                      }`}
+                                    >
+                                      {t.status === 'resolved' ? 'Selesai' : t.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 pl-2 pr-5 text-right">
+                                    <RowActionMenu
+                                      ariaLabel={`Tindakan untuk tiket ${t.slotCode}`}
+                                      items={[
+                                        {
+                                          label: isTicketExpanded ? 'Tutup Butiran' : 'Lihat Butiran',
+                                          onClick: () =>
+                                            setExpandedTicketIds((prev) =>
+                                              prev.includes(t.id)
+                                                ? prev.filter((item) => item !== t.id)
+                                                : [...prev, t.id]
+                                            )
+                                        },
+                                        ...(onOpenMaintenanceModal
+                                          ? [
+                                              {
+                                                label: 'Buat Aduan Baharu',
+                                                tone: 'accent' as const,
+                                                onClick: onOpenMaintenanceModal
+                                              }
+                                            ]
+                                          : [])
+                                      ]}
+                                    />
+                                  </td>
+                                </tr>
+                                {isTicketExpanded && (
+                                  <tr className="bg-slate-50/70 dark:bg-zinc-950/60">
+                                    <td colSpan={4} className="px-5 py-3.5 text-sm text-black dark:text-white space-y-1.5">
+                                      <p className="font-semibold">Keterangan Penuh Aduan:</p>
+                                      <p className="text-black/75 dark:text-white/80">{t.description}</p>
+                                      {t.adminNotes && (
+                                        <p className="text-xs text-black/70 dark:text-white/75 pt-1">
+                                          <strong className="text-black dark:text-white">Catatan Teknikal:</strong> {t.adminNotes}
+                                        </p>
+                                      )}
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <PaginationBar
+                      currentPage={ticketsPagination.currentPage}
+                      totalItems={ticketsPagination.totalItems}
+                      itemsPerPage={7}
+                      onPageChange={ticketsPagination.setCurrentPage}
+                      itemLabel="tiket aduan"
+                      accent="blue"
+                    />
+                  </>
+                )}
               </div>
-              <PaginationBar
-                currentPage={ticketsPagination.currentPage}
-                totalItems={ticketsPagination.totalItems}
-                itemsPerPage={5}
-                onPageChange={ticketsPagination.setCurrentPage}
-                itemLabel="tiket aduan"
-                accent="blue"
-              />
             </div>
           )}
 

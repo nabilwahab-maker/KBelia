@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Calendar,
   Plus,
-  Edit3,
-  Trash2,
   X,
   Save,
   Loader2,
-  Users
+  Users,
+  ArrowUpDown
 } from 'lucide-react';
 import { EventBooking, KelantanDistrict, YouthEvent } from '../types';
 import {
@@ -24,6 +23,8 @@ import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveEventImage } from '../utils/visualAssets';
 import { ImageDropzone } from './ImageDropzone';
+import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
+import { PaginationBar, usePagination } from './PaginationBar';
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -67,6 +68,18 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
   const [imageUrl, setImageUrl] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  // Search, filter & sort states for catalog and bookings
+  const [catalogSearch, setCatalogSearch] = useState('');
+  const [catalogCategoryFilter, setCatalogCategoryFilter] = useState<'all' | YouthEvent['category']>('all');
+  const [catalogDistrictFilter, setCatalogDistrictFilter] = useState<'all' | KelantanDistrict>('all');
+  const [catalogSortBy, setCatalogSortBy] = useState<'title' | 'category' | 'district' | 'booths'>('title');
+  const [catalogSortDir, setCatalogSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const [bookingSearch, setBookingSearch] = useState('');
+  const [bookingStatusFilter, setBookingStatusFilter] = useState<'all' | 'booked' | 'cancelled'>('all');
+  const [bookingSortBy, setBookingSortBy] = useState<'userName' | 'eventTitle' | 'status'>('userName');
+  const [bookingSortDir, setBookingSortDir] = useState<'asc' | 'desc'>('asc');
+
   useEffect(() => {
     const unsubEvents = subscribeYouthEvents(setEvents);
     const unsubBookings = subscribeEventBookings(user?.uid, isAdmin, setEventBookings);
@@ -75,6 +88,86 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
       unsubBookings();
     };
   }, [user?.uid, isAdmin]);
+
+  const filteredSortedEvents = useMemo(() => {
+    const q = catalogSearch.trim().toLowerCase();
+    return events
+      .filter((evt) => {
+        if (catalogCategoryFilter !== 'all' && evt.category !== catalogCategoryFilter) return false;
+        if (catalogDistrictFilter !== 'all' && evt.district !== catalogDistrictFilter) return false;
+        if (!q) return true;
+        return (
+          evt.title.toLowerCase().includes(q) ||
+          evt.location.toLowerCase().includes(q) ||
+          evt.district.toLowerCase().includes(q) ||
+          evt.category.toLowerCase().includes(q)
+        );
+      })
+      .sort((a, b) => {
+        let cmp = 0;
+        if (catalogSortBy === 'category') cmp = a.category.localeCompare(b.category);
+        else if (catalogSortBy === 'district') cmp = a.district.localeCompare(b.district);
+        else if (catalogSortBy === 'booths') cmp = a.boothsAvailable - b.boothsAvailable;
+        else cmp = a.title.localeCompare(b.title);
+        return catalogSortDir === 'asc' ? cmp : -cmp;
+      });
+  }, [events, catalogSearch, catalogCategoryFilter, catalogDistrictFilter, catalogSortBy, catalogSortDir]);
+
+  const filteredSortedBookings = useMemo(() => {
+    const q = bookingSearch.trim().toLowerCase();
+    return eventBookings
+      .filter((b) => {
+        if (bookingStatusFilter !== 'all' && b.status !== bookingStatusFilter) return false;
+        if (!q) return true;
+        return (
+          (b.userName || '').toLowerCase().includes(q) ||
+          b.eventTitle.toLowerCase().includes(q) ||
+          b.userId.toLowerCase().includes(q)
+        );
+      })
+      .sort((a, b) => {
+        let cmp = 0;
+        if (bookingSortBy === 'eventTitle') cmp = a.eventTitle.localeCompare(b.eventTitle);
+        else if (bookingSortBy === 'status') cmp = a.status.localeCompare(b.status);
+        else cmp = (a.userName || '').localeCompare(b.userName || '');
+        return bookingSortDir === 'asc' ? cmp : -cmp;
+      });
+  }, [eventBookings, bookingSearch, bookingStatusFilter, bookingSortBy, bookingSortDir]);
+
+  const catalogPagination = usePagination(filteredSortedEvents, 7, [
+    catalogSearch,
+    catalogCategoryFilter,
+    catalogDistrictFilter,
+    catalogSortBy,
+    catalogSortDir,
+    filteredSortedEvents.length
+  ]);
+
+  const bookingsPagination = usePagination(filteredSortedBookings, 7, [
+    bookingSearch,
+    bookingStatusFilter,
+    bookingSortBy,
+    bookingSortDir,
+    filteredSortedBookings.length
+  ]);
+
+  const toggleCatalogSort = (col: 'title' | 'category' | 'district' | 'booths') => {
+    if (catalogSortBy === col) {
+      setCatalogSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setCatalogSortBy(col);
+      setCatalogSortDir('asc');
+    }
+  };
+
+  const toggleBookingSort = (col: 'userName' | 'eventTitle' | 'status') => {
+    if (bookingSortBy === col) {
+      setBookingSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setBookingSortBy(col);
+      setBookingSortDir('asc');
+    }
+  };
 
   const openCreateEvent = () => {
     setEditingEvent(null);
@@ -236,135 +329,339 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
       </div>
 
       {subView === 'catalog' ? (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
-          {events.length === 0 ? (
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+          <ReferenceTableToolbar
+            searchValue={catalogSearch}
+            onSearchChange={setCatalogSearch}
+            searchPlaceholder="Cari tajuk acara, lokasi atau daerah..."
+            filterCount={(catalogCategoryFilter !== 'all' ? 1 : 0) + (catalogDistrictFilter !== 'all' ? 1 : 0)}
+            onResetFilters={() => {
+              setCatalogCategoryFilter('all');
+              setCatalogDistrictFilter('all');
+            }}
+            filterContent={
+              <>
+                <div>
+                  <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                    Kategori Acara
+                  </label>
+                  <select
+                    value={catalogCategoryFilter}
+                    onChange={(e) => setCatalogCategoryFilter(e.target.value as 'all' | YouthEvent['category'])}
+                    className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                  >
+                    <option value="all">Semua Kategori</option>
+                    <option value="karnival">Karnival Jualan</option>
+                    <option value="bengkel">Bengkel Pensijilan</option>
+                    <option value="pitching">Pitching &amp; Demo Day</option>
+                    <option value="expo">Ekspo &amp; Kraf</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                    Daerah
+                  </label>
+                  <select
+                    value={catalogDistrictFilter}
+                    onChange={(e) => setCatalogDistrictFilter(e.target.value as 'all' | KelantanDistrict)}
+                    className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                  >
+                    <option value="all">Semua Daerah</option>
+                    {DISTRICTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            }
+          />
+
+          {filteredSortedEvents.length === 0 ? (
             <div className="p-10 text-center text-sm text-black/70 dark:text-white/75">
-              Tiada acara usahawan belia direkodkan.
+              Tiada acara usahawan belia direkodkan bagi carian atau tapisan ini.
             </div>
           ) : (
-            events.map((evt) => (
-              <div
-                key={evt.id}
-                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors"
-              >
-                <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                  <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 overflow-hidden shrink-0">
-                    <PortalImage
-                      src={resolveEventImage(evt.category, evt.imageUrl)}
-                      alt={evt.title}
-                      fallbackType="event"
-                      fallbackLabel={evt.category}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <button
+                        type="button"
+                        onClick={() => toggleCatalogSort('title')}
+                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                      >
+                        <span>Acara &amp; Lokasi</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <button
+                        type="button"
+                        onClick={() => toggleCatalogSort('category')}
+                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                      >
+                        <span>Kategori</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <button
+                        type="button"
+                        onClick={() => toggleCatalogSort('district')}
+                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                      >
+                        <span>Daerah</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <button
+                        type="button"
+                        onClick={() => toggleCatalogSort('booths')}
+                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                      >
+                        <span>Tarikh &amp; Kuota</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      Yuran
+                    </th>
+                    <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                      <span className="sr-only">Tindakan</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                  {catalogPagination.paginatedItems.map((evt) => (
+                    <tr
+                      key={evt.id}
+                      className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors"
+                    >
+                      <td className="py-3.5 px-4 max-w-sm">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 overflow-hidden shrink-0">
+                            <PortalImage
+                              src={resolveEventImage(evt.category, evt.imageUrl)}
+                              alt={evt.title}
+                              fallbackType="event"
+                              fallbackLabel={evt.category}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-bold text-black dark:text-white truncate">
+                              {evt.title}
+                            </div>
+                            <div className="text-xs text-black/65 dark:text-white/65 truncate">
+                              {evt.location}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200">
+                          {evt.category}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
+                        {evt.district}
+                      </td>
+                      <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap tabular-nums">
+                        <div>{evt.date}</div>
+                        <div className="text-xs text-black/60 dark:text-white/60">
+                          {evt.boothsAvailable}/{evt.totalBooths} tapak
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 font-semibold text-black dark:text-white whitespace-nowrap">
+                        {evt.fee}
+                      </td>
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <RowActionMenu
+                          ariaLabel={`Tindakan untuk ${evt.title}`}
+                          items={[
+                            {
+                              label: 'Edit Acara',
+                              onClick: () => openEditEvent(evt)
+                            },
+                            {
+                              label: 'Padam Acara',
+                              onClick: () =>
+                                confirmDelete({
+                                  itemName: evt.title,
+                                  itemType: 'Acara Belia',
+                                  onConfirm: () => handleDeleteEvent(evt)
+                                }),
+                              tone: 'danger',
+                              dividerBefore: true
+                            }
+                          ]}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <h4 className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
-                        {evt.title}
-                      </h4>
-                      <span className="px-2 py-0.5 rounded text-[0.75rem] font-bold uppercase shrink-0 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-black dark:text-white">
-                        {evt.category}
-                      </span>
-                    </div>
-                    <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
-                      {evt.date} · {evt.location} ({evt.district}) · {evt.boothsAvailable}/{evt.totalBooths} tapak · {evt.fee}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  <button
-                    type="button"
-                    onClick={() => openEditEvent(evt)}
-                    className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>Edit</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      confirmDelete({
-                        itemName: evt.title,
-                        itemType: 'Acara Belia',
-                        onConfirm: () => handleDeleteEvent(evt)
-                      })
-                    }
-                    className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Padam</span>
-                  </button>
-                </div>
-              </div>
-            ))
+          {filteredSortedEvents.length > 0 && (
+            <PaginationBar
+              currentPage={catalogPagination.currentPage}
+              totalItems={catalogPagination.totalItems}
+              itemsPerPage={7}
+              onPageChange={catalogPagination.setCurrentPage}
+              itemLabel="acara belia"
+              accent="blue"
+            />
           )}
         </div>
       ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
-          {eventBookings.length === 0 ? (
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+          <ReferenceTableToolbar
+            searchValue={bookingSearch}
+            onSearchChange={setBookingSearch}
+            searchPlaceholder="Cari nama peserta, acara atau ID..."
+            filterCount={bookingStatusFilter !== 'all' ? 1 : 0}
+            onResetFilters={() => setBookingStatusFilter('all')}
+            filterContent={
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  Status Tempahan
+                </label>
+                <select
+                  value={bookingStatusFilter}
+                  onChange={(e) => setBookingStatusFilter(e.target.value as 'all' | 'booked' | 'cancelled')}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  <option value="all">Semua Status</option>
+                  <option value="booked">Ditempah (Aktif)</option>
+                  <option value="cancelled">Dibatalkan</option>
+                </select>
+              </div>
+            }
+          />
+
+          {filteredSortedBookings.length === 0 ? (
             <div className="p-10 text-center text-sm text-black/70 dark:text-white/75">
-              Belum ada rekod tempahan tapak acara diterima.
+              Belum ada rekod tempahan tapak acara bagi carian atau tapisan ini.
             </div>
           ) : (
-            eventBookings.map((b) => (
-              <div
-                key={b.id}
-                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors"
-              >
-                <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                  <div className="w-16 h-16 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-700 dark:text-indigo-300 shrink-0">
-                    <Users className="w-6 h-6" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <h4 className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
-                        {b.userName || 'Usahawan Belia'}
-                      </h4>
-                      <span
-                        className={`px-2 py-0.5 rounded text-[0.75rem] font-bold shrink-0 border ${
-                          b.status === 'booked'
-                            ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
-                            : 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-black dark:text-white'
-                        }`}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <button
+                        type="button"
+                        onClick={() => toggleBookingSort('userName')}
+                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
                       >
-                        {b.status === 'booked' ? 'Ditempah' : 'Dibatalkan'}
-                      </span>
-                    </div>
-                    <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5">
-                      {b.eventTitle} · ID: {b.userId}
-                    </p>
-                  </div>
-                </div>
+                        <span>Peserta</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <button
+                        type="button"
+                        onClick={() => toggleBookingSort('eventTitle')}
+                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                      >
+                        <span>Acara</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <button
+                        type="button"
+                        onClick={() => toggleBookingSort('status')}
+                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                      >
+                        <span>Status</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                      <span className="sr-only">Tindakan</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                  {bookingsPagination.paginatedItems.map((b) => (
+                    <tr
+                      key={b.id}
+                      className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors"
+                    >
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-700 dark:text-indigo-300 shrink-0">
+                            <Users className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-bold text-black dark:text-white truncate">
+                              {b.userName || 'Usahawan Belia'}
+                            </div>
+                            <div className="text-xs text-black/60 dark:text-white/60 font-mono truncate">
+                              ID: {b.userId}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 text-black/80 dark:text-white/80">
+                        {b.eventTitle}
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                            b.status === 'booked'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                              : 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                          }`}
+                        >
+                          {b.status === 'booked' ? 'Ditempah' : 'Dibatalkan'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <RowActionMenu
+                          ariaLabel={`Tindakan untuk tempahan ${b.userName || b.eventTitle}`}
+                          items={[
+                            {
+                              label: b.status === 'booked' ? 'Tandakan Dibatalkan' : 'Aktifkan Semula (Ditempah)',
+                              onClick: () =>
+                                handleBookingStatusChange(b, b.status === 'booked' ? 'cancelled' : 'booked'),
+                              tone: 'accent'
+                            },
+                            {
+                              label: 'Padam Tempahan',
+                              onClick: () =>
+                                confirmDelete({
+                                  itemName: `${b.userName || 'Peserta'} — ${b.eventTitle}`,
+                                  itemType: 'Tempahan Tapak Acara',
+                                  onConfirm: () => handleDeleteBooking(b)
+                                }),
+                              tone: 'danger',
+                              dividerBefore: true
+                            }
+                          ]}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  <select
-                    aria-label={`Tukar status tempahan ${b.eventTitle}`}
-                    value={b.status}
-                    onChange={(e) => handleBookingStatusChange(b, e.target.value as 'booked' | 'cancelled')}
-                    className="px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
-                  >
-                    <option value="booked">Ditempah (Aktif)</option>
-                    <option value="cancelled">Dibatalkan</option>
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      confirmDelete({
-                        itemName: `${b.userName || 'Peserta'} — ${b.eventTitle}`,
-                        itemType: 'Tempahan Tapak Acara',
-                        onConfirm: () => handleDeleteBooking(b)
-                      })
-                    }
-                    className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Padam</span>
-                  </button>
-                </div>
-              </div>
-            ))
+          {filteredSortedBookings.length > 0 && (
+            <PaginationBar
+              currentPage={bookingsPagination.currentPage}
+              totalItems={bookingsPagination.totalItems}
+              itemsPerPage={7}
+              onPageChange={bookingsPagination.setCurrentPage}
+              itemLabel="tempahan peserta"
+              accent="blue"
+            />
           )}
         </div>
       )}

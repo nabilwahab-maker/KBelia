@@ -432,7 +432,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                       Pentadbir Urusetia Belia
                     </div>
                     <div className="text-[0.8125rem] text-black font-mono font-bold">
-                      PENGESAHAN DIGITAL: SHA256-CERTIFIED
+                      PENGESAHAN DIGITAL: SHA256-VERIFIED
                     </div>
                   </div>
                 </div>

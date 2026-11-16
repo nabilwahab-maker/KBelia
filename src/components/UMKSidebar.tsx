@@ -18,7 +18,6 @@ import {
   BarChart3,
   CheckCircle2,
   Clock,
-  Database,
   Sliders,
   FileText,
   Users,
@@ -294,7 +293,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             </>
           )}
 
-          {/* ROLE B MINI: MENTOR BERTAULIAH */}
+          {/* ROLE B MINI: MENTOR */}
           {isMentor && (
             <>
               <button
@@ -545,12 +544,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
       label: isMs ? 'Urus Pengguna' : 'User Management',
       keywords: 'pengguna akaun profil ahli peranan user management users',
       icon: Users
-    },
-    {
-      id: 'sync',
-      label: isMs ? 'Muat Semula Data' : 'Data Sync',
-      keywords: 'penyegerakan muat semula pangkalan data sync database',
-      icon: Database
     },
     {
       id: 'settings',
@@ -981,7 +974,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
         )}
 
         {/* =============================================================== */}
-        {/* ROLE B: MENTOR BERTAULIAH                                       */}
+        {/* ROLE B: MENTOR                                                 */}
         {/* =============================================================== */}
         {isMentor && hasAnySearchMatch && (
           <div className="space-y-4">

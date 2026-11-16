@@ -1,24 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Calendar, 
-  MapPin, 
   Clock, 
-  Users, 
   Store, 
-  Share2, 
   Check, 
-  Sparkles, 
-  ArrowRight,
-  Filter,
-  Search,
-  ExternalLink,
-  MessageCircle,
-  Tag,
-  XCircle,
-  AlertTriangle,
-  X
+  MessageCircle, 
+  XCircle, 
+  AlertTriangle
 } from 'lucide-react';
-import { KelantanDistrict, YouthEvent } from '../types';
+import { YouthEvent } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -31,6 +21,53 @@ import {
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveEventImage } from '../utils/visualAssets';
+import { ReferenceTableToolbar } from './ReferenceTableKit';
+import { PaginationBar, usePagination } from './PaginationBar';
+
+const MONTH_MAP: Record<string, number> = {
+  januari: 0, january: 0, jan: 0,
+  februari: 1, february: 1, feb: 1,
+  mac: 2, march: 2, mar: 2,
+  april: 3, apr: 3,
+  mei: 4, may: 4,
+  jun: 5, june: 5,
+  julai: 6, july: 6, jul: 6,
+  ogos: 7, august: 7, aug: 7,
+  september: 8, sept: 8, sep: 8,
+  oktober: 9, october: 9, okt: 9, oct: 9,
+  november: 10, nov: 10,
+  disember: 11, december: 11, dis: 11, dec: 11
+};
+
+const parseEventEndDate = (dateStr?: string): Date | null => {
+  if (!dateStr) return null;
+  const trimmed = dateStr.trim();
+  const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) {
+    return new Date(Number(isoMatch[1]), Number(isoMatch[2]) - 1, Number(isoMatch[3]), 23, 59, 59, 999);
+  }
+  const slashMatch = trimmed.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (slashMatch) {
+    return new Date(Number(slashMatch[3]), Number(slashMatch[2]) - 1, Number(slashMatch[1]), 23, 59, 59, 999);
+  }
+  const lower = trimmed.toLowerCase();
+  const textMatch = lower.match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})(?!.*\d{4})/);
+  if (textMatch) {
+    const day = Number(textMatch[1]);
+    const month = MONTH_MAP[textMatch[2]];
+    const year = Number(textMatch[3]);
+    if (month !== undefined && !Number.isNaN(day) && !Number.isNaN(year)) {
+      return new Date(year, month, day, 23, 59, 59, 999);
+    }
+  }
+  return null;
+};
+
+const isEventEnded = (dateStr?: string): boolean => {
+  const endDate = parseEventEndDate(dateStr);
+  if (!endDate) return false;
+  return endDate.getTime() < Date.now();
+};
 
 export const EventsSection: React.FC = () => {
   const { language } = useLanguage();
@@ -40,6 +77,7 @@ export const EventsSection: React.FC = () => {
   const [events, setEvents] = useState<YouthEvent[]>(INITIAL_YOUTH_EVENTS);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'available' | 'full' | 'ended'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [bookedEvents, setBookedEvents] = useState<string[]>(() => {
     if (!user?.uid) return [];
@@ -68,26 +106,45 @@ export const EventsSection: React.FC = () => {
     return () => unsub();
   }, [user?.uid, isAdmin]);
 
-  const handleBookBooth = async (eventId: string, eventTitle: string) => {
+  const handleBookBooth = async (evt: YouthEvent) => {
+    const ended = isEventEnded(evt.date);
+    const alreadyBooked = bookedEvents.includes(evt.id);
+    const remaining = Math.max(0, evt.boothsAvailable - (alreadyBooked ? 1 : 0));
+
+    if (ended) {
+      showToast(
+        isEn ? 'This event has already ended and bookings are closed.' : 'Acara ini telah selesai dan tempahan slot telah ditutup.',
+        'warning'
+      );
+      return;
+    }
+    if (remaining <= 0 && !alreadyBooked) {
+      showToast(
+        isEn ? 'All stall slots for this event are currently full.' : 'Semua slot gerai bagi acara ini telah penuh.',
+        'warning'
+      );
+      return;
+    }
     if (!user?.uid) {
       openLoginModal();
       return;
     }
-    if (bookedEvents.includes(eventId)) {
+    if (alreadyBooked) {
       showToast(isEn ? 'You have already registered for this event!' : 'Anda telah pun berdaftar untuk acara ini!');
       return;
     }
-    setBookedEvents(prev => [...prev, eventId]);
+    setBookedEvents(prev => [...prev, evt.id]);
     try {
       await saveEventBookingRecord(
-        eventId,
-        eventTitle,
+        evt.id,
+        evt.title,
         user.uid,
         userProfile?.fullName || user.displayName || 'Usahawan Belia',
         'booked'
       );
-      showToast(isEn ? `Successfully registered for: ${eventTitle}` : `Pendaftaran slot gerai bagi: ${eventTitle} berjaya!`);
+      showToast(isEn ? `Successfully registered for: ${evt.title}` : `Pendaftaran slot gerai bagi: ${evt.title} berjaya!`);
     } catch {
+      setBookedEvents(prev => prev.filter(id => id !== evt.id));
       showToast(isEn ? 'Failed to register booth. Please try again.' : 'Gagal mendaftar slot gerai. Sila cuba lagi.');
     }
   };
@@ -112,14 +169,43 @@ export const EventsSection: React.FC = () => {
   };
 
   const filteredEvents = events.filter((evt) => {
+    const isBooked = bookedEvents.includes(evt.id);
+    const remaining = Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0));
+    const ended = isEventEnded(evt.date);
+    const full = !ended && remaining <= 0;
+
     const matchCat = selectedCategory === 'all' || evt.category === selectedCategory;
     const matchDist = selectedDistrict === 'all' || evt.district === selectedDistrict;
-    const matchSearch = !searchQuery || 
-      evt.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      evt.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      evt.organizer.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCat && matchDist && matchSearch;
+    const matchAvailability =
+      availabilityFilter === 'all'
+        ? true
+        : availabilityFilter === 'ended'
+        ? ended
+        : availabilityFilter === 'full'
+        ? full
+        : !ended && remaining > 0;
+    const q = searchQuery.trim().toLowerCase();
+    const matchSearch =
+      !q ||
+      evt.title.toLowerCase().includes(q) ||
+      evt.location.toLowerCase().includes(q) ||
+      evt.organizer.toLowerCase().includes(q) ||
+      evt.district.toLowerCase().includes(q);
+    return matchCat && matchDist && matchAvailability && matchSearch;
   });
+
+  const pagination = usePagination(filteredEvents, 7, [
+    searchQuery,
+    selectedCategory,
+    selectedDistrict,
+    availabilityFilter,
+    filteredEvents.length
+  ]);
+
+  const activeFilterCount =
+    (selectedCategory !== 'all' ? 1 : 0) +
+    (selectedDistrict !== 'all' ? 1 : 0) +
+    (availabilityFilter !== 'all' ? 1 : 0);
 
   return (
     <div className="w-full space-y-4">
@@ -149,7 +235,9 @@ export const EventsSection: React.FC = () => {
         </div>
         <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
           <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Stalls Open' : 'Tapak Kosong'}</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{events.reduce((sum, e) => sum + Math.max(0, e.boothsAvailable - (bookedEvents.includes(e.id) ? 1 : 0)), 0)}</span>
+          <span className="text-lg font-black text-black dark:text-white tabular-nums">
+            {events.reduce((sum, e) => sum + (isEventEnded(e.date) ? 0 : Math.max(0, e.boothsAvailable - (bookedEvents.includes(e.id) ? 1 : 0))), 0)}
+          </span>
         </div>
         <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
           <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Matching Results' : 'Dipaparkan'}</span>
@@ -157,155 +245,219 @@ export const EventsSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
-        <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            placeholder={isEn ? 'Enter search keyword' : 'Masukkan kata kunci carian'}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
-          />
-        </div>
+      {/* Acara & Karnival: Carian, Penapis Bersepadu, Senarai Baris & Halaman Bernombor */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+        <ReferenceTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={isEn ? 'Search event title, location or organizer...' : 'Cari tajuk acara, lokasi atau penganjur...'}
+          filterCount={activeFilterCount}
+          onResetFilters={() => {
+            setSelectedCategory('all');
+            setSelectedDistrict('all');
+            setAvailabilityFilter('all');
+          }}
+          filterContent={
+            <>
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  {isEn ? 'Category' : 'Kategori Acara'}
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  <option value="all">{isEn ? 'All Event Types' : 'Semua Kategori'}</option>
+                  <option value="karnival">{isEn ? 'Carnivals & Expos' : 'Karnival Jualan'}</option>
+                  <option value="bengkel">{isEn ? 'Workshops & Training' : 'Bengkel Pensijilan'}</option>
+                  <option value="pitching">{isEn ? 'Pitching & Demo Day' : 'Pitching Pelabur'}</option>
+                  <option value="expo">{isEn ? 'Pop-up Flea Market' : 'Pasar Lambak & Kraf'}</option>
+                </select>
+              </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          {/* Category Filter */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
-          >
-            <option value="all">{isEn ? 'All Event Types' : 'Semua Kategori'}</option>
-            <option value="karnival">{isEn ? 'Carnivals & Expos' : 'Karnival Jualan'}</option>
-            <option value="bengkel">{isEn ? 'Workshops & Training' : 'Bengkel Pensijilan'}</option>
-            <option value="pitching">{isEn ? 'Pitching & Demo Day' : 'Pitching Pelabur'}</option>
-            <option value="expo">{isEn ? 'Pop-up Flea Market' : 'Pasar Lambak & Kraf'}</option>
-          </select>
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  {isEn ? 'District' : 'Daerah'}
+                </label>
+                <select
+                  value={selectedDistrict}
+                  onChange={(e) => setSelectedDistrict(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  <option value="all">{isEn ? 'Across Kelantan' : 'Seluruh Kelantan'}</option>
+                  <option value="Kota Bharu">Kota Bharu</option>
+                  <option value="Bachok">Bachok</option>
+                  <option value="Pasir Mas">Pasir Mas</option>
+                  <option value="Tumpat">Tumpat</option>
+                  <option value="Tanah Merah">Tanah Merah</option>
+                  <option value="Machang">Machang</option>
+                  <option value="Pasir Puteh">Pasir Puteh</option>
+                  <option value="Kuala Krai">Kuala Krai</option>
+                  <option value="Gua Musang">Gua Musang</option>
+                  <option value="Jeli">Jeli</option>
+                </select>
+              </div>
 
-          {/* District Filter */}
-          <select
-            value={selectedDistrict}
-            onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
-          >
-            <option value="all">{isEn ? 'Across Kelantan' : 'Seluruh Kelantan'}</option>
-            <option value="Kota Bharu">Kota Bharu</option>
-            <option value="Bachok">Bachok</option>
-            <option value="Pasir Mas">Pasir Mas</option>
-            <option value="Tumpat">Tumpat</option>
-            <option value="Tanah Merah">Tanah Merah</option>
-            <option value="Machang">Machang</option>
-            <option value="Pasir Puteh">Pasir Puteh</option>
-            <option value="Kuala Krai">Kuala Krai</option>
-            <option value="Gua Musang">Gua Musang</option>
-            <option value="Jeli">Jeli</option>
-          </select>
-        </div>
-      </div>
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  {isEn ? 'Availability Status' : 'Status Ketersediaan'}
+                </label>
+                <select
+                  value={availabilityFilter}
+                  onChange={(e) => setAvailabilityFilter(e.target.value as 'all' | 'available' | 'full' | 'ended')}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  <option value="all">{isEn ? 'All Statuses' : 'Semua Status'}</option>
+                  <option value="available">{isEn ? 'Available to Book' : 'Tersedia Ditempah'}</option>
+                  <option value="full">{isEn ? 'Slots Full' : 'Slot Penuh'}</option>
+                  <option value="ended">{isEn ? 'Ended' : 'Telah Selesai'}</option>
+                </select>
+              </div>
+            </>
+          }
+        />
 
-      {/* Senarai Menegak Acara */}
-      {filteredEvents.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 h-fit">
-          <Calendar className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
-          <p className="text-sm font-bold text-black dark:text-white">
-            {isEn ? 'No events match your filter' : 'Tiada acara sepadan ditemui'}
-          </p>
-        </div>
-      ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
-          {filteredEvents.map((evt) => {
-            const isBooked = bookedEvents.includes(evt.id);
+        {filteredEvents.length === 0 ? (
+          <div className="text-center py-12 px-4">
+            <Calendar className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
+            <p className="text-sm font-bold text-black dark:text-white">
+              {isEn ? 'No events match your filter' : 'Tiada acara sepadan ditemui'}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col divide-y divide-slate-200 dark:divide-zinc-700">
+              {pagination.paginatedItems.map((evt) => {
+                const isBooked = bookedEvents.includes(evt.id);
+                const remainingBooths = Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0));
+                const ended = isEventEnded(evt.date);
+                const full = !ended && !isBooked && remainingBooths <= 0;
+                const bookingBlocked = isBooked || ended || full;
 
-            return (
-              <div
-                key={evt.id}
-                className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
-              >
-                <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
-                    <PortalImage
-                      src={resolveEventImage(evt.category, evt.imageUrl)}
-                      alt={evt.title}
-                      fallbackType="event"
-                      fallbackLabel={evt.category}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                return (
+                  <div
+                    key={evt.id}
+                    className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                        <PortalImage
+                          src={resolveEventImage(evt.category, evt.imageUrl)}
+                          alt={evt.title}
+                          fallbackType="event"
+                          fallbackLabel={evt.category}
+                          className={`w-full h-full object-cover ${ended ? 'grayscale opacity-75' : ''}`}
+                        />
+                      </div>
 
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
-                        {evt.title}
-                      </h3>
-                      <span
-                        className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                            {evt.title}
+                          </h3>
+                          {ended ? (
+                            <span className="px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 bg-slate-100 text-black/75 border-slate-300 dark:bg-zinc-800 dark:text-white/80 dark:border-zinc-600">
+                              {isEn ? 'Ended' : 'Telah Selesai'}
+                            </span>
+                          ) : full ? (
+                            <span className="px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800">
+                              {isEn ? 'Slots Full' : 'Slot Penuh'}
+                            </span>
+                          ) : (
+                            <span
+                              className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${
+                                isBooked
+                                  ? 'bg-emerald-50 text-black border-emerald-300 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-700'
+                                  : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/60 dark:text-white dark:border-amber-800/70'
+                              }`}
+                            >
+                              {isBooked ? (isEn ? 'Booked' : 'Berdaftar') : evt.category}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                          {evt.date} · {evt.location} ({evt.district}) · {remainingBooths}/{evt.totalBooths} tapak · {evt.fee}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                      <button
+                        type="button"
+                        onClick={() => !bookingBlocked && handleBookBooth(evt)}
+                        disabled={bookingBlocked}
+                        className={`py-2 px-3.5 text-sm font-bold rounded-lg transition-colors inline-flex items-center gap-1.5 shrink-0 ${
                           isBooked
-                            ? 'bg-emerald-50 text-black border-emerald-300 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-700'
-                            : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/60 dark:text-white dark:border-amber-800/70'
+                            ? 'bg-emerald-50 text-black border border-emerald-300 dark:bg-emerald-950/40 dark:text-white dark:border-emerald-800 cursor-default'
+                            : ended
+                            ? 'bg-slate-100 text-black/60 border border-slate-200 dark:bg-zinc-800 dark:text-white/60 dark:border-zinc-700 cursor-not-allowed'
+                            : full
+                            ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 cursor-not-allowed'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
                         }`}
                       >
-                        {isBooked ? (isEn ? 'Booked' : 'Berdaftar') : evt.category}
-                      </span>
+                        {isBooked ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>{isEn ? 'Booked' : 'Ditempah'}</span>
+                          </>
+                        ) : ended ? (
+                          <>
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>{isEn ? 'Event Ended' : 'Telah Selesai'}</span>
+                          </>
+                        ) : full ? (
+                          <>
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>{isEn ? 'Slots Full' : 'Slot Penuh'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Store className="w-3.5 h-3.5" />
+                            <span>{isEn ? 'Book Stall' : 'Tempah Slot Gerai'}</span>
+                          </>
+                        )}
+                      </button>
+
+                      {isBooked && !ended && (
+                        <button
+                          type="button"
+                          onClick={() => setEventToCancel(evt)}
+                          className="py-2 px-3 text-sm font-bold rounded-lg bg-rose-50 hover:bg-rose-100 text-black border border-rose-200 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-white dark:border-rose-800 transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0"
+                          title={isEn ? 'Cancel event registration' : 'Batal pendaftaran acara ini'}
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>{isEn ? 'Cancel' : 'Batal'}</span>
+                        </button>
+                      )}
+
+                      <a
+                        href={`https://wa.me/${evt.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(evt.title)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 transition-colors shrink-0"
+                        title="WhatsApp Penganjur"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                      </a>
                     </div>
-                    <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                      {evt.date} · {evt.location} ({evt.district}) · {Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0))}/{evt.totalBooths} tapak · {evt.fee}
-                    </p>
                   </div>
-                </div>
+                );
+              })}
+            </div>
 
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  <button
-                    type="button"
-                    onClick={() => !isBooked && handleBookBooth(evt.id, evt.title)}
-                    disabled={isBooked}
-                    className={`py-2 px-3.5 text-sm font-bold rounded-lg transition-colors inline-flex items-center gap-1.5 shrink-0 ${
-                      isBooked
-                        ? 'bg-emerald-50 text-black border border-emerald-300 dark:bg-emerald-950/40 dark:text-white dark:border-emerald-800 cursor-default'
-                        : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
-                    }`}
-                  >
-                    {isBooked ? (
-                      <>
-                        <Check className="w-3.5 h-3.5" />
-                        <span>{isEn ? 'Booked' : 'Ditempah'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Store className="w-3.5 h-3.5" />
-                        <span>{isEn ? 'Book Stall' : 'Tempah Slot Gerai'}</span>
-                      </>
-                    )}
-                  </button>
-
-                  {isBooked && (
-                    <button
-                      type="button"
-                      onClick={() => setEventToCancel(evt)}
-                      className="py-2 px-3 text-sm font-bold rounded-lg bg-rose-50 hover:bg-rose-100 text-black border border-rose-200 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-white dark:border-rose-800 transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0"
-                      title={isEn ? 'Cancel event registration' : 'Batal pendaftaran acara ini'}
-                    >
-                      <XCircle className="w-3.5 h-3.5" />
-                      <span>{isEn ? 'Cancel' : 'Batal'}</span>
-                    </button>
-                  )}
-
-                  <a
-                    href={`https://wa.me/${evt.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(evt.title)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 transition-colors shrink-0"
-                    title="WhatsApp Penganjur"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+            <PaginationBar
+              currentPage={pagination.currentPage}
+              totalItems={pagination.totalItems}
+              itemsPerPage={7}
+              onPageChange={pagination.setCurrentPage}
+              itemLabel={isEn ? 'events' : 'acara'}
+              accent="blue"
+            />
+          </>
+        )}
+      </div>
 
       {/* Confirmation Modal for Cancelling Event Registration */}
       {eventToCancel && (

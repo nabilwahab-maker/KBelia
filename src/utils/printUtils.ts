@@ -1153,7 +1153,7 @@ export const generateMentorEndorsementOfficialHtml = (endorsement: GrantEndorsem
     </div>
     <p style="margin-bottom:12px;">
       Kepada Jawatankuasa Pemilihan Geran Usahawan Belia Negeri Kelantan / UMK CEED,<br/>
-      Saya selaku Mentor Bertauliah yang menyelia perkembangan perniagaan usahawan berikut memperakukan permohonan geran ini berdasarkan prestasi bimbingan semasa:
+      Saya selaku Mentor yang menyelia perkembangan perniagaan usahawan berikut memperakukan permohonan geran ini berdasarkan prestasi bimbingan semasa:
     </p>
     <table class="info-table">
       <tr><th>Nama Mentee / Usahawan</th><td><strong>${escapeHtml(endorsement.menteeName)}</strong></td></tr>
@@ -1165,7 +1165,7 @@ export const generateMentorEndorsementOfficialHtml = (endorsement: GrantEndorsem
       <tr><th>Status Kesiapsiagaan Bisnes</th><td>${escapeHtml(endorsement.businessReadinessRemark)}</td></tr>
     </table>
     <div class="highlight-card">
-      <strong>Diperakui Oleh Mentor Bertauliah:</strong><br/>
+      <strong>Diperakui Oleh Mentor:</strong><br/>
       <strong>${escapeHtml(endorsement.mentorName)}</strong> · ${escapeHtml(endorsement.mentorDesignation || 'Mentor Keusahawanan')}<br/>
       Agensi: ${escapeHtml(endorsement.mentorAgency)}
     </div>
@@ -1176,7 +1176,7 @@ export const generateMentorEndorsementOfficialHtml = (endorsement: GrantEndorsem
     toolbarLabel: 'Surat Perakuan Rasmi Mentor UMK CEED',
     badgeText: endorsement.recommendedAmount,
     agencyKicker: 'UNIVERSITI MALAYSIA KELANTAN (UMK CEED) · HAB NIAGA BELIA KELANTAN',
-    agencyHeading: 'INSTITUT KEUSAHAWANAN UMK & MENTOR BERTAULIAH KBELIA',
+    agencyHeading: 'INSTITUT KEUSAHAWANAN UMK & MENTOR KBELIA',
     agencySubheading: 'Kampus Kota, Pengkalan Chepa, 16100 Kota Bharu, Kelantan · Tel: +609-771 7000',
     refNumber: endorsement.endorsementCode,
     issueDate,
@@ -1184,7 +1184,7 @@ export const generateMentorEndorsementOfficialHtml = (endorsement: GrantEndorsem
     bodyHtml,
     auditCode: endorsement.endorsementCode,
     signatoryTitle: endorsement.mentorName.toUpperCase(),
-    signatorySub: `${endorsement.mentorDesignation || 'Mentor Bertauliah'} · ${endorsement.mentorAgency}`,
+    signatorySub: `${endorsement.mentorDesignation || 'Mentor'} · ${endorsement.mentorAgency}`,
     sealText: '★ DIPERAKUI MENTOR UMK CEED ★'
   });
 };

@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Megaphone,
-  MessageCircle,
-  MapPin,
-  Search
+  MessageCircle
 } from 'lucide-react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { B2BListing } from '../types';
@@ -22,6 +20,8 @@ import {
 } from '../services/realtimeSync';
 import { PortalImage } from './PortalImage';
 import { resolveB2BImage } from '../utils/visualAssets';
+import { ReferenceTableToolbar } from './ReferenceTableKit';
+import { PaginationBar, usePagination } from './PaginationBar';
 
 export const B2BMarketSection: React.FC = () => {
   const { language } = useLanguage();
@@ -112,9 +112,22 @@ export const B2BMarketSection: React.FC = () => {
       !q ||
       item.title.toLowerCase().includes(q) ||
       item.description.toLowerCase().includes(q) ||
-      item.authorBusiness.toLowerCase().includes(q);
+      item.authorBusiness.toLowerCase().includes(q) ||
+      item.authorName.toLowerCase().includes(q) ||
+      item.district.toLowerCase().includes(q);
     return matchType && matchDist && matchSearch;
   });
+
+  const pagination = usePagination(filteredListings, 7, [
+    searchQuery,
+    filterType,
+    filterDistrict,
+    filteredListings.length
+  ]);
+
+  const activeFilterCount =
+    (filterType !== 'all' ? 1 : 0) +
+    (filterDistrict !== 'all' ? 1 : 0);
 
   return (
     <div className="w-full space-y-4">
@@ -150,140 +163,173 @@ export const B2BMarketSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Control Bar */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-300 dark:border-slate-600 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
-        <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            placeholder={isEn ? 'Enter search keyword' : 'Masukkan kata kunci carian'}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
-          />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          {/* Type Toggle */}
-          <div className="flex rounded-lg bg-slate-50 dark:bg-slate-900 p-1 border border-slate-300 dark:border-slate-600">
-            <button
-              type="button"
-              onClick={() => setFilterType('all')}
-              className={`px-3 py-1.5 text-[0.8125rem] font-bold rounded-md transition-colors cursor-pointer ${
-                filterType === 'all'
-                  ? 'bg-white dark:bg-slate-700 text-black dark:text-white shadow-xs border border-slate-300 dark:border-slate-600'
-                  : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
-              }`}
-            >
-              {isEn ? 'All' : 'Semua'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterType('demand')}
-              className={`px-3 py-1.5 text-[0.8125rem] font-bold rounded-md transition-colors cursor-pointer ${
-                filterType === 'demand'
-                  ? 'bg-teal-600 text-white shadow-xs dark:bg-teal-600'
-                  : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
-              }`}
-            >
-              {isEn ? 'Seeking / Demand' : 'Mencari'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterType('supply')}
-              className={`px-3 py-1.5 text-[0.8125rem] font-bold rounded-md transition-colors cursor-pointer ${
-                filterType === 'supply'
-                  ? 'bg-teal-600 text-white shadow-xs dark:bg-teal-600'
-                  : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
-              }`}
-            >
-              {isEn ? 'Supplying / Wholesale' : 'Membekal'}
-            </button>
-          </div>
-
-          {/* District Select */}
-          <select
-            value={filterDistrict}
-            onChange={(e) => setFilterDistrict(e.target.value)}
-            className="px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
-          >
-            <option value="all">{isEn ? 'Across Kelantan' : 'Seluruh Kelantan'}</option>
-            <option value="Kota Bharu">Kota Bharu</option>
-            <option value="Bachok">Bachok</option>
-            <option value="Pasir Mas">Pasir Mas</option>
-            <option value="Tumpat">Tumpat</option>
-            <option value="Tanah Merah">Tanah Merah</option>
-            <option value="Machang">Machang</option>
-            <option value="Pasir Puteh">Pasir Puteh</option>
-            <option value="Kuala Krai">Kuala Krai</option>
-            <option value="Gua Musang">Gua Musang</option>
-            <option value="Jeli">Jeli</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Senarai Menegak Ruang Niaga */}
-      {filteredListings.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 py-12 text-center h-fit">
-          <Megaphone className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
-          <p className="text-sm font-bold text-black dark:text-white">
-            {isEn ? 'No Ruang Niaga listings match your filter' : 'Tiada iklan Ruang Niaga sepadan dengan carian anda'}
-          </p>
-        </div>
-      ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
-          {filteredListings.map((item) => (
-            <div
-              key={item.id}
-              className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
-            >
-              <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 overflow-hidden border border-slate-300 dark:border-slate-600 shrink-0">
-                  <PortalImage
-                    src={resolveB2BImage(item)}
-                    alt={item.title}
-                    fallbackType="b2b"
-                    fallbackLabel={item.authorBusiness}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
-                      {item.title}
-                    </h3>
-                    <span
-                      className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${
-                        item.type === 'supply'
-                          ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-800'
-                          : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800'
-                      }`}
-                    >
-                      {item.type === 'supply'
-                        ? (isEn ? 'Supplying' : 'Membekal')
-                        : (isEn ? 'Seeking' : 'Mencari')}
-                    </span>
-                  </div>
-                  <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                    {item.authorBusiness} ({item.authorName}) · {item.district} · {item.date} · {item.description}
-                  </p>
+      {/* Ruang Niaga: Carian, Penapis Bersepadu, Senarai Baris & Halaman Bernombor */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+        <ReferenceTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={isEn ? 'Search ad title, business or district...' : 'Cari tajuk iklan, perniagaan atau daerah...'}
+          filterCount={activeFilterCount}
+          onResetFilters={() => {
+            setFilterType('all');
+            setFilterDistrict('all');
+          }}
+          filterContent={
+            <>
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  {isEn ? 'Listing Type' : 'Jenis Iklan'}
+                </label>
+                <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-50 dark:bg-zinc-950 p-1 border border-slate-200 dark:border-zinc-700">
+                  <button
+                    type="button"
+                    onClick={() => setFilterType('all')}
+                    className={`px-2 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                      filterType === 'all'
+                        ? 'bg-white dark:bg-zinc-800 text-black dark:text-white shadow-2xs border border-slate-200 dark:border-zinc-600'
+                        : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    {isEn ? 'All' : 'Semua'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFilterType('demand')}
+                    className={`px-2 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                      filterType === 'demand'
+                        ? 'bg-teal-600 text-white shadow-2xs dark:bg-teal-600'
+                        : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    {isEn ? 'Seeking' : 'Mencari'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFilterType('supply')}
+                    className={`px-2 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                      filterType === 'supply'
+                        ? 'bg-teal-600 text-white shadow-2xs dark:bg-teal-600'
+                        : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    {isEn ? 'Supplying' : 'Membekal'}
+                  </button>
                 </div>
               </div>
 
-              <a
-                href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20Ruang%20Niaga%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2 px-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-lg shadow-xs transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 self-end sm:self-center"
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  {isEn ? 'District' : 'Daerah'}
+                </label>
+                <select
+                  value={filterDistrict}
+                  onChange={(e) => setFilterDistrict(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  <option value="all">{isEn ? 'Across Kelantan' : 'Seluruh Kelantan'}</option>
+                  <option value="Kota Bharu">Kota Bharu</option>
+                  <option value="Bachok">Bachok</option>
+                  <option value="Pasir Mas">Pasir Mas</option>
+                  <option value="Tumpat">Tumpat</option>
+                  <option value="Tanah Merah">Tanah Merah</option>
+                  <option value="Machang">Machang</option>
+                  <option value="Pasir Puteh">Pasir Puteh</option>
+                  <option value="Kuala Krai">Kuala Krai</option>
+                  <option value="Gua Musang">Gua Musang</option>
+                  <option value="Jeli">Jeli</option>
+                </select>
+              </div>
+            </>
+          }
+        />
+
+        {/* Senarai Menegak Ruang Niaga */}
+        {filteredListings.length === 0 ? (
+          <div className="py-12 px-4 text-center">
+            <Megaphone className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
+            <p className="text-sm font-bold text-black dark:text-white">
+              {isEn ? 'No Ruang Niaga listings match your filter' : 'Tiada iklan Ruang Niaga sepadan dengan carian anda'}
+            </p>
+            {(searchQuery.trim() !== '' || activeFilterCount > 0) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setFilterType('all');
+                  setFilterDistrict('all');
+                }}
+                className="mt-3 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-black dark:text-white transition-colors cursor-pointer"
               >
-                <MessageCircle className="w-4 h-4" />
-                <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>
-              </a>
+                {isEn ? 'Reset Filters' : 'Set Semula Penapis'}
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col divide-y divide-slate-200 dark:divide-zinc-700">
+              {pagination.paginatedItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-zinc-800 overflow-hidden border border-slate-200 dark:border-zinc-700 shrink-0">
+                      <PortalImage
+                        src={resolveB2BImage(item)}
+                        alt={item.title}
+                        fallbackType="b2b"
+                        fallbackLabel={item.authorBusiness}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+                          {item.title}
+                        </h3>
+                        <span
+                          className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${
+                            item.type === 'supply'
+                              ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-800'
+                              : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800'
+                          }`}
+                        >
+                          {item.type === 'supply'
+                            ? (isEn ? 'Supplying' : 'Membekal')
+                            : (isEn ? 'Seeking' : 'Mencari')}
+                        </span>
+                      </div>
+                      <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                        {item.authorBusiness} ({item.authorName}) · {item.district} · {item.date} · {item.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <a
+                    href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20Ruang%20Niaga%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-2 px-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-lg shadow-xs transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 self-end sm:self-center"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>
+                  </a>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+
+            <PaginationBar
+              currentPage={pagination.currentPage}
+              totalItems={pagination.totalItems}
+              itemsPerPage={7}
+              onPageChange={pagination.setCurrentPage}
+              itemLabel={isEn ? 'listings' : 'iklan ruang niaga'}
+              accent="teal"
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 };

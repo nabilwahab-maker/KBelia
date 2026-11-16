@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Users,
-  Search,
   Plus,
-  Edit3,
-  Trash2,
   X,
   Save,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  ArrowUpDown
 } from 'lucide-react';
 import { KelantanDistrict, UserProfile, UserRole } from '../types';
 import {
@@ -20,6 +18,7 @@ import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { showToast } from './ToastNotification';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -36,7 +35,7 @@ const DISTRICTS: KelantanDistrict[] = [
 
 const ROLE_LABELS: Record<UserRole, string> = {
   user: 'Usahawan Belia',
-  mentor: 'Mentor Bertauliah',
+  mentor: 'Mentor',
   admin: 'Pentadbir Sistem'
 };
 
@@ -50,7 +49,12 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
 
   const [portalUsers, setPortalUsers] = useState<UserProfile[]>([]);
   const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all');
+  const [districtFilter, setDistrictFilter] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortConfig, setSortConfig] = useState<{ key: 'fullName' | 'role' | 'district'; dir: 'asc' | 'desc' }>({
+    key: 'fullName',
+    dir: 'asc'
+  });
 
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
@@ -81,8 +85,9 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
 
   const filteredUsers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return nonAdminUsers.filter((u) => {
+    const filtered = nonAdminUsers.filter((u) => {
       if (roleFilter !== 'all' && u.role !== roleFilter) return false;
+      if (districtFilter !== 'Semua' && (u.district || 'Kota Bharu') !== districtFilter) return false;
       if (!q) return true;
       return (
         (u.fullName || '').toLowerCase().includes(q) ||
@@ -91,9 +96,35 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
         (u.district || '').toLowerCase().includes(q)
       );
     });
-  }, [nonAdminUsers, roleFilter, searchQuery]);
 
-  const pagination = usePagination(filteredUsers, 6, [roleFilter, searchQuery, filteredUsers.length]);
+    const dirMult = sortConfig.dir === 'asc' ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      if (sortConfig.key === 'role') {
+        return (ROLE_LABELS[a.role] || '').localeCompare(ROLE_LABELS[b.role] || '') * dirMult;
+      }
+      if (sortConfig.key === 'district') {
+        return (a.district || 'Kota Bharu').localeCompare(b.district || 'Kota Bharu') * dirMult;
+      }
+      return (a.fullName || '').localeCompare(b.fullName || '') * dirMult;
+    });
+  }, [nonAdminUsers, roleFilter, districtFilter, searchQuery, sortConfig]);
+
+  const pagination = usePagination(filteredUsers, 7, [
+    roleFilter,
+    districtFilter,
+    searchQuery,
+    sortConfig.key,
+    sortConfig.dir,
+    filteredUsers.length
+  ]);
+
+  const activeFilterCount = (roleFilter !== 'all' ? 1 : 0) + (districtFilter !== 'Semua' ? 1 : 0);
+
+  const toggleSort = (key: 'fullName' | 'role' | 'district') => {
+    setSortConfig((prev) =>
+      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
+    );
+  };
 
   const counts = useMemo(
     () => ({
@@ -229,132 +260,218 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
         </button>
       </div>
 
-      {/* Role Filter & Search Bar */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 h-fit">
-        <div className="flex flex-wrap items-center gap-2">
-          {([
-            { id: 'all', label: `Semua (${counts.all})` },
-            { id: 'user', label: `Usahawan Belia (${counts.user})` },
-            { id: 'mentor', label: `Mentor (${counts.mentor})` }
-          ] as const).map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setRoleFilter(tab.id)}
-              className={`px-3 py-1.5 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
-                roleFilter === tab.id
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="relative w-full lg:w-80">
-          <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Cari nama, emel atau perniagaan..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
-          />
-        </div>
-      </div>
-
-      {/* Users List View */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs h-fit">
-        <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-700">
-          {pagination.paginatedItems.length === 0 ? (
-            <div className="p-10 text-center text-sm text-black/70 dark:text-white/75">
-              Tiada rekod akaun pengguna sepadan dengan tapisan semasa.
-            </div>
-          ) : (
-            pagination.paginatedItems.map((u) => {
-              const isSelf = isCurrentActiveUser(u);
-              const orgLabel =
-                u.role === 'user'
-                  ? u.businessName || 'Belum daftar perniagaan'
-                  : u.role === 'mentor'
-                  ? u.institution || 'UMK / Agensi Bimbingan'
-                  : u.designation || 'Pentadbir Portal KBelia';
-              return (
-                <div
-                  key={u.userId}
-                  className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                    <img
-                      src={u.avatarUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg'}
-                      alt={u.fullName}
-                      className="w-16 h-16 rounded-lg object-cover border border-slate-300 dark:border-slate-600 shrink-0"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
-                          {u.fullName}
-                          {isSelf ? ' (Anda)' : ''}
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 rounded text-[0.75rem] font-bold border shrink-0 ${
-                            u.role === 'mentor'
-                              ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70 text-black dark:text-white'
-                              : 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70 text-black dark:text-white'
-                          }`}
-                        >
-                          {ROLE_LABELS[u.role] || 'Usahawan Belia'}
-                        </span>
-                      </div>
-                      <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
-                        {u.email} · {u.phone || 'Tiada telefon'} · {u.district || 'Kota Bharu'} · {orgLabel}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="inline-flex items-center justify-end gap-2 shrink-0 self-end sm:self-center">
+      {/* Reference-Style Users Table Card */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+        <ReferenceTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Cari nama, emel atau perniagaan..."
+          filterCount={activeFilterCount}
+          onResetFilters={() => {
+            setRoleFilter('all');
+            setDistrictFilter('Semua');
+          }}
+          filterContent={
+            <>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                  Peranan Akaun
+                </label>
+                <div className="grid grid-cols-1 gap-1.5">
+                  {([
+                    { id: 'all', label: `Semua (${counts.all})` },
+                    { id: 'user', label: `Usahawan Belia (${counts.user})` },
+                    { id: 'mentor', label: `Mentor (${counts.mentor})` }
+                  ] as const).map((tab) => (
                     <button
+                      key={tab.id}
                       type="button"
-                      onClick={() => openEditModal(u)}
-                      className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+                      onClick={() => setRoleFilter(tab.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border text-left transition-colors cursor-pointer ${
+                        roleFilter === tab.id
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                      }`}
                     >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>Edit</span>
+                      {tab.label}
                     </button>
-                    <button
-                      type="button"
-                      disabled={isSelf}
-                      onClick={() =>
-                        confirmDelete({
-                          itemName: `${u.fullName} (${u.email})`,
-                          itemType: 'Akaun Pengguna',
-                          description: 'Akaun yang dipadam akan dikeluarkan daripada senarai pengguna aktif portal.',
-                          onConfirm: () => handleDeleteUser(u)
-                        })
-                      }
-                      className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                      title={isSelf ? 'Akaun aktif sendiri tidak boleh dipadam' : `Padam ${u.fullName}`}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Padam</span>
-                    </button>
-                  </div>
+                  ))}
                 </div>
-              );
-            })
-          )}
-        </div>
-        <div className="px-4 pb-3 border-t border-slate-200 dark:border-slate-700">
-          <PaginationBar
-            currentPage={pagination.currentPage}
-            totalItems={pagination.totalItems}
-            itemsPerPage={6}
-            onPageChange={pagination.setCurrentPage}
-            itemLabel="akaun pengguna"
-            accent="rose"
-          />
-        </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                  Daerah
+                </label>
+                <select
+                  value={districtFilter}
+                  onChange={(e) => setDistrictFilter(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer"
+                >
+                  <option value="Semua">Semua Daerah</option>
+                  {DISTRICTS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+            </>
+          }
+        />
+
+        {pagination.paginatedItems.length === 0 ? (
+          <div className="p-10 text-center space-y-2">
+            <Users className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
+            <p className="text-sm font-bold text-black dark:text-white">
+              Tiada rekod akaun pengguna sepadan dengan tapisan semasa.
+            </p>
+            {(searchQuery || activeFilterCount > 0) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setRoleFilter('all');
+                  setDistrictFilter('Semua');
+                }}
+                className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+              >
+                Set Semula Carian &amp; Penapis
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                    <th className="py-3 pl-4 pr-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('fullName')}
+                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                      >
+                        <span>Pengguna</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('role')}
+                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                      >
+                        <span>Peranan</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('district')}
+                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                      >
+                        <span>Daerah</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-3">Organisasi / Perniagaan</th>
+                    <th className="py-3 px-3">Hubungi</th>
+                    <th className="py-3 pl-2 pr-4 w-12 text-right">
+                      <span className="sr-only">Tindakan</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-black dark:text-white">
+                  {pagination.paginatedItems.map((u) => {
+                    const isSelf = isCurrentActiveUser(u);
+                    const orgLabel =
+                      u.role === 'user'
+                        ? u.businessName || 'Belum daftar perniagaan'
+                        : u.role === 'mentor'
+                        ? u.institution || 'UMK / Agensi Bimbingan'
+                        : u.designation || 'Pentadbir Portal KBelia';
+
+                    return (
+                      <tr key={u.userId} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                        <td className="py-3.5 pl-4 pr-3">
+                          <div className="flex items-center gap-3 min-w-[200px]">
+                            <img
+                              src={u.avatarUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg'}
+                              alt={u.fullName}
+                              className="w-9 h-9 rounded-lg object-cover border border-slate-200 dark:border-zinc-700 shrink-0"
+                            />
+                            <div className="min-w-0">
+                              <div className="font-semibold text-black dark:text-white truncate max-w-[220px]">
+                                {u.fullName}
+                                {isSelf ? ' (Anda)' : ''}
+                              </div>
+                              <div className="text-xs text-black/65 dark:text-white/70 truncate max-w-[220px]">
+                                {u.email}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-3 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                              u.role === 'mentor'
+                                ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70 text-teal-800 dark:text-teal-200'
+                                : 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70 text-blue-800 dark:text-blue-200'
+                            }`}
+                          >
+                            {ROLE_LABELS[u.role] || 'Usahawan Belia'}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
+                          {u.district || 'Kota Bharu'}
+                        </td>
+                        <td className="py-3.5 px-3 text-black/80 dark:text-white/85 max-w-[220px] truncate">
+                          {orgLabel}
+                        </td>
+                        <td className="py-3.5 px-3 text-black/70 dark:text-white/75 font-mono text-xs tabular-nums whitespace-nowrap">
+                          {u.phone || '-'}
+                        </td>
+                        <td className="py-3.5 pl-2 pr-4 text-right">
+                          <RowActionMenu
+                            ariaLabel={`Tindakan untuk ${u.fullName}`}
+                            items={[
+                              {
+                                label: 'Edit Profil',
+                                onClick: () => openEditModal(u)
+                              },
+                              {
+                                label: 'Padam Akaun',
+                                tone: 'danger',
+                                dividerBefore: true,
+                                disabled: isSelf,
+                                onClick: () =>
+                                  confirmDelete({
+                                    itemName: `${u.fullName} (${u.email})`,
+                                    itemType: 'Akaun Pengguna',
+                                    description: 'Akaun yang dipadam akan dikeluarkan daripada senarai pengguna aktif portal.',
+                                    onConfirm: () => handleDeleteUser(u)
+                                  })
+                              }
+                            ]}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <PaginationBar
+              currentPage={pagination.currentPage}
+              totalItems={pagination.totalItems}
+              itemsPerPage={7}
+              onPageChange={pagination.setCurrentPage}
+              itemLabel="akaun pengguna"
+              accent="blue"
+            />
+          </>
+        )}
       </div>
 
       {/* Add / Edit User Modal */}
@@ -462,7 +579,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                       className="w-full px-3.5 py-2.5 rounded-xl text-sm font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
                     >
                       <option value="user">Usahawan Belia</option>
-                      <option value="mentor">Mentor Bertauliah</option>
+                      <option value="mentor">Mentor</option>
                     </select>
                   )}
                 </div>

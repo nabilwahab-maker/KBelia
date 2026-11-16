@@ -40,7 +40,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
   {
     id: 'mentor-3',
     name: 'En. Khairul Hafiz Bin Razali, CA',
-    title: 'Perunding Kewangan SME & Juruaudit Bertauliah',
+    title: 'Perunding Kewangan SME & Juruaudit',
     agency: 'Dewan Perniagaan Melayu Kelantan & SME Corp Panel',
     expertise: [
       'Penyediaan Penyata Kewangan Kiosk',

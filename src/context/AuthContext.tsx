@@ -591,7 +591,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const matchedMentor = mentorList.find(m => m.email.toLowerCase() === cleanEmail);
         if (!matchedMentor) {
-          const msg = `Emel "${cleanEmail}" tidak didaftarkan sebagai Mentor bertauliah. Gunakan butang Demo Mentor di bawah untuk ujian pembangunan.`;
+          const msg = `Emel "${cleanEmail}" tidak didaftarkan sebagai Mentor. Gunakan butang Demo Mentor di bawah untuk ujian pembangunan.`;
           setAuthError(msg);
           return { success: false, error: msg };
         }

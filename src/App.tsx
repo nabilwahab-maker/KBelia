@@ -2099,7 +2099,7 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black dark:text-white">
-                    {language === 'en' ? 'Certified Mentor Access Only' : 'Akses Khusus Mentor Sahaja'}
+                    {language === 'en' ? 'Mentor Access Only' : 'Akses Khusus Mentor Sahaja'}
                   </h3>
                   <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {isAdmin

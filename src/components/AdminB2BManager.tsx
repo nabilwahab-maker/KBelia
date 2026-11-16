@@ -2,12 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   Megaphone,
   Plus,
-  Edit3,
-  Trash2,
-  Search,
   Sparkles,
   X,
-  Save
+  Save,
+  ArrowUpDown
 } from 'lucide-react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { B2BListing, KelantanDistrict } from '../types';
@@ -32,6 +30,7 @@ import { B2BAdPreviewCard } from './B2BAdPreviewCard';
 import { b2bKopiSangaiImg, resolveB2BImage } from '../utils/visualAssets';
 import { showToast } from './ToastNotification';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -65,6 +64,11 @@ export const AdminB2BManager: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'supply' | 'demand'>('all');
+  const [districtFilter, setDistrictFilter] = useState<string>('Semua');
+  const [sortConfig, setSortConfig] = useState<{
+    key: 'title' | 'type' | 'district' | 'date';
+    dir: 'asc' | 'desc';
+  }>({ key: 'date', dir: 'desc' });
 
   useEffect(() => {
     const loadLocalB2B = (): B2BListing[] => {
@@ -125,10 +129,19 @@ export const AdminB2BManager: React.FC = () => {
     };
   }, [user?.uid, isDemoSession]);
 
+  const toggleSort = (key: 'title' | 'type' | 'district' | 'date') => {
+    setSortConfig((prev) =>
+      prev.key === key
+        ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
+        : { key, dir: 'asc' }
+    );
+  };
+
   const filteredListings = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return listings.filter((item) => {
+    const filtered = listings.filter((item) => {
       if (filterType !== 'all' && item.type !== filterType) return false;
+      if (districtFilter !== 'Semua' && item.district !== districtFilter) return false;
       if (!q) return true;
       return (
         item.title.toLowerCase().includes(q) ||
@@ -138,13 +151,32 @@ export const AdminB2BManager: React.FC = () => {
         item.description.toLowerCase().includes(q)
       );
     });
-  }, [listings, searchQuery, filterType]);
 
-  const b2bPagination = usePagination(filteredListings, 5, [
+    const dirMult = sortConfig.dir === 'asc' ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      if (sortConfig.key === 'title') {
+        return a.title.localeCompare(b.title) * dirMult;
+      }
+      if (sortConfig.key === 'type') {
+        return a.type.localeCompare(b.type) * dirMult;
+      }
+      if (sortConfig.key === 'district') {
+        return (a.district || '').localeCompare(b.district || '') * dirMult;
+      }
+      return (a.date || '').localeCompare(b.date || '') * dirMult;
+    });
+  }, [listings, searchQuery, filterType, districtFilter, sortConfig]);
+
+  const b2bPagination = usePagination(filteredListings, 7, [
     searchQuery,
     filterType,
+    districtFilter,
+    sortConfig.key,
+    sortConfig.dir,
     filteredListings.length
   ]);
+
+  const activeFilterCount = (filterType !== 'all' ? 1 : 0) + (districtFilter !== 'Semua' ? 1 : 0);
 
   if (!isAdmin) return null;
 
@@ -505,120 +537,218 @@ export const AdminB2BManager: React.FC = () => {
         </form>
       )}
 
-      {/* Search & Type Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 p-3.5 rounded-xl border border-slate-300 dark:border-zinc-600">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Masukkan kata kunci carian"
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
-          />
-        </div>
-
-        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600 self-start sm:self-auto">
-          {([
-            { id: 'all', label: 'Semua' },
-            { id: 'supply', label: 'Membekal' },
-            { id: 'demand', label: 'Mencari' }
-          ] as const).map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setFilterType(tab.id)}
-              className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-colors cursor-pointer whitespace-nowrap ${
-                filterType === tab.id
-                  ? 'bg-white dark:bg-zinc-800 text-black dark:text-white shadow-2xs'
-                  : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Existing Listings List */}
-      {filteredListings.length === 0 ? (
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 py-14 text-center h-fit">
-          <Megaphone className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
-          <p className="text-sm font-bold text-black dark:text-white">
-            Tiada iklan Ruang Niaga sepadan dengan carian anda
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-3 h-fit">
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 shadow-xs overflow-hidden flex flex-col divide-y divide-slate-200 dark:divide-zinc-700 h-fit">
-            {b2bPagination.paginatedItems.map((item) => (
-              <div
-                key={item.id}
-                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-zinc-950/60 transition-colors"
-              >
-                <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                  <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-300 dark:border-zinc-700">
-                    <PortalImage
-                      src={resolveB2BImage(item)}
-                      alt={item.title}
-                      fallbackType="b2b"
-                      fallbackLabel={item.authorBusiness}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <h4 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
-                        {item.title}
-                      </h4>
-                      <span
-                        className={`px-2 py-0.5 rounded text-[0.75rem] font-semibold border shrink-0 ${
-                          item.type === 'supply'
-                            ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-900/40'
-                            : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800/40'
-                        }`}
-                      >
-                        {item.type === 'supply' ? 'Membekal' : 'Mencari'}
-                      </span>
-                    </div>
-                    <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
-                      {item.authorBusiness} · {item.district} · +{item.whatsapp} · {item.date}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  <button
-                    type="button"
-                    onClick={() => handleOpenEdit(item)}
-                    className="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-800 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>Edit</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(item)}
-                    className="px-3 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 hover:bg-rose-100 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Padam</span>
-                  </button>
+      {/* Unified Reference Table Card */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+        <ReferenceTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Cari iklan, perniagaan atau daerah..."
+          filterCount={activeFilterCount}
+          onResetFilters={() => {
+            setFilterType('all');
+            setDistrictFilter('Semua');
+          }}
+          filterContent={
+            <>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                  Jenis Iklan
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {([
+                    { id: 'all', label: 'Semua' },
+                    { id: 'supply', label: 'Membekal' },
+                    { id: 'demand', label: 'Mencari' }
+                  ] as const).map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setFilterType(opt.id)}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                        filterType === opt.id
+                          ? 'bg-blue-600 border-blue-600 text-white'
+                          : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
               </div>
-            ))}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                  Daerah
+                </label>
+                <select
+                  value={districtFilter}
+                  onChange={(e) => setDistrictFilter(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                >
+                  <option value="Semua">Semua Daerah</option>
+                  {DISTRICTS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+            </>
+          }
+        />
+
+        {filteredListings.length === 0 ? (
+          <div className="py-14 px-6 text-center space-y-2">
+            <Megaphone className="w-10 h-10 text-black/30 dark:text-white/30 mx-auto" />
+            <p className="text-sm font-bold text-black dark:text-white">
+              Tiada iklan Ruang Niaga sepadan dengan carian anda
+            </p>
+            {(searchQuery || activeFilterCount > 0) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setFilterType('all');
+                  setDistrictFilter('Semua');
+                }}
+                className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+              >
+                Set Semula Carian &amp; Penapis
+              </button>
+            )}
           </div>
-          <PaginationBar
-            currentPage={b2bPagination.currentPage}
-            totalItems={b2bPagination.totalItems}
-            itemsPerPage={5}
-            onPageChange={b2bPagination.setCurrentPage}
-            itemLabel="iklan"
-            accent="teal"
-          />
-        </div>
-      )}
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                    <th className="py-3 pl-5 pr-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('title')}
+                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                      >
+                        <span>Iklan</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('type')}
+                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                      >
+                        <span>Jenis</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('district')}
+                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                      >
+                        <span>Perniagaan &amp; Daerah</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort('date')}
+                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                      >
+                        <span>Hubungi &amp; Tarikh</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                      </button>
+                    </th>
+                    <th className="py-3 pl-2 pr-5 w-12 text-right">
+                      <span className="sr-only">Tindakan</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                  {b2bPagination.paginatedItems.map((item) => (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors"
+                    >
+                      <td className="py-3.5 pl-5 pr-3">
+                        <div className="flex items-center gap-3 min-w-[210px]">
+                          <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-zinc-950 overflow-hidden shrink-0 border border-slate-200 dark:border-zinc-700">
+                            <PortalImage
+                              src={resolveB2BImage(item)}
+                              alt={item.title}
+                              fallbackType="b2b"
+                              fallbackLabel={item.authorBusiness}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-black dark:text-white truncate max-w-[250px]">
+                              {item.title}
+                            </p>
+                            <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[250px]">
+                              {item.authorName}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-3 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                            item.type === 'supply'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
+                              : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
+                          }`}
+                        >
+                          {item.type === 'supply' ? 'Membekal' : 'Mencari'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-3">
+                        <p className="font-medium text-black dark:text-white whitespace-nowrap">
+                          {item.authorBusiness}
+                        </p>
+                        <p className="text-xs text-black/60 dark:text-white/65 whitespace-nowrap">
+                          {item.district}
+                        </p>
+                      </td>
+                      <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
+                        <p className="font-mono text-xs text-black dark:text-white">+{item.whatsapp}</p>
+                        <p className="text-xs text-black/60 dark:text-white/65">{item.date}</p>
+                      </td>
+                      <td className="py-3.5 pl-2 pr-5 text-right">
+                        <RowActionMenu
+                          ariaLabel={`Tindakan untuk ${item.title}`}
+                          items={[
+                            {
+                              label: 'Edit Iklan',
+                              onClick: () => handleOpenEdit(item)
+                            },
+                            {
+                              label: 'Padam Iklan',
+                              tone: 'danger',
+                              dividerBefore: true,
+                              onClick: () => handleDelete(item)
+                            }
+                          ]}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <PaginationBar
+              currentPage={b2bPagination.currentPage}
+              totalItems={b2bPagination.totalItems}
+              itemsPerPage={7}
+              onPageChange={b2bPagination.setCurrentPage}
+              itemLabel="iklan"
+              accent="blue"
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 };

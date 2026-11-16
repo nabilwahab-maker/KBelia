@@ -1351,11 +1351,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                 </div>
                 <button
                   type="button"
-                  onClick={() => onChangeView('book')}
+                  onClick={() => onChangeView('browse')}
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold cursor-pointer"
                 >
                   <Store className="w-4 h-4" />
-                  <span>Tempah Kiosk Sekarang</span>
+                  <span>{bookingHistory.some((b) => b.status === 'cancelled') ? 'Pilih & Mohon Semula Kiosk' : 'Pilih Slot Kiosk'}</span>
                 </button>
               </div>
             )}

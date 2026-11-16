@@ -4,12 +4,9 @@ import {
   Store,
   GraduationCap,
   MessageSquare,
-  Search,
   PieChart as PieChartIcon,
   BarChart3,
-  FileText,
-  ChevronDown,
-  ChevronUp
+  FileText
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -37,6 +34,7 @@ import {
   PortalSettings
 } from '../types';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 
 export type ReportUserTypeKey = 'all' | 'usahawan' | 'mentor' | 'komuniti';
 
@@ -223,7 +221,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         locationOrAgency: m.agency || 'Universiti Malaysia Kelantan',
         activitySummary: m.expertise.slice(0, 2).join(', ') || 'Bimbingan Keusahawanan',
         metricDisplay: `${assignedSessions.length} Sesi (${completedSessions} Selesai)`,
-        statusLabel: m.availableDays ? 'Aktif Bertauliah' : 'Jadual Penuh',
+        statusLabel: m.availableDays ? 'Mentor' : 'Jadual Penuh',
         statusTone: m.availableDays ? 'emerald' : 'amber',
         detailLine: `Jadual: ${m.availableDays || 'Waktu Pejabat'} · Hubungan: ${m.email || m.phone}`
       });
@@ -317,115 +315,23 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
   return (
     <section className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-4 sm:px-6 sm:py-5 border-b border-slate-300 dark:border-zinc-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-black dark:text-white" />
-            <h3 className="text-base sm:text-lg font-bold text-black dark:text-white">
-              Laporan Data Terkumpul Mengikut Jenis Pengguna
-            </h3>
-          </div>
-          <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
-            Susunan bersepadu rekod Usahawan Belia, Panel Mentor, dan Komuniti Awam
-          </p>
+      <div className="px-5 py-4 sm:px-6 sm:py-5 border-b border-slate-300 dark:border-zinc-700">
+        <div className="flex items-center gap-2">
+          <FileText className="w-5 h-5 text-black dark:text-white" />
+          <h3 className="text-base sm:text-lg font-bold text-black dark:text-white">
+            Laporan Data Terkumpul Mengikut Jenis Pengguna
+          </h3>
         </div>
-        <span className="text-sm font-mono font-bold px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black dark:text-white tabular-nums self-start sm:self-auto">
-          {consolidatedRecords.length} Jumlah Rekod
-        </span>
+        <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
+          Susunan bersepadu rekod Usahawan Belia, Panel Mentor, dan Komuniti Awam
+        </p>
       </div>
 
       <div className="p-5 sm:p-6 space-y-6">
-        {/* Top Row: 3 User-Type Summary Cards + Clean Percentage Chart */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          {/* Left 7 Cols: 3 User Type Cards */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <button
-              type="button"
-              onClick={() => setSelectedType(selectedType === 'usahawan' ? 'all' : 'usahawan')}
-              className={`p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
-                selectedType === 'usahawan'
-                  ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-600 ring-1 ring-blue-500/40'
-                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-blue-50/40 dark:hover:bg-zinc-800/70'
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Usahawan Belia</span>
-                <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                  <Store className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums">
-                  {countsByType.usahawan}
-                </span>
-                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {Math.round((countsByType.usahawan / totalCount) * 100)}%
-                </span>
-              </div>
-              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
-                {businesses.length} perniagaan · {bookings.length} tempahan · {grantApplications.length} geran
-              </p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSelectedType(selectedType === 'mentor' ? 'all' : 'mentor')}
-              className={`p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
-                selectedType === 'mentor'
-                  ? 'bg-teal-50/90 dark:bg-teal-950/40 border-teal-600 ring-1 ring-teal-500/40'
-                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-teal-50/40 dark:hover:bg-zinc-800/70'
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Panel Mentor</span>
-                <div className="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center shrink-0">
-                  <GraduationCap className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums">
-                  {countsByType.mentor}
-                </span>
-                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {Math.round((countsByType.mentor / totalCount) * 100)}%
-                </span>
-              </div>
-              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
-                {mentors.length} mentor bertauliah · {mentorshipRegistrations.length} sesi bimbingan
-              </p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSelectedType(selectedType === 'komuniti' ? 'all' : 'komuniti')}
-              className={`p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
-                selectedType === 'komuniti'
-                  ? 'bg-amber-50/90 dark:bg-amber-950/40 border-amber-600 ring-1 ring-amber-500/40'
-                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-amber-50/40 dark:hover:bg-zinc-800/70'
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Komuniti &amp; Awam</span>
-                <div className="w-9 h-9 rounded-lg bg-amber-500 text-black flex items-center justify-center shrink-0">
-                  <MessageSquare className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
-                  {countsByType.komuniti}
-                </span>
-                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {Math.round((countsByType.komuniti / totalCount) * 100)}%
-                </span>
-              </div>
-              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
-                {communityPosts.length} topik perbincangan forum komuniti
-              </p>
-            </button>
-          </div>
-
-          {/* Right 5 Cols: BarChart Default + Donut Toggle for User Types */}
-          <div className="lg:col-span-5 min-w-0 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 p-4 sm:p-5 flex flex-col justify-between h-fit">
+        {/* Balanced Vertical Stack: Full-Width Chart on Top + 3 Equal-Width/Height Cards Below */}
+        <div className="space-y-5">
+          {/* Top Tier: Full-Width Bar/Donut Chart + Compact 3-Column Bottom Legend */}
+          <div className="w-full min-w-0 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 p-4 sm:p-5 flex flex-col justify-between">
             <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-700">
               <div className="flex items-center gap-2">
                 {chartMode === 'bar' ? (
@@ -441,7 +347,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => setChartMode('bar')}
-                  className={`px-2 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
                     chartMode === 'bar'
                       ? 'bg-blue-600 text-white'
                       : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
@@ -452,7 +358,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => setChartMode('donut')}
-                  className={`px-2 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
                     chartMode === 'donut'
                       ? 'bg-blue-600 text-white'
                       : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
@@ -463,16 +369,16 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
               </div>
             </div>
 
-            <div className="relative h-60 min-h-[240px] w-full min-w-0 my-1 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-              <ResponsiveContainer width="100%" height={240} minWidth={0} initialDimension={{ width: 420, height: 240 }}>
+            <div className="relative h-64 min-h-[256px] w-full min-w-0 my-2 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+              <ResponsiveContainer width="100%" height={256} minWidth={0} initialDimension={{ width: 640, height: 256 }}>
                 {chartMode === 'bar' ? (
                   <BarChart
                     data={donutChartData}
-                    barCategoryGap="22%"
-                    margin={{ top: 24, right: 12, left: -4, bottom: 6 }}
+                    barCategoryGap="24%"
+                    margin={{ top: 26, right: 20, left: -4, bottom: 6 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                    <XAxis dataKey="shortLabel" tick={{ fontSize: 12, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12.5, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
                     <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} />
                     <Tooltip
                       cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
@@ -495,7 +401,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                       dataKey="count"
                       fill="#2563EB"
                       radius={[6, 6, 0, 0]}
-                      maxBarSize={46}
+                      maxBarSize={72}
                       minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
                       isAnimationActive={false}
                       onClick={(data) => {
@@ -518,7 +424,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                         position="top"
                         formatter={(val: unknown) => String(Number(val) || 0)}
                         className="fill-slate-900 dark:fill-slate-100 font-mono"
-                        style={{ fontSize: 12, fontWeight: 700 }}
+                        style={{ fontSize: 12.5, fontWeight: 700 }}
                       />
                     </Bar>
                   </BarChart>
@@ -530,8 +436,8 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      innerRadius={56}
-                      outerRadius={84}
+                      innerRadius={60}
+                      outerRadius={90}
                       paddingAngle={2}
                       strokeWidth={2}
                       stroke="#FFFFFF"
@@ -574,7 +480,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
 
               {chartMode === 'donut' && (
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                  <span className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/80 truncate max-w-[115px]">
+                  <span className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/80 truncate max-w-[125px]">
                     {activeDonutFocus.label}
                   </span>
                   <span className="text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums leading-tight">
@@ -587,19 +493,19 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-300 dark:border-zinc-700">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-slate-300 dark:border-zinc-700">
               {donutChartData.map((entry) => (
                 <button
                   key={entry.key}
                   type="button"
                   onClick={() => setSelectedType(selectedType === entry.key ? 'all' : entry.key)}
-                  className={`flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-medium cursor-pointer transition-colors ${
+                  className={`flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-[0.8125rem] font-medium cursor-pointer transition-colors ${
                     selectedType === entry.key
-                      ? 'bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 font-bold text-black dark:text-white'
-                      : 'text-black/80 dark:text-white/80 hover:text-black dark:hover:text-white'
+                      ? 'bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 font-bold text-black dark:text-white shadow-2xs'
+                      : 'text-black/80 dark:text-white/80 hover:bg-white/70 dark:hover:bg-zinc-900/70 hover:text-black dark:hover:text-white'
                   }`}
                 >
-                  <span className="flex items-center gap-1.5 min-w-0">
+                  <span className="flex items-center gap-2 min-w-0">
                     <span className="w-2.5 h-2.5 rounded-xs shrink-0" style={{ backgroundColor: entry.color }} />
                     <span className="truncate">{entry.name}</span>
                   </span>
@@ -608,154 +514,246 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
               ))}
             </div>
           </div>
+
+          {/* Bottom Tier: 3 Equal-Width, Equal-Height Summary Cards in a Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-stretch">
+            <button
+              type="button"
+              onClick={() => setSelectedType(selectedType === 'usahawan' ? 'all' : 'usahawan')}
+              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                selectedType === 'usahawan'
+                  ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-600 ring-1 ring-blue-500/40'
+                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-blue-50/40 dark:hover:bg-zinc-800/70'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Usahawan Belia</span>
+                <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                  <Store className="w-4 h-4" />
+                </div>
+              </div>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
+                  {countsByType.usahawan}
+                </span>
+                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
+                  {Math.round((countsByType.usahawan / totalCount) * 100)}%
+                </span>
+              </div>
+              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
+                {businesses.length} perniagaan · {bookings.length} tempahan · {grantApplications.length} geran
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedType(selectedType === 'mentor' ? 'all' : 'mentor')}
+              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                selectedType === 'mentor'
+                  ? 'bg-teal-50/90 dark:bg-teal-950/40 border-teal-600 ring-1 ring-teal-500/40'
+                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-teal-50/40 dark:hover:bg-zinc-800/70'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Panel Mentor</span>
+                <div className="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center shrink-0">
+                  <GraduationCap className="w-4 h-4" />
+                </div>
+              </div>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
+                  {countsByType.mentor}
+                </span>
+                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
+                  {Math.round((countsByType.mentor / totalCount) * 100)}%
+                </span>
+              </div>
+              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
+                {mentors.length} mentor · {mentorshipRegistrations.length} sesi bimbingan
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedType(selectedType === 'komuniti' ? 'all' : 'komuniti')}
+              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                selectedType === 'komuniti'
+                  ? 'bg-amber-50/90 dark:bg-amber-950/40 border-amber-600 ring-1 ring-amber-500/40'
+                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-amber-50/40 dark:hover:bg-zinc-800/70'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Komuniti &amp; Awam</span>
+                <div className="w-9 h-9 rounded-lg bg-amber-500 text-black flex items-center justify-center shrink-0">
+                  <MessageSquare className="w-4 h-4" />
+                </div>
+              </div>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
+                  {countsByType.komuniti}
+                </span>
+                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
+                  {Math.round((countsByType.komuniti / totalCount) * 100)}%
+                </span>
+              </div>
+              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
+                {communityPosts.length} topik perbincangan forum komuniti
+              </p>
+            </button>
+          </div>
         </div>
 
-        {/* Filter Bar & Search */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2 border-t border-slate-200 dark:border-zinc-700">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {(
-              [
-                { id: 'all', label: `Semua (${consolidatedRecords.length})` },
-                { id: 'usahawan', label: `Usahawan (${countsByType.usahawan})` },
-                { id: 'mentor', label: `Mentor (${countsByType.mentor})` },
-                { id: 'komuniti', label: `Komuniti (${countsByType.komuniti})` }
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setSelectedType(tab.id)}
-                className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap ${
-                  selectedType === tab.id
-                    ? 'bg-blue-600 text-white dark:bg-blue-600'
-                    : 'bg-slate-100 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-600 hover:bg-slate-200 dark:hover:bg-zinc-700'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        {/* Reference-Style Unified User-Type Data Table Card */}
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+          <ReferenceTableToolbar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Cari nama, perniagaan atau daerah..."
+            filterCount={selectedType !== 'all' ? 1 : 0}
+            onResetFilters={() => setSelectedType('all')}
+            filterContent={
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                  Jenis Pengguna
+                </label>
+                <div className="grid grid-cols-1 gap-1.5">
+                  {(
+                    [
+                      { id: 'all', label: `Semua (${consolidatedRecords.length})` },
+                      { id: 'usahawan', label: `Usahawan (${countsByType.usahawan})` },
+                      { id: 'mentor', label: `Mentor (${countsByType.mentor})` },
+                      { id: 'komuniti', label: `Komuniti (${countsByType.komuniti})` }
+                    ] as const
+                  ).map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setSelectedType(tab.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border text-left transition-colors cursor-pointer ${
+                        selectedType === tab.id
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            }
+          />
 
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-black/55 dark:text-white/55 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Masukkan kata kunci carian"
-              className="w-full pl-9 pr-3.5 py-2 rounded-xl text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
-            />
-          </div>
-        </div>
+          {filteredRecords.length === 0 ? (
+            <div className="p-10 text-center space-y-2">
+              <Users className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
+              <p className="text-sm font-bold text-black dark:text-white">Tiada Rekod Pengguna Dijumpai</p>
+              <p className="text-sm text-black/70 dark:text-white/75">
+                Cuba pilih penapis jenis pengguna lain atau tukar kata kunci carian anda.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                      <th className="py-3 pl-4 pr-2 w-12 text-center">Bil</th>
+                      <th className="py-3 px-3">Nama &amp; Entiti</th>
+                      <th className="py-3 px-3">Jenis Pengguna</th>
+                      <th className="py-3 px-3">Daerah / Agensi</th>
+                      <th className="py-3 px-3">Ringkasan Aktiviti</th>
+                      <th className="py-3 px-3 text-right">Metrik</th>
+                      <th className="py-3 px-3 text-center">Status</th>
+                      <th className="py-3 pl-2 pr-4 w-12 text-right">
+                        <span className="sr-only">Tindakan</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-black dark:text-white">
+                    {pagination.paginatedItems.map((rec, idx) => {
+                      const rowNumber = (pagination.currentPage - 1) * 6 + idx + 1;
+                      const isExpanded = expandedRowId === rec.id;
+                      const badgeStyle = USER_TYPE_COLORS[rec.userType].badgeBg;
+                      const statusBg =
+                        rec.statusTone === 'emerald'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/70 text-emerald-700 dark:text-emerald-300'
+                          : rec.statusTone === 'amber'
+                          ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300'
+                          : rec.statusTone === 'blue'
+                          ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70 text-blue-700 dark:text-blue-300'
+                          : 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800/70 text-indigo-700 dark:text-indigo-300';
 
-        {/* Neatly Organized Unified User-Type Data Table */}
-        {filteredRecords.length === 0 ? (
-          <div className="p-8 text-center rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-950">
-            <Users className="w-8 h-8 text-black/40 dark:text-white/40 mx-auto mb-2" />
-            <p className="text-base font-bold text-black dark:text-white">Tiada Rekod Pengguna Dijumpai</p>
-            <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">
-              Cuba pilih penapis jenis pengguna lain atau tukar kata kunci carian anda.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="overflow-x-auto rounded-xl border border-slate-300 dark:border-zinc-700">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-100 dark:bg-zinc-950 border-b border-slate-300 dark:border-zinc-700 text-[0.8125rem] font-bold uppercase tracking-wide text-black dark:text-white">
-                    <th className="py-3 px-4 w-12 text-center">Bil</th>
-                    <th className="py-3 px-4">Nama &amp; Entiti</th>
-                    <th className="py-3 px-4">Jenis Pengguna</th>
-                    <th className="py-3 px-4">Daerah / Agensi</th>
-                    <th className="py-3 px-4">Ringkasan Aktiviti</th>
-                    <th className="py-3 px-4 text-right">Metrik</th>
-                    <th className="py-3 px-4 text-center">Status</th>
-                    <th className="py-3 px-4 text-right">Butiran</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-[0.9375rem]">
-                  {pagination.paginatedItems.map((rec, idx) => {
-                    const rowNumber = (pagination.currentPage - 1) * 6 + idx + 1;
-                    const isExpanded = expandedRowId === rec.id;
-                    const badgeStyle = USER_TYPE_COLORS[rec.userType].badgeBg;
-                    const statusBg =
-                      rec.statusTone === 'emerald'
-                        ? 'bg-emerald-100 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700'
-                        : rec.statusTone === 'amber'
-                        ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-300 dark:border-amber-700'
-                        : rec.statusTone === 'blue'
-                        ? 'bg-blue-100 dark:bg-blue-950/60 border-blue-300 dark:border-blue-700'
-                        : 'bg-indigo-100 dark:bg-indigo-950/60 border-indigo-300 dark:border-indigo-700';
-
-                    return (
-                      <React.Fragment key={rec.id}>
-                        <tr className="hover:bg-slate-50 dark:hover:bg-zinc-800/60 transition-colors">
-                          <td className="py-3.5 px-4 text-center font-mono text-black/80 dark:text-white/80 tabular-nums">
-                            {rowNumber}
-                          </td>
-                          <td className="py-3.5 px-4">
-                            <div className="font-bold text-black dark:text-white leading-snug">
-                              {rec.displayName}
-                            </div>
-                            <div className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 truncate max-w-[240px]">
-                              {rec.secondaryEntity}
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-[0.8125rem] font-semibold text-black dark:text-white ${badgeStyle}`}>
-                              {rec.userTypeLabel}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 text-black/85 dark:text-white/85 whitespace-nowrap">
-                            {rec.locationOrAgency}
-                          </td>
-                          <td className="py-3.5 px-4 text-black/85 dark:text-white/85 max-w-[260px]">
-                            <span className="line-clamp-2">{rec.activitySummary}</span>
-                          </td>
-                          <td className="py-3.5 px-4 text-right font-mono font-bold text-black dark:text-white tabular-nums whitespace-nowrap">
-                            {rec.metricDisplay}
-                          </td>
-                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-[0.8125rem] font-bold text-black dark:text-white ${statusBg}`}>
-                              {rec.statusLabel}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                            <button
-                              type="button"
-                              onClick={() => setExpandedRowId(isExpanded ? null : rec.id)}
-                              className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 border border-slate-300 dark:border-zinc-600 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer"
-                            >
-                              <span>{isExpanded ? 'Tutup' : 'Lihat'}</span>
-                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                            </button>
-                          </td>
-                        </tr>
-                        {isExpanded && (
-                          <tr className="bg-slate-50/80 dark:bg-zinc-950/70">
-                            <td colSpan={8} className="px-6 py-3.5 text-[0.9375rem] text-black dark:text-white border-t border-slate-200 dark:border-zinc-700">
-                              <span className="font-bold mr-2">Maklumat Tambahan:</span>
-                              <span>{rec.detailLine}</span>
+                      return (
+                        <React.Fragment key={rec.id}>
+                          <tr className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                            <td className="py-3.5 pl-4 pr-2 text-center font-mono text-black/75 dark:text-white/75 tabular-nums">
+                              {rowNumber}
+                            </td>
+                            <td className="py-3.5 px-3">
+                              <div className="font-semibold text-black dark:text-white leading-snug">
+                                {rec.displayName}
+                              </div>
+                              <div className="text-xs text-black/65 dark:text-white/70 truncate max-w-[220px]">
+                                {rec.secondaryEntity}
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold text-black dark:text-white ${badgeStyle}`}>
+                                {rec.userTypeLabel}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
+                              {rec.locationOrAgency}
+                            </td>
+                            <td className="py-3.5 px-3 text-black/80 dark:text-white/85 max-w-[240px]">
+                              <span className="line-clamp-2">{rec.activitySummary}</span>
+                            </td>
+                            <td className="py-3.5 px-3 text-right font-mono font-bold text-black dark:text-white tabular-nums whitespace-nowrap">
+                              {rec.metricDisplay}
+                            </td>
+                            <td className="py-3.5 px-3 text-center whitespace-nowrap">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${statusBg}`}>
+                                {rec.statusLabel}
+                              </span>
+                            </td>
+                            <td className="py-3.5 pl-2 pr-4 text-right whitespace-nowrap">
+                              <RowActionMenu
+                                ariaLabel={`Tindakan untuk ${rec.displayName}`}
+                                items={[
+                                  {
+                                    label: isExpanded ? 'Tutup Maklumat' : 'Lihat Maklumat Tambahan',
+                                    onClick: () => setExpandedRowId(isExpanded ? null : rec.id)
+                                  }
+                                ]}
+                              />
                             </td>
                           </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                          {isExpanded && (
+                            <tr className="bg-slate-50/80 dark:bg-zinc-950/70">
+                              <td colSpan={8} className="px-6 py-3.5 text-sm text-black dark:text-white border-t border-slate-200 dark:border-zinc-700">
+                                <span className="font-bold mr-2">Maklumat Tambahan:</span>
+                                <span>{rec.detailLine}</span>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
 
-            <PaginationBar
-              currentPage={pagination.currentPage}
-              totalItems={pagination.totalItems}
-              itemsPerPage={6}
-              onPageChange={pagination.setCurrentPage}
-              itemLabel="rekod pengguna"
-              accent="blue"
-            />
-          </div>
-        )}
+              <PaginationBar
+                currentPage={pagination.currentPage}
+                totalItems={pagination.totalItems}
+                itemsPerPage={6}
+                onPageChange={pagination.setCurrentPage}
+                itemLabel="rekod pengguna"
+                accent="blue"
+              />
+            </>
+          )}
+        </div>
       </div>
     </section>
   );

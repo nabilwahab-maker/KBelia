@@ -9,8 +9,7 @@ import {
   MapPin, 
   LayoutDashboard, 
   MessageSquare, 
-  Search, 
-  Filter, 
+  ArrowUpDown, 
   Phone, 
   Mail, 
   Building2, 
@@ -36,9 +35,7 @@ import {
   ArrowRight,
   Sliders,
   FileCheck,
-  BarChart3,
-  ChevronDown,
-  ChevronUp
+  BarChart3
 } from 'lucide-react';
 import { 
   MentorProfile, 
@@ -74,6 +71,7 @@ import { showToast as triggerToast } from './ToastNotification';
 import { SaaSKpiCard } from './SaaSKpiCard';
 import { PortalImage } from './PortalImage';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { resolveMenteeVisuals } from '../utils/visualAssets';
 import {
   BarChart,
@@ -390,10 +388,38 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     };
   }, [user?.uid, isDemoSession, isMentor, currentMentor?.id]);
 
-  // Filters for Sessions Tab
+  // Filters & sorting for MentorPortal tables
+  const [overviewSearch, setOverviewSearch] = useState('');
+  const [overviewStatusFilter, setOverviewStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed'>('all');
+  const [overviewDistrictFilter, setOverviewDistrictFilter] = useState<'all' | KelantanDistrict>('all');
+  const [overviewSortBy, setOverviewSortBy] = useState<'status' | 'name' | 'district'>('status');
+  const [overviewSortDir, setOverviewSortDir] = useState<'asc' | 'desc'>('asc');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled'>('all');
   const [modeFilter, setModeFilter] = useState<'all' | 'Bersemuka di Kampus' | 'Google Meet Maya'>('all');
+  const [applicationsSortBy, setApplicationsSortBy] = useState<'status' | 'name' | 'date'>('status');
+  const [applicationsSortDir, setApplicationsSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const [scheduleSearch, setScheduleSearch] = useState('');
+  const [scheduleModeFilter, setScheduleModeFilter] = useState<'all' | 'Bersemuka di Kampus' | 'Google Meet Maya'>('all');
+  const [scheduleSortBy, setScheduleSortBy] = useState<'date' | 'name'>('date');
+  const [scheduleSortDir, setScheduleSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const [actionPlansSearch, setActionPlansSearch] = useState('');
+  const [actionPlansDistrictFilter, setActionPlansDistrictFilter] = useState<'all' | KelantanDistrict>('all');
+  const [actionPlansSortBy, setActionPlansSortBy] = useState<'name' | 'topic'>('name');
+  const [actionPlansSortDir, setActionPlansSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const [endorsementsSearch, setEndorsementsSearch] = useState('');
+  const [endorsementsGrantFilter, setEndorsementsGrantFilter] = useState<'all' | 'RM3,000' | 'RM5,000' | 'RM10,000'>('all');
+  const [endorsementsSortBy, setEndorsementsSortBy] = useState<'date' | 'name'>('date');
+  const [endorsementsSortDir, setEndorsementsSortDir] = useState<'asc' | 'desc'>('desc');
+
+  const [logsSearch, setLogsSearch] = useState('');
+  const [logsStatusFilter, setLogsStatusFilter] = useState<'all' | 'done' | 'pending'>('all');
+  const [logsSortBy, setLogsSortBy] = useState<'date' | 'name'>('date');
+  const [logsSortDir, setLogsSortDir] = useState<'asc' | 'desc'>('desc');
 
   // Modals state
   const [selectedMenteeForNotes, setSelectedMenteeForNotes] = useState<MentorshipRegistration | null>(null);
@@ -449,10 +475,17 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     return 3;
   };
 
-  // Overview table: matches search across all statuses, sorted active-first
+  const uniqueMentorDistricts = Array.from(
+    new Set(mentorRegistrations.map(r => r.district).filter(Boolean))
+  ).sort() as KelantanDistrict[];
+
+  // Overview table: matches search + filter + sort
   const overviewRegistrations = mentorRegistrations
     .filter(r => {
-      const q = searchQuery.toLowerCase();
+      if (overviewStatusFilter !== 'all' && r.status !== overviewStatusFilter) return false;
+      if (overviewDistrictFilter !== 'all' && r.district !== overviewDistrictFilter) return false;
+      const q = overviewSearch.trim().toLowerCase();
+      if (!q) return true;
       return (
         r.entrepreneurName.toLowerCase().includes(q) ||
         r.businessName.toLowerCase().includes(q) ||
@@ -460,13 +493,20 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         r.district.toLowerCase().includes(q)
       );
     })
-    .sort((a, b) => statusOrderWeight(a.status) - statusOrderWeight(b.status));
+    .sort((a, b) => {
+      let cmp = 0;
+      if (overviewSortBy === 'name') cmp = a.entrepreneurName.localeCompare(b.entrepreneurName);
+      else if (overviewSortBy === 'district') cmp = a.district.localeCompare(b.district);
+      else cmp = statusOrderWeight(a.status) - statusOrderWeight(b.status);
+      return overviewSortDir === 'asc' ? cmp : -cmp;
+    });
 
-  // Permohonan Bimbingan: 'all' tab ONLY shows active (pending + confirmed); 'completed' is separated into 'Selesai' tab
+  // Permohonan Bimbingan: 'all' shows active (pending + confirmed); 'completed' shows completed
   const filteredRegistrations = mentorRegistrations
     .filter(r => {
-      const q = searchQuery.toLowerCase();
+      const q = searchQuery.trim().toLowerCase();
       const matchesSearch =
+        !q ||
         r.entrepreneurName.toLowerCase().includes(q) ||
         r.businessName.toLowerCase().includes(q) ||
         r.topic.toLowerCase().includes(q) ||
@@ -480,10 +520,102 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
       return matchesSearch && matchesStatus && matchesMode;
     })
-    .sort((a, b) => statusOrderWeight(a.status) - statusOrderWeight(b.status));
+    .sort((a, b) => {
+      let cmp = 0;
+      if (applicationsSortBy === 'name') cmp = a.entrepreneurName.localeCompare(b.entrepreneurName);
+      else if (applicationsSortBy === 'date') cmp = (a.preferredDate || '').localeCompare(b.preferredDate || '');
+      else cmp = statusOrderWeight(a.status) - statusOrderWeight(b.status);
+      return applicationsSortDir === 'asc' ? cmp : -cmp;
+    });
 
   const confirmedScheduleSessions = mentorRegistrations.filter(m => m.status === 'confirmed');
+  const filteredScheduleSessions = confirmedScheduleSessions
+    .filter(m => {
+      const inferredMode = m.meetingLink ? 'Google Meet Maya' : (m.mode || 'Bersemuka di Kampus');
+      if (scheduleModeFilter !== 'all' && inferredMode !== scheduleModeFilter && m.mode !== scheduleModeFilter) {
+        return false;
+      }
+      const q = scheduleSearch.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        m.entrepreneurName.toLowerCase().includes(q) ||
+        m.businessName.toLowerCase().includes(q) ||
+        m.topic.toLowerCase().includes(q) ||
+        (m.preferredDate || '').toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      const cmp =
+        scheduleSortBy === 'name'
+          ? a.entrepreneurName.localeCompare(b.entrepreneurName)
+          : (a.preferredDate || '').localeCompare(b.preferredDate || '');
+      return scheduleSortDir === 'asc' ? cmp : -cmp;
+    });
+
   const actionPlanMentees = mentorRegistrations.filter(m => Boolean(m.mentorActionPlan));
+  const filteredActionPlanMentees = actionPlanMentees
+    .filter(m => {
+      if (actionPlansDistrictFilter !== 'all' && m.district !== actionPlansDistrictFilter) return false;
+      const q = actionPlansSearch.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        m.entrepreneurName.toLowerCase().includes(q) ||
+        m.businessName.toLowerCase().includes(q) ||
+        m.topic.toLowerCase().includes(q) ||
+        (m.mentorActionPlan || '').toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      const cmp =
+        actionPlansSortBy === 'topic'
+          ? a.topic.localeCompare(b.topic)
+          : a.entrepreneurName.localeCompare(b.entrepreneurName);
+      return actionPlansSortDir === 'asc' ? cmp : -cmp;
+    });
+
+  const filteredEndorsements = mentorEndorsements
+    .filter(e => {
+      if (endorsementsGrantFilter !== 'all' && e.recommendedAmount !== endorsementsGrantFilter) return false;
+      const q = endorsementsSearch.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        e.menteeName.toLowerCase().includes(q) ||
+        e.businessName.toLowerCase().includes(q) ||
+        e.endorsementCode.toLowerCase().includes(q) ||
+        e.district.toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      const cmp =
+        endorsementsSortBy === 'name'
+          ? a.menteeName.localeCompare(b.menteeName)
+          : (a.issuedAt || '').localeCompare(b.issuedAt || '');
+      return endorsementsSortDir === 'asc' ? cmp : -cmp;
+    });
+
+  const filteredLogs = mentorLogs
+    .filter(l => {
+      const totalTasks = l.actionItems?.length || 0;
+      const doneTasks = l.actionItems?.filter(a => a.completed).length || 0;
+      const allDone = totalTasks > 0 && doneTasks === totalTasks;
+      if (logsStatusFilter === 'done' && !allDone) return false;
+      if (logsStatusFilter === 'pending' && allDone) return false;
+      const q = logsSearch.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        l.menteeName.toLowerCase().includes(q) ||
+        l.businessName.toLowerCase().includes(q) ||
+        l.topic.toLowerCase().includes(q) ||
+        l.sessionDate.toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      const cmp =
+        logsSortBy === 'name'
+          ? a.menteeName.localeCompare(b.menteeName)
+          : (a.sessionDate || '').localeCompare(b.sessionDate || '');
+      return logsSortDir === 'asc' ? cmp : -cmp;
+    });
 
   // Calculate statistics for this mentor
   const totalMentees = mentorRegistrations.length;
@@ -494,13 +626,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const totalEndorsementsCount = mentorEndorsements.length;
   const totalLogbookCount = mentorLogs.length;
 
-  // Unconditional 5-item pagination hooks across MentorPortal lists
-  const overviewPagination = usePagination(overviewRegistrations, 5, [searchQuery, currentMentor.id]);
-  const applicationsPagination = usePagination(filteredRegistrations, 5, [searchQuery, statusFilter, modeFilter, currentMentor.id]);
-  const schedulePagination = usePagination(confirmedScheduleSessions, 5, [currentMentor.id, confirmedScheduleSessions.length]);
-  const actionPlansPagination = usePagination(actionPlanMentees, 5, [currentMentor.id, actionPlanMentees.length]);
-  const endorsementsPagination = usePagination(mentorEndorsements, 5, [currentMentor.id, mentorEndorsements.length]);
-  const logsPagination = usePagination(mentorLogs, 5, [currentMentor.id, mentorLogs.length]);
+  // Unconditional 7-item pagination hooks across MentorPortal lists
+  const overviewPagination = usePagination(overviewRegistrations, 7, [overviewSearch, overviewStatusFilter, overviewDistrictFilter, overviewSortBy, overviewSortDir, currentMentor.id]);
+  const applicationsPagination = usePagination(filteredRegistrations, 7, [searchQuery, statusFilter, modeFilter, applicationsSortBy, applicationsSortDir, currentMentor.id]);
+  const schedulePagination = usePagination(filteredScheduleSessions, 7, [scheduleSearch, scheduleModeFilter, scheduleSortBy, scheduleSortDir, currentMentor.id, filteredScheduleSessions.length]);
+  const actionPlansPagination = usePagination(filteredActionPlanMentees, 7, [actionPlansSearch, actionPlansDistrictFilter, actionPlansSortBy, actionPlansSortDir, currentMentor.id, filteredActionPlanMentees.length]);
+  const endorsementsPagination = usePagination(filteredEndorsements, 7, [endorsementsSearch, endorsementsGrantFilter, endorsementsSortBy, endorsementsSortDir, currentMentor.id, filteredEndorsements.length]);
+  const logsPagination = usePagination(filteredLogs, 7, [logsSearch, logsStatusFilter, logsSortBy, logsSortDir, currentMentor.id, filteredLogs.length]);
 
   const showToast = (msg: string) => {
     setIsSuccessToast(msg);
@@ -712,7 +844,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     setNewLogDueDate2('');
   };
 
-  // Security Barrier: Strictly Certified Mentor ONLY (Zero Cross-Portal Access)
+  // Security Barrier: Strictly Mentor ONLY (Zero Cross-Portal Access)
   if (!isMentor) {
     return (
       <div className="py-8 px-2 sm:px-4 w-full animate-in fade-in duration-300">
@@ -1212,107 +1344,217 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
             </div>
 
-            {/* Direktori Ringkas Usahawan Mentee (Integrated Table) */}
-            <div className="rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden">
-              <div className="px-4 sm:px-5 py-3.5 border-b border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
-                    Direktori Ringkas Usahawan Mentee
-                  </h3>
-                  <p className="text-[0.875rem] text-black/70 dark:text-white/75">
-                    Senarai usahawan belia di bawah pemantauan {currentMentor.name}
-                  </p>
-                </div>
-
-                <div className="relative w-full sm:w-64">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-black/70 dark:text-white/75" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Masukkan kata kunci carian"
-                    className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-sm text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:border-indigo-600 dark:focus:border-blue-500"
-                  />
-                </div>
+            {/* Direktori Ringkas Usahawan Mentee (Reference Table) */}
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
+                  Direktori Ringkas Usahawan Mentee
+                </h3>
+                <p className="text-[0.875rem] text-black/70 dark:text-white/75">
+                  Senarai usahawan belia di bawah pemantauan {currentMentor.name}
+                </p>
               </div>
 
-              <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
-                {overviewPagination.paginatedItems.map((mentee) => {
-                  const hasEndorsement = mentorEndorsements.some(e => e.menteeName.toLowerCase() === mentee.entrepreneurName.toLowerCase());
-                  const visuals = resolveMenteeVisuals(
-                    {
-                      applicantId: mentee.applicantId,
-                      entrepreneurName: mentee.entrepreneurName,
-                      businessName: mentee.businessName,
-                      category: mentee.businessCategory
-                    },
-                    businesses
-                  );
-                  return (
-                    <div
-                      key={mentee.id}
-                      className="p-3.5 sm:px-5 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                    >
-                      <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                        <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 shrink-0">
-                          <PortalImage
-                            src={visuals.businessUrl}
-                            alt={mentee.businessName}
-                            fallbackType="business"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <h4 className="text-sm font-bold text-black dark:text-white truncate">
-                              {mentee.entrepreneurName} · {mentee.businessName}
-                            </h4>
-                            <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
-                              mentee.status === 'confirmed'
-                                ? 'bg-amber-100 text-black dark:bg-teal-600 dark:text-white'
-                                : mentee.status === 'completed'
-                                ? 'bg-emerald-100 text-black dark:bg-emerald-950 dark:text-white'
-                                : 'bg-amber-100 text-black dark:bg-amber-950 dark:text-white'
-                            }`}>
-                              {mentee.status === 'confirmed' ? 'Disahkan' : mentee.status === 'completed' ? 'Selesai' : 'Menunggu'}
-                            </span>
-                          </div>
-                          <p className="text-sm text-black/70 dark:text-white/75 truncate">
-                            {mentee.district} · {mentee.topic} · {hasEndorsement ? 'Geran Diperaku' : 'Belum Diperaku'}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-end shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => handleSubTabChange('sessions')}
-                          className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap"
+              <div className="rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xs overflow-visible">
+                <ReferenceTableToolbar
+                  searchValue={overviewSearch}
+                  onSearchChange={setOverviewSearch}
+                  searchPlaceholder="Cari usahawan, perniagaan, topik atau daerah..."
+                  filterCount={(overviewStatusFilter !== 'all' ? 1 : 0) + (overviewDistrictFilter !== 'all' ? 1 : 0)}
+                  onResetFilters={() => {
+                    setOverviewStatusFilter('all');
+                    setOverviewDistrictFilter('all');
+                  }}
+                  filterContent={
+                    <>
+                      <div>
+                        <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                          Status Bimbingan
+                        </label>
+                        <select
+                          value={overviewStatusFilter}
+                          onChange={(e) => setOverviewStatusFilter(e.target.value as 'all' | 'pending' | 'confirmed' | 'completed')}
+                          className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
                         >
-                          Buka Sesi
-                        </button>
+                          <option value="all">Semua Status</option>
+                          <option value="pending">Menunggu Pengesahan</option>
+                          <option value="confirmed">Disahkan</option>
+                          <option value="completed">Selesai</option>
+                        </select>
                       </div>
-                    </div>
-                  );
-                })}
-                {overviewRegistrations.length === 0 && (
-                  <div className="py-8 text-center text-[0.9375rem] text-black/70 dark:text-white/75">
+                      <div>
+                        <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                          Daerah
+                        </label>
+                        <select
+                          value={overviewDistrictFilter}
+                          onChange={(e) => setOverviewDistrictFilter(e.target.value as 'all' | KelantanDistrict)}
+                          className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                        >
+                          <option value="all">Semua Daerah</option>
+                          {uniqueMentorDistricts.map(d => (
+                            <option key={d} value={d}>{d}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  }
+                />
+
+                {overviewRegistrations.length === 0 ? (
+                  <div className="py-10 text-center text-[0.9375rem] text-black/70 dark:text-white/75">
                     Tiada rekod usahawan mentee dijumpai.
                   </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                          <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (overviewSortBy === 'name') setOverviewSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                                else { setOverviewSortBy('name'); setOverviewSortDir('asc'); }
+                              }}
+                              className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                            >
+                              <span>Usahawan &amp; Perniagaan</span>
+                              <ArrowUpDown className="w-3 h-3" />
+                            </button>
+                          </th>
+                          <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (overviewSortBy === 'district') setOverviewSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                                else { setOverviewSortBy('district'); setOverviewSortDir('asc'); }
+                              }}
+                              className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                            >
+                              <span>Daerah &amp; Topik</span>
+                              <ArrowUpDown className="w-3 h-3" />
+                            </button>
+                          </th>
+                          <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                            Perakuan Geran
+                          </th>
+                          <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (overviewSortBy === 'status') setOverviewSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                                else { setOverviewSortBy('status'); setOverviewSortDir('asc'); }
+                              }}
+                              className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                            >
+                              <span>Status</span>
+                              <ArrowUpDown className="w-3 h-3" />
+                            </button>
+                          </th>
+                          <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                            <span className="sr-only">Tindakan</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                        {overviewPagination.paginatedItems.map((mentee) => {
+                          const hasEndorsement = mentorEndorsements.some(e => e.menteeName.toLowerCase() === mentee.entrepreneurName.toLowerCase());
+                          const visuals = resolveMenteeVisuals(
+                            {
+                              applicantId: mentee.applicantId,
+                              entrepreneurName: mentee.entrepreneurName,
+                              businessName: mentee.businessName,
+                              category: mentee.businessCategory
+                            },
+                            businesses
+                          );
+                          return (
+                            <tr key={mentee.id} className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors">
+                              <td className="py-3.5 px-4 max-w-xs">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                    <PortalImage
+                                      src={visuals.businessUrl}
+                                      alt={mentee.businessName}
+                                      fallbackType="business"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="font-bold text-black dark:text-white truncate">{mentee.entrepreneurName}</div>
+                                    <div className="text-xs text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-3.5 px-4 max-w-xs">
+                                <div className="text-black/85 dark:text-white/85 font-medium truncate">{mentee.district}</div>
+                                <div className="text-xs text-black/60 dark:text-white/60 truncate">{mentee.topic}</div>
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap">
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                  hasEndorsement
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                                    : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black/70 dark:text-white/75'
+                                }`}>
+                                  {hasEndorsement ? 'Geran Diperaku' : 'Belum Diperaku'}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap">
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                                  mentee.status === 'confirmed'
+                                    ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-200'
+                                    : mentee.status === 'completed'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                                    : 'bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200'
+                                }`}>
+                                  {mentee.status === 'confirmed' ? 'Disahkan' : mentee.status === 'completed' ? 'Selesai' : 'Menunggu'}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                                <RowActionMenu
+                                  ariaLabel={`Tindakan untuk ${mentee.entrepreneurName}`}
+                                  items={[
+                                    {
+                                      label: 'Buka Sesi Bimbingan',
+                                      onClick: () => handleSubTabChange('sessions'),
+                                      tone: 'accent'
+                                    },
+                                    {
+                                      label: mentee.mentorActionPlan ? 'Kemaskini Nota Bimbingan' : 'Tambah Nota Bimbingan',
+                                      onClick: () => handleOpenNotesModal(mentee)
+                                    },
+                                    {
+                                      label: 'Perakuan Geran',
+                                      onClick: () => {
+                                        setNewEndorsementMenteeName(mentee.entrepreneurName);
+                                        setNewEndorsementBusinessName(mentee.businessName);
+                                        setNewEndorsementDistrict(mentee.district);
+                                        setIsNewEndorsementModalOpen(true);
+                                      }
+                                    }
+                                  ]}
+                                />
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
-              </div>
-              {overviewRegistrations.length > 5 && (
-                <div className="px-4 pb-4">
+
+                {overviewRegistrations.length > 0 && (
                   <PaginationBar
                     currentPage={overviewPagination.currentPage}
                     totalItems={overviewPagination.totalItems}
-                    itemsPerPage={5}
+                    itemsPerPage={7}
                     onPageChange={overviewPagination.setCurrentPage}
                     itemLabel="usahawan"
                     accent="teal"
                   />
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
         </div>
@@ -1326,10 +1568,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         <div className="flex flex-col space-y-8 animate-in fade-in duration-200">
           
           {/* =================================================================== */}
-          {/* SEKSYEN 1: PERMOHONAN BIMBINGAN (FULL-WIDTH STACKED CARD)           */}
+          {/* SEKSYEN 1: PERMOHONAN BIMBINGAN (REFERENCE TABLE + DRAWER)           */}
           {/* =================================================================== */}
-          <section id="mentor-applications-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-300 dark:border-slate-600 gap-3">
+          <section id="mentor-applications-section" className="space-y-4 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center">
@@ -1339,269 +1581,356 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     Permohonan Bimbingan
                   </h3>
                 </div>
-                <p className="text-[0.9375rem] text-black dark:text-white/75 mt-1">
-                  Senarai padat permohonan aktif (rekod selesai diasingkan di tab Selesai). Klik baris untuk melihat mesej penuh &amp; tindakan.
+                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
+                  Senarai permohonan aktif (rekod selesai boleh ditapis melalui Penapis). Klik baris atau menu tiga titik untuk butiran &amp; tindakan.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-[0.8125rem] font-mono font-bold tabular-nums px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
-                  {filteredRegistrations.length} {statusFilter === 'completed' ? 'Selesai' : 'Aktif'}
-                </span>
-              </div>
+              <span className="text-[0.8125rem] font-mono font-bold tabular-nums px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70 self-start sm:self-auto">
+                {filteredRegistrations.length} {statusFilter === 'completed' ? 'Selesai' : 'Rekod'}
+              </span>
             </div>
 
-            {/* Quick Search & Filter Controls Bar */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              <div className="relative flex-1 max-w-md">
-                <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Masukkan kata kunci carian"
-                  className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm sm:text-[0.9375rem] text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
-                />
-              </div>
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+              <ReferenceTableToolbar
+                searchValue={searchQuery}
+                onSearchChange={setSearchQuery}
+                searchPlaceholder="Cari usahawan, perniagaan, topik atau daerah..."
+                filterCount={(statusFilter !== 'all' ? 1 : 0) + (modeFilter !== 'all' ? 1 : 0)}
+                onResetFilters={() => {
+                  setStatusFilter('all');
+                  setModeFilter('all');
+                }}
+                filterContent={
+                  <>
+                    <div>
+                      <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                        Status Permohonan
+                      </label>
+                      <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled')}
+                        className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                      >
+                        <option value="all">Aktif ({activeCount})</option>
+                        <option value="pending">Menunggu ({pendingCount})</option>
+                        <option value="confirmed">Disahkan ({confirmedCount})</option>
+                        <option value="completed">Selesai ({completedCount})</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                        Mod Sesi
+                      </label>
+                      <select
+                        value={modeFilter}
+                        onChange={(e) => setModeFilter(e.target.value as 'all' | 'Bersemuka di Kampus' | 'Google Meet Maya')}
+                        className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                      >
+                        <option value="all">Semua Mod</option>
+                        <option value="Bersemuka di Kampus">Bersemuka di Kampus</option>
+                        <option value="Google Meet Maya">Google Meet Maya</option>
+                      </select>
+                    </div>
+                  </>
+                }
+              />
 
-              {/* Status Tabs Filter: Semua (Aktif) | Menunggu | Disahkan | Selesai */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-                {(['all', 'pending', 'confirmed', 'completed'] as const).map(tab => (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => setStatusFilter(tab)}
-                    className={`px-3 py-1.5 text-sm font-semibold rounded-xl transition-all whitespace-nowrap cursor-pointer tabular-nums ${
-                      statusFilter === tab
-                        ? 'bg-teal-600 text-white shadow-xs font-bold dark:bg-teal-600'
-                        : 'text-black dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {tab === 'all'
-                      ? `Aktif (${activeCount})`
-                      : tab === 'pending'
-                      ? `Menunggu (${pendingCount})`
-                      : tab === 'confirmed'
-                      ? `Disahkan (${confirmedCount})`
-                      : `Selesai (${completedCount})`}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Mentee Applications Compact Expandable List */}
-            <div className="pt-1">
               {filteredRegistrations.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900">
-                  <GraduationCap className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto mb-2 opacity-50" />
+                <div className="text-center py-12 px-4">
+                  <GraduationCap className="w-10 h-10 text-black/40 dark:text-white/40 mx-auto mb-2" />
                   <p className="text-sm font-bold text-black dark:text-white">
                     {statusFilter === 'completed'
                       ? 'Tiada rekod bimbingan yang telah selesai buat masa ini.'
-                      : 'Tiada permohonan bimbingan aktif buat masa ini.'}
+                      : 'Tiada permohonan bimbingan ditemui.'}
                   </p>
                   <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">
                     {statusFilter !== 'completed' && completedCount > 0
-                      ? 'Permohonan yang telah selesai dibimbing dipaparkan secara berasingan di tab Selesai.'
-                      : 'Cuba tukar kata kunci carian atau pilih tab status lain di atas.'}
+                      ? 'Permohonan yang telah selesai dibimbing boleh dilihat dengan menukar Status di Penapis.'
+                      : 'Cuba tukar kata kunci carian atau tetapkan semula penapis.'}
                   </p>
                 </div>
               ) : (
-                <>
-                  <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
-                    {applicationsPagination.paginatedItems.map(mentee => {
-                      const isPending = mentee.status === 'pending';
-                      const isConfirmed = mentee.status === 'confirmed';
-                      const isCompleted = mentee.status === 'completed';
-                      const isExpanded = Boolean(expandedApplicationIds[mentee.id]);
-
-                      const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
-                      const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
-                      const visuals = resolveMenteeVisuals(
-                        {
-                          applicantId: mentee.applicantId,
-                          entrepreneurName: mentee.entrepreneurName,
-                          businessName: mentee.businessName,
-                          category: mentee.businessCategory
-                        },
-                        businesses
-                      );
-
-                      return (
-                        <div key={mentee.id} className="transition-colors">
-                          {/* Compact Summary Row */}
-                          <div
-                            onClick={() =>
-                              setExpandedApplicationIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
-                            }
-                            className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (applicationsSortBy === 'name') setApplicationsSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                              else { setApplicationsSortBy('name'); setApplicationsSortDir('asc'); }
+                            }}
+                            className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
                           >
-                            <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 shrink-0">
-                                <PortalImage
-                                  src={visuals.businessUrl}
-                                  alt={mentee.businessName}
-                                  fallbackType="business"
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
+                            <span>Usahawan &amp; Perniagaan</span>
+                            <ArrowUpDown className="w-3 h-3" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (applicationsSortBy === 'date') setApplicationsSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                              else { setApplicationsSortBy('date'); setApplicationsSortDir('asc'); }
+                            }}
+                            className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                          >
+                            <span>Topik &amp; Tarikh</span>
+                            <ArrowUpDown className="w-3 h-3" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          Daerah
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (applicationsSortBy === 'status') setApplicationsSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                              else { setApplicationsSortBy('status'); setApplicationsSortDir('asc'); }
+                            }}
+                            className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                          >
+                            <span>Status</span>
+                            <ArrowUpDown className="w-3 h-3" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                          <span className="sr-only">Tindakan</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                      {applicationsPagination.paginatedItems.map(mentee => {
+                        const isPending = mentee.status === 'pending';
+                        const isConfirmed = mentee.status === 'confirmed';
+                        const isCompleted = mentee.status === 'completed';
+                        const isExpanded = Boolean(expandedApplicationIds[mentee.id]);
 
-                              <div className="min-w-0 flex-1 space-y-0.5">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <h4 className="text-sm font-bold text-black dark:text-white truncate">
-                                    {mentee.entrepreneurName} · {mentee.businessName}
-                                  </h4>
-                                  <span
-                                    className={`shrink-0 inline-flex items-center text-xs font-bold px-2 py-0.5 rounded-md border whitespace-nowrap ${
-                                      isCompleted
-                                        ? 'bg-emerald-50 dark:bg-emerald-950/70 text-black dark:text-white border-emerald-200 dark:border-emerald-800'
-                                        : isConfirmed
-                                        ? 'bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border-teal-200 dark:border-teal-800/70'
-                                        : isPending
-                                        ? 'bg-amber-50 dark:bg-amber-950/70 text-black dark:text-white border-amber-200 dark:border-amber-800'
-                                        : 'bg-rose-50 dark:bg-rose-950/70 text-black dark:text-white border-rose-200 dark:border-rose-800'
-                                    }`}
-                                  >
-                                    {isCompleted ? 'Selesai' : isConfirmed ? 'Disahkan' : isPending ? 'Menunggu' : 'Dibatalkan'}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-black/70 dark:text-white/75 truncate">
-                                  {mentee.district || 'Kelantan'} · {mentee.businessCategory || 'Perniagaan Belia'} · {mentee.topic}{mentee.preferredDate ? ` · ${mentee.preferredDate} (${mentee.preferredTime || '10:00 AM'})` : ''}
-                                </p>
-                              </div>
-                            </div>
+                        const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
+                        const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
+                        const visuals = resolveMenteeVisuals(
+                          {
+                            applicantId: mentee.applicantId,
+                            entrepreneurName: mentee.entrepreneurName,
+                            businessName: mentee.businessName,
+                            category: mentee.businessCategory
+                          },
+                          businesses
+                        );
 
-                            <div className="flex items-center justify-end gap-2 shrink-0">
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedApplicationIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }));
-                                }}
-                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                              >
-                                <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
-                                {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Expandable Details Drawer */}
-                          {isExpanded && (
-                            <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/40 space-y-3 animate-in fade-in duration-150">
-                              <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-1.5">
-                                <div className="flex items-center gap-2 text-sm font-bold text-black dark:text-white">
-                                  <MessageSquare className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
-                                  <span>Mesej Permohonan &amp; Cabaran Usahawan:</span>
-                                </div>
-                                <p className="text-[0.9375rem] leading-relaxed text-black dark:text-white whitespace-pre-line">
-                                  {mentee.challenges ? (
-                                    `"${mentee.challenges}"`
-                                  ) : (
-                                    <span className="italic text-black/70 dark:text-white/75">
-                                      "Usahawan memohon sesi bimbingan khusus bagi strategi pemasaran, pengurusan kos operasi, dan persediaan dokumentasi permohonan geran belia UMK."
-                                    </span>
-                                  )}
-                                </p>
-                              </div>
-
-                              {mentee.mentorActionPlan && (
-                                <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800/70 space-y-1">
-                                  <div className="flex items-center justify-between text-sm font-bold text-black dark:text-white">
-                                    <span className="flex items-center gap-1.5">
-                                      <FileText className="w-3.5 h-3.5" />
-                                      <span>Nota Bimbingan Mentor Tersimpan:</span>
-                                    </span>
-                                    <span className="text-[0.8125rem] font-normal opacity-75">Telah dihantar</span>
+                        return (
+                          <React.Fragment key={mentee.id}>
+                            <tr
+                              onClick={() =>
+                                setExpandedApplicationIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
+                              }
+                              className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                            >
+                              <td className="py-3.5 px-4 max-w-xs">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                    <PortalImage
+                                      src={visuals.businessUrl}
+                                      alt={mentee.businessName}
+                                      fallbackType="business"
+                                      className="w-full h-full object-cover"
+                                    />
                                   </div>
-                                  <p className="text-[0.9375rem] text-black dark:text-white whitespace-pre-line leading-relaxed">
-                                    {mentee.mentorActionPlan}
-                                  </p>
+                                  <div className="min-w-0">
+                                    <div className="font-bold text-black dark:text-white truncate">{mentee.entrepreneurName}</div>
+                                    <div className="text-xs text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
+                                  </div>
                                 </div>
-                              )}
-
-                              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
-                                <a
-                                  href={cleanPhone ? `https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20saya%20mentor%20anda%20dari%20KBelia%20UMK.` : '#'}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="px-3 py-1.5 rounded-xl text-sm font-bold text-black dark:text-white bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
+                              </td>
+                              <td className="py-3.5 px-4 max-w-xs">
+                                <div className="font-medium text-black dark:text-white truncate">{mentee.topic}</div>
+                                <div className="text-xs text-black/60 dark:text-white/60 tabular-nums truncate">
+                                  {mentee.preferredDate ? `${mentee.preferredDate} · ${mentee.preferredTime || '10:00 AM'}` : mentee.businessCategory || 'Perniagaan Belia'}
+                                </div>
+                              </td>
+                              <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
+                                {mentee.district || 'Kelantan'}
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap">
+                                <span
+                                  className={`inline-flex items-center text-xs font-bold px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
+                                    isCompleted
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
+                                      : isConfirmed
+                                      ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-200 border-teal-200 dark:border-teal-800'
+                                      : isPending
+                                      ? 'bg-amber-50 dark:bg-amber-950/70 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-800'
+                                      : 'bg-rose-50 dark:bg-rose-950/70 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-800'
+                                  }`}
                                 >
-                                  <Phone className="w-3.5 h-3.5" />
-                                  <span>WhatsApp Usahawan</span>
-                                </a>
+                                  {isCompleted ? 'Selesai' : isConfirmed ? 'Disahkan' : isPending ? 'Menunggu' : 'Dibatalkan'}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                                <RowActionMenu
+                                  ariaLabel={`Tindakan untuk permohonan ${mentee.entrepreneurName}`}
+                                  items={[
+                                    {
+                                      label: isExpanded ? 'Tutup Butiran' : 'Lihat Butiran & Mesej',
+                                      onClick: () =>
+                                        setExpandedApplicationIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
+                                    },
+                                    ...(isPending
+                                      ? [{
+                                          label: 'Sahkan Sesi Bimbingan',
+                                          onClick: () => handleStatusChange(mentee, 'confirmed'),
+                                          tone: 'accent' as const
+                                        }]
+                                      : []),
+                                    ...(isConfirmed
+                                      ? [{
+                                          label: 'Tandakan Selesai Sesi',
+                                          onClick: () => handleStatusChange(mentee, 'completed'),
+                                          tone: 'accent' as const
+                                        }]
+                                      : []),
+                                    {
+                                      label: mentee.mentorActionPlan ? 'Kemaskini Nota Bimbingan' : 'Tambah Nota Bimbingan',
+                                      onClick: () => handleOpenNotesModal(mentee)
+                                    },
+                                    {
+                                      label: 'Perakuan Geran',
+                                      onClick: () => {
+                                        setNewEndorsementMenteeName(mentee.entrepreneurName);
+                                        setNewEndorsementBusinessName(mentee.businessName);
+                                        setNewEndorsementDistrict(mentee.district);
+                                        setIsNewEndorsementModalOpen(true);
+                                      }
+                                    }
+                                  ]}
+                                />
+                              </td>
+                            </tr>
 
-                                <div className="flex flex-wrap items-center gap-2">
-                                  {isPending && (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleStatusChange(mentee, 'confirmed')}
-                                      className="px-3.5 py-1.5 rounded-xl text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-teal-600"
-                                    >
-                                      <Calendar className="w-3.5 h-3.5" />
-                                      <span>Sahkan Sesi Bimbingan</span>
-                                    </button>
+                            {isExpanded && (
+                              <tr className="bg-slate-50/80 dark:bg-zinc-950/40">
+                                <td colSpan={5} className="px-4 sm:px-5 py-4 space-y-3">
+                                  <div className="p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 space-y-1.5">
+                                    <div className="flex items-center gap-2 text-sm font-bold text-black dark:text-white">
+                                      <MessageSquare className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
+                                      <span>Mesej Permohonan &amp; Cabaran Usahawan:</span>
+                                    </div>
+                                    <p className="text-[0.9375rem] leading-relaxed text-black dark:text-white whitespace-pre-line">
+                                      {mentee.challenges ? (
+                                        `"${mentee.challenges}"`
+                                      ) : (
+                                        <span className="italic text-black/70 dark:text-white/75">
+                                          "Usahawan memohon sesi bimbingan khusus bagi strategi pemasaran, pengurusan kos operasi, dan persediaan dokumentasi permohonan geran belia UMK."
+                                        </span>
+                                      )}
+                                    </p>
+                                  </div>
+
+                                  {mentee.mentorActionPlan && (
+                                    <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800/70 space-y-1">
+                                      <div className="flex items-center justify-between text-sm font-bold text-black dark:text-white">
+                                        <span className="flex items-center gap-1.5">
+                                          <FileText className="w-3.5 h-3.5" />
+                                          <span>Nota Bimbingan Mentor Tersimpan:</span>
+                                        </span>
+                                        <span className="text-[0.8125rem] font-normal opacity-75">Telah dihantar</span>
+                                      </div>
+                                      <p className="text-[0.9375rem] text-black dark:text-white whitespace-pre-line leading-relaxed">
+                                        {mentee.mentorActionPlan}
+                                      </p>
+                                    </div>
                                   )}
 
-                                  {isConfirmed && (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleStatusChange(mentee, 'completed')}
-                                      className="px-3.5 py-1.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                                  <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                                    <a
+                                      href={cleanPhone ? `https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20saya%20mentor%20anda%20dari%20KBelia%20UMK.` : '#'}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="px-3 py-1.5 rounded-xl text-sm font-bold text-black dark:text-white bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
                                     >
-                                      <CheckCircle2 className="w-3.5 h-3.5" />
-                                      <span>Tandakan Selesai Sesi</span>
-                                    </button>
-                                  )}
+                                      <Phone className="w-3.5 h-3.5" />
+                                      <span>WhatsApp Usahawan</span>
+                                    </a>
 
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOpenNotesModal(mentee)}
-                                    className="px-3 py-1.5 rounded-xl text-sm font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
-                                  >
-                                    <FileText className="w-3.5 h-3.5" />
-                                    <span>{mentee.mentorActionPlan ? 'Kemaskini Nota Bimbingan' : '+ Tambah Nota Bimbingan'}</span>
-                                  </button>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      {isPending && (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleStatusChange(mentee, 'confirmed')}
+                                          className="px-3.5 py-1.5 rounded-xl text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-teal-600"
+                                        >
+                                          <Calendar className="w-3.5 h-3.5" />
+                                          <span>Sahkan Sesi Bimbingan</span>
+                                        </button>
+                                      )}
 
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setNewEndorsementMenteeName(mentee.entrepreneurName);
-                                      setNewEndorsementBusinessName(mentee.businessName);
-                                      setNewEndorsementDistrict(mentee.district);
-                                      setIsNewEndorsementModalOpen(true);
-                                    }}
-                                    className="px-3 py-1.5 rounded-xl text-sm font-bold text-black dark:text-white bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
-                                  >
-                                    <Award className="w-3.5 h-3.5" />
-                                    <span>Perakuan Geran</span>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                                      {isConfirmed && (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleStatusChange(mentee, 'completed')}
+                                          className="px-3.5 py-1.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                                        >
+                                          <CheckCircle2 className="w-3.5 h-3.5" />
+                                          <span>Tandakan Selesai Sesi</span>
+                                        </button>
+                                      )}
 
-                  <PaginationBar
-                    currentPage={applicationsPagination.currentPage}
-                    totalItems={applicationsPagination.totalItems}
-                    itemsPerPage={5}
-                    onPageChange={applicationsPagination.setCurrentPage}
-                    itemLabel="permohonan"
-                    accent="teal"
-                  />
-                </>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleOpenNotesModal(mentee)}
+                                        className="px-3 py-1.5 rounded-xl text-sm font-bold text-black dark:text-white bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 hover:bg-amber-50 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+                                      >
+                                        <FileText className="w-3.5 h-3.5" />
+                                        <span>{mentee.mentorActionPlan ? 'Kemaskini Nota Bimbingan' : '+ Tambah Nota Bimbingan'}</span>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setNewEndorsementMenteeName(mentee.entrepreneurName);
+                                          setNewEndorsementBusinessName(mentee.businessName);
+                                          setNewEndorsementDistrict(mentee.district);
+                                          setIsNewEndorsementModalOpen(true);
+                                        }}
+                                        className="px-3 py-1.5 rounded-xl text-sm font-bold text-black dark:text-white bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
+                                      >
+                                        <Award className="w-3.5 h-3.5" />
+                                        <span>Perakuan Geran</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {filteredRegistrations.length > 0 && (
+                <PaginationBar
+                  currentPage={applicationsPagination.currentPage}
+                  totalItems={applicationsPagination.totalItems}
+                  itemsPerPage={7}
+                  onPageChange={applicationsPagination.setCurrentPage}
+                  itemLabel="permohonan"
+                  accent="teal"
+                />
               )}
             </div>
           </section>
 
           {/* =================================================================== */}
-          {/* SEKSYEN 2: JADUAL (COMPACT EXPANDABLE LIST + PAGINATION)            */}
+          {/* SEKSYEN 2: JADUAL (REFERENCE TABLE + EXPANDABLE DRAWER)             */}
           {/* =================================================================== */}
-          <section id="mentor-schedule-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-300 dark:border-slate-600 gap-3">
+          <section id="mentor-schedule-section" className="space-y-4 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/70 flex items-center justify-center">
@@ -1611,7 +1940,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     Jadual
                   </h3>
                 </div>
-                <p className="text-[0.9375rem] text-black dark:text-white/75 mt-1">
+                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
                   Takwim sesi temujanji aktif bersemuka di bilik bimbingan UMK serta sesi Google Meet maya.
                 </p>
               </div>
@@ -1626,162 +1955,250 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </button>
             </div>
 
-            {/* Confirmed Sessions Compact Expandable List */}
-            <div>
-              {confirmedScheduleSessions.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900">
-                  <Clock className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto mb-2 opacity-50" />
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+              <ReferenceTableToolbar
+                searchValue={scheduleSearch}
+                onSearchChange={setScheduleSearch}
+                searchPlaceholder="Cari usahawan, topik atau tarikh sesi..."
+                filterCount={scheduleModeFilter !== 'all' ? 1 : 0}
+                onResetFilters={() => setScheduleModeFilter('all')}
+                filterContent={
+                  <div>
+                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                      Mod Temujanji
+                    </label>
+                    <select
+                      value={scheduleModeFilter}
+                      onChange={(e) => setScheduleModeFilter(e.target.value as 'all' | 'Bersemuka di Kampus' | 'Google Meet Maya')}
+                      className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                    >
+                      <option value="all">Semua Mod</option>
+                      <option value="Google Meet Maya">Google Meet Maya</option>
+                      <option value="Bersemuka di Kampus">Bersemuka di Kampus</option>
+                    </select>
+                  </div>
+                }
+              />
+
+              {filteredScheduleSessions.length === 0 ? (
+                <div className="text-center py-12 px-4">
+                  <Clock className="w-10 h-10 text-black/40 dark:text-white/40 mx-auto mb-2" />
                   <p className="text-sm font-bold text-black dark:text-white">Tiada sesi bimbingan aktif ditetapkan dalam jadual.</p>
                   <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">Sahkan permohonan bimbingan di bahagian atas untuk menjadualkan tarikh dan slot.</p>
                 </div>
               ) : (
-                <>
-                  <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
-                    {schedulePagination.paginatedItems.map((mentee) => {
-                      const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
-                      const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
-                      const isExpanded = Boolean(expandedScheduleIds[mentee.id]);
-                      const visuals = resolveMenteeVisuals(
-                        {
-                          applicantId: mentee.applicantId,
-                          entrepreneurName: mentee.entrepreneurName,
-                          businessName: mentee.businessName,
-                          category: mentee.businessCategory
-                        },
-                        businesses
-                      );
-
-                      return (
-                        <div key={mentee.id}>
-                          <div
-                            onClick={() =>
-                              setExpandedScheduleIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
-                            }
-                            className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (scheduleSortBy === 'name') setScheduleSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                              else { setScheduleSortBy('name'); setScheduleSortDir('asc'); }
+                            }}
+                            className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
                           >
-                            <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 shrink-0">
-                                <PortalImage
-                                  src={visuals.businessUrl}
-                                  alt={mentee.businessName}
-                                  fallbackType="business"
-                                  className="w-full h-full object-cover"
+                            <span>Usahawan &amp; Perniagaan</span>
+                            <ArrowUpDown className="w-3 h-3" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (scheduleSortBy === 'date') setScheduleSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                              else { setScheduleSortBy('date'); setScheduleSortDir('asc'); }
+                            }}
+                            className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                          >
+                            <span>Tarikh &amp; Masa</span>
+                            <ArrowUpDown className="w-3 h-3" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          Mod &amp; Lokasi
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          Daerah
+                        </th>
+                        <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                          <span className="sr-only">Tindakan</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                      {schedulePagination.paginatedItems.map((mentee) => {
+                        const rawPhone = mentee.entrepreneurPhone || (mentee as any).phone || '';
+                        const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
+                        const isExpanded = Boolean(expandedScheduleIds[mentee.id]);
+                        const visuals = resolveMenteeVisuals(
+                          {
+                            applicantId: mentee.applicantId,
+                            entrepreneurName: mentee.entrepreneurName,
+                            businessName: mentee.businessName,
+                            category: mentee.businessCategory
+                          },
+                          businesses
+                        );
+
+                        return (
+                          <React.Fragment key={mentee.id}>
+                            <tr
+                              onClick={() =>
+                                setExpandedScheduleIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
+                              }
+                              className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                            >
+                              <td className="py-3.5 px-4 max-w-xs">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                    <PortalImage
+                                      src={visuals.businessUrl}
+                                      alt={mentee.businessName}
+                                      fallbackType="business"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="font-bold text-black dark:text-white truncate">{mentee.entrepreneurName}</div>
+                                    <div className="text-xs text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap tabular-nums">
+                                <div className="font-semibold text-black dark:text-white">{mentee.preferredDate || 'Akan Ditetapkan'}</div>
+                                <div className="text-xs text-black/60 dark:text-white/60">{mentee.preferredTime || '10:00 AM'}</div>
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-200 border border-teal-200 dark:border-teal-800">
+                                  {mentee.meetingLink ? 'Google Meet Maya' : 'Bilik Bimbingan UMK CEED'}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
+                                {mentee.district || 'Kelantan'}
+                              </td>
+                              <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                                <RowActionMenu
+                                  ariaLabel={`Tindakan jadual untuk ${mentee.entrepreneurName}`}
+                                  items={[
+                                    {
+                                      label: isExpanded ? 'Tutup Butiran' : 'Lihat Butiran Sesi',
+                                      onClick: () =>
+                                        setExpandedScheduleIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
+                                    },
+                                    ...(mentee.meetingLink
+                                      ? [{
+                                          label: 'Salin Pautan Google Meet',
+                                          onClick: () => {
+                                            navigator.clipboard?.writeText(mentee.meetingLink || '');
+                                            showToast('Pautan Google Meet disalin.');
+                                          }
+                                        }]
+                                      : []),
+                                    {
+                                      label: 'Nota Bimbingan',
+                                      onClick: () => handleOpenNotesModal(mentee)
+                                    },
+                                    {
+                                      label: 'Tandakan Selesai Sesi',
+                                      onClick: () => handleStatusChange(mentee, 'completed'),
+                                      tone: 'accent'
+                                    }
+                                  ]}
                                 />
-                              </div>
+                              </td>
+                            </tr>
 
-                              <div className="min-w-0 flex-1 space-y-0.5">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <h4 className="text-sm font-bold text-black dark:text-white truncate">
-                                    {mentee.entrepreneurName} · {mentee.businessName}
-                                  </h4>
-                                  <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
-                                    {mentee.meetingLink ? 'Google Meet' : 'Bersemuka'}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                                  {mentee.preferredDate || 'Akan Ditetapkan'} · {mentee.preferredTime || '10:00 AM'} · {mentee.meetingLink ? 'Google Meet Maya' : 'Bilik Bimbingan UMK CEED'} · {mentee.district || 'Kelantan'}
-                                </p>
-                              </div>
-                            </div>
+                            {isExpanded && (
+                              <tr className="bg-teal-50/35 dark:bg-teal-950/20">
+                                <td colSpan={5} className="px-4 sm:px-5 py-4 space-y-3">
+                                  <div className="text-sm text-black dark:text-white space-y-1">
+                                    <p>
+                                      Topik Perbincangan: <strong className="font-semibold">{mentee.topic}</strong>
+                                    </p>
+                                    {mentee.challenges && (
+                                      <p className="text-black/75 dark:text-white/75 italic">
+                                        Nota usahawan: &quot;{mentee.challenges}&quot;
+                                      </p>
+                                    )}
+                                  </div>
 
-                            <div className="flex items-center justify-end gap-2 shrink-0">
-                              {mentee.meetingLink && (
-                                <a
-                                  href={mentee.meetingLink}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors whitespace-nowrap"
-                                >
-                                  <Video className="w-3 h-3" />
-                                  <span>Google Meet</span>
-                                </a>
-                              )}
+                                  <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                                    <div className="flex flex-wrap items-center gap-3">
+                                      {mentee.meetingLink && (
+                                        <a
+                                          href={mentee.meetingLink}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors"
+                                        >
+                                          <Video className="w-3.5 h-3.5" />
+                                          <span>Buka Google Meet</span>
+                                        </a>
+                                      )}
+                                      {cleanPhone && (
+                                        <a
+                                          href={`https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20peringatan%20sesi%20bimbingan%20kita%20pada%20${encodeURIComponent(mentee.preferredDate || 'tarikh dijadualkan')}.`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-sm text-black dark:text-white/85 font-bold hover:underline flex items-center gap-1"
+                                        >
+                                          <Phone className="w-3.5 h-3.5" />
+                                          <span>Hantar Peringatan WhatsApp</span>
+                                        </a>
+                                      )}
+                                    </div>
 
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedScheduleIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }));
-                                }}
-                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                              >
-                                <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
-                                {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                              </button>
-                            </div>
-                          </div>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleOpenNotesModal(mentee)}
+                                        className="px-3 py-1.5 rounded-lg text-sm font-semibold text-black dark:text-white bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 hover:bg-amber-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                      >
+                                        Nota Bimbingan
+                                      </button>
 
-                          {isExpanded && (
-                            <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200 dark:border-slate-700 bg-teal-50/40 dark:bg-teal-950/20 space-y-3 animate-in fade-in duration-150">
-                              <div className="text-sm text-black dark:text-white space-y-1">
-                                <p>
-                                  Topik Perbincangan: <strong className="font-semibold">{mentee.topic}</strong>
-                                </p>
-                                {mentee.challenges && (
-                                  <p className="text-black/75 dark:text-white/75 italic">
-                                    Nota usahawan: &quot;{mentee.challenges}&quot;
-                                  </p>
-                                )}
-                              </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleStatusChange(mentee, 'completed')}
+                                        className="px-3.5 py-1.5 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+                                      >
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        <span>Selesai Sesi</span>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
 
-                              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
-                                {cleanPhone ? (
-                                  <a
-                                    href={`https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20peringatan%20sesi%20bimbingan%20kita%20pada%20${encodeURIComponent(mentee.preferredDate || 'tarikh dijadualkan')}.`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-sm text-black dark:text-white/75 font-bold hover:underline flex items-center gap-1"
-                                  >
-                                    <Phone className="w-3.5 h-3.5" />
-                                    <span>Hantar Peringatan WhatsApp</span>
-                                  </a>
-                                ) : <span />}
-
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOpenNotesModal(mentee)}
-                                    className="px-3 py-1.5 rounded-lg text-sm font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                                  >
-                                    Nota Bimbingan
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => handleStatusChange(mentee, 'completed')}
-                                    className="px-3.5 py-1.5 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
-                                  >
-                                    <CheckCircle2 className="w-3.5 h-3.5" />
-                                    <span>Selesai Sesi</span>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <PaginationBar
-                    currentPage={schedulePagination.currentPage}
-                    totalItems={schedulePagination.totalItems}
-                    itemsPerPage={5}
-                    onPageChange={schedulePagination.setCurrentPage}
-                    itemLabel="sesi disahkan"
-                    accent="teal"
-                  />
-                </>
+              {filteredScheduleSessions.length > 0 && (
+                <PaginationBar
+                  currentPage={schedulePagination.currentPage}
+                  totalItems={schedulePagination.totalItems}
+                  itemsPerPage={7}
+                  onPageChange={schedulePagination.setCurrentPage}
+                  itemLabel="sesi disahkan"
+                  accent="teal"
+                />
               )}
             </div>
           </section>
 
           {/* =================================================================== */}
-          {/* SEKSYEN 3: PELAN TINDAKAN (COMPACT EXPANDABLE LIST + PAGINATION)    */}
+          {/* SEKSYEN 3: NOTA BIMBINGAN USAHAWAN (REFERENCE TABLE + DRAWER)       */}
           {/* =================================================================== */}
-          <section id="mentor-action-plans-section" className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-2xs space-y-5 scroll-mt-24">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-300 dark:border-slate-600 gap-3">
+          <section id="mentor-action-plans-section" className="space-y-4 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center">
@@ -1791,124 +2208,198 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     Nota Bimbingan Usahawan
                   </h3>
                 </div>
-                <p className="text-[0.9375rem] text-black dark:text-white/75 mt-1">
+                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
                   Panduan bimbingan, sasaran jualan, dan pelan susulan usahawan.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-[0.8125rem] font-mono font-bold tabular-nums px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
-                  {actionPlanMentees.length} Nota Disediakan
-                </span>
-              </div>
+              <span className="text-[0.8125rem] font-mono font-bold tabular-nums px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70 self-start sm:self-auto">
+                {filteredActionPlanMentees.length} Nota Disediakan
+              </span>
             </div>
 
-            <div>
-              {actionPlanMentees.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-slate-50 dark:bg-slate-900 space-y-2">
-                  <MessageSquare className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto opacity-50" />
-                  <p className="text-sm font-bold text-black dark:text-white">Belum ada nota bimbingan lagi.</p>
-                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Tekan &quot;+ Tambah Nota Bimbingan&quot; pada senarai sesi di atas untuk rekodkan panduan bisnes usahawan.</p>
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+              <ReferenceTableToolbar
+                searchValue={actionPlansSearch}
+                onSearchChange={setActionPlansSearch}
+                searchPlaceholder="Cari usahawan, topik atau kandungan nota..."
+                filterCount={actionPlansDistrictFilter !== 'all' ? 1 : 0}
+                onResetFilters={() => setActionPlansDistrictFilter('all')}
+                filterContent={
+                  <div>
+                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                      Daerah
+                    </label>
+                    <select
+                      value={actionPlansDistrictFilter}
+                      onChange={(e) => setActionPlansDistrictFilter(e.target.value as 'all' | KelantanDistrict)}
+                      className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                    >
+                      <option value="all">Semua Daerah</option>
+                      {uniqueMentorDistricts.map(d => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                  </div>
+                }
+              />
+
+              {filteredActionPlanMentees.length === 0 ? (
+                <div className="text-center py-12 px-4 space-y-2">
+                  <MessageSquare className="w-10 h-10 text-black/40 dark:text-white/40 mx-auto" />
+                  <p className="text-sm font-bold text-black dark:text-white">Belum ada nota bimbingan ditemui.</p>
+                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Gunakan menu tindakan pada senarai permohonan untuk merekodkan panduan bisnes usahawan.</p>
                 </div>
               ) : (
-                <>
-                  <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden">
-                    {actionPlansPagination.paginatedItems.map((mentee) => {
-                      const isExpanded = Boolean(expandedActionPlanIds[mentee.id]);
-                      const visuals = resolveMenteeVisuals(
-                        {
-                          applicantId: mentee.applicantId,
-                          entrepreneurName: mentee.entrepreneurName,
-                          businessName: mentee.businessName,
-                          category: mentee.businessCategory
-                        },
-                        businesses
-                      );
-                      return (
-                        <div key={mentee.id}>
-                          <div
-                            onClick={() =>
-                              setExpandedActionPlanIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
-                            }
-                            className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (actionPlansSortBy === 'name') setActionPlansSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                              else { setActionPlansSortBy('name'); setActionPlansSortDir('asc'); }
+                            }}
+                            className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
                           >
-                            <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                              <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 shrink-0">
-                                <PortalImage
-                                  src={visuals.businessUrl}
-                                  alt={mentee.businessName}
-                                  fallbackType="business"
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-
-                              <div className="min-w-0 flex-1 space-y-0.5">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <h4 className="text-sm font-bold text-black dark:text-white truncate">
-                                    {mentee.entrepreneurName} · {mentee.businessName}
-                                  </h4>
-                                  <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70">
-                                    Tersimpan
-                                  </span>
+                            <span>Usahawan &amp; Perniagaan</span>
+                            <ArrowUpDown className="w-3 h-3" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (actionPlansSortBy === 'topic') setActionPlansSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                              else { setActionPlansSortBy('topic'); setActionPlansSortDir('asc'); }
+                            }}
+                            className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                          >
+                            <span>Topik Bimbingan</span>
+                            <ArrowUpDown className="w-3 h-3" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          Daerah
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          Status
+                        </th>
+                        <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                          <span className="sr-only">Tindakan</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                      {actionPlansPagination.paginatedItems.map((mentee) => {
+                        const isExpanded = Boolean(expandedActionPlanIds[mentee.id]);
+                        const visuals = resolveMenteeVisuals(
+                          {
+                            applicantId: mentee.applicantId,
+                            entrepreneurName: mentee.entrepreneurName,
+                            businessName: mentee.businessName,
+                            category: mentee.businessCategory
+                          },
+                          businesses
+                        );
+                        return (
+                          <React.Fragment key={mentee.id}>
+                            <tr
+                              onClick={() =>
+                                setExpandedActionPlanIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
+                              }
+                              className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                            >
+                              <td className="py-3.5 px-4 max-w-xs">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                    <PortalImage
+                                      src={visuals.businessUrl}
+                                      alt={mentee.businessName}
+                                      fallbackType="business"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="font-bold text-black dark:text-white truncate">{mentee.entrepreneurName}</div>
+                                    <div className="text-xs text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
+                                  </div>
                                 </div>
-                                <p className="text-sm text-black/70 dark:text-white/75 truncate">
-                                  {mentee.topic} · {mentee.district || 'Kelantan'}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-end gap-2 shrink-0">
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedActionPlanIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }));
-                                }}
-                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                              >
-                                <span>{isExpanded ? 'Tutup' : 'Lihat Nota'}</span>
-                                {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                              </button>
-                            </div>
-                          </div>
-
-                          {isExpanded && (
-                            <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200 dark:border-slate-700 bg-teal-50/40 dark:bg-teal-950/20 space-y-3 animate-in fade-in duration-150">
-                              <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-800/70 space-y-1.5">
-                                <span className="text-sm font-bold text-black dark:text-white block">
-                                  Garis Panduan &amp; Sasaran Tindakan Mentor:
+                              </td>
+                              <td className="py-3.5 px-4 text-black/85 dark:text-white/85 max-w-xs truncate">
+                                {mentee.topic}
+                              </td>
+                              <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
+                                {mentee.district || 'Kelantan'}
+                              </td>
+                              <td className="py-3.5 px-4 whitespace-nowrap">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+                                  Tersimpan
                                 </span>
-                                <p className="text-[0.9375rem] text-black dark:text-white whitespace-pre-line leading-relaxed font-sans">
-                                  {mentee.mentorActionPlan}
-                                </p>
-                              </div>
+                              </td>
+                              <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                                <RowActionMenu
+                                  ariaLabel={`Tindakan nota untuk ${mentee.entrepreneurName}`}
+                                  items={[
+                                    {
+                                      label: isExpanded ? 'Tutup Nota' : 'Lihat Nota Penuh',
+                                      onClick: () =>
+                                        setExpandedActionPlanIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
+                                    },
+                                    {
+                                      label: 'Kemaskini Nota Bimbingan',
+                                      onClick: () => handleOpenNotesModal(mentee),
+                                      tone: 'accent'
+                                    }
+                                  ]}
+                                />
+                              </td>
+                            </tr>
 
-                              <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-black/70 dark:text-white/75">
-                                <span>Penyeliaan berterusan di bawah inisiatif keusahawanan UMK CEED</span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenNotesModal(mentee)}
-                                  className="px-3 py-1.5 rounded-lg text-sm font-bold text-black dark:text-white bg-amber-100 dark:bg-teal-600 hover:bg-amber-200 transition-colors cursor-pointer"
-                                >
-                                  Kemaskini Nota Bimbingan
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                            {isExpanded && (
+                              <tr className="bg-teal-50/35 dark:bg-teal-950/20">
+                                <td colSpan={5} className="px-4 sm:px-5 py-4 space-y-3">
+                                  <div className="p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-teal-200 dark:border-teal-800/70 space-y-1.5">
+                                    <span className="text-sm font-bold text-black dark:text-white block">
+                                      Garis Panduan &amp; Sasaran Tindakan Mentor:
+                                    </span>
+                                    <p className="text-[0.9375rem] text-black dark:text-white whitespace-pre-line leading-relaxed font-sans">
+                                      {mentee.mentorActionPlan}
+                                    </p>
+                                  </div>
 
-                  <PaginationBar
-                    currentPage={actionPlansPagination.currentPage}
-                    totalItems={actionPlansPagination.totalItems}
-                    itemsPerPage={5}
-                    onPageChange={actionPlansPagination.setCurrentPage}
-                    itemLabel="nota bimbingan"
-                    accent="teal"
-                  />
-                </>
+                                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-black/70 dark:text-white/75">
+                                    <span>Penyeliaan berterusan di bawah inisiatif keusahawanan UMK CEED</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenNotesModal(mentee)}
+                                      className="px-3 py-1.5 rounded-lg text-sm font-bold text-black dark:text-white bg-amber-100 dark:bg-teal-600 hover:bg-amber-200 transition-colors cursor-pointer"
+                                    >
+                                      Kemaskini Nota Bimbingan
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {filteredActionPlanMentees.length > 0 && (
+                <PaginationBar
+                  currentPage={actionPlansPagination.currentPage}
+                  totalItems={actionPlansPagination.totalItems}
+                  itemsPerPage={7}
+                  onPageChange={actionPlansPagination.setCurrentPage}
+                  itemLabel="nota bimbingan"
+                  accent="teal"
+                />
               )}
             </div>
           </section>
@@ -1946,13 +2437,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </button>
           </div>
 
-          {/* List of Issued Endorsements */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-6 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
+          {/* List of Issued Endorsements (Reference Table) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-4 h-4 text-black dark:text-white/75" />
                 <h4 className="text-sm font-bold text-black dark:text-white">
-                  Senarai Surat Perakuan Geran yang Telah Dikeluarkan ({mentorEndorsements.length})
+                  Senarai Surat Perakuan Geran yang Telah Dikeluarkan ({filteredEndorsements.length})
                 </h4>
               </div>
               <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
@@ -1960,62 +2451,141 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </span>
             </div>
 
-            {mentorEndorsements.length === 0 ? (
-              <div className="py-10 text-center text-sm text-black/70 dark:text-white/75 border border-dashed border-slate-300 dark:border-slate-600 rounded-2xl">
-                Tiada surat perakuan geran dikeluarkan di bawah seliaan anda buat masa ini.
-              </div>
-            ) : (
-            <>
-              <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden h-fit">
-                {endorsementsPagination.paginatedItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-16 h-16 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
-                        <Award className="w-7 h-7" />
-                      </div>
-
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <h5 className="text-sm font-bold text-black dark:text-white truncate">
-                            {item.menteeName} · {item.endorsementCode}
-                          </h5>
-                          <span className="shrink-0 text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-black dark:bg-emerald-950/70 dark:text-white inline-flex items-center gap-1">
-                            <Check className="w-3 h-3" />
-                            <span>Disahkan Rasmi</span>
-                          </span>
-                        </div>
-                        <p className="text-sm text-black/70 dark:text-white/75 truncate">
-                          {item.grantProgramTitle} ({item.recommendedAmount}) · {item.businessName} · {item.district} · {item.issuedAt}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-end shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedEndorsementForView(item)}
-                        className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs dark:bg-teal-600 whitespace-nowrap"
-                      >
-                        <Printer className="w-3.5 h-3.5" />
-                        <span>Cetak Surat</span>
-                      </button>
-                    </div>
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+              <ReferenceTableToolbar
+                searchValue={endorsementsSearch}
+                onSearchChange={setEndorsementsSearch}
+                searchPlaceholder="Cari nama usahawan, kod perakuan atau daerah..."
+                filterCount={endorsementsGrantFilter !== 'all' ? 1 : 0}
+                onResetFilters={() => setEndorsementsGrantFilter('all')}
+                filterContent={
+                  <div>
+                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                      Jumlah Geran Disyorkan
+                    </label>
+                    <select
+                      value={endorsementsGrantFilter}
+                      onChange={(e) => setEndorsementsGrantFilter(e.target.value as 'all' | 'RM3,000' | 'RM5,000' | 'RM10,000')}
+                      className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                    >
+                      <option value="all">Semua Peringkat Geran</option>
+                      <option value="RM3,000">RM3,000 (Permulaan)</option>
+                      <option value="RM5,000">RM5,000 (Pemangkin)</option>
+                      <option value="RM10,000">RM10,000 (Skala Besar)</option>
+                    </select>
                   </div>
-                ))}
-              </div>
-              <PaginationBar
-                currentPage={endorsementsPagination.currentPage}
-                totalItems={endorsementsPagination.totalItems}
-                itemsPerPage={5}
-                onPageChange={endorsementsPagination.setCurrentPage}
-                itemLabel="surat perakuan"
-                accent="teal"
+                }
               />
-            </>
-            )}
+
+              {filteredEndorsements.length === 0 ? (
+                <div className="py-10 text-center text-sm text-black/70 dark:text-white/75">
+                  Tiada surat perakuan geran dikeluarkan di bawah seliaan anda bagi carian ini.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (endorsementsSortBy === 'name') setEndorsementsSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                              else { setEndorsementsSortBy('name'); setEndorsementsSortDir('asc'); }
+                            }}
+                            className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                          >
+                            <span>Usahawan &amp; Kod Perakuan</span>
+                            <ArrowUpDown className="w-3 h-3" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          Program &amp; Jumlah Geran
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          Daerah
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (endorsementsSortBy === 'date') setEndorsementsSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                              else { setEndorsementsSortBy('date'); setEndorsementsSortDir('desc'); }
+                            }}
+                            className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                          >
+                            <span>Tarikh</span>
+                            <ArrowUpDown className="w-3 h-3" />
+                          </button>
+                        </th>
+                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          Status
+                        </th>
+                        <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                          <span className="sr-only">Tindakan</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                      {endorsementsPagination.paginatedItems.map((item) => (
+                        <tr key={item.id} className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors">
+                          <td className="py-3.5 px-4 max-w-xs">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+                                <Award className="w-5 h-5" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-bold text-black dark:text-white truncate">{item.menteeName}</div>
+                                <div className="text-xs text-black/60 dark:text-white/60 font-mono truncate">{item.endorsementCode}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4 max-w-xs">
+                            <div className="font-medium text-black dark:text-white truncate">{item.businessName}</div>
+                            <div className="text-xs text-black/65 dark:text-white/65 truncate">{item.grantProgramTitle} ({item.recommendedAmount})</div>
+                          </td>
+                          <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
+                            {item.district}
+                          </td>
+                          <td className="py-3.5 px-4 text-black/75 dark:text-white/75 whitespace-nowrap tabular-nums">
+                            {item.issuedAt}
+                          </td>
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+                              <Check className="w-3 h-3" />
+                              <span>Disahkan Rasmi</span>
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <RowActionMenu
+                              ariaLabel={`Tindakan surat perakuan ${item.menteeName}`}
+                              items={[
+                                {
+                                  label: 'Lihat & Cetak Surat',
+                                  onClick: () => setSelectedEndorsementForView(item),
+                                  tone: 'accent'
+                                }
+                              ]}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {filteredEndorsements.length > 0 && (
+                <PaginationBar
+                  currentPage={endorsementsPagination.currentPage}
+                  totalItems={endorsementsPagination.totalItems}
+                  itemsPerPage={7}
+                  onPageChange={endorsementsPagination.setCurrentPage}
+                  itemLabel="surat perakuan"
+                  accent="teal"
+                />
+              )}
+            </div>
           </div>
 
         </div>
@@ -2032,7 +2602,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-black dark:text-white/75 shrink-0" />
                 <h3 className="text-base font-bold text-black dark:text-white">
-                  Rekod Sesi Bimbingan & Tugasan Usahawan
+                  Rekod Sesi Bimbingan &amp; Tugasan Usahawan
                 </h3>
               </div>
               <p className="text-[0.9375rem] text-black dark:text-white max-w-2xl leading-relaxed">
@@ -2050,147 +2620,218 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </button>
           </div>
 
-          <div>
-            {mentorLogs.length === 0 ? (
-              <div className="py-10 text-center text-sm text-black/70 dark:text-white/75 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
-                Belum ada rekod sesi bimbingan untuk usahawan seliaan anda.
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+            <ReferenceTableToolbar
+              searchValue={logsSearch}
+              onSearchChange={setLogsSearch}
+              searchPlaceholder="Cari usahawan, topik atau tarikh sesi..."
+              filterCount={logsStatusFilter !== 'all' ? 1 : 0}
+              onResetFilters={() => setLogsStatusFilter('all')}
+              filterContent={
+                <div>
+                  <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                    Status Tugasan
+                  </label>
+                  <select
+                    value={logsStatusFilter}
+                    onChange={(e) => setLogsStatusFilter(e.target.value as 'all' | 'done' | 'pending')}
+                    className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                  >
+                    <option value="all">Semua Rekod Sesi</option>
+                    <option value="pending">Tugasan Masih Berjalan</option>
+                    <option value="done">Semua Tugasan Selesai</option>
+                  </select>
+                </div>
+              }
+            />
+
+            {filteredLogs.length === 0 ? (
+              <div className="py-10 text-center text-sm text-black/70 dark:text-white/75">
+                Belum ada rekod sesi bimbingan untuk usahawan seliaan anda bagi carian ini.
               </div>
             ) : (
-              <>
-                <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden shadow-2xs">
-                  {logsPagination.paginatedItems.map((log) => {
-                    const isExpanded = Boolean(expandedLogIds[log.id]);
-                    const totalTasks = log.actionItems?.length || 0;
-                    const doneTasks = log.actionItems?.filter(a => a.completed).length || 0;
-                    const visuals = resolveMenteeVisuals(
-                      {
-                        entrepreneurName: log.menteeName,
-                        businessName: log.businessName
-                      },
-                      businesses
-                    );
-                    return (
-                      <div key={log.id}>
-                        <div
-                          onClick={() =>
-                            setExpandedLogIds(prev => ({ ...prev, [log.id]: !prev[log.id] }))
-                          }
-                          className="p-4 sm:p-5 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                      <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (logsSortBy === 'name') setLogsSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                            else { setLogsSortBy('name'); setLogsSortDir('asc'); }
+                          }}
+                          className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
                         >
-                          <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
-                              <PortalImage
-                                src={visuals.businessUrl}
-                                alt={log.businessName}
-                                fallbackType="business"
-                                className="w-full h-full object-cover"
+                          <span>Usahawan &amp; Perniagaan</span>
+                          <ArrowUpDown className="w-3 h-3" />
+                        </button>
+                      </th>
+                      <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        Topik Bimbingan
+                      </th>
+                      <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (logsSortBy === 'date') setLogsSortDir(p => p === 'asc' ? 'desc' : 'asc');
+                            else { setLogsSortBy('date'); setLogsSortDir('desc'); }
+                          }}
+                          className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                        >
+                          <span>Tarikh Sesi</span>
+                          <ArrowUpDown className="w-3 h-3" />
+                        </button>
+                      </th>
+                      <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        Kemajuan Tugasan
+                      </th>
+                      <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                        <span className="sr-only">Tindakan</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                    {logsPagination.paginatedItems.map((log) => {
+                      const isExpanded = Boolean(expandedLogIds[log.id]);
+                      const totalTasks = log.actionItems?.length || 0;
+                      const doneTasks = log.actionItems?.filter(a => a.completed).length || 0;
+                      const visuals = resolveMenteeVisuals(
+                        {
+                          entrepreneurName: log.menteeName,
+                          businessName: log.businessName
+                        },
+                        businesses
+                      );
+                      return (
+                        <React.Fragment key={log.id}>
+                          <tr
+                            onClick={() =>
+                              setExpandedLogIds(prev => ({ ...prev, [log.id]: !prev[log.id] }))
+                            }
+                            className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                          >
+                            <td className="py-3.5 px-4 max-w-xs">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                  <PortalImage
+                                    src={visuals.businessUrl}
+                                    alt={log.businessName}
+                                    fallbackType="business"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="font-bold text-black dark:text-white truncate">{log.menteeName}</div>
+                                  <div className="text-xs text-black/65 dark:text-white/65 truncate">{log.businessName}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4 text-black/85 dark:text-white/85 max-w-xs truncate">
+                              {log.topic}
+                            </td>
+                            <td className="py-3.5 px-4 text-black/75 dark:text-white/75 whitespace-nowrap font-mono tabular-nums">
+                              {log.sessionDate}
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap">
+                              <span
+                                className={`inline-flex items-center text-xs font-bold tabular-nums px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
+                                  totalTasks > 0 && doneTasks === totalTasks
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                                    : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-200'
+                                }`}
+                              >
+                                {totalTasks > 0 ? `${doneTasks}/${totalTasks} Tugasan` : 'Direkodkan'}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                              <RowActionMenu
+                                ariaLabel={`Tindakan log ${log.menteeName}`}
+                                items={[
+                                  {
+                                    label: isExpanded ? 'Tutup Butiran' : 'Lihat Minit & Tugasan',
+                                    onClick: () =>
+                                      setExpandedLogIds(prev => ({ ...prev, [log.id]: !prev[log.id] })),
+                                    tone: 'accent'
+                                  }
+                                ]}
                               />
-                            </div>
+                            </td>
+                          </tr>
 
-                            <div className="min-w-0 flex-1 space-y-0.5">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <h4 className="text-sm font-bold text-black dark:text-white truncate">
-                                  {log.menteeName} · {log.businessName}
-                                </h4>
-                                <span
-                                  className={`shrink-0 text-xs font-bold tabular-nums px-2 py-0.5 rounded-md border whitespace-nowrap ${
-                                    totalTasks > 0 && doneTasks === totalTasks
-                                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
-                                      : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70 text-black dark:text-white'
-                                  }`}
-                                >
-                                  {totalTasks > 0 ? `${doneTasks}/${totalTasks} Tugasan` : 'Direkodkan'}
-                                </span>
-                              </div>
-                              <p className="text-sm text-black/70 dark:text-white/75 truncate">
-                                <span className="font-mono tabular-nums">{log.sessionDate}</span> · {log.topic}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center justify-end gap-2 shrink-0">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedLogIds(prev => ({ ...prev, [log.id]: !prev[log.id] }));
-                              }}
-                              className="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                            >
-                              <span>{isExpanded ? 'Tutup' : 'Butiran'}</span>
-                              {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                            </button>
-                          </div>
-                        </div>
-
-                        {isExpanded && (
-                          <div className="px-4 sm:px-5 pb-4 pt-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 space-y-3.5 animate-in fade-in duration-150">
-                            <div className="space-y-1.5">
-                              <div className="text-sm font-bold text-black dark:text-white">
-                                Ringkasan Minit Bimbingan Mentor:
-                              </div>
-                              <p className="text-[0.9375rem] text-black dark:text-white bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 leading-relaxed font-sans">
-                                {log.minutes}
-                              </p>
-                            </div>
-
-                            {log.actionItems && log.actionItems.length > 0 && (
-                              <div className="space-y-2">
-                                <div className="text-sm font-bold text-black dark:text-white flex items-center justify-between gap-2 flex-wrap">
-                                  <span>Senarai Semak Tugasan Wajib Mentee:</span>
-                                  <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-normal">
-                                    Tekan kotak untuk tandakan status selesai
-                                  </span>
+                          {isExpanded && (
+                            <tr className="bg-slate-50/75 dark:bg-zinc-950/40">
+                              <td colSpan={5} className="px-4 sm:px-5 py-4 space-y-3.5">
+                                <div className="space-y-1.5">
+                                  <div className="text-sm font-bold text-black dark:text-white">
+                                    Ringkasan Minit Bimbingan Mentor:
+                                  </div>
+                                  <p className="text-[0.9375rem] text-black dark:text-white bg-white dark:bg-zinc-900 p-3 rounded-xl border border-slate-200 dark:border-zinc-700 leading-relaxed font-sans">
+                                    {log.minutes}
+                                  </p>
                                 </div>
 
-                                <div className="space-y-2">
-                                  {log.actionItems.map((task) => (
-                                    <div
-                                      key={task.id}
-                                      onClick={() => handleToggleLogTask(log.id, task.id)}
-                                      className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
-                                        task.completed
-                                          ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-black/70 dark:text-white/75 line-through'
-                                          : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 hover:border-blue-400/70 dark:hover:border-blue-400/70 text-black dark:text-white'
-                                      }`}
-                                    >
-                                      <div className="flex items-center gap-2.5">
-                                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
-                                          task.completed
-                                            ? 'bg-emerald-600 border-emerald-600 text-white'
-                                            : 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800'
-                                        }`}>
-                                          {task.completed && <Check className="w-3.5 h-3.5" />}
-                                        </div>
-                                        <span className="text-sm font-medium">{task.task}</span>
-                                      </div>
-
-                                      <span className={`text-[0.8125rem] font-mono tabular-nums px-2 py-0.5 rounded shrink-0 ${
-                                        task.completed ? 'bg-emerald-100 text-black' : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600'
-                                      }`}>
-                                        Sasaran: {task.dueDate}
+                                {log.actionItems && log.actionItems.length > 0 && (
+                                  <div className="space-y-2">
+                                    <div className="text-sm font-bold text-black dark:text-white flex items-center justify-between gap-2 flex-wrap">
+                                      <span>Senarai Semak Tugasan Wajib Mentee:</span>
+                                      <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-normal">
+                                        Tekan kotak untuk tandakan status selesai
                                       </span>
                                     </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
 
-                <PaginationBar
-                  currentPage={logsPagination.currentPage}
-                  totalItems={logsPagination.totalItems}
-                  itemsPerPage={5}
-                  onPageChange={logsPagination.setCurrentPage}
-                  itemLabel="rekod sesi"
-                  accent="teal"
-                />
-              </>
+                                    <div className="space-y-2">
+                                      {log.actionItems.map((task) => (
+                                        <div
+                                          key={task.id}
+                                          onClick={() => handleToggleLogTask(log.id, task.id)}
+                                          className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
+                                            task.completed
+                                              ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-black/70 dark:text-white/75 line-through'
+                                              : 'bg-white dark:bg-zinc-900 border-slate-300 dark:border-zinc-700 hover:border-blue-400/70 dark:hover:border-blue-400/70 text-black dark:text-white'
+                                          }`}
+                                        >
+                                          <div className="flex items-center gap-2.5">
+                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
+                                              task.completed
+                                                ? 'bg-emerald-600 border-emerald-600 text-white'
+                                                : 'border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800'
+                                            }`}>
+                                              {task.completed && <Check className="w-3.5 h-3.5" />}
+                                            </div>
+                                            <span className="text-sm font-medium">{task.task}</span>
+                                          </div>
+
+                                          <span className={`text-[0.8125rem] font-mono tabular-nums px-2 py-0.5 rounded shrink-0 ${
+                                            task.completed ? 'bg-emerald-100 text-black' : 'bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-700'
+                                          }`}>
+                                            Sasaran: {task.dueDate}
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {filteredLogs.length > 0 && (
+              <PaginationBar
+                currentPage={logsPagination.currentPage}
+                totalItems={logsPagination.totalItems}
+                itemsPerPage={7}
+                onPageChange={logsPagination.setCurrentPage}
+                itemLabel="rekod sesi"
+                accent="teal"
+              />
             )}
           </div>
 
@@ -2605,7 +3246,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Title */}
             <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-center">
               <h4 className="font-bold text-sm text-black uppercase">
-                SURAT PERAKUAN SOKONGAN MENTOR BERTAULIAH
+                SURAT PERAKUAN SOKONGAN MENTOR
               </h4>
               <p className="text-[0.9375rem] font-semibold text-black mt-0.5">
                 {selectedEndorsementForView.grantProgramTitle} ({selectedEndorsementForView.recommendedAmount})
@@ -2616,7 +3257,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             <div className="text-sm text-black space-y-3 leading-relaxed font-serif">
               <p>
                 Dengan segala hormatnya dimaklumkan bahawa saya, <strong>{selectedEndorsementForView.mentorName}</strong>, 
-                selaku Mentor Bertauliah di bawah <strong>{selectedEndorsementForView.mentorAgency}</strong> telah membimbing dan 
+                selaku Mentor di bawah <strong>{selectedEndorsementForView.mentorAgency}</strong> telah membimbing dan 
                 menilai potensi perniagaan penama di bawah:
               </p>
 
@@ -2662,7 +3303,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
                 <div>
                   <strong className="block text-black">{selectedEndorsementForView.mentorName}</strong>
-                  <span className="text-black block">{selectedEndorsementForView.mentorDesignation || 'Mentor Bertauliah'}</span>
+                  <span className="text-black block">{selectedEndorsementForView.mentorDesignation || 'Mentor'}</span>
                   <span className="text-black/70 block">{selectedEndorsementForView.mentorAgency}</span>
                 </div>
               </div>

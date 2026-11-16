@@ -40,6 +40,7 @@ interface PaginationBarProps {
   onPageChange: (page: number) => void;
   itemLabel?: string;
   accent?: 'teal' | 'blue' | 'rose';
+  variant?: 'default' | 'compact';
 }
 
 export const PaginationBar: React.FC<PaginationBarProps> = ({
@@ -48,10 +49,11 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
   itemsPerPage = 5,
   onPageChange,
   itemLabel = 'rekod',
-  accent = 'teal'
+  accent = 'teal',
+  variant = 'compact'
 }) => {
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
-  if (totalItems <= itemsPerPage || totalPages <= 1) {
+  if (totalItems === 0) {
     return null;
   }
 
@@ -81,6 +83,66 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
     pages.push(totalPages);
     return pages;
   };
+
+  if (variant === 'compact') {
+    return (
+      <div className="px-4 py-3.5 border-t border-slate-200 dark:border-zinc-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 rounded-b-2xl">
+        <div className="text-sm text-black/75 dark:text-white/80 tabular-nums">
+          Menunjukkan <span className="font-bold text-black dark:text-white">{startItem}–{endItem}</span> daripada{' '}
+          <span className="font-bold text-black dark:text-white">{totalItems}</span> {itemLabel}
+        </div>
+
+        <nav className="flex flex-wrap items-center gap-1.5" aria-label="Navigasi halaman">
+          <button
+            type="button"
+            onClick={() => onPageChange(Math.max(1, safePage - 1))}
+            disabled={safePage <= 1}
+            aria-label="Halaman sebelumnya"
+            title="Halaman sebelumnya"
+            className="w-9 h-9 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center cursor-pointer transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          {getPageNumbers().map((page, idx) =>
+            page === 'ellipsis' ? (
+              <span
+                key={`ellipsis-${idx}`}
+                className="px-1.5 text-sm text-black/60 dark:text-white/60 select-none"
+              >
+                …
+              </span>
+            ) : (
+              <button
+                key={page}
+                type="button"
+                onClick={() => onPageChange(page)}
+                aria-current={safePage === page ? 'page' : undefined}
+                className={`w-9 h-9 rounded-lg text-sm font-bold border tabular-nums inline-flex items-center justify-center transition-colors cursor-pointer ${
+                  safePage === page
+                    ? `${activeButtonClass} shadow-2xs`
+                    : 'border-transparent bg-transparent text-black/80 dark:text-white/80 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                {page}
+              </button>
+            )
+          )}
+
+          <button
+            type="button"
+            onClick={() => onPageChange(Math.min(totalPages, safePage + 1))}
+            disabled={safePage >= totalPages}
+            aria-label="Halaman seterusnya"
+            title="Halaman seterusnya"
+            className="w-9 h-9 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center justify-center cursor-pointer transition-colors"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </nav>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">

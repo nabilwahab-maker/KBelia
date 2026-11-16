@@ -90,7 +90,7 @@ export const INITIAL_PORTAL_NEWS: PortalNews[] = [
     id: 'news-demo-05',
     title: 'Jadual Klinik Bimbingan Mentor UMK & Bantuan Pengesahan SSM Pantas Bulan Ini',
     summary:
-      'Panel mentor bertauliah dari UMK dan agensi keusahawanan membuka slot konsultasi bersemuka dan Google Meet untuk semakan kos, penjenamaan dan strategi jualan.',
+      'Panel mentor dari UMK dan agensi keusahawanan membuka slot konsultasi bersemuka dan Google Meet untuk semakan kos, penjenamaan dan strategi jualan.',
     content:
       'Usahawan belia yang ingin memperkukuh rancangan perniagaan sebelum memohon pembiayaan boleh menempah sesi Klinik Bimbingan Mentor secara dalam talian atau bersemuka di kampus.\n\nSetiap mentor akan membimbing usahawan dari aspek pengiraan margin untung, pematuhan pendaftaran SSM, serta menyediakan minit jurnal dan pelan tindakan susulan.\n\nMentor yang terlibat juga boleh mengemas kini jadual kelapangan dan mengeluarkan surat perakuan geran secara digital melalui Portal Mentor masing-masing.',
     category: 'Info Terkini',

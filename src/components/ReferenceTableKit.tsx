@@ -1,0 +1,254 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Search, SlidersHorizontal, MoreHorizontal, X } from 'lucide-react';
+
+interface ReferenceTableToolbarProps {
+  searchValue: string;
+  onSearchChange: (val: string) => void;
+  searchPlaceholder?: string;
+  filterCount?: number;
+  onResetFilters?: () => void;
+  filterContent?: React.ReactNode;
+  rightSlot?: React.ReactNode;
+}
+
+export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
+  searchValue,
+  onSearchChange,
+  searchPlaceholder = 'Cari rekod...',
+  filterCount = 0,
+  onResetFilters,
+  filterContent,
+  rightSlot
+}) => {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isFilterOpen) return;
+    const handlePointerDown = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFilterOpen]);
+
+  return (
+    <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-700">
+      <div className="relative w-full sm:w-72">
+        <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <input
+          type="text"
+          value={searchValue}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder={searchPlaceholder}
+          className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+        />
+        {searchValue && (
+          <button
+            type="button"
+            onClick={() => onSearchChange('')}
+            aria-label="Kosongkan carian"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white cursor-pointer"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {rightSlot}
+
+        {filterContent && (
+          <div className="relative" ref={filterRef}>
+            <button
+              type="button"
+              onClick={() => setIsFilterOpen((prev) => !prev)}
+              aria-expanded={isFilterOpen}
+              className={`min-h-[38px] px-3.5 py-2 rounded-xl border text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${
+                filterCount > 0
+                  ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-black dark:text-white'
+                  : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
+              }`}
+            >
+              <SlidersHorizontal className="w-4 h-4 shrink-0" />
+              <span>Penapis{filterCount > 0 ? ` (${filterCount})` : ''}</span>
+            </button>
+
+            {isFilterOpen && (
+              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-40 space-y-3.5 text-left">
+                {filterContent}
+                <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+                  {onResetFilters ? (
+                    <button
+                      type="button"
+                      onClick={onResetFilters}
+                      className="text-xs font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
+                    >
+                      Set Semula
+                    </button>
+                  ) : (
+                    <span />
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsFilterOpen(false)}
+                    className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export interface RowActionItem {
+  label: string;
+  onClick: () => void;
+  tone?: 'default' | 'danger' | 'accent';
+  disabled?: boolean;
+  dividerBefore?: boolean;
+}
+
+interface RowActionMenuProps {
+  items: RowActionItem[];
+  ariaLabel?: string;
+}
+
+export const RowActionMenu: React.FC<RowActionMenuProps> = ({
+  items,
+  ariaLabel = 'Tindakan baris'
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number; openUp: boolean }>({
+    top: 0,
+    left: 0,
+    openUp: false
+  });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const visibleItems = items.filter(Boolean);
+
+  const updateMenuPosition = () => {
+    const btn = buttonRef.current;
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+    const estimatedHeight = visibleItems.length * 38 + 20;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUp = spaceBelow < estimatedHeight && rect.top > estimatedHeight;
+    const menuWidth = 208;
+    const left = Math.max(12, Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 12));
+    const top = openUp ? Math.max(12, rect.top - 4) : rect.bottom + 4;
+    setMenuPos({ top, left, openUp });
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    updateMenuPosition();
+    const handlePointerDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+    const handleScrollOrResize = () => {
+      setIsOpen(false);
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [isOpen, visibleItems.length]);
+
+  if (visibleItems.length === 0) return null;
+
+  return (
+    <div className="relative inline-flex justify-end">
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!isOpen) updateMenuPosition();
+          setIsOpen((prev) => !prev);
+        }}
+        aria-expanded={isOpen}
+        aria-label={ariaLabel}
+        className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-black/60 dark:text-white/65 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
+      >
+        <MoreHorizontal className="w-4 h-4" />
+      </button>
+
+      {isOpen && (
+        <div
+          ref={menuRef}
+          style={{
+            position: 'fixed',
+            top: `${menuPos.top}px`,
+            left: `${menuPos.left}px`,
+            transform: menuPos.openUp ? 'translateY(-100%)' : undefined
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-52 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-50 text-left"
+        >
+          {visibleItems.map((item, idx) => (
+            <React.Fragment key={`${item.label}-${idx}`}>
+              {item.dividerBefore && (
+                <div className="my-1 border-t border-slate-200 dark:border-zinc-700" />
+              )}
+              <button
+                type="button"
+                disabled={item.disabled}
+                onClick={() => {
+                  setIsOpen(false);
+                  item.onClick();
+                }}
+                className={`w-full px-3.5 py-2 text-sm text-left cursor-pointer transition-colors disabled:opacity-45 disabled:cursor-not-allowed ${
+                  item.tone === 'danger'
+                    ? 'font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50'
+                    : item.tone === 'accent'
+                    ? 'font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
+                    : 'font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
+                }`}
+              >
+                {item.label}
+              </button>
+            </React.Fragment>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

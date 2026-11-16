@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 import { 
   Store, 
-  Search, 
-  MapPin, 
-  Sparkles, 
-  Filter, 
   MessageCircle, 
   ShieldCheck, 
-  Star, 
   ArrowRight,
   GraduationCap
 } from 'lucide-react';
-import { BusinessListing, BusinessCategory, KelantanDistrict } from '../types';
+import { BusinessListing, KelantanDistrict } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { showToast } from './ToastNotification';
+import { ReferenceTableToolbar } from './ReferenceTableKit';
+import { PaginationBar, usePagination } from './PaginationBar';
 
 interface DirectorySectionProps {
   businesses?: BusinessListing[];
@@ -76,6 +73,17 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
     return matchesSearch && matchesCat && matchesDist && biz.isApproved !== false;
   });
 
+  const pagination = usePagination(filteredBusinesses, 7, [
+    searchQuery,
+    selectedCategory,
+    selectedDistrict,
+    filteredBusinesses.length
+  ]);
+
+  const activeFilterCount =
+    (selectedCategory !== 'Semua Kategori' ? 1 : 0) +
+    (selectedDistrict !== 'Semua Jajahan' ? 1 : 0);
+
   return (
     <div className="w-full space-y-4">
       
@@ -133,168 +141,186 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
         </div>
       </div>
 
-      {/* Search & Filter Controls */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-4 transition-colors">
-        <div className="grid md:grid-cols-12 gap-3">
-          
-          {/* Search input */}
-          <div className="md:col-span-6 relative">
-            <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder={t('search_business_ph')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 transition-colors dark:focus:border-blue-500"
-            />
-          </div>
-
-          {/* Category Dropdown */}
-          <div className="md:col-span-3">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c === 'Semua Kategori' ? t('all_categories') : c}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* District Dropdown */}
-          <div className="md:col-span-3">
-            <select
-              value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value as KelantanDistrict)}
-              className="w-full px-3 py-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 focus:outline-none font-medium text-black dark:text-white transition-colors dark:focus:border-blue-500"
-            >
-              {DISTRICTS.map((d) => (
-                <option key={d} value={d}>
-                  {d === 'Semua Jajahan' ? (language === 'en' ? 'Across Kelantan' : 'Seluruh Kelantan') : d}
-                </option>
-              ))}
-            </select>
-          </div>
-
-        </div>
-
-        {/* Quick category pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-sm pt-1 border-t border-slate-300 dark:border-slate-600">
-          <span className="text-[0.8125rem] font-bold text-black/70 dark:text-white/75 shrink-0">{t('popular_categories_label')}</span>
-          {CATEGORIES.slice(1, 5).map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`interactive-press px-2.5 py-1 rounded-lg text-[0.8125rem] font-medium shrink-0 transition-colors cursor-pointer ${
-                selectedCategory === cat
-                  ? 'bg-amber-100 dark:bg-indigo-600 text-black dark:text-white font-bold border border-indigo-200 dark:border-indigo-800/70'
-                  : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700 dark:hover:text-white border border-slate-300 dark:border-slate-600'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Senarai Menegak Usahawan */}
-      {filteredBusinesses.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 h-fit">
-          <Store className="w-12 h-12 text-black/35 dark:text-white/35 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-black dark:text-white">{t('no_businesses_found')}</h3>
-          <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">{t('no_businesses_desc')}</p>
-        </div>
-      ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
-          {filteredBusinesses.map((biz) => {
-            const rawPhone = biz.whatsapp || biz.ownerPhone || '';
-            const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
-            const waGreeting = language === 'en'
-              ? `Hello ${biz.businessName}, I saw your business profile on the Kelantan Youth Portal.`
-              : `Assalamualaikum ${biz.businessName}, saya melihat perniagaan anda di Portal NiagaBelia Kelantan.`;
-            const waLink = cleanPhone
-              ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waGreeting)}`
-              : '#';
-
-            return (
-              <div
-                key={biz.id}
-                id={`business-card-${biz.id}`}
-                onClick={() => onSelectBusiness(biz)}
-                className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                  <img
-                    src={biz.logoUrl || biz.bannerUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
-                    alt={biz.businessName}
-                    className="w-16 h-16 rounded-lg object-cover shrink-0 border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900"
-                  />
-
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <h3 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
-                        {biz.businessName}
-                      </h3>
-                      {biz.ssmNumber ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-300 dark:border-emerald-700 shrink-0">
-                          <ShieldCheck className="w-3 h-3" />
-                          <span>SSM Sah</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-slate-100 dark:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 shrink-0">
-                          Aktif
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                      {biz.category} · {biz.district}, Kelantan · ★ {biz.rating || 5.0}{biz.tagline ? ` · ${biz.tagline}` : ''}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectBusiness(biz);
-                    }}
-                    className="py-2 px-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs shrink-0"
-                  >
-                    <span>{language === 'en' ? 'View Profile & Catalog' : 'Katalog & Profil'}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-
-                  <a
-                    href={waLink}
-                    target={cleanPhone ? '_blank' : undefined}
-                    rel={cleanPhone ? 'noopener noreferrer' : undefined}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!cleanPhone) {
-                        e.preventDefault();
-                        showToast(
-                          language === 'en'
-                            ? 'This business has not added a WhatsApp number yet.'
-                            : 'Perniagaan ini belum mendaftarkan nombor WhatsApp.',
-                          'warning'
-                        );
+      {/* Direktori Usahawan: Carian, Penapis Bersepadu, Senarai Baris & Halaman Bernombor */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+        <ReferenceTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={t('search_business_ph')}
+          filterCount={activeFilterCount}
+          onResetFilters={() => {
+            setSelectedCategory('Semua Kategori');
+            setSelectedDistrict('Semua Jajahan');
+          }}
+          filterContent={
+            <>
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  {t('popular_categories_label')}
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {CATEGORIES.slice(1, 5).map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() =>
+                        setSelectedCategory((prev) => (prev === cat ? 'Semua Kategori' : cat))
                       }
-                    }}
-                    title={language === 'en' ? 'Direct WhatsApp' : 'WhatsApp Terus'}
-                    className="p-2 bg-indigo-50 hover:bg-amber-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/60 dark:hover:bg-indigo-600 dark:text-indigo-400 dark:border-indigo-800/70 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center shrink-0"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                  </a>
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer text-left border ${
+                        selectedCategory === cat
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  {language === 'en' ? 'Category' : 'Kategori'}
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c === 'Semua Kategori' ? t('all_categories') : c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  {language === 'en' ? 'District' : 'Jajahan'}
+                </label>
+                <select
+                  value={selectedDistrict}
+                  onChange={(e) => setSelectedDistrict(e.target.value as KelantanDistrict)}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  {DISTRICTS.map((d) => (
+                    <option key={d} value={d}>
+                      {d === 'Semua Jajahan' ? (language === 'en' ? 'Across Kelantan' : 'Seluruh Kelantan') : d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          }
+        />
+
+        {filteredBusinesses.length === 0 ? (
+          <div className="text-center py-12 px-4">
+            <Store className="w-12 h-12 text-black/35 dark:text-white/35 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-black dark:text-white">{t('no_businesses_found')}</h3>
+            <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1">{t('no_businesses_desc')}</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col divide-y divide-slate-200 dark:divide-zinc-700">
+              {pagination.paginatedItems.map((biz) => {
+                const rawPhone = biz.whatsapp || biz.ownerPhone || '';
+                const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
+                const waGreeting = language === 'en'
+                  ? `Hello ${biz.businessName}, I saw your business profile on the Kelantan Youth Portal.`
+                  : `Assalamualaikum ${biz.businessName}, saya melihat perniagaan anda di Portal NiagaBelia Kelantan.`;
+                const waLink = cleanPhone
+                  ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waGreeting)}`
+                  : '#';
+
+                return (
+                  <div
+                    key={biz.id}
+                    id={`business-card-${biz.id}`}
+                    onClick={() => onSelectBusiness(biz)}
+                    className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <img
+                        src={biz.logoUrl || biz.bannerUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
+                        alt={biz.businessName}
+                        className="w-16 h-16 rounded-lg object-cover shrink-0 border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800"
+                      />
+
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h3 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
+                            {biz.businessName}
+                          </h3>
+                          {biz.ssmNumber ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-300 dark:border-emerald-700 shrink-0">
+                              <ShieldCheck className="w-3 h-3" />
+                              <span>SSM Sah</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-slate-100 dark:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 shrink-0">
+                              Aktif
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                          {biz.category} · {biz.district}, Kelantan · ★ {biz.rating || 5.0}{biz.tagline ? ` · ${biz.tagline}` : ''}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectBusiness(biz);
+                        }}
+                        className="py-2 px-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs shrink-0"
+                      >
+                        <span>{language === 'en' ? 'View Profile & Catalog' : 'Katalog & Profil'}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+
+                      <a
+                        href={waLink}
+                        target={cleanPhone ? '_blank' : undefined}
+                        rel={cleanPhone ? 'noopener noreferrer' : undefined}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!cleanPhone) {
+                            e.preventDefault();
+                            showToast(
+                              language === 'en'
+                                ? 'This business has not added a WhatsApp number yet.'
+                                : 'Perniagaan ini belum mendaftarkan nombor WhatsApp.',
+                              'warning'
+                            );
+                          }
+                        }}
+                        title={language === 'en' ? 'Direct WhatsApp' : 'WhatsApp Terus'}
+                        className="p-2 bg-indigo-50 hover:bg-amber-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/60 dark:hover:bg-indigo-600 dark:text-indigo-400 dark:border-indigo-800/70 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center shrink-0"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <PaginationBar
+              currentPage={pagination.currentPage}
+              totalItems={pagination.totalItems}
+              itemsPerPage={7}
+              onPageChange={pagination.setCurrentPage}
+              itemLabel={language === 'en' ? 'businesses' : 'perniagaan'}
+              accent="blue"
+            />
+          </>
+        )}
+      </div>
 
     </div>
   );

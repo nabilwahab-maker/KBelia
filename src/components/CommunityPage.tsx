@@ -44,7 +44,7 @@ interface CommunityPageProps {
 
 const ROLE_LABEL: Record<UserRole, string> = {
   admin: 'Pentadbir',
-  mentor: 'Mentor Bertauliah',
+  mentor: 'Mentor',
   user: 'Usahawan Belia'
 };
 

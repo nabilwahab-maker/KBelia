@@ -2,15 +2,10 @@ import React, { useState, useMemo } from 'react';
 import {
   Newspaper,
   Plus,
-  Edit3,
-  Trash2,
-  Pin,
-  Eye,
-  EyeOff,
-  Search,
   Save,
   X,
-  Send
+  Send,
+  ArrowUpDown
 } from 'lucide-react';
 import { NewsCategory, NewsStatus, PortalNews } from '../types';
 import { NEWS_CATEGORIES } from '../data/newsData';
@@ -23,6 +18,8 @@ import { ImageDropzone } from './ImageDropzone';
 import { showToast } from './ToastNotification';
 import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
+import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
+import { PaginationBar, usePagination } from './PaginationBar';
 
 interface AdminNewsManagerProps {
   newsItems: PortalNews[];
@@ -52,8 +49,10 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
-
-  if (!isAdmin) return null;
+  const [categoryFilter, setCategoryFilter] = useState<'all' | NewsCategory>('all');
+  const [pinnedFilter, setPinnedFilter] = useState<'all' | 'pinned' | 'normal'>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'title' | 'category'>('date');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   const stats = useMemo(() => {
     const published = newsItems.filter(n => n.status === 'published').length;
@@ -67,6 +66,9 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
     return newsItems
       .filter(item => {
         if (statusFilter !== 'all' && item.status !== statusFilter) return false;
+        if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
+        if (pinnedFilter === 'pinned' && !item.isPinned) return false;
+        if (pinnedFilter === 'normal' && item.isPinned) return false;
         if (!q) return true;
         return (
           item.title.toLowerCase().includes(q) ||
@@ -75,10 +77,45 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
         );
       })
       .sort((a, b) => {
+        if (sortBy === 'title') {
+          const cmp = a.title.localeCompare(b.title);
+          return sortDir === 'asc' ? cmp : -cmp;
+        }
+        if (sortBy === 'category') {
+          const cmp = a.category.localeCompare(b.category);
+          return sortDir === 'asc' ? cmp : -cmp;
+        }
         if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
-        return new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime();
+        const diff = new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime();
+        return sortDir === 'asc' ? -diff : diff;
       });
-  }, [newsItems, searchQuery, statusFilter]);
+  }, [newsItems, searchQuery, statusFilter, categoryFilter, pinnedFilter, sortBy, sortDir]);
+
+  const newsPagination = usePagination(filteredList, 7, [
+    searchQuery,
+    statusFilter,
+    categoryFilter,
+    pinnedFilter,
+    sortBy,
+    sortDir,
+    filteredList.length
+  ]);
+
+  const activeFilterCount =
+    (statusFilter !== 'all' ? 1 : 0) +
+    (categoryFilter !== 'all' ? 1 : 0) +
+    (pinnedFilter !== 'all' ? 1 : 0);
+
+  const toggleSort = (col: 'date' | 'title' | 'category') => {
+    if (sortBy === col) {
+      setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(col);
+      setSortDir(col === 'date' ? 'desc' : 'asc');
+    }
+  };
+
+  if (!isAdmin) return null;
 
   const resetForm = () => {
     setEditingId(null);
@@ -442,172 +479,231 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
         </form>
       )}
 
-      {/* Search & Status Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 p-3.5 rounded-xl border border-slate-300 dark:border-zinc-600">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Masukkan kata kunci carian"
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
-          />
-        </div>
+      {/* Admin News Table Card */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+        <ReferenceTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Cari tajuk, ringkasan atau kategori..."
+          filterCount={activeFilterCount}
+          onResetFilters={() => {
+            setStatusFilter('all');
+            setCategoryFilter('all');
+            setPinnedFilter('all');
+          }}
+          filterContent={
+            <>
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  Status Penerbitan
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as 'all' | 'published' | 'draft')}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  <option value="all">Semua Status</option>
+                  <option value="published">Disiar (Awam)</option>
+                  <option value="draft">Draf (Admin Sahaja)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  Kategori
+                </label>
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value as 'all' | NewsCategory)}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  <option value="all">Semua Kategori</option>
+                  {NEWS_CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  Sorotan Utama
+                </label>
+                <select
+                  value={pinnedFilter}
+                  onChange={(e) => setPinnedFilter(e.target.value as 'all' | 'pinned' | 'normal')}
+                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                >
+                  <option value="all">Semua Artikel</option>
+                  <option value="pinned">Berita Utama Dipin</option>
+                  <option value="normal">Artikel Biasa</option>
+                </select>
+              </div>
+            </>
+          }
+        />
 
-        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600 self-start sm:self-auto">
-          {([
-            { id: 'all', label: 'Semua' },
-            { id: 'published', label: 'Disiar' },
-            { id: 'draft', label: 'Draf' }
-          ] as const).map(tab => (
+        {filteredList.length === 0 ? (
+          <div className="p-10 text-center space-y-3">
+            <Newspaper className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
+            <p className="text-sm font-bold text-black dark:text-white">Tiada artikel ditemui</p>
+            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
+              Cipta berita baharu atau ubah tapisan carian di atas.
+            </p>
             <button
-              key={tab.id}
               type="button"
-              onClick={() => setStatusFilter(tab.id)}
-              className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-colors cursor-pointer whitespace-nowrap ${
-                statusFilter === tab.id
-                  ? 'bg-white dark:bg-zinc-800 text-black dark:text-white shadow-2xs'
-                  : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
-              }`}
+              onClick={handleOpenCreate}
+              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold cursor-pointer inline-flex items-center gap-1.5 dark:bg-blue-600"
             >
-              {tab.label}
+              <Plus className="w-3.5 h-3.5" />
+              <span>Tambah Berita Pertama</span>
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Admin News List */}
-      {filteredList.length === 0 ? (
-        <div className="p-10 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 space-y-3">
-          <Newspaper className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
-          <p className="text-sm font-bold text-black dark:text-white">Tiada artikel ditemui</p>
-          <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-            Cipta berita baharu untuk mula mengurus kandungan portal.
-          </p>
-          <button
-            type="button"
-            onClick={handleOpenCreate}
-            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold cursor-pointer inline-flex items-center gap-1.5 dark:bg-blue-600"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Tambah Berita Pertama</span>
-          </button>
-        </div>
-      ) : (
-        <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 flex flex-col divide-y divide-slate-200 dark:divide-zinc-700 overflow-hidden h-fit">
-          {filteredList.map(item => (
-            <div
-              key={item.id}
-              className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3.5 hover:bg-slate-50/70 dark:hover:bg-zinc-950/60 transition-colors"
-            >
-              <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-zinc-800 overflow-hidden shrink-0 border border-slate-300 dark:border-zinc-600">
-                  {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.title}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-black/70 dark:text-white/75">
-                      <Newspaper className="w-5 h-5" />
-                    </div>
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <h4 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
-                      {item.title}
-                    </h4>
-                    <span
-                      className={`px-2 py-0.5 rounded text-[0.75rem] font-bold shrink-0 border ${
-                        item.status === 'published'
-                          ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-black dark:text-white'
-                          : 'bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800 text-black dark:text-white'
-                      }`}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                  <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <button
+                      type="button"
+                      onClick={() => toggleSort('title')}
+                      className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
                     >
-                      {item.status === 'published' ? 'Disiar' : 'Draf'}
-                    </span>
-                  </div>
-                  <p className="text-sm text-black/70 dark:text-white/75 truncate mt-0.5 tabular-nums">
-                    {item.category}{item.isPinned ? ' · Dipin' : ''} · {formatDate(item.publishedAt || item.updatedAt)} · {item.summary}
-                  </p>
-                </div>
-              </div>
+                      <span>Artikel Berita</span>
+                      <ArrowUpDown className="w-3 h-3" />
+                    </button>
+                  </th>
+                  <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <button
+                      type="button"
+                      onClick={() => toggleSort('category')}
+                      className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                    >
+                      <span>Kategori</span>
+                      <ArrowUpDown className="w-3 h-3" />
+                    </button>
+                  </th>
+                  <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    Status
+                  </th>
+                  <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <button
+                      type="button"
+                      onClick={() => toggleSort('date')}
+                      className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+                    >
+                      <span>Tarikh</span>
+                      <ArrowUpDown className="w-3 h-3" />
+                    </button>
+                  </th>
+                  <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                    <span className="sr-only">Tindakan</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                {newsPagination.paginatedItems.map(item => (
+                  <tr
+                    key={item.id}
+                    className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors"
+                  >
+                    <td className="py-3.5 px-4 max-w-md">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-zinc-800 overflow-hidden shrink-0 border border-slate-200 dark:border-zinc-700">
+                          {item.imageUrl ? (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.title}
+                              referrerPolicy="no-referrer"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-black/55 dark:text-white/60">
+                              <Newspaper className="w-4 h-4" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-black dark:text-white truncate">
+                            {item.title}
+                          </div>
+                          <div className="text-xs text-black/65 dark:text-white/65 truncate">
+                            {item.summary}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <span>{item.category}</span>
+                        {item.isPinned && (
+                          <span className="px-2 py-0.5 rounded-full text-[0.6875rem] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
+                            Utama
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                          item.status === 'published'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                            : 'bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200'
+                        }`}
+                      >
+                        {item.status === 'published' ? 'Disiar' : 'Draf'}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-black/75 dark:text-white/75 whitespace-nowrap tabular-nums">
+                      {formatDate(item.publishedAt || item.updatedAt)}
+                    </td>
+                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                      <RowActionMenu
+                        ariaLabel={`Tindakan untuk ${item.title}`}
+                        items={[
+                          {
+                            label: item.isPinned ? 'Nyahpin Berita Utama' : 'Pin Berita Utama',
+                            onClick: () => handleQuickTogglePin(item)
+                          },
+                          {
+                            label: item.status === 'published' ? 'Tukar kepada Draf' : 'Siarkan Sekarang',
+                            onClick: () => handleQuickToggleStatus(item),
+                            tone: 'accent'
+                          },
+                          {
+                            label: 'Edit Artikel',
+                            onClick: () => handleOpenEdit(item)
+                          },
+                          {
+                            label: 'Padam Berita',
+                            onClick: () =>
+                              confirmDelete({
+                                itemName: item.title,
+                                itemType: 'Berita Portal',
+                                onConfirm: () => handleDelete(item.id)
+                              }),
+                            tone: 'danger',
+                            dividerBefore: true
+                          }
+                        ]}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-              {/* Admin Action Controls */}
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => handleQuickTogglePin(item)}
-                  className={`px-2.5 py-1.5 rounded-lg border text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
-                    item.isPinned
-                      ? 'bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border-amber-200 dark:border-amber-800/70'
-                      : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-800'
-                  }`}
-                  title={item.isPinned ? 'Nyahpin Berita Utama' : 'Pin sebagai Berita Utama'}
-                >
-                  <Pin className="w-3.5 h-3.5" />
-                  <span>{item.isPinned ? 'Dipin' : 'Pin'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickToggleStatus(item)}
-                  className={`px-2.5 py-1.5 rounded-lg border text-[0.8125rem] font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap ${
-                    item.status === 'published'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border-emerald-200 dark:border-emerald-800 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
-                      : 'bg-amber-50 dark:bg-amber-950/50 text-black dark:text-white border-amber-200 dark:border-amber-800 hover:bg-emerald-50 hover:text-black dark:hover:text-white'
-                  }`}
-                  title={item.status === 'published' ? 'Tukar kepada Draf' : 'Siarkan Sekarang'}
-                >
-                  {item.status === 'published' ? (
-                    <>
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Siar</span>
-                    </>
-                  ) : (
-                    <>
-                      <EyeOff className="w-3.5 h-3.5" />
-                      <span>Draf</span>
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleOpenEdit(item)}
-                  className="px-2.5 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/70 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 transition-colors"
-                  title="Edit Berita"
-                >
-                  <Edit3 className="w-3.5 h-3.5 shrink-0" />
-                  <span>Edit</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    confirmDelete({
-                      itemName: item.title,
-                      itemType: 'Berita Portal',
-                      onConfirm: () => handleDelete(item.id)
-                    })
-                  }
-                  className="px-2.5 py-1.5 rounded-lg border border-rose-200 dark:border-rose-800/70 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 transition-colors"
-                  title="Padam Berita"
-                  aria-label="Padam berita"
-                >
-                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                  <span>Padam</span>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+        {filteredList.length > 0 && (
+          <PaginationBar
+            currentPage={newsPagination.currentPage}
+            totalItems={newsPagination.totalItems}
+            itemsPerPage={7}
+            onPageChange={newsPagination.setCurrentPage}
+            itemLabel="artikel berita"
+            accent="blue"
+          />
+        )}
+      </div>
     </div>
   );
 };
