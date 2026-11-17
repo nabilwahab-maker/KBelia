@@ -48,7 +48,6 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
   totalItems,
   itemsPerPage = 5,
   onPageChange,
-  itemLabel = 'rekod',
   accent = 'teal',
   variant = 'compact'
 }) => {
@@ -58,8 +57,6 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
   }
 
   const safePage = Math.min(Math.max(1, currentPage), totalPages);
-  const startItem = (safePage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(safePage * itemsPerPage, totalItems);
 
   const activeButtonClass =
     accent === 'rose'
@@ -86,12 +83,7 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
 
   if (variant === 'compact') {
     return (
-      <div className="px-4 py-3.5 border-t border-slate-200 dark:border-zinc-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 rounded-b-2xl">
-        <div className="text-sm text-black/75 dark:text-white/80 tabular-nums">
-          Menunjukkan <span className="font-bold text-black dark:text-white">{startItem}–{endItem}</span> daripada{' '}
-          <span className="font-bold text-black dark:text-white">{totalItems}</span> {itemLabel}
-        </div>
-
+      <div className="px-4 py-3.5 border-t border-slate-200 dark:border-zinc-700 flex flex-wrap items-center justify-end gap-3 bg-white dark:bg-zinc-900 rounded-b-2xl">
         <nav className="flex flex-wrap items-center gap-1.5" aria-label="Navigasi halaman">
           <button
             type="button"
@@ -145,12 +137,7 @@ export const PaginationBar: React.FC<PaginationBarProps> = ({
   }
 
   return (
-    <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div className="text-sm text-black/75 dark:text-white/80 tabular-nums">
-        Menunjukkan <span className="font-bold text-black dark:text-white">{startItem}–{endItem}</span> daripada{' '}
-        <span className="font-bold text-black dark:text-white">{totalItems}</span> {itemLabel}
-      </div>
-
+    <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-end gap-3">
       <nav className="flex flex-wrap items-center gap-1.5" aria-label="Navigasi halaman">
         <button
           type="button"

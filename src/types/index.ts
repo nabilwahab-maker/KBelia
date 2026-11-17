@@ -83,8 +83,6 @@ export interface BusinessListing {
   isApproved: boolean;
   isFeatured: boolean;
   capsuleSlotId?: string;
-  rating?: number;
-  reviewsCount?: number;
   createdAt: string;
   updatedAt?: string;
 }

@@ -26,6 +26,7 @@ import { ImageDropzone } from './ImageDropzone';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
+import { ModernDatePicker, ModernTimePicker } from './ModernDateTimePicker';
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -838,21 +839,25 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
 
                 <div>
                   <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Tarikh</label>
-                  <input
-                    type="text"
+                  <ModernDatePicker
                     value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    onChange={setDate}
+                    valueFormat="malay-date"
+                    allowRange
+                    placeholder="Pilih tarikh atau julat"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Masa</label>
-                  <input
-                    type="text"
+                  <ModernTimePicker
                     value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    onChange={setTime}
+                    mode="range"
+                    allowRangeToggle
+                    formatStyle="12h-pg"
+                    defaultDurationMinutes={480}
+                    placeholder="Pilih waktu acara"
                   />
                 </div>
 

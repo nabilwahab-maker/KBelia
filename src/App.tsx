@@ -1940,10 +1940,11 @@ function MainApp() {
               <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
                 <ProgramsSection 
                   programs={programs} 
-                  grantApplications={myYouthGrants}
+                  grantApplications={isAdmin ? grantApplications : myYouthGrants}
                   onOpenGrantModal={isYouth ? handleOpenGrantModal : undefined}
                   onCancelGrant={isYouth ? handleCancelGrantApplication : undefined}
                   onAddProgram={isAdmin ? () => { setAdminSubTab('programs'); navigateWithSkeleton('admin', 'programs'); } : undefined}
+                  onRefresh={triggerRefresh}
                   isReadOnly={isAdmin}
                 />
               </div>

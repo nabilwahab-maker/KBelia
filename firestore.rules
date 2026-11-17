@@ -880,7 +880,9 @@ service cloud.firestore {
           ])
         )
       );
-      allow delete: if isAdmin() && isValidId(logId);
+      allow delete: if isSignedIn() && isValidId(logId) && (
+        isAdmin() || (isMentor() && existing().mentorId == getMentorId())
+      );
     }
 
     // 15. B2B Listings Collection (Admin + Signed-In Youth Owner Control)

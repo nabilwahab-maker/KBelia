@@ -47,24 +47,18 @@ const DISTRICTS: KelantanDistrict[] = [
 
 export const DirectorySection: React.FC<DirectorySectionProps> = ({
   businesses = [],
-  onSelectBusiness,
-  onOpenRegister,
-  onRegisterBusiness
+  onSelectBusiness
 }) => {
   const { userProfile, isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const isMentor = userProfile?.role === 'mentor';
-  const isYouth = !isAdmin && !isMentor;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua Kategori');
   const [selectedDistrict, setSelectedDistrict] = useState<KelantanDistrict>('Semua Jajahan');
   const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
 
-  const handleRegister = onOpenRegister || onRegisterBusiness || (() => {});
-
   const sortOptions = buildStandardSortOptions(
     [
-      { value: 'rating_desc', label: language === 'en' ? 'Rating (Highest)' : 'Penilaian (Tertinggi)' },
       { value: 'featured_first', label: language === 'en' ? 'Featured & SSM Verified' : 'Pilihan Utama & Disahkan SSM' }
     ],
     language === 'en'
@@ -87,9 +81,6 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
       sortBy,
       getName: (biz) => biz.businessName || biz.ownerName || '',
       customCompare: (a, b, mode) => {
-        if (mode === 'rating_desc') {
-          return Number(b.rating || 0) - Number(a.rating || 0);
-        }
         if (mode === 'featured_first') {
           const scoreA = (a.isFeatured ? 2 : 0) + (a.ssmNumber ? 1 : 0);
           const scoreB = (b.isFeatured ? 2 : 0) + (b.ssmNumber ? 1 : 0);
@@ -137,16 +128,6 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
             <ShieldCheck className="w-4 h-4 text-black dark:text-white/75" />
             <span>{language === 'en' ? 'Directory Audit Mode (Admin)' : 'Mod Audit Direktori & SSM (Pentadbir)'}</span>
           </div>
-        ) : isYouth ? (
-          <button
-            type="button"
-            onClick={handleRegister}
-            className="interactive-press interactive-lift inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm transition-all shrink-0 cursor-pointer dark:bg-blue-600"
-            title={language === 'en' ? 'Open Merchant Business Management' : 'Buka Dashboard Pengurusan Bisnes Usahawan'}
-          >
-            <Store className="w-4 h-4" />
-            <span>{t('manage_business_btn')}</span>
-          </button>
         ) : null}
       </div>
 
@@ -299,7 +280,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                           )}
                         </div>
                         <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                          {biz.category} · {biz.district}, Kelantan · ★ {biz.rating || 5.0}{biz.tagline ? ` · ${biz.tagline}` : ''}
+                          {biz.category} · {biz.district}, Kelantan{biz.tagline ? ` · ${biz.tagline}` : ''}
                         </p>
                       </div>
                     </div>

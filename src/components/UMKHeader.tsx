@@ -853,7 +853,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
               {/* Profile Dropdown Menu */}
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-76 sm:w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-3 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute right-0 mt-2 w-76 sm:w-80 max-h-[calc(100vh-5rem)] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-3 z-50 animate-in fade-in zoom-in-95 duration-100">
                   {/* Kad Identiti Utama */}
                   <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2.5 border border-slate-300 dark:border-slate-600">
                     <div className="flex items-start gap-3">

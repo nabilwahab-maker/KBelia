@@ -4,7 +4,6 @@ import {
   MapPin,
   CheckCircle2,
   Clock,
-  Send,
   ArrowRight,
   FileText,
   Eye,
@@ -223,16 +222,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               </button>
             )}
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={onOpenNewBooking}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
-          >
-            <Send className="w-4 h-4" />
-            <span>Mohon Kiosk</span>
-          </button>
-        )}
+        ) : null}
       </div>
 
       {/* Ringkasan Statistik Ringkas */}

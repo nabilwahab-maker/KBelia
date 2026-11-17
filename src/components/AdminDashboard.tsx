@@ -77,6 +77,7 @@ import { EditBusinessModal } from './EditBusinessModal';
 import { EditSlotModal } from './EditSlotModal';
 import { EditProgramModal } from './EditProgramModal';
 import { ImageDropzone } from './ImageDropzone';
+import { ModernDatePicker } from './ModernDateTimePicker';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import { INITIAL_COMMUNITY_POSTS } from '../data/communityData';
@@ -161,7 +162,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   activeSubTab,
   onSelectSubTab
 }) => {
-  const { user, isAdmin } = useAuth();
+  const { user, userProfile, isAdmin } = useAuth();
   const { language } = useLanguage();
   const isMs = language === 'ms';
   const { confirmDelete } = useConfirmDelete();
@@ -1021,90 +1022,55 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <div className="relative z-10">
           {(() => {
-            const adminHeaderMap: Record<AdminSubTab, { prefix: string; accent: string; subtitle: string }> = {
+            const adminDisplayName = userProfile?.fullName || user?.displayName || (isMs ? 'Pentadbir Sistem' : 'System Admin');
+            const adminHeaderMap: Record<AdminSubTab, { prefix: string; accent: string }> = {
               queue: {
                 prefix: isMs ? 'Giliran Semakan & ' : 'Review & ',
-                accent: isMs ? 'Kelulusan' : 'Approval Queue',
-                subtitle: isMs
-                  ? 'Semak dan luluskan permohonan baharu sewaan kapsul niaga, geran pembiayaan, serta pendaftaran mentor.'
-                  : 'Review and approve new capsule kiosk leases, funding grants, and mentor registrations.'
+                accent: isMs ? 'Kelulusan' : 'Approval Queue'
               },
               bookings: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Tempahan Kiosk' : 'Kiosk Bookings',
-                subtitle: isMs
-                  ? 'Urus permohonan sewaan ruang kapsul niaga, status kelulusan, dan penempatan usahawan mengikut jajahan.'
-                  : 'Manage capsule kiosk lease requests, approval statuses, and entrepreneur placements across districts.'
+                accent: isMs ? 'Tempahan Kiosk' : 'Kiosk Bookings'
               },
               businesses: {
                 prefix: isMs ? 'Direktori & Audit ' : 'Entrepreneur Directory & ',
-                accent: isMs ? 'Usahawan' : 'Audit',
-                subtitle: isMs
-                  ? 'Pantau senarai perniagaan belia berdaftar, pengesahan SSM, serta kelulusan paparan direktori awam.'
-                  : 'Monitor registered youth businesses, SSM verification, and public directory listing approvals.'
+                accent: isMs ? 'Usahawan' : 'Audit'
               },
               slots: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Slot Kiosk' : 'Kiosk Slots',
-                subtitle: isMs
-                  ? 'Konfigurasi unit kapsul niaga, kadar sewaan bulanan, kemudahan tapak, dan status kekosongan semasa.'
-                  : 'Configure capsule kiosk units, monthly rental rates, site amenities, and live availability statuses.'
+                accent: isMs ? 'Slot Kiosk' : 'Kiosk Slots'
               },
               programs: {
                 prefix: isMs ? 'Pengurusan Geran & ' : 'Manage Grants & ',
-                accent: isMs ? 'Inisiatif' : 'Initiatives',
-                subtitle: isMs
-                  ? 'Selenggara senarai program bantuan modal, tarikh tutup permohonan, dan agihan dana belia Kelantan.'
-                  : 'Maintain capital assistance programs, application deadlines, and Kelantan youth fund allocations.'
+                accent: isMs ? 'Inisiatif' : 'Initiatives'
               },
               mentors: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Panel Mentor' : 'Mentor Panel',
-                subtitle: isMs
-                  ? 'Selaras senarai mentor bertauliah, agensi rakan strategik, dan agihan sesi bimbingan usahawan.'
-                  : 'Coordinate certified mentors, strategic agency partners, and entrepreneur coaching assignments.'
+                accent: isMs ? 'Panel Mentor' : 'Mentor Panel'
               },
               news: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Berita Rasmi' : 'Official News',
-                subtitle: isMs
-                  ? 'Terbit, sunting, dan sematkan pengumuman penting serta info terkini untuk komuniti portal.'
-                  : 'Publish, edit, and pin important announcements and latest updates for the portal community.'
+                accent: isMs ? 'Berita Rasmi' : 'Official News'
               },
               b2b: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Ruang Niaga' : 'Ruang Niaga Ads',
-                subtitle: isMs
-                  ? 'Kawal selia iklan bekalan dan permintaan niaga B2B antara usahawan dan pembekal negeri.'
-                  : 'Moderate B2B supply and demand trade listings between youth entrepreneurs and state suppliers.'
+                accent: isMs ? 'Ruang Niaga' : 'Ruang Niaga Ads'
               },
               events: {
                 prefix: isMs ? 'Pengurusan Acara & ' : 'Manage Events & ',
-                accent: isMs ? 'Tempahan' : 'Bookings',
-                subtitle: isMs
-                  ? 'Atur jadual karnival, bengkel keusahawanan, sesi pitching, dan penyertaan tapak jualan belia.'
-                  : 'Organize carnivals, entrepreneurship workshops, pitching sessions, and youth booth participations.'
+                accent: isMs ? 'Tempahan' : 'Bookings'
               },
               users: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Pengguna Portal' : 'Portal Users',
-                subtitle: isMs
-                  ? 'Urus akaun berdaftar, peranan akses (Usahawan, Mentor, Pentadbir), dan status pengesahan pengguna.'
-                  : 'Manage registered accounts, access roles (Entrepreneur, Mentor, Admin), and verification statuses.'
+                accent: isMs ? 'Pengguna Portal' : 'Portal Users'
               },
               sync: {
                 prefix: isMs ? 'Penyelarasan & ' : 'Database ',
-                accent: isMs ? 'Segerak Data' : 'Data Sync',
-                subtitle: isMs
-                  ? 'Pantau integriti rekod pangkalan data serta penyelarasan status operasi sistem secara langsung.'
-                  : 'Monitor database record integrity and synchronize live portal operational states.'
+                accent: isMs ? 'Segerak Data' : 'Data Sync'
               },
               settings: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Tetapan Operasi' : 'Operations Settings',
-                subtitle: isMs
-                  ? 'Laras kadar subsidi sewaan, tempoh maksimum pajakan kiosk, maklumat pegawai, dan pengumuman sistem.'
-                  : 'Adjust rental subsidy rates, maximum lease durations, officer contacts, and system announcements.'
+                accent: isMs ? 'Tetapan Operasi' : 'Operations Settings'
               }
             };
             const currentAdminHeader = adminHeaderMap[adminTab] || adminHeaderMap.queue;
@@ -1115,7 +1081,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span className="kbelia-title-shimmer">{currentAdminHeader.accent}</span>
                 </h1>
                 <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 max-w-2xl">
-                  {currentAdminHeader.subtitle}
+                  {isMs ? (
+                    <>
+                      Selamat kembali, <span className="font-semibold text-black dark:text-white">{adminDisplayName}</span>
+                    </>
+                  ) : (
+                    <>
+                      Welcome back, <span className="font-semibold text-black dark:text-white">{adminDisplayName}</span>
+                    </>
+                  )}
                 </p>
               </>
             );
@@ -2961,12 +2935,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
                       Tarikh Pelaksanaan
                     </label>
-                    <input
-                      type="text"
-                      placeholder="Masukkan tarikh pelaksanaan"
+                    <ModernDatePicker
                       value={progDate}
-                      onChange={(e) => setProgDate(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all dark:focus:border-blue-500"
+                      onChange={setProgDate}
+                      valueFormat="program-date"
+                      allowRange
+                      allowOngoingPreset
+                      placeholder="Pilih tarikh atau tempoh"
                     />
                   </div>
                   <div>

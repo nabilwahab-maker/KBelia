@@ -26,6 +26,7 @@ import {
   Lock,
   LogOut,
   Edit3,
+  Trash2,
   ShieldCheck,
   XCircle,
   Printer,
@@ -47,9 +48,11 @@ import {
   BusinessListing,
   PublishedMentorSlot
 } from '../types';
+import { ModernDatePicker, ModernTimePicker, toLocalIsoDate } from './ModernDateTimePicker';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import {
+  deleteMentoringLogRecord,
   getDeletedIds,
   isProductionAuthenticated,
   saveGrantEndorsementRecord,
@@ -64,6 +67,7 @@ import {
 import { openAndPrintDocument, generateMentorEndorsementOfficialHtml } from '../utils/printUtils';
 import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import { useAuth } from '../context/AuthContext';
+import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { useLanguage } from '../context/LanguageContext';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
@@ -229,6 +233,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   onSelectSubTab
 }) => {
   const { user, userProfile, isMentor, isDemoSession, openLoginModal } = useAuth();
+  const { confirmDelete } = useConfirmDelete();
   const { language } = useLanguage();
   const isEn = language === 'en';
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -496,16 +501,35 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const [newEndorsementReadiness, setNewEndorsementReadiness] = useState('');
   const [isEndorsementConfirmed, setIsEndorsementConfirmed] = useState(false);
 
-  // New Logbook Entry Modal
+  // Logbook Entry Modal (Create & Edit with dynamic task list)
+  const createEmptyTaskDraft = (seedIndex = 0) => ({
+    id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 7)}-${seedIndex}`,
+    task: '',
+    dueDate: '',
+    completed: false
+  });
   const [isNewLogModalOpen, setIsNewLogModalOpen] = useState(false);
+  const [editingLogId, setEditingLogId] = useState<string | null>(null);
   const [newLogMenteeName, setNewLogMenteeName] = useState('');
   const [newLogBusinessName, setNewLogBusinessName] = useState('');
+  const [newLogSessionDate, setNewLogSessionDate] = useState(() => toLocalIsoDate(new Date()));
   const [newLogTopic, setNewLogTopic] = useState('');
   const [newLogMinutes, setNewLogMinutes] = useState('');
-  const [newLogTask1, setNewLogTask1] = useState('');
-  const [newLogDueDate1, setNewLogDueDate1] = useState('');
-  const [newLogTask2, setNewLogTask2] = useState('');
-  const [newLogDueDate2, setNewLogDueDate2] = useState('');
+  const [newLogTasks, setNewLogTasks] = useState<{ id: string; task: string; dueDate: string; completed: boolean }[]>(() => [
+    createEmptyTaskDraft(1),
+    createEmptyTaskDraft(2)
+  ]);
+
+  // Inline task editing & quick-add state in expanded logbook checklist
+  const [editingInlineTask, setEditingInlineTask] = useState<{
+    logId: string;
+    taskId: string;
+    task: string;
+    dueDate: string;
+  } | null>(null);
+  const [inlineNewTaskDrafts, setInlineNewTaskDrafts] = useState<
+    Record<string, { isOpen: boolean; task: string; dueDate: string }>
+  >({});
 
   // Expandable compact list states
   const [expandedApplicationIds, setExpandedApplicationIds] = useState<Record<string, boolean>>({});
@@ -818,25 +842,138 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     showToast(`Status temujanji ${mentee.entrepreneurName} dikemas kini kepada: ${newStatus === 'confirmed' ? 'Disahkan' : newStatus === 'completed' ? 'Selesai' : 'Dibatalkan'}`);
   };
 
-  // Toggle logbook task completion
-  const handleToggleLogTask = (logId: string, taskId: string) => {
+  const getPlusDaysIso = (offsetDays: number) => {
+    const dt = new Date();
+    dt.setDate(dt.getDate() + offsetDays);
+    return toLocalIsoDate(dt);
+  };
+
+  const persistUpdatedLogEntry = (
+    logId: string,
+    updater: (log: MentoringLogEntry) => MentoringLogEntry,
+    toastMessage: string
+  ) => {
     let targetUpdatedLog: MentoringLogEntry | null = null;
     const updated = logEntries.map(log => {
       if (log.id !== logId || log.mentorId !== currentMentor.id) return log;
-      targetUpdatedLog = {
-        ...log,
-        actionItems: log.actionItems.map(task => {
-          if (task.id !== taskId) return task;
-          return { ...task, completed: !task.completed };
-        })
-      };
+      targetUpdatedLog = updater(log);
       return targetUpdatedLog;
     });
     saveLogEntries(updated);
     if (targetUpdatedLog) {
       void saveMentoringLogRecord(targetUpdatedLog).catch(console.error);
     }
-    showToast('Status semakan tugasan usahawan dikemaskini!');
+    showToast(toastMessage);
+  };
+
+  // Toggle logbook task completion
+  const handleToggleLogTask = (logId: string, taskId: string) => {
+    persistUpdatedLogEntry(
+      logId,
+      (log) => ({
+        ...log,
+        updatedAt: new Date().toISOString(),
+        actionItems: (log.actionItems || []).map(task =>
+          task.id === taskId ? { ...task, completed: !task.completed } : task
+        )
+      }),
+      'Status semakan tugasan usahawan dikemaskini!'
+    );
+  };
+
+  const handleStartInlineTaskEdit = (
+    logId: string,
+    task: { id: string; task: string; dueDate: string }
+  ) => {
+    setEditingInlineTask({
+      logId,
+      taskId: task.id,
+      task: task.task,
+      dueDate: task.dueDate || ''
+    });
+  };
+
+  const handleSaveInlineTaskEdit = () => {
+    if (!editingInlineTask) return;
+    const trimmedTask = editingInlineTask.task.trim();
+    if (!trimmedTask) {
+      triggerToast('Sila masukkan penerangan tugasan sebelum menyimpan.', 'error');
+      return;
+    }
+    const { logId, taskId, dueDate } = editingInlineTask;
+    persistUpdatedLogEntry(
+      logId,
+      (log) => ({
+        ...log,
+        updatedAt: new Date().toISOString(),
+        actionItems: (log.actionItems || []).map(item =>
+          item.id === taskId
+            ? { ...item, task: trimmedTask, dueDate: dueDate || item.dueDate || getPlusDaysIso(7) }
+            : item
+        )
+      }),
+      'Tugasan berjaya dikemaskini!'
+    );
+    setEditingInlineTask(null);
+  };
+
+  const handleDeleteInlineTask = (logId: string, taskId: string) => {
+    if (editingInlineTask?.logId === logId && editingInlineTask?.taskId === taskId) {
+      setEditingInlineTask(null);
+    }
+    persistUpdatedLogEntry(
+      logId,
+      (log) => ({
+        ...log,
+        updatedAt: new Date().toISOString(),
+        actionItems: (log.actionItems || []).filter(item => item.id !== taskId)
+      }),
+      'Tugasan berjaya dipadam.'
+    );
+  };
+
+  const handleOpenInlineNewTask = (logId: string) => {
+    setInlineNewTaskDrafts(prev => ({
+      ...prev,
+      [logId]: {
+        isOpen: true,
+        task: prev[logId]?.task || '',
+        dueDate: prev[logId]?.dueDate || ''
+      }
+    }));
+  };
+
+  const handleSaveInlineNewTask = (logId: string) => {
+    const draft = inlineNewTaskDrafts[logId];
+    const trimmedTask = draft?.task.trim() || '';
+    if (!trimmedTask) {
+      triggerToast('Sila masukkan penerangan tugasan baharu.', 'error');
+      return;
+    }
+    const targetLog = logEntries.find(l => l.id === logId && l.mentorId === currentMentor.id);
+    if (targetLog && (targetLog.actionItems?.length || 0) >= 30) {
+      triggerToast('Maksimum 30 tugasan bagi setiap rekod sesi telah dicapai.', 'warning');
+      return;
+    }
+    const newTaskItem = {
+      id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      task: trimmedTask,
+      completed: false,
+      dueDate: draft?.dueDate || getPlusDaysIso(7)
+    };
+    persistUpdatedLogEntry(
+      logId,
+      (log) => ({
+        ...log,
+        updatedAt: new Date().toISOString(),
+        actionItems: [...(log.actionItems || []), newTaskItem]
+      }),
+      'Tugasan baharu berjaya ditambah!'
+    );
+    setInlineNewTaskDrafts(prev => ({
+      ...prev,
+      [logId]: { isOpen: false, task: '', dueDate: '' }
+    }));
   };
 
   // Issue New Grant Endorsement
@@ -910,64 +1047,145 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     setIsEndorsementConfirmed(false);
   };
 
-  // Add New Logbook Entry
-  const handleCreateLogEntry = (e: React.FormEvent) => {
+  const openCreateLogModal = () => {
+    setEditingLogId(null);
+    setNewLogMenteeName('');
+    setNewLogBusinessName('');
+    setNewLogSessionDate(toLocalIsoDate(new Date()));
+    setNewLogTopic('');
+    setNewLogMinutes('');
+    setNewLogTasks([createEmptyTaskDraft(1), createEmptyTaskDraft(2)]);
+    setIsNewLogModalOpen(true);
+  };
+
+  const openEditLogModal = (log: MentoringLogEntry) => {
+    setEditingLogId(log.id);
+    setNewLogMenteeName(log.menteeName || '');
+    setNewLogBusinessName(log.businessName || '');
+    setNewLogSessionDate(log.sessionDate || toLocalIsoDate(new Date()));
+    setNewLogTopic(log.topic || '');
+    setNewLogMinutes(log.minutes || '');
+    setNewLogTasks(
+      log.actionItems && log.actionItems.length > 0
+        ? log.actionItems.map((item) => ({
+            id: item.id,
+            task: item.task,
+            dueDate: item.dueDate || '',
+            completed: Boolean(item.completed)
+          }))
+        : [createEmptyTaskDraft(1)]
+    );
+    setIsNewLogModalOpen(true);
+  };
+
+  const handleAddModalTaskRow = () => {
+    if (newLogTasks.length >= 30) {
+      triggerToast('Maksimum 30 tugasan bagi setiap rekod sesi telah dicapai.', 'warning');
+      return;
+    }
+    setNewLogTasks(prev => [...prev, createEmptyTaskDraft(prev.length + 1)]);
+  };
+
+  const handleUpdateModalTaskRow = (
+    taskId: string,
+    patch: Partial<{ task: string; dueDate: string; completed: boolean }>
+  ) => {
+    setNewLogTasks(prev =>
+      prev.map(item => (item.id === taskId ? { ...item, ...patch } : item))
+    );
+  };
+
+  const handleRemoveModalTaskRow = (taskId: string) => {
+    setNewLogTasks(prev => prev.filter(item => item.id !== taskId));
+  };
+
+  // Create or Update Logbook Entry
+  const handleSaveLogEntry = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newLogMenteeName || !newLogBusinessName || !newLogTopic || !newLogMinutes) {
+    if (!newLogMenteeName.trim() || !newLogBusinessName.trim() || !newLogTopic.trim() || !newLogMinutes.trim()) {
       triggerToast('Sila isi nama mentee, bisnes, topik dan minit bimbingan.', 'error');
       return;
     }
 
-    const plusDaysIso = (offsetDays: number) => {
-      const dt = new Date();
-      dt.setDate(dt.getDate() + offsetDays);
-      return dt.toISOString().split('T')[0];
-    };
+    const actions = newLogTasks
+      .filter(item => item.task.trim().length > 0)
+      .slice(0, 30)
+      .map((item, index) => ({
+        id: item.id || `act-${Date.now()}-${index + 1}`,
+        task: item.task.trim(),
+        completed: Boolean(item.completed),
+        dueDate: item.dueDate || getPlusDaysIso((index + 1) * 7)
+      }));
 
-    const actions = [];
-    if (newLogTask1.trim()) {
-      actions.push({
-        id: `act-${Date.now()}-1`,
-        task: newLogTask1.trim(),
-        completed: false,
-        dueDate: newLogDueDate1 || plusDaysIso(7)
+    if (editingLogId) {
+      let updatedEntry: MentoringLogEntry | null = null;
+      const updatedList = logEntries.map(log => {
+        if (log.id !== editingLogId || log.mentorId !== currentMentor.id) return log;
+        updatedEntry = {
+          ...log,
+          menteeName: newLogMenteeName.trim(),
+          businessName: newLogBusinessName.trim(),
+          sessionDate: newLogSessionDate || log.sessionDate || toLocalIsoDate(new Date()),
+          topic: newLogTopic.trim(),
+          minutes: newLogMinutes.trim(),
+          actionItems: actions,
+          updatedAt: new Date().toISOString()
+        };
+        return updatedEntry;
       });
-    }
-    if (newLogTask2.trim()) {
-      actions.push({
-        id: `act-${Date.now()}-2`,
-        task: newLogTask2.trim(),
-        completed: false,
-        dueDate: newLogDueDate2 || plusDaysIso(14)
-      });
+      saveLogEntries(updatedList);
+      if (updatedEntry) {
+        void saveMentoringLogRecord(updatedEntry).catch(console.error);
+      }
+      setExpandedLogIds(prev => ({ ...prev, [editingLogId]: true }));
+      setIsNewLogModalOpen(false);
+      setEditingLogId(null);
+      showToast('Rekod sesi bimbingan & tugasan berjaya dikemaskini!');
+      return;
     }
 
+    const nowIso = new Date().toISOString();
     const newEntry: MentoringLogEntry = {
       id: `log-${Date.now()}`,
       mentorId: currentMentor.id,
-      menteeName: newLogMenteeName,
-      businessName: newLogBusinessName,
-      sessionDate: new Date().toISOString().split('T')[0],
-      topic: newLogTopic,
-      minutes: newLogMinutes,
+      menteeName: newLogMenteeName.trim(),
+      businessName: newLogBusinessName.trim(),
+      sessionDate: newLogSessionDate || toLocalIsoDate(new Date()),
+      topic: newLogTopic.trim(),
+      minutes: newLogMinutes.trim(),
       actionItems: actions,
-      createdAt: new Date().toISOString()
+      createdAt: nowIso,
+      updatedAt: nowIso
     };
 
     saveLogEntries([newEntry, ...logEntries]);
     void saveMentoringLogRecord(newEntry).catch(console.error);
+    setExpandedLogIds(prev => ({ ...prev, [newEntry.id]: true }));
     setIsNewLogModalOpen(false);
     showToast('Rekod sesi bimbingan berjaya disimpan!');
+  };
 
-    // Reset
-    setNewLogMenteeName('');
-    setNewLogBusinessName('');
-    setNewLogTopic('');
-    setNewLogMinutes('');
-    setNewLogTask1('');
-    setNewLogDueDate1('');
-    setNewLogTask2('');
-    setNewLogDueDate2('');
+  const handleDeleteLogEntry = (log: MentoringLogEntry) => {
+    confirmDelete({
+      title: 'Padam Rekod Sesi Bimbingan?',
+      itemName: `${log.menteeName} — ${log.topic}`,
+      itemType: 'Rekod Sesi Mentor',
+      description: 'Semua minit perbincangan dan senarai tugasan di bawah rekod sesi ini akan dipadamkan secara kekal.',
+      confirmLabel: 'Padam Rekod',
+      onConfirm: async () => {
+        saveLogEntries(logEntries.filter(item => item.id !== log.id));
+        if (editingInlineTask?.logId === log.id) {
+          setEditingInlineTask(null);
+        }
+        setInlineNewTaskDrafts(prev => {
+          const next = { ...prev };
+          delete next[log.id];
+          return next;
+        });
+        await deleteMentoringLogRecord(log.id);
+        showToast('Rekod sesi bimbingan berjaya dipadam.');
+      }
+    });
   };
 
   // Security Barrier: Strictly Mentor ONLY (Zero Cross-Portal Access)
@@ -1030,47 +1248,27 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
         <div className="relative z-10 space-y-1">
           {(() => {
-            const mentorHeaderMap: Record<MentorSubTab, { prefix: string; accent: string; subtitle: React.ReactNode }> = {
+            const mentorDisplayName = currentMentor?.name || userProfile?.fullName || 'Mentor';
+            const mentorHeaderMap: Record<MentorSubTab, { prefix: string; accent: string }> = {
               overview: {
                 prefix: !isEn ? 'Ringkasan & ' : 'Mentorship ',
-                accent: !isEn ? 'Prestasi Bimbingan' : 'Performance',
-                subtitle: !isEn ? (
-                  <>
-                    Selamat kembali, <span className="font-semibold text-black dark:text-white">{currentMentor.name}</span> ({currentMentor.agency}) — pantau statistik mentee, sesi aktif, dan perakuan geran.
-                  </>
-                ) : (
-                  <>
-                    Welcome back, <span className="font-semibold text-black dark:text-white">{currentMentor.name}</span> ({currentMentor.agency}) — monitor mentee stats, active sessions, and grant endorsements.
-                  </>
-                )
+                accent: !isEn ? 'Prestasi Bimbingan' : 'Performance'
               },
               sessions: {
                 prefix: !isEn ? 'Pengurusan ' : 'Manage ',
-                accent: !isEn ? 'Sesi Bimbingan' : 'Coaching Sessions',
-                subtitle: !isEn
-                  ? 'Semak permintaan konsultasi klinik keusahawanan, sahkan tarikh temujanji, dan kongsi pautan mesyuarat.'
-                  : 'Review entrepreneurship clinic requests, confirm appointment slots, and share meeting links.'
+                accent: !isEn ? 'Sesi Bimbingan' : 'Coaching Sessions'
               },
               endorsements: {
                 prefix: !isEn ? 'Pengeluaran ' : 'Issue ',
-                accent: !isEn ? 'Perakuan Geran' : 'Grant Endorsements',
-                subtitle: !isEn
-                  ? 'Nilai kesediaan perniagaan mentee dan keluarkan surat perakuan rasmi untuk menyokong permohonan geran.'
-                  : 'Evaluate mentee business readiness and issue official endorsement letters for grant applications.'
+                accent: !isEn ? 'Perakuan Geran' : 'Grant Endorsements'
               },
               logbook: {
                 prefix: !isEn ? 'Jurnal & ' : 'Session ',
-                accent: !isEn ? 'Rekod Sesi' : 'Logbook & Notes',
-                subtitle: !isEn
-                  ? 'Catat minit perbincangan bimbingan, pelan tindakan susulan, dan kemajuan pencapaian mentee anda.'
-                  : 'Record coaching discussion minutes, follow-up action plans, and mentee progress milestones.'
+                accent: !isEn ? 'Rekod Sesi' : 'Logbook & Notes'
               },
               profile: {
                 prefix: !isEn ? 'Pengurusan ' : 'Manage ',
-                accent: !isEn ? 'Profil & Jadual' : 'Profile & Schedule',
-                subtitle: !isEn
-                  ? 'Kemas kini kepakaran bimbingan, bio agensi, hari kelapangan, dan slot masa sesi klinik mentor.'
-                  : 'Update coaching expertise, agency bio, available days, and mentor clinic time slots.'
+                accent: !isEn ? 'Profil & Jadual' : 'Profile & Schedule'
               }
             };
             const currentMentorHeader = mentorHeaderMap[currentSubTab] || mentorHeaderMap.overview;
@@ -1081,30 +1279,19 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <span className="kbelia-title-shimmer">{currentMentorHeader.accent}</span>
                 </h1>
                 <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
-                  {currentMentorHeader.subtitle}
+                  {!isEn ? (
+                    <>
+                      Selamat kembali, <span className="font-semibold text-black dark:text-white">{mentorDisplayName}</span>
+                    </>
+                  ) : (
+                    <>
+                      Welcome back, <span className="font-semibold text-black dark:text-white">{mentorDisplayName}</span>
+                    </>
+                  )}
                 </p>
               </>
             );
           })()}
-        </div>
-
-        <div className="relative z-10 flex flex-wrap items-center gap-2.5 shrink-0">
-          <button
-            type="button"
-            onClick={() => handleSubTabChange('sessions')}
-            className="py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer interactive-press dark:bg-teal-600"
-          >
-            <Calendar className="w-4 h-4 text-white" />
-            <span>Jadual Bimbingan ({totalMentees})</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsNewEndorsementModalOpen(true)}
-            className="py-2.5 px-4 rounded-xl text-sm font-semibold text-black dark:text-white bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-700 transition-all flex items-center gap-2 cursor-pointer interactive-press"
-          >
-            <Award className="w-4 h-4 text-black dark:text-white/75" />
-            <span>Perakuan Geran ({mentorEndorsements.length})</span>
-          </button>
         </div>
       </div>
 
@@ -2870,7 +3057,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
             <button
               type="button"
-              onClick={() => setIsNewLogModalOpen(true)}
+              onClick={openCreateLogModal}
               className="interactive-press interactive-lift px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer dark:bg-teal-600"
             >
               <Plus className="w-4 h-4 text-white" />
@@ -3016,7 +3203,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                 {totalTasks > 0 ? `${doneTasks}/${totalTasks} Tugasan` : 'Direkodkan'}
                               </span>
                             </td>
-                            <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <td
+                              className="py-3.5 px-4 text-right whitespace-nowrap"
+                              onClick={(e) => e.stopPropagation()}
+                            >
                               <RowActionMenu
                                 ariaLabel={`Tindakan log ${log.menteeName}`}
                                 items={[
@@ -3025,6 +3215,16 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                     onClick: () =>
                                       setExpandedLogIds(prev => ({ ...prev, [log.id]: !prev[log.id] })),
                                     tone: 'accent'
+                                  },
+                                  {
+                                    label: 'Sunting Rekod & Tugasan',
+                                    onClick: () => openEditLogModal(log)
+                                  },
+                                  {
+                                    label: 'Padam Rekod',
+                                    onClick: () => handleDeleteLogEntry(log),
+                                    tone: 'danger',
+                                    dividerBefore: true
                                   }
                                 ]}
                               />
@@ -3033,57 +3233,274 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
                           {isExpanded && (
                             <tr className="bg-slate-50/75 dark:bg-zinc-950/40">
-                              <td colSpan={5} className="px-4 sm:px-5 py-4 space-y-3.5">
+                              <td colSpan={5} className="px-4 sm:px-5 py-4 space-y-4">
                                 <div className="space-y-1.5">
-                                  <div className="text-sm font-bold text-black dark:text-white">
-                                    Ringkasan Minit Bimbingan Mentor:
+                                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                                    <div className="text-sm font-bold text-black dark:text-white">
+                                      Ringkasan Minit Bimbingan Mentor:
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => openEditLogModal(log)}
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                      >
+                                        <Edit3 className="w-3.5 h-3.5" />
+                                        <span>Sunting Rekod</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteLogEntry(log)}
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors cursor-pointer"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                        <span>Padam Rekod</span>
+                                      </button>
+                                    </div>
                                   </div>
                                   <p className="text-[0.9375rem] text-black dark:text-white bg-white dark:bg-zinc-900 p-3 rounded-xl border border-slate-200 dark:border-zinc-700 leading-relaxed font-sans">
                                     {log.minutes}
                                   </p>
                                 </div>
 
-                                {log.actionItems && log.actionItems.length > 0 && (
-                                  <div className="space-y-2">
-                                    <div className="text-sm font-bold text-black dark:text-white flex items-center justify-between gap-2 flex-wrap">
-                                      <span>Senarai Semak Tugasan Wajib Mentee:</span>
+                                <div className="space-y-2.5">
+                                  <div className="text-sm font-bold text-black dark:text-white flex items-center justify-between gap-2 flex-wrap">
+                                    <span>Senarai Semak Tugasan Wajib Mentee:</span>
+                                    <div className="flex items-center gap-3 flex-wrap">
                                       <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-normal">
-                                        Tekan kotak untuk tandakan status selesai
+                                        Tekan kotak untuk tandakan selesai, atau sunting terus
                                       </span>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                      {log.actionItems.map((task) => (
-                                        <div
-                                          key={task.id}
-                                          onClick={() => handleToggleLogTask(log.id, task.id)}
-                                          className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
-                                            task.completed
-                                              ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-black/70 dark:text-white/75 line-through'
-                                              : 'bg-white dark:bg-zinc-900 border-slate-300 dark:border-zinc-700 hover:border-blue-400/70 dark:hover:border-blue-400/70 text-black dark:text-white'
-                                          }`}
+                                      {!inlineNewTaskDrafts[log.id]?.isOpen && (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleOpenInlineNewTask(log.id)}
+                                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white transition-colors cursor-pointer"
                                         >
-                                          <div className="flex items-center gap-2.5">
-                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
-                                              task.completed
-                                                ? 'bg-emerald-600 border-emerald-600 text-white'
-                                                : 'border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800'
-                                            }`}>
-                                              {task.completed && <Check className="w-3.5 h-3.5" />}
-                                            </div>
-                                            <span className="text-sm font-medium">{task.task}</span>
-                                          </div>
-
-                                          <span className={`text-[0.8125rem] font-mono tabular-nums px-2 py-0.5 rounded shrink-0 ${
-                                            task.completed ? 'bg-emerald-100 text-black' : 'bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-700'
-                                          }`}>
-                                            Sasaran: {task.dueDate}
-                                          </span>
-                                        </div>
-                                      ))}
+                                          <Plus className="w-3.5 h-3.5" />
+                                          <span>Tambah Tugasan</span>
+                                        </button>
+                                      )}
                                     </div>
                                   </div>
-                                )}
+
+                                  {(!log.actionItems || log.actionItems.length === 0) ? (
+                                    <div className="p-3 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 bg-white/70 dark:bg-zinc-900/50 text-xs text-black/70 dark:text-white/70 flex items-center justify-between gap-2 flex-wrap">
+                                      <span>Belum ada tugasan direkodkan untuk sesi ini.</span>
+                                      {!inlineNewTaskDrafts[log.id]?.isOpen && (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleOpenInlineNewTask(log.id)}
+                                          className="font-bold text-teal-700 dark:text-teal-300 hover:underline cursor-pointer"
+                                        >
+                                          + Tambah tugasan pertama
+                                        </button>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-2">
+                                      {log.actionItems.map((task) => {
+                                        const isEditingThis =
+                                          editingInlineTask?.logId === log.id &&
+                                          editingInlineTask?.taskId === task.id;
+
+                                        if (isEditingThis && editingInlineTask) {
+                                          return (
+                                            <div
+                                              key={task.id}
+                                              className="p-3 rounded-xl border border-teal-500/70 bg-white dark:bg-zinc-900 space-y-2.5 shadow-xs"
+                                            >
+                                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
+                                                <input
+                                                  type="text"
+                                                  value={editingInlineTask.task}
+                                                  onChange={(e) =>
+                                                    setEditingInlineTask(prev =>
+                                                      prev ? { ...prev, task: e.target.value } : prev
+                                                    )
+                                                  }
+                                                  onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                      e.preventDefault();
+                                                      handleSaveInlineTaskEdit();
+                                                    } else if (e.key === 'Escape') {
+                                                      setEditingInlineTask(null);
+                                                    }
+                                                  }}
+                                                  placeholder="Masukkan penerangan tugasan"
+                                                  autoFocus
+                                                  className="sm:col-span-2 px-3 py-2 bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+                                                />
+                                                <ModernDatePicker
+                                                  value={editingInlineTask.dueDate}
+                                                  onChange={(val) =>
+                                                    setEditingInlineTask(prev =>
+                                                      prev ? { ...prev, dueDate: val } : prev
+                                                    )
+                                                  }
+                                                  valueFormat="iso"
+                                                  accentColor="teal"
+                                                  placeholder="Tarikh sasaran"
+                                                />
+                                              </div>
+                                              <div className="flex items-center justify-end gap-2">
+                                                <button
+                                                  type="button"
+                                                  onClick={() => setEditingInlineTask(null)}
+                                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-black/75 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                                >
+                                                  Batal
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  onClick={handleSaveInlineTaskEdit}
+                                                  className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
+                                                >
+                                                  Simpan Tugasan
+                                                </button>
+                                              </div>
+                                            </div>
+                                          );
+                                        }
+
+                                        return (
+                                          <div
+                                            key={task.id}
+                                            className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+                                              task.completed
+                                                ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-black/70 dark:text-white/75'
+                                                : 'bg-white dark:bg-zinc-900 border-slate-300 dark:border-zinc-700 hover:border-blue-400/70 dark:hover:border-blue-400/70 text-black dark:text-white'
+                                            }`}
+                                          >
+                                            <button
+                                              type="button"
+                                              onClick={() => handleToggleLogTask(log.id, task.id)}
+                                              className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer"
+                                            >
+                                              <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
+                                                task.completed
+                                                  ? 'bg-emerald-600 border-emerald-600 text-white'
+                                                  : 'border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800'
+                                              }`}>
+                                                {task.completed && <Check className="w-3.5 h-3.5" />}
+                                              </div>
+                                              <span className={`text-sm font-medium break-words ${task.completed ? 'line-through' : ''}`}>
+                                                {task.task}
+                                              </span>
+                                            </button>
+
+                                            <div className="flex items-center gap-2 shrink-0">
+                                              <span className={`text-[0.8125rem] font-mono tabular-nums px-2 py-0.5 rounded ${
+                                                task.completed
+                                                  ? 'bg-emerald-100 text-black'
+                                                  : 'bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-700'
+                                              }`}>
+                                                Sasaran: {task.dueDate}
+                                              </span>
+                                              <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleStartInlineTaskEdit(log.id, task);
+                                                }}
+                                                aria-label={`Sunting tugasan ${task.task}`}
+                                                title="Sunting tugasan"
+                                                className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                              >
+                                                <Edit3 className="w-3.5 h-3.5" />
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleDeleteInlineTask(log.id, task.id);
+                                                }}
+                                                aria-label={`Padam tugasan ${task.task}`}
+                                                title="Padam tugasan"
+                                                className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                                              >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                              </button>
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+
+                                  {inlineNewTaskDrafts[log.id]?.isOpen && (
+                                    <div className="p-3 rounded-xl border border-teal-500/70 bg-white dark:bg-zinc-900 space-y-2.5 shadow-xs">
+                                      <div className="text-xs font-bold text-black dark:text-white">
+                                        Tambah Tugasan Baharu
+                                      </div>
+                                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
+                                        <input
+                                          type="text"
+                                          value={inlineNewTaskDrafts[log.id]?.task || ''}
+                                          onChange={(e) =>
+                                            setInlineNewTaskDrafts(prev => ({
+                                              ...prev,
+                                              [log.id]: {
+                                                ...(prev[log.id] || { isOpen: true, dueDate: '' }),
+                                                task: e.target.value
+                                              }
+                                            }))
+                                          }
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                              e.preventDefault();
+                                              handleSaveInlineNewTask(log.id);
+                                            } else if (e.key === 'Escape') {
+                                              setInlineNewTaskDrafts(prev => ({
+                                                ...prev,
+                                                [log.id]: { isOpen: false, task: '', dueDate: '' }
+                                              }));
+                                            }
+                                          }}
+                                          placeholder="Masukkan tugasan baharu untuk mentee"
+                                          autoFocus
+                                          className="sm:col-span-2 px-3 py-2 bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+                                        />
+                                        <ModernDatePicker
+                                          value={inlineNewTaskDrafts[log.id]?.dueDate || ''}
+                                          onChange={(val) =>
+                                            setInlineNewTaskDrafts(prev => ({
+                                              ...prev,
+                                              [log.id]: {
+                                                ...(prev[log.id] || { isOpen: true, task: '' }),
+                                                dueDate: val
+                                              }
+                                            }))
+                                          }
+                                          valueFormat="iso"
+                                          minDate={toLocalIsoDate(new Date())}
+                                          accentColor="teal"
+                                          placeholder="Tarikh sasaran"
+                                        />
+                                      </div>
+                                      <div className="flex items-center justify-end gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            setInlineNewTaskDrafts(prev => ({
+                                              ...prev,
+                                              [log.id]: { isOpen: false, task: '', dueDate: '' }
+                                            }))
+                                          }
+                                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-black/75 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                        >
+                                          Batal
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleSaveInlineNewTask(log.id)}
+                                          className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
+                                        >
+                                          Tambah Tugasan
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           )}
@@ -3598,11 +4015,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       )}
 
       {/* ===================================================================== */}
-      {/* MODAL 3: TAMBAH MINIT LOG JURNAL & TUGASAN MENTEE                     */}
+      {/* MODAL 3: TAMBAH / SUNTING MINIT LOG JURNAL & TUGASAN MENTEE           */}
       {/* ===================================================================== */}
       {isNewLogModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 max-h-[92vh] overflow-y-auto overflow-hidden">
+          <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 max-h-[92vh] overflow-y-auto overflow-hidden">
             
             <div className="kbelia-important-header px-6 sm:px-7 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-2.5">
@@ -3611,23 +4028,28 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-black dark:text-white">
-                    Tambah Rekod Sesi Bimbingan
+                    {editingLogId ? 'Sunting Rekod Sesi Bimbingan' : 'Tambah Rekod Sesi Bimbingan'}
                   </h3>
                   <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-                    Simpan nota perbincangan dan senarai tugasan usahawan
+                    {editingLogId
+                      ? 'Kemas kini minit perbincangan dan senarai tugasan usahawan'
+                      : 'Simpan nota perbincangan dan senarai tugasan usahawan'}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => setIsNewLogModalOpen(false)}
+                onClick={() => {
+                  setIsNewLogModalOpen(false);
+                  setEditingLogId(null);
+                }}
                 className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer dark:hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateLogEntry} className="px-6 sm:px-7 pb-6 sm:pb-7 pt-4 space-y-3.5">
+            <form onSubmit={handleSaveLogEntry} className="px-6 sm:px-7 pb-6 sm:pb-7 pt-4 space-y-3.5">
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
@@ -3659,18 +4081,33 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-black dark:text-white mb-1">
-                  Topik Bimbingan *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newLogTopic}
-                  onChange={(e) => setNewLogTopic(e.target.value)}
-                  placeholder="Masukkan topik bimbingan"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1">
+                    Topik Bimbingan *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newLogTopic}
+                    onChange={(e) => setNewLogTopic(e.target.value)}
+                    placeholder="Masukkan topik bimbingan"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-black dark:text-white mb-1">
+                    Tarikh Sesi
+                  </label>
+                  <ModernDatePicker
+                    value={newLogSessionDate}
+                    onChange={setNewLogSessionDate}
+                    valueFormat="iso"
+                    accentColor="teal"
+                    placeholder="Tarikh sesi"
+                  />
+                </div>
               </div>
 
               <div>
@@ -3687,50 +4124,113 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 />
               </div>
 
-              <div className="space-y-2 pt-1 border-t border-slate-300 dark:border-slate-600">
-                <label className="block text-sm font-bold text-black dark:text-white">
-                  Senarai Tugasan
-                </label>
-                
-                <div className="grid grid-cols-3 gap-2">
-                  <input
-                    type="text"
-                    value={newLogTask1}
-                    onChange={(e) => setNewLogTask1(e.target.value)}
-                    placeholder="Masukkan tugasan pertama"
-                    className="col-span-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
-                  />
-                  <input
-                    type="text"
-                    value={newLogDueDate1}
-                    onChange={(e) => setNewLogDueDate1(e.target.value)}
-                    placeholder="Masukkan tarikh sasaran"
-                    className="px-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-[0.8125rem] text-black dark:text-white font-mono focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
-                  />
+              <div className="space-y-2.5 pt-2 border-t border-slate-300 dark:border-slate-600">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div>
+                    <label className="block text-sm font-bold text-black dark:text-white">
+                      Senarai Tugasan ({newLogTasks.length})
+                    </label>
+                    <p className="text-xs text-black/65 dark:text-white/65">
+                      Tambah, sunting, atau padam seberapa banyak tugasan untuk sesi ini.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddModalTaskRow}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-2xs transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Tambah Tugasan</span>
+                  </button>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
-                  <input
-                    type="text"
-                    value={newLogTask2}
-                    onChange={(e) => setNewLogTask2(e.target.value)}
-                    placeholder="Masukkan tugasan kedua"
-                    className="col-span-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
-                  />
-                  <input
-                    type="text"
-                    value={newLogDueDate2}
-                    onChange={(e) => setNewLogDueDate2(e.target.value)}
-                    placeholder="Masukkan tarikh sasaran"
-                    className="px-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-[0.8125rem] text-black dark:text-white font-mono focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
-                  />
-                </div>
+                {newLogTasks.length === 0 ? (
+                  <div className="p-3.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/70 dark:bg-slate-800/40 text-xs text-black/70 dark:text-white/75 flex items-center justify-between gap-2">
+                    <span>Tiada tugasan ditambah. Tekan Tambah Tugasan jika ada tindakan susulan.</span>
+                    <button
+                      type="button"
+                      onClick={handleAddModalTaskRow}
+                      className="font-bold text-teal-700 dark:text-teal-300 hover:underline shrink-0 cursor-pointer"
+                    >
+                      + Tambah Baris
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {newLogTasks.map((taskRow, idx) => (
+                      <div
+                        key={taskRow.id}
+                        className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 space-y-2"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            {editingLogId && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateModalTaskRow(taskRow.id, { completed: !taskRow.completed })
+                                }
+                                title={taskRow.completed ? 'Tandakan belum selesai' : 'Tandakan selesai'}
+                                className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
+                                  taskRow.completed
+                                    ? 'bg-emerald-600 border-emerald-600 text-white'
+                                    : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900'
+                                }`}
+                              >
+                                {taskRow.completed && <Check className="w-3.5 h-3.5" />}
+                              </button>
+                            )}
+                            <span className="text-xs font-bold text-black/70 dark:text-white/75">
+                              Tugasan #{idx + 1}
+                              {taskRow.completed ? ' (Selesai)' : ''}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveModalTaskRow(taskRow.id)}
+                            aria-label={`Padam tugasan ${idx + 1}`}
+                            title="Padam baris tugasan"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Padam</span>
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
+                          <input
+                            type="text"
+                            value={taskRow.task}
+                            onChange={(e) =>
+                              handleUpdateModalTaskRow(taskRow.id, { task: e.target.value })
+                            }
+                            placeholder={`Masukkan tugasan ke-${idx + 1}`}
+                            className="sm:col-span-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                          />
+                          <ModernDatePicker
+                            value={taskRow.dueDate}
+                            onChange={(val) =>
+                              handleUpdateModalTaskRow(taskRow.id, { dueDate: val })
+                            }
+                            valueFormat="iso"
+                            minDate={editingLogId ? undefined : toLocalIsoDate(new Date())}
+                            accentColor="teal"
+                            placeholder="Tarikh sasaran"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex items-center justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setIsNewLogModalOpen(false)}
+                  onClick={() => {
+                    setIsNewLogModalOpen(false);
+                    setEditingLogId(null);
+                  }}
                   className="px-4 py-2 rounded-xl text-sm font-semibold text-black dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   Batal
@@ -3739,7 +4239,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   type="submit"
                   className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm cursor-pointer dark:bg-blue-600"
                 >
-                  Simpan Rekod Sesi
+                  {editingLogId ? 'Simpan Perubahan' : 'Simpan Rekod Sesi'}
                 </button>
               </div>
 
@@ -3861,12 +4361,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <label className="block text-sm font-medium text-black dark:text-white mb-1">
                   Tarikh Sesi
                 </label>
-                <input
-                  type="text"
+                <ModernDatePicker
                   value={newSlotDate}
-                  onChange={(e) => setNewSlotDate(e.target.value)}
-                  placeholder="Masukkan tarikh sesi"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  onChange={setNewSlotDate}
+                  valueFormat="malay-day"
+                  minDate={toLocalIsoDate(new Date())}
+                  accentColor="teal"
+                  placeholder="Pilih tarikh sesi"
                 />
               </div>
 
@@ -3874,12 +4375,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <label className="block text-sm font-medium text-black dark:text-white mb-1">
                   Masa Sesi
                 </label>
-                <input
-                  type="text"
+                <ModernTimePicker
                   value={newSlotTime}
-                  onChange={(e) => setNewSlotTime(e.target.value)}
-                  placeholder="Masukkan masa sesi"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  onChange={setNewSlotTime}
+                  mode="range"
+                  allowRangeToggle
+                  formatStyle="12h-am"
+                  defaultDurationMinutes={60}
+                  accentColor="teal"
+                  placeholder="Pilih masa sesi"
                 />
               </div>
 

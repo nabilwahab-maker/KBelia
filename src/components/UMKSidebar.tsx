@@ -10,7 +10,6 @@ import {
   Calendar,
   Network,
   Coins,
-  Settings,
   ChevronDown,
   FileCheck,
   ShoppingBag,
@@ -281,15 +280,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               >
                 <Users className="w-5 h-5" />
               </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab('settings')}
-                title={t('nav_settings')}
-                className={`${miniBtnBase} ${activeTab === 'settings' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Settings className="w-5 h-5" />
-              </button>
             </>
           )}
 
@@ -371,15 +361,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Sliders className="w-5 h-5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab('settings')}
-                title={t('nav_settings')}
-                className={`${miniBtnBase} ${activeTab === 'settings' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Settings className="w-5 h-5" />
               </button>
             </>
           )}
@@ -469,15 +450,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 className={`${miniBtnBase} ${activeTab === 'hepa' ? miniBtnActive : miniBtnIdle}`}
               >
                 <Store className="w-5 h-5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab('settings')}
-                title={t('nav_settings')}
-                className={`${miniBtnBase} ${activeTab === 'settings' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Settings className="w-5 h-5" />
               </button>
             </>
           )}
@@ -640,16 +612,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     matchesSearch('inisiatif geran program dana kelantan programs') ||
     matchesSearch('panel mentor bimbingan agensi ukm insken mentors');
   const adminCat3HasMatches =
-    matchesSearch('audit usahawan direktori semakan ssm audit') ||
-    matchesSearch('tetapan akaun profil pentadbir keselamatan settings');
+    matchesSearch('audit usahawan direktori semakan ssm audit');
 
   const mentorCat1HasMatches =
     matchesSearch('portal mentor hab bimbingan mentor hub') || filteredMentorAccordion.length > 0;
   const mentorCat2HasMatches =
     matchesSearch('perakuan geran dana sokongan surat kelulusan benih pemangkin endorsements');
   const mentorCat3HasMatches =
-    matchesSearch('profil jadual kelapangan mentor waktu bimbingan profile schedule') ||
-    matchesSearch('tetapan akaun kata laluan paparan settings');
+    matchesSearch('profil jadual kelapangan mentor waktu bimbingan profile schedule');
 
   const youthCat1HasMatches =
     matchesSearch('papan pemuka usahawan belia dashboard') ||
@@ -662,8 +632,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     matchesSearch('ruang niaga iklan peluang pembekal market trade') ||
     matchesSearch('acara karnival ekspo bengkel jadual events');
   const youthCat3HasMatches =
-    matchesSearch('direktori usahawan kelantan bisnes produk kedai servis ssm directory') ||
-    matchesSearch('tetapan akaun profil maklumat bisnes perbankan settings');
+    matchesSearch('direktori usahawan kelantan bisnes produk kedai servis ssm directory');
 
   const hasAnySearchMatch = isAdmin
     ? adminCat1HasMatches || adminCat2HasMatches || adminCat3HasMatches
@@ -947,27 +916,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                     </div>
                   </button>
                 )}
-
-                {matchesSearch('tetapan akaun profil pentadbir keselamatan settings') && (
-                  <button
-                    type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('settings'))}
-                    className={`${navBtnBase} ${activeTab === 'settings' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Settings
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'settings'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Tetapan Akaun' : 'Account Settings'}
-                      </span>
-                    </div>
-                  </button>
-                )}
               </div>
             )}
           </div>
@@ -1101,11 +1049,11 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               </div>
             )}
 
-            {/* KATEGORI 3: PROFIL & TETAPAN */}
+            {/* KATEGORI 3: PROFIL MENTOR */}
             {mentorCat3HasMatches && (
               <div className={mentorCat1HasMatches || mentorCat2HasMatches ? categoryDividerClass : 'space-y-1'}>
                 <div className={categoryHeaderClass}>
-                  {isMs ? 'PROFIL & TETAPAN' : 'PROFILE & SETTINGS'}
+                  {isMs ? 'PROFIL MENTOR' : 'MENTOR PROFILE'}
                 </div>
 
                 {matchesSearch('profil jadual kelapangan mentor waktu bimbingan profile schedule') && (
@@ -1131,27 +1079,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">
                         {isMs ? 'Profil & Jadual' : 'Profile & Schedule'}
-                      </span>
-                    </div>
-                  </button>
-                )}
-
-                {matchesSearch('tetapan akaun kata laluan paparan settings') && (
-                  <button
-                    type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('settings'))}
-                    className={`${navBtnBase} ${activeTab === 'settings' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Settings
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'settings'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Tetapan Akaun' : 'Account Settings'}
                       </span>
                     </div>
                   </button>
@@ -1407,27 +1334,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">{t('directory')}</span>
-                    </div>
-                  </button>
-                )}
-
-                {matchesSearch('tetapan akaun profil maklumat bisnes perbankan settings') && (
-                  <button
-                    type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('settings'))}
-                    className={`${navBtnBase} ${activeTab === 'settings' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Settings
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'settings'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Tetapan Akaun' : 'Account Settings'}
-                      </span>
                     </div>
                   </button>
                 )}

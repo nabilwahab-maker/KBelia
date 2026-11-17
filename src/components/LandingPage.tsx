@@ -13,7 +13,6 @@ import {
   LogIn, 
   Globe, 
   Clock,
-  Star,
   Zap,
   Wifi,
   XCircle,
@@ -118,7 +117,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       badge: 'Usahawan Kraf Bimbingan UMK',
       location: 'Kota Bharu',
       imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
-      stat: 'Penilaian 4.8 / 5.0',
+      stat: 'Disahkan SSM',
       ctaText: 'Lihat Direktori',
       onAction: () => navigateToPage('login')
     },
@@ -130,7 +129,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       badge: 'Inkubasi F&B Berjaya',
       location: 'Hub UMK Bachok',
       imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
-      stat: '42 Ulasan Pelanggan',
+      stat: 'Inkubasi F&B Aktif',
       ctaText: 'Lihat Menu',
       onAction: () => navigateToPage('login')
     }
@@ -168,8 +167,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       img: '/assets/generated/batik_canting_kelantan.jpg',
       title: 'Batik Belia Kontemporari',
       subtitle: 'Fesyen & Kraf Moden',
-      tag: 'Penarafan 4.8',
-      tagColor: 'bg-blue-600 text-white border-amber-400/40',
+      tag: '',
+      tagColor: '',
       location: 'Kota Bharu',
       type: 'Kraf & Fesyen'
     },
@@ -495,11 +494,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <MapPin className="w-2.5 h-2.5 text-white" />
                     <span>{card.location}</span>
                   </div>
-                  <div className="absolute top-2 right-2">
-                    <span className={`px-2 py-0.5 rounded text-[0.8125rem] font-bold border shadow-xs ${card.tagColor}`}>
-                      {card.tag}
-                    </span>
-                  </div>
+                  {card.tag && (
+                    <div className="absolute top-2 right-2">
+                      <span className={`px-2 py-0.5 rounded text-[0.8125rem] font-bold border shadow-xs ${card.tagColor}`}>
+                        {card.tag}
+                      </span>
+                    </div>
+                  )}
                   <div className="absolute bottom-2 left-2 bg-slate-900/75 backdrop-blur px-1.5 py-0.5 rounded text-[0.8125rem] font-mono font-bold text-white/85 uppercase">
                     {card.type}
                   </div>

@@ -11,8 +11,7 @@ import {
   ExternalLink,
   MessageCircle,
   Sparkles,
-  ShoppingBag,
-  Star
+  ShoppingBag
 } from 'lucide-react';
 import { BusinessListing, ProductItem } from '../types';
 import { showToast } from './ToastNotification';
@@ -150,10 +149,6 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
               <div className="flex items-center gap-1 text-black dark:text-white font-medium">
                 <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75" />
                 <span>{business.district}, Kelantan</span>
-              </div>
-              <div className="flex items-center gap-1 text-black dark:text-white/75 font-bold">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-black/70 dark:text-white/75" />
-                <span>{business.rating || 5.0} ({business.reviewsCount || 1} ulasan)</span>
               </div>
               <div className="text-black/70 dark:text-white/75">
                 Pengasas: <span className="text-black dark:text-white font-semibold">{business.ownerName}</span>

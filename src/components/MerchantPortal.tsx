@@ -819,61 +819,34 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         <div className="relative z-10">
           {(() => {
             const merchantDisplayName = userProfile?.fullName || user.displayName || (isMs ? 'Usahawan Belia' : 'Youth Entrepreneur');
-            const headerMap: Record<MerchantSubTab, { prefix: string; accent: string; subtitle: React.ReactNode }> = {
+            const headerMap: Record<MerchantSubTab, { prefix: string; accent: string }> = {
               overview: {
                 prefix: isMs ? 'Ringkasan & ' : 'Business Overview & ',
-                accent: isMs ? 'Prestasi Bisnes' : 'Performance',
-                subtitle: isMs ? (
-                  <>
-                    Selamat kembali, <span className="font-semibold text-black dark:text-white">{merchantDisplayName}</span> — pantau jualan harian, status kiosk, dan geran anda di satu tempat.
-                  </>
-                ) : (
-                  <>
-                    Welcome back, <span className="font-semibold text-black dark:text-white">{merchantDisplayName}</span> — monitor daily sales, kiosk status, and grants in one place.
-                  </>
-                )
+                accent: isMs ? 'Prestasi Bisnes' : 'Performance'
               },
               profile: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Profil Kedai' : 'Business Profile',
-                subtitle: isMs
-                  ? 'Kemas kini maklumat perniagaan, nombor SSM, waktu operasi, dan pautan media sosial kedai anda.'
-                  : 'Update your business details, SSM registration, operating hours, and store social links.'
+                accent: isMs ? 'Profil Kedai' : 'Business Profile'
               },
               products: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Produk Saya' : 'My Products',
-                subtitle: isMs
-                  ? 'Tambah, kemas kini harga, dan urus senarai produk serta servis yang dipaparkan di direktori awam.'
-                  : 'Add, update pricing, and manage products or services displayed in the public directory.'
+                accent: isMs ? 'Produk Saya' : 'My Products'
               },
               bookings: {
                 prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Kiosk Saya' : 'My Kiosks',
-                subtitle: isMs
-                  ? 'Semak status permohonan tapak kapsul niaga, surat tawaran, perjanjian sewaan, dan aduan selenggara.'
-                  : 'Track capsule kiosk applications, offer letters, tenancy agreements, and maintenance tickets.'
+                accent: isMs ? 'Kiosk Saya' : 'My Kiosks'
               },
               cashflow: {
                 prefix: isMs ? 'Rekod Jualan & ' : 'Sales & ',
-                accent: isMs ? 'Aliran Tunai' : 'Cashflow Tracker',
-                subtitle: isMs
-                  ? 'Catat jualan tunai, kod QR, dan perbelanjaan harian untuk memantau untung bersih perniagaan anda.'
-                  : 'Record cash sales, QR transactions, and daily expenses to track net business profit.'
+                accent: isMs ? 'Aliran Tunai' : 'Cashflow Tracker'
               },
               vault: {
                 prefix: isMs ? 'Peti Dokumen & ' : 'Document Vault & ',
-                accent: isMs ? 'Rekod Rasmi' : 'Official Records',
-                subtitle: isMs
-                  ? 'Muat turun surat tawaran rasmi, perjanjian sewaan digital, dan sijil sokongan perniagaan anda.'
-                  : 'Download official offer letters, digital tenancy agreements, and business endorsement certificates.'
+                accent: isMs ? 'Rekod Rasmi' : 'Official Records'
               },
               card: {
                 prefix: isMs ? 'Perkongsian ' : 'Share ',
-                accent: isMs ? 'Kad Digital' : 'Digital Card',
-                subtitle: isMs
-                  ? 'Jana pautan kedai, kod QR, dan mesej tempahan pantas WhatsApp untuk dikongsi kepada pelanggan.'
-                  : 'Generate your store link, QR code, and instant WhatsApp order message to share with customers.'
+                accent: isMs ? 'Kad Digital' : 'Digital Card'
               }
             };
             const currentHeader = headerMap[activeTab] || headerMap.overview;
@@ -884,7 +857,15 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <span className="kbelia-title-shimmer">{currentHeader.accent}</span>
                 </h1>
                 <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
-                  {currentHeader.subtitle}
+                  {isMs ? (
+                    <>
+                      Selamat kembali, <span className="font-semibold text-black dark:text-white">{merchantDisplayName}</span>
+                    </>
+                  ) : (
+                    <>
+                      Welcome back, <span className="font-semibold text-black dark:text-white">{merchantDisplayName}</span>
+                    </>
+                  )}
                 </p>
               </>
             );

@@ -3,6 +3,7 @@ import { X, Save, Loader2, Edit3, AlertCircle, Star } from 'lucide-react';
 import { YouthProgram } from '../types';
 import { saveProgram } from '../services/dataService';
 import { ImageDropzone } from './ImageDropzone';
+import { ModernDatePicker } from './ModernDateTimePicker';
 
 interface EditProgramModalProps {
   isOpen: boolean;
@@ -186,13 +187,13 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
 
             <div>
               <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Tarikh Pelaksanaan</label>
-              <input
-                type="text"
-                maxLength={100}
+              <ModernDatePicker
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
-                placeholder="Masukkan tarikh atau tempoh"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                onChange={setDate}
+                valueFormat="program-date"
+                allowRange
+                allowOngoingPreset
+                placeholder="Pilih tarikh atau tempoh"
               />
             </div>
 

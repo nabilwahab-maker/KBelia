@@ -41,6 +41,7 @@ import {
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { ImageDropzone } from './ImageDropzone';
 import { showToast } from './ToastNotification';
+import { ModernDatePicker } from './ModernDateTimePicker';
 import { PortalImage } from './PortalImage';
 import { resolveBookingKioskImage, resolveSlotImage } from '../utils/visualAssets';
 import { PaginationBar, usePagination } from './PaginationBar';
@@ -2514,12 +2515,13 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-black dark:text-white mb-1">Tarikh Pelaksanaan</label>
-                  <input
-                    type="text"
-                    placeholder="Masukkan tarikh pelaksanaan"
+                  <ModernDatePicker
                     value={progDate}
-                    onChange={(e) => setProgDate(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                    onChange={setProgDate}
+                    valueFormat="program-date"
+                    allowRange
+                    allowOngoingPreset
+                    placeholder="Pilih tarikh atau tempoh"
                   />
                 </div>
                 <div>

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { KelantanDistrict, MentorProfile, MentorshipRegistration, PublishedMentorSlot } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { ModernDatePicker, ModernTimePicker, toLocalIsoDate } from './ModernDateTimePicker';
 
 interface MentorshipPageProps {
   mentors: MentorProfile[];
@@ -129,7 +130,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
   const [district, setDistrict] = useState<KelantanDistrict>(defaultDistrict);
   const [topic, setTopic] = useState(isEn ? TOPIC_OPTIONS_EN[0] : TOPIC_OPTIONS_MS[0]);
   const [challenges, setChallenges] = useState('');
-  const [selectedSlotIdx, setSelectedSlotIdx] = useState(0);
+  const [preferredDate, setPreferredDate] = useState('');
+  const [preferredTime, setPreferredTime] = useState('10:00 AM - 11:00 AM');
   const [mode, setMode] = useState<'Bersemuka di Kampus' | 'Google Meet Maya'>('Bersemuka di Kampus');
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -147,10 +149,6 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       setDistrict(defaultDistrict);
     }
   }, [defaultEntrepreneurName, defaultBusinessName, defaultPhone, defaultDistrict]);
-
-  useEffect(() => {
-    setSelectedSlotIdx(0);
-  }, [selectedMentor?.id]);
 
   const availableDateSlots = useMemo(() => {
     const generated = generateUpcomingDateSlots(isEn);
@@ -174,6 +172,43 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       arr.findIndex(s => s.date === slot.date && s.time === slot.time) === idx
     );
   }, [selectedMentor, isEn]);
+
+  useEffect(() => {
+    const firstSlot = availableDateSlots[0];
+    if (firstSlot) {
+      setPreferredDate(firstSlot.date);
+      setPreferredTime(firstSlot.time);
+    }
+  }, [selectedMentor?.id, availableDateSlots]);
+
+  const todayIso = useMemo(() => toLocalIsoDate(new Date()), []);
+
+  const quickMentorDates = useMemo(() => {
+    const seen = new Set<string>();
+    return availableDateSlots
+      .filter((s) => {
+        if (seen.has(s.date)) return false;
+        seen.add(s.date);
+        return true;
+      })
+      .slice(0, 4)
+      .map((s) => ({ label: s.date, value: s.date }));
+  }, [availableDateSlots]);
+
+  const quickMentorTimes = useMemo(() => {
+    const seen = new Set<string>();
+    const list: { label: string; value: string }[] = [];
+    availableDateSlots.forEach((s) => {
+      if (!seen.has(s.time)) {
+        seen.add(s.time);
+        list.push({ label: s.time, value: s.time });
+      }
+    });
+    if (list.length === 0) {
+      return DEFAULT_SLOT_TIMES.slice(0, 3).map((t) => ({ label: t, value: t }));
+    }
+    return list;
+  }, [availableDateSlots]);
 
   // Derive sorted registrations, single active appointment, and history
   const sortedRegistrations = useMemo(() => {
@@ -250,7 +285,18 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       return;
     }
 
-    const chosenSlot = availableDateSlots[selectedSlotIdx] || availableDateSlots[0];
+    const fallbackSlot = availableDateSlots[0];
+    const finalDate = preferredDate.trim() || fallbackSlot?.date || '';
+    const finalTime = preferredTime.trim() || fallbackSlot?.time || '10:00 AM - 11:00 AM';
+
+    if (!finalDate || !finalTime) {
+      setValidationError(
+        isEn
+          ? 'Please select both session date and time.'
+          : 'Sila pilih tarikh dan masa sesi bimbingan anda.'
+      );
+      return;
+    }
 
     const newRegistration: MentorshipRegistration = {
       id: `mentee-reg-${Date.now()}`,
@@ -268,8 +314,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
         (isEn
           ? 'Seeking practical guidance on operations, pricing, and customer growth.'
           : 'Memerlukan bimbingan praktikal operasi, penetapan harga, dan pemasaran.'),
-      preferredDate: chosenSlot.date,
-      preferredTime: chosenSlot.time,
+      preferredDate: finalDate,
+      preferredTime: finalTime,
       mode,
       status: 'pending',
       notes: 'Permohonan baharu melalui Halaman Bimbingan Mentor.',
@@ -690,7 +736,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
                   {isEn ? 'Advisory Topic' : 'Topik Bimbingan'} *
@@ -703,23 +749,6 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   {(isEn ? TOPIC_OPTIONS_EN : TOPIC_OPTIONS_MS).map((opt) => (
                     <option key={opt} value={opt}>
                       {opt}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
-                  {isEn ? 'Date and Time' : 'Tarikh dan Masa'} *
-                </label>
-                <select
-                  value={selectedSlotIdx}
-                  onChange={(e) => setSelectedSlotIdx(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
-                >
-                  {availableDateSlots.map((slot, idx) => (
-                    <option key={`${slot.date}-${slot.time}`} value={idx}>
-                      {slot.date} ({slot.time})
                     </option>
                   ))}
                 </select>
@@ -741,6 +770,40 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                     {isEn ? 'Google Meet (Online)' : 'Google Meet Maya (Atas Talian)'}
                   </option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Session Date' : 'Tarikh Sesi'} *
+                </label>
+                <ModernDatePicker
+                  value={preferredDate}
+                  onChange={setPreferredDate}
+                  valueFormat="malay-day"
+                  minDate={todayIso}
+                  quickDates={quickMentorDates}
+                  isEn={isEn}
+                  accentColor="teal"
+                  placeholder={isEn ? 'Choose session date' : 'Pilih tarikh sesi'}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
+                  {isEn ? 'Session Time' : 'Masa Sesi'} *
+                </label>
+                <ModernTimePicker
+                  value={preferredTime}
+                  onChange={setPreferredTime}
+                  mode="range"
+                  allowRangeToggle
+                  formatStyle="12h-am"
+                  quickSlots={quickMentorTimes}
+                  defaultDurationMinutes={60}
+                  isEn={isEn}
+                  accentColor="teal"
+                  placeholder={isEn ? 'Choose session time' : 'Pilih masa sesi'}
+                />
               </div>
             </div>
 

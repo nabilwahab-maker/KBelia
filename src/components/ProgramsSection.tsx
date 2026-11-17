@@ -1,23 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Award,
-  Calendar,
-  MapPin,
-  DollarSign,
   ArrowRight,
   CheckCircle2,
-  Users,
   X,
   XCircle,
   Clock,
-  Eye
+  Star
 } from 'lucide-react';
 import { GrantApplication, YouthProgram } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { useConfirmDelete } from '../context/ConfirmDeleteContext';
+import { deleteProgram, saveProgram } from '../services/dataService';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveProgramImage } from '../utils/visualAssets';
+import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
+import { PaginationBar, usePagination } from './PaginationBar';
+import { EditProgramModal } from './EditProgramModal';
+import {
+  DEFAULT_SORT_VALUE,
+  buildStandardSortOptions,
+  parseNumericAmount,
+  sortRecords
+} from '../utils/sortUtils';
 
 interface ProgramsSectionProps {
   programs: YouthProgram[];
@@ -25,6 +32,7 @@ interface ProgramsSectionProps {
   onOpenGrantModal?: (title?: string, amount?: string) => void;
   onCancelGrant?: (grant: GrantApplication) => Promise<void> | void;
   onAddProgram?: () => void;
+  onRefresh?: () => void;
   isReadOnly?: boolean;
 }
 
@@ -34,14 +42,22 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   onOpenGrantModal,
   onCancelGrant,
   onAddProgram,
+  onRefresh,
   isReadOnly = false
 }) => {
   const { language } = useLanguage();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
+  const { confirmDelete } = useConfirmDelete();
   const isEn = language === 'en';
+  const isAdminView = isAdmin || isReadOnly;
+
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
+  const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [activeNotice, setActiveNotice] = useState<string | null>(null);
   const [cancellingGrantId, setCancellingGrantId] = useState<string | null>(null);
+  const [editingProgram, setEditingProgram] = useState<YouthProgram | null>(null);
 
   const storageKey = `kbelia_program_registrations_${user?.uid || 'guest'}`;
   const [registeredIds, setRegisteredIds] = useState<string[]>(() => {
@@ -63,17 +79,129 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   }, [storageKey]);
 
   const categoryOptions = [
-    { key: 'Semua', label: isEn ? 'All' : 'Semua' },
+    { key: 'Semua', label: isEn ? 'All Categories' : 'Semua Kategori' },
     { key: 'Geran & Dana', label: isEn ? 'Grants & Funding' : 'Geran & Dana' },
     { key: 'Bengkel & Latihan', label: isEn ? 'Workshops & Training' : 'Bengkel & Latihan' },
     { key: 'Pameran & Ekspo', label: isEn ? 'Expos & Exhibitions' : 'Pameran & Ekspo' },
     { key: 'Pitching & Inkubasi', label: isEn ? 'Pitching & Incubation' : 'Pitching & Inkubasi' }
   ];
 
-  const safePrograms = programs || [];
-  const filteredPrograms = safePrograms.filter(
-    (p) => p && (selectedCategory === 'Semua' || p.category === selectedCategory)
+  const sortOptions = useMemo(
+    () =>
+      buildStandardSortOptions(
+        [
+          {
+            value: 'featured_first',
+            label: isEn ? 'Featured First' : 'Pilihan Utama Dahulu'
+          },
+          {
+            value: 'amount_desc',
+            label: isEn ? 'Grant Amount (Highest)' : 'Nilai Bantuan (Tertinggi)'
+          }
+        ],
+        isEn,
+        {
+          asc: isEn ? 'Title (A - Z)' : 'Tajuk (A - Z)',
+          desc: isEn ? 'Title (Z - A)' : 'Tajuk (Z - A)'
+        }
+      ),
+    [isEn]
   );
+
+  const safePrograms = programs || [];
+
+  const filteredPrograms = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const matched = safePrograms.filter((p) => {
+      if (!p) return false;
+      if (selectedCategory !== 'Semua' && p.category !== selectedCategory) return false;
+      if (featuredFilter === 'featured' && !p.isFeatured) return false;
+      if (!q) return true;
+      return (
+        (p.title || '').toLowerCase().includes(q) ||
+        (p.category || '').toLowerCase().includes(q) ||
+        (p.location || '').toLowerCase().includes(q) ||
+        (p.organizer || '').toLowerCase().includes(q) ||
+        (p.grantAmount || '').toLowerCase().includes(q) ||
+        (p.description || '').toLowerCase().includes(q)
+      );
+    });
+
+    return sortRecords(matched, {
+      sortBy,
+      getName: (p) => p.title || '',
+      customCompare: (a, b, mode) => {
+        if (mode === 'featured_first') {
+          return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
+        }
+        if (mode === 'amount_desc') {
+          return parseNumericAmount(b.grantAmount) - parseNumericAmount(a.grantAmount);
+        }
+        return null;
+      }
+    });
+  }, [safePrograms, selectedCategory, featuredFilter, searchQuery, sortBy]);
+
+  const pagination = usePagination(filteredPrograms, 7, [
+    searchQuery,
+    selectedCategory,
+    featuredFilter,
+    sortBy,
+    filteredPrograms.length
+  ]);
+
+  const activeFilterCount =
+    (selectedCategory !== 'Semua' ? 1 : 0) +
+    (featuredFilter !== 'all' ? 1 : 0) +
+    (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
+
+  const handleResetFilters = () => {
+    setSelectedCategory('Semua');
+    setFeaturedFilter('all');
+    setSortBy(DEFAULT_SORT_VALUE);
+  };
+
+  const handleToggleFeaturedProgram = async (prog: YouthProgram) => {
+    const nextFeatured = !prog.isFeatured;
+    try {
+      await saveProgram({
+        ...prog,
+        isFeatured: nextFeatured
+      });
+      showToast({
+        type: 'success',
+        title: nextFeatured
+          ? (isEn ? 'Marked as Featured' : 'Ditanda Pilihan Utama')
+          : (isEn ? 'Removed from Featured' : 'Dinyah-tanda Pilihan Utama'),
+        message: prog.title
+      });
+      onRefresh?.();
+    } catch {
+      showToast({
+        type: 'error',
+        title: isEn ? 'Update Failed' : 'Gagal Mengemas Kini',
+        message: isEn ? 'Could not update featured status.' : 'Gagal mengemas kini status pilihan utama.'
+      });
+    }
+  };
+
+  const handleDeleteProgramConfirm = async (prog: YouthProgram) => {
+    try {
+      await deleteProgram(prog.id);
+      showToast({
+        type: 'info',
+        title: isEn ? 'Program Deleted' : 'Program Dipadam',
+        message: prog.title
+      });
+      onRefresh?.();
+    } catch {
+      showToast({
+        type: 'error',
+        title: isEn ? 'Delete Failed' : 'Gagal Memadam',
+        message: isEn ? 'Could not delete the selected program.' : 'Gagal memadam rekod program.'
+      });
+    }
+  };
 
   const handleProgramAction = (prog: YouthProgram) => {
     const isGrantScheme = prog.category === 'Geran & Dana';
@@ -187,13 +315,17 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             {isEn ? 'Youth Grants & Programs' : 'Geran & Program Belia'}
           </h1>
           <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
-            {isEn
+            {isAdminView
+              ? isEn
+                ? 'Manage state grant schemes, training workshops, featured highlights, and youth entrepreneurship initiatives.'
+                : 'Urus senarai skim geran, bengkel latihan, pilihan utama, dan inisiatif keusahawanan belia Kelantan.'
+              : isEn
               ? 'Join incubation tracks, digital workshops, TEKUN/MARA/UMK matching, and kiosk rental subsidies.'
               : 'Sertai inisiatif inkubasi, bengkel digital, padanan TEKUN/MARA/UMK, dan subsidi sewa kapsul niaga.'}
           </p>
         </div>
 
-        {isReadOnly && onAddProgram && (
+        {isAdminView && onAddProgram && (
           <button
             type="button"
             onClick={onAddProgram}
@@ -205,46 +337,42 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
         )}
       </div>
 
-      {/* Ringkasan Statistik Ringkas */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
+      {/* Summary Stats (Admin sees 3 management metrics without personal participation) */}
+      <div className={`grid ${isAdminView ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'} gap-3 h-fit items-start`}>
         <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Active Programs' : 'Program Aktif'}</span>
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">
+            {isEn ? 'Active Programs' : 'Program Aktif'}
+          </span>
           <span className="text-lg font-black text-black dark:text-white tabular-nums">{safePrograms.length}</span>
         </div>
         <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Grant Schemes' : 'Skim Geran'}</span>
-          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{safePrograms.filter(p => p.category === 'Geran & Dana').length}</span>
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">
+            {isEn ? 'Grant Schemes' : 'Skim Geran'}
+          </span>
+          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">
+            {safePrograms.filter(p => p.category === 'Geran & Dana').length}
+          </span>
         </div>
         <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Your Grants' : 'Permohonan Geran'}</span>
+          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">
+            {isAdminView
+              ? (isEn ? 'Youth Grant Applications' : 'Permohonan Geran Belia')
+              : (isEn ? 'Your Grants' : 'Permohonan Geran')}
+          </span>
           <span className="text-lg font-black text-black dark:text-white tabular-nums">{visibleGrants.length}</span>
         </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Registered' : 'Penyertaan Anda'}</span>
-          <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{registeredIds.length}</span>
-        </div>
+        {!isAdminView && (
+          <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
+            <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">
+              {isEn ? 'Registered' : 'Penyertaan Anda'}
+            </span>
+            <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{registeredIds.length}</span>
+          </div>
+        )}
       </div>
 
-      {/* Categories Filter */}
-      <div className="flex flex-wrap items-center gap-2">
-        {categoryOptions.map((cat) => (
-          <button
-            key={cat.key}
-            type="button"
-            onClick={() => setSelectedCategory(cat.key)}
-            className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer ${
-              selectedCategory === cat.key
-                ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
-                : 'bg-white dark:bg-slate-800 text-black dark:text-white hover:bg-amber-50 dark:hover:bg-slate-700 hover:text-black dark:hover:text-white border border-slate-300 dark:border-slate-600'
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Active Grant Applications Status & Cancel Controls */}
-      {!isReadOnly && visibleGrants.length > 0 && (
+      {/* Active Grant Applications Status & Cancel Controls (Youth Only) */}
+      {!isAdminView && visibleGrants.length > 0 && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden h-fit">
           <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 flex items-center justify-between gap-2">
             <h2 className="text-sm font-extrabold text-black dark:text-white flex items-center gap-2">
@@ -318,122 +446,260 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
         </div>
       )}
 
-      {/* Empty State or Vertical List View */}
-      {filteredPrograms.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 h-fit">
-          <Award className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
-          <p className="text-sm font-bold text-black dark:text-white">
-            {isEn ? 'No programs found in this category' : 'Tiada program ditemui dalam kategori ini'}
-          </p>
-        </div>
-      ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden shadow-xs flex flex-col divide-y divide-slate-200 dark:divide-slate-700 h-fit">
-          {filteredPrograms.map((prog) => {
-            const isGrant = prog.category === 'Geran & Dana';
-            const isRegistered = !isGrant && registeredIds.includes(prog.id);
-            const matchingPendingGrant = isGrant
-              ? pendingGrants.find(
-                  (g) =>
-                    g.programId === prog.id ||
-                    g.programTitle.trim().toLowerCase() === prog.title.trim().toLowerCase()
-                )
-              : undefined;
-
-            return (
-              <div
-                key={prog.id}
-                id={`program-card-${prog.id}`}
-                className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors"
-              >
-                <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 shrink-0">
-                    <PortalImage
-                      src={resolveProgramImage(prog)}
-                      alt={prog.title}
-                      fallbackType="program"
-                      fallbackLabel={prog.category}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <h3 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
-                        {prog.title}
-                      </h3>
-                      <span className="px-2 py-0.5 bg-slate-50 dark:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 rounded-md text-xs font-semibold shrink-0">
-                        {prog.category}
-                      </span>
-                    </div>
-                    <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                      {prog.grantAmount ? `${prog.grantAmount} · ` : ''}{prog.date} · {prog.location} · {prog.organizer}
-                    </p>
-                  </div>
+      {/* Programs List Card with Integrated Toolbar & Pagination */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+        <ReferenceTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={
+            isEn
+              ? 'Search program title, category or organizer...'
+              : 'Cari tajuk program, kategori atau lokasi...'
+          }
+          filterCount={activeFilterCount}
+          onResetFilters={handleResetFilters}
+          sortOptions={sortOptions}
+          sortValue={sortBy}
+          onSortChange={setSortBy}
+          sortLabel={isEn ? 'Sort By' : 'Susun Mengikut'}
+          filterContent={
+            <>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                  {isEn ? 'Program Category' : 'Kategori Program'}
+                </label>
+                <div className="grid grid-cols-1 gap-1.5">
+                  {categoryOptions.map((cat) => (
+                    <button
+                      key={cat.key}
+                      type="button"
+                      onClick={() => setSelectedCategory(cat.key)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border text-left transition-colors cursor-pointer ${
+                        selectedCategory === cat.key
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
                 </div>
+              </div>
 
-                <div className="shrink-0 self-end sm:self-center">
-                  {isReadOnly ? (
-                    <div className="py-2 px-3.5 bg-slate-50 dark:bg-slate-900 text-black dark:text-white border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium inline-flex items-center gap-1.5">
-                      <Eye className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                      <span>{isEn ? 'Monitored' : 'Dipantau'}</span>
-                    </div>
-                  ) : matchingPendingGrant ? (
-                    <div className="flex items-center gap-2">
-                      <div className="py-2 px-3 bg-amber-50 dark:bg-amber-950/50 text-black dark:text-white border border-amber-300 dark:border-amber-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 shrink-0" />
-                        <span>{isEn ? 'Pending' : 'Disemak'}</span>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                  {isEn ? 'Highlight Status' : 'Status Pilihan'}
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { id: 'all', label: isEn ? 'All' : 'Semua' },
+                    { id: 'featured', label: isEn ? 'Featured' : 'Pilihan Utama' }
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setFeaturedFilter(opt.id as 'all' | 'featured')}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
+                        featuredFilter === opt.id
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          }
+        />
+
+        {filteredPrograms.length === 0 ? (
+          <div className="text-center py-12 px-4 space-y-2">
+            <Award className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto" />
+            <p className="text-sm font-bold text-black dark:text-white">
+              {isEn
+                ? 'No programs or grants match your current filters.'
+                : 'Tiada program atau geran ditemui sepadan dengan carian atau penapis.'}
+            </p>
+            {(searchQuery || activeFilterCount > 0) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  handleResetFilters();
+                }}
+                className="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+              >
+                {isEn ? 'Reset Search & Filters' : 'Set Semula Carian & Penapis'}
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col divide-y divide-slate-200 dark:divide-zinc-700">
+              {pagination.paginatedItems.map((prog) => {
+                const isGrant = prog.category === 'Geran & Dana';
+                const isRegistered = !isGrant && registeredIds.includes(prog.id);
+                const matchingPendingGrant = isGrant
+                  ? pendingGrants.find(
+                      (g) =>
+                        g.programId === prog.id ||
+                        g.programTitle.trim().toLowerCase() === prog.title.trim().toLowerCase()
+                    )
+                  : undefined;
+
+                return (
+                  <div
+                    key={prog.id}
+                    id={`program-card-${prog.id}`}
+                    className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shrink-0">
+                        <PortalImage
+                          src={resolveProgramImage(prog)}
+                          alt={prog.title}
+                          fallbackType="program"
+                          fallbackLabel={prog.category}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      {onCancelGrant && (
+
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex flex-wrap items-center gap-2 min-w-0">
+                          <h3 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
+                            {prog.title}
+                          </h3>
+                          <span className="px-2 py-0.5 bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 rounded-md text-xs font-semibold shrink-0">
+                            {prog.category}
+                          </span>
+                          {prog.isFeatured && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-md text-xs font-bold shrink-0">
+                              <Star className="w-3 h-3 fill-current" />
+                              <span>{isEn ? 'Featured' : 'Pilihan Utama'}</span>
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                          {prog.grantAmount ? `${prog.grantAmount} · ` : ''}{prog.date} · {prog.location} · {prog.organizer}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 self-end sm:self-center">
+                      {isAdminView ? (
+                        <RowActionMenu
+                          ariaLabel={`Tindakan untuk ${prog.title}`}
+                          items={[
+                            {
+                              label: isEn ? 'Edit Program' : 'Edit Program',
+                              onClick: () => setEditingProgram(prog)
+                            },
+                            {
+                              label: prog.isFeatured
+                                ? (isEn ? 'Unmark Featured' : 'Nyah-tanda Utama')
+                                : (isEn ? 'Mark Featured' : 'Tandakan Utama'),
+                              tone: 'accent',
+                              onClick: () => handleToggleFeaturedProgram(prog)
+                            },
+                            {
+                              label: isEn ? 'Delete Program' : 'Padam Program',
+                              tone: 'danger',
+                              dividerBefore: true,
+                              onClick: () =>
+                                confirmDelete({
+                                  itemName: prog.title,
+                                  itemType: isEn ? 'Grant & Program' : 'Program & Geran',
+                                  onConfirm: () => handleDeleteProgramConfirm(prog)
+                                })
+                            }
+                          ]}
+                        />
+                      ) : matchingPendingGrant ? (
+                        <div className="flex items-center gap-2">
+                          <div className="py-2 px-3 bg-amber-50 dark:bg-amber-950/50 text-black dark:text-white border border-amber-300 dark:border-amber-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 shrink-0" />
+                            <span>{isEn ? 'Pending' : 'Disemak'}</span>
+                          </div>
+                          {onCancelGrant && (
+                            <button
+                              type="button"
+                              disabled={cancellingGrantId === matchingPendingGrant.id}
+                              onClick={() => handleCancelGrantClick(matchingPendingGrant)}
+                              className="py-2 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                            >
+                              <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                              <span>
+                                {cancellingGrantId === matchingPendingGrant.id
+                                  ? (isEn ? 'Cancelling...' : 'Membatalkan...')
+                                  : (isEn ? 'Cancel Request' : 'Batal Permohonan')}
+                              </span>
+                            </button>
+                          )}
+                        </div>
+                      ) : isRegistered ? (
+                        <div className="flex items-center gap-2">
+                          <div className="py-2 px-3 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold inline-flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                            <span>{isEn ? 'Registered' : 'Didaftarkan'}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCancelProgramRegistration(prog)}
+                            className="py-2 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                            <span>{isEn ? 'Cancel Join' : 'Batal Penyertaan'}</span>
+                          </button>
+                        </div>
+                      ) : (
                         <button
                           type="button"
-                          disabled={cancellingGrantId === matchingPendingGrant.id}
-                          onClick={() => handleCancelGrantClick(matchingPendingGrant)}
-                          className="py-2 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                          onClick={() => handleProgramAction(prog)}
+                          className="py-2 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
-                          <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                           <span>
-                            {cancellingGrantId === matchingPendingGrant.id
-                              ? (isEn ? 'Cancelling...' : 'Membatalkan...')
-                              : (isEn ? 'Cancel Request' : 'Batal Permohonan')}
+                            {isGrant
+                              ? (isEn ? 'Apply Grant' : 'Mohon Geran')
+                              : (isEn ? 'Join Program' : 'Daftar Program')}
                           </span>
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
-                  ) : isRegistered ? (
-                    <div className="flex items-center gap-2">
-                      <div className="py-2 px-3 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold inline-flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                        <span>{isEn ? 'Registered' : 'Didaftarkan'}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleCancelProgramRegistration(prog)}
-                        className="py-2 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
-                      >
-                        <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-                        <span>{isEn ? 'Cancel Join' : 'Batal Penyertaan'}</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handleProgramAction(prog)}
-                      className="py-2 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <span>
-                        {isGrant
-                          ? (isEn ? 'Apply Grant' : 'Mohon Geran')
-                          : (isEn ? 'Join Program' : 'Daftar Program')}
-                      </span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <PaginationBar
+              currentPage={pagination.currentPage}
+              totalItems={pagination.totalItems}
+              itemsPerPage={7}
+              onPageChange={pagination.setCurrentPage}
+              itemLabel={isEn ? 'programs' : 'program'}
+              accent="blue"
+            />
+          </>
+        )}
+      </div>
+
+      {/* Edit Program Modal (Admin) */}
+      <EditProgramModal
+        isOpen={Boolean(editingProgram)}
+        program={editingProgram}
+        onClose={() => setEditingProgram(null)}
+        onSaved={(updated) => {
+          setEditingProgram(null);
+          showToast({
+            type: 'success',
+            title: isEn ? 'Program Updated' : 'Program Dikemas Kini',
+            message: updated.title
+          });
+          onRefresh?.();
+        }}
+      />
     </div>
   );
 };

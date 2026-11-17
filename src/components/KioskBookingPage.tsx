@@ -31,6 +31,7 @@ import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveSlotImage } from '../utils/visualAssets';
 import { CapsuleGrid } from './CapsuleGrid';
+import { ModernDatePicker } from './ModernDateTimePicker';
 import {
   validateMyKad,
   validateMalaysianPhone,
@@ -797,16 +798,13 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                       <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
                         Tarikh Mula Operasi *
                       </label>
-                      <div className="relative">
-                        <Calendar className="w-4 h-4 text-black/70 dark:text-white/75 absolute left-4 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="date"
-                          min={todayISO}
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          className="w-full pl-11 pr-4 py-3 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 focus:outline-none transition-all cursor-pointer"
-                        />
-                      </div>
+                      <ModernDatePicker
+                        value={startDate}
+                        onChange={setStartDate}
+                        valueFormat="iso"
+                        minDate={todayISO}
+                        placeholder="Pilih tarikh mula operasi"
+                      />
                     </div>
 
                     <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-zinc-600">

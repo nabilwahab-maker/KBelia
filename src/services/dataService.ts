@@ -470,8 +470,6 @@ export async function saveBusinessListing(
     isApproved: business.isApproved ?? true,
     isFeatured: business.isFeatured ?? false,
     capsuleSlotId: business.capsuleSlotId || '',
-    rating: business.rating || 5.0,
-    reviewsCount: business.reviewsCount || 1,
     createdAt: business.createdAt || now,
     updatedAt: now
   };
@@ -1127,6 +1125,8 @@ export async function saveMentoringLogRecord(logEntry: MentoringLogEntry) {
     updatedAt: now
   };
 
+  unmarkIdAsDeleted(stamped.id);
+
   if (!isProductionAuthenticated()) {
     const key = 'kbelia_mentor_logs_v1';
     const existing: MentoringLogEntry[] = JSON.parse(localStorage.getItem(key) || '[]');
@@ -1142,6 +1142,33 @@ export async function saveMentoringLogRecord(logEntry: MentoringLogEntry) {
     handleFirestoreError(error, OperationType.WRITE, 'mentor_logs');
     throw error;
   }
+}
+
+export async function deleteMentoringLogRecord(logId: string): Promise<void> {
+  markIdAsDeleted(logId);
+
+  try {
+    const key = 'kbelia_mentor_logs_v1';
+    const existing: MentoringLogEntry[] = JSON.parse(localStorage.getItem(key) || '[]');
+    localStorage.setItem(key, JSON.stringify(existing.filter(l => l.id !== logId)));
+  } catch {
+    // ignore
+  }
+
+  if (!isProductionAuthenticated()) {
+    await publishDemoSyncRecord('log', logId, { id: logId }, true);
+    return;
+  }
+
+  try {
+    await deleteDoc(doc(db, 'mentor_logs', logId));
+  } catch (error: any) {
+    if (error?.code !== 'permission-denied') {
+      handleFirestoreError(error, OperationType.DELETE, 'mentor_logs');
+      throw error;
+    }
+  }
+  await publishDemoSyncRecord('log', logId, { id: logId }, true);
 }
 
 // --- B2B / RUANG NIAGA LISTINGS ---

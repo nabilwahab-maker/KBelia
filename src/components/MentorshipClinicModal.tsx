@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { MentorProfile, MentorshipRegistration, KelantanDistrict } from '../types';
 import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
+import { ModernDatePicker, ModernTimePicker, toLocalIsoDate } from './ModernDateTimePicker';
 
 interface MentorshipClinicModalProps {
   isOpen: boolean;
@@ -320,25 +321,39 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                   />
                 </div>
 
-                {/* 2-Column Row 3: Tarikh + Mod */}
+                {/* 3-Field Row: Tarikh Sesi, Masa Sesi, Mod Sesi */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
-                      Tarikh dan Masa <span className="text-black dark:text-white">*</span>
+                      Tarikh Sesi <span className="text-black dark:text-white">*</span>
                     </label>
-                    <select
+                    <ModernDatePicker
                       value={preferredDate}
-                      onChange={(e) => setPreferredDate(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
-                    >
-                      <option value="28 Mac 2026 (Sabtu)" className="dark:bg-slate-900">28 Mac 2026 (Sabtu) - 10:00 AM</option>
-                      <option value="30 Mac 2026 (Isnin)" className="dark:bg-slate-900">30 Mac 2026 (Isnin) - 11:30 AM</option>
-                      <option value="2 April 2026 (Khamis)" className="dark:bg-slate-900">2 April 2026 (Khamis) - 2:30 PM</option>
-                      <option value="5 April 2026 (Ahad)" className="dark:bg-slate-900">5 April 2026 (Ahad) - 10:00 AM</option>
-                    </select>
+                      onChange={setPreferredDate}
+                      valueFormat="malay-day"
+                      minDate={toLocalIsoDate(new Date())}
+                      accentColor="teal"
+                      placeholder="Pilih tarikh sesi"
+                    />
                   </div>
 
                   <div>
+                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                      Masa Sesi <span className="text-black dark:text-white">*</span>
+                    </label>
+                    <ModernTimePicker
+                      value={preferredTime}
+                      onChange={setPreferredTime}
+                      mode="range"
+                      allowRangeToggle
+                      formatStyle="12h-am"
+                      defaultDurationMinutes={60}
+                      accentColor="teal"
+                      placeholder="Pilih masa sesi"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
                     <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
                       Mod Sesi <span className="text-black dark:text-white">*</span>
                     </label>

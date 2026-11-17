@@ -37,6 +37,7 @@ import {
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { showToast } from './ToastNotification';
 import { ImageDropzone } from './ImageDropzone';
+import { ModernDatePicker, ModernTimePicker } from './ModernDateTimePicker';
 
 const CATEGORIES: BusinessCategory[] = [
   'Makanan & Minuman (F&B)',
@@ -337,11 +338,11 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
 
             <div>
               <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Tarikh Mula</label>
-              <input
-                type="date"
+              <ModernDatePicker
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className={inputClass}
+                onChange={setStartDate}
+                valueFormat="iso"
+                placeholder="Pilih tarikh mula"
               />
             </div>
 
@@ -1269,11 +1270,24 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
 
             <div>
               <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Tarikh Sesi</label>
-              <input
-                type="date"
+              <ModernDatePicker
                 value={preferredDate}
-                onChange={(e) => setPreferredDate(e.target.value)}
-                className={inputClass}
+                onChange={setPreferredDate}
+                valueFormat="iso"
+                placeholder="Pilih tarikh sesi"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Masa Sesi</label>
+              <ModernTimePicker
+                value={preferredTime}
+                onChange={setPreferredTime}
+                mode="single"
+                allowRangeToggle
+                formatStyle="12h-pg"
+                defaultDurationMinutes={60}
+                placeholder="Pilih masa sesi"
               />
             </div>
 

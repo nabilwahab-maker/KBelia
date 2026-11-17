@@ -25,6 +25,7 @@ import { EditCashflowModal } from './EditCashflowModal';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { exportSalesToExcel } from '../utils/excelExport';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
+import { ModernDatePicker, addDaysIso, toLocalIsoDate } from './ModernDateTimePicker';
 
 interface KioskCashflowTrackerProps {
   kioskName?: string;
@@ -503,11 +504,16 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
               <div>
                 <label className="text-sm font-medium text-black dark:text-white block mb-1.5">Tarikh</label>
-                <input
-                  type="date"
+                <ModernDatePicker
                   value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                  onChange={setDate}
+                  valueFormat="iso"
+                  quickDates={[
+                    { label: 'Hari Ini', value: toLocalIsoDate(new Date()) },
+                    { label: 'Semalam', value: addDaysIso(toLocalIsoDate(new Date()), -1) },
+                    { label: '2 Hari Lepas', value: addDaysIso(toLocalIsoDate(new Date()), -2) }
+                  ]}
+                  placeholder="Pilih tarikh jualan"
                 />
               </div>
               <div>

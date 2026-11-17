@@ -122,8 +122,6 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     isApproved: true,
     isFeatured: true,
     capsuleSlotId: 'cap-umk-01',
-    rating: 4.9,
-    reviewsCount: 42,
     createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
@@ -146,8 +144,6 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     isApproved: true,
     isFeatured: true,
     capsuleSlotId: 'cap-kb-01',
-    rating: 4.8,
-    reviewsCount: 38,
     createdAt: '2026-03-01T08:00:00.000Z'
   },
   {
@@ -170,8 +166,6 @@ export const INITIAL_BUSINESSES: BusinessListing[] = [
     isApproved: true,
     isFeatured: true,
     capsuleSlotId: 'cap-kb-02',
-    rating: 5.0,
-    reviewsCount: 19,
     createdAt: '2026-03-01T08:00:00.000Z'
   }
 ];

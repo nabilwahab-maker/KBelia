@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { X, Save, Loader2, Edit3, AlertCircle } from 'lucide-react';
 import { KioskDailySale } from '../types';
 import { saveCashflowRecord } from '../services/dataService';
+import { ModernDatePicker, addDaysIso, toLocalIsoDate } from './ModernDateTimePicker';
 
 interface EditCashflowModalProps {
   isOpen: boolean;
@@ -146,12 +147,15 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
               <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Tarikh</label>
-              <input
-                type="date"
-                required
+              <ModernDatePicker
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                onChange={setDate}
+                valueFormat="iso"
+                quickDates={[
+                  { label: 'Hari Ini', value: toLocalIsoDate(new Date()) },
+                  { label: 'Semalam', value: addDaysIso(toLocalIsoDate(new Date()), -1) }
+                ]}
+                placeholder="Pilih tarikh"
               />
             </div>
 
