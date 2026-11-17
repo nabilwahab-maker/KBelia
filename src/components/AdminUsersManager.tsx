@@ -264,9 +264,10 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
   };
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-200">
+    <div className="space-y-4 animate-dashboard-tab">
       {/* Header */}
-      <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
             <Users className="w-3.5 h-3.5" />
@@ -283,7 +284,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
         <button
           type="button"
           onClick={openCreateModal}
-          className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs cursor-pointer shrink-0 self-start sm:self-auto"
+          className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs cursor-pointer shrink-0 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Tambah Pengguna Baharu</span>
@@ -293,6 +294,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       {/* Reference-Style Users Table Card */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
         <ReferenceTableToolbar
+          accent="indigo"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder="Cari nama, emel atau perniagaan..."
@@ -329,7 +331,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                       onClick={() => setRoleFilter(tab.id)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold border text-left transition-colors cursor-pointer ${
                         roleFilter === tab.id
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? 'bg-indigo-600 text-white border-indigo-600'
                           : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
                       }`}
                     >
@@ -432,7 +434,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         : u.designation || 'Pentadbir Portal KBelia';
 
                     return (
-                      <tr key={u.userId} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                      <tr key={u.userId} className="kbelia-table-row">
                         <td className="py-3.5 pl-4 pr-3">
                           <div className="flex items-center gap-3 min-w-[200px]">
                             <img
@@ -517,16 +519,16 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       {/* Add / Edit User Modal */}
       {showUserModal && (
         <div
-          className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+          className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
           onClick={() => !isSaving && setShowUserModal(false)}
         >
           <div
-            className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+            className="animate-popover-enter relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+            <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-5 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                   <Users className="w-4 h-4" />
@@ -549,7 +551,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
               </button>
             </div>
 
-            <form onSubmit={handleSaveUser} className="p-6 space-y-4">
+            <form onSubmit={handleSaveUser} className="p-4 sm:p-5 space-y-3.5">
               {formError && (
                 <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-sm font-medium text-black dark:text-white flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />

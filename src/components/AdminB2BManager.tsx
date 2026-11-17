@@ -334,12 +334,13 @@ export const AdminB2BManager: React.FC = () => {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 animate-dashboard-tab">
       {/* Header Banner */}
-      <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-            <Megaphone className="w-4 h-4" />
+            <Megaphone className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             <span>Kawalan Iklan Bergambar Pentadbir</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
@@ -365,9 +366,10 @@ export const AdminB2BManager: React.FC = () => {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 shadow-xs overflow-hidden"
+          className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 shadow-xs overflow-hidden animate-dashboard-tab"
         >
-          <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2 bg-slate-50 dark:bg-zinc-950">
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
+          <div className="px-4 sm:px-5 py-3.5 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2 bg-slate-50 dark:bg-zinc-950">
             <h4 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
               <Megaphone className="w-4 h-4 text-teal-600 dark:text-teal-400" />
               <span>{editingId ? 'Edit Iklan Ruang Niaga' : 'Cipta Iklan Ruang Niaga Bergambar'}</span>
@@ -398,7 +400,7 @@ export const AdminB2BManager: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="p-4 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             {/* Left Column: Form Fields + Image Dropzone */}
             <div className="lg:col-span-7 space-y-4">
               <div>
@@ -577,6 +579,7 @@ export const AdminB2BManager: React.FC = () => {
       {/* Unified Reference Table Card */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
         <ReferenceTableToolbar
+          accent="indigo"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder="Cari iklan, perniagaan atau daerah..."
@@ -613,7 +616,7 @@ export const AdminB2BManager: React.FC = () => {
                       onClick={() => setFilterType(opt.id)}
                       className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                         filterType === opt.id
-                          ? 'bg-blue-600 border-blue-600 text-white'
+                          ? 'bg-indigo-600 border-indigo-600 text-white'
                           : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
                       }`}
                     >
@@ -716,7 +719,7 @@ export const AdminB2BManager: React.FC = () => {
                   {b2bPagination.paginatedItems.map((item) => (
                     <tr
                       key={item.id}
-                      className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors"
+                      className="kbelia-table-row"
                     >
                       <td className="py-3.5 pl-5 pr-3">
                         <div className="flex items-center gap-3 min-w-[210px]">

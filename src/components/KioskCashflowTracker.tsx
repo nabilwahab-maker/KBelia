@@ -26,6 +26,7 @@ import { PaginationBar, usePagination } from './PaginationBar';
 import { exportSalesToExcel } from '../utils/excelExport';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 import { ModernDatePicker, addDaysIso, toLocalIsoDate } from './ModernDateTimePicker';
+import { useAnimatedMetric } from '../hooks/useMotion';
 
 interface KioskCashflowTrackerProps {
   kioskName?: string;
@@ -379,8 +380,17 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     ? Math.round((salesRecords.reduce((acc, r) => acc + r.qrSales, 0) / totalRevenue) * 100)
     : 0;
 
+  const formattedRevenue = `RM ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formattedExpenses = `RM ${totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formattedNetProfit = `RM ${netProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const animatedRevenue = useAnimatedMetric(formattedRevenue);
+  const animatedExpenses = useAnimatedMetric(formattedExpenses);
+  const animatedNetProfit = useAnimatedMetric(formattedNetProfit);
+  const animatedQrPct = useAnimatedMetric(`${qrPercentage}%`);
+
   return (
-    <div className="space-y-5">
+    <div className="animate-dashboard-tab space-y-4">
       {/* Header Row: Title + Subtitle left | Eksport (.xlsx) + Catat Jualan right */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -430,53 +440,69 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
       </div>
 
       {/* KPI Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="rounded-xl p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700">
-          <span className="text-sm sm:text-[0.9375rem] font-medium text-black/75 dark:text-white/80 block mb-1">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 items-stretch">
+        <div
+          style={{ '--stagger': 0 } as React.CSSProperties}
+          className="animate-dashboard-card group relative overflow-hidden rounded-xl p-3.5 sm:p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-blue-400/70 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm flex flex-col justify-between"
+        >
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/75 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+          <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 block mb-1">
             Jumlah Jualan Kasar
           </span>
-          <span className="text-2xl sm:text-[1.75rem] font-bold text-black dark:text-white tabular-nums tracking-tight">
-            RM {totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
+            {animatedRevenue}
           </span>
         </div>
 
-        <div className="rounded-xl p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700">
-          <span className="text-sm sm:text-[0.9375rem] font-medium text-black/75 dark:text-white/80 block mb-1">
+        <div
+          style={{ '--stagger': 1 } as React.CSSProperties}
+          className="animate-dashboard-card group relative overflow-hidden rounded-xl p-3.5 sm:p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-amber-400/70 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm flex flex-col justify-between"
+        >
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-500/80 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+          <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 block mb-1">
             Kos &amp; Belanja Stok
           </span>
-          <span className="text-2xl sm:text-[1.75rem] font-bold text-black dark:text-white/85 tabular-nums tracking-tight">
-            RM {totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white/90 tabular-nums tracking-tight">
+            {animatedExpenses}
           </span>
         </div>
 
-        <div className="rounded-xl p-4 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-          <span className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white block mb-1">
+        <div
+          style={{ '--stagger': 2 } as React.CSSProperties}
+          className="animate-dashboard-card group relative overflow-hidden rounded-xl p-3.5 sm:p-4 bg-emerald-50/75 dark:bg-emerald-950/35 border border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm flex flex-col justify-between"
+        >
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-600/80 opacity-75 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+          <span className="text-xs sm:text-sm font-bold text-black dark:text-white block mb-1">
             Untung Bersih Terkumpul
           </span>
-          <span className="text-2xl sm:text-[1.75rem] font-bold text-black dark:text-white tabular-nums tracking-tight">
-            RM {netProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <span className="text-xl sm:text-2xl font-extrabold font-mono text-emerald-800 dark:text-emerald-300 tabular-nums tracking-tight">
+            {animatedNetProfit}
           </span>
         </div>
 
-        <div className="rounded-xl p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700">
-          <span className="text-sm sm:text-[0.9375rem] font-medium text-black/75 dark:text-white/80 block mb-1">
-            Peratusan Bayaran DuitNow QR
+        <div
+          style={{ '--stagger': 3 } as React.CSSProperties}
+          className="animate-dashboard-card group relative overflow-hidden rounded-xl p-3.5 sm:p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-indigo-400/70 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm flex flex-col justify-between"
+        >
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-indigo-600/75 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+          <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 block mb-1">
+            Bayaran DuitNow QR
           </span>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-[1.75rem] font-bold text-black dark:text-white tabular-nums tracking-tight">
-              {qrPercentage}%
+            <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
+              {animatedQrPct}
             </span>
-            <span className="text-sm text-black/70 dark:text-white/75">Tanpa Tunai</span>
+            <span className="text-xs sm:text-sm text-black/65 dark:text-white/70">Tanpa Tunai</span>
           </div>
         </div>
       </div>
 
       {/* Collapsible Record Input Form */}
       {showAddForm && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden animate-in fade-in transition-colors">
-          <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-3.5 px-5 flex items-center justify-between">
+        <div className="animate-dashboard-tab bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden transition-colors">
+          <div className="kbelia-important-header border-b border-slate-200 dark:border-slate-700 py-3 px-4 flex items-center justify-between">
             <span className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white flex items-center gap-2">
-              <Coins className="w-4 h-4 text-black/75 dark:text-white/75" />
+              <Coins className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span>Borang Catatan Jualan &amp; Belanja Harian</span>
             </span>
             <button
@@ -489,7 +515,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
             </button>
           </div>
 
-          <form onSubmit={handleAddRecord} className="p-5 space-y-4">
+          <form onSubmit={handleAddRecord} className="p-4 space-y-3.5">
             {validationError && (
               <div className="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-black dark:text-white text-sm font-semibold border border-rose-200 dark:border-rose-800">
                 {validationError}
@@ -638,7 +664,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               </button>
 
               {isFilterOpen && (
-                <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
+                <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
                   <div className="pb-3 border-b border-slate-200 dark:border-zinc-700">
                     <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
                       <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
@@ -842,10 +868,10 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                     return (
                       <tr
                         key={r.id}
-                        className={`transition-colors ${
+                        className={`kbelia-table-row ${
                           isChecked
                             ? 'bg-blue-50/40 dark:bg-blue-950/20'
-                            : 'hover:bg-slate-50/80 dark:hover:bg-zinc-800/50'
+                            : ''
                         }`}
                       >
                         <td className="py-3.5 pl-4 pr-2">

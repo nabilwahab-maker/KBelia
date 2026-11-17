@@ -19,6 +19,7 @@ import {
   generateYouthCertificateOfficialHtml
 } from '../utils/printUtils';
 import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
+import { useAnimatedMetric } from '../hooks/useMotion';
 
 interface UserDocumentsVaultProps {
   bookings: CapsuleBooking[];
@@ -55,60 +56,69 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
   const resolvedDistrict = district || approvedBookings[0]?.hubLocation || 'Negeri Kelantan';
 
   const totalDocsCount = approvedBookings.length + approvedGrants.length + 1;
+  const animatedTotalDocs = useAnimatedMetric(totalDocsCount);
+  const animatedKioskDocs = useAnimatedMetric(approvedBookings.length);
+  const animatedGrantDocs = useAnimatedMetric(approvedGrants.length);
+  const animatedCertDocs = useAnimatedMetric(1);
 
   return (
-    <div className="rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-6 md:p-8 shadow-sm space-y-5 h-fit">
+    <div className="animate-dashboard-tab relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-4 sm:p-5 shadow-sm space-y-4 h-fit">
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/80 dark:bg-blue-500/80" aria-hidden="true" />
       {/* (a) Tajuk Utama */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-300 dark:border-slate-600">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-slate-200 dark:border-slate-700">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold tracking-wider uppercase text-black dark:text-white/75">
-              <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white" />
+          <div className="flex flex-wrap items-center gap-2 mb-1">
+            <span className="inline-flex items-center gap-1.5 text-[0.75rem] font-semibold tracking-wider uppercase text-blue-700 dark:text-blue-400">
+              <ShieldCheck className="w-3.5 h-3.5" />
               Simpanan Dokumen Rasmi Anda
             </span>
             <span className="text-black/35 dark:text-white/35">·</span>
-            <span className="text-sm text-black/70 dark:text-white/75 font-medium">
+            <span className="text-xs text-black/70 dark:text-white/75 font-medium">
               Disimpan Selamat (PDPA 2010)
             </span>
           </div>
-          <h2 className="text-2xl font-bold text-black dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white tracking-tight">
             Dokumen &amp; Sijil Saya
           </h2>
         </div>
       </div>
 
       {/* (b) Jalur Statistik Ringkas */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit">
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-2.5 h-fit">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-stretch">
+        <div style={{ '--stagger': 0 } as React.CSSProperties} className="animate-dashboard-card group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400/70 flex flex-col justify-between">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/65 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
           <p className="text-xs font-medium text-black/65 dark:text-white/70">Jumlah Dokumen</p>
-          <p className="text-lg font-extrabold font-mono tabular-nums text-black dark:text-white">{totalDocsCount}</p>
+          <p className="text-lg font-extrabold font-mono tabular-nums text-black dark:text-white mt-0.5">{animatedTotalDocs}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-2.5 h-fit">
+        <div style={{ '--stagger': 1 } as React.CSSProperties} className="animate-dashboard-card group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-400/70 flex flex-col justify-between">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-600/65 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
           <p className="text-xs font-medium text-black/65 dark:text-white/70">Surat Kiosk</p>
-          <p className="text-lg font-extrabold font-mono tabular-nums text-emerald-700 dark:text-emerald-400">{approvedBookings.length}</p>
+          <p className="text-lg font-extrabold font-mono tabular-nums text-emerald-700 dark:text-emerald-400 mt-0.5">{animatedKioskDocs}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-2.5 h-fit">
+        <div style={{ '--stagger': 2 } as React.CSSProperties} className="animate-dashboard-card group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400/70 flex flex-col justify-between">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/65 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
           <p className="text-xs font-medium text-black/65 dark:text-white/70">Kelulusan Geran</p>
-          <p className="text-lg font-extrabold font-mono tabular-nums text-blue-700 dark:text-blue-400">{approvedGrants.length}</p>
+          <p className="text-lg font-extrabold font-mono tabular-nums text-blue-700 dark:text-blue-400 mt-0.5">{animatedGrantDocs}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-2.5 h-fit">
+        <div style={{ '--stagger': 3 } as React.CSSProperties} className="animate-dashboard-card group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-400/70 flex flex-col justify-between">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-500/75 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
           <p className="text-xs font-medium text-black/65 dark:text-white/70">Sijil Keahlian</p>
-          <p className="text-lg font-extrabold font-mono tabular-nums text-amber-700 dark:text-amber-400">1</p>
+          <p className="text-lg font-extrabold font-mono tabular-nums text-amber-700 dark:text-amber-400 mt-0.5">{animatedCertDocs}</p>
         </div>
       </div>
 
       {/* (d) Senarai Menegak Dokumen Rasmi */}
-      <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden h-fit">
+      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col divide-y divide-slate-200 dark:divide-slate-700 overflow-hidden h-fit">
         {/* Document 1: Kiosk Offer Letter */}
         {approvedBookings.length > 0 ? (
           approvedBookings.map((b) => (
             <div
               key={b.id}
-              className="p-4 hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              className="p-3.5 sm:p-4 hover:bg-slate-50/90 dark:hover:bg-slate-900/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             >
-              <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                <div className="w-16 h-16 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-7 h-7" />
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
                 </div>
 
                 <div className="min-w-0 flex-1 space-y-1">
@@ -161,10 +171,10 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
             </div>
           ))
         ) : (
-          <div className="p-4 bg-slate-50/60 dark:bg-slate-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3.5 min-w-0 flex-1">
-              <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black/60 dark:text-white/65 flex items-center justify-center shrink-0">
-                <FileText className="w-7 h-7" />
+          <div className="p-3.5 sm:p-4 bg-slate-50/60 dark:bg-slate-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black/60 dark:text-white/65 flex items-center justify-center shrink-0">
+                <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-2 min-w-0">
@@ -187,11 +197,11 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
         {approvedGrants.map((g) => (
           <div
             key={g.id}
-            className="p-4 hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            className="p-3.5 sm:p-4 hover:bg-slate-50/90 dark:hover:bg-slate-900/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
           >
-            <div className="flex items-center gap-3.5 min-w-0 flex-1">
-              <div className="w-16 h-16 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0">
-                <CheckCircle2 className="w-7 h-7" />
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-5 h-5" />
               </div>
 
               <div className="min-w-0 flex-1 space-y-1">
@@ -231,10 +241,10 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
         ))}
 
         {/* Document 2: Certificate of Youth Entrepreneurship */}
-        <div className="p-4 hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3.5 min-w-0 flex-1">
-            <div className="w-16 h-16 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
-              <Award className="w-7 h-7" />
+        <div className="p-3.5 sm:p-4 hover:bg-slate-50/90 dark:hover:bg-slate-900/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+              <Award className="w-5 h-5" />
             </div>
 
             <div className="min-w-0 flex-1 space-y-1">

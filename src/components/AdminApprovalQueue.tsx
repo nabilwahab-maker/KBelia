@@ -57,6 +57,7 @@ import {
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { EditSlotModal } from './EditSlotModal';
 import { EditBookingModal, EditGrantModal, EditMaintenanceTicketModal } from './AdminEditModals';
+import { useAnimatedMetric } from '../hooks/useMotion';
 
 interface AdminApprovalQueueProps {
   bookings: CapsuleBooking[];
@@ -91,6 +92,19 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [adminNoteInput, setAdminNoteInput] = useState<{ [key: string]: string }>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const pendingBookingCount = bookings.filter(b => b.status === 'pending').length;
+  const pendingGrantCount = grantApplications.filter(g => g.status === 'pending').length;
+  const availableSlotCount = slots.filter(s => s.status === 'available').length;
+  const occupiedSlotCount = slots.filter(s => s.status === 'occupied').length;
+  const maintenanceSlotCount = slots.filter(s => s.status === 'maintenance').length;
+
+  const animPendingBookings = useAnimatedMetric(pendingBookingCount);
+  const animPendingGrants = useAnimatedMetric(pendingGrantCount);
+  const animTotalSlots = useAnimatedMetric(slots.length);
+  const animAvailableSlots = useAnimatedMetric(availableSlotCount);
+  const animOccupiedSlots = useAnimatedMetric(occupiedSlotCount);
+  const animMaintenanceSlots = useAnimatedMetric(maintenanceSlotCount);
 
   // Admin Edit / Create Modals
   const [editingBooking, setEditingBooking] = useState<CapsuleBooking | null>(null);
@@ -647,13 +661,14 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   });
 
   return (
-    <div className="rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-6 md:p-8 shadow-xs overflow-visible">
+    <div className="rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 md:p-6 shadow-xs overflow-visible animate-dashboard-tab">
       {/* Top Controls & Navigation (Important Header Only) */}
-      <div className="-mx-6 -mt-6 md:-mx-8 md:-mt-8 px-6 pt-6 md:px-8 md:pt-8 pb-6 mb-6 kbelia-important-header border-b border-slate-300 dark:border-slate-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="-mx-5 -mt-5 md:-mx-6 md:-mt-6 px-5 pt-5 md:px-6 md:pt-6 pb-5 mb-5 kbelia-important-header border-b border-slate-300 dark:border-slate-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4 rounded-t-3xl relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold tracking-wider uppercase text-black dark:text-white/75">
-              <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75" />
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               Pusat Kawalan & Kelulusan Rasmi Pegawai
             </span>
             <span className="text-black/35 dark:text-white/35">·</span>
@@ -671,7 +686,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           <button
             type="button"
             onClick={() => setShowAddSlotModal(true)}
-            className="px-3.5 py-2 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer dark:bg-blue-600"
+            className="px-3.5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>Daftar Kiosk Niaga</span>
@@ -699,7 +714,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
       </div>
 
       {/* Main Tab Segmented Controls */}
-      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1">
+      <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
         <button
           type="button"
           onClick={() => setActiveTab('overview')}
@@ -723,7 +738,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           }`}
         >
           <Store className="w-3.5 h-3.5" />
-          <span>Kiosk ({bookings.filter(b => b.status === 'pending').length})</span>
+          <span className="tabular-nums">Kiosk ({pendingBookingCount})</span>
         </button>
 
         <button
@@ -736,7 +751,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           }`}
         >
           <Coins className="w-3.5 h-3.5" />
-          <span>Geran ({grantApplications.filter(g => g.status === 'pending').length})</span>
+          <span className="tabular-nums">Geran ({pendingGrantCount})</span>
         </button>
 
         <button
@@ -749,7 +764,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           }`}
         >
           <Wrench className="w-3.5 h-3.5" />
-          <span>Fasiliti ({slots.length})</span>
+          <span className="tabular-nums">Fasiliti ({slots.length})</span>
         </button>
 
         <button
@@ -768,20 +783,24 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* TAB 0: 3-COLUMN OVERVIEW MATCHING WIREFRAME */}
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-stretch">
+        <div key="overview" className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5 mb-2 items-stretch animate-dashboard-tab">
           
           {/* Kolum 1: Permohonan Sewa Kiosk */}
-          <div className="min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col justify-start h-full">
+          <div
+            style={{ '--stagger': 0 } as React.CSSProperties}
+            className="animate-dashboard-card relative overflow-hidden min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-4 sm:p-5 shadow-2xs flex flex-col justify-start h-full"
+          >
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Store className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
+                  <Store className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                   <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
                     Permohonan Sewa Kiosk
                   </h4>
                 </div>
-                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200/80 shrink-0">
-                  {bookings.filter(b => b.status === 'pending').length} Menunggu
+                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200/80 shrink-0 tabular-nums">
+                  {animPendingBookings} Menunggu
                 </span>
               </div>
 
@@ -860,17 +879,21 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           </div>
 
           {/* Kolum 2: Permohonan Dana & Geran Belia */}
-          <div className="min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col justify-start h-full">
+          <div
+            style={{ '--stagger': 1 } as React.CSSProperties}
+            className="animate-dashboard-card relative overflow-hidden min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-4 sm:p-5 shadow-2xs flex flex-col justify-start h-full"
+          >
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Coins className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
+                  <Coins className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
                     Permohonan Geran & Pembiayaan
                   </h4>
                 </div>
-                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 shrink-0">
-                  {grantApplications.filter(g => g.status === 'pending').length} Menunggu
+                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 shrink-0 tabular-nums">
+                  {animPendingGrants} Menunggu
                 </span>
               </div>
 
@@ -949,17 +972,21 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           </div>
 
           {/* Kolum 3: Kawalan Fasiliti Kiosk & Tindakan Pantas */}
-          <div className="min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col justify-start h-full">
+          <div
+            style={{ '--stagger': 2 } as React.CSSProperties}
+            className="animate-dashboard-card relative overflow-hidden min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-4 sm:p-5 shadow-2xs flex flex-col justify-start h-full"
+          >
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Wrench className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
+                  <Wrench className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                   <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
                     Fasiliti & Tindakan Pantas
                   </h4>
                 </div>
-                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 shrink-0">
-                  {slots.length} Unit Pod
+                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 shrink-0 tabular-nums">
+                  {animTotalSlots} Unit Pod
                 </span>
               </div>
 
@@ -967,15 +994,15 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               <div className="grid grid-cols-3 gap-2 mb-4 text-center">
                 <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                   <span className="text-sm text-black/70 dark:text-white/75 block font-medium">Kosong</span>
-                  <span className="font-mono text-base font-bold text-black dark:text-white">{slots.filter(s => s.status === 'available').length}</span>
+                  <span className="font-mono text-base font-bold text-emerald-700 dark:text-emerald-300 tabular-nums">{animAvailableSlots}</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                   <span className="text-sm text-black/70 dark:text-white/75 block font-medium">Disewa</span>
-                  <span className="font-mono text-base font-bold text-black dark:text-white">{slots.filter(s => s.status === 'occupied').length}</span>
+                  <span className="font-mono text-base font-bold text-blue-700 dark:text-blue-300 tabular-nums">{animOccupiedSlots}</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
                   <span className="text-sm text-black/70 dark:text-white/75 block font-medium">Selenggara</span>
-                  <span className="font-mono text-base font-bold text-black dark:text-white">{slots.filter(s => s.status === 'maintenance').length}</span>
+                  <span className="font-mono text-base font-bold text-amber-700 dark:text-amber-300 tabular-nums">{animMaintenanceSlots}</span>
                 </div>
               </div>
 
@@ -1029,7 +1056,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* TAB 1: KIOSK BOOKINGS */}
       {activeTab === 'kiosks' && (
-        <div className="space-y-4">
+        <div key="kiosks" className="space-y-4 animate-dashboard-tab">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h4 className="text-base font-bold text-black dark:text-white">
@@ -1045,7 +1072,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 setEditingBooking(null);
                 setShowCreateBooking(true);
               }}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
             >
               <Plus className="w-4 h-4" />
               <span>Tambah Permohonan</span>
@@ -1054,6 +1081,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
             <ReferenceTableToolbar
+              accent="indigo"
               searchValue={searchQuery}
               onSearchChange={setSearchQuery}
               searchPlaceholder="Cari pemohon, perniagaan atau kod kiosk..."
@@ -1089,7 +1117,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         onClick={() => setStatusFilter(opt.id)}
                         className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                           statusFilter === opt.id
-                            ? 'bg-blue-600 border-blue-600 text-white'
+                            ? 'bg-indigo-600 border-indigo-600 text-white'
                             : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
                         }`}
                       >
@@ -1178,7 +1206,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         const isExpanded = expandedKioskIds.includes(booking.id);
                         return (
                           <React.Fragment key={booking.id}>
-                            <tr className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                            <tr className="kbelia-table-row">
                               <td className="py-3.5 pl-5 pr-3">
                                 <div className="flex items-center gap-3 min-w-[210px]">
                                   <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
@@ -1363,7 +1391,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* TAB 2: GRANT APPLICATIONS */}
       {activeTab === 'grants' && (
-        <div className="space-y-4">
+        <div key="grants" className="space-y-4 animate-dashboard-tab">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h4 className="text-base font-bold text-black dark:text-white">
@@ -1379,7 +1407,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 setEditingGrant(null);
                 setShowCreateGrant(true);
               }}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
             >
               <Plus className="w-4 h-4" />
               <span>Tambah Geran</span>
@@ -1388,6 +1416,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
             <ReferenceTableToolbar
+              accent="indigo"
               searchValue={searchQuery}
               onSearchChange={setSearchQuery}
               searchPlaceholder="Cari pemohon, perniagaan atau program geran..."
@@ -1423,7 +1452,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         onClick={() => setStatusFilter(opt.id)}
                         className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                           statusFilter === opt.id
-                            ? 'bg-blue-600 border-blue-600 text-white'
+                            ? 'bg-indigo-600 border-indigo-600 text-white'
                             : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
                         }`}
                       >
@@ -1512,7 +1541,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         const isExpanded = expandedGrantIds.includes(grant.id);
                         return (
                           <React.Fragment key={grant.id}>
-                            <tr className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                            <tr className="kbelia-table-row">
                               <td className="py-3.5 pl-5 pr-3">
                                 <div className="flex items-center gap-3 min-w-[200px]">
                                   <div className="w-10 h-10 rounded-xl shrink-0 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
@@ -1693,7 +1722,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* TAB 3: FACILITY & KIOSK MAINTENANCE CONTROL */}
       {activeTab === 'facility' && (
-        <div className="space-y-6">
+        <div key="facility" className="space-y-5 animate-dashboard-tab">
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
@@ -1707,7 +1736,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAddSlotModal(true)}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>Tambah Unit Kiosk</span>
@@ -1716,6 +1745,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
               <ReferenceTableToolbar
+                accent="indigo"
                 searchValue={slotSearch}
                 onSearchChange={setSlotSearch}
                 searchPlaceholder="Cari kod kiosk, nama atau daerah..."
@@ -1751,7 +1781,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           onClick={() => setSlotStatusFilter(opt.id)}
                           className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                             slotStatusFilter === opt.id
-                              ? 'bg-blue-600 border-blue-600 text-white'
+                              ? 'bg-indigo-600 border-indigo-600 text-white'
                               : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
                           }`}
                         >
@@ -1836,7 +1866,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         {facilitySlotsPagination.paginatedItems.map((slot) => (
                           <tr
                             key={slot.id}
-                            className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors"
+                            className="kbelia-table-row"
                           >
                             <td className="py-3.5 pl-5 pr-3">
                               <div className="flex items-center gap-3 min-w-[200px]">
@@ -1979,6 +2009,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             ) : (
               <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
                 <ReferenceTableToolbar
+                  accent="indigo"
                   searchValue={ticketSearch}
                   onSearchChange={setTicketSearch}
                   searchPlaceholder="Cari kod kiosk, pelapor atau kategori aduan..."
@@ -2014,7 +2045,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             onClick={() => setTicketStatusFilter(opt.id)}
                             className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                               ticketStatusFilter === opt.id
-                                ? 'bg-blue-600 border-blue-600 text-white'
+                                ? 'bg-indigo-600 border-indigo-600 text-white'
                                 : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
                             }`}
                           >
@@ -2091,7 +2122,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             const isBusy = actionLoading === ticket.id;
                             return (
                               <React.Fragment key={ticket.id}>
-                                <tr className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                                <tr className="kbelia-table-row">
                                   <td className="py-3.5 pl-5 pr-3">
                                     <div className="flex items-center gap-3 min-w-[200px]">
                                       <div className="w-10 h-10 rounded-xl shrink-0 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 flex items-center justify-center text-amber-700 dark:text-amber-300">
@@ -2235,34 +2266,46 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* TAB 4: DEMAND HEATMAP & AUDIT TRAIL */}
       {activeTab === 'audit' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
-            <span className="text-sm font-bold text-black dark:text-white block mb-3 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-black dark:text-white/75" />
-              Peta Haba Permintaan Lokasi Kiosk (Berdasarkan Carian & Permohonan Belia)
-            </span>
-            <div className="flex flex-col gap-2.5">
-              {Object.entries(districtDemandCount).map(([location, count]) => (
-                <div key={location} className="flex items-center justify-between text-sm p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
-                  <span className="font-medium text-black dark:text-white">
-                    {location}
-                  </span>
-                  <span className="font-bold text-black dark:text-white/75 tabular-nums">
-                    {count} Permohonan
-                  </span>
-                </div>
-              ))}
+        <div key="audit" className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-stretch animate-dashboard-tab">
+          <div
+            style={{ '--stagger': 0 } as React.CSSProperties}
+            className="animate-dashboard-card relative overflow-hidden p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex flex-col justify-between"
+          >
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
+            <div>
+              <span className="text-sm font-bold text-black dark:text-white block mb-3 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                Peta Haba Permintaan Lokasi Kiosk (Berdasarkan Carian & Permohonan Belia)
+              </span>
+              <div className="flex flex-col gap-2">
+                {Object.entries(districtDemandCount).map(([location, count]) => (
+                  <div key={location} className="flex items-center justify-between text-sm p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 transition-colors hover:border-indigo-300 dark:hover:border-indigo-500/60">
+                    <span className="font-medium text-black dark:text-white">
+                      {location}
+                    </span>
+                    <span className="font-bold text-indigo-700 dark:text-indigo-300 tabular-nums">
+                      {count} Permohonan
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
-            <span className="text-sm font-bold text-black dark:text-white block mb-3 flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75" />
-              Integriti & Garis Panduan Tatakelola Negeri
-            </span>
-            <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed mb-3">
-              Setiap kelulusan yang dibuat oleh pegawai direkodkan dengan cap masa antarabangsa, alamat sesi pentadbir, dan terikat dengan Akta Perlindungan Data Peribadi (PDPA 2010).
-            </p>
+          <div
+            style={{ '--stagger': 1 } as React.CSSProperties}
+            className="animate-dashboard-card relative overflow-hidden p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex flex-col justify-between"
+          >
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
+            <div>
+              <span className="text-sm font-bold text-black dark:text-white block mb-3 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                Integriti & Garis Panduan Tatakelola Negeri
+              </span>
+              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed mb-3">
+                Setiap kelulusan yang dibuat oleh pegawai direkodkan dengan cap masa antarabangsa, alamat sesi pentadbir, dan terikat dengan Akta Perlindungan Data Peribadi (PDPA 2010).
+              </p>
+            </div>
             <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-800/50 text-sm text-black dark:text-white">
               ✓ Semua permohonan yang diluluskan secara automatik menjana Surat Tawaran Digital rasmi berkod QR untuk semakan pihak berkuasa tempatan (PBT).
             </div>

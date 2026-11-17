@@ -25,6 +25,8 @@ import {
 } from 'recharts';
 
 import { BusinessListing, CapsuleSlot, GrantApplication, YouthProgram } from '../types';
+import { usePrefersReducedMotion } from '../hooks/useMotion';
+import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
 
 interface SectorData {
   name: string;
@@ -62,6 +64,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
   businesses = [],
   grantApplications = []
 }) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [activeSector, setActiveSector] = useState<SectorData>(SECTOR_BREAKDOWN[0]);
   const [chartTab, setChartTab] = useState<'sectors' | 'growth'>('growth');
 
@@ -315,7 +318,8 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
                       paddingAngle={2}
                       strokeWidth={2}
                       stroke="#FFFFFF"
-                      isAnimationActive={false}
+                      isAnimationActive={!prefersReducedMotion}
+                      animationDuration={680}
                       onClick={(_, index) => {
                         if (SECTOR_BREAKDOWN[index]) {
                           setActiveSector(SECTOR_BREAKDOWN[index]);
@@ -489,7 +493,23 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
                     return null;
                   }}
                 />
-                <Bar yAxisId="left" dataKey="grantsAmount" name="Dana Geran" fill="#2563EB" radius={[8, 8, 0, 0]} maxBarSize={72} isAnimationActive={false}>
+                <Bar
+                  yAxisId="left"
+                  dataKey="grantsAmount"
+                  name="Dana Geran"
+                  fill="#2563EB"
+                  radius={[8, 8, 0, 0]}
+                  maxBarSize={72}
+                  isAnimationActive={!prefersReducedMotion}
+                  animationDuration={680}
+                  shape={(barProps: unknown) => (
+                    <AnimatedShimmerBar
+                      {...(barProps as AnimatedShimmerBarProps)}
+                      radius={8}
+                      reducedMotion={prefersReducedMotion}
+                    />
+                  )}
+                >
                   <LabelList
                     dataKey="grants"
                     position="top"
@@ -497,7 +517,23 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
                     style={{ fontSize: 12.5, fontWeight: 700 }}
                   />
                 </Bar>
-                <Bar yAxisId="right" dataKey="businesses" name="Usahawan Aktif" fill="#059669" radius={[8, 8, 0, 0]} maxBarSize={72} isAnimationActive={false}>
+                <Bar
+                  yAxisId="right"
+                  dataKey="businesses"
+                  name="Usahawan Aktif"
+                  fill="#059669"
+                  radius={[8, 8, 0, 0]}
+                  maxBarSize={72}
+                  isAnimationActive={!prefersReducedMotion}
+                  animationDuration={760}
+                  shape={(barProps: unknown) => (
+                    <AnimatedShimmerBar
+                      {...(barProps as AnimatedShimmerBarProps)}
+                      radius={8}
+                      reducedMotion={prefersReducedMotion}
+                    />
+                  )}
+                >
                   <LabelList
                     dataKey="businesses"
                     position="top"

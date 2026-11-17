@@ -21,6 +21,7 @@ import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
+import { useAnimatedMetric } from '../hooks/useMotion';
 
 interface AdminNewsManagerProps {
   newsItems: PortalNews[];
@@ -79,6 +80,11 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
     const pinned = newsItems.filter(n => n.isPinned).length;
     return { total: newsItems.length, published, draft, pinned };
   }, [newsItems]);
+
+  const animTotal = useAnimatedMetric(stats.total);
+  const animPublished = useAnimatedMetric(stats.published);
+  const animDraft = useAnimatedMetric(stats.draft);
+  const animPinned = useAnimatedMetric(stats.pinned);
 
   const filteredList = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -300,12 +306,13 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 animate-dashboard-tab">
       {/* Header Bar */}
-      <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="kbelia-important-header p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-            <Newspaper className="w-4 h-4" />
+            <Newspaper className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             <span>Kawalan Berita Pentadbir</span>
           </div>
           <h3 className={`${compactHeader ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'} font-extrabold text-black dark:text-white tracking-tight`}>
@@ -321,7 +328,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
             id="btn-admin-add-news"
             type="button"
             onClick={showForm ? () => setShowForm(false) : handleOpenCreate}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 dark:bg-blue-600"
+            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
             {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             <span>{showForm ? 'Tutup Borang' : 'Tambah Berita Baharu'}</span>
@@ -329,23 +336,39 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
         </div>
       </div>
 
-      {/* Compact Stats Row (Single-elevation, Tabular numerals) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 h-fit">
+      {/* Compact Stats Row (Single-elevation, Equal height, Tabular numerals) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 items-stretch">
+        <div
+          style={{ '--stagger': 0 } as React.CSSProperties}
+          className="animate-dashboard-card relative overflow-hidden p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 flex flex-col justify-between transition-colors hover:border-indigo-300 dark:hover:border-indigo-500/60"
+        >
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
           <div className="text-sm text-black/70 dark:text-white/75 font-medium">Jumlah Artikel</div>
-          <div className="text-xl font-black text-black dark:text-white tabular-nums mt-0.5">{stats.total}</div>
+          <div className="text-2xl font-black text-black dark:text-white tabular-nums mt-1">{animTotal}</div>
         </div>
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 h-fit">
+        <div
+          style={{ '--stagger': 1 } as React.CSSProperties}
+          className="animate-dashboard-card relative overflow-hidden p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 flex flex-col justify-between transition-colors hover:border-emerald-300 dark:hover:border-emerald-500/60"
+        >
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
           <div className="text-sm text-black/70 dark:text-white/75 font-medium">Sedang Disiar</div>
-          <div className="text-xl font-black text-black dark:text-white/75 tabular-nums mt-0.5">{stats.published}</div>
+          <div className="text-2xl font-black text-emerald-700 dark:text-emerald-300 tabular-nums mt-1">{animPublished}</div>
         </div>
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 h-fit">
+        <div
+          style={{ '--stagger': 2 } as React.CSSProperties}
+          className="animate-dashboard-card relative overflow-hidden p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 flex flex-col justify-between transition-colors hover:border-amber-300 dark:hover:border-amber-500/60"
+        >
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-amber-500/80 dark:bg-amber-400/80" />
           <div className="text-sm text-black/70 dark:text-white/75 font-medium">Draf Admin</div>
-          <div className="text-xl font-black text-black dark:text-white/75 tabular-nums mt-0.5">{stats.draft}</div>
+          <div className="text-2xl font-black text-amber-700 dark:text-amber-300 tabular-nums mt-1">{animDraft}</div>
         </div>
-        <div className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 h-fit">
+        <div
+          style={{ '--stagger': 3 } as React.CSSProperties}
+          className="animate-dashboard-card relative overflow-hidden p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 flex flex-col justify-between transition-colors hover:border-blue-300 dark:hover:border-blue-500/60"
+        >
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
           <div className="text-sm text-black/70 dark:text-white/75 font-medium">Berita Utama Dipin</div>
-          <div className="text-xl font-black text-black dark:text-white/75 tabular-nums mt-0.5">{stats.pinned}</div>
+          <div className="text-2xl font-black text-blue-700 dark:text-blue-300 tabular-nums mt-1">{animPinned}</div>
         </div>
       </div>
 
@@ -353,11 +376,12 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 shadow-xs overflow-hidden animate-in fade-in duration-150"
+          className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 shadow-xs overflow-hidden animate-dashboard-tab"
         >
-          <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between bg-slate-50 dark:bg-zinc-950">
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
+          <div className="px-4 sm:px-5 py-3.5 border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between bg-slate-50 dark:bg-zinc-950">
             <h4 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
-              <Newspaper className="w-4 h-4 text-black dark:text-white/75" />
+              <Newspaper className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <span>{editingId ? 'Edit Artikel Berita' : 'Tambah Berita & Pengumuman'}</span>
             </h4>
             <button
@@ -373,7 +397,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
             </button>
           </div>
 
-          <div className="p-5 sm:p-6 space-y-5">
+          <div className="p-4 sm:p-5 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               <div className="md:col-span-6">
                 <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
@@ -517,6 +541,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
       {/* Admin News Table Card */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
         <ReferenceTableToolbar
+          accent="indigo"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder="Cari tajuk, ringkasan atau kategori..."
@@ -648,7 +673,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                 {newsPagination.paginatedItems.map(item => (
                   <tr
                     key={item.id}
-                    className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors"
+                    className="kbelia-table-row"
                   >
                     <td className="py-3.5 px-4 max-w-md">
                       <div className="flex items-center gap-3 min-w-0">

@@ -73,6 +73,7 @@ import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast as triggerToast } from './ToastNotification';
 import { SaaSKpiCard } from './SaaSKpiCard';
+import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
 import { PortalImage } from './PortalImage';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
@@ -87,6 +88,7 @@ import {
   parseNumericAmount,
   sortRecords
 } from '../utils/sortUtils';
+import { usePrefersReducedMotion } from '../hooks/useMotion';
 import {
   BarChart,
   Bar,
@@ -236,6 +238,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const { confirmDelete } = useConfirmDelete();
   const { language } = useLanguage();
   const isEn = language === 'en';
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   // Sub-Tab State synchronized with parent UMKSidebar
@@ -1227,7 +1230,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   }
 
   return (
-    <div className="w-full space-y-4 animate-in fade-in duration-300 pb-2">
+    <div className="w-full space-y-3.5 animate-in fade-in duration-300 pb-2">
       
       {/* Toast Notification */}
       {isSuccessToast && (
@@ -1241,7 +1244,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       )}
 
       {/* 1. MENTOR PORTAL HEADER STRIP WITH AMBIENT GLOW & SHEEN */}
-      <div className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Autonomous Ambient Glowing Orbs */}
         <div className="pointer-events-none absolute -top-14 -left-10 w-56 h-56 rounded-full bg-teal-500/14 dark:bg-teal-500/16 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
         <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-cyan-500/12 dark:bg-cyan-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
@@ -1350,10 +1353,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         const mentorChartData = Array.from(districtMap.values()).slice(0, 8);
 
         return (
-        <div className="space-y-6 animate-in fade-in duration-200">
+        <div className="space-y-4 animate-in fade-in duration-200">
 
           {/* 4 Compact Summary KPI Cards inside Overview Bento */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <SaaSKpiCard
               title="Jumlah Usahawan Mentee"
               value={totalMentees}
@@ -1363,6 +1366,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               trendDirection={pendingCount > 0 ? 'up' : 'neutral'}
               accentColor="blue"
               isLive
+              staggerIndex={0}
               onClick={() => handleSubTabChange('sessions')}
             />
 
@@ -1375,6 +1379,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               trendDirection={confirmedCount > 0 ? 'up' : 'neutral'}
               accentColor="emerald"
               isLive
+              staggerIndex={1}
               onClick={() => handleSubTabChange('sessions')}
             />
 
@@ -1386,6 +1391,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               trendLabel="Aktif"
               trendDirection={totalEndorsementsCount > 0 ? 'up' : 'neutral'}
               accentColor="amber"
+              staggerIndex={2}
               onClick={() => handleSubTabChange('endorsements')}
             />
 
@@ -1397,13 +1403,17 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               trendLabel={`${mentorLogs.reduce((acc, l) => acc + (l.actionItems?.filter(a => a.completed).length || 0), 0)} Selesai`}
               trendDirection={totalLogbookCount > 0 ? 'up' : 'neutral'}
               accentColor="violet"
+              staggerIndex={3}
               onClick={() => handleSubTabChange('logbook')}
             />
           </div>
 
           {/* [2] Graf Taburan Sesi & Perakuan Seluruh Kelantan (Lebar Penuh) */}
-          <div className="w-full bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-slate-300 dark:border-zinc-700 shadow-sm min-w-0">
-            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-600 mb-4">
+          <div
+            style={{ '--stagger': 4 } as React.CSSProperties}
+            className="animate-dashboard-card w-full bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 min-w-0"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-300 dark:border-zinc-600 mb-3">
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-black dark:text-white/80 shrink-0" />
                 <h3 className="text-sm sm:text-base font-bold text-black dark:text-white tracking-tight">
@@ -1415,8 +1425,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </span>
             </div>
 
-            <div className="h-[260px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-              <ResponsiveContainer width="100%" height={260} minWidth={0} initialDimension={{ width: 640, height: 260 }}>
+            <div className="h-[220px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+              <ResponsiveContainer width="100%" height={220} minWidth={0} initialDimension={{ width: 640, height: 220 }}>
                 <BarChart
                   data={mentorChartData}
                   barCategoryGap="16%"
@@ -1449,7 +1459,16 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     radius={[6, 6, 0, 0]}
                     maxBarSize={38}
                     minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                    isAnimationActive={false}
+                    isAnimationActive={!prefersReducedMotion}
+                    animationDuration={650}
+                    animationEasing="ease-out"
+                    shape={(barProps: unknown) => (
+                      <AnimatedShimmerBar
+                        {...(barProps as AnimatedShimmerBarProps)}
+                        radius={6}
+                        reducedMotion={prefersReducedMotion}
+                      />
+                    )}
                   >
                     <LabelList
                       dataKey="sesi"
@@ -1466,7 +1485,16 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     radius={[6, 6, 0, 0]}
                     maxBarSize={38}
                     minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                    isAnimationActive={false}
+                    isAnimationActive={!prefersReducedMotion}
+                    animationDuration={650}
+                    animationEasing="ease-out"
+                    shape={(barProps: unknown) => (
+                      <AnimatedShimmerBar
+                        {...(barProps as AnimatedShimmerBarProps)}
+                        radius={6}
+                        reducedMotion={prefersReducedMotion}
+                      />
+                    )}
                   >
                     <LabelList
                       dataKey="perakuan"
@@ -1482,12 +1510,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           </div>
 
           {/* [3] Dua Lajur Ringkasan Seimbang Kiri & Kanan: Temujanji Terdekat + Status Perakuan Geran */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 items-start">
 
             {/* Lajur Kiri: Temujanji Terdekat & Tindakan Segera */}
-            <div className="min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col justify-start h-full">
+            <div
+              style={{ '--stagger': 5 } as React.CSSProperties}
+              className="animate-dashboard-card min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 flex flex-col justify-start"
+            >
               <div>
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
                     <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
@@ -1499,7 +1530,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </span>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {mentorRegistrations.slice(0, 3).map((reg) => {
                     const visuals = resolveMenteeVisuals(
                       {
@@ -1513,7 +1544,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     return (
                     <div
                       key={reg.id}
-                      className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                      className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-teal-400/70 dark:hover:border-teal-500/70 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
                       <div className="flex items-start gap-3 min-w-0 flex-1">
                         <div className="relative w-12 h-10 shrink-0 mt-0.5">
@@ -1605,9 +1636,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             {/* Lajur Kanan: Status Perakuan Geran & Dana Benih */}
-            <div className="min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col justify-start h-full">
+            <div
+              style={{ '--stagger': 6 } as React.CSSProperties}
+              className="animate-dashboard-card min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 flex flex-col justify-start"
+            >
               <div>
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
                   <div className="flex items-center gap-2">
                     <Award className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0" />
                     <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
@@ -1619,11 +1653,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </span>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {mentorEndorsements.slice(0, 3).map((end) => (
                     <div
                       key={end.id}
-                      className="p-3.5 rounded-xl bg-slate-50 dark:bg-amber-950/20 border border-slate-200 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                      className="p-3 rounded-xl bg-slate-50 dark:bg-amber-950/20 border border-slate-200 dark:border-amber-900/40 hover:border-amber-400/70 dark:hover:border-amber-500/60 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -1681,6 +1715,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
               <div className="rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xs overflow-visible">
                 <ReferenceTableToolbar
+                  accent="teal"
                   searchValue={overviewSearch}
                   onSearchChange={setOverviewSearch}
                   searchPlaceholder="Cari usahawan, perniagaan, topik atau daerah..."
@@ -1811,7 +1846,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             businesses
                           );
                           return (
-                            <tr key={mentee.id} className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors">
+                            <tr key={mentee.id} className="kbelia-table-row">
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="flex items-center gap-3 min-w-0">
                                   <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
@@ -1906,12 +1941,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* TAB 1: SESI BIMBINGAN (LAYOUT KEBAWAH PENUH & MESRA BACAAN MESEJ)     */}
       {/* ===================================================================== */}
       {currentSubTab === 'sessions' && (
-        <div className="flex flex-col space-y-8 animate-in fade-in duration-200">
+        <div key="sessions" className="flex flex-col space-y-5 animate-dashboard-tab">
           
           {/* =================================================================== */}
           {/* SEKSYEN 1: PERMOHONAN BIMBINGAN (REFERENCE TABLE + DRAWER)           */}
           {/* =================================================================== */}
-          <section id="mentor-applications-section" className="space-y-4 scroll-mt-24">
+          <section id="mentor-applications-section" className="space-y-3.5 scroll-mt-24">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
@@ -1934,6 +1969,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
               <ReferenceTableToolbar
+                accent="teal"
                 searchValue={searchQuery}
                 onSearchChange={setSearchQuery}
                 searchPlaceholder="Cari usahawan, perniagaan, topik atau daerah..."
@@ -2085,7 +2121,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               onClick={() =>
                                 setExpandedApplicationIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
                               }
-                              className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                              className="kbelia-table-row cursor-pointer"
                             >
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="flex items-center gap-3 min-w-0">
@@ -2315,6 +2351,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
               <ReferenceTableToolbar
+                accent="teal"
                 searchValue={scheduleSearch}
                 onSearchChange={setScheduleSearch}
                 searchPlaceholder="Cari usahawan, topik atau tarikh sesi..."
@@ -2421,7 +2458,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               onClick={() =>
                                 setExpandedScheduleIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
                               }
-                              className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                              className="kbelia-table-row cursor-pointer"
                             >
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="flex items-center gap-3 min-w-0">
@@ -2592,6 +2629,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
               <ReferenceTableToolbar
+                accent="teal"
                 searchValue={actionPlansSearch}
                 onSearchChange={setActionPlansSearch}
                 searchPlaceholder="Cari usahawan, topik atau kandungan nota..."
@@ -2699,7 +2737,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               onClick={() =>
                                 setExpandedActionPlanIds(prev => ({ ...prev, [mentee.id]: !prev[mentee.id] }))
                               }
-                              className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                              className="kbelia-table-row cursor-pointer"
                             >
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="flex items-center gap-3 min-w-0">
@@ -2800,13 +2838,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* TAB 2: PERAKUAN RASMI GERAN BELIA (OFFICIAL GRANT ENDORSEMENT)       */}
       {/* ===================================================================== */}
       {currentSubTab === 'endorsements' && (
-        <div className="space-y-6 animate-in fade-in duration-200">
+        <div key="endorsements" className="space-y-4 animate-dashboard-tab">
           
           {/* Header Action Banner */}
-          <div className="p-5 kbelia-important-header dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="relative overflow-hidden p-4 sm:p-5 kbelia-important-header dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-teal-500/80 dark:bg-teal-400/80" />
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <Award className="w-5 h-5 text-black dark:text-white/75 shrink-0" />
+                <Award className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
                 <h3 className="text-base font-bold text-black dark:text-white">
                   Pengeluaran Surat Perakuan Rasmi Geran Belia UMK
                 </h3>
@@ -2830,7 +2869,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2">
-                <FileCheck className="w-4 h-4 text-black dark:text-white/75" />
+                <FileCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                 <h4 className="text-sm font-bold text-black dark:text-white">
                   Senarai Surat Perakuan Geran yang Telah Dikeluarkan ({filteredEndorsements.length})
                 </h4>
@@ -2842,6 +2881,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
               <ReferenceTableToolbar
+                accent="teal"
                 searchValue={endorsementsSearch}
                 onSearchChange={setEndorsementsSearch}
                 searchPlaceholder="Cari nama usahawan, kod perakuan atau daerah..."
@@ -2934,7 +2974,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
                       {endorsementsPagination.paginatedItems.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors">
+                        <tr key={item.id} className="kbelia-table-row">
                           <td className="py-3.5 px-4 max-w-xs">
                             <div className="flex items-center gap-3 min-w-0">
                               <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
@@ -3001,12 +3041,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* TAB 3: LOG JURNAL & PELAN TINDAKAN MENTEE                              */}
       {/* ===================================================================== */}
       {currentSubTab === 'logbook' && (
-        <div className="space-y-6 animate-in fade-in duration-200">
+        <div key="logbook" className="space-y-4 animate-dashboard-tab">
           
-          <div className="p-5 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="relative overflow-hidden p-4 sm:p-5 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-teal-500/80 dark:bg-teal-400/80" />
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-black dark:text-white/75 shrink-0" />
+                <FileText className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
                 <h3 className="text-base font-bold text-black dark:text-white">
                   Rekod Sesi Bimbingan &amp; Tugasan Usahawan
                 </h3>
@@ -3028,6 +3069,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
             <ReferenceTableToolbar
+              accent="teal"
               searchValue={logsSearch}
               onSearchChange={setLogsSearch}
               searchPlaceholder="Cari usahawan, topik atau tarikh sesi..."
@@ -3129,7 +3171,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             onClick={() =>
                               setExpandedLogIds(prev => ({ ...prev, [log.id]: !prev[log.id] }))
                             }
-                            className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
+                            className="kbelia-table-row cursor-pointer"
                           >
                             <td className="py-3.5 px-4 max-w-xs">
                               <div className="flex items-center gap-3 min-w-0">
@@ -3154,15 +3196,27 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               {log.sessionDate}
                             </td>
                             <td className="py-3.5 px-4 whitespace-nowrap">
-                              <span
-                                className={`inline-flex items-center text-xs font-bold tabular-nums px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
-                                  totalTasks > 0 && doneTasks === totalTasks
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
-                                    : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-200'
-                                }`}
-                              >
-                                {totalTasks > 0 ? `${doneTasks}/${totalTasks} Tugasan` : 'Direkodkan'}
-                              </span>
+                              <div className="inline-flex items-center gap-2">
+                                <span
+                                  className={`inline-flex items-center text-xs font-bold tabular-nums px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
+                                    totalTasks > 0 && doneTasks === totalTasks
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                                      : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-200'
+                                  }`}
+                                >
+                                  {totalTasks > 0 ? `${doneTasks}/${totalTasks} Tugasan` : 'Direkodkan'}
+                                </span>
+                                {totalTasks > 0 && (
+                                  <div className="w-16 h-1.5 rounded-full bg-slate-200 dark:bg-zinc-700 overflow-hidden hidden sm:block">
+                                    <div
+                                      className={`h-full rounded-full transition-[width] duration-500 ${
+                                        doneTasks === totalTasks ? 'bg-emerald-500' : 'bg-teal-500'
+                                      }`}
+                                      style={{ width: `${Math.round((doneTasks / totalTasks) * 100)}%` }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
                             </td>
                             <td
                               className="py-3.5 px-4 text-right whitespace-nowrap"
@@ -3492,9 +3546,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       {/* TAB 4: PROFIL MENTOR & JADUAL KELAPANGAN                              */}
       {/* ===================================================================== */}
       {currentSubTab === 'profile' && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-6 shadow-2xs space-y-6 animate-in fade-in duration-200">
+        <div key="profile" className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-4 sm:p-5 shadow-2xs space-y-4 animate-dashboard-tab">
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-teal-500/80 dark:bg-teal-400/80" />
           
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-300 dark:border-slate-600">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3.5 border-b border-slate-300 dark:border-slate-600">
             <div>
               <h3 className="text-lg font-bold text-black dark:text-white">
                 Profil & Maklumat Mentor
@@ -3514,8 +3569,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+            <div className="space-y-3.5">
               <div>
                 <label className="text-sm font-semibold text-black dark:text-white block mb-1">
                   Nama Penuh
@@ -3540,18 +3595,18 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </label>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-black dark:text-white p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
-                    <Phone className="w-4 h-4 text-black dark:text-white" />
+                    <Phone className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                     <span>WhatsApp: +{currentMentor.phone}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-black dark:text-white p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
-                    <Mail className="w-4 h-4 text-black dark:text-white" />
+                    <Mail className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                     <span>Emel Rasmi: {currentMentor.email}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               <div>
                 <label className="text-sm font-semibold text-black dark:text-white block mb-1">
                   Jadual Bimbingan

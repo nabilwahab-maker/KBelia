@@ -42,6 +42,8 @@ import {
   getModifiedTimestamp,
   sortRecords
 } from '../utils/sortUtils';
+import { useAnimatedMetric, usePrefersReducedMotion } from '../hooks/useMotion';
+import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
 
 export type ReportUserTypeKey = 'all' | 'usahawan' | 'mentor' | 'komuniti';
 
@@ -99,6 +101,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
   mentorshipRegistrations = [],
   communityPosts = []
 }) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [selectedType, setSelectedType] = useState<ReportUserTypeKey>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
@@ -286,6 +289,13 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
 
   const totalCount = Math.max(1, consolidatedRecords.length);
 
+  const animatedUsahawanCount = useAnimatedMetric(countsByType.usahawan);
+  const animatedMentorCount = useAnimatedMetric(countsByType.mentor);
+  const animatedKomunitiCount = useAnimatedMetric(countsByType.komuniti);
+  const animatedUsahawanPct = useAnimatedMetric(`${Math.round((countsByType.usahawan / totalCount) * 100)}%`);
+  const animatedMentorPct = useAnimatedMetric(`${Math.round((countsByType.mentor / totalCount) * 100)}%`);
+  const animatedKomunitiPct = useAnimatedMetric(`${Math.round((countsByType.komuniti / totalCount) * 100)}%`);
+
   const donutChartData = useMemo(
     () =>
       (Object.keys(USER_TYPE_COLORS) as Array<Exclude<ReportUserTypeKey, 'all'>>).map((key) => ({
@@ -356,43 +366,44 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         };
 
   return (
-    <section className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden">
+    <section className="relative overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm">
+      <div className="h-0.5 w-full bg-indigo-600/80 dark:bg-indigo-500/80" aria-hidden="true" />
       {/* Header */}
-      <div className="px-5 py-4 sm:px-6 sm:py-5 border-b border-slate-300 dark:border-zinc-700">
+      <div className="px-4 py-3.5 sm:px-5 sm:py-4 border-b border-slate-200 dark:border-zinc-700">
         <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-black dark:text-white" />
+          <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
           <h3 className="text-base sm:text-lg font-bold text-black dark:text-white">
             Laporan Data Terkumpul Mengikut Jenis Pengguna
           </h3>
         </div>
-        <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
+        <p className="text-sm text-black/75 dark:text-white/80 mt-0.5">
           Susunan bersepadu rekod Usahawan Belia, Panel Mentor, dan Komuniti Awam
         </p>
       </div>
 
-      <div className="p-5 sm:p-6 space-y-6">
+      <div className="p-4 sm:p-5 space-y-4">
         {/* Balanced Vertical Stack: Full-Width Chart on Top + 3 Equal-Width/Height Cards Below */}
-        <div className="space-y-5">
+        <div className="space-y-4">
           {/* Top Tier: Full-Width Bar/Donut Chart + Compact 3-Column Bottom Legend */}
-          <div className="w-full min-w-0 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 p-4 sm:p-5 flex flex-col justify-start">
-            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-700">
+          <div className="w-full min-w-0 rounded-xl bg-slate-50/80 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 p-4 flex flex-col justify-start">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-zinc-700">
               <div className="flex items-center gap-2">
                 {chartMode === 'bar' ? (
-                  <BarChart3 className="w-4 h-4 text-black dark:text-white" />
+                  <BarChart3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 ) : (
-                  <PieChartIcon className="w-4 h-4 text-black dark:text-white" />
+                  <PieChartIcon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 )}
                 <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
                   Komposisi Jenis Pengguna
                 </h4>
               </div>
-              <div className="inline-flex items-center gap-1 p-0.5 bg-white dark:bg-zinc-900 rounded-lg border border-slate-300 dark:border-zinc-700">
+              <div className="inline-flex items-center gap-1 p-0.5 bg-white dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-700">
                 <button
                   type="button"
                   onClick={() => setChartMode('bar')}
                   className={`px-2.5 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
                     chartMode === 'bar'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-indigo-600 text-white'
                       : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
                   }`}
                 >
@@ -403,7 +414,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                   onClick={() => setChartMode('donut')}
                   className={`px-2.5 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
                     chartMode === 'donut'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-indigo-600 text-white'
                       : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
                   }`}
                 >
@@ -412,8 +423,8 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
               </div>
             </div>
 
-            <div className="relative h-64 min-h-[256px] w-full min-w-0 my-2 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-              <ResponsiveContainer width="100%" height={256} minWidth={0} initialDimension={{ width: 640, height: 256 }}>
+            <div className="relative h-[224px] min-h-[224px] w-full min-w-0 my-2 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+              <ResponsiveContainer width="100%" height={224} minWidth={0} initialDimension={{ width: 640, height: 224 }}>
                 {chartMode === 'bar' ? (
                   <BarChart
                     data={donutChartData}
@@ -446,7 +457,15 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                       radius={[6, 6, 0, 0]}
                       maxBarSize={72}
                       minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
-                      isAnimationActive={false}
+                      isAnimationActive={!prefersReducedMotion}
+                      animationDuration={650}
+                      shape={(barProps: unknown) => (
+                        <AnimatedShimmerBar
+                          {...(barProps as AnimatedShimmerBarProps)}
+                          radius={6}
+                          reducedMotion={prefersReducedMotion}
+                        />
+                      )}
                       onClick={(data) => {
                         const clickedKey = (data as unknown as { key?: Exclude<ReportUserTypeKey, 'all'> })?.key;
                         if (clickedKey) {
@@ -484,7 +503,8 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                       paddingAngle={2}
                       strokeWidth={2}
                       stroke="#FFFFFF"
-                      isAnimationActive={false}
+                      isAnimationActive={!prefersReducedMotion}
+                      animationDuration={650}
                       onClick={(_, idx) => {
                         const clicked = donutChartData[idx];
                         if (clicked) {
@@ -559,28 +579,30 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
           </div>
 
           {/* Bottom Tier: 3 Equal-Width, Equal-Height Summary Cards in a Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-stretch">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 items-stretch">
             <button
               type="button"
               onClick={() => setSelectedType(selectedType === 'usahawan' ? 'all' : 'usahawan')}
-              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-start gap-3 ${
+              style={{ '--stagger': 0 } as React.CSSProperties}
+              className={`animate-dashboard-card group relative overflow-hidden h-full p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-pointer flex flex-col justify-between gap-2.5 ${
                 selectedType === 'usahawan'
                   ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-600 ring-1 ring-blue-500/40'
-                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-blue-50/40 dark:hover:bg-zinc-800/70'
+                  : 'bg-slate-50/80 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 hover:bg-blue-50/40 dark:hover:bg-zinc-800/70 hover:border-blue-400/70'
               }`}
             >
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[0.9375rem] font-bold text-black dark:text-white">Usahawan Belia</span>
-                <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                   <Store className="w-4 h-4" />
                 </div>
               </div>
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
-                  {countsByType.usahawan}
+                  {animatedUsahawanCount}
                 </span>
                 <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {Math.round((countsByType.usahawan / totalCount) * 100)}%
+                  {animatedUsahawanPct}
                 </span>
               </div>
               <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
@@ -591,24 +613,26 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             <button
               type="button"
               onClick={() => setSelectedType(selectedType === 'mentor' ? 'all' : 'mentor')}
-              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-start gap-3 ${
+              style={{ '--stagger': 1 } as React.CSSProperties}
+              className={`animate-dashboard-card group relative overflow-hidden h-full p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-pointer flex flex-col justify-between gap-2.5 ${
                 selectedType === 'mentor'
                   ? 'bg-teal-50/90 dark:bg-teal-950/40 border-teal-600 ring-1 ring-teal-500/40'
-                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-teal-50/40 dark:hover:bg-zinc-800/70'
+                  : 'bg-slate-50/80 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 hover:bg-teal-50/40 dark:hover:bg-zinc-800/70 hover:border-teal-400/70'
               }`}
             >
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-teal-600/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[0.9375rem] font-bold text-black dark:text-white">Panel Mentor</span>
-                <div className="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                   <GraduationCap className="w-4 h-4" />
                 </div>
               </div>
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
-                  {countsByType.mentor}
+                  {animatedMentorCount}
                 </span>
                 <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {Math.round((countsByType.mentor / totalCount) * 100)}%
+                  {animatedMentorPct}
                 </span>
               </div>
               <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
@@ -619,24 +643,26 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             <button
               type="button"
               onClick={() => setSelectedType(selectedType === 'komuniti' ? 'all' : 'komuniti')}
-              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-start gap-3 ${
+              style={{ '--stagger': 2 } as React.CSSProperties}
+              className={`animate-dashboard-card group relative overflow-hidden h-full p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-pointer flex flex-col justify-between gap-2.5 ${
                 selectedType === 'komuniti'
                   ? 'bg-amber-50/90 dark:bg-amber-950/40 border-amber-600 ring-1 ring-amber-500/40'
-                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-amber-50/40 dark:hover:bg-zinc-800/70'
+                  : 'bg-slate-50/80 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 hover:bg-amber-50/40 dark:hover:bg-zinc-800/70 hover:border-amber-400/70'
               }`}
             >
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-500/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[0.9375rem] font-bold text-black dark:text-white">Komuniti &amp; Awam</span>
-                <div className="w-9 h-9 rounded-lg bg-amber-500 text-black flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-amber-500 text-black flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                   <MessageSquare className="w-4 h-4" />
                 </div>
               </div>
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
-                  {countsByType.komuniti}
+                  {animatedKomunitiCount}
                 </span>
                 <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {Math.round((countsByType.komuniti / totalCount) * 100)}%
+                  {animatedKomunitiPct}
                 </span>
               </div>
               <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
@@ -649,6 +675,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         {/* Reference-Style Unified User-Type Data Table Card */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
           <ReferenceTableToolbar
+            accent="indigo"
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             searchPlaceholder="Cari nama, perniagaan atau daerah..."
@@ -734,7 +761,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
 
                       return (
                         <React.Fragment key={rec.id}>
-                          <tr className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                          <tr className="kbelia-table-row">
                             <td className="py-3.5 pl-4 pr-2 text-center font-mono text-black/75 dark:text-white/75 tabular-nums">
                               {rowNumber}
                             </td>

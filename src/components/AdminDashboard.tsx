@@ -83,6 +83,7 @@ import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import { INITIAL_COMMUNITY_POSTS } from '../data/communityData';
 import { UserTypeReportSection } from './UserTypeReportSection';
 import { SaaSKpiCard } from './SaaSKpiCard';
+import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
 import {
   BarChart,
   Bar,
@@ -111,6 +112,7 @@ import {
   parseNumericAmount,
   sortRecords
 } from '../utils/sortUtils';
+import { usePrefersReducedMotion, useAnimatedMetric } from '../hooks/useMotion';
 
 interface AdminDashboardProps {
   slots: CapsuleSlot[];
@@ -165,6 +167,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const { user, userProfile, isAdmin } = useAuth();
   const { language } = useLanguage();
   const isMs = language === 'ms';
+  const prefersReducedMotion = usePrefersReducedMotion();
   const { confirmDelete } = useConfirmDelete();
   const [internalTab, setInternalTab] = useState<AdminSubTab>('queue');
 
@@ -273,6 +276,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const safeBusinesses = businesses || [];
   const safeBookings = bookings || [];
   const safePrograms = programs || [];
+
+  const animSettingsBizCount = useAnimatedMetric(safeBusinesses.length);
+  const animSettingsBookingCount = useAnimatedMetric(safeBookings.length);
+  const animSettingsSlotCount = useAnimatedMetric(safeSlots.length);
 
   // Filter states
   const [bookingFilter, setBookingFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
@@ -1012,10 +1019,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   }
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-3.5">
       
       {/* Admin Subheader & Quick Action Bar */}
-      <div className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Autonomous Ambient Glowing Orbs */}
         <div className="pointer-events-none absolute -top-14 -left-10 w-56 h-56 rounded-full bg-indigo-500/14 dark:bg-indigo-500/16 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
         <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-rose-500/12 dark:bg-rose-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
@@ -1145,7 +1152,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         return (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <SaaSKpiCard
                 title="Permohonan Menunggu"
                 value={pendingBookingsCount}
@@ -1155,6 +1162,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 trendDirection={pendingBookingsCount > 0 ? 'down' : 'up'}
                 accentColor="amber"
                 isLive
+                staggerIndex={0}
                 onClick={() => setAdminTab('bookings')}
               />
 
@@ -1166,6 +1174,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 trendLabel={`${safeBusinesses.filter(b => b.isFeatured).length} Pilihan`}
                 trendDirection="up"
                 accentColor="blue"
+                staggerIndex={1}
                 onClick={() => setAdminTab('businesses')}
               />
 
@@ -1178,6 +1187,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 trendDirection={occupancyRate >= 50 ? 'up' : 'neutral'}
                 accentColor="emerald"
                 isLive
+                staggerIndex={2}
                 onClick={() => setAdminTab('slots')}
               />
 
@@ -1189,16 +1199,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 trendLabel={`${(grantApplications || []).length} Permohonan`}
                 trendDirection="up"
                 accentColor="violet"
+                staggerIndex={3}
                 onClick={() => setAdminTab('programs')}
               />
             </div>
 
             {/* Ringkasan Admin: Graf Lebar Penuh -> Dua Lajur Seimbang -> Laporan Terperinci */}
             {adminTab === 'queue' && (
-              <div className="space-y-4">
+              <div key="queue-analytics" className="space-y-3.5 animate-dashboard-tab">
                 {/* 1. Graf Lebar Penuh: Analitik Infrastruktur & Permohonan Negeri */}
-                <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col h-fit">
-                  <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div
+                  style={{ '--stagger': 4 } as React.CSSProperties}
+                  className="animate-dashboard-card relative rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm overflow-hidden transition-all duration-200 flex flex-col h-fit"
+                >
+                  <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
+                  <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                     <div>
                       <div className="flex items-center gap-2">
                         <BarChart3 className="w-5 h-5 text-black dark:text-white/80" />
@@ -1238,9 +1253,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
 
                   <div className="p-0 pt-2 pb-1 min-w-0">
-                    <div className="relative h-[235px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                    <div className="relative h-[210px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
                       <div className="absolute inset-0">
-                      <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 600, height: 235 }}>
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 600, height: 210 }}>
                         {adminChartMode === 'districts' ? (
                           <BarChart
                             data={districtChartData}
@@ -1274,7 +1289,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               radius={[5, 5, 0, 0]}
                               maxBarSize={64}
                               minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                              isAnimationActive={false}
+                              isAnimationActive={!prefersReducedMotion}
+                              animationDuration={650}
+                              animationEasing="ease-out"
+                              shape={(barProps: unknown) => (
+                                <AnimatedShimmerBar
+                                  {...(barProps as AnimatedShimmerBarProps)}
+                                  radius={5}
+                                  reducedMotion={prefersReducedMotion}
+                                />
+                              )}
                             >
                               <LabelList
                                 dataKey="beroperasi"
@@ -1291,7 +1315,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               radius={[5, 5, 0, 0]}
                               maxBarSize={64}
                               minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                              isAnimationActive={false}
+                              isAnimationActive={!prefersReducedMotion}
+                              animationDuration={650}
+                              animationEasing="ease-out"
+                              shape={(barProps: unknown) => (
+                                <AnimatedShimmerBar
+                                  {...(barProps as AnimatedShimmerBarProps)}
+                                  radius={5}
+                                  reducedMotion={prefersReducedMotion}
+                                />
+                              )}
                             >
                               <LabelList
                                 dataKey="tersedia"
@@ -1333,7 +1366,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               radius={[6, 6, 0, 0]}
                               maxBarSize={110}
                               minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                              isAnimationActive={false}
+                              isAnimationActive={!prefersReducedMotion}
+                              animationDuration={650}
+                              animationEasing="ease-out"
+                              shape={(barProps: unknown) => (
+                                <AnimatedShimmerBar
+                                  {...(barProps as AnimatedShimmerBarProps)}
+                                  radius={6}
+                                  reducedMotion={prefersReducedMotion}
+                                />
+                              )}
                             >
                               <LabelList
                                 dataKey="jumlah"
@@ -1350,7 +1392,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
                   </div>
 
-                  <div className="px-5 py-3 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex flex-wrap items-center justify-between gap-2 text-sm">
+                  <div className="px-4 py-2.5 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex flex-wrap items-center justify-between gap-2 text-sm">
                     {adminChartMode === 'districts' ? (
                       <>
                         <div className="flex flex-wrap items-center gap-4">
@@ -1382,10 +1424,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
 
                 {/* 2. Dua Lajur Seimbang Kiri & Kanan (Ketinggian Sekata Tanpa Ruang Kosong) */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 items-stretch">
                   {/* Lajur Kiri: Metrik Prestasi & Operasi Daerah */}
-                  <div className="min-w-0 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col justify-start h-full">
-                    <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2">
+                  <div
+                    style={{ '--stagger': 5 } as React.CSSProperties}
+                    className="animate-dashboard-card relative min-w-0 h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm overflow-hidden transition-all duration-200 flex flex-col justify-start"
+                  >
+                    <div className="h-0.5 w-full bg-blue-500/80 dark:bg-blue-400/80" />
+                    <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <Building2 className="w-4 h-4 text-black dark:text-white/75" />
                         <h3 className="text-base font-bold text-black dark:text-white">
@@ -1397,7 +1443,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </span>
                     </div>
 
-                    <div className="p-5 flex-1 flex flex-col gap-3">
+                    <div className="p-4 flex flex-col gap-2.5">
                       {/* Baris 1: 3 Kolum Metrik Prestasi */}
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
@@ -1444,8 +1490,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </div>
 
                       {/* Baris 2: 2 Kolum Operasi Daerah & Tindakan Segera */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1 items-stretch">
-                        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col justify-start gap-2 h-full">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-start">
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col justify-start gap-2">
                           <div className="space-y-2">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <span className="text-sm font-bold text-black dark:text-white">
@@ -1485,7 +1531,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </div>
                         </div>
 
-                        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col justify-start gap-2 h-full">
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col justify-start gap-2">
                           <div className="space-y-2">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <span className="text-sm font-bold text-black dark:text-white">
@@ -1508,7 +1554,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               </div>
                               <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-zinc-800 overflow-hidden">
                                 <div
-                                  className="h-full rounded-full bg-blue-600 dark:bg-blue-500 transition-all duration-300"
+                                  className="h-full rounded-full bg-blue-600 dark:bg-blue-500 transition-all duration-500"
                                   style={{ width: `${Math.min(100, Math.max(0, occupancyRate))}%` }}
                                 />
                               </div>
@@ -1523,8 +1569,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
 
                   {/* Lajur Kanan: Ringkasan Semakan & Operasi */}
-                  <div className="min-w-0 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 shadow-sm overflow-hidden flex flex-col justify-start h-full">
-                    <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2">
+                  <div
+                    style={{ '--stagger': 6 } as React.CSSProperties}
+                    className="animate-dashboard-card relative min-w-0 h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm overflow-hidden transition-all duration-200 flex flex-col justify-start"
+                  >
+                    <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
+                    <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <Activity className="w-4 h-4 text-black dark:text-white/75" />
                         <h3 className="text-base font-bold text-black dark:text-white">
@@ -1536,11 +1586,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </span>
                     </div>
 
-                    <div className="p-5 space-y-3 flex-1">
+                    <div className="p-4 space-y-2.5">
                       <button
                         type="button"
                         onClick={() => setAdminTab('bookings')}
-                        className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3 transition-colors cursor-pointer text-left"
+                        className="w-full p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:-translate-y-0.5 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3 transition-all duration-200 cursor-pointer text-left"
                       >
                         <div className="flex items-start gap-3 min-w-0 flex-1">
                           <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
@@ -1556,7 +1606,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         </span>
                       </button>
 
-                      <div className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3">
+                      <div className="w-full p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3">
                         <div className="flex items-start gap-3 min-w-0 flex-1">
                           <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                             <Award className="w-4 h-4" />
@@ -1571,7 +1621,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         </span>
                       </div>
 
-                      <div className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3">
+                      <div className="w-full p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3">
                         <div className="flex items-start gap-3 min-w-0 flex-1">
                           <div className="w-9 h-9 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
                             <Wrench className="w-4 h-4" />
@@ -1589,7 +1639,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <button
                         type="button"
                         onClick={() => setAdminTab('mentors')}
-                        className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3 transition-colors cursor-pointer text-left"
+                        className="w-full p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:-translate-y-0.5 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3 transition-all duration-200 cursor-pointer text-left"
                       >
                         <div className="flex items-start gap-3 min-w-0 flex-1">
                           <div className="w-9 h-9 rounded-lg bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
@@ -1735,7 +1785,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* TAB 1: BOOKINGS MANAGEMENT */}
       {adminTab === 'bookings' && (
-        <div className="space-y-4">
+        <div key="bookings" className="space-y-4 animate-dashboard-tab">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-bold text-black dark:text-white">Senarai Permohonan Sewaan Kapsul</h3>
@@ -1747,15 +1797,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 setEditingBooking(null);
                 setIsCreatingBooking(true);
               }}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span>Tambah Permohonan</span>
             </button>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+          <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+            <div className="absolute inset-x-0 top-0 h-0.5 rounded-t-2xl bg-indigo-500/80 dark:bg-indigo-400/80" />
             <ReferenceTableToolbar
+              accent="indigo"
               searchValue={adminBookingSearch}
               onSearchChange={setAdminBookingSearch}
               searchPlaceholder="Cari pemohon, perniagaan atau kod kapsul..."
@@ -1791,7 +1843,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         onClick={() => setBookingFilter(opt.id)}
                         className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                           bookingFilter === opt.id
-                            ? 'bg-blue-600 border-blue-600 text-white'
+                            ? 'bg-indigo-600 border-indigo-600 text-white'
                             : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
                         }`}
                       >
@@ -1905,7 +1957,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         const isExpanded = expandedAdminBookingIds.includes(b.id);
                         return (
                           <React.Fragment key={b.id}>
-                            <tr className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                            <tr className="kbelia-table-row">
                               <td className="py-3.5 pl-5 pr-3">
                                 <div className="flex items-center gap-3 min-w-[200px]">
                                   <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
@@ -2101,7 +2153,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* TAB 2: BUSINESSES DIRECTORY MANAGEMENT */}
       {adminTab === 'businesses' && (
-        <div className="space-y-4">
+        <div key="businesses" className="space-y-4 animate-dashboard-tab">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-lg font-bold text-black dark:text-white">Senarai Kedai &amp; Usahawan</h3>
@@ -2113,15 +2165,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 setEditingBusiness(null);
                 setIsCreatingBusiness(true);
               }}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shadow-xs transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span>Tambah Perniagaan</span>
             </button>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+          <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+            <div className="absolute inset-x-0 top-0 h-0.5 rounded-t-2xl bg-indigo-500/80 dark:bg-indigo-400/80" />
             <ReferenceTableToolbar
+              accent="indigo"
               searchValue={bizSearch}
               onSearchChange={setBizSearch}
               searchPlaceholder="Cari nama perniagaan, pemilik atau kategori..."
@@ -2163,7 +2217,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           onClick={() => setBizStatusFilter(opt.id)}
                           className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                             bizStatusFilter === opt.id
-                              ? 'bg-blue-600 border-blue-600 text-white'
+                              ? 'bg-indigo-600 border-indigo-600 text-white'
                               : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
                           }`}
                         >
@@ -2294,7 +2348,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       {businessesPagination.paginatedItems.map((biz) => {
                         const bizProductCount = products.filter(p => p.businessId === biz.id).length;
                         return (
-                          <tr key={biz.id} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                          <tr key={biz.id} className="kbelia-table-row">
                             <td className="py-3.5 pl-5 pr-3">
                               <div className="flex items-center gap-3 min-w-[200px]">
                                 <img
@@ -2403,8 +2457,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* TAB 3: CAPSULE SLOTS MANAGEMENT */}
       {adminTab === 'slots' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+        <div key="slots" className="space-y-4 animate-dashboard-tab">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-base font-bold text-black dark:text-white">Inventori & Pengurusan Kapsul Jajahan</h3>
               <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Urus pendaftaran slot kiosk, tetapkan kadar sewa bulanan, atau padam unit yang tidak lagi beroperasi.</p>
@@ -2414,7 +2468,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               type="button"
               id="btn-admin-add-slot-toggle"
               onClick={() => setShowSlotForm(!showSlotForm)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer shrink-0 dark:bg-blue-600"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer shrink-0"
             >
               <Building2 className="w-4 h-4" />
               <span>{showSlotForm ? 'Tutup Borang' : 'Tambah Kiosk Baharu'}</span>
@@ -2423,10 +2477,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* New Slot Form */}
           {showSlotForm && (
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden animate-in fade-in transition-colors">
-              <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-4 px-6 flex items-center justify-between">
+            <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden animate-dashboard-tab transition-colors">
+              <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
+              <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-3.5 px-5 flex items-center justify-between">
                 <h4 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-black dark:text-white/75" />
+                  <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   <span>Borang Tambah Kiosk Baharu</span>
                 </h4>
                 <button
@@ -2438,8 +2493,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </button>
               </div>
 
-              <form onSubmit={handleSaveSlot} className="p-6 space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              <form onSubmit={handleSaveSlot} className="p-4 sm:p-5 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
                       Kod Kiosk <span className="text-black dark:text-white">*</span>
@@ -2481,7 +2536,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
                       Lokasi Hab
@@ -2558,7 +2613,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 dark:bg-blue-600"
+                    className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <span>{loading ? 'Menyimpan...' : 'Simpan Kapsul'}</span>
                   </button>
@@ -2568,8 +2623,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           )}
 
           {/* Slots Reference Table View */}
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+          <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+            <div className="absolute inset-x-0 top-0 h-0.5 rounded-t-2xl bg-indigo-500/80 dark:bg-indigo-400/80" />
             <ReferenceTableToolbar
+              accent="indigo"
               searchValue={adminSlotSearch}
               onSearchChange={setAdminSlotSearch}
               searchPlaceholder="Cari kod kapsul, nama, hab atau daerah..."
@@ -2611,7 +2668,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           onClick={() => setAdminSlotStatusFilter(opt.id)}
                           className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                             adminSlotStatusFilter === opt.id
-                              ? 'bg-blue-600 border-blue-600 text-white'
+                              ? 'bg-indigo-600 border-indigo-600 text-white'
                               : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
                           }`}
                         >
@@ -2739,7 +2796,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
                       {slotsPagination.paginatedItems.map((s) => (
-                        <tr key={s.id} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                        <tr key={s.id} className="kbelia-table-row">
                           <td className="py-3.5 pl-5 pr-3">
                             <div className="flex items-center gap-3 min-w-[200px]">
                               <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
@@ -2851,8 +2908,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* TAB 4: PROGRAMS MANAGEMENT */}
       {adminTab === 'programs' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+        <div key="programs" className="space-y-4 animate-dashboard-tab">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-base font-bold text-black dark:text-white">Pengurusan Inisiatif Geran & Program Belia</h3>
               <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Terbit, kemas kini dan padam hebahan rasmi program latihan serta geran usahawan belia Kelantan.</p>
@@ -2862,7 +2919,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               type="button"
               id="btn-admin-add-prog-toggle"
               onClick={() => setShowProgramForm(!showProgramForm)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer shrink-0 dark:bg-blue-600"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer shrink-0"
             >
               <Award className="w-4 h-4" />
               <span>{showProgramForm ? 'Tutup Borang' : 'Terbitkan Program Baharu'}</span>
@@ -2871,10 +2928,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* New Program Form */}
           {showProgramForm && (
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden animate-in fade-in transition-colors">
-              <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-4 px-6 flex items-center justify-between">
+            <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden animate-dashboard-tab transition-colors">
+              <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
+              <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-3.5 px-5 flex items-center justify-between">
                 <h4 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white flex items-center gap-2">
-                  <Award className="w-4 h-4 text-black dark:text-white/75" />
+                  <Award className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   <span>Borang Terbit Program Keusahawanan Baharu</span>
                 </h4>
                 <button
@@ -2886,8 +2944,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </button>
               </div>
 
-              <form onSubmit={handleSaveProgram} className="p-6 space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <form onSubmit={handleSaveProgram} className="p-4 sm:p-5 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
                       Tajuk Program <span className="text-black dark:text-white">*</span>
@@ -2918,7 +2976,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
                       Tarikh Pelaksanaan
@@ -2991,7 +3049,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 dark:bg-blue-600"
+                    className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <span>{loading ? 'Menerbitkan...' : 'Terbitkan Program'}</span>
                   </button>
@@ -3000,8 +3058,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           )}
 
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+          <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+            <div className="absolute inset-x-0 top-0 h-0.5 rounded-t-2xl bg-indigo-500/80 dark:bg-indigo-400/80" />
             <ReferenceTableToolbar
+              accent="indigo"
               searchValue={progSearch}
               onSearchChange={setProgSearch}
               searchPlaceholder="Cari tajuk program, kategori atau keterangan..."
@@ -3122,7 +3182,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
                       {programsPagination.paginatedItems.map((p) => (
-                        <tr key={p.id} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                        <tr key={p.id} className="kbelia-table-row">
                           <td className="py-3.5 pl-5 pr-3">
                             <div className="flex items-center gap-3 min-w-[200px]">
                               <div className="w-11 h-11 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 shrink-0">
@@ -3200,11 +3260,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* TAB: MENTOR & MENTEE MONITORING HUB */}
       {adminTab === 'mentors' && (
-        <div className="space-y-6 animate-in fade-in duration-200">
-          <div className="kbelia-important-header p-6 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-300 dark:border-slate-600">
+        <div key="mentors" className="space-y-4 animate-dashboard-tab">
+          <div className="relative overflow-hidden kbelia-important-header p-5 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-300 dark:border-slate-600">
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
-                <GraduationCap className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
+                <GraduationCap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Pusat Bimbingan Mentor UMK</span>
               </div>
               <h3 className="text-xl font-bold text-black dark:text-white">Pemantauan Mentor &amp; Usahawan Kelantan</h3>
@@ -3218,7 +3279,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h4 className="text-base font-bold text-black dark:text-white flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-black dark:text-white/75" />
+                <GraduationCap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <span>Senarai Mentor ({mentors.length})</span>
               </h4>
               <button
@@ -3227,15 +3288,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   setSelectedMentorForEdit(null);
                   setIsCreatingMentor(true);
                 }}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 <span>Tambah Mentor Baharu</span>
               </button>
             </div>
 
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+            <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+              <div className="absolute inset-x-0 top-0 h-0.5 rounded-t-2xl bg-indigo-500/80 dark:bg-indigo-400/80" />
               <ReferenceTableToolbar
+                accent="indigo"
                 searchValue={mentorListSearch}
                 onSearchChange={setMentorListSearch}
                 searchPlaceholder="Cari nama mentor, agensi atau jawatan..."
@@ -3323,7 +3386,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         {adminMentorsPagination.paginatedItems.map((m) => {
                           const menteeCount = mentorshipRegistrations.filter(r => r.mentorId === m.id).length;
                           return (
-                            <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                            <tr key={m.id} className="kbelia-table-row">
                               <td className="py-3.5 pl-5 pr-3">
                                 <div className="flex items-center gap-3 min-w-[180px]">
                                   <img
@@ -3412,15 +3475,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   setEditingMentorship(null);
                   setIsCreatingMentorship(true);
                 }}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 <span>Tambah Sesi Bimbingan</span>
               </button>
             </div>
 
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+            <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+              <div className="absolute inset-x-0 top-0 h-0.5 rounded-t-2xl bg-indigo-500/80 dark:bg-indigo-400/80" />
               <ReferenceTableToolbar
+                accent="indigo"
                 searchValue={mentorshipSearch}
                 onSearchChange={setMentorshipSearch}
                 searchPlaceholder="Cari usahawan, perniagaan, mentor atau topik..."
@@ -3459,7 +3524,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           onClick={() => setMentorshipStatusFilter(opt.id)}
                           className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
                             mentorshipStatusFilter === opt.id
-                              ? 'bg-blue-600 border-blue-600 text-white'
+                              ? 'bg-indigo-600 border-indigo-600 text-white'
                               : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
                           }`}
                         >
@@ -3572,7 +3637,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </thead>
                       <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
                         {adminMentorshipsPagination.paginatedItems.map((m) => (
-                          <tr key={m.id} className="hover:bg-slate-50/80 dark:hover:bg-zinc-800/50 transition-colors">
+                          <tr key={m.id} className="kbelia-table-row">
                             <td className="py-3.5 pl-5 pr-3">
                               <div className="flex items-center gap-3 min-w-[200px]">
                                 <div className="w-10 h-10 rounded-xl shrink-0 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center text-indigo-700 dark:text-indigo-300">
@@ -3690,7 +3755,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* TAB: PORTAL NEWS MANAGEMENT (ADMIN ONLY) */}
       {adminTab === 'news' && (
-        <div className="animate-in fade-in duration-200">
+        <div key="news" className="animate-dashboard-tab">
           <AdminNewsManager
             newsItems={newsItems}
             onRefresh={onRefresh}
@@ -3700,33 +3765,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* TAB: RUANG NIAGA VISUAL AD MANAGEMENT (ADMIN ONLY) */}
       {adminTab === 'b2b' && (
-        <div className="animate-in fade-in duration-200">
+        <div key="b2b" className="animate-dashboard-tab">
           <AdminB2BManager />
         </div>
       )}
 
       {/* TAB: EVENTS & BOOKINGS MANAGEMENT (ADMIN ONLY) */}
       {adminTab === 'events' && (
-        <div className="animate-in fade-in duration-200">
+        <div key="events" className="animate-dashboard-tab">
           <AdminEventsManager onRefresh={onRefresh} />
         </div>
       )}
 
       {/* TAB: USER ACCOUNT MANAGEMENT (ADMIN ONLY) */}
       {adminTab === 'users' && (
-        <div className="animate-in fade-in duration-200">
+        <div key="users" className="animate-dashboard-tab">
           <AdminUsersManager onRefresh={onRefresh} />
         </div>
       )}
 
       {/* TAB 5: ADMIN & SYSTEM SETTINGS */}
       {adminTab === 'settings' && (
-        <div className="space-y-6">
+        <div key="settings" className="space-y-4 animate-dashboard-tab">
           {/* Header Banner */}
-          <div className="kbelia-important-header p-6 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-300 dark:border-slate-600">
+          <div className="relative overflow-hidden kbelia-important-header p-5 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-300 dark:border-slate-600">
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-rose-50 dark:bg-rose-950/60 text-black dark:text-white border border-rose-200 dark:border-rose-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
-                <Shield className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
+                <Shield className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Pengurusan Sistem Pentadbir</span>
               </div>
               <h3 className="text-xl font-bold text-black dark:text-white">Tetapan Sistem & Profil Pentadbir</h3>
@@ -3736,7 +3802,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
             <div className="shrink-0 flex items-center gap-2">
               <span className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-xl text-sm font-semibold flex items-center gap-1.5">
-                <UserCheck className="w-4 h-4 text-black dark:text-white/75" />
+                <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Super Admin Berkuasa Penuh
               </span>
             </div>
@@ -3759,16 +3825,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           )}
 
-          <form onSubmit={handleSaveAdminSettings} className="space-y-6">
+          <form onSubmit={handleSaveAdminSettings} className="space-y-4">
             {/* Section 1: Profil Pentadbir */}
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-5 transition-colors">
+            <div className="relative overflow-hidden bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-4 transition-colors">
+              <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
               <div className="flex items-center gap-2.5 pb-3 border-b border-slate-300 dark:border-slate-600">
-                <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center font-bold">
                   <UserCheck className="w-4 h-4" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-black dark:text-white">Profil Pentadbir &amp; Saluran Sokongan Rasmi</h4>
-                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Maklumat pentadbir yang mengurus portal dan kelulusan usahawan.</p>
+                  <p className="text-[0.875rem] text-black/70 dark:text-white/75">Maklumat pentadbir yang mengurus portal dan kelulusan usahawan.</p>
                 </div>
               </div>
 
@@ -3840,14 +3907,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Section 2: Tetapan & Parameter Portal */}
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-5 transition-colors">
+            <div className="relative overflow-hidden bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-4 transition-colors">
+              <div className="absolute inset-x-0 top-0 h-0.5 bg-amber-500/80 dark:bg-amber-400/80" />
               <div className="flex items-center gap-2.5 pb-3 border-b border-slate-300 dark:border-slate-600">
-                <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/80 text-black dark:text-white border border-amber-200 dark:border-amber-800 flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center justify-center font-bold">
                   <Sliders className="w-4 h-4" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-black dark:text-white">Tetapan &amp; Parameter Operasi Portal KBelia</h4>
-                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Konfigurasi subsidi sewaan, had tempoh dan status pelayan portal.</p>
+                  <p className="text-[0.875rem] text-black/70 dark:text-white/75">Konfigurasi subsidi sewaan, had tempoh dan status pelayan portal.</p>
                 </div>
               </div>
 
@@ -3916,28 +3984,41 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
 
             {/* Section 3: Ringkasan Pengguna & Kawalan Pangkalan Data */}
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-4 transition-colors">
+            <div className="relative overflow-hidden bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs space-y-4 transition-colors">
+              <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
               <div className="flex items-center gap-2.5 pb-3 border-b border-slate-300 dark:border-slate-600">
                 <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold">
                   <Database className="w-4 h-4" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-black dark:text-white">Kawalan Pangkalan Data & Penyelenggaraan Sesi</h4>
-                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Tindakan kecemasan untuk menyegerakkan data dan memadam cache sistem.</p>
+                  <p className="text-[0.875rem] text-black/70 dark:text-white/75">Tindakan kecemasan untuk menyegerakkan data dan memadam cache sistem.</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600">
-                  <div className="text-xl font-bold text-black dark:text-white">{safeBusinesses.length}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-center items-stretch">
+                <div
+                  style={{ '--stagger': 0 } as React.CSSProperties}
+                  className="animate-dashboard-card relative overflow-hidden p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600"
+                >
+                  <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
+                  <div className="text-xl font-bold font-mono tabular-nums text-black dark:text-white">{animSettingsBizCount}</div>
                   <div className="text-sm text-black/70 dark:text-white/75 font-medium">Usahawan Berdaftar</div>
                 </div>
-                <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600">
-                  <div className="text-xl font-bold text-black dark:text-white">{safeBookings.length}</div>
+                <div
+                  style={{ '--stagger': 1 } as React.CSSProperties}
+                  className="animate-dashboard-card relative overflow-hidden p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600"
+                >
+                  <div className="absolute inset-x-0 top-0 h-0.5 bg-amber-500/80 dark:bg-amber-400/80" />
+                  <div className="text-xl font-bold font-mono tabular-nums text-black dark:text-white">{animSettingsBookingCount}</div>
                   <div className="text-sm text-black/70 dark:text-white/75 font-medium">Jumlah Permohonan Kiosk</div>
                 </div>
-                <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600">
-                  <div className="text-xl font-bold text-black dark:text-white">{safeSlots.length}</div>
+                <div
+                  style={{ '--stagger': 2 } as React.CSSProperties}
+                  className="animate-dashboard-card relative overflow-hidden p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600"
+                >
+                  <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
+                  <div className="text-xl font-bold font-mono tabular-nums text-black dark:text-white">{animSettingsSlotCount}</div>
                   <div className="text-sm text-black/70 dark:text-white/75 font-medium">Slot Kiosk Terkawal</div>
                 </div>
               </div>

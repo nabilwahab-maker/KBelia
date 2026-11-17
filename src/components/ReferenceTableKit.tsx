@@ -3,6 +3,37 @@ import { createPortal } from 'react-dom';
 import { Search, SlidersHorizontal, MoreHorizontal, X, ArrowUpDown } from 'lucide-react';
 import { ToolbarSortOption } from '../utils/sortUtils';
 
+type ToolbarAccent = 'blue' | 'indigo' | 'teal';
+
+const TOOLBAR_ACCENTS: Record<
+  ToolbarAccent,
+  {
+    inputFocus: string;
+    activeFilter: string;
+    sortIcon: string;
+    closeBtn: string;
+  }
+> = {
+  blue: {
+    inputFocus: 'focus:ring-blue-500/30 focus:border-blue-600',
+    activeFilter: 'bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-black dark:text-white',
+    sortIcon: 'text-blue-600 dark:text-blue-400',
+    closeBtn: 'bg-blue-600 hover:bg-blue-700'
+  },
+  indigo: {
+    inputFocus: 'focus:ring-indigo-500/30 focus:border-indigo-600',
+    activeFilter: 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-300 dark:border-indigo-700 text-black dark:text-white',
+    sortIcon: 'text-indigo-600 dark:text-indigo-400',
+    closeBtn: 'bg-indigo-600 hover:bg-indigo-700'
+  },
+  teal: {
+    inputFocus: 'focus:ring-teal-500/30 focus:border-teal-600',
+    activeFilter: 'bg-teal-50 dark:bg-teal-950/50 border-teal-300 dark:border-teal-700 text-black dark:text-white',
+    sortIcon: 'text-teal-600 dark:text-teal-400',
+    closeBtn: 'bg-teal-600 hover:bg-teal-700'
+  }
+};
+
 interface ReferenceTableToolbarProps {
   searchValue: string;
   onSearchChange: (val: string) => void;
@@ -15,6 +46,7 @@ interface ReferenceTableToolbarProps {
   onSortChange?: (val: string) => void;
   sortLabel?: string;
   rightSlot?: React.ReactNode;
+  accent?: ToolbarAccent;
 }
 
 export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
@@ -28,12 +60,14 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
   sortValue,
   onSortChange,
   sortLabel = 'Susun Mengikut',
-  rightSlot
+  rightSlot,
+  accent = 'blue'
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const hasSortControl = Boolean(sortOptions && sortOptions.length > 0 && sortValue !== undefined && onSortChange);
   const hasPopoverBody = Boolean(filterContent || hasSortControl);
+  const theme = TOOLBAR_ACCENTS[accent];
 
   useEffect(() => {
     if (!isFilterOpen) return;
@@ -56,7 +90,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
   }, [isFilterOpen]);
 
   return (
-    <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-700">
+    <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-200 dark:border-zinc-700">
       <div className="relative w-full sm:w-72 min-w-0">
         <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
@@ -64,7 +98,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={searchPlaceholder}
-          className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+          className={`w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 transition-all ${theme.inputFocus}`}
         />
         {searchValue && (
           <button
@@ -89,7 +123,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
               aria-expanded={isFilterOpen}
               className={`min-h-[38px] px-3.5 py-2 rounded-xl border text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${
                 filterCount > 0
-                  ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-black dark:text-white'
+                  ? theme.activeFilter
                   : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
               }`}
             >
@@ -98,17 +132,17 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
             </button>
 
             {isFilterOpen && (
-              <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-40 space-y-3.5 text-left">
+              <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-40 space-y-3.5 text-left">
                 {hasSortControl && sortOptions && onSortChange && (
                   <div className={filterContent ? 'pb-3 border-b border-slate-200 dark:border-zinc-700' : ''}>
                     <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
-                      <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                      <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${theme.sortIcon}`} />
                       <span>{sortLabel}</span>
                     </label>
                     <select
                       value={sortValue}
                       onChange={(e) => onSortChange(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      className={`w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer focus:outline-none focus:ring-2 ${theme.inputFocus}`}
                     >
                       {sortOptions.map((opt) => (
                         <option key={opt.value} value={opt.value}>
@@ -136,7 +170,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsFilterOpen(false)}
-                    className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+                    className={`px-3 py-1.5 rounded-lg text-white text-xs font-bold cursor-pointer transition-colors ${theme.closeBtn}`}
                   >
                     Tutup
                   </button>
@@ -257,7 +291,7 @@ export const RowActionMenu: React.FC<RowActionMenuProps> = ({
               visibility: menuPos.ready ? 'visible' : 'hidden'
             }}
             onClick={(e) => e.stopPropagation()}
-            className="w-52 max-w-[calc(100vw-24px)] overflow-y-auto rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-[80] text-left"
+            className="animate-popover-enter w-52 max-w-[calc(100vw-24px)] overflow-y-auto rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-[80] text-left"
           >
             {visibleItems.map((item, idx) => (
               <React.Fragment key={`${item.label}-${idx}`}>

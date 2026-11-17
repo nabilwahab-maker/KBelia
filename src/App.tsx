@@ -1733,7 +1733,7 @@ function MainApp() {
             <>
               {/* 1. ADMIN DASHBOARD VIEW */}
               {isAdmin && (
-                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
                   <AdminDashboard
                     slots={enrichedSlots}
                     businesses={businesses}
@@ -1760,7 +1760,7 @@ function MainApp() {
 
               {/* 2. MENTOR DASHBOARD VIEW */}
               {isMentor && (
-                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
                   <MentorPortal
                     mentors={mentors}
                     registrations={scopedMentorRegistrations}
@@ -1778,7 +1778,7 @@ function MainApp() {
 
               {/* 3. YOUTH ENTREPRENEUR DASHBOARD VIEW */}
               {isYouth && (
-                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
                   <MerchantPortal
                     myBusiness={myBusiness}
                     myProducts={myProducts}
@@ -2065,7 +2065,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
                 <AdminDashboard
                   slots={enrichedSlots}
                   businesses={businesses}
@@ -2118,7 +2118,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
                 <MentorPortal
                   mentors={mentors}
                   registrations={scopedMentorRegistrations}
@@ -2186,7 +2186,7 @@ function MainApp() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
                 <MerchantPortal
                   myBusiness={myBusiness}
                   myProducts={myProducts}

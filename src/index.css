@@ -231,6 +231,69 @@ html.dark ::-webkit-scrollbar-thumb {
   animation: fadeInSubtle 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+@keyframes kbeliaCardReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-dashboard-card {
+  opacity: 0;
+  animation: kbeliaCardReveal 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--stagger, 0) * 55ms);
+  will-change: transform, opacity;
+}
+
+@keyframes kbeliaTabEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-dashboard-tab {
+  animation: kbeliaTabEnter 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+@keyframes kbeliaPopoverEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -4px, 0) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.animate-popover-enter {
+  transform-origin: top right;
+  animation: kbeliaPopoverEnter 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+.kbelia-table-row {
+  transition: background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.kbelia-table-row:hover {
+  background-color: rgba(241, 245, 249, 0.85);
+}
+
+html.dark .kbelia-table-row:hover {
+  background-color: rgba(39, 39, 42, 0.55);
+}
+
 /* Login Showcase Panel: Bespoke GPU-Composited Dark Slate Animations */
 @keyframes loginFloatA {
   0%, 100% {
@@ -670,6 +733,26 @@ html.dark .kbelia-live-dot::after {
   background-color: #34d399;
 }
 
+/* Smooth continuous flowing rope wave line for KPI cards */
+@keyframes kbeliaRopeFlow {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.kbelia-rope-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+
+.animate-rope-flow {
+  animation: kbeliaRopeFlow 5.5s linear infinite;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-login-float-a,
   .animate-login-float-b,
@@ -687,8 +770,17 @@ html.dark .kbelia-live-dot::after {
   .animate-float-gentle,
   .animate-float-gentle-alt,
   .animate-hero-ken-burns,
-  .animate-marquee-left {
+  .animate-marquee-left,
+  .animate-rope-flow {
     animation: none;
+  }
+
+  .animate-dashboard-card,
+  .animate-dashboard-tab,
+  .animate-popover-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 
   .reveal-section {

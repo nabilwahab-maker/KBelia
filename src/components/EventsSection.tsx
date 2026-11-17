@@ -6,7 +6,8 @@ import {
   Check, 
   MessageCircle, 
   XCircle, 
-  AlertTriangle
+  AlertTriangle,
+  MapPin
 } from 'lucide-react';
 import { YouthEvent } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -68,6 +69,21 @@ const isEventEnded = (dateStr?: string): boolean => {
   const endDate = parseEventEndDate(dateStr);
   if (!endDate) return false;
   return endDate.getTime() < Date.now();
+};
+
+const getEventCategoryLabel = (category: string, isEn: boolean): string => {
+  switch (category) {
+    case 'karnival':
+      return isEn ? 'Carnival & Expo' : 'Karnival Jualan';
+    case 'bengkel':
+      return isEn ? 'Workshop & Training' : 'Bengkel Pensijilan';
+    case 'pitching':
+      return isEn ? 'Pitching & Demo Day' : 'Pitching Pelabur';
+    case 'expo':
+      return isEn ? 'Expo & Craft Fair' : 'Ekspo & Kraf';
+    default:
+      return category;
+  }
 };
 
 export const EventsSection: React.FC = () => {
@@ -242,8 +258,34 @@ export const EventsSection: React.FC = () => {
     (availabilityFilter !== 'all' ? 1 : 0) +
     (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
+  // Compute Main Featured Event (nearest open event still accepting stall bookings) & 3 nearest upcoming highlights
+  const eventsByNearestDate = [...events].sort((a, b) => {
+    const da = parseEventEndDate(a.date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+    const db = parseEventEndDate(b.date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+    return da - db;
+  });
+
+  const featuredEvent: YouthEvent | null =
+    eventsByNearestDate.find((evt) => {
+      const isBooked = bookedEvents.includes(evt.id);
+      const remaining = Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0));
+      return !isEventEnded(evt.date) && remaining > 0;
+    }) ||
+    eventsByNearestDate.find((evt) => !isEventEnded(evt.date)) ||
+    eventsByNearestDate[0] ||
+    null;
+
+  const nonFeaturedEvents = featuredEvent
+    ? eventsByNearestDate.filter((evt) => evt.id !== featuredEvent.id)
+    : [];
+
+  const upcomingHighlightEvents: YouthEvent[] = [
+    ...nonFeaturedEvents.filter((evt) => !isEventEnded(evt.date)),
+    ...nonFeaturedEvents.filter((evt) => isEventEnded(evt.date))
+  ].slice(0, 3);
+
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-5 animate-dashboard-tab">
       {/* Section Header */}
       <div className="rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 border border-slate-200 dark:border-zinc-700">
         <div className="max-w-2xl">
@@ -252,37 +294,359 @@ export const EventsSection: React.FC = () => {
           </h1>
           <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 leading-relaxed">
             {isEn
-              ? 'Book popup stalls, join halal workshops, and network with partners across the state.'
-              : 'Tempah tapak gerai, sertai bengkel pensijilan halal, dan temui rakan niaga seluruh negeri.'}
+              ? 'Explore our flagship upcoming carnival, book popup stalls, and join hands-on workshops across Kelantan.'
+              : 'Terokai acara utama terdekat, tempah tapak gerai jualan, dan sertai bengkel keusahawanan seluruh Kelantan.'}
           </p>
         </div>
       </div>
 
-      {/* Ringkasan Statistik Ringkas */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Total Events' : 'Jumlah Acara'}</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{events.length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Your Bookings' : 'Slot Ditempah'}</span>
-          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{bookedEvents.length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Stalls Open' : 'Tapak Kosong'}</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">
-            {events.reduce((sum, e) => sum + (isEventEnded(e.date) ? 0 : Math.max(0, e.boothsAvailable - (bookedEvents.includes(e.id) ? 1 : 0))), 0)}
-          </span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Matching Results' : 'Dipaparkan'}</span>
-          <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{filteredEvents.length}</span>
-        </div>
-      </div>
+      {/* Sorotan Utama & 3 Acara Terdekat Akan Datang */}
+      {featuredEvent && (() => {
+        const isFeaturedBooked = bookedEvents.includes(featuredEvent.id);
+        const featuredRemaining = Math.max(0, featuredEvent.boothsAvailable - (isFeaturedBooked ? 1 : 0));
+        const featuredEnded = isEventEnded(featuredEvent.date);
+        const featuredFull = !featuredEnded && !isFeaturedBooked && featuredRemaining <= 0;
+        const featuredBlocked = isFeaturedBooked || featuredEnded || featuredFull;
+        const occupancyPercent = featuredEvent.totalBooths > 0
+          ? Math.min(100, Math.max(0, Math.round(((featuredEvent.totalBooths - featuredRemaining) / featuredEvent.totalBooths) * 100)))
+          : 0;
+
+        return (
+          <div className="space-y-4">
+            {/* 1. Sorotan Acara Utama Besar */}
+            <div
+              style={{ '--stagger': 0 } as React.CSSProperties}
+              className="animate-dashboard-card group relative rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-blue-400/80 dark:hover:border-blue-500/70 shadow-xs overflow-hidden transition-colors duration-200"
+            >
+              <div className="h-0.5 w-full bg-blue-600 dark:bg-blue-500" />
+              <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+                {/* Poster Besar Acara Utama */}
+                <div className="lg:col-span-6 relative min-h-[240px] sm:min-h-[290px] lg:min-h-[320px] lg:h-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
+                  <PortalImage
+                    src={resolveEventImage(featuredEvent.category, featuredEvent.imageUrl)}
+                    alt={featuredEvent.title}
+                    fallbackType="event"
+                    fallbackLabel={featuredEvent.category}
+                    className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02] ${featuredEnded ? 'grayscale opacity-75' : ''}`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none" />
+                  <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 text-white">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-blue-200">
+                      {isEn ? 'Featured Upcoming Event' : 'Sorotan Acara Utama'} · {featuredEvent.district}
+                    </div>
+                    <div className="text-sm font-medium text-white/90 mt-0.5 truncate">
+                      {featuredEvent.organizer}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Butiran Lengkap & Tindakan Pantas Acara Utama */}
+                <div className="lg:col-span-6 p-5 sm:p-6 flex flex-col justify-between gap-4">
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold text-blue-700 dark:text-blue-400">
+                      <span>{getEventCategoryLabel(featuredEvent.category, isEn)}</span>
+                      <span aria-hidden="true">·</span>
+                      <span className="tabular-nums">{featuredEvent.date}</span>
+                      <span aria-hidden="true">·</span>
+                      <span className={
+                        isFeaturedBooked
+                          ? 'text-emerald-700 dark:text-emerald-400'
+                          : featuredEnded
+                          ? 'text-slate-600 dark:text-zinc-400'
+                          : featuredFull
+                          ? 'text-rose-700 dark:text-rose-400'
+                          : 'text-emerald-700 dark:text-emerald-400'
+                      }>
+                        {isFeaturedBooked
+                          ? (isEn ? 'Your Stall Booked' : 'Slot Anda Berdaftar')
+                          : featuredEnded
+                          ? (isEn ? 'Ended' : 'Telah Selesai')
+                          : featuredFull
+                          ? (isEn ? 'Slots Full' : 'Slot Penuh')
+                          : (isEn ? 'Open for Registration' : 'Tempahan Dibuka')}
+                      </span>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white leading-snug">
+                      {featuredEvent.title}
+                    </h2>
+
+                    <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed line-clamp-2">
+                      {featuredEvent.description}
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2.5 pt-3 border-t border-slate-200 dark:border-zinc-700 text-sm">
+                      <div className="flex items-start gap-2 min-w-0">
+                        <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                        <div className="min-w-0">
+                          <span className="block text-xs font-medium text-black/60 dark:text-white/65">
+                            {isEn ? 'Date & Time' : 'Tarikh & Masa'}
+                          </span>
+                          <span className="font-semibold text-black dark:text-white tabular-nums block truncate">
+                            {featuredEvent.date} · {featuredEvent.time}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2 min-w-0">
+                        <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                        <div className="min-w-0">
+                          <span className="block text-xs font-medium text-black/60 dark:text-white/65">
+                            {isEn ? 'Venue' : 'Lokasi Acara'}
+                          </span>
+                          <span className="font-semibold text-black dark:text-white block truncate" title={featuredEvent.location}>
+                            {featuredEvent.location}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="sm:col-span-2 pt-1 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs sm:text-sm tabular-nums">
+                          <span className="font-semibold text-black dark:text-white inline-flex items-center gap-1.5">
+                            <Store className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span>
+                              {isEn
+                                ? `${featuredRemaining} of ${featuredEvent.totalBooths} stalls remaining`
+                                : `Baki ${featuredRemaining} daripada ${featuredEvent.totalBooths} tapak gerai`}
+                            </span>
+                          </span>
+                          <span className="font-semibold text-black/70 dark:text-white/75">
+                            {featuredEvent.fee}
+                          </span>
+                        </div>
+                        <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-zinc-800 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-[width] duration-500 ${
+                              featuredFull ? 'bg-rose-500' : 'bg-blue-600 dark:bg-blue-500'
+                            }`}
+                            style={{ width: `${occupancyPercent}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-200 dark:border-zinc-700">
+                    <button
+                      type="button"
+                      onClick={() => !featuredBlocked && handleBookBooth(featuredEvent)}
+                      disabled={featuredBlocked}
+                      className={`py-2.5 px-5 text-sm font-bold rounded-xl transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 ${
+                        isFeaturedBooked
+                          ? 'bg-emerald-50 text-black border border-emerald-300 dark:bg-emerald-950/40 dark:text-white dark:border-emerald-800 cursor-default'
+                          : featuredEnded
+                          ? 'bg-slate-100 text-black/60 border border-slate-200 dark:bg-zinc-800 dark:text-white/60 dark:border-zinc-700 cursor-not-allowed'
+                          : featuredFull
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 cursor-not-allowed'
+                          : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
+                      }`}
+                    >
+                      {isFeaturedBooked ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>{isEn ? 'Stall Booked' : 'Slot Ditempah'}</span>
+                        </>
+                      ) : featuredEnded ? (
+                        <>
+                          <Clock className="w-4 h-4" />
+                          <span>{isEn ? 'Event Ended' : 'Telah Selesai'}</span>
+                        </>
+                      ) : featuredFull ? (
+                        <>
+                          <XCircle className="w-4 h-4" />
+                          <span>{isEn ? 'Slots Full' : 'Slot Penuh'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Store className="w-4 h-4" />
+                          <span>{isEn ? 'Book Stall Slot' : 'Tempah Slot Gerai'}</span>
+                        </>
+                      )}
+                    </button>
+
+                    {isFeaturedBooked && !featuredEnded && (
+                      <button
+                        type="button"
+                        onClick={() => setEventToCancel(featuredEvent)}
+                        className="py-2.5 px-4 text-sm font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-black border border-rose-200 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-white dark:border-rose-800 transition-colors inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        <span>{isEn ? 'Cancel' : 'Batal'}</span>
+                      </button>
+                    )}
+
+                    <a
+                      href={`https://wa.me/${featuredEvent.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(featuredEvent.title)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="py-2.5 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 text-sm font-semibold inline-flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>{isEn ? 'Organizer' : 'Hubungi Penganjur'}</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Sorotan 3 Acara Akan Datang */}
+            {upcomingHighlightEvents.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2 px-0.5">
+                  <h2 className="text-base font-bold text-black dark:text-white">
+                    {isEn ? 'Upcoming Event Highlights' : 'Sorotan Acara Akan Datang'}
+                  </h2>
+                  <span className="text-xs font-semibold text-black/60 dark:text-white/65 tabular-nums">
+                    {isEn
+                      ? `${upcomingHighlightEvents.length} nearest events`
+                      : `${upcomingHighlightEvents.length} acara terdekat`}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-stretch">
+                  {upcomingHighlightEvents.map((evt, idx) => {
+                    const isBooked = bookedEvents.includes(evt.id);
+                    const remainingBooths = Math.max(0, evt.boothsAvailable - (isBooked ? 1 : 0));
+                    const ended = isEventEnded(evt.date);
+                    const full = !ended && !isBooked && remainingBooths <= 0;
+                    const bookingBlocked = isBooked || ended || full;
+
+                    return (
+                      <div
+                        key={evt.id}
+                        style={{ '--stagger': idx + 1 } as React.CSSProperties}
+                        className="animate-dashboard-card group relative flex flex-col justify-between rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-blue-400/80 dark:hover:border-blue-500/70 shadow-2xs overflow-hidden transition-colors duration-200"
+                      >
+                        <div className={`h-0.5 w-full ${isBooked ? 'bg-emerald-500' : 'bg-blue-500/80 dark:bg-blue-400/80'}`} />
+
+                        <div className="relative aspect-[16/9] overflow-hidden bg-slate-100 dark:bg-zinc-800">
+                          <PortalImage
+                            src={resolveEventImage(evt.category, evt.imageUrl)}
+                            alt={evt.title}
+                            fallbackType="event"
+                            fallbackLabel={evt.category}
+                            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03] ${ended ? 'grayscale opacity-75' : ''}`}
+                          />
+                        </div>
+
+                        <div className="p-4 flex-1 flex flex-col justify-between gap-3.5">
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs font-semibold text-black/65 dark:text-white/70 tabular-nums">
+                              <span className="text-blue-700 dark:text-blue-400">
+                                {getEventCategoryLabel(evt.category, isEn)}
+                              </span>
+                              <span aria-hidden="true">·</span>
+                              <span>{evt.date}</span>
+                            </div>
+
+                            <h3 className="text-base font-bold text-black dark:text-white leading-snug line-clamp-2">
+                              {evt.title}
+                            </h3>
+
+                            <div className="space-y-1.5 text-sm text-black/75 dark:text-white/75 tabular-nums pt-0.5">
+                              <div className="flex items-start gap-1.5 min-w-0">
+                                <MapPin className="w-4 h-4 text-black/50 dark:text-white/55 shrink-0 mt-0.5" />
+                                <span className="truncate" title={`${evt.location} (${evt.district})`}>
+                                  {evt.location} ({evt.district})
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-2 text-xs sm:text-sm">
+                                <span className={`inline-flex items-center gap-1.5 font-semibold ${
+                                  ended
+                                    ? 'text-black/60 dark:text-white/60'
+                                    : full
+                                    ? 'text-rose-700 dark:text-rose-400'
+                                    : 'text-emerald-700 dark:text-emerald-400'
+                                }`}>
+                                  <Store className="w-4 h-4 shrink-0" />
+                                  <span>
+                                    {isEn
+                                      ? `${remainingBooths}/${evt.totalBooths} stalls left`
+                                      : `Baki ${remainingBooths}/${evt.totalBooths} tapak`}
+                                  </span>
+                                </span>
+                                <span className="text-black/65 dark:text-white/70 truncate max-w-[130px]" title={evt.fee}>
+                                  {evt.fee}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-3 border-t border-slate-200 dark:border-zinc-800">
+                            <button
+                              type="button"
+                              onClick={() => !bookingBlocked && handleBookBooth(evt)}
+                              disabled={bookingBlocked}
+                              className={`flex-1 py-2 px-3 text-sm font-bold rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 whitespace-nowrap ${
+                                isBooked
+                                  ? 'bg-emerald-50 text-black border border-emerald-300 dark:bg-emerald-950/40 dark:text-white dark:border-emerald-800 cursor-default'
+                                  : ended
+                                  ? 'bg-slate-100 text-black/60 border border-slate-200 dark:bg-zinc-800 dark:text-white/60 dark:border-zinc-700 cursor-not-allowed'
+                                  : full
+                                  ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 cursor-not-allowed'
+                                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
+                              }`}
+                            >
+                              {isBooked ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5" />
+                                  <span>{isEn ? 'Booked' : 'Ditempah'}</span>
+                                </>
+                              ) : ended ? (
+                                <>
+                                  <Clock className="w-3.5 h-3.5" />
+                                  <span>{isEn ? 'Ended' : 'Selesai'}</span>
+                                </>
+                              ) : full ? (
+                                <>
+                                  <XCircle className="w-3.5 h-3.5" />
+                                  <span>{isEn ? 'Full' : 'Penuh'}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Store className="w-3.5 h-3.5" />
+                                  <span>{isEn ? 'Book Stall' : 'Tempah Slot'}</span>
+                                </>
+                              )}
+                            </button>
+
+                            {isBooked && !ended && (
+                              <button
+                                type="button"
+                                onClick={() => setEventToCancel(evt)}
+                                className="py-2 px-3 text-sm font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-black border border-rose-200 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-white dark:border-rose-800 transition-colors inline-flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
+                                title={isEn ? 'Cancel registration' : 'Batal pendaftaran'}
+                              >
+                                <XCircle className="w-3.5 h-3.5" />
+                                <span>{isEn ? 'Cancel' : 'Batal'}</span>
+                              </button>
+                            )}
+
+                            <a
+                              href={`https://wa.me/${evt.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(evt.title)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 transition-colors shrink-0"
+                              title="WhatsApp Penganjur"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Acara & Karnival: Carian, Penapis Bersepadu, Senarai Baris & Halaman Bernombor */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
         <ReferenceTableToolbar
+          accent="blue"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder={isEn ? 'Search event title, location or organizer...' : 'Cari tajuk acara, lokasi atau penganjur...'}
@@ -378,7 +742,7 @@ export const EventsSection: React.FC = () => {
                 return (
                   <div
                     key={evt.id}
-                    className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors"
+                    className="kbelia-table-row p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5"
                   >
                     <div className="flex items-center gap-3.5 min-w-0 flex-1">
                       <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">

@@ -341,8 +341,9 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
   };
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-200">
-      <div className="kbelia-important-header p-5 sm:p-6 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+    <div className="space-y-4 animate-dashboard-tab">
+      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
             <Calendar className="w-3.5 h-3.5" />
@@ -359,7 +360,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
         <button
           type="button"
           onClick={openCreateEvent}
-          className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs cursor-pointer shrink-0 self-start sm:self-auto"
+          className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs cursor-pointer shrink-0 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Tambah Acara Baharu</span>
@@ -395,8 +396,9 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
       </div>
 
       {subView === 'catalog' ? (
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+        <div key="catalog" className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs animate-dashboard-tab">
           <ReferenceTableToolbar
+            accent="indigo"
             searchValue={catalogSearch}
             onSearchChange={setCatalogSearch}
             searchPlaceholder="Cari tajuk acara, lokasi atau daerah..."
@@ -517,7 +519,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                   {catalogPagination.paginatedItems.map((evt) => (
                     <tr
                       key={evt.id}
-                      className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors"
+                      className="kbelia-table-row"
                     >
                       <td className="py-3.5 px-4 max-w-sm">
                         <div className="flex items-center gap-3 min-w-0">
@@ -598,8 +600,9 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
           )}
         </div>
       ) : (
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+        <div key="bookings" className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs animate-dashboard-tab">
           <ReferenceTableToolbar
+            accent="indigo"
             searchValue={bookingSearch}
             onSearchChange={setBookingSearch}
             searchPlaceholder="Cari nama peserta, acara atau ID..."
@@ -686,7 +689,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                   {bookingsPagination.paginatedItems.map((b) => (
                     <tr
                       key={b.id}
-                      className="hover:bg-slate-50/70 dark:hover:bg-zinc-800/40 transition-colors"
+                      className="kbelia-table-row"
                     >
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3 min-w-0">
@@ -764,16 +767,16 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
       {/* Add / Edit Youth Event Modal */}
       {showEventModal && (
         <div
-          className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+          className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
           onClick={() => !isSaving && setShowEventModal(false)}
         >
           <div
-            className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+            className="animate-popover-enter relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+            <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-5 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                   <Calendar className="w-4 h-4" />
@@ -796,7 +799,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
               </button>
             </div>
 
-            <form onSubmit={handleSaveEvent} className="p-6 space-y-4">
+            <form onSubmit={handleSaveEvent} className="p-4 sm:p-5 space-y-3.5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Tajuk Acara *</label>
