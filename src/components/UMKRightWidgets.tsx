@@ -27,7 +27,6 @@ export const UMKRightWidgets: React.FC<UMKRightWidgetsProps> = ({
             <Bell className="w-3.5 h-3.5 text-black dark:text-white/75" />
             <span>Pengumuman Rasmi</span>
           </div>
-          <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-medium">Sesi 2026</span>
         </div>
 
         <div className="p-3.5 bg-blue-50 dark:bg-blue-950/60 rounded-xl border border-blue-200 dark:border-blue-800/70 text-left">

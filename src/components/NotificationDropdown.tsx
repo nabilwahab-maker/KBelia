@@ -125,7 +125,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-88 sm:w-[26rem] rounded-2xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-300 dark:border-slate-600 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="absolute right-0 mt-2 w-88 sm:w-[26rem] max-w-[calc(100vw-1.5rem)] rounded-2xl bg-white dark:bg-slate-800 shadow-2xl border border-slate-300 dark:border-slate-600 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
             {/* Header: Displays notification title & active account badge */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-2 flex-wrap">

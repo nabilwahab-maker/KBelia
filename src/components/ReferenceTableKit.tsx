@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, SlidersHorizontal, MoreHorizontal, X, ArrowUpDown } from 'lucide-react';
 import { ToolbarSortOption } from '../utils/sortUtils';
 
@@ -56,7 +57,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
 
   return (
     <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-700">
-      <div className="relative w-full sm:w-72">
+      <div className="relative w-full sm:w-72 min-w-0">
         <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           type="text"
@@ -97,7 +98,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
             </button>
 
             {isFilterOpen && (
-              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-40 space-y-3.5 text-left">
+              <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-40 space-y-3.5 text-left">
                 {hasSortControl && sortOptions && onSortChange && (
                   <div className={filterContent ? 'pb-3 border-b border-slate-200 dark:border-zinc-700' : ''}>
                     <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
@@ -120,7 +121,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
 
                 {filterContent}
 
-                <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+                <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-2">
                   {onResetFilters ? (
                     <button
                       type="button"
@@ -167,10 +168,11 @@ export const RowActionMenu: React.FC<RowActionMenuProps> = ({
   ariaLabel = 'Tindakan baris'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number; openUp: boolean }>({
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number; maxHeight: number; ready: boolean }>({
     top: 0,
     left: 0,
-    openUp: false
+    maxHeight: 320,
+    ready: false
   });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -181,18 +183,34 @@ export const RowActionMenu: React.FC<RowActionMenuProps> = ({
     const btn = buttonRef.current;
     if (!btn) return;
     const rect = btn.getBoundingClientRect();
-    const estimatedHeight = visibleItems.length * 38 + 20;
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const openUp = spaceBelow < estimatedHeight && rect.top > estimatedHeight;
-    const menuWidth = 208;
-    const left = Math.max(12, Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 12));
-    const top = openUp ? Math.max(12, rect.top - 4) : rect.bottom + 4;
-    setMenuPos({ top, left, openUp });
+    const padding = 12;
+    const menuEl = menuRef.current;
+    const menuWidth = menuEl?.offsetWidth || 208;
+    const estimatedHeight = menuEl?.offsetHeight || Math.min(320, visibleItems.length * 40 + 18);
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+
+    const spaceBelow = viewportH - rect.bottom - padding;
+    const spaceAbove = rect.top - padding;
+    const openUp = spaceBelow < estimatedHeight && spaceAbove > spaceBelow;
+
+    const maxHeight = Math.max(140, openUp ? spaceAbove : spaceBelow);
+    const effectiveHeight = Math.min(estimatedHeight, maxHeight);
+
+    const rawTop = openUp ? rect.top - effectiveHeight - 4 : rect.bottom + 4;
+    const top = Math.max(padding, Math.min(rawTop, viewportH - effectiveHeight - padding));
+    const left = Math.max(padding, Math.min(rect.right - menuWidth, viewportW - menuWidth - padding));
+
+    setMenuPos({ top, left, maxHeight, ready: true });
   };
+
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    updateMenuPosition();
+  }, [isOpen, visibleItems.length]);
 
   useEffect(() => {
     if (!isOpen) return;
-    updateMenuPosition();
     const handlePointerDown = (e: MouseEvent) => {
       const target = e.target as Node;
       if (
@@ -222,65 +240,76 @@ export const RowActionMenu: React.FC<RowActionMenuProps> = ({
       window.removeEventListener('scroll', handleScrollOrResize, true);
       window.removeEventListener('resize', handleScrollOrResize);
     };
-  }, [isOpen, visibleItems.length]);
+  }, [isOpen]);
 
   if (visibleItems.length === 0) return null;
 
+  const portalContent =
+    isOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            ref={menuRef}
+            style={{
+              position: 'fixed',
+              top: `${menuPos.top}px`,
+              left: `${menuPos.left}px`,
+              maxHeight: `${menuPos.maxHeight}px`,
+              visibility: menuPos.ready ? 'visible' : 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-52 max-w-[calc(100vw-24px)] overflow-y-auto rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-[80] text-left"
+          >
+            {visibleItems.map((item, idx) => (
+              <React.Fragment key={`${item.label}-${idx}`}>
+                {item.dividerBefore && (
+                  <div className="my-1 border-t border-slate-200 dark:border-zinc-700" />
+                )}
+                <button
+                  type="button"
+                  disabled={item.disabled}
+                  onClick={() => {
+                    setIsOpen(false);
+                    item.onClick();
+                  }}
+                  className={`w-full px-3.5 py-2 text-sm text-left cursor-pointer transition-colors disabled:opacity-45 disabled:cursor-not-allowed ${
+                    item.tone === 'danger'
+                      ? 'font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50'
+                      : item.tone === 'accent'
+                      ? 'font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
+                      : 'font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              </React.Fragment>
+            ))}
+          </div>,
+          document.body
+        )
+      : null;
+
   return (
-    <div className="relative inline-flex justify-end">
+    <div className="relative inline-flex items-center justify-end max-w-full">
       <button
         ref={buttonRef}
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          if (!isOpen) updateMenuPosition();
-          setIsOpen((prev) => !prev);
+          setIsOpen((prev) => {
+            if (!prev) {
+              setMenuPos((m) => ({ ...m, ready: false }));
+            }
+            return !prev;
+          });
         }}
         aria-expanded={isOpen}
         aria-label={ariaLabel}
-        className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-black/60 dark:text-white/65 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
+        className="w-8 h-8 rounded-lg inline-flex items-center justify-center shrink-0 text-black/60 dark:text-white/65 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>
-
-      {isOpen && (
-        <div
-          ref={menuRef}
-          style={{
-            position: 'fixed',
-            top: `${menuPos.top}px`,
-            left: `${menuPos.left}px`,
-            transform: menuPos.openUp ? 'translateY(-100%)' : undefined
-          }}
-          onClick={(e) => e.stopPropagation()}
-          className="w-52 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-50 text-left"
-        >
-          {visibleItems.map((item, idx) => (
-            <React.Fragment key={`${item.label}-${idx}`}>
-              {item.dividerBefore && (
-                <div className="my-1 border-t border-slate-200 dark:border-zinc-700" />
-              )}
-              <button
-                type="button"
-                disabled={item.disabled}
-                onClick={() => {
-                  setIsOpen(false);
-                  item.onClick();
-                }}
-                className={`w-full px-3.5 py-2 text-sm text-left cursor-pointer transition-colors disabled:opacity-45 disabled:cursor-not-allowed ${
-                  item.tone === 'danger'
-                    ? 'font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50'
-                    : item.tone === 'accent'
-                    ? 'font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
-                    : 'font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
-                }`}
-              >
-                {item.label}
-              </button>
-            </React.Fragment>
-          ))}
-        </div>
-      )}
+      {portalContent}
     </div>
   );
 };
+

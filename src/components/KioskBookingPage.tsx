@@ -300,7 +300,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     }
 
     if (!pdpaConsent) {
-      setError('Sila tandakan persetujuan pemprosesan data peribadi (PDPA) sebelum meneruskan.');
+      setError('Sila tandakan kotak persetujuan sebelum meneruskan.');
       return;
     }
 
@@ -632,7 +632,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                         {availableSlots.length > 0 ? (
                           availableSlots.map((s) => (
                             <option key={s.id} value={s.id}>
-                              {s.code} — {s.name} ({s.hubLocation}, {s.district}) · [Tersedia]
+                              {s.code} - {s.name} ({s.hubLocation}, {s.district}) · [Tersedia]
                             </option>
                           ))
                         ) : (
@@ -991,7 +991,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                             Premis Kiosk:
                           </span>
                           <span className="font-semibold text-black dark:text-white">
-                            {currentSlot?.code} — {currentSlot?.name}
+                            {currentSlot?.code} - {currentSlot?.name}
                           </span>
                         </div>
                         <div>
@@ -1040,9 +1040,9 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                       />
                       <div className="text-sm text-black dark:text-white leading-relaxed">
                         <strong className="text-black dark:text-white font-semibold block mb-0.5">
-                          Persetujuan Rasmi PDPA &amp; Integriti Belia:
+                          Persetujuan:
                         </strong>
-                        Saya mengesahkan semua maklumat perniagaan dan peribadi di atas adalah benar serta bersetuju dengan pemprosesan data di bawah Akta Perlindungan Data Peribadi 2010 (PDPA) bagi permohonan kiosk negeri Kelantan.
+                        Saya mengesahkan semua maklumat di atas adalah benar dan bersetuju ia diproses bagi permohonan kiosk ini.
                       </div>
                     </label>
 
@@ -1316,7 +1316,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   >
                     <div>
                       <div className="font-bold text-black dark:text-white">
-                        {item.slotCode} — {item.slotName}
+                        {item.slotCode} - {item.slotName}
                       </div>
                       <div className="text-black/70 dark:text-white/75">
                         {item.hubLocation} · {item.businessName} · Mula: {item.startDate}

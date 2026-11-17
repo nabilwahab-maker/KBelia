@@ -246,7 +246,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                 type="button"
                 onClick={() => {
                   setFirstName('Usahawan');
-                  setLastName('Belia 2026');
+                  setLastName('Belia');
                   setEmail('usahawan.belia@gmail.com');
                   setPassword('kbelia123');
                 }}
@@ -568,7 +568,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
 
             {/* SUBTITLE MOTTO */}
             <p className="text-[0.9375rem] xl:text-sm text-black dark:text-white font-normal leading-relaxed max-w-xs mt-1">
-              Portal Rasmi Kiosk & Keusahawanan Belia Kelantan 2026
+              Portal Rasmi Kiosk & Keusahawanan Belia Kelantan
             </p>
 
             {/* WELCOME BADGE */}
@@ -605,7 +605,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             <div className="kbelia-important-header px-6 pt-5 pb-3.5 flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-2 text-black dark:text-white/75 font-bold text-sm">
                 <ShieldCheck className="w-4 h-4" />
-                <span>Terma & Syarat Pendaftaran KBelia 2026</span>
+                <span>Terma & Syarat Pendaftaran KBelia</span>
               </div>
               <button
                 type="button"

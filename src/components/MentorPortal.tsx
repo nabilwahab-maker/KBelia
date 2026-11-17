@@ -1168,7 +1168,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const handleDeleteLogEntry = (log: MentoringLogEntry) => {
     confirmDelete({
       title: 'Padam Rekod Sesi Bimbingan?',
-      itemName: `${log.menteeName} — ${log.topic}`,
+      itemName: `${log.menteeName} - ${log.topic}`,
       itemType: 'Rekod Sesi Mentor',
       description: 'Semua minit perbincangan dan senarai tugasan di bawah rekod sesi ini akan dipadamkan secara kekal.',
       confirmLabel: 'Padam Rekod',
@@ -1401,142 +1401,139 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             />
           </div>
 
-          {/* Asymmetric Bento Grid (lg:grid-cols-12): Left Analytics + Temujanji, Right Perakuan Geran */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-              
-              {/* Left Span (7 Cols): Interactive Recharts Analytics + Temujanji Terdekat */}
-              <div className="lg:col-span-7 min-w-0 space-y-5 h-fit">
+          {/* [2] Graf Taburan Sesi & Perakuan Seluruh Kelantan (Lebar Penuh) */}
+          <div className="w-full bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-slate-300 dark:border-zinc-700 shadow-sm min-w-0">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-600 mb-4">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-black dark:text-white/80 shrink-0" />
+                <h3 className="text-sm sm:text-base font-bold text-black dark:text-white tracking-tight">
+                  Taburan Sesi &amp; Perakuan Seluruh Kelantan
+                </h3>
+              </div>
+              <span className="text-[0.8125rem] font-mono font-bold text-black dark:text-white bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 px-2.5 py-1 rounded-md">
+                Seluruh Kelantan
+              </span>
+            </div>
 
-                {/* Interactive Recharts District & Endorsement Distribution */}
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-slate-300 dark:border-zinc-700 shadow-sm min-w-0 h-fit">
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-600 mb-4">
-                    <div className="flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5 text-black dark:text-white/80" />
-                      <h3 className="text-sm sm:text-base font-bold text-black dark:text-white tracking-tight">
-                        Taburan Sesi &amp; Perakuan Seluruh Kelantan
-                      </h3>
-                    </div>
-                    <span className="text-[0.8125rem] font-mono font-bold text-black dark:text-white bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 px-2.5 py-1 rounded-md">
-                      Seluruh Kelantan
-                    </span>
-                  </div>
+            <div className="h-[260px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+              <ResponsiveContainer width="100%" height={260} minWidth={0} initialDimension={{ width: 640, height: 260 }}>
+                <BarChart
+                  data={mentorChartData}
+                  barCategoryGap="16%"
+                  barGap={4}
+                  margin={{ top: 24, right: 12, left: -4, bottom: 6 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                  <XAxis dataKey="district" tick={{ fontSize: 12.5, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
+                  <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    cursor={{ fill: 'rgba(13, 148, 136, 0.12)' }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const d = payload[0].payload as { fullName?: string; district: string; sesi: number; perakuan: number };
+                        return (
+                          <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                            <div className="font-bold text-white mb-1">{d.fullName || d.district}</div>
+                            <div className="text-white/90">Sesi Bimbingan: {d.sesi}</div>
+                            <div className="text-white/90">Perakuan Geran: {d.perakuan}</div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar
+                    dataKey="sesi"
+                    name="Sesi Bimbingan"
+                    fill="#0D9488"
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={38}
+                    minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                    isAnimationActive={false}
+                  >
+                    <LabelList
+                      dataKey="sesi"
+                      position="top"
+                      formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
+                      className="fill-slate-900 dark:fill-slate-100 font-mono"
+                      style={{ fontSize: 12, fontWeight: 700 }}
+                    />
+                  </Bar>
+                  <Bar
+                    dataKey="perakuan"
+                    name="Perakuan Geran"
+                    fill="#F59E0B"
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={38}
+                    minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                    isAnimationActive={false}
+                  >
+                    <LabelList
+                      dataKey="perakuan"
+                      position="top"
+                      formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
+                      className="fill-slate-900 dark:fill-slate-100 font-mono"
+                      style={{ fontSize: 12, fontWeight: 700 }}
+                    />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
 
-                  <div className="h-[260px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                    <ResponsiveContainer width="100%" height={260} minWidth={0} initialDimension={{ width: 520, height: 260 }}>
-                      <BarChart
-                        data={mentorChartData}
-                        barCategoryGap="16%"
-                        barGap={4}
-                        margin={{ top: 24, right: 12, left: -4, bottom: 6 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                        <XAxis dataKey="district" tick={{ fontSize: 12.5, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
-                        <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
-                        <Tooltip
-                          cursor={{ fill: 'rgba(13, 148, 136, 0.12)' }}
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              const d = payload[0].payload as { fullName?: string; district: string; sesi: number; perakuan: number };
-                              return (
-                                <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                  <div className="font-bold text-white mb-1">{d.fullName || d.district}</div>
-                                  <div className="text-white/90">Sesi Bimbingan: {d.sesi}</div>
-                                  <div className="text-white/90">Perakuan Geran: {d.perakuan}</div>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Bar
-                          dataKey="sesi"
-                          name="Sesi Bimbingan"
-                          fill="#0D9488"
-                          radius={[6, 6, 0, 0]}
-                          maxBarSize={38}
-                          minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                          isAnimationActive={false}
-                        >
-                          <LabelList
-                            dataKey="sesi"
-                            position="top"
-                            formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
-                            className="fill-slate-900 dark:fill-slate-100 font-mono"
-                            style={{ fontSize: 12, fontWeight: 700 }}
-                          />
-                        </Bar>
-                        <Bar
-                          dataKey="perakuan"
-                          name="Perakuan Geran"
-                          fill="#F59E0B"
-                          radius={[6, 6, 0, 0]}
-                          maxBarSize={38}
-                          minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                          isAnimationActive={false}
-                        >
-                          <LabelList
-                            dataKey="perakuan"
-                            position="top"
-                            formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
-                            className="fill-slate-900 dark:fill-slate-100 font-mono"
-                            style={{ fontSize: 12, fontWeight: 700 }}
-                          />
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
+          {/* [3] Dua Lajur Ringkasan Seimbang Kiri & Kanan: Temujanji Terdekat + Status Perakuan Geran */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+
+            {/* Lajur Kiri: Temujanji Terdekat & Tindakan Segera */}
+            <div className="min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col justify-start h-full">
+              <div>
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
+                    <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
+                      Temujanji Terdekat &amp; Tindakan
+                    </h3>
                   </div>
+                  <span className="text-[0.8125rem] font-mono text-black dark:text-white bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 px-2 py-0.5 rounded shrink-0">
+                    {mentorRegistrations.slice(0, 3).length} Sesi Terkini
+                  </span>
                 </div>
 
-                {/* Temujanji Terdekat & Tindakan Segera */}
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col h-fit">
-                <div>
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-black dark:text-white/75" />
-                      <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
-                        Temujanji Terdekat & Tindakan
-                      </h3>
-                    </div>
-                    <span className="text-[0.8125rem] font-mono text-black dark:text-white bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 px-2 py-0.5 rounded">
-                      {mentorRegistrations.slice(0, 3).length} Sesi Terkini
-                    </span>
-                  </div>
-
-                  <div className="space-y-3">
-                    {mentorRegistrations.slice(0, 3).map((reg) => {
-                      const visuals = resolveMenteeVisuals(
-                        {
-                          applicantId: reg.applicantId,
-                          entrepreneurName: reg.entrepreneurName,
-                          businessName: reg.businessName,
-                          category: reg.businessCategory
-                        },
-                        businesses
-                      );
-                      return (
-                      <div 
-                        key={reg.id}
-                        className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                      >
-                        <div className="flex items-start gap-3 min-w-0 flex-1">
-                          <div className="relative w-12 h-10 shrink-0 mt-0.5">
-                            <div className="w-full h-full rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
-                              <PortalImage
-                                src={visuals.businessUrl}
-                                alt={reg.businessName}
-                                fallbackType="business"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-xs absolute -bottom-1 -right-1 bg-white dark:bg-slate-900">
-                              <PortalImage
-                                src={visuals.avatarUrl}
-                                alt={reg.entrepreneurName}
-                                fallbackType="avatar"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
+                <div className="space-y-3">
+                  {mentorRegistrations.slice(0, 3).map((reg) => {
+                    const visuals = resolveMenteeVisuals(
+                      {
+                        applicantId: reg.applicantId,
+                        entrepreneurName: reg.entrepreneurName,
+                        businessName: reg.businessName,
+                        category: reg.businessCategory
+                      },
+                      businesses
+                    );
+                    return (
+                    <div
+                      key={reg.id}
+                      className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    >
+                      <div className="flex items-start gap-3 min-w-0 flex-1">
+                        <div className="relative w-12 h-10 shrink-0 mt-0.5">
+                          <div className="w-full h-full rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
+                            <PortalImage
+                              src={visuals.businessUrl}
+                              alt={reg.businessName}
+                              fallbackType="business"
+                              className="w-full h-full object-cover"
+                            />
                           </div>
+                          <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-xs absolute -bottom-1 -right-1 bg-white dark:bg-slate-900">
+                            <PortalImage
+                              src={visuals.avatarUrl}
+                              alt={reg.entrepreneurName}
+                              fallbackType="avatar"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
 
                         <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -1563,149 +1560,113 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <span>{reg.mode === 'Google Meet Maya' ? 'Google Meet Maya' : 'Bersemuka Kampus'}</span>
                           </div>
                         </div>
-                        </div>
-
-                        <div className="shrink-0">
-                          {reg.status === 'pending' ? (
-                            <button
-                              type="button"
-                              onClick={() => handleStatusChange(reg, 'confirmed')}
-                              className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-[0.8125rem] font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap dark:bg-teal-600"
-                            >
-                              Sahkan Sesi
-                            </button>
-                          ) : reg.meetingLink ? (
-                            <a
-                              href={reg.meetingLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold transition-all inline-flex items-center gap-1.5 shadow-2xs whitespace-nowrap dark:bg-teal-600"
-                            >
-                              <Video className="w-3 h-3" />
-                              <span>Bilik Maya</span>
-                            </a>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => handleSubTabChange('sessions')}
-                              className="px-3 py-1.5 rounded-lg bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-semibold transition-all cursor-pointer whitespace-nowrap"
-                            >
-                              Butiran
-                            </button>
-                          )}
-                        </div>
                       </div>
-                      );
-                    })}
 
-                    {mentorRegistrations.length === 0 && (
-                      <div className="py-8 text-center text-sm text-black/70 dark:text-white/75">
-                        Tiada temujanji aktif buat masa ini.
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-slate-300 dark:border-slate-600 mt-4 flex items-center justify-between">
-                  <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
-                    Semak jadual lengkap & pengurusan mentee
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleSubTabChange('sessions')}
-                    className="text-sm font-bold text-black dark:text-white/75 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>Buka Sesi Bimbingan</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                </div>
-
-              </div>
-
-              {/* Right Span (5 Cols): Status Perakuan Geran & Dana Benih */}
-              <div className="lg:col-span-5 h-fit bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col">
-                <div>
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
-                    <div className="flex items-center gap-2">
-                      <Award className="w-4 h-4 text-black/70 dark:text-white/75" />
-                      <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
-                        Status Perakuan Geran Usahawan
-                      </h3>
-                    </div>
-                    <span className="text-[0.8125rem] font-mono text-black dark:text-white bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded">
-                      {mentorEndorsements.length} Diluluskan
-                    </span>
-                  </div>
-
-                  <div className="space-y-3">
-                    {mentorEndorsements.slice(0, 3).map((end) => (
-                      <div 
-                        key={end.id}
-                        className="p-3.5 rounded-xl bg-slate-50 dark:bg-amber-950/20 border border-slate-200 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                      >
-                        <div className="min-w-0 flex-1 space-y-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-bold text-black dark:text-white leading-snug break-words">
-                              {end.menteeName}
-                            </span>
-                            <span className="text-[0.8125rem] font-mono font-bold text-black dark:text-white bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded shrink-0">
-                              {end.recommendedAmount}
-                            </span>
-                          </div>
-                          <p className="text-[0.875rem] text-black dark:text-white leading-relaxed break-words">
-                            {end.businessName} &middot; <span className="text-black/70 dark:text-white/75">{end.district}</span>
-                          </p>
-                          <p className="text-[0.875rem] font-mono text-black/70 dark:text-white/75 pt-0.5 break-words">
-                            Kod: {end.endorsementCode} &middot; Tarikh: {end.issuedAt}
-                          </p>
-                        </div>
-
-                        <div className="shrink-0">
+                      <div className="shrink-0">
+                        {reg.status === 'pending' ? (
                           <button
                             type="button"
-                            onClick={() => {
-                              setSelectedEndorsementForView(end);
-                              handleSubTabChange('endorsements');
-                            }}
+                            onClick={() => handleStatusChange(reg, 'confirmed')}
                             className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-[0.8125rem] font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap dark:bg-teal-600"
                           >
-                            Lihat Surat
+                            Sahkan Sesi
                           </button>
-                        </div>
+                        ) : reg.meetingLink ? (
+                          <a
+                            href={reg.meetingLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold transition-all inline-flex items-center gap-1.5 shadow-2xs whitespace-nowrap dark:bg-teal-600"
+                          >
+                            <Video className="w-3 h-3" />
+                            <span>Bilik Maya</span>
+                          </a>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleSubTabChange('sessions')}
+                            className="px-3 py-1.5 rounded-lg bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-semibold transition-all cursor-pointer whitespace-nowrap"
+                          >
+                            Butiran
+                          </button>
+                        )}
                       </div>
-                    ))}
+                    </div>
+                    );
+                  })}
 
-                    {mentorEndorsements.length === 0 && (
-                      <div className="py-8 text-center text-sm text-black/70 dark:text-white/75">
-                        Belum ada surat perakuan geran dikeluarkan.
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-slate-300 dark:border-slate-600 mt-4 flex items-center justify-between">
-                  <button
-                    type="button"
-                    onClick={() => setIsNewEndorsementModalOpen(true)}
-                    className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs dark:bg-teal-600"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Keluarkan Perakuan Baharu</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSubTabChange('endorsements')}
-                    className="text-sm font-bold text-black dark:text-white/75 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>Senarai Lengkap</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
+                  {mentorRegistrations.length === 0 && (
+                    <div className="py-8 text-center text-sm text-black/70 dark:text-white/75">
+                      Tiada temujanji aktif buat masa ini.
+                    </div>
+                  )}
                 </div>
               </div>
-
             </div>
+
+            {/* Lajur Kanan: Status Perakuan Geran & Dana Benih */}
+            <div className="min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-zinc-700 shadow-sm flex flex-col justify-start h-full">
+              <div>
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-slate-600 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0" />
+                    <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
+                      Status Perakuan Geran Usahawan
+                    </h3>
+                  </div>
+                  <span className="text-[0.8125rem] font-mono text-black dark:text-white bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded shrink-0">
+                    {mentorEndorsements.length} Diluluskan
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {mentorEndorsements.slice(0, 3).map((end) => (
+                    <div
+                      key={end.id}
+                      className="p-3.5 rounded-xl bg-slate-50 dark:bg-amber-950/20 border border-slate-200 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    >
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-bold text-black dark:text-white leading-snug break-words">
+                            {end.menteeName}
+                          </span>
+                          <span className="text-[0.8125rem] font-mono font-bold text-black dark:text-white bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded shrink-0">
+                            {end.recommendedAmount}
+                          </span>
+                        </div>
+                        <p className="text-[0.875rem] text-black dark:text-white leading-relaxed break-words">
+                          {end.businessName} &middot; <span className="text-black/70 dark:text-white/75">{end.district}</span>
+                        </p>
+                        <p className="text-[0.875rem] font-mono text-black/70 dark:text-white/75 pt-0.5 break-words">
+                          Kod: {end.endorsementCode} &middot; Tarikh: {end.issuedAt}
+                        </p>
+                      </div>
+
+                      <div className="shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedEndorsementForView(end);
+                            handleSubTabChange('endorsements');
+                          }}
+                          className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-[0.8125rem] font-bold transition-all cursor-pointer shadow-2xs whitespace-nowrap dark:bg-teal-600"
+                        >
+                          Lihat Surat
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {mentorEndorsements.length === 0 && (
+                    <div className="py-8 text-center text-sm text-black/70 dark:text-white/75">
+                      Belum ada surat perakuan geran dikeluarkan.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+          </div>
 
             {/* Direktori Ringkas Usahawan Mentee (Reference Table) */}
             <div className="space-y-3">
@@ -3365,7 +3326,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                         return (
                                           <div
                                             key={task.id}
-                                            className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+                                            className={`p-3 rounded-xl border transition-all flex flex-wrap items-center justify-between gap-3 ${
                                               task.completed
                                                 ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800 text-black/70 dark:text-white/75'
                                                 : 'bg-white dark:bg-zinc-900 border-slate-300 dark:border-zinc-700 hover:border-blue-400/70 dark:hover:border-blue-400/70 text-black dark:text-white'
@@ -4145,7 +4106,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
 
                 {newLogTasks.length === 0 ? (
-                  <div className="p-3.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/70 dark:bg-slate-800/40 text-xs text-black/70 dark:text-white/75 flex items-center justify-between gap-2">
+                  <div className="p-3.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/70 dark:bg-slate-800/40 text-xs text-black/70 dark:text-white/75 flex flex-wrap items-center justify-between gap-2">
                     <span>Tiada tugasan ditambah. Tekan Tambah Tugasan jika ada tindakan susulan.</span>
                     <button
                       type="button"

@@ -16,7 +16,6 @@ import {
   GraduationCap,
   Phone,
   MapPin,
-  Sparkles,
   Sun,
   Moon,
   HelpCircle,
@@ -843,17 +842,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
             {/* SUBTITLE MOTTO */}
             <p className="text-[0.9375rem] xl:text-sm text-slate-300 font-normal leading-relaxed max-w-xs">
               {isEn
-                ? 'Official Kelantan Youth Kiosk & Entrepreneurship Portal 2026'
-                : 'Portal Rasmi Kiosk & Keusahawanan Belia Kelantan 2026'}
+                ? 'Official Kelantan Youth Kiosk & Entrepreneurship Portal'
+                : 'Portal Rasmi Kiosk & Keusahawanan Belia Kelantan'}
             </p>
-
-            {/* MODERN GLASS STATUS BADGE */}
-            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-slate-900/80 backdrop-blur-md border border-blue-400/25 text-white shadow-lg shadow-slate-950/50 whitespace-nowrap">
-              <Sparkles className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-              <span>{isEn ? 'Welcome to KBelia' : 'Selamat Datang ke KBelia'}</span>
-              <span aria-hidden="true" className="text-blue-400/60">&middot;</span>
-              <span className="text-white font-bold tabular-nums">2026</span>
-            </div>
           </div>
 
           {/* FLOATING DARK / LIGHT THEME TOGGLE (BOTTOM LEFT CORNER) */}
@@ -898,7 +889,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               </p>
 
               <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 text-sm">
-                <div className="font-bold text-black dark:text-white">Admin KBelia Kelantan 2026</div>
+                <div className="font-bold text-black dark:text-white">Admin KBelia Kelantan</div>
                 <div className="text-black dark:text-white/75 mt-0.5">Emel: urusetia@kbelia.kelantan.gov.my</div>
                 <div className="text-black dark:text-white/75">Talian: +60 9-748 1957 (Pusat Pentadbiran Negeri)</div>
               </div>

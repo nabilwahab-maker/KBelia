@@ -63,7 +63,7 @@ export const DEFAULT_PORTAL_SETTINGS: PortalSettings = {
   portalSubsidyRate: 50,
   maxLeaseDurationMonths: 12,
   systemStatus: 'operational',
-  portalAnnouncement: 'Permohonan Kiosk Belia Kelantan Sesi 2026 kini dibuka dengan subsidi sewaan sehingga 50%.',
+  portalAnnouncement: 'Permohonan Kiosk Belia Kelantan kini dibuka dengan subsidi sewaan sehingga 50%.',
   updatedAt: '2026-03-01T08:00:00.000Z'
 };
 

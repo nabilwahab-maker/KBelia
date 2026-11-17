@@ -486,7 +486,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                                     type="button"
                                     onClick={() =>
                                       confirmDelete({
-                                        itemName: `${r.date} — RM ${(r.cashSales + r.qrSales).toFixed(2)}`,
+                                        itemName: `${r.date} - RM ${(r.cashSales + r.qrSales).toFixed(2)}`,
                                         itemType: 'Rekod Jualan Harian',
                                         onConfirm: () => handleDelete(r.id)
                                       })

@@ -206,7 +206,7 @@ export const generateSinglePageA4OfferLetterHtml = (
                 Kod & Nama Premis Kiosk
               </th>
               <td style="border: 1px solid #cbd5e1; padding: 6px 9px; color: #000000; font-weight: 700;">
-                <span style="color: #000000;">${booking.slotCode}</span> — ${booking.slotName}
+                <span style="color: #000000;">${booking.slotCode}</span> - ${booking.slotName}
               </td>
             </tr>
             <tr>

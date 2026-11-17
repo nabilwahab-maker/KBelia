@@ -1710,7 +1710,7 @@ function MainApp() {
           {portalSettings.systemStatus === 'maintenance' && !isAdmin && (
             <div className="mb-3 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-black dark:text-white text-sm flex items-center justify-between gap-3">
               <span className="font-semibold">
-                Mod Penyelenggaraan Sistem Aktif — Sebahagian permohonan baharu ditutup buat sementara waktu. {portalSettings.portalAnnouncement}
+                Mod Penyelenggaraan Sistem Aktif: Sebahagian permohonan baharu ditutup buat sementara waktu. {portalSettings.portalAnnouncement}
               </span>
             </div>
           )}

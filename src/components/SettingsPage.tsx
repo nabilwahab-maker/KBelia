@@ -193,7 +193,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
     String(initialPortalSettings.maxLeaseDurationMonths ?? 12)
   );
   const [portalAnnouncement, setPortalAnnouncement] = useState(
-    initialPortalSettings.portalAnnouncement || 'Permohonan Kiosk Belia & Geran Belia Kelantan 2026/2027 Kini Dibuka!'
+    initialPortalSettings.portalAnnouncement || 'Permohonan Kiosk Belia & Geran Belia Kelantan Kini Dibuka!'
   );
 
   // Sync settings state if userProfile or myBusiness changes

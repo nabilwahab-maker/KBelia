@@ -926,7 +926,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
 
           {/* Right Column: Side Location & Slot Availability Panel (5 Cols) */}
           <div className="xl:col-span-5 flex flex-col gap-4 w-full min-w-0">
-            <div className="h-full rounded-3xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-sm flex flex-col justify-between gap-4">
+            <div className="h-full rounded-3xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-sm flex flex-col justify-start gap-4">
               <div className="space-y-4">
                 {/* Hub Header */}
                 <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">

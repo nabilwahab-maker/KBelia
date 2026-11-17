@@ -40,7 +40,6 @@ import {
   Search,
   SlidersHorizontal,
   ArrowUpDown,
-  MoreHorizontal,
   Plus
 } from 'lucide-react';
 import { 
@@ -285,7 +284,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     dir: 'asc' | 'desc';
   }>({ key: 'createdAt', dir: 'desc' });
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
-  const [openProductMenuId, setOpenProductMenuId] = useState<string | null>(null);
 
   // Booking action states
   const [selectedReceiptBooking, setSelectedReceiptBooking] = useState<CapsuleBooking | null>(null);
@@ -305,16 +303,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     const handleOutsideClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
       if (!target) return;
-      if (!target.closest('[data-prod-menu]')) {
-        setOpenProductMenuId(null);
-      }
       if (!target.closest('[data-prod-filter]')) {
         setIsProdFilterOpen(false);
       }
     };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setOpenProductMenuId(null);
         setIsProdFilterOpen(false);
       }
     };
@@ -714,7 +708,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     try {
       await deleteProduct(id);
       setSelectedProductIds((prev) => prev.filter((item) => item !== id));
-      setOpenProductMenuId(null);
       setMessage({ type: 'success', text: 'Produk telah dipadam dari katalog.' });
       showToast('Produk telah dipadam dari katalog.', 'success');
       onRefresh();
@@ -741,7 +734,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         imageUrl: prod.imageUrl,
         inStock: nextInStock
       });
-      setOpenProductMenuId(null);
       showToast(
         nextInStock
           ? `${prod.name} ditanda sebagai stok tersedia.`
@@ -771,7 +763,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         imageUrl: prod.imageUrl || DEFAULT_PRODUCT_IMAGE,
         inStock: prod.inStock !== false
       });
-      setOpenProductMenuId(null);
       showToast(`"${prod.name}" berjaya diduplikasi.`, 'success');
       onRefresh();
     } catch (err) {
@@ -1313,289 +1304,264 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             />
           </div>
 
-          {/* Asymmetric Bento Grid (lg:grid-cols-12) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-            
-            {/* Left Bento Span (7 Cols): Compact Chart Card + Separate Pending Approvals Card Below */}
-            <div className="lg:col-span-7 min-w-0 flex flex-col gap-4 h-fit">
-              {/* KOTAK 1: Carta Recharts Analitik Jualan Interaktif (Padat & Seimbang) */}
-              <div className="rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-fit">
-                
-                {/* Card Header */}
-                <div className="border-b border-slate-300 dark:border-zinc-600 py-4 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-black dark:text-white/75" />
-                      <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                        Analitik Aliran Jualan Kiosk
-                      </h4>
-                    </div>
-                    <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-                      Transaksi tunai &amp; DuitNow QR (data sebenar &amp; asas sampel)
-                    </p>
-                  </div>
-
-                  {/* Chart Mode + Period Selector Tabs */}
-                  <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-                    <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
-                      <button
-                        type="button"
-                        onClick={() => setChartMode('bar')}
-                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
-                          chartMode === 'bar'
-                            ? 'bg-slate-800 dark:bg-zinc-700 text-white'
-                            : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
-                        }`}
-                      >
-                        Bar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setChartMode('area')}
-                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
-                          chartMode === 'area'
-                            ? 'bg-slate-800 dark:bg-zinc-700 text-white'
-                            : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
-                        }`}
-                      >
-                        Grafik
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
-                      <button
-                        type="button"
-                        onClick={() => setSalesPeriod('weekly')}
-                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                          salesPeriod === 'weekly'
-                            ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                        }`}
-                      >
-                        Mingguan
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setSalesPeriod('monthly')}
-                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                          salesPeriod === 'monthly'
-                            ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                        }`}
-                      >
-                        Bulanan
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setSalesPeriod('quarterly')}
-                        className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                          salesPeriod === 'quarterly'
-                            ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                        }`}
-                      >
-                        Suku
-                      </button>
-                    </div>
-                  </div>
+          {/* [2] Graf Analitik Aliran Jualan Kiosk (Lebar Penuh) */}
+          <div className="w-full rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col">
+            {/* Card Header */}
+            <div className="border-b border-slate-300 dark:border-zinc-600 py-4 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-black dark:text-white/75" />
+                  <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
+                    Analitik Aliran Jualan Kiosk
+                  </h4>
                 </div>
-
-                {/* Compact Chart Content Area */}
-                <div className="p-4 sm:p-5 flex flex-col gap-3 min-w-0">
-                  
-                  {/* Metric Strip */}
-                  <div className="grid grid-cols-3 gap-2 pb-3 border-b border-slate-300 dark:border-zinc-600 text-center">
-                    <div>
-                      <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Terkumpul</span>
-                      <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
-                        RM {periodTotal.toLocaleString()}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Purata/Tempoh</span>
-                      <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
-                        RM {periodAvg.toLocaleString()}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Puncak</span>
-                      <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white/85">
-                        RM {periodMax.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Interactive Compact Recharts Chart */}
-                  <div className="relative h-[235px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                    <div className="absolute inset-0">
-                      <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 520, height: 235 }}>
-                        {chartMode === 'area' ? (
-                          <AreaChart data={chartBars} margin={{ top: 18, right: 8, left: 0, bottom: 2 }}>
-                            <defs>
-                              <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#10B981" stopOpacity={0.38} />
-                                <stop offset="100%" stopColor="#2563EB" stopOpacity={0.04} />
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                            <XAxis
-                              dataKey="label"
-                              height={24}
-                              tickMargin={4}
-                              tick={{ fontSize: 12, fontWeight: 600 }}
-                              interval={0}
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <YAxis
-                              width={48}
-                              tickMargin={2}
-                              domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
-                              allowDecimals={false}
-                              tick={{ fontSize: 12, fontWeight: 500 }}
-                              axisLine={false}
-                              tickLine={false}
-                              tickFormatter={(val) => `RM${val}`}
-                            />
-                            <Tooltip
-                              content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                  const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
-                                  return (
-                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                      <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
-                                      <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                      <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              }}
-                            />
-                            <Area
-                              type="monotone"
-                              dataKey="value"
-                              stroke="#10B981"
-                              strokeWidth={2.5}
-                              fill="url(#beliaSalesGradient)"
-                              isAnimationActive={false}
-                              dot={{ r: 4, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
-                              activeDot={{ r: 6, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
-                            />
-                          </AreaChart>
-                        ) : (
-                          <BarChart
-                            data={chartBars}
-                            barCategoryGap="16%"
-                            margin={{ top: 18, right: 8, left: 0, bottom: 2 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                            <XAxis
-                              dataKey="label"
-                              height={24}
-                              tickMargin={4}
-                              tick={{ fontSize: 12, fontWeight: 600 }}
-                              interval={0}
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <YAxis
-                              width={48}
-                              tickMargin={2}
-                              domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
-                              allowDecimals={false}
-                              tick={{ fontSize: 12, fontWeight: 500 }}
-                              axisLine={false}
-                              tickLine={false}
-                              tickFormatter={(val) => `RM${val}`}
-                            />
-                            <Tooltip
-                              cursor={{ fill: 'rgba(37, 99, 235, 0.12)' }}
-                              content={({ active, payload }) => {
-                                if (active && payload && payload.length) {
-                                  const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
-                                  return (
-                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                      <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
-                                      <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                      <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              }}
-                            />
-                            <Bar
-                              dataKey="value"
-                              fill="#2563EB"
-                              radius={[6, 6, 0, 0]}
-                              maxBarSize={56}
-                              minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
-                              isAnimationActive={false}
-                            >
-                              <LabelList
-                                dataKey="value"
-                                position="top"
-                                formatter={(val: unknown) => {
-                                  const num = Number(val);
-                                  return num > 0 ? `RM${num.toLocaleString()}` : '';
-                                }}
-                                className="fill-slate-900 dark:fill-slate-100 font-mono"
-                                style={{ fontSize: 11.5, fontWeight: 700 }}
-                              />
-                            </Bar>
-                          </BarChart>
-                        )}
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-
-                  {/* Footer notes & Cashflow shortcut */}
-                  <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between text-sm text-black/75 dark:text-white/80 gap-2">
-                    <span className="leading-snug font-medium">
-                      {safeCashflow.length > 0
-                        ? isHistoricalAnchor
-                          ? `Julat rekod terkini: ${chartRangeLabel}`
-                          : `Buku Tunai Transaksi Sah · ${chartRangeLabel}`
-                        : 'Belum ada rekod jualan harian direkodkan'}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('cashflow')}
-                      className="text-black dark:text-white/75 hover:underline font-bold flex items-center gap-1 cursor-pointer shrink-0"
-                    >
-                      <span>Buka Rekod</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                </div>
-
+                <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
+                  Transaksi tunai &amp; DuitNow QR (data sebenar &amp; asas sampel)
+                </p>
               </div>
 
-              {/* KOTAK 2: Kad Ringkasan 3 Permohonan Terkini Menunggu Kelulusan (Di Luar & Di Bawah Kotak Graf) */}
-              <div className="rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-fit">
-                <div className="border-b border-slate-300 dark:border-zinc-600 py-4 px-5 sm:px-6 flex items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                      <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                        Permohonan Menunggu Kelulusan
-                      </h4>
-                    </div>
-                    <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-                      Ringkasan 3 permohonan terkini dalam semakan pentadbir &amp; mentor
-                    </p>
-                  </div>
-
-                  <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 shrink-0 tabular-nums">
-                    {pendingApprovalItems.length} Menunggu
-                  </span>
+              {/* Chart Mode + Period Selector Tabs */}
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
+                  <button
+                    type="button"
+                    onClick={() => setChartMode('bar')}
+                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
+                      chartMode === 'bar'
+                        ? 'bg-slate-800 dark:bg-zinc-700 text-white'
+                        : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    Bar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChartMode('area')}
+                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
+                      chartMode === 'area'
+                        ? 'bg-slate-800 dark:bg-zinc-700 text-white'
+                        : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    Grafik
+                  </button>
                 </div>
 
-                <div className="p-4 sm:p-5 flex flex-col gap-3 h-fit">
+                <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
+                  <button
+                    type="button"
+                    onClick={() => setSalesPeriod('weekly')}
+                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                      salesPeriod === 'weekly'
+                        ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                        : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    Mingguan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSalesPeriod('monthly')}
+                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                      salesPeriod === 'monthly'
+                        ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                        : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    Bulanan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSalesPeriod('quarterly')}
+                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                      salesPeriod === 'quarterly'
+                        ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                        : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    Suku
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Compact Chart Content Area */}
+            <div className="p-4 sm:p-5 flex flex-col gap-3 min-w-0">
+              {/* Metric Strip */}
+              <div className="grid grid-cols-3 gap-2 pb-3 border-b border-slate-300 dark:border-zinc-600 text-center">
+                <div>
+                  <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Terkumpul</span>
+                  <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
+                    RM {periodTotal.toLocaleString()}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Purata/Tempoh</span>
+                  <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
+                    RM {periodAvg.toLocaleString()}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Puncak</span>
+                  <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white/85">
+                    RM {periodMax.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Interactive Full-Width Recharts Chart */}
+              <div className="relative h-[245px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                <div className="absolute inset-0">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 640, height: 245 }}>
+                    {chartMode === 'area' ? (
+                      <AreaChart data={chartBars} margin={{ top: 18, right: 12, left: 0, bottom: 2 }}>
+                        <defs>
+                          <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#10B981" stopOpacity={0.38} />
+                            <stop offset="100%" stopColor="#2563EB" stopOpacity={0.04} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                        <XAxis
+                          dataKey="label"
+                          height={24}
+                          tickMargin={4}
+                          tick={{ fontSize: 12, fontWeight: 600 }}
+                          interval={0}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          width={48}
+                          tickMargin={2}
+                          domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
+                          allowDecimals={false}
+                          tick={{ fontSize: 12, fontWeight: 500 }}
+                          axisLine={false}
+                          tickLine={false}
+                          tickFormatter={(val) => `RM${val}`}
+                        />
+                        <Tooltip
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
+                              return (
+                                <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                  <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
+                                  <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
+                                  <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="value"
+                          stroke="#10B981"
+                          strokeWidth={2.5}
+                          fill="url(#beliaSalesGradient)"
+                          isAnimationActive={false}
+                          dot={{ r: 4, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
+                          activeDot={{ r: 6, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
+                        />
+                      </AreaChart>
+                    ) : (
+                      <BarChart
+                        data={chartBars}
+                        barCategoryGap="18%"
+                        margin={{ top: 18, right: 12, left: 0, bottom: 2 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                        <XAxis
+                          dataKey="label"
+                          height={24}
+                          tickMargin={4}
+                          tick={{ fontSize: 12, fontWeight: 600 }}
+                          interval={0}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          width={48}
+                          tickMargin={2}
+                          domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
+                          allowDecimals={false}
+                          tick={{ fontSize: 12, fontWeight: 500 }}
+                          axisLine={false}
+                          tickLine={false}
+                          tickFormatter={(val) => `RM${val}`}
+                        />
+                        <Tooltip
+                          cursor={{ fill: 'rgba(37, 99, 235, 0.12)' }}
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
+                              return (
+                                <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                  <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
+                                  <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
+                                  <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Bar
+                          dataKey="value"
+                          fill="#2563EB"
+                          radius={[6, 6, 0, 0]}
+                          maxBarSize={56}
+                          minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
+                          isAnimationActive={false}
+                        >
+                          <LabelList
+                            dataKey="value"
+                            position="top"
+                            formatter={(val: unknown) => {
+                              const num = Number(val);
+                              return num > 0 ? `RM${num.toLocaleString()}` : '';
+                            }}
+                            className="fill-slate-900 dark:fill-slate-100 font-mono"
+                            style={{ fontSize: 11.5, fontWeight: 700 }}
+                          />
+                        </Bar>
+                      </BarChart>
+                    )}
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* [3] Dua Lajur Ringkasan Seimbang Kiri & Kanan */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+            {/* Lajur Kiri: Permohonan Menunggu Kelulusan */}
+            <div className="min-w-0 rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-full">
+              <div className="border-b border-slate-300 dark:border-zinc-600 py-4 px-5 sm:px-6 flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
+                      Permohonan Menunggu Kelulusan
+                    </h4>
+                  </div>
+                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
+                    Ringkasan permohonan terkini dalam semakan pentadbir &amp; mentor
+                  </p>
+                </div>
+
+                <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 shrink-0 tabular-nums">
+                  {pendingApprovalItems.length} Menunggu
+                </span>
+              </div>
+
+              <div className="p-4 sm:p-5 flex-1 flex flex-col justify-start gap-4">
+                <div className="flex flex-col justify-start">
                   {topPendingApprovals.length === 0 ? (
-                    <div className="p-5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col items-center justify-center text-center gap-2.5 h-fit">
+                    <div className="p-5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col items-center justify-center text-center gap-2.5">
                       <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                       <div>
                         <p className="text-sm sm:text-base font-bold text-black dark:text-white">
@@ -1623,7 +1589,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-2.5 h-fit">
+                    <div className="space-y-2.5">
                       {topPendingApprovals.map((item) => (
                         <button
                           key={item.id}
@@ -1667,74 +1633,41 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       ))}
                     </div>
                   )}
-
-                  {/* Footer Summary & Quick Links */}
-                  <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2 text-sm">
-                    <span className="text-black/75 dark:text-white/75 font-medium">
-                      {pendingApprovalItems.length > 0
-                        ? `Memaparkan ${topPendingApprovals.length} daripada ${pendingApprovalItems.length} permohonan menunggu`
-                        : 'Pantauan status permohonan semasa secara langsung'}
-                    </span>
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab('bookings')}
-                        className="font-bold text-black dark:text-white hover:underline inline-flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Urus Kiosk</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab('vault')}
-                        className="font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Dokumen &amp; Geran</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Bento Span (5 Cols): Penjejak Permohonan + Ringkasan Aktiviti */}
-            <div className="lg:col-span-5 space-y-5 sm:space-y-6">
-
-            {/* Card A: Stepper Penjejak Permohonan Berperingkat */}
-            <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-fit">
-              
+            {/* Lajur Kanan: Penjejak Permohonan Berperingkat */}
+            <div className="min-w-0 rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-full">
               {/* Card Header */}
-              <div className="border-b border-slate-300 dark:border-slate-600 py-4.5 px-5 sm:px-6 flex items-center justify-between">
-                <div>
+              <div className="border-b border-slate-300 dark:border-slate-600 py-4 px-5 sm:px-6 flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <FileCheck className="w-4 h-4 text-black dark:text-white/75" />
+                    <FileCheck className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
                     <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
                       Penjejak Permohonan
                     </h4>
                   </div>
                   <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-                    Status semakan semasa PBT & UMK
+                    Status semakan semasa PBT &amp; UMK
                   </p>
                 </div>
 
-                <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70">
+                <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 shrink-0">
                   {primaryBooking ? primaryBooking.slotCode : hasBusiness ? 'PROFIL-AKTIF' : 'BELUM-MOHON'}
                 </span>
               </div>
 
               {/* Stepper Timeline Body */}
-              <div className="p-5 sm:p-6 flex flex-col space-y-4 h-fit">
-                
-                {/* 5-Step Vertical Stepper */}
-                <div className="space-y-3">
+              <div className="p-4 sm:p-5 flex-1 flex flex-col justify-start gap-4">
+                <div className="space-y-2.5">
                   {stepperItems.map((stepItem, idx) => {
                     const isCompleted = stepItem.status === 'completed';
                     const isCurrent = stepItem.status === 'current';
                     const isSelected = selectedStepperIndex === idx;
 
                     return (
-                      <div 
+                      <div
                         key={stepItem.step}
                         onClick={() => setSelectedStepperIndex(idx)}
                         className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
@@ -1744,7 +1677,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         }`}
                       >
                         <div className="flex items-start gap-2.5">
-                          {/* Node Icon */}
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[0.8125rem] font-bold ${
                             isCompleted
                               ? 'bg-emerald-600 text-white'
@@ -1755,7 +1687,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             {isCompleted ? <Check className="w-3.5 h-3.5" /> : stepItem.step}
                           </div>
 
-                          {/* Step Content */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <h5 className={`text-sm font-bold leading-snug break-words ${
@@ -1791,136 +1722,107 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     );
                   })}
                 </div>
-
-                {/* Direct Action Buttons for Timeline */}
-                <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (approvedBooking && onViewOfferLetter) {
-                        onViewOfferLetter(approvedBooking);
-                      } else {
-                        setActiveTab('bookings');
-                      }
-                    }}
-                    className="py-1.5 px-3 rounded-lg text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <FileText className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                    <span>Surat Tawaran</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('bookings')}
-                    className="py-1.5 px-3 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-all flex items-center gap-1.5 cursor-pointer dark:bg-blue-600"
-                  >
-                    <span>Urus Kiosk</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
               </div>
-
             </div>
+          </div>
 
-            {/* Card B: Pusat Notifikasi & Tindakan Segera Usahawan */}
-            <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col h-fit">
-              
-              {/* Card Header */}
-              <div className="border-b border-slate-300 dark:border-slate-600 py-4.5 px-5 sm:px-6 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-black dark:text-white/75" />
-                  <div>
-                    <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                      Ringkasan Aktiviti & Tindakan
-                    </h4>
-                  </div>
+          {/* [4] Senarai Ringkasan Aktiviti & Laporan Pantas Usahawan (Lebar Penuh Padat) */}
+          <div className="w-full rounded-2xl border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-colors flex flex-col">
+            <div className="border-b border-slate-300 dark:border-slate-600 py-4 px-5 sm:px-6 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
+                <div>
+                  <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
+                    Ringkasan Aktiviti &amp; Laporan Semasa
+                  </h4>
+                  <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5">
+                    Senarai padat notifikasi terkini, status lesen kiosk, dan jalan pintas pengurusan perniagaan
+                  </p>
                 </div>
-                <span className="text-[0.8125rem] font-mono font-bold text-black/70 dark:text-white/75">
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[0.8125rem] font-mono font-bold text-black/75 dark:text-white/80 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 tabular-nums">
                   {liveAlerts.length} Rekod
                 </span>
+                <button
+                  type="button"
+                  onClick={() => (onOpenSettingsTab ? onOpenSettingsTab() : setActiveTab('card'))}
+                  className="py-1.5 px-3 rounded-lg text-[0.8125rem] font-bold bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-700 transition-all cursor-pointer"
+                >
+                  Tetapan Akaun
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('products')}
+                  className="py-1.5 px-3 rounded-lg text-[0.8125rem] font-bold bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 hover:bg-amber-100 dark:hover:bg-blue-600 transition-all cursor-pointer"
+                >
+                  Urus Produk
+                </button>
               </div>
+            </div>
 
-              {/* Live Alert Items */}
-              <div className="p-5 sm:p-6 flex flex-col space-y-3 h-fit">
-                <div className="space-y-3">
-                  {liveAlerts.length === 0 ? (
-                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-2 text-center">
-                      <p className="text-[0.9375rem] font-bold text-black dark:text-white">
-                        Mulakan Langkah Usahawan Anda
-                      </p>
-                      <p className="text-[0.875rem] text-black dark:text-white/75 leading-relaxed">
-                        Lengkapkan profil perniagaan, tempah klinik bimbingan mentor, atau laporkan sebarang aduan fasiliti kiosk anda.
-                      </p>
-                      <div className="flex flex-wrap justify-center gap-2 pt-1">
-                        {onOpenMentorshipClinic && (
-                          <button
-                            type="button"
-                            onClick={onOpenMentorshipClinic}
-                            className="px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70 text-[0.8125rem] font-semibold cursor-pointer"
-                          >
-                            Klinik Mentor
-                          </button>
-                        )}
-                        {onOpenMaintenanceModal && (
-                          <button
-                            type="button"
-                            onClick={onOpenMaintenanceModal}
-                            className="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800 text-[0.8125rem] font-semibold cursor-pointer"
-                          >
-                            Aduan Fasiliti
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    liveAlerts.slice(0, 3).map((item, idx) => (
-                      <div
-                        key={idx}
-                        onClick={item.action}
-                        className={`p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1 ${
-                          item.action ? 'cursor-pointer hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-colors' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2 flex-wrap">
-                          <span className={`text-[0.8125rem] font-bold uppercase tracking-wider ${item.tagColor}`}>{item.tag}</span>
-                          <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono">{item.time}</span>
-                        </div>
-                        <h5 className="text-sm font-bold text-black dark:text-white leading-snug break-words">
-                          {item.title}
-                        </h5>
-                        <p className="text-[0.875rem] text-black dark:text-white/75 leading-relaxed break-words">
-                          {item.body}
-                        </p>
-                      </div>
-                    ))
+            {liveAlerts.length === 0 ? (
+              <div className="p-6 text-center space-y-2.5">
+                <p className="text-[0.9375rem] font-bold text-black dark:text-white">
+                  Mulakan Langkah Usahawan Anda
+                </p>
+                <p className="text-[0.875rem] text-black dark:text-white/75 leading-relaxed max-w-xl mx-auto">
+                  Lengkapkan profil perniagaan, tempah klinik bimbingan mentor, atau laporkan sebarang aduan fasiliti kiosk anda.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2 pt-1">
+                  {onOpenMentorshipClinic && (
+                    <button
+                      type="button"
+                      onClick={onOpenMentorshipClinic}
+                      className="px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70 text-[0.8125rem] font-semibold cursor-pointer"
+                    >
+                      Klinik Mentor
+                    </button>
+                  )}
+                  {onOpenMaintenanceModal && (
+                    <button
+                      type="button"
+                      onClick={onOpenMaintenanceModal}
+                      className="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800 text-[0.8125rem] font-semibold cursor-pointer"
+                    >
+                      Aduan Fasiliti
+                    </button>
                   )}
                 </div>
-
-                {/* Quick Action Shortcuts */}
-                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => (onOpenSettingsTab ? onOpenSettingsTab() : setActiveTab('card'))}
-                    className="flex-1 py-2 px-2.5 rounded-lg text-[0.8125rem] font-bold bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-700 transition-all text-center cursor-pointer"
-                  >
-                    Tetapan Akaun
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('products')}
-                    className="flex-1 py-2 px-2.5 rounded-lg text-[0.8125rem] font-bold bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 hover:bg-amber-100 dark:hover:bg-blue-600 transition-all text-center cursor-pointer"
-                  >
-                    Urus Produk
-                  </button>
-                </div>
-
               </div>
-
-            </div>
-
-            </div>
-
+            ) : (
+              <div className="flex flex-col divide-y divide-slate-200 dark:divide-zinc-700">
+                {liveAlerts.slice(0, 5).map((item, idx) => (
+                  <div
+                    key={idx}
+                    onClick={item.action}
+                    className={`px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                      item.action ? 'cursor-pointer hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors' : ''
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`text-xs font-bold uppercase tracking-wider ${item.tagColor}`}>{item.tag}</span>
+                        <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
+                        <span className="text-xs text-black/65 dark:text-white/70 font-mono tabular-nums">{item.time}</span>
+                      </div>
+                      <h5 className="text-sm font-bold text-black dark:text-white leading-snug truncate">
+                        {item.title}
+                      </h5>
+                      <p className="text-xs sm:text-[0.875rem] text-black/75 dark:text-white/75 truncate">
+                        {item.body}
+                      </p>
+                    </div>
+                    {item.action && (
+                      <span className="inline-flex items-center gap-1 text-xs sm:text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 shrink-0 self-start sm:self-center">
+                        <span>Buka</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
         </div>
@@ -2395,7 +2297,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   </button>
 
                   {isProdFilterOpen && (
-                    <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
+                    <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
                       <div className="pb-3 border-b border-slate-200 dark:border-zinc-700">
                         <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
                           <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
@@ -2592,7 +2494,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       {productsPagination.paginatedItems.map((prod) => {
                         const isAvailable = prod.inStock !== false;
                         const isChecked = selectedProductIds.includes(prod.id);
-                        const isMenuOpen = openProductMenuId === prod.id;
                         const formattedPrice = `RM ${Number(prod.price || 0).toFixed(2)}`;
                         const dateStr = formatDisplayDate(
                           (prod.updatedAt || prod.createdAt || '').slice(0, 10)
@@ -2644,64 +2545,37 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             <td className="py-3.5 px-3 text-black/70 dark:text-white/75 tabular-nums whitespace-nowrap">
                               {dateStr || '-'}
                             </td>
-                            <td className="py-3.5 pl-2 pr-4 text-right relative" data-prod-menu>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setOpenProductMenuId(isMenuOpen ? null : prod.id)
-                                }
-                                aria-expanded={isMenuOpen}
-                                aria-label={`Tindakan untuk ${prod.name}`}
-                                className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-black/60 dark:text-white/65 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
-                              >
-                                <MoreHorizontal className="w-4 h-4" />
-                              </button>
-
-                              {isMenuOpen && (
-                                <div className="absolute right-4 mt-1 w-44 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-30 text-left">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setOpenProductMenuId(null);
-                                      setEditingProduct(prod);
-                                    }}
-                                    className="w-full px-3.5 py-2 text-sm font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-left cursor-pointer transition-colors"
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={duplicatingProdId === prod.id}
-                                    onClick={() => handleDuplicateProduct(prod)}
-                                    className="w-full px-3.5 py-2 text-sm font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-left cursor-pointer transition-colors disabled:opacity-50"
-                                  >
-                                    {duplicatingProdId === prod.id ? 'Menduplikasi...' : 'Duplikasi'}
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={togglingStockId === prod.id}
-                                    onClick={() => handleToggleProductStock(prod)}
-                                    className="w-full px-3.5 py-2 text-sm font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-left cursor-pointer transition-colors disabled:opacity-50"
-                                  >
-                                    {isAvailable ? 'Tanda Habis Stok' : 'Tanda Stok Tersedia'}
-                                  </button>
-                                  <div className="my-1 border-t border-slate-200 dark:border-zinc-700" />
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setOpenProductMenuId(null);
+                            <td className="py-3.5 pl-2 pr-4 text-right whitespace-nowrap">
+                              <RowActionMenu
+                                ariaLabel={`Tindakan untuk ${prod.name}`}
+                                items={[
+                                  {
+                                    label: 'Edit',
+                                    onClick: () => setEditingProduct(prod)
+                                  },
+                                  {
+                                    label: duplicatingProdId === prod.id ? 'Menduplikasi...' : 'Duplikasi',
+                                    disabled: duplicatingProdId === prod.id,
+                                    onClick: () => handleDuplicateProduct(prod)
+                                  },
+                                  {
+                                    label: isAvailable ? 'Tanda Habis Stok' : 'Tanda Stok Tersedia',
+                                    disabled: togglingStockId === prod.id,
+                                    onClick: () => handleToggleProductStock(prod)
+                                  },
+                                  {
+                                    label: 'Padam',
+                                    tone: 'danger',
+                                    dividerBefore: true,
+                                    onClick: () =>
                                       confirmDelete({
                                         itemName: prod.name,
                                         itemType: 'Produk Katalog',
                                         onConfirm: () => handleDeleteProd(prod.id)
-                                      });
-                                    }}
-                                    className="w-full px-3.5 py-2 text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-left cursor-pointer transition-colors"
-                                  >
-                                    Padam
-                                  </button>
-                                </div>
-                              )}
+                                      })
+                                  }
+                                ]}
+                              />
                             </td>
                           </tr>
                         );

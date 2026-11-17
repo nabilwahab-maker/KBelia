@@ -731,7 +731,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                               label: 'Padam Tempahan',
                               onClick: () =>
                                 confirmDelete({
-                                  itemName: `${b.userName || 'Peserta'} — ${b.eventTitle}`,
+                                  itemName: `${b.userName || 'Peserta'} - ${b.eventTitle}`,
                                   itemType: 'Tempahan Tapak Acara',
                                   onConfirm: () => handleDeleteBooking(b)
                                 }),

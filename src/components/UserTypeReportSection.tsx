@@ -374,7 +374,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         {/* Balanced Vertical Stack: Full-Width Chart on Top + 3 Equal-Width/Height Cards Below */}
         <div className="space-y-5">
           {/* Top Tier: Full-Width Bar/Donut Chart + Compact 3-Column Bottom Legend */}
-          <div className="w-full min-w-0 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 p-4 sm:p-5 flex flex-col justify-between">
+          <div className="w-full min-w-0 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 p-4 sm:p-5 flex flex-col justify-start">
             <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-zinc-700">
               <div className="flex items-center gap-2">
                 {chartMode === 'bar' ? (
@@ -563,7 +563,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             <button
               type="button"
               onClick={() => setSelectedType(selectedType === 'usahawan' ? 'all' : 'usahawan')}
-              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-start gap-3 ${
                 selectedType === 'usahawan'
                   ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-600 ring-1 ring-blue-500/40'
                   : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-blue-50/40 dark:hover:bg-zinc-800/70'
@@ -591,7 +591,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             <button
               type="button"
               onClick={() => setSelectedType(selectedType === 'mentor' ? 'all' : 'mentor')}
-              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-start gap-3 ${
                 selectedType === 'mentor'
                   ? 'bg-teal-50/90 dark:bg-teal-950/40 border-teal-600 ring-1 ring-teal-500/40'
                   : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-teal-50/40 dark:hover:bg-zinc-800/70'
@@ -619,7 +619,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             <button
               type="button"
               onClick={() => setSelectedType(selectedType === 'komuniti' ? 'all' : 'komuniti')}
-              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+              className={`h-full p-4 sm:p-5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-start gap-3 ${
                 selectedType === 'komuniti'
                   ? 'bg-amber-50/90 dark:bg-amber-950/40 border-amber-600 ring-1 ring-amber-500/40'
                   : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-700 hover:bg-amber-50/40 dark:hover:bg-zinc-800/70'

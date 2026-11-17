@@ -62,7 +62,7 @@ export const B2BAdPreviewCard: React.FC<B2BAdPreviewCardProps> = ({
           {!hasCustomImage && (
             <div className="px-2.5 py-1 bg-slate-900/75 text-white text-[0.8125rem] font-semibold absolute bottom-2 left-2 rounded-md inline-flex items-center gap-1.5 backdrop-blur-xs">
               <ImageIcon className="w-3 h-3" />
-              <span>{isEn ? 'Example visual — upload your photo on the left' : 'Contoh visual — muat naik gambar anda di sebelah'}</span>
+              <span>{isEn ? 'Example visual, upload your photo on the left' : 'Contoh visual, muat naik gambar anda di sebelah'}</span>
             </div>
           )}
         </div>

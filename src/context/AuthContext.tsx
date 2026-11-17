@@ -579,7 +579,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: msg };
       }
 
-      // 1. MENTOR LOGIN (Strict email match — NO fallback to mentorList[0])
+      // 1. MENTOR LOGIN (Strict email match - NO fallback to mentorList[0])
       if (targetRole === 'mentor') {
         let mentorList = INITIAL_MENTOR_PROFILES;
         try {
@@ -631,7 +631,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: true };
       }
 
-      // 2. ADMIN LOGIN (Must use authorized admin email — NO random emails or backdoors)
+      // 2. ADMIN LOGIN (Must use authorized admin email - NO random emails or backdoors)
       if (targetRole === 'admin') {
         if (!checkIsAdminEmail(cleanEmail)) {
           const msg = 'Emel ini tiada kebenaran Pentadbir Sistem. Sila log masuk menggunakan akaun Google Pentadbir yang sah.';

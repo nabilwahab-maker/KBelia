@@ -361,7 +361,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                     ? 'bg-blue-600 text-white border-blue-700 dark:bg-blue-600 dark:border-blue-500'
                     : 'bg-slate-50 hover:bg-slate-100 text-black border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:border-slate-600'
                 }`}
-                title="Komuniti — Forum & Soal Jawab Usahawan"
+                title="Komuniti: Forum & Soal Jawab Usahawan"
               >
                 <MessagesSquare className={`w-4 h-4 shrink-0 ${activeTab === 'community' ? 'text-white' : 'text-black/75 dark:text-white/75'}`} />
                 <span>Komuniti</span>
@@ -390,7 +390,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
             </button>
 
             {isSearchOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
                 <div className="relative flex items-center mb-2">
                   <input
                     ref={searchInputRef}
@@ -677,7 +677,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               </button>
 
               {mobileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute right-0 mt-2 w-60 max-w-[calc(100vw-1.5rem)] bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-100">
                   <div className="text-[0.8125rem] font-extrabold text-black/75 dark:text-white/80 uppercase tracking-wider px-2.5 py-1 mb-1">
                     {t('nav_quick_nav')}
                   </div>
@@ -853,7 +853,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
               {/* Profile Dropdown Menu */}
               {profileDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-76 sm:w-80 max-h-[calc(100vh-5rem)] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-3 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute right-0 mt-2 w-76 sm:w-80 max-w-[calc(100vw-1.5rem)] max-h-[calc(100vh-5rem)] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 p-3 z-50 animate-in fade-in zoom-in-95 duration-100">
                   {/* Kad Identiti Utama */}
                   <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2.5 border border-slate-300 dark:border-slate-600">
                     <div className="flex items-start gap-3">

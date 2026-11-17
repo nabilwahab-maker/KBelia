@@ -607,7 +607,7 @@ export const generateOfferLetterOfficialHtml = (
     <table class="info-table">
       <tr>
         <th>Kod & Nama Premis Kiosk</th>
-        <td><strong>${booking.slotCode}</strong> — ${booking.slotName}</td>
+        <td><strong>${booking.slotCode}</strong> - ${booking.slotName}</td>
       </tr>
       <tr>
         <th>Lokasi Hab Penempatan</th>
@@ -1051,17 +1051,17 @@ export const generateTenancyAgreementOfficialHtml = (
     <p style="margin-bottom:12px;">
       Perjanjian ini dimeterai pada <strong>${escapeHtml(formattedDate)}</strong> antara <strong>Pentadbiran Pembangunan Keusahawanan Belia Negeri Kelantan (KBelia) &amp; Universiti Malaysia Kelantan (UMK)</strong> ("Pemberi Sewa") dan pihak Penyewa seperti butiran di bawah:
     </p>
-    <div class="section-title">Jadual A — Butiran Penyewa &amp; Premis Kiosk</div>
+    <div class="section-title">Jadual A: Butiran Penyewa &amp; Premis Kiosk</div>
     <table class="info-table">
       <tr><th>Nama Penuh Penyewa</th><td><strong>${escapeHtml(booking.applicantName)}</strong></td></tr>
       <tr><th>Nama Perniagaan / Jenama</th><td>${escapeHtml(booking.businessName)} (${escapeHtml(booking.businessCategory)})</td></tr>
       <tr><th>No. Telefon &amp; E-mel</th><td>${escapeHtml(booking.applicantPhone)} · ${escapeHtml(booking.applicantEmail)}</td></tr>
-      <tr><th>Kod &amp; Nama Unit Kiosk</th><td><strong>${escapeHtml(booking.slotCode)}</strong> — ${escapeHtml(booking.slotName)}</td></tr>
+      <tr><th>Kod &amp; Nama Unit Kiosk</th><td><strong>${escapeHtml(booking.slotCode)}</strong> - ${escapeHtml(booking.slotName)}</td></tr>
       <tr><th>Lokasi Hab Penempatan</th><td>${escapeHtml(booking.hubLocation)}, Kelantan</td></tr>
       <tr><th>Tempoh Sewaan Sah</th><td>${escapeHtml(booking.durationMonths)} Bulan (${escapeHtml(startDisp)} hingga ${escapeHtml(endDisp)})</td></tr>
       <tr><th>Kadar Sewaan Bersubsidi</th><td><strong>RM ${rate.toFixed(2)} / sebulan</strong> (Subsidi ${safeSubsidy}% Kerajaan Negeri · Kadar Asal RM ${marketRate.toFixed(2)})</td></tr>
     </table>
-    <div class="section-title">Jadual B — Terma &amp; Syarat Perjanjian Penyewaan</div>
+    <div class="section-title">Jadual B: Terma &amp; Syarat Perjanjian Penyewaan</div>
     <div class="clause-box">
       <div class="clause-title">Fasal 1: Kadar Sewaan &amp; Pembayaran Komitmen</div>
       <div class="clause-text">Penyewa bersetuju membayar kadar sewaan bersubsidi RM ${rate.toFixed(2)} sebulan selewat-lewatnya pada 7hb setiap bulan bagi tempoh ${escapeHtml(booking.durationMonths)} bulan yang dipersetujui.</div>
@@ -1255,7 +1255,7 @@ export const generateOfficialReceiptHtml = (
       <div class="doc-banner-status">TRANSAKSI BERJAYA &amp; DIPERAKUI</div>
     </div>
     <table class="info-table">
-      <tr><th>Diterima Daripada</th><td><strong>${escapeHtml(booking.applicantName)}</strong> — ${escapeHtml(booking.businessName)}</td></tr>
+      <tr><th>Diterima Daripada</th><td><strong>${escapeHtml(booking.applicantName)}</strong> - ${escapeHtml(booking.businessName)}</td></tr>
       <tr><th>Unit Kiosk &amp; Lokasi</th><td>${escapeHtml(booking.slotCode)} · ${escapeHtml(booking.slotName)} (${escapeHtml(booking.hubLocation)})</td></tr>
       <tr><th>Tempoh Sewaan</th><td>${escapeHtml(booking.durationMonths)} Bulan (Mula: ${escapeHtml(formatDisplayDate(booking.startDate))})</td></tr>
     </table>

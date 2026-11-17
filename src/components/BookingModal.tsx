@@ -218,7 +218,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     }
 
     if (!pdpaConsent) {
-      setError('Sila tandakan persetujuan pemprosesan data peribadi (PDPA) sebelum meneruskan.');
+      setError('Sila tandakan kotak persetujuan sebelum meneruskan.');
       return;
     }
 
@@ -476,7 +476,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         const isFree = s.status === 'available' && !s.currentTenantBusinessName;
                         return (
                           <option key={s.id} value={s.id} disabled={!isFree} className="dark:bg-slate-900">
-                            {s.code} — {s.name} ({s.hubLocation}, {s.district}) {isFree ? '· [Tersedia]' : '· [Telah Berdaftar - Penuh]'}
+                            {s.code} - {s.name} ({s.hubLocation}, {s.district}) {isFree ? '· [Tersedia]' : '· [Telah Berdaftar - Penuh]'}
                           </option>
                         );
                       })}
@@ -817,7 +817,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-[0.9375rem]">
                       <div>
                         <span className="text-black/70 dark:text-white/75 text-sm block font-medium">Premis Kiosk:</span>
-                        <span className="font-semibold text-black dark:text-white">{currentSlot?.code} — {currentSlot?.name}</span>
+                        <span className="font-semibold text-black dark:text-white">{currentSlot?.code} - {currentSlot?.name}</span>
                       </div>
                       <div>
                         <span className="text-black/70 dark:text-white/75 text-sm block font-medium">Lokasi Hab:</span>
@@ -852,9 +852,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     />
                     <div className="text-sm text-black dark:text-white leading-relaxed">
                       <strong className="text-black dark:text-white font-semibold block mb-0.5">
-                        Persetujuan Rasmi PDPA & Integriti Belia:
+                        Persetujuan:
                       </strong>
-                      Saya mengesahkan semua maklumat perniagaan dan peribadi di atas adalah benar serta bersetuju dengan pemprosesan data di bawah Akta Perlindungan Data Peribadi 2010 (PDPA) bagi permohonan kiosk negeri Kelantan.
+                      Saya mengesahkan semua maklumat di atas adalah benar dan bersetuju ia diproses bagi permohonan kiosk ini.
                     </div>
                   </label>
 

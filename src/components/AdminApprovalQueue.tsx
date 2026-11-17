@@ -768,19 +768,19 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* TAB 0: 3-COLUMN OVERVIEW MATCHING WIREFRAME */}
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-stretch">
           
           {/* Kolum 1: Permohonan Sewa Kiosk */}
-          <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col h-fit">
+          <div className="min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col justify-start h-full">
             <div>
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <div className="flex items-center gap-2">
-                  <Store className="w-4 h-4 text-black dark:text-white/75" />
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Store className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
                   <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
                     Permohonan Sewa Kiosk
                   </h4>
                 </div>
-                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200/80">
+                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200/80 shrink-0">
                   {bookings.filter(b => b.status === 'pending').length} Menunggu
                 </span>
               </div>
@@ -857,30 +857,19 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 )}
               </div>
             </div>
-
-            <div className="pt-3 border-t border-slate-300 dark:border-slate-600 mt-3 flex items-center justify-between">
-              <span className="text-sm text-black/70 dark:text-white/75">Sewaan Kiosk Belia</span>
-              <button
-                type="button"
-                onClick={() => setActiveTab('kiosks')}
-                className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white hover:underline cursor-pointer"
-              >
-                Lihat Semua ({bookings.length})
-              </button>
-            </div>
           </div>
 
           {/* Kolum 2: Permohonan Dana & Geran Belia */}
-          <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col h-fit">
+          <div className="min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col justify-start h-full">
             <div>
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <div className="flex items-center gap-2">
-                  <Coins className="w-4 h-4 text-black dark:text-white/75" />
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Coins className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
                   <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
                     Permohonan Geran & Pembiayaan
                   </h4>
                 </div>
-                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200">
+                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 shrink-0">
                   {grantApplications.filter(g => g.status === 'pending').length} Menunggu
                 </span>
               </div>
@@ -957,30 +946,19 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 )}
               </div>
             </div>
-
-            <div className="pt-3 border-t border-slate-300 dark:border-slate-600 mt-3 flex items-center justify-between">
-              <span className="text-sm text-black/70 dark:text-white/75">Dana & Pemangkin Belia</span>
-              <button
-                type="button"
-                onClick={() => setActiveTab('grants')}
-                className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white hover:underline cursor-pointer"
-              >
-                Lihat Semua ({grantApplications.length})
-              </button>
-            </div>
           </div>
 
           {/* Kolum 3: Kawalan Fasiliti Kiosk & Tindakan Pantas */}
-          <div className="rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col h-fit">
+          <div className="min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-5 shadow-2xs flex flex-col justify-start h-full">
             <div>
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <div className="flex items-center gap-2">
-                  <Wrench className="w-4 h-4 text-black dark:text-white/75" />
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Wrench className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
                   <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
                     Fasiliti & Tindakan Pantas
                   </h4>
                 </div>
-                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200">
+                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 shrink-0">
                   {slots.length} Unit Pod
                 </span>
               </div>
@@ -1043,17 +1021,6 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className="pt-3 border-t border-slate-300 dark:border-slate-600 mt-3 flex items-center justify-between">
-              <span className="text-sm text-black/70 dark:text-white/75">Pusat Audit PBT & SUK</span>
-              <button
-                type="button"
-                onClick={() => setActiveTab('facility')}
-                className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white hover:underline cursor-pointer"
-              >
-                Urus Fasiliti
-              </button>
             </div>
           </div>
 

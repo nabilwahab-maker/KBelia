@@ -140,12 +140,12 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
     <div className="fixed inset-0 z-[9999] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-5 overflow-y-auto">
       <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-4xl w-full border border-slate-300 dark:border-slate-600 shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         {/* Modal Header */}
-        <div className="kbelia-important-header px-5 py-4 border-b border-slate-300 dark:border-slate-600 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+        <div className="kbelia-important-header px-5 py-4 border-b border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0">
               <FileText className="w-5 h-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h3 className="text-sm sm:text-base font-bold text-black dark:text-white">
                 Dokumen Ringkasan Kelulusan Rasmi
               </h3>
@@ -155,7 +155,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Unified and Fixed "Cetak / Simpan PDF" Action with Royal Border */}
             <div className="relative inline-flex items-center shadow-xs rounded-xl">
               <button
@@ -195,7 +195,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
 
               {/* Sub-menu Dropdown */}
               {showMenu && (
-                <div className="absolute right-0 top-full mt-2 w-60 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-300 dark:border-slate-600 py-1.5 z-50 animate-in fade-in">
+                <div className="absolute right-0 top-full mt-2 w-60 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-300 dark:border-slate-600 py-1.5 z-50 animate-in fade-in">
                   <button
                     type="button"
                     onClick={handleSavePdf}

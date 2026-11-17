@@ -683,8 +683,8 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
               <div className="text-xs font-semibold text-black/75 dark:text-white/80 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
                 {rangeDraftStart
                   ? isEn
-                    ? `Start: ${formatSingleDateHuman(rangeDraftStart, { shortMonth: true, isEn })} — Click end date`
-                    : `Mula: ${formatSingleDateHuman(rangeDraftStart, { shortMonth: true })} — Tekan tarikh tamat`
+                    ? `Start: ${formatSingleDateHuman(rangeDraftStart, { shortMonth: true, isEn })}, click end date`
+                    : `Mula: ${formatSingleDateHuman(rangeDraftStart, { shortMonth: true })}, tekan tarikh tamat`
                   : isEn
                   ? 'Click start date on the calendar'
                   : 'Tekan tarikh mula pada kalendar'}

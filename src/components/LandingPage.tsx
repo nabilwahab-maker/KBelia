@@ -99,7 +99,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const heroSlides = [
     {
       id: 'slide-1',
-      title: 'Kiosk Belia Modular Pintar 2026',
+      title: 'Kiosk Belia Modular Pintar',
       subtitle: 'Hab Kiosk Usahawan UMK Bachok & Kota Bharu',
       description: 'Kiosk pasang-siap lengkap soket 13A, Wi-Fi 500Mbps, dan kawalan keselamatan serendah RM15/hari.',
       badge: 'Kekosongan Sedia',
@@ -112,7 +112,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     {
       id: 'slide-2',
       title: 'Batik Belia Kontemporari & Streetwear',
-      subtitle: 'Koleksi Fesyen Graduan Muda — Nur Syafiqah (Kota Bharu)',
+      subtitle: 'Koleksi Fesyen Graduan Muda - Nur Syafiqah (Kota Bharu)',
       description: 'Batik canting kontemporari dengan motif flora moden pada kemeja cuban dan beg kanvas untuk pasaran eksport.',
       badge: 'Usahawan Kraf Bimbingan UMK',
       location: 'Kota Bharu',
@@ -124,7 +124,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     {
       id: 'slide-3',
       title: 'Kafe Artisan & Masakan Warisan Moden',
-      subtitle: "D'Kelate Artisan Coffee & Akok Tart — Ahmad Faizul",
+      subtitle: "D'Kelate Artisan Coffee & Akok Tart - Ahmad Faizul",
       description: 'Gabungan kopi barista espresso serta kuih tradisi Akok Tart dan Kopi Nissem Melaka di kiosk inkubator belia.',
       badge: 'Inkubasi F&B Berjaya',
       location: 'Hub UMK Bachok',
@@ -1180,11 +1180,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" aria-hidden="true" />
         <div className="absolute -bottom-24 left-1/3 w-96 h-96 bg-blue-500/12 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
         <RevealBlock className="relative z-10 max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
-          <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Permohonan 2026/2027 Dibuka</span>
-          </div>
-
           <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
             Mulakan Langkah Anda Hari Ini
           </h2>

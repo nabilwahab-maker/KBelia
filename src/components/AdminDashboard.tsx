@@ -214,7 +214,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     resolvedInitialSettings.systemStatus === 'maintenance' ? 'maintenance' : 'operational'
   );
   const [portalAnnouncement, setPortalAnnouncement] = useState(
-    resolvedInitialSettings.portalAnnouncement || 'Permohonan Kiosk & Geran Belia Kelantan 2026 Kini Dibuka!'
+    resolvedInitialSettings.portalAnnouncement || 'Permohonan Kiosk & Geran Belia Kelantan Kini Dibuka!'
   );
   const [savingAdminSettings, setSavingAdminSettings] = useState(false);
   const [adminSettingsSuccess, setAdminSettingsSuccess] = useState<string | null>(null);
@@ -1193,432 +1193,420 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               />
             </div>
 
-            {/* Asymmetric Bento Analytics Section inside Queue / Overview */}
+            {/* Ringkasan Admin: Graf Lebar Penuh -> Dua Lajur Seimbang -> Laporan Terperinci */}
             {adminTab === 'queue' && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                
-                {/* Left Bento Stack (7 Cols): Compact Chart Card + Separate Standalone Metrics/Availability Card Below */}
-                <div className="lg:col-span-7 min-w-0 flex flex-col gap-4 h-fit">
-                  {/* KOTAK 1: Compact Chart Card (Natural tight height, zero stretching) */}
-                  <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col h-fit">
-                    <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <BarChart3 className="w-5 h-5 text-black dark:text-white/80" />
-                          <h3 className="text-base font-bold text-black dark:text-white">
-                            Analitik Infrastruktur &amp; Permohonan Negeri
-                          </h3>
-                        </div>
-                        <p className="text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
-                          Statistik langsung hab kapsul seluruh Kelantan dan aliran kelulusan
-                        </p>
+              <div className="space-y-4">
+                {/* 1. Graf Lebar Penuh: Analitik Infrastruktur & Permohonan Negeri */}
+                <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col h-fit">
+                  <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5 text-black dark:text-white/80" />
+                        <h3 className="text-base font-bold text-black dark:text-white">
+                          Analitik Infrastruktur &amp; Permohonan Negeri
+                        </h3>
                       </div>
-
-                      <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600 self-start sm:self-auto">
-                        <button
-                          type="button"
-                          onClick={() => setAdminChartMode('districts')}
-                          className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                            adminChartMode === 'districts'
-                              ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                              : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                          }`}
-                        >
-                          Kapsul Seluruh Kelantan
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAdminChartMode('pipeline')}
-                          className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                            adminChartMode === 'pipeline'
-                              ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
-                              : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                          }`}
-                        >
-                          Aliran Permohonan
-                        </button>
-                      </div>
+                      <p className="text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
+                        Statistik langsung hab kapsul seluruh Kelantan dan aliran kelulusan
+                      </p>
                     </div>
 
-                    <div className="p-0 pt-2 pb-1 min-w-0">
-                      <div className="relative h-[235px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                        <div className="absolute inset-0">
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 600, height: 235 }}>
-                          {adminChartMode === 'districts' ? (
-                            <BarChart
-                              data={districtChartData}
-                              barCategoryGap="8%"
-                              barGap={3}
-                              margin={{ top: 18, right: 4, left: 0, bottom: 2 }}
-                            >
-                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                              <XAxis dataKey="district" height={24} tickMargin={4} tick={{ fontSize: 11.5, fontWeight: 600 }} interval={0} padding={{ left: 0, right: 0 }} axisLine={false} tickLine={false} />
-                              <YAxis width={24} tickMargin={2} domain={[0, (dataMax: number) => Math.max(dataMax, 1)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
-                              <Tooltip
-                                cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
-                                content={({ active, payload }) => {
-                                  if (active && payload && payload.length) {
-                                    const d = payload[0].payload as { fullName: string; beroperasi: number; tersedia: number };
-                                    return (
-                                      <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                        <div className="font-bold text-white mb-1">{d.fullName}</div>
-                                        <div className="text-white/90">Beroperasi / Ditempah: {d.beroperasi}</div>
-                                        <div className="text-white/90">Slot Kosong Sedia: {d.tersedia}</div>
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                }}
-                              />
-                              <Bar
-                                dataKey="beroperasi"
-                                name="Beroperasi"
-                                fill="#2563EB"
-                                radius={[5, 5, 0, 0]}
-                                maxBarSize={64}
-                                minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                                isAnimationActive={false}
-                              >
-                                <LabelList
-                                  dataKey="beroperasi"
-                                  position="top"
-                                  formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
-                                  className="fill-slate-900 dark:fill-slate-100 font-mono"
-                                  style={{ fontSize: 11.5, fontWeight: 700 }}
-                                />
-                              </Bar>
-                              <Bar
-                                dataKey="tersedia"
-                                name="Tersedia"
-                                fill="#10B981"
-                                radius={[5, 5, 0, 0]}
-                                maxBarSize={64}
-                                minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                                isAnimationActive={false}
-                              >
-                                <LabelList
-                                  dataKey="tersedia"
-                                  position="top"
-                                  formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
-                                  className="fill-slate-900 dark:fill-slate-100 font-mono"
-                                  style={{ fontSize: 11.5, fontWeight: 700 }}
-                                />
-                              </Bar>
-                            </BarChart>
-                          ) : (
-                            <BarChart
-                              data={pipelineChartData}
-                              barCategoryGap="10%"
-                              margin={{ top: 18, right: 4, left: 0, bottom: 2 }}
-                            >
-                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                              <XAxis dataKey="label" height={24} tickMargin={4} tick={{ fontSize: 12, fontWeight: 600 }} interval={0} padding={{ left: 0, right: 0 }} axisLine={false} tickLine={false} />
-                              <YAxis width={24} tickMargin={2} domain={[0, (dataMax: number) => Math.max(dataMax, 1)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
-                              <Tooltip
-                                cursor={{ fill: 'rgba(79, 70, 229, 0.10)' }}
-                                content={({ active, payload }) => {
-                                  if (active && payload && payload.length) {
-                                    const d = payload[0].payload as { label: string; jumlah: number };
-                                    return (
-                                      <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                        <div className="text-white/80 text-[0.8125rem]">{d.label}</div>
-                                        <div className="font-bold text-white">{d.jumlah} Rekod</div>
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                }}
-                              />
-                              <Bar
-                                dataKey="jumlah"
-                                name="Jumlah Rekod"
-                                fill="#4F46E5"
-                                radius={[6, 6, 0, 0]}
-                                maxBarSize={110}
-                                minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
-                                isAnimationActive={false}
-                              >
-                                <LabelList
-                                  dataKey="jumlah"
-                                  position="top"
-                                  formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '0')}
-                                  className="fill-slate-900 dark:fill-slate-100 font-mono"
-                                  style={{ fontSize: 12.5, fontWeight: 700 }}
-                                />
-                              </Bar>
-                            </BarChart>
-                          )}
-                        </ResponsiveContainer>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="px-5 py-3 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex flex-wrap items-center justify-between gap-2 text-sm">
-                      {adminChartMode === 'districts' ? (
-                        <>
-                          <div className="flex flex-wrap items-center gap-4">
-                            <span className="inline-flex items-center gap-1.5 font-semibold text-black dark:text-white">
-                              <span className="w-3 h-3 rounded-xs bg-blue-600 shrink-0" />
-                              <span>Beroperasi / Ditempah</span>
-                            </span>
-                            <span className="inline-flex items-center gap-1.5 font-semibold text-black dark:text-white">
-                              <span className="w-3 h-3 rounded-xs bg-emerald-500 shrink-0" />
-                              <span>Slot Tersedia</span>
-                            </span>
-                          </div>
-                          <span className="font-mono font-bold tabular-nums text-black/80 dark:text-white/85">
-                            {occupiedSlotsCount + availableSlotsCount} Unit Kapsul
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-2 font-semibold text-black dark:text-white">
-                            <span className="w-3 h-3 rounded-xs bg-indigo-600 shrink-0" />
-                            <span>Jumlah Rekod Aliran Semasa</span>
-                          </div>
-                          <span className="font-mono font-bold tabular-nums text-black/80 dark:text-white/85">
-                            {pipelineChartData.reduce((sum, item) => sum + item.jumlah, 0)} Jumlah Aktiviti
-                          </span>
-                        </>
-                      )}
+                    <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600 self-start sm:self-auto">
+                      <button
+                        type="button"
+                        onClick={() => setAdminChartMode('districts')}
+                        className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                          adminChartMode === 'districts'
+                            ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
+                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                        }`}
+                      >
+                        Kapsul Seluruh Kelantan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAdminChartMode('pipeline')}
+                        className={`px-3 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
+                          adminChartMode === 'pipeline'
+                            ? 'bg-indigo-600 text-white shadow-2xs dark:bg-indigo-600'
+                            : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
+                        }`}
+                      >
+                        Aliran Permohonan
+                      </button>
                     </div>
                   </div>
 
-                  {/* KOTAK 2: Separate Standalone Card Outside & Below Chart Box */}
-                  <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden p-4 flex flex-col gap-3 h-fit">
-                    {/* Baris 1: 3 Kolum Metrik Prestasi */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
-                        <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/75">
-                          Kadar Lulus Kapsul
-                        </div>
-                        <div className="mt-1 flex items-baseline justify-between gap-2">
-                          <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
-                            {bookingApprovalRate}%
-                          </span>
-                          <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
-                            {approvedBookingsCount}/{safeBookings.length}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
-                        <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/75">
-                          Kadar Lulus Geran
-                        </div>
-                        <div className="mt-1 flex items-baseline justify-between gap-2">
-                          <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
-                            {grantApprovalRate}%
-                          </span>
-                          <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
-                            {approvedGrantsCount}/{totalGrantsCount}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
-                        <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/75">
-                          Liputan Daerah Aktif
-                        </div>
-                        <div className="mt-1 flex items-baseline justify-between gap-2">
-                          <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
-                            {activeDistrictsCount}/10
-                          </span>
-                          <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
-                            {occupiedSlotsCount} unit aktif
-                          </span>
-                        </div>
+                  <div className="p-0 pt-2 pb-1 min-w-0">
+                    <div className="relative h-[235px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
+                      <div className="absolute inset-0">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 600, height: 235 }}>
+                        {adminChartMode === 'districts' ? (
+                          <BarChart
+                            data={districtChartData}
+                            barCategoryGap="8%"
+                            barGap={3}
+                            margin={{ top: 18, right: 4, left: 0, bottom: 2 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                            <XAxis dataKey="district" height={24} tickMargin={4} tick={{ fontSize: 11.5, fontWeight: 600 }} interval={0} padding={{ left: 0, right: 0 }} axisLine={false} tickLine={false} />
+                            <YAxis width={24} tickMargin={2} domain={[0, (dataMax: number) => Math.max(dataMax, 1)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                            <Tooltip
+                              cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  const d = payload[0].payload as { fullName: string; beroperasi: number; tersedia: number };
+                                  return (
+                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                      <div className="font-bold text-white mb-1">{d.fullName}</div>
+                                      <div className="text-white/90">Beroperasi / Ditempah: {d.beroperasi}</div>
+                                      <div className="text-white/90">Slot Kosong Sedia: {d.tersedia}</div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                            <Bar
+                              dataKey="beroperasi"
+                              name="Beroperasi"
+                              fill="#2563EB"
+                              radius={[5, 5, 0, 0]}
+                              maxBarSize={64}
+                              minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                              isAnimationActive={false}
+                            >
+                              <LabelList
+                                dataKey="beroperasi"
+                                position="top"
+                                formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
+                                className="fill-slate-900 dark:fill-slate-100 font-mono"
+                                style={{ fontSize: 11.5, fontWeight: 700 }}
+                              />
+                            </Bar>
+                            <Bar
+                              dataKey="tersedia"
+                              name="Tersedia"
+                              fill="#10B981"
+                              radius={[5, 5, 0, 0]}
+                              maxBarSize={64}
+                              minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                              isAnimationActive={false}
+                            >
+                              <LabelList
+                                dataKey="tersedia"
+                                position="top"
+                                formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '')}
+                                className="fill-slate-900 dark:fill-slate-100 font-mono"
+                                style={{ fontSize: 11.5, fontWeight: 700 }}
+                              />
+                            </Bar>
+                          </BarChart>
+                        ) : (
+                          <BarChart
+                            data={pipelineChartData}
+                            barCategoryGap="10%"
+                            margin={{ top: 18, right: 4, left: 0, bottom: 2 }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
+                            <XAxis dataKey="label" height={24} tickMargin={4} tick={{ fontSize: 12, fontWeight: 600 }} interval={0} padding={{ left: 0, right: 0 }} axisLine={false} tickLine={false} />
+                            <YAxis width={24} tickMargin={2} domain={[0, (dataMax: number) => Math.max(dataMax, 1)]} allowDecimals={false} tick={{ fontSize: 13, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                            <Tooltip
+                              cursor={{ fill: 'rgba(79, 70, 229, 0.10)' }}
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  const d = payload[0].payload as { label: string; jumlah: number };
+                                  return (
+                                    <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
+                                      <div className="text-white/80 text-[0.8125rem]">{d.label}</div>
+                                      <div className="font-bold text-white">{d.jumlah} Rekod</div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                            <Bar
+                              dataKey="jumlah"
+                              name="Jumlah Rekod"
+                              fill="#4F46E5"
+                              radius={[6, 6, 0, 0]}
+                              maxBarSize={110}
+                              minPointSize={(val) => (Number(val) > 0 ? 4 : 0)}
+                              isAnimationActive={false}
+                            >
+                              <LabelList
+                                dataKey="jumlah"
+                                position="top"
+                                formatter={(val: unknown) => (Number(val) > 0 ? String(val) : '0')}
+                                className="fill-slate-900 dark:fill-slate-100 font-mono"
+                                style={{ fontSize: 12.5, fontWeight: 700 }}
+                              />
+                            </Bar>
+                          </BarChart>
+                        )}
+                      </ResponsiveContainer>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Baris 2: 2 Kolum Operasi Daerah & Tindakan Segera */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-start">
-                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col gap-2 h-fit">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm font-bold text-black dark:text-white">
-                            Daerah Ada Kekosongan ({availableSlotsCount})
+                  <div className="px-5 py-3 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex flex-wrap items-center justify-between gap-2 text-sm">
+                    {adminChartMode === 'districts' ? (
+                      <>
+                        <div className="flex flex-wrap items-center gap-4">
+                          <span className="inline-flex items-center gap-1.5 font-semibold text-black dark:text-white">
+                            <span className="w-3 h-3 rounded-xs bg-blue-600 shrink-0" />
+                            <span>Beroperasi / Ditempah</span>
                           </span>
-                          <button
-                            type="button"
-                            onClick={() => setAdminTab('slots')}
-                            className="text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
-                          >
-                            <span>Urus Slot</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
+                          <span className="inline-flex items-center gap-1.5 font-semibold text-black dark:text-white">
+                            <span className="w-3 h-3 rounded-xs bg-emerald-500 shrink-0" />
+                            <span>Slot Tersedia</span>
+                          </span>
+                        </div>
+                        <span className="font-mono font-bold tabular-nums text-black/80 dark:text-white/85">
+                          {occupiedSlotsCount + availableSlotsCount} Unit Kapsul
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2 font-semibold text-black dark:text-white">
+                          <span className="w-3 h-3 rounded-xs bg-indigo-600 shrink-0" />
+                          <span>Jumlah Rekod Aliran Semasa</span>
+                        </div>
+                        <span className="font-mono font-bold tabular-nums text-black/80 dark:text-white/85">
+                          {pipelineChartData.reduce((sum, item) => sum + item.jumlah, 0)} Jumlah Aktiviti
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. Dua Lajur Seimbang Kiri & Kanan (Ketinggian Sekata Tanpa Ruang Kosong) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+                  {/* Lajur Kiri: Metrik Prestasi & Operasi Daerah */}
+                  <div className="min-w-0 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm overflow-hidden flex flex-col justify-start h-full">
+                    <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-black dark:text-white/75" />
+                        <h3 className="text-base font-bold text-black dark:text-white">
+                          Metrik Prestasi &amp; Operasi Daerah
+                        </h3>
+                      </div>
+                      <span className="text-[0.8125rem] font-mono font-bold text-black dark:text-white bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 px-2.5 py-0.5 rounded">
+                        {activeDistrictsCount}/10 Daerah
+                      </span>
+                    </div>
+
+                    <div className="p-5 flex-1 flex flex-col gap-3">
+                      {/* Baris 1: 3 Kolum Metrik Prestasi */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
+                          <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/75">
+                            Kadar Lulus Kapsul
+                          </div>
+                          <div className="mt-1 flex items-baseline justify-between gap-2">
+                            <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
+                              {bookingApprovalRate}%
+                            </span>
+                            <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
+                              {approvedBookingsCount}/{safeBookings.length}
+                            </span>
+                          </div>
                         </div>
 
-                        {availableDistricts.length > 0 ? (
-                          <div className="flex flex-wrap gap-1.5">
-                            {availableDistricts.map((d) => (
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
+                          <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/75">
+                            Kadar Lulus Geran
+                          </div>
+                          <div className="mt-1 flex items-baseline justify-between gap-2">
+                            <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
+                              {grantApprovalRate}%
+                            </span>
+                            <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
+                              {approvedGrantsCount}/{totalGrantsCount}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700">
+                          <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/75">
+                            Liputan Daerah Aktif
+                          </div>
+                          <div className="mt-1 flex items-baseline justify-between gap-2">
+                            <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
+                              {activeDistrictsCount}/10
+                            </span>
+                            <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
+                              {occupiedSlotsCount} unit aktif
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Baris 2: 2 Kolum Operasi Daerah & Tindakan Segera */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1 items-stretch">
+                        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col justify-start gap-2 h-full">
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <span className="text-sm font-bold text-black dark:text-white">
+                                Daerah Ada Kekosongan ({availableSlotsCount})
+                              </span>
                               <button
-                                key={d.fullName}
                                 type="button"
                                 onClick={() => setAdminTab('slots')}
-                                className="px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:border-emerald-500 dark:hover:border-emerald-500 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                                className="text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
                               >
-                                <span>{d.fullName}</span>
-                                <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
-                                  {d.tersedia}
-                                </span>
+                                <span>Urus Slot</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
                               </button>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-[0.8125rem] text-black/75 dark:text-white/80">
-                            Kesemua 10 jajahan telah penuh ditempah buat masa ini.
-                          </p>
-                        )}
-                      </div>
+                            </div>
 
-                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col gap-2 h-fit">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm font-bold text-black dark:text-white">
-                            Pengisian &amp; Tindakan Semakan
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setAdminTab('bookings')}
-                            className="text-[0.8125rem] font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
-                          >
-                            <span>Semak</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                          </button>
+                            {availableDistricts.length > 0 ? (
+                              <div className="flex flex-wrap gap-1.5">
+                                {availableDistricts.map((d) => (
+                                  <button
+                                    key={d.fullName}
+                                    type="button"
+                                    onClick={() => setAdminTab('slots')}
+                                    className="px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:border-emerald-500 dark:hover:border-emerald-500 text-[0.8125rem] font-semibold text-black dark:text-white inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                                  >
+                                    <span>{d.fullName}</span>
+                                    <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
+                                      {d.tersedia}
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-[0.8125rem] text-black/75 dark:text-white/80">
+                                Kesemua 10 jajahan telah penuh ditempah buat masa ini.
+                              </p>
+                            )}
+                          </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                          <div className="flex items-center justify-between text-[0.8125rem] text-black/80 dark:text-white/85">
-                            <span>Kadar Pengisian Keseluruhan</span>
-                            <span className="font-mono font-bold text-black dark:text-white tabular-nums">{occupancyRate}%</span>
+                        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col justify-start gap-2 h-full">
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <span className="text-sm font-bold text-black dark:text-white">
+                                Pengisian &amp; Tindakan Semakan
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setAdminTab('bookings')}
+                                className="text-[0.8125rem] font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0"
+                              >
+                                <span>Semak</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between text-[0.8125rem] text-black/80 dark:text-white/85">
+                                <span>Kadar Pengisian Keseluruhan</span>
+                                <span className="font-mono font-bold text-black dark:text-white tabular-nums">{occupancyRate}%</span>
+                              </div>
+                              <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-zinc-800 overflow-hidden">
+                                <div
+                                  className="h-full rounded-full bg-blue-600 dark:bg-blue-500 transition-all duration-300"
+                                  style={{ width: `${Math.min(100, Math.max(0, occupancyRate))}%` }}
+                                />
+                              </div>
+                              <p className="text-[0.8125rem] text-black/75 dark:text-white/80 tabular-nums">
+                                {pendingBookingsCount + pendingGrantsCount} permohonan menunggu tindakan pegawai.
+                              </p>
+                            </div>
                           </div>
-                          <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-zinc-800 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-blue-600 dark:bg-blue-500 transition-all duration-300"
-                              style={{ width: `${Math.min(100, Math.max(0, occupancyRate))}%` }}
-                            />
-                          </div>
-                          <p className="text-[0.8125rem] text-black/75 dark:text-white/80 tabular-nums">
-                            {pendingBookingsCount + pendingGrantsCount} permohonan menunggu tindakan pegawai.
-                          </p>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Lajur Kanan: Ringkasan Semakan & Operasi */}
+                  <div className="min-w-0 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 shadow-sm overflow-hidden flex flex-col justify-start h-full">
+                    <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-black dark:text-white/75" />
+                        <h3 className="text-base font-bold text-black dark:text-white">
+                          Ringkasan Semakan &amp; Operasi
+                        </h3>
+                      </div>
+                      <span className="text-[0.8125rem] font-mono font-bold text-black dark:text-white bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 px-2.5 py-0.5 rounded">
+                        Langsung
+                      </span>
+                    </div>
+
+                    <div className="p-5 space-y-3 flex-1">
+                      <button
+                        type="button"
+                        onClick={() => setAdminTab('bookings')}
+                        className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3 transition-colors cursor-pointer text-left"
+                      >
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
+                            <Clock className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">Permohonan Sewaan Kapsul</div>
+                            <div className="text-sm text-black/75 dark:text-white/75 leading-relaxed break-words">Menunggu kelulusan rasmi hab</div>
+                          </div>
+                        </div>
+                        <span className="font-mono tabular-nums text-[0.8125rem] font-black px-2.5 py-1 rounded-md bg-amber-100 dark:bg-amber-950 text-black dark:text-white shrink-0">
+                          {pendingBookingsCount}
+                        </span>
+                      </button>
+
+                      <div className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                            <Award className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">Permohonan Geran Belia</div>
+                            <div className="text-sm text-black/75 dark:text-white/75 leading-relaxed break-words">{approvedGrantsCount} telah diluluskan</div>
+                          </div>
+                        </div>
+                        <span className="font-mono tabular-nums text-[0.8125rem] font-black px-2.5 py-1 rounded-md bg-amber-100 dark:bg-emerald-600 text-black dark:text-white shrink-0">
+                          {pendingGrantsCount}
+                        </span>
+                      </div>
+
+                      <div className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <div className="w-9 h-9 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
+                            <Wrench className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">Tiket Aduan Fasiliti</div>
+                            <div className="text-sm text-black/75 dark:text-white/75 leading-relaxed break-words">Penyelenggaraan &amp; teknikal kiosk</div>
+                          </div>
+                        </div>
+                        <span className="font-mono tabular-nums text-[0.8125rem] font-black px-2.5 py-1 rounded-md bg-rose-100 dark:bg-rose-950 text-black dark:text-white shrink-0">
+                          {openTicketsCount}
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setAdminTab('mentors')}
+                        className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3 transition-colors cursor-pointer text-left"
+                      >
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <div className="w-9 h-9 rounded-lg bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
+                            <GraduationCap className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">Panel &amp; Sesi Bimbingan Mentor</div>
+                            <div className="text-sm text-black/75 dark:text-white/75 leading-relaxed break-words">{mentors.length} mentor aktif</div>
+                          </div>
+                        </div>
+                        <span className="font-mono tabular-nums text-[0.8125rem] font-black px-2.5 py-1 rounded-md bg-violet-100 dark:bg-violet-950 text-black dark:text-white shrink-0">
+                          {mentorshipRegistrations.length}
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </div>
-
-                {/* Right Bento (5 Cols): Ringkasan Tindakan & Barisan Semakan */}
-                <div className="lg:col-span-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 shadow-sm overflow-hidden flex flex-col h-fit">
-                  <div className="px-5 py-4 border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Activity className="w-4 h-4 text-black dark:text-white/75" />
-                      <h3 className="text-base font-bold text-black dark:text-white">
-                        Ringkasan Semakan & Operasi
-                      </h3>
-                    </div>
-                    <span className="text-[0.8125rem] font-mono font-bold text-black dark:text-white bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 px-2.5 py-0.5 rounded">
-                      Langsung
-                    </span>
-                  </div>
-
-                  <div className="p-5 space-y-3">
-                    <button
-                      type="button"
-                      onClick={() => setAdminTab('bookings')}
-                      className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3 transition-colors cursor-pointer text-left"
-                    >
-                      <div className="flex items-start gap-3 min-w-0 flex-1">
-                        <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
-                          <Clock className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">Permohonan Sewaan Kapsul</div>
-                          <div className="text-sm text-black/75 dark:text-white/75 leading-relaxed break-words">Menunggu kelulusan rasmi hab</div>
-                        </div>
-                      </div>
-                      <span className="font-mono tabular-nums text-[0.8125rem] font-black px-2.5 py-1 rounded-md bg-amber-100 dark:bg-amber-950 text-black dark:text-white shrink-0">
-                        {pendingBookingsCount}
-                      </span>
-                    </button>
-
-                    <div className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3 min-w-0 flex-1">
-                        <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                          <Award className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">Permohonan Geran Belia</div>
-                          <div className="text-sm text-black/75 dark:text-white/75 leading-relaxed break-words">{approvedGrantsCount} telah diluluskan</div>
-                        </div>
-                      </div>
-                      <span className="font-mono tabular-nums text-[0.8125rem] font-black px-2.5 py-1 rounded-md bg-amber-100 dark:bg-emerald-600 text-black dark:text-white shrink-0">
-                        {pendingGrantsCount}
-                      </span>
-                    </div>
-
-                    <div className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3 min-w-0 flex-1">
-                        <div className="w-9 h-9 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
-                          <Wrench className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">Tiket Aduan Fasiliti</div>
-                          <div className="text-sm text-black/75 dark:text-white/75 leading-relaxed break-words">Penyelenggaraan &amp; teknikal kiosk</div>
-                        </div>
-                      </div>
-                      <span className="font-mono tabular-nums text-[0.8125rem] font-black px-2.5 py-1 rounded-md bg-rose-100 dark:bg-rose-950 text-black dark:text-white shrink-0">
-                        {openTicketsCount}
-                      </span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setAdminTab('mentors')}
-                      className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-start justify-between gap-3 transition-colors cursor-pointer text-left"
-                    >
-                      <div className="flex items-start gap-3 min-w-0 flex-1">
-                        <div className="w-9 h-9 rounded-lg bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800 text-black dark:text-white/75 flex items-center justify-center shrink-0">
-                          <GraduationCap className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">Panel &amp; Sesi Bimbingan Mentor</div>
-                          <div className="text-sm text-black/75 dark:text-white/75 leading-relaxed break-words">{mentors.length} mentor aktif</div>
-                        </div>
-                      </div>
-                      <span className="font-mono tabular-nums text-[0.8125rem] font-black px-2.5 py-1 rounded-md bg-violet-100 dark:bg-violet-950 text-black dark:text-white shrink-0">
-                        {mentorshipRegistrations.length}
-                      </span>
-                    </button>
-                  </div>
-
-                  <div className="px-5 py-3 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 flex items-center justify-between gap-2 text-sm">
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setAdminTab('news')}
-                        className="text-black dark:text-white hover:text-black dark:hover:text-white font-bold inline-flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Newspaper className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                        <span>Urus Berita ({newsItems.length})</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setAdminTab('b2b')}
-                        className="text-black dark:text-white font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Ruang Niaga</span>
-                      </button>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setAdminTab('slots')}
-                      className="text-black dark:text-white/75 font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>Slot Kapsul</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
               </div>
             )}
 

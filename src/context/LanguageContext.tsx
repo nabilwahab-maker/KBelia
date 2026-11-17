@@ -202,7 +202,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
 
     // Landing Page / UMKHomeFeed
     portal_brand_title: 'Portal Usahawan Belia Kelantan',
-    fiscal_year: 'Sesi 2026',
+    fiscal_year: 'Sesi Aktif',
     welcome_greeting: 'Selamat Datang,',
     home_subtitle: 'Platform sehenti untuk mohon sewa kiosk, mohon geran perniagaan belia dan senaraikan kedai anda di Kelantan.',
     badge_admin: 'Admin Portal',
@@ -546,7 +546,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
 
     // Landing Page / UMKHomeFeed
     portal_brand_title: 'Official Kelantan Youth Portal',
-    fiscal_year: 'Financial & Operational Year 2026',
+    fiscal_year: 'Operational Session',
     welcome_greeting: 'Welcome,',
     home_subtitle: 'One-stop digital hub for modular kiosk leases, state seed grant applications, and commercial directory across Kelantan.',
     badge_admin: 'State Admin',

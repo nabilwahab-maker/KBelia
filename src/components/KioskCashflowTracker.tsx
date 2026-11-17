@@ -7,9 +7,9 @@ import {
   Search,
   SlidersHorizontal,
   ArrowUpDown,
-  MoreHorizontal,
   X
 } from 'lucide-react';
+import { RowActionMenu } from './ReferenceTableKit';
 import { KioskDailySale } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
@@ -87,7 +87,6 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     dir: 'desc'
   });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   useEffect(() => {
     let demoSyncItems: KioskDailySale[] = [];
@@ -128,20 +127,16 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     };
   }, [ownerId, isDemoSession, externalRecords, storageKey]);
 
-  // Dismiss row menu and filter popover on outside click / Escape
+  // Dismiss filter popover on outside click / Escape
   useEffect(() => {
     const handlePointerDown = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
-      if (openMenuId && !target?.closest('[data-cf-menu]')) {
-        setOpenMenuId(null);
-      }
       if (isFilterOpen && !target?.closest('[data-cf-filter]')) {
         setIsFilterOpen(false);
       }
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setOpenMenuId(null);
         setIsFilterOpen(false);
       }
     };
@@ -151,7 +146,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [openMenuId, isFilterOpen]);
+  }, [isFilterOpen]);
 
   // Keep selectedIds synced with existing records
   useEffect(() => {
@@ -643,7 +638,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               </button>
 
               {isFilterOpen && (
-                <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
+                <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
                   <div className="pb-3 border-b border-slate-200 dark:border-zinc-700">
                     <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
                       <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
@@ -843,7 +838,6 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                   {salesPagination.paginatedItems.map((r) => {
                     const dailyNet = (r.cashSales + r.qrSales) - r.expenses;
                     const isChecked = selectedIds.includes(r.id);
-                    const isMenuOpen = openMenuId === r.id;
 
                     return (
                       <tr
@@ -889,46 +883,27 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                         <td className="py-3.5 px-3 text-black/75 dark:text-white/80 max-w-[240px] truncate">
                           {r.notes || '-'}
                         </td>
-                        <td className="py-3.5 pl-2 pr-4 text-right relative" data-cf-menu>
-                          <button
-                            type="button"
-                            onClick={() => setOpenMenuId(isMenuOpen ? null : r.id)}
-                            aria-expanded={isMenuOpen}
-                            aria-label={`Tindakan untuk rekod ${r.date}`}
-                            className="w-8 h-8 rounded-lg inline-flex items-center justify-center text-black/60 dark:text-white/65 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
-                          >
-                            <MoreHorizontal className="w-4 h-4" />
-                          </button>
-
-                          {isMenuOpen && (
-                            <div className="absolute right-4 mt-1 w-40 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-30 text-left">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setOpenMenuId(null);
-                                  setEditingRecord(r);
-                                }}
-                                className="w-full px-3.5 py-2 text-sm font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-left cursor-pointer transition-colors"
-                              >
-                                Edit
-                              </button>
-                              <div className="my-1 border-t border-slate-200 dark:border-zinc-700" />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setOpenMenuId(null);
+                        <td className="py-3.5 pl-2 pr-4 text-right whitespace-nowrap">
+                          <RowActionMenu
+                            ariaLabel={`Tindakan untuk rekod ${r.date}`}
+                            items={[
+                              {
+                                label: 'Edit',
+                                onClick: () => setEditingRecord(r)
+                              },
+                              {
+                                label: 'Padam',
+                                tone: 'danger',
+                                dividerBefore: true,
+                                onClick: () =>
                                   confirmDelete({
-                                    itemName: `${r.date} — RM ${(r.cashSales + r.qrSales).toFixed(2)}`,
+                                    itemName: `${r.date} - RM ${(r.cashSales + r.qrSales).toFixed(2)}`,
                                     itemType: 'Rekod Jualan Harian',
                                     onConfirm: () => handleDeleteRecord(r.id)
-                                  });
-                                }}
-                                className="w-full px-3.5 py-2 text-sm font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-left cursor-pointer transition-colors"
-                              >
-                                Padam
-                              </button>
-                            </div>
-                          )}
+                                  })
+                              }
+                            ]}
+                          />
                         </td>
                       </tr>
                     );
