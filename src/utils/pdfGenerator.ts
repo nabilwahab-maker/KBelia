@@ -68,7 +68,7 @@ export const generateSinglePageA4OfferLetterHtml = (
               color: #000000;
               margin-bottom: 2px;
             ">
-              KERAJAAN NEGERI KELANTAN · UNIVERSITI MALAYSIA KELANTAN (UMK)
+              HAB USAHAWAN BELIA KELANTAN · PORTAL KBELIA
             </div>
             <div style="
               font-size: 18px;
@@ -86,7 +86,7 @@ export const generateSinglePageA4OfferLetterHtml = (
               margin-top: 3px;
               line-height: 1.35;
             ">
-              Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK) bersama Pentadbiran Hal Ehwal Belia & Keusahawanan Negeri Kelantan.
+              Hab Pembangunan Usahawan Belia Kelantan bersama Urusetia Portal KBelia.
             </div>
           </div>
 
@@ -379,13 +379,13 @@ export const generateSinglePageA4OfferLetterHtml = (
               letter-spacing: 0.4px;
               margin-bottom: 4px;
             ">
-              ★ DIMETERAI RASMI UMK KELANTAN ★
+              ★ DIMETERAI RASMI KBELIA KELANTAN ★
             </div>
             <div style="font-size: 12px; font-weight: 800; color: #000000;">
               PENTADBIRAN HAB KAPSUL NIAGA BELIA
             </div>
             <div style="font-size: 11px; color: #000000; opacity: 0.78; margin-top: 1px;">
-              Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK)
+              Hab Pembangunan Usahawan Belia Kelantan (KBelia)
             </div>
           </div>
         </div>
@@ -507,7 +507,7 @@ export const downloadOfferLetterPdf = async (
 
       fallbackPdf.line(20, 125, 190, 125);
       fallbackPdf.setFontSize(9);
-      fallbackPdf.text('Dokumen ini disahkan secara digital di bawah inisiatif UMK & Kerajaan Negeri Kelantan.', 20, 135);
+      fallbackPdf.text('Dokumen ini disahkan secara digital di bawah inisiatif Portal KBelia Kelantan.', 20, 135);
       fallbackPdf.save(fileName);
       return true;
     } catch {
@@ -594,7 +594,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
                 margin-bottom: 3px;
               ">
                 <span>🛡️</span>
-                <span>KERAJAAN NEGERI KELANTAN · UNIVERSITI MALAYSIA KELANTAN (UMK)</span>
+                <span>HAB USAHAWAN BELIA KELANTAN · PORTAL KBELIA</span>
               </div>
               <div style="
                 font-size: 19px;
@@ -697,7 +697,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
                       </td>
                       <td style="padding: 8px 9px; border: 1px solid #cbd5e1;">
                         <strong style="font-family: monospace; color: #000000;">${b.slotCode}</strong>
-                        <span style="display: block; font-size: 12px; color: #000000; opacity: 0.78;">${b.hubLocation || 'Hab UMK Bachok'}</span>
+                        <span style="display: block; font-size: 12px; color: #000000; opacity: 0.78;">${b.hubLocation || 'Hab Usahawan Bachok'}</span>
                       </td>
                       <td style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: right; font-weight: 800; font-family: monospace; color: #000000;">
                         RM${b.monthlyRate || 150}
@@ -772,7 +772,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
           ">
             <div style="flex: 1;">
               <div style="font-size: 12.5px; font-weight: 800; color: #000000;">Urusetia Pentadbiran Keusahawanan Belia</div>
-              <div style="font-size: 12px; color: #000000; opacity: 0.82;">Hab Pembangunan Belia Negeri Kelantan bersama UMK</div>
+              <div style="font-size: 12px; color: #000000; opacity: 0.82;">Hab Pembangunan Usahawan Belia Kelantan (KBelia)</div>
               <div style="font-size: 11.5px; color: #000000; opacity: 0.72; margin-top: 4px; line-height: 1.4;">
                 Dokumen ini merupakan salinan audit rasmi bercetak yang dikeluarkan di bawah kelulusan Jawatankuasa Penyelaras Inisiatif Belia Negeri Kelantan.
               </div>
@@ -915,7 +915,7 @@ export const downloadOfficialApprovalReportPdf = async (
       fallbackPdf.text('LAPORAN RASMI KELULUSAN PERMOHONAN', 20, 25);
       fallbackPdf.setFontSize(9);
       fallbackPdf.setFont('helvetica', 'normal');
-      fallbackPdf.text('Pentadbiran Hal Ehwal Usahawan Belia Kelantan & UMK', 20, 31);
+      fallbackPdf.text('Hab Pembangunan Usahawan Belia Kelantan (KBelia)', 20, 31);
       fallbackPdf.text(`No. Rujukan: ${params.reportRef}    Tarikh: ${params.reportDate}`, 20, 36);
       fallbackPdf.line(20, 40, 190, 40);
 

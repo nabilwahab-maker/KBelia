@@ -560,10 +560,10 @@ export const generateOfferLetterOfficialHtml = (
     <!-- Official Header & Letterhead -->
     <div class="letterhead">
       <div class="agency-info">
-        <div class="state-sub">KERAJAAN NEGERI KELANTAN · UNIVERSITI MALAYSIA KELANTAN (UMK)</div>
+        <div class="state-sub">HAB USAHAWAN BELIA KELANTAN · PORTAL KBELIA</div>
         <h1 class="agency-title">PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN</h1>
         <p class="agency-desc">
-          Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK) bersama Pentadbiran Hal Ehwal Belia & Keusahawanan Negeri Kelantan.
+          Hab Pembangunan Usahawan Belia Kelantan bersama Urusetia Portal KBelia.
         </p>
       </div>
 
@@ -704,9 +704,9 @@ export const generateOfferLetterOfficialHtml = (
       </div>
 
       <div class="seal-sign-box">
-        <div class="seal-badge">★ DIMETERAI RASMI UMK KELANTAN ★</div>
+        <div class="seal-badge">★ DIMETERAI RASMI KBELIA KELANTAN ★</div>
         <div class="sign-authority">PENTADBIRAN HAB KAPSUL NIAGA BELIA</div>
-        <div class="sign-title">Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK)</div>
+        <div class="sign-title">Hab Pembangunan Usahawan Belia Kelantan (KBelia)</div>
       </div>
     </div>
 
@@ -1001,7 +1001,7 @@ const buildOfficialLetterheadShell = (options: {
         </svg>
         <div>
           <div style="font-size:11px;font-weight:800;color:#0f172a;">INTEGRITI KOD QR BERAUDIT</div>
-          <div style="font-size:10.5px;color:#475569;">Disahkan melalui Portal Pengesahan Berpusat KBelia &amp; UMK.</div>
+          <div style="font-size:10.5px;color:#475569;">Disahkan melalui Portal Pengesahan Berpusat KBelia Kelantan.</div>
           <div style="font-size:11px;font-family:monospace;font-weight:700;color:#1E40AF;">KOD: ${escapeHtml(options.auditCode)}</div>
         </div>
       </div>
@@ -1049,7 +1049,7 @@ export const generateTenancyAgreementOfficialHtml = (
       <div class="doc-banner-status">${escapeHtml(signedStatus)}</div>
     </div>
     <p style="margin-bottom:12px;">
-      Perjanjian ini dimeterai pada <strong>${escapeHtml(formattedDate)}</strong> antara <strong>Pentadbiran Pembangunan Keusahawanan Belia Negeri Kelantan (KBelia) &amp; Universiti Malaysia Kelantan (UMK)</strong> ("Pemberi Sewa") dan pihak Penyewa seperti butiran di bawah:
+      Perjanjian ini dimeterai pada <strong>${escapeHtml(formattedDate)}</strong> antara <strong>Pentadbiran Hab Pembangunan Usahawan Belia Kelantan (KBelia)</strong> ("Pemberi Sewa") dan pihak Penyewa seperti butiran di bawah:
     </p>
     <div class="section-title">Jadual A: Butiran Penyewa &amp; Premis Kiosk</div>
     <table class="info-table">
@@ -1085,16 +1085,16 @@ export const generateTenancyAgreementOfficialHtml = (
     title: `Perjanjian Sewa Kiosk - ${booking.slotCode} - ${refNumber}`,
     toolbarLabel: 'Perjanjian Penyewaan Digital Kiosk KBelia',
     badgeText: booking.tenancySigned ? 'Dimeterai Sah' : 'Draf Perjanjian',
-    agencyKicker: 'KERAJAAN NEGERI KELANTAN · UNIVERSITI MALAYSIA KELANTAN (UMK)',
+    agencyKicker: 'HAB USAHAWAN BELIA KELANTAN · PORTAL KBELIA',
     agencyHeading: 'PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)',
-    agencySubheading: 'Urus Setia Penempatan Kiosk Modular & Keusahawanan Belia, Kampus Kota, Pengkalan Chepa, 16100 Kota Bharu, Kelantan',
+    agencySubheading: 'Urus Setia Penempatan Kiosk Modular & Keusahawanan Belia, 15000 Kota Bharu, Kelantan',
     refNumber,
     issueDate: formattedDate,
     statusText: booking.tenancySigned ? 'SAH & DIMETERAI' : 'DRAF RASMI',
     bodyHtml,
     auditCode: refNumber,
     signatoryTitle: 'PENTADBIRAN HAB KAPSUL NIAGA BELIA',
-    signatorySub: 'Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK)'
+    signatorySub: 'Hab Pembangunan Usahawan Belia Kelantan (KBelia)'
   });
 };
 
@@ -1133,7 +1133,7 @@ export const generateGrantApprovalOfficialHtml = (grant: GrantApplication): stri
     badgeText: statusLabel,
     agencyKicker: 'KERAJAAN NEGERI KELANTAN · UNIT DANA & GERAN BELIA',
     agencyHeading: 'PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)',
-    agencySubheading: 'Jawatankuasa Pembiayaan & Geran Pemula Belia Kelantan dengan Kerjasama UMK CEED',
+    agencySubheading: 'Jawatankuasa Pembiayaan Mikro & Geran Digital Belia Kelantan',
     refNumber: refCode,
     issueDate,
     statusText: statusLabel,
@@ -1152,7 +1152,7 @@ export const generateMentorEndorsementOfficialHtml = (endorsement: GrantEndorsem
       <div class="doc-banner-status">SYOR PERUNTUKAN: ${escapeHtml(endorsement.recommendedAmount)} · ${endorsement.status === 'active' ? 'SAH & AKTIF' : 'DITARIK BALIK'}</div>
     </div>
     <p style="margin-bottom:12px;">
-      Kepada Jawatankuasa Pemilihan Geran Usahawan Belia Negeri Kelantan / UMK CEED,<br/>
+      Kepada Jawatankuasa Pemilihan Geran Usahawan Belia Kelantan (KBelia),<br/>
       Saya selaku Mentor yang menyelia perkembangan perniagaan usahawan berikut memperakukan permohonan geran ini berdasarkan prestasi bimbingan semasa:
     </p>
     <table class="info-table">
@@ -1173,11 +1173,11 @@ export const generateMentorEndorsementOfficialHtml = (endorsement: GrantEndorsem
 
   return buildOfficialLetterheadShell({
     title: `Surat Perakuan Geran - ${endorsement.endorsementCode}`,
-    toolbarLabel: 'Surat Perakuan Rasmi Mentor UMK CEED',
+    toolbarLabel: 'Surat Perakuan Rasmi Mentor KBelia',
     badgeText: endorsement.recommendedAmount,
-    agencyKicker: 'UNIVERSITI MALAYSIA KELANTAN (UMK CEED) · HAB NIAGA BELIA KELANTAN',
-    agencyHeading: 'INSTITUT KEUSAHAWANAN UMK & MENTOR KBELIA',
-    agencySubheading: 'Kampus Kota, Pengkalan Chepa, 16100 Kota Bharu, Kelantan · Tel: +609-771 7000',
+    agencyKicker: 'HAB USAHAWAN BELIA KELANTAN · PANEL BIMBINGAN MENTOR',
+    agencyHeading: 'HAB PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)',
+    agencySubheading: 'Pusat Operasi Hab Usahawan Belia Kelantan, 15000 Kota Bharu, Kelantan · Tel: +609-771 7000',
     refNumber: endorsement.endorsementCode,
     issueDate,
     statusText: endorsement.status === 'active' ? 'DISYORKAN RASMI' : 'DIBATALKAN',
@@ -1185,7 +1185,7 @@ export const generateMentorEndorsementOfficialHtml = (endorsement: GrantEndorsem
     auditCode: endorsement.endorsementCode,
     signatoryTitle: endorsement.mentorName.toUpperCase(),
     signatorySub: `${endorsement.mentorDesignation || 'Mentor'} · ${endorsement.mentorAgency}`,
-    sealText: '★ DIPERAKUI MENTOR UMK CEED ★'
+    sealText: '★ DIPERAKUI MENTOR KBELIA ★'
   });
 };
 
@@ -1209,12 +1209,12 @@ export const generateYouthCertificateOfficialHtml = (params: {
         ${escapeHtml(params.businessName || 'Perusahaan Belia Berdaftar Kelantan')}
       </div>
       <p style="font-size: 13px; color: #1e293b; max-width: 620px; margin: 0 auto 14px auto; line-height: 1.6;">
-        Telah didaftarkan secara sah di bawah Ekosistem Pemerkasaan Usahawan Belia Negeri Kelantan (KBelia) bersama Pusat Pembangunan Keusahawanan Universiti Malaysia Kelantan (UMK CEED) dan layak mengakses fasiliti kiosk bersubsidi, klinik mentor, serta skim geran negeri.
+        Telah didaftarkan secara sah di bawah Ekosistem Pemerkasaan Usahawan Belia Kelantan (KBelia) bersama Hab Usahawan Belia dan layak mengakses fasiliti kiosk bersubsidi, klinik mentor, serta skim geran & pembiayaan mikro.
       </p>
       <table class="info-table" style="text-align:left; margin-top:12px;">
         <tr><th>No. Pendaftaran Keahlian</th><td><strong>${escapeHtml(params.refCode)}</strong></td></tr>
         <tr><th>Jajahan Operasi</th><td>${escapeHtml(params.district || 'Negeri Kelantan')}</td></tr>
-        <tr><th>No. Pendaftaran SSM</th><td>${escapeHtml(params.ssmNumber || 'Dalam Rekod Portal KBelia')}</td></tr>
+        <tr><th>No. Pendaftaran Perniagaan</th><td>${escapeHtml(params.ssmNumber || 'Dalam Rekod Portal KBelia')}</td></tr>
         <tr><th>Tarikh Pengesahan</th><td>${escapeHtml(issued)}</td></tr>
       </table>
     </div>
@@ -1224,7 +1224,7 @@ export const generateYouthCertificateOfficialHtml = (params: {
     title: `Sijil Pendaftaran Usahawan Belia - ${params.refCode}`,
     toolbarLabel: 'Sijil Pendaftaran Usahawan Belia Kelantan',
     badgeText: 'Sijil Sah',
-    agencyKicker: 'KERAJAAN NEGERI KELANTAN · UNIVERSITI MALAYSIA KELANTAN (UMK)',
+    agencyKicker: 'HAB USAHAWAN BELIA KELANTAN · PORTAL KBELIA',
     agencyHeading: 'PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)',
     agencySubheading: 'Sijil Pendaftaran Rasmi Rangkaian Keusahawanan Anak Muda Kelantan',
     refNumber: params.refCode,
@@ -1233,7 +1233,7 @@ export const generateYouthCertificateOfficialHtml = (params: {
     bodyHtml,
     auditCode: params.refCode,
     signatoryTitle: 'URUSETIA INDUK KBelia KELANTAN',
-    signatorySub: 'Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK)'
+    signatorySub: 'Hab Pembangunan Usahawan Belia Kelantan (KBelia)'
   });
 };
 
@@ -1342,7 +1342,7 @@ export const generateCashflowStatementOfficialHtml = (params: {
       bodyHtml,
       auditCode: refCode,
       signatoryTitle: 'PENGESAHAN DAGANG DIGITAL KBelia',
-      signatorySub: 'Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK)'
+      signatorySub: 'Hab Pembangunan Usahawan Belia Kelantan (KBelia)'
     });
   }
 

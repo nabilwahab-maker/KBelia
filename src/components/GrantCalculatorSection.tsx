@@ -87,8 +87,8 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
           </h1>
           <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 leading-relaxed">
             {isEn
-              ? 'Estimate your match score across state schemes (TEKUN, YBK, MARA & RM3,000 Starter Fund) in 30 seconds.'
-              : 'Anggarkan skor padanan skim TEKUN, YBK, MARA dan dana permulaan negeri Kelantan dalam 30 saat.'}
+              ? 'Estimate your match score across micro-financing schemes, digital grants, and RM3,000 starter funds in 30 seconds.'
+              : 'Anggarkan skor padanan skim pembiayaan mikro, geran digital dan dana permulaan belia dalam 30 saat.'}
           </p>
         </div>
       </div>
@@ -411,7 +411,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               <div className="flex items-start justify-between">
                 <div>
                   <h4 className="text-sm font-bold text-black dark:text-white">
-                    Geran Permulaan Usahawan Belia (UMK)
+                    Geran Permulaan Hab Usahawan Belia
                   </h4>
                   <div className="text-[0.8125rem] font-extrabold text-black dark:text-white/75">
                     Geran Percuma RM3,000
@@ -427,7 +427,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenGrantModal(
-                  'Geran Permulaan Usahawan Belia (UMK)',
+                  'Geran Permulaan Hab Usahawan Belia',
                   `RM ${Math.min(Math.max(fundingNeed, 1000), 3000).toLocaleString('ms-MY')}`
                 )}
                 className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer dark:bg-emerald-600"
@@ -442,7 +442,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               <div className="flex items-start justify-between">
                 <div>
                   <h4 className="text-sm font-bold text-black dark:text-white">
-                    Tabung Usahawan Kiosk Kelantan (TEKUN)
+                    Skim Pembiayaan Mikro &amp; Geran Digital Belia
                   </h4>
                   <div className="text-[0.8125rem] font-extrabold text-black dark:text-white/75">
                     Mikro Pembiayaan RM5,000 - RM20,000

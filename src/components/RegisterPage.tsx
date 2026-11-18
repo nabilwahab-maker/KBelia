@@ -496,7 +496,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                   <span>Demo Mentor</span>
                 </div>
                 <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
-                  Dr. Wan Azhar (UMK)
+                  Dr. Wan Azhar (Mentor Dalaman)
                 </div>
               </button>
 

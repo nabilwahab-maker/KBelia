@@ -541,7 +541,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     {
       id: 'sessions',
       label: isMs ? 'Sesi Bimbingan' : 'Sessions',
-      keywords: 'sesi bimbingan kalendar temujanji mentee maya google meet sessions',
+      keywords: 'sesi bimbingan kalendar temujanji mentee google meet sessions',
       icon: Calendar
     },
     {
@@ -610,7 +610,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const adminCat2HasMatches =
     matchesSearch('pemantauan status geran peruntukan dana bantuan belia grant') ||
     matchesSearch('inisiatif geran program dana kelantan programs') ||
-    matchesSearch('panel mentor bimbingan agensi ukm insken mentors');
+    matchesSearch('panel mentor bimbingan dalaman rakan industri kbelia mentors');
   const adminCat3HasMatches =
     matchesSearch('audit usahawan direktori semakan ssm audit');
 
@@ -861,7 +861,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   </button>
                 )}
 
-                {matchesSearch('panel mentor bimbingan agensi ukm insken mentors') && (
+                {matchesSearch('panel mentor bimbingan dalaman rakan industri kbelia mentors') && (
                   <button
                     type="button"
                     onClick={() =>

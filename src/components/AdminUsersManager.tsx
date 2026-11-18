@@ -430,7 +430,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                       u.role === 'user'
                         ? u.businessName || 'Belum daftar perniagaan'
                         : u.role === 'mentor'
-                        ? u.institution || 'UMK / Agensi Bimbingan'
+                        ? u.institution || 'Hab Usahawan / Rakan Industri'
                         : u.designation || 'Pentadbir Portal KBelia';
 
                     return (
@@ -659,7 +659,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         type="text"
                         value={institution}
                         onChange={(e) => setInstitution(e.target.value)}
-                        placeholder="UMK / INSKEN / SME Corp"
+                        placeholder="Hab Usahawan / Rakan Industri"
                         className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
                       />
                     </div>

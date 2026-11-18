@@ -51,7 +51,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
   const [challenges, setChallenges] = useState('');
   const [preferredDate, setPreferredDate] = useState('28 Mac 2026 (Sabtu)');
   const [preferredTime, setPreferredTime] = useState('10:00 AM - 11:00 AM');
-  const [mode, setMode] = useState<'Bersemuka di Kampus' | 'Google Meet Maya'>('Bersemuka di Kampus');
+  const [mode, setMode] = useState<'Bersemuka di Kampus' | 'Google Meet'>('Bersemuka di Kampus');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -119,7 +119,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 Hab Temujanji Klinik Usahawan & Mentor
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white">
-                Bimbingan 1-ke-1 Percuma Bersama Mentor UMK & Industri (Tajaan Dana Belia)
+                Bimbingan 1-ke-1 Percuma Bersama Mentor Dalaman &amp; Pakar Industri (Tajaan Dana Belia)
               </p>
             </div>
           </div>
@@ -298,11 +298,11 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     onChange={(e) => setTopic(e.target.value)}
                     className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
                   >
-                    <option value="Strategi Pemasaran Digital & TikTok Shop" className="dark:bg-slate-900">Strategi Pemasaran Digital &amp; TikTok Shop</option>
+                    <option value="Strategi Pemasaran Digital & Jualan Langsung" className="dark:bg-slate-900">Strategi Pemasaran Digital &amp; Jualan Langsung</option>
                     <option value="Pengurusan Aliran Tunai & Penyata Kewangan Kiosk" className="dark:bg-slate-900">Pengurusan Aliran Tunai &amp; Penyata Kewangan Kiosk</option>
-                    <option value="Permohonan Pembiayaan TEKUN, MARA & Geran Negeri" className="dark:bg-slate-900">Permohonan Pembiayaan TEKUN, MARA &amp; Geran Negeri</option>
+                    <option value="Permohonan Pembiayaan Mikro & Geran Digital" className="dark:bg-slate-900">Permohonan Pembiayaan Mikro &amp; Geran Digital</option>
                     <option value="Penembusan Pasaran Eksport & Fesyen Batik Warisan" className="dark:bg-slate-900">Penembusan Pasaran Eksport &amp; Fesyen Batik Warisan</option>
-                    <option value="Pensijilan Halal JAKIM & Piawaian Makanan MeSTI" className="dark:bg-slate-900">Pensijilan Halal JAKIM &amp; Piawaian Makanan MeSTI</option>
+                    <option value="Piawaian Pensijilan Halal & Keselamatan Makanan" className="dark:bg-slate-900">Piawaian Pensijilan Halal &amp; Keselamatan Makanan</option>
                     <option value="Rundingan Pembekal & Pengurusan Inventori" className="dark:bg-slate-900">Rundingan Pembekal &amp; Pengurusan Inventori</option>
                   </select>
                 </div>
@@ -362,8 +362,8 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       onChange={(e) => setMode(e.target.value as any)}
                       className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
-                      <option value="Bersemuka di Kampus" className="dark:bg-slate-900">Bersemuka di Kampus UMK</option>
-                      <option value="Google Meet Maya" className="dark:bg-slate-900">Google Meet Maya (Atas Talian)</option>
+                      <option value="Bersemuka di Kampus" className="dark:bg-slate-900">Bersemuka di Hab Usahawan</option>
+                      <option value="Google Meet" className="dark:bg-slate-900">Google Meet</option>
                     </select>
                   </div>
                 </div>
@@ -391,7 +391,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
             /* View 3: Mentor List */
             <div className="space-y-4">
               <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-                Pilih mentor daripada Universiti Malaysia Kelantan (UMK) dan industri untuk mendapatkan maklum balas perniagaan, penetapan harga, atau pelan pensijilan secara percuma.
+                Pilih mentor daripada Hab Usahawan KBelia (Mentor Dalaman) dan Pakar Industri untuk mendapatkan maklum balas perniagaan, penetapan harga, atau pelan pensijilan secara percuma.
               </p>
 
               <div className="flex flex-col gap-3.5">

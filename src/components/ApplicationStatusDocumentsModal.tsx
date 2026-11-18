@@ -19,7 +19,7 @@ import {
   AlertCircle,
   XCircle
 } from 'lucide-react';
-import { CapsuleBooking, GrantApplication, MentorshipRegistration } from '../types';
+import { CapsuleBooking, GrantApplication, MentorshipRegistration, normalizeMentorshipMode } from '../types';
 import { showToast } from './ToastNotification';
 import {
   formatDisplayDate,
@@ -363,7 +363,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                       </div>
                       <div>
                         <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-                          Bimbingan Mentor UMK
+                          Bimbingan Mentor KBelia
                         </span>
                         <h4 className="font-bold text-sm sm:text-base text-black dark:text-white">
                           Klinik Usahawan bersama: <span className="text-black dark:text-white">{userMentorship.mentorName}</span>
@@ -397,7 +397,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     <div className="text-black dark:text-white text-[0.8125rem] flex items-center gap-2">
                       <Calendar className="w-3.5 h-3.5 text-black dark:text-white" />
                       <span>{userMentorship.preferredDate} ({userMentorship.preferredTime})</span>
-                      <span>&bull; {userMentorship.mode}</span>
+                      <span>&bull; {normalizeMentorshipMode(userMentorship.mode)}</span>
                     </div>
 
                     <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -430,7 +430,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </div>
                     <div>
                       <h4 className="font-bold text-sm text-black dark:text-white">Tiada Temujanji Klinik Mentor</h4>
-                      <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Tempah sesi bimbingan perniagaan 1-ke-1 bersama mentor industri UMK.</p>
+                      <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Tempah sesi bimbingan perniagaan 1-ke-1 bersama mentor dalaman &amp; pakar industri.</p>
                     </div>
                   </div>
                   <button
@@ -542,10 +542,10 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                         PUSAT PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)
                       </h4>
                       <div className="text-[0.8125rem] font-semibold text-black">
-                        Dengan Kerjasama Institut Perusahaan & Keusahawanan Universiti Malaysia Kelantan (UMK)
+                        Inisiatif Hab Usahawan Belia Negeri Kelantan
                       </div>
                       <div className="text-[0.8125rem] text-black/70">
-                        Bangunan Pentadbiran UMK Kampus Kota, Pengkalan Chepa, 16100 Kota Bharu, Kelantan
+                        Pusat Operasi Hab Usahawan Belia Kelantan, 15000 Kota Bharu, Kelantan
                       </div>
                     </div>
                   </div>
@@ -608,8 +608,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 {/* Sign-off & Digital Stamp */}
                 <div className="pt-4 border-t border-slate-300 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                   <div>
-                    <div className="text-sm font-bold text-black">Pentadbiran Hab Kapsul Niaga Belia / UMK CEED</div>
-                    <div className="text-[0.8125rem] text-black">Penyelaras Keusahawanan UMK &amp; Urusetia KBelia Kelantan</div>
+                    <div className="text-sm font-bold text-black">Pentadbiran Hab Kapsul Niaga Belia (KBelia)</div>
+                    <div className="text-[0.8125rem] text-black">Penyelaras Keusahawanan &amp; Urusetia KBelia Kelantan</div>
                     <div className="text-[0.8125rem] text-black/70 mt-1">Dokumen ditandatangani secara digital mengikut Akta Tandatangan Digital 1997.</div>
                   </div>
 
@@ -655,7 +655,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <div>
                     <strong className="text-black dark:text-white block mb-0.5">Klausa 1: Tempoh Sewaan & Pembayaran</strong>
                     <p className="text-[0.875rem]">
-                      Sewaan bermula pada {formatDisplayDate(userBooking.startDate)} bagi tempoh {userBooking.durationMonths} bulan. Bayaran subsidi RM{monthlyRate}/bulan hendaklah diselesaikan selewat-lewatnya pada 7hb setiap bulan melalui akaun rasmi UMK/KBelia.
+                      Sewaan bermula pada {formatDisplayDate(userBooking.startDate)} bagi tempoh {userBooking.durationMonths} bulan. Bayaran subsidi RM{monthlyRate}/bulan hendaklah diselesaikan selewat-lewatnya pada 7hb setiap bulan melalui akaun rasmi KBelia.
                     </p>
                   </div>
 
@@ -676,7 +676,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <div>
                     <strong className="text-black dark:text-white block mb-0.5">Klausa 4: Penyertaan Klinik Bimbingan Mentor</strong>
                     <p className="text-[0.875rem]">
-                      Penyewa disyaratkan menghadiri sekurang-kurangnya 1 sesi bimbingan mentor percuma UMK setiap 3 bulan bagi mengekalkan kelayakan subsidi sewa bulanan.
+                      Penyewa disyaratkan menghadiri sekurang-kurangnya 1 sesi bimbingan mentor percuma KBelia setiap 3 bulan bagi mengekalkan kelayakan subsidi sewa bulanan.
                     </p>
                   </div>
                 </div>
@@ -748,7 +748,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
         {/* Modal Footer */}
         <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
           <div className="text-[0.8125rem] text-black/70">
-            Perlukan bantuan? Hubungi Khidmat Bantuan UMK & KBelia di <span className="font-bold text-black dark:text-white">09-771 7000</span>
+            Perlukan bantuan? Hubungi Khidmat Bantuan KBelia di <span className="font-bold text-black dark:text-white">09-771 7000</span>
           </div>
           <button
             type="button"

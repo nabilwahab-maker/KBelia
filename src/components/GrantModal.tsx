@@ -187,7 +187,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
       amount: 'RM5,000',
       badge: 'Disyorkan Kerajaan Negeri',
       badgeColor: 'bg-amber-100 text-black dark:bg-emerald-600 dark:text-white font-bold',
-      description: 'Perkakasan POS tablet, sistem tanpa tunai DuitNow QR & promosi media sosial.'
+      description: 'Perkakasan POS tablet, sistem pembayaran QR tanpa tunai & promosi media sosial.'
     },
     {
       title: 'Skim Bantuan Pemasaran Kraf & Makanan Warisan (RM2,000)',
@@ -217,7 +217,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                 Permohonan Geran &amp; Bantuan Modal
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white">
-                Skim Bantuan Modal Perniagaan Negeri Kelantan &amp; UMK
+                Skim Bantuan Modal Perniagaan Belia Kelantan
               </p>
             </div>
           </div>

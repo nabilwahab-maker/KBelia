@@ -46,7 +46,8 @@ import {
   GrantEndorsementLetter, 
   MentoringLogEntry,
   BusinessListing,
-  PublishedMentorSlot
+  PublishedMentorSlot,
+  normalizeMentorshipMode
 } from '../types';
 import { ModernDatePicker, ModernTimePicker, toLocalIsoDate } from './ModernDateTimePicker';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
@@ -73,6 +74,7 @@ import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast as triggerToast } from './ToastNotification';
 import { SaaSKpiCard } from './SaaSKpiCard';
+import { RoleDonutCard } from './RoleDonutCard';
 import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
 import { PortalImage } from './PortalImage';
 import { PaginationBar, usePagination } from './PaginationBar';
@@ -113,11 +115,11 @@ interface MentorPortalProps {
 const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
   {
     id: 'end-1',
-    endorsementCode: 'PERAKUAN-UMK-2026-8812',
+    endorsementCode: 'PERAKUAN-KBELIA-2026-8812',
     mentorId: 'mentor-1',
     mentorName: 'Prof. Madya Dr. Wan Azhar',
-    mentorAgency: 'Universiti Malaysia Kelantan (UMK)',
-    mentorDesignation: 'Pengarah Institut Keusahawanan Universiti Malaysia Kelantan (UMK)',
+    mentorAgency: 'Hab Usahawan KBelia (Mentor Dalaman)',
+    mentorDesignation: 'Ketua Penyelaras Bimbingan Usahawan Belia KBelia',
     menteeId: 'mentee-1',
     menteeName: 'Siti Aminah binti Yusof',
     menteePhone: '60112345678',
@@ -127,18 +129,18 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     recommendedAmount: 'RM3,000',
     grantProgramTitle: 'Geran Permulaan Usahawan Belia Kelantan (RM3,000)',
     justification: 'Usahawan menunjukkan komitmen tinggi dengan rekod jualan tunai konsisten melebihi RM4,200 sebulan. Penggunaan mesin retort pembungkusan akan memanjangkan jangka hayat sambal dan sedia dipasarkan di Kiosk Belia KB Sentral.',
-    businessReadinessRemark: 'Telah menghadiri 3 sesi bimbingan penuh dan mematuhi piawaian pembungkusan label produk UMK CEED.',
+    businessReadinessRemark: 'Telah menghadiri 3 sesi bimbingan penuh dan mematuhi piawaian pembungkusan label produk Hab Usahawan.',
     issuedAt: '2026-03-28',
     status: 'active',
     updatedAt: '2026-03-01T08:00:00.000Z'
   },
   {
     id: 'end-2',
-    endorsementCode: 'PERAKUAN-UMK-2026-9043',
+    endorsementCode: 'PERAKUAN-KBELIA-2026-9043',
     mentorId: 'mentor-1',
     mentorName: 'Prof. Madya Dr. Wan Azhar',
-    mentorAgency: 'Universiti Malaysia Kelantan (UMK)',
-    mentorDesignation: 'Pengarah Institut Keusahawanan Universiti Malaysia Kelantan (UMK)',
+    mentorAgency: 'Hab Usahawan KBelia (Mentor Dalaman)',
+    mentorDesignation: 'Ketua Penyelaras Bimbingan Usahawan Belia KBelia',
     menteeId: 'mentee-2',
     menteeName: 'Muhammad Farhan bin Zulkifli',
     menteePhone: '60198765432',
@@ -147,7 +149,7 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     district: 'Bachok',
     recommendedAmount: 'RM5,000',
     grantProgramTitle: 'Geran Pemangkin Usahawan Belia Kelantan (RM5,000)',
-    justification: 'Inovasi sistem POS dan inventori awan yang dibangunkan telah diuji oleh 5 peniaga kapsul niaga UMK dengan maklum balas positif. Geran disyorkan bagi menaik taraf server awan dan perlesenan keselamatan.',
+    justification: 'Inovasi sistem POS dan inventori awan yang dibangunkan telah diuji oleh 5 peniaga kapsul niaga Hab Usahawan dengan maklum balas positif. Geran disyorkan bagi menaik taraf server awan dan perlesenan keselamatan.',
     businessReadinessRemark: 'Model Ruang Niaga yang mampan dengan unjuran pulangan modal dalam tempoh 4 bulan.',
     issuedAt: '2026-04-02',
     status: 'active',
@@ -155,11 +157,11 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
   },
   {
     id: 'end-3',
-    endorsementCode: 'PERAKUAN-UMK-2026-7734',
+    endorsementCode: 'PERAKUAN-KBELIA-2026-7734',
     mentorId: 'mentor-1',
     mentorName: 'Prof. Madya Dr. Wan Azhar',
-    mentorAgency: 'Universiti Malaysia Kelantan (UMK)',
-    mentorDesignation: 'Pengarah Institut Keusahawanan Universiti Malaysia Kelantan (UMK)',
+    mentorAgency: 'Hab Usahawan KBelia (Mentor Dalaman)',
+    mentorDesignation: 'Ketua Penyelaras Bimbingan Usahawan Belia KBelia',
     menteeId: 'mentee-3',
     menteeName: 'Nurul Izzah binti Razak',
     menteePhone: '60133445566',
@@ -168,8 +170,8 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     district: 'Pasir Mas',
     recommendedAmount: 'RM5,000',
     grantProgramTitle: 'Geran Pemangkin Usahawan Belia Kelantan (RM5,000)',
-    justification: 'Mempunyai keunikan rekaan moden kontemporari yang menarik minat pasaran belia dan pelancong. Dana diperlukan bagi pembelian benang emas berkualiti tinggi dan pemasaran TikTok Live berpusat.',
-    businessReadinessRemark: 'Dokumen pendaftaran SSM dan penyata akaun bank syarikat lengkap dan teratur.',
+    justification: 'Mempunyai keunikan rekaan moden kontemporari yang menarik minat pasaran belia dan pelancong. Dana diperlukan bagi pembelian benang emas berkualiti tinggi dan pemasaran video digital berpusat.',
+    businessReadinessRemark: 'Dokumen pendaftaran perniagaan dan penyata akaun bank syarikat lengkap dan teratur.',
     issuedAt: '2026-04-06',
     status: 'active',
     updatedAt: '2026-03-01T08:00:00.000Z'
@@ -184,11 +186,11 @@ const INITIAL_LOGS: MentoringLogEntry[] = [
     businessName: 'Sambal Tok Abah Original',
     sessionDate: '2026-03-25',
     topic: 'Peningkatan Kualiti Pembungkusan Retort & Pematuhan Label',
-    minutes: 'Membincangkan peralihan daripada balang kaca biasa kepada pouch retort tahan suhu tinggi. Usahawan dinasihatkan menambah maklumat tarikh luput, kod bar dan logo Halal pada label baharu.',
+    minutes: 'Membincangkan peralihan daripada balang kaca biasa kepada pouch retort tahan suhu tinggi. Usahawan dinasihatkan menambah maklumat tarikh luput, kod bar dan penandaan piawaian keselamatan makanan pada label baharu.',
     actionItems: [
-      { id: 'act-1', task: 'Dapatkan sebut harga mesin pouch retort dari pembekal UMK', completed: true, dueDate: '2026-03-30' },
-      { id: 'act-2', task: 'Ubah suai grafik label mengikut format Peraturan Makanan 1985', completed: true, dueDate: '2026-04-05' },
-      { id: 'act-3', task: 'Hantar 5 sampel untuk ujian ketahanan haba di Makmal Makanan UMK', completed: false, dueDate: '2026-04-15' }
+      { id: 'act-1', task: 'Dapatkan sebut harga mesin pouch retort dari rakan pembekal industri', completed: true, dueDate: '2026-03-30' },
+      { id: 'act-2', task: 'Ubah suai grafik label mengikut garis panduan keselamatan makanan', completed: true, dueDate: '2026-04-05' },
+      { id: 'act-3', task: 'Hantar 5 sampel untuk ujian ketahanan haba di makmal ujian keselamatan makanan', completed: false, dueDate: '2026-04-15' }
     ],
     createdAt: '2026-03-25T14:30:00Z',
     updatedAt: '2026-03-01T08:00:00.000Z'
@@ -199,11 +201,11 @@ const INITIAL_LOGS: MentoringLogEntry[] = [
     menteeName: 'Muhammad Farhan bin Zulkifli',
     businessName: 'Kelantan Tech Solution',
     sessionDate: '2026-04-01',
-    topic: 'Pengurusan Aliran Tunai & Pemisahan Akaun Bank Maybank Bisnes',
+    topic: 'Pengurusan Aliran Tunai & Pemisahan Akaun Bank Perniagaan',
     minutes: 'Meneliti buku tunai syarikat. Didapati usahawan masih menggabungkan wang tunai peribadi dengan hasil langganan perisian. Prosedur perakaunan asas telah dirangka bersama mentor.',
     actionItems: [
-      { id: 'act-4', task: 'Buka akaun semasa Maybank Islamic atas nama Kelantan Tech Solution', completed: true, dueDate: '2026-04-04' },
-      { id: 'act-5', task: 'Aktifkan integrasi DuitNow QR khusus bisnes untuk terimaan yuran langganan', completed: false, dueDate: '2026-04-10' }
+      { id: 'act-4', task: 'Buka akaun semasa perniagaan berasingan atas nama Kelantan Tech Solution', completed: true, dueDate: '2026-04-04' },
+      { id: 'act-5', task: 'Aktifkan integrasi QR pembayaran digital khusus bisnes untuk terimaan yuran langganan', completed: false, dueDate: '2026-04-10' }
     ],
     createdAt: '2026-04-01T11:00:00Z',
     updatedAt: '2026-03-01T08:00:00.000Z'
@@ -218,7 +220,7 @@ const INITIAL_LOGS: MentoringLogEntry[] = [
     minutes: 'Menyemak kos setiap cawan (COGS) kopi bancuhan sejuk (cold brew). Margin keuntungan dicadangkan pada tahap minimum 65% untuk menampung kos sewaan tapak kapsul.',
     actionItems: [
       { id: 'act-6', task: 'Sediakan formula penetapan harga (Cost Sheet) terperinci', completed: true, dueDate: '2026-04-08' },
-      { id: 'act-7', task: 'Jalankan sesi ujian rasa (blind taste test) bersama 20 mahasiswa UMK', completed: false, dueDate: '2026-04-14' }
+      { id: 'act-7', task: 'Jalankan sesi ujian rasa (blind taste test) bersama 20 pelanggan komuniti setempat', completed: false, dueDate: '2026-04-14' }
     ],
     createdAt: '2026-04-05T16:00:00Z',
     updatedAt: '2026-03-01T08:00:00.000Z'
@@ -416,13 +418,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled'>('all');
-  const [modeFilter, setModeFilter] = useState<'all' | 'Bersemuka di Kampus' | 'Google Meet Maya'>('all');
+  const [modeFilter, setModeFilter] = useState<'all' | 'Bersemuka di Kampus' | 'Google Meet'>('all');
   const [applicationsSortBy, setApplicationsSortBy] = useState<'status' | 'name' | 'date'>('status');
   const [applicationsSortDir, setApplicationsSortDir] = useState<'asc' | 'desc'>('asc');
   const [applicationsSortPreset, setApplicationsSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [scheduleSearch, setScheduleSearch] = useState('');
-  const [scheduleModeFilter, setScheduleModeFilter] = useState<'all' | 'Bersemuka di Kampus' | 'Google Meet Maya'>('all');
+  const [scheduleModeFilter, setScheduleModeFilter] = useState<'all' | 'Bersemuka di Kampus' | 'Google Meet'>('all');
   const [scheduleSortBy, setScheduleSortBy] = useState<'date' | 'name'>('date');
   const [scheduleSortDir, setScheduleSortDir] = useState<'asc' | 'desc'>('asc');
   const [scheduleSortPreset, setScheduleSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
@@ -490,7 +492,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const [isNewSlotModalOpen, setIsNewSlotModalOpen] = useState(false);
   const [newSlotDate, setNewSlotDate] = useState('');
   const [newSlotTime, setNewSlotTime] = useState('10:00 AM - 11:00 AM');
-  const [newSlotMode, setNewSlotMode] = useState<'Bersemuka di Kampus' | 'Google Meet Maya'>('Bersemuka di Kampus');
+  const [newSlotMode, setNewSlotMode] = useState<'Bersemuka di Kampus' | 'Google Meet'>('Bersemuka di Kampus');
 
   // New Grant Endorsement Modal
   const [isNewEndorsementModalOpen, setIsNewEndorsementModalOpen] = useState(false);
@@ -604,7 +606,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       statusFilter === 'all'
         ? r.status === 'pending' || r.status === 'confirmed'
         : r.status === statusFilter;
-    const matchesMode = modeFilter === 'all' || r.mode === modeFilter;
+    const matchesMode = modeFilter === 'all' || normalizeMentorshipMode(r.mode) === modeFilter;
 
     return matchesSearch && matchesStatus && matchesMode;
   });
@@ -631,8 +633,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
   const confirmedScheduleSessions = mentorRegistrations.filter(m => m.status === 'confirmed');
   const baseScheduleSessions = confirmedScheduleSessions.filter(m => {
-    const inferredMode = m.meetingLink ? 'Google Meet Maya' : (m.mode || 'Bersemuka di Kampus');
-    if (scheduleModeFilter !== 'all' && inferredMode !== scheduleModeFilter && m.mode !== scheduleModeFilter) {
+    const inferredMode = m.meetingLink ? 'Google Meet' : normalizeMentorshipMode(m.mode);
+    if (scheduleModeFilter !== 'all' && inferredMode !== scheduleModeFilter) {
       return false;
     }
     const q = scheduleSearch.trim().toLowerCase();
@@ -997,7 +999,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     );
 
     const currentYear = new Date().getFullYear();
-    const uniqueCode = `PERAKUAN-UMK-${currentYear}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const uniqueCode = `PERAKUAN-KBELIA-${currentYear}-${Math.floor(1000 + Math.random() * 9000)}`;
     const programTitle = newEndorsementGrantType === 'RM3,000' 
       ? 'Geran Permulaan Usahawan Belia Kelantan (RM3,000)'
       : newEndorsementGrantType === 'RM5,000'
@@ -1019,7 +1021,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       recommendedAmount: newEndorsementGrantType,
       grantProgramTitle: programTitle,
       justification: newEndorsementJustification,
-      businessReadinessRemark: newEndorsementReadiness || 'Telah dinilai secara profesional dalam sesi bimbingan mentor UMK.',
+      businessReadinessRemark: newEndorsementReadiness || 'Telah dinilai secara profesional dalam sesi bimbingan mentor Hab Usahawan.',
       issuedAt: new Date().toISOString().split('T')[0],
       status: 'active'
     };
@@ -1209,7 +1211,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               Portal Pengurusan Mentor
             </h2>
             <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-              Bahagian ini dikhaskan untuk <strong>Mentor Rasmi (UMK, INSKEN & SME Corp)</strong> sahaja bagi menguruskan sesi bimbingan usahawan seliaan sendiri, mengeluarkan <strong>Surat Sokongan Geran Belia</strong>, dan mencatat rekod sesi serta tugasan. Modul ini diasingkan sepenuhnya daripada fungsi usahawan mahupun pentadbir sistem.
+              Bahagian ini dikhaskan untuk <strong>Mentor Dalaman &amp; Pakar Industri Berdaftar</strong> sahaja bagi menguruskan sesi bimbingan usahawan seliaan sendiri, mengeluarkan <strong>Surat Sokongan Geran Belia</strong>, dan mencatat rekod sesi serta tugasan. Modul ini diasingkan sepenuhnya daripada fungsi usahawan mahupun pentadbir sistem.
             </p>
           </div>
 
@@ -1352,6 +1354,39 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         });
         const mentorChartData = Array.from(districtMap.values()).slice(0, 8);
 
+        // Grant endorsement tier breakdown (RM3,000 / RM5,000 / RM10,000) for RoleDonutCard
+        const activeEndorsementsList = mentorEndorsements.filter((e) => e.status === 'active');
+        const tier3kCount = activeEndorsementsList.filter((e) => e.recommendedAmount === 'RM3,000').length;
+        const tier5kCount = activeEndorsementsList.filter((e) => e.recommendedAmount === 'RM5,000').length;
+        const tier10kCount = activeEndorsementsList.filter((e) => e.recommendedAmount === 'RM10,000').length;
+        const totalEndorsedRm = tier3kCount * 3000 + tier5kCount * 5000 + tier10kCount * 10000;
+        const avgEndorsedRm =
+          activeEndorsementsList.length > 0 ? Math.round(totalEndorsedRm / activeEndorsementsList.length) : 0;
+        const centerEndorsedDisplay =
+          totalEndorsedRm >= 1000
+            ? `RM${(totalEndorsedRm / 1000).toFixed(totalEndorsedRm % 1000 === 0 ? 0 : 1)}K`
+            : `RM${totalEndorsedRm}`;
+        const endorsementTierSegments = [
+          {
+            name: 'Tier RM3,000',
+            value: tier3kCount,
+            color: '#0D9488',
+            secondaryLabel: `RM ${(tier3kCount * 3000).toLocaleString('ms-MY')}`
+          },
+          {
+            name: 'Tier RM5,000',
+            value: tier5kCount,
+            color: '#2563EB',
+            secondaryLabel: `RM ${(tier5kCount * 5000).toLocaleString('ms-MY')}`
+          },
+          {
+            name: 'Tier RM10,000',
+            value: tier10kCount,
+            color: '#F59E0B',
+            secondaryLabel: `RM ${(tier10kCount * 10000).toLocaleString('ms-MY')}`
+          }
+        ];
+
         return (
         <div className="space-y-4 animate-in fade-in duration-200">
 
@@ -1373,7 +1408,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             <SaaSKpiCard
               title="Sesi Bimbingan Disahkan"
               value={confirmedCount}
-              subtitle="Kampus & Google Meet Maya"
+              subtitle="Kampus & Google Meet"
               icon={Calendar}
               trendLabel={`${completedCount} Selesai`}
               trendDirection={confirmedCount > 0 ? 'up' : 'neutral'}
@@ -1408,11 +1443,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             />
           </div>
 
-          {/* [2] Graf Taburan Sesi & Perakuan Seluruh Kelantan (Lebar Penuh) */}
-          <div
-            style={{ '--stagger': 4 } as React.CSSProperties}
-            className="animate-dashboard-card w-full bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 min-w-0"
-          >
+          {/* [2] Seksyen Analitik 2:1 — Graf Taburan Negeri (2 Bahagian) + Donat Perakuan Geran (1 Bahagian) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 items-stretch">
+            <div
+              style={{ '--stagger': 4 } as React.CSSProperties}
+              className="animate-dashboard-card lg:col-span-2 h-full w-full bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 min-w-0 flex flex-col justify-between"
+            >
             <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-300 dark:border-zinc-600 mb-3">
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-black dark:text-white/80 shrink-0" />
@@ -1507,6 +1543,30 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </BarChart>
               </ResponsiveContainer>
             </div>
+            </div>
+
+            <RoleDonutCard
+              className="lg:col-span-1 h-full"
+              title="Agihan Nilai Perakuan"
+              subtitle="Pecahan surat perakuan mengikut tier"
+              icon={Award}
+              accentBarClass="bg-amber-500/85 dark:bg-amber-400/85"
+              segments={endorsementTierSegments}
+              centerValue={centerEndorsedDisplay}
+              centerLabel="Nilai Diperaku"
+              valueUnit="surat"
+              summaryPairs={[
+                { label: 'Surat Aktif', value: `${activeEndorsementsList.length} surat`, dotColor: '#0D9488' },
+                { label: 'Purata Tier', value: `RM ${avgEndorsedRm.toLocaleString('ms-MY')}`, dotColor: '#F59E0B' }
+              ]}
+              emptyState={{
+                title: 'Tiada Perakuan Geran Aktif',
+                description: 'Keluarkan perakuan geran untuk memaparkan pecahan tier RM3,000, RM5,000 dan RM10,000.',
+                actionLabel: 'Buka Perakuan Geran',
+                onAction: () => handleSubTabChange('endorsements')
+              }}
+              staggerIndex={5}
+            />
           </div>
 
           {/* [3] Dua Lajur Ringkasan Seimbang Kiri & Kanan: Temujanji Terdekat + Status Perakuan Geran */}
@@ -1588,7 +1648,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <Clock className="w-3 h-3 text-black/70 dark:text-white/75 shrink-0" />
                             <span>{reg.preferredDate || 'Akan ditetapkan'} &middot; {reg.preferredTime || '10:00 AM'}</span>
                             <span>&middot;</span>
-                            <span>{reg.mode === 'Google Meet Maya' ? 'Google Meet Maya' : 'Bersemuka Kampus'}</span>
+                            <span>{normalizeMentorshipMode(reg.mode) === 'Google Meet' ? 'Google Meet' : 'Bersemuka Kampus'}</span>
                           </div>
                         </div>
                       </div>
@@ -1610,7 +1670,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold transition-all inline-flex items-center gap-1.5 shadow-2xs whitespace-nowrap dark:bg-teal-600"
                           >
                             <Video className="w-3 h-3" />
-                            <span>Bilik Maya</span>
+                            <span>Google Meet</span>
                           </a>
                         ) : (
                           <button
@@ -2015,12 +2075,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       </label>
                       <select
                         value={modeFilter}
-                        onChange={(e) => setModeFilter(e.target.value as 'all' | 'Bersemuka di Kampus' | 'Google Meet Maya')}
+                        onChange={(e) => setModeFilter(e.target.value as 'all' | 'Bersemuka di Kampus' | 'Google Meet')}
                         className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
                       >
                         <option value="all">Semua Mod</option>
                         <option value="Bersemuka di Kampus">Bersemuka di Kampus</option>
-                        <option value="Google Meet Maya">Google Meet Maya</option>
+                        <option value="Google Meet">Google Meet</option>
                       </select>
                     </div>
                   </>
@@ -2216,31 +2276,31 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                       {mentee.challenges ? (
                                         `"${mentee.challenges}"`
                                       ) : (
-                                        <span className="italic text-black/70 dark:text-white/75">
-                                          "Usahawan memohon sesi bimbingan khusus bagi strategi pemasaran, pengurusan kos operasi, dan persediaan dokumentasi permohonan geran belia UMK."
-                                        </span>
-                                      )}
-                                    </p>
-                                  </div>
-
-                                  {mentee.mentorActionPlan && (
-                                    <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800/70 space-y-1">
-                                      <div className="flex items-center justify-between text-sm font-bold text-black dark:text-white">
-                                        <span className="flex items-center gap-1.5">
-                                          <FileText className="w-3.5 h-3.5" />
-                                          <span>Nota Bimbingan Mentor Tersimpan:</span>
-                                        </span>
-                                        <span className="text-[0.8125rem] font-normal opacity-75">Telah dihantar</span>
-                                      </div>
-                                      <p className="text-[0.9375rem] text-black dark:text-white whitespace-pre-line leading-relaxed">
-                                        {mentee.mentorActionPlan}
+                                          <span className="italic text-black/70 dark:text-white/75">
+                                            "Usahawan memohon sesi bimbingan khusus bagi strategi pemasaran, pengurusan kos operasi, dan persediaan dokumentasi permohonan geran belia."
+                                          </span>
+                                        )}
                                       </p>
                                     </div>
-                                  )}
 
-                                  <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
-                                    <a
-                                      href={cleanPhone ? `https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20saya%20mentor%20anda%20dari%20KBelia%20UMK.` : '#'}
+                                    {mentee.mentorActionPlan && (
+                                      <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800/70 space-y-1">
+                                        <div className="flex items-center justify-between text-sm font-bold text-black dark:text-white">
+                                          <span className="flex items-center gap-1.5">
+                                            <FileText className="w-3.5 h-3.5" />
+                                            <span>Nota Bimbingan Mentor Tersimpan:</span>
+                                          </span>
+                                          <span className="text-[0.8125rem] font-normal opacity-75">Telah dihantar</span>
+                                        </div>
+                                        <p className="text-[0.9375rem] text-black dark:text-white whitespace-pre-line leading-relaxed">
+                                          {mentee.mentorActionPlan}
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                                      <a
+                                        href={cleanPhone ? `https://wa.me/${cleanPhone}?text=Salam%20${encodeURIComponent(mentee.entrepreneurName)}%2C%20saya%20mentor%20anda%20dari%20Hab%20Usahawan%20KBelia.` : '#'}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="px-3 py-1.5 rounded-xl text-sm font-bold text-black dark:text-white bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
@@ -2335,7 +2395,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </h3>
                 </div>
                 <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
-                  Takwim sesi temujanji aktif bersemuka di bilik bimbingan UMK serta sesi Google Meet maya.
+                  Takwim sesi temujanji aktif bersemuka di bilik bimbingan Hab Usahawan serta sesi Google Meet.
                 </p>
               </div>
 
@@ -2376,12 +2436,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     </label>
                     <select
                       value={scheduleModeFilter}
-                      onChange={(e) => setScheduleModeFilter(e.target.value as 'all' | 'Bersemuka di Kampus' | 'Google Meet Maya')}
+                      onChange={(e) => setScheduleModeFilter(e.target.value as 'all' | 'Bersemuka di Kampus' | 'Google Meet')}
                       className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
                     >
                       <option value="all">Semua Mod</option>
-                      <option value="Google Meet Maya">Google Meet Maya</option>
-                      <option value="Bersemuka di Kampus">Bersemuka di Kampus</option>
+                      <option value="Google Meet">Google Meet</option>
+                      <option value="Bersemuka di Kampus">Bersemuka di Hab Usahawan</option>
                     </select>
                   </div>
                 }
@@ -2482,7 +2542,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               </td>
                               <td className="py-3.5 px-4 whitespace-nowrap">
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-200 border border-teal-200 dark:border-teal-800">
-                                  {mentee.meetingLink ? 'Google Meet Maya' : 'Bilik Bimbingan UMK CEED'}
+                                  {mentee.meetingLink || normalizeMentorshipMode(mentee.mode) === 'Google Meet'
+                                    ? 'Google Meet'
+                                    : 'Bilik Bimbingan Hab Usahawan'}
                                 </span>
                               </td>
                               <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
@@ -2798,7 +2860,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                   </div>
 
                                   <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-black/70 dark:text-white/75">
-                                    <span>Penyeliaan berterusan di bawah inisiatif keusahawanan UMK CEED</span>
+                                    <span>Penyeliaan berterusan di bawah inisiatif Hab Usahawan KBelia</span>
                                     <button
                                       type="button"
                                       onClick={() => handleOpenNotesModal(mentee)}
@@ -2847,7 +2909,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <div className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
                 <h3 className="text-base font-bold text-black dark:text-white">
-                  Pengeluaran Surat Perakuan Rasmi Geran Belia UMK
+                  Pengeluaran Surat Perakuan Rasmi Geran Belia
                 </h3>
               </div>
               <p className="text-[0.9375rem] text-black dark:text-white max-w-2xl leading-relaxed">
@@ -2875,7 +2937,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </h4>
               </div>
               <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
-                Disahkan oleh Universiti Malaysia Kelantan
+                Disahkan oleh Hab Pembangunan Usahawan Belia Kelantan
               </span>
             </div>
 
@@ -3661,7 +3723,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     Borang Perakuan Rasmi Geran Belia
                   </h3>
                   <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-                    Universiti Malaysia Kelantan &bull; Hab Usahawan Belia KBelia
+                    Hab Usahawan Belia Kelantan (KBelia) &bull; Panel Bimbingan Mentor
                   </p>
                 </div>
               </div>
@@ -3912,20 +3974,20 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Letterhead */}
             <div className="text-center space-y-1 pb-4 border-b-2 border-slate-900">
               <div className="flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-800 text-white flex items-center justify-center font-black text-sm">
-                  UMK
+                <div className="w-10 h-10 rounded-xl bg-emerald-800 text-white flex items-center justify-center font-black text-xs">
+                  KBELIA
                 </div>
                 <div className="text-left">
                   <h3 className="font-black text-base tracking-tight text-black uppercase">
-                    UNIVERSITI MALAYSIA KELANTAN
+                    HAB PEMBANGUNAN USAHAWAN BELIA KELANTAN
                   </h3>
                   <p className="text-[0.875rem] font-semibold text-black uppercase tracking-wider">
-                    INSTITUT KEUSAHAWANAN UMK (UMK CEED) &bull; HAB NIAGA BELIA KELANTAN
+                    PANEL BIMBINGAN MENTOR &amp; KEUSAHAWANAN &bull; PORTAL KBELIA
                   </p>
                 </div>
               </div>
               <p className="text-[0.875rem] text-black/70 pt-1">
-                Kampus Kota, Pengkalan Chepa, 16100 Kota Bharu, Kelantan &bull; Tel: +609-771 7000
+                Pusat Operasi Hab Usahawan Belia Kelantan, 15000 Kota Bharu, Kelantan &bull; Tel: +609-771 7000
               </p>
             </div>
 
@@ -4017,7 +4079,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <div className="inline-block p-3 rounded-2xl bg-amber-50 border-2 border-amber-400 text-center">
                   <ShieldCheck className="w-7 h-7 text-black mx-auto mb-1" />
                   <span className="font-black text-[0.8125rem] text-black uppercase tracking-wider block">
-                    PENGESAHAN DIGITAL UMK
+                    PENGESAHAN DIGITAL KBELIA
                   </span>
                   <span className="font-mono text-[0.8125rem] text-black/70 block">
                     STATUS: SAH DIPERAKUKAN
@@ -4412,8 +4474,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   onChange={(e) => setNewSlotMode(e.target.value as any)}
                   className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                 >
-                  <option value="Bersemuka di Kampus">Bersemuka di Kampus (Bilik Bimbingan UMK)</option>
-                  <option value="Google Meet Maya">Google Meet Maya</option>
+                  <option value="Bersemuka di Kampus">Bersemuka di Hab Usahawan (Bilik Bimbingan KBelia)</option>
+                  <option value="Google Meet">Google Meet</option>
                 </select>
               </div>
 

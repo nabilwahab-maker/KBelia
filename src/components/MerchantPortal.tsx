@@ -40,7 +40,8 @@ import {
   Search,
   SlidersHorizontal,
   ArrowUpDown,
-  Plus
+  Plus,
+  Wallet
 } from 'lucide-react';
 import { 
   BusinessListing, 
@@ -53,7 +54,8 @@ import {
   KioskDailySale,
   MaintenanceTicket,
   MentorshipRegistration,
-  MerchantSubTab
+  MerchantSubTab,
+  normalizeMentorshipMode
 } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -76,6 +78,7 @@ import { resolveBookingKioskImage } from '../utils/visualAssets';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { SaaSKpiCard } from './SaaSKpiCard';
+import { RoleDonutCard } from './RoleDonutCard';
 import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
 import {
   AreaChart,
@@ -948,11 +951,15 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   .map((item) => item.record);
                 const cash = dayRecs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
                 const qr = dayRecs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+                const expenses = dayRecs.reduce((s, r) => s + (Number(r.expenses) || 0), 0);
                 const value = cash + qr;
                 return {
                   label: includeDateLabel ? `${days[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}` : days[d.getDay()],
                   fullDate: `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`,
                   value,
+                  cashSales: cash,
+                  qrSales: qr,
+                  expenses,
                   tx: dayRecs.length,
                   qr: value > 0 ? Math.round((qr / value) * 100) : 0
                 };
@@ -988,12 +995,16 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   .map((item) => item.record);
                 const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
                 const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+                const expenses = recs.reduce((s, r) => s + (Number(r.expenses) || 0), 0);
                 const value = cash + qr;
                 const shortYear = String(d.getFullYear()).slice(-2);
                 return {
                   label: includeYear ? `${months[d.getMonth()]} '${shortYear}` : months[d.getMonth()],
                   fullDate: `${months[d.getMonth()]} ${d.getFullYear()}`,
                   value,
+                  cashSales: cash,
+                  qrSales: qr,
+                  expenses,
                   tx: recs.length,
                   qr: value > 0 ? Math.round((qr / value) * 100) : 0
                 };
@@ -1024,11 +1035,15 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 .map((item) => item.record);
               const cash = recs.reduce((s, r) => s + (Number(r.cashSales) || 0), 0);
               const qr = recs.reduce((s, r) => s + (Number(r.qrSales) || 0), 0);
+              const expenses = recs.reduce((s, r) => s + (Number(r.expenses) || 0), 0);
               const value = cash + qr;
               return {
                 label: qLabel,
                 fullDate: `Suku ${qIdx + 1} ${targetYear}`,
                 value,
+                cashSales: cash,
+                qrSales: qr,
+                expenses,
                 tx: recs.length,
                 qr: value > 0 ? Math.round((qr / value) * 100) : 0
               };
@@ -1047,6 +1062,20 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         const periodTotal = chartBars.reduce((s, b) => s + b.value, 0);
         const periodMax = Math.max(...chartBars.map(b => b.value), 0);
         const periodAvg = chartBars.length > 0 ? Math.round(periodTotal / chartBars.length) : 0;
+
+        // Payment Mix (Tunai vs Pembayaran QR) & Profit Margin synced with salesPeriod
+        const periodCashTotal = chartBars.reduce((s, b) => s + b.cashSales, 0);
+        const periodQrTotal = chartBars.reduce((s, b) => s + b.qrSales, 0);
+        const periodExpensesTotal = chartBars.reduce((s, b) => s + b.expenses, 0);
+        const periodNetProfit = periodTotal - periodExpensesTotal;
+        const periodProfitMargin = periodTotal > 0 ? Math.round((periodNetProfit / periodTotal) * 100) : 0;
+
+        const paymentMixSegments = [
+          { name: 'Pembayaran QR', value: periodQrTotal, color: '#2563EB' },
+          { name: 'Jualan Tunai', value: periodCashTotal, color: '#10B981' }
+        ];
+        const periodShortBadge =
+          salesPeriod === 'weekly' ? 'Mingguan' : salesPeriod === 'monthly' ? 'Bulanan' : 'Suku';
 
         // Dynamic Application Stepper based on user's actual state
         const hasBusiness = Boolean(myBusiness || userProfile?.businessName);
@@ -1070,7 +1099,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             step: 2,
             title: 'Pengesahan SSM & Hubungi',
             date: hasSsm ? 'Disahkan' : 'Menunggu',
-            officer: 'Pegawai PBT',
+            officer: 'Pegawai Pengesah',
             status: hasSsm ? 'completed' : hasBusiness ? 'current' : 'upcoming',
             desc: hasSsm
               ? `No. SSM (${myBusiness?.ssmNumber || userProfile?.ssmNumber}) telah direkodkan.`
@@ -1090,7 +1119,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             step: 4,
             title: 'Surat Tawaran & Perjanjian Digital',
             date: isBookingApproved ? (isTenancySigned ? 'Dimeterai' : 'Sedia Ditandatangani') : 'Menunggu Kelulusan',
-            officer: 'Penyelaras UMK',
+            officer: 'Penyelaras KBelia',
             status: isTenancySigned ? 'completed' : isBookingApproved ? 'current' : 'upcoming',
             desc: isTenancySigned
               ? 'Perjanjian sewaan digital telah ditandatangani.'
@@ -1118,7 +1147,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             tagColor: 'text-black dark:text-white/75',
             time: upcomingMentor.preferredDate || 'Dijadualkan',
             title: `Sesi Bimbingan: ${upcomingMentor.topic}`,
-            body: `${upcomingMentor.mentorName} · ${upcomingMentor.preferredTime} (${upcomingMentor.mode}).`,
+            body: `${upcomingMentor.mentorName} · ${upcomingMentor.preferredTime} (${normalizeMentorshipMode(upcomingMentor.mode)}).`,
             action: onOpenMentorshipClinic
           });
         }
@@ -1308,7 +1337,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   : 'Tempah sesi bimbingan mentor'
               }
               icon={Calendar}
-              trendLabel={upcomingMentor ? upcomingMentor.mode.split(' ')[0] : 'Sedia'}
+              trendLabel={
+                upcomingMentor
+                  ? normalizeMentorshipMode(upcomingMentor.mode) === 'Google Meet'
+                    ? 'Google Meet'
+                    : 'Hab Usahawan'
+                  : 'Sedia'
+              }
               trendDirection={upcomingMentor ? 'up' : 'neutral'}
               accentColor="violet"
               staggerIndex={3}
@@ -1316,11 +1351,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             />
           </div>
 
-          {/* [2] Graf Analitik Aliran Jualan Kiosk (Lebar Penuh) */}
-          <div
-            style={{ '--stagger': 4 } as React.CSSProperties}
-            className="animate-dashboard-card w-full rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
-          >
+          {/* [2] Seksyen Analitik 2:1 — Graf Aliran Jualan (2 Bahagian) + Donat Kategori & Stok (1 Bahagian) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 items-stretch">
+            <div
+              style={{ '--stagger': 4 } as React.CSSProperties}
+              className="animate-dashboard-card lg:col-span-2 h-full w-full rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col justify-between min-w-0"
+            >
             {/* Card Header */}
             <div className="border-b border-slate-300 dark:border-zinc-600 py-3 px-4 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div>
@@ -1331,7 +1367,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   </h4>
                 </div>
                 <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-                  Transaksi tunai &amp; DuitNow QR (data sebenar &amp; asas sampel)
+                  Transaksi tunai &amp; pembayaran QR (data sebenar &amp; asas sampel)
                 </p>
               </div>
 
@@ -1464,7 +1500,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                 <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
                                   <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
                                   <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                  <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                  <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% Pembayaran QR</div>
                                 </div>
                               );
                             }
@@ -1519,7 +1555,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                 <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
                                   <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
                                   <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                  <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% DuitNow QR</div>
+                                  <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% Pembayaran QR</div>
                                 </div>
                               );
                             }
@@ -1560,6 +1596,43 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 </div>
               </div>
             </div>
+            </div>
+
+            <RoleDonutCard
+              className="lg:col-span-1 h-full"
+              title="Saluran Bayaran & Untung"
+              subtitle="Nisbah Tunai vs QR mengikut tempoh"
+              icon={Wallet}
+              accentBarClass="bg-emerald-600/80 dark:bg-emerald-500/80"
+              headerRight={
+                <span className="text-[0.75rem] font-mono font-semibold text-black/70 dark:text-white/75 tabular-nums">
+                  {periodShortBadge}
+                </span>
+              }
+              segments={paymentMixSegments}
+              centerValue={`${periodProfitMargin}%`}
+              centerLabel="Margin Untung"
+              valueUnit="RM"
+              summaryPairs={[
+                {
+                  label: 'Untung Bersih',
+                  value: `${periodNetProfit < 0 ? '-' : ''}RM ${Math.abs(periodNetProfit).toLocaleString('ms-MY')}`,
+                  dotColor: periodNetProfit >= 0 ? '#10B981' : '#F43F5E'
+                },
+                {
+                  label: 'Kos / Belanja',
+                  value: `RM ${periodExpensesTotal.toLocaleString('ms-MY')}`,
+                  dotColor: '#F59E0B'
+                }
+              ]}
+              emptyState={{
+                title: 'Tiada Rekod Jualan Tempoh Ini',
+                description: 'Catat jualan tunai, pembayaran QR, dan kos di Buku Tunai untuk melihat pecahan saluran bayaran serta margin untung.',
+                actionLabel: 'Rekod Jualan',
+                onAction: () => setActiveTab('cashflow')
+              }}
+              staggerIndex={5}
+            />
           </div>
 
           {/* [3] Dua Lajur Ringkasan Seimbang Kiri & Kanan */}
@@ -1681,7 +1754,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </h4>
                   </div>
                   <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5">
-                    Status semakan semasa PBT &amp; UMK
+                    Status semakan semasa Jawatankuasa KBelia
                   </p>
                 </div>
 

@@ -24,7 +24,8 @@ import {
   MaintenanceTicket,
   MentorProfile,
   MentorshipRegistration,
-  ProductItem
+  ProductItem,
+  normalizeMentorshipMode
 } from '../types';
 import {
   updateCapsuleBookingRecord,
@@ -162,7 +163,7 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
         slotId,
         slotCode: selectedSlot?.code || booking?.slotCode || 'KBN-01',
         slotName: selectedSlot?.name || booking?.slotName || 'Kapsul Niaga',
-        hubLocation: selectedSlot?.hubLocation || booking?.hubLocation || 'Hub UMK Kampus Bachok',
+        hubLocation: selectedSlot?.hubLocation || booking?.hubLocation || 'Hab Usahawan Bachok',
         monthlyRate: selectedSlot?.monthlyRate ?? booking?.monthlyRate ?? 150,
         applicantId: booking?.applicantId,
         applicantName: applicantName.trim(),
@@ -1060,7 +1061,7 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
       setChallenges(registration.challenges || '');
       setPreferredDate(registration.preferredDate || new Date().toISOString().slice(0, 10));
       setPreferredTime(registration.preferredTime || '10:00 PG');
-      setMode(registration.mode || 'Bersemuka di Kampus');
+      setMode(normalizeMentorshipMode(registration.mode));
       setStatus(registration.status || 'pending');
       setMeetingLink(registration.meetingLink || '');
       setNotes(registration.notes || '');
@@ -1113,7 +1114,7 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
         ...(registration || {}),
         id,
         mentorId,
-        mentorName: selectedMentor?.name || registration?.mentorName || 'Mentor UMK',
+        mentorName: selectedMentor?.name || registration?.mentorName || 'Mentor KBelia',
         entrepreneurName: entrepreneurName.trim(),
         entrepreneurPhone: entrepreneurPhone.trim(),
         entrepreneurEmail: entrepreneurEmail.trim(),
@@ -1298,8 +1299,8 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
                 onChange={(e) => setMode(e.target.value as MentorshipRegistration['mode'])}
                 className={`${inputClass} cursor-pointer`}
               >
-                <option value="Bersemuka di Kampus">Bersemuka di Kampus</option>
-                <option value="Google Meet Maya">Google Meet Maya</option>
+                <option value="Bersemuka di Kampus">Bersemuka di Hab Usahawan</option>
+                <option value="Google Meet">Google Meet</option>
               </select>
             </div>
 

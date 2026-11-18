@@ -100,10 +100,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     {
       id: 'slide-1',
       title: 'Kiosk Belia Modular Pintar',
-      subtitle: 'Hab Kiosk Usahawan UMK Bachok & Kota Bharu',
+      subtitle: 'Hab Usahawan Bachok & Kota Bharu',
       description: 'Kiosk pasang-siap lengkap soket 13A, Wi-Fi 500Mbps, dan kawalan keselamatan serendah RM15/hari.',
       badge: 'Kekosongan Sedia',
-      location: 'Hub UMK Bachok & KB Sentral',
+      location: 'Hab Usahawan Bachok & KB Sentral',
       imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
       stat: `${slots.length} Kiosk Strategik`,
       ctaText: 'Mohon Kiosk',
@@ -112,12 +112,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     {
       id: 'slide-2',
       title: 'Batik Belia Kontemporari & Streetwear',
-      subtitle: 'Koleksi Fesyen Graduan Muda - Nur Syafiqah (Kota Bharu)',
+      subtitle: 'Koleksi Fesyen Usahawan Muda - Nur Syafiqah (Kota Bharu)',
       description: 'Batik canting kontemporari dengan motif flora moden pada kemeja cuban dan beg kanvas untuk pasaran eksport.',
-      badge: 'Usahawan Kraf Bimbingan UMK',
+      badge: 'Usahawan Kraf Bimbingan KBelia',
       location: 'Kota Bharu',
       imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
-      stat: 'Disahkan SSM',
+      stat: 'Berdaftar Sah',
       ctaText: 'Lihat Direktori',
       onAction: () => navigateToPage('login')
     },
@@ -127,7 +127,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       subtitle: "D'Kelate Artisan Coffee & Akok Tart - Ahmad Faizul",
       description: 'Gabungan kopi barista espresso serta kuih tradisi Akok Tart dan Kopi Nissem Melaka di kiosk inkubator belia.',
       badge: 'Inkubasi F&B Berjaya',
-      location: 'Hub UMK Bachok',
+      location: 'Hab Usahawan Bachok',
       imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
       stat: 'Inkubasi F&B Aktif',
       ctaText: 'Lihat Menu',
@@ -717,8 +717,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 {isBM
-                  ? 'Akses Geran Permulaan Negeri, geran digital MDEC, serta pembiayaan mikro TEKUN dan MARA.'
-                  : 'Access state seed grants, MDEC digital grants, and TEKUN/MARA micro-financing schemes.'}
+                  ? 'Akses Dana Pemula Niaga, Geran Digital, serta skim Pembiayaan Mikro untuk usahawan belia.'
+                  : 'Access starter capital funds, Digital Grants, and Micro-Financing schemes for youth entrepreneurs.'}
               </p>
               <div className="pt-2 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -784,12 +784,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <FileText className="w-6 h-6" />
               </div>
               <h3 className="font-extrabold text-base text-black dark:text-white">
-                {isBM ? 'Panduan SSM & Lesen' : 'Compliance & SSM Guide'}
+                {isBM ? 'Panduan Pendaftaran & Lesen' : 'Compliance & Licensing Guide'}
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 {isBM
-                  ? 'Panduan pendaftaran SSM, pematuhan cukai LHDN, pensijilan Halal JAKIM, dan lesen PBT.'
-                  : 'Interactive guidance for SSM registration, LHDN tax compliance, Halal JAKIM, and PBT permits.'}
+                  ? 'Panduan pendaftaran perniagaan, pematuhan cukai, pensijilan halal, dan pelesenan operasi.'
+                  : 'Interactive guidance for business registration, tax compliance, halal certification, and operating permits.'}
               </p>
               <div className="pt-2 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5" />

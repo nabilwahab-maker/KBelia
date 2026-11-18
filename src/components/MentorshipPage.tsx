@@ -14,13 +14,19 @@ import {
   AlertCircle,
   History,
   UserCheck,
+  ChevronLeft,
   ChevronRight,
+  Pause,
+  Play,
+  SlidersHorizontal,
   X,
   FileText
 } from 'lucide-react';
-import { KelantanDistrict, MentorProfile, MentorshipRegistration, PublishedMentorSlot } from '../types';
+import { KelantanDistrict, MentorProfile, MentorshipRegistration, PublishedMentorSlot, normalizeMentorshipMode } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { usePrefersReducedMotion } from '../hooks/useMotion';
 import { ModernDatePicker, ModernTimePicker, toLocalIsoDate } from './ModernDateTimePicker';
+import { PaginationBar, usePagination } from './PaginationBar';
 
 interface MentorshipPageProps {
   mentors: MentorProfile[];
@@ -48,20 +54,20 @@ const KELANTAN_DISTRICTS: KelantanDistrict[] = [
 ];
 
 const TOPIC_OPTIONS_MS = [
-  'Strategi Pemasaran Digital & TikTok Shop',
+  'Strategi Pemasaran Digital & E-Dagang',
   'Pengurusan Aliran Tunai & Penyata Kewangan Kiosk',
-  'Permohonan Pembiayaan TEKUN, MARA & Geran Negeri',
+  'Permohonan Pembiayaan Mikro & Geran Digital',
   'Penembusan Pasaran Eksport & Fesyen Batik Warisan',
-  'Pensijilan Halal JAKIM & Piawaian Makanan MeSTI',
+  'Pensijilan Halal & Piawaian Keselamatan Makanan',
   'Rundingan Pembekal & Pengurusan Inventori'
 ];
 
 const TOPIC_OPTIONS_EN = [
-  'Digital Marketing Strategy & TikTok Shop',
+  'Digital Marketing & E-Commerce Strategy',
   'Kiosk Cashflow & Financial Statement Management',
-  'TEKUN, MARA & State Grant Applications',
+  'Micro-Financing & Digital Grant Applications',
   'Export Market Entry & Heritage Batik Branding',
-  'Halal JAKIM & MeSTI Food Certification',
+  'Halal & Food Safety Certification Standards',
   'Supplier Negotiation & Inventory Control'
 ];
 
@@ -111,12 +117,17 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 }) => {
   const { language } = useLanguage();
   const isEn = language === 'en';
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const bookingSectionRef = useRef<HTMLDivElement | null>(null);
 
-  // Mentor filtering & selection
+  // Mentor filtering, spotlight rotation & selection
   const [searchQuery, setSearchQuery] = useState('');
-  const [agencyFilter, setAgencyFilter] = useState<'all' | 'umk' | 'insken' | 'industry'>('all');
+  const [agencyFilter, setAgencyFilter] = useState<'all' | 'internal' | 'industry'>('all');
+  const [expertiseFilter, setExpertiseFilter] = useState<string>('all');
+  const [spotlightIndex, setSpotlightIndex] = useState(0);
+  const [isSpotlightPaused, setIsSpotlightPaused] = useState(false);
+  const [isSpotlightHovered, setIsSpotlightHovered] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState<MentorProfile | null>(null);
   const [brokenAvatarIds, setBrokenAvatarIds] = useState<Record<string, boolean>>({});
 
@@ -132,7 +143,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
   const [challenges, setChallenges] = useState('');
   const [preferredDate, setPreferredDate] = useState('');
   const [preferredTime, setPreferredTime] = useState('10:00 AM - 11:00 AM');
-  const [mode, setMode] = useState<'Bersemuka di Kampus' | 'Google Meet Maya'>('Bersemuka di Kampus');
+  const [mode, setMode] = useState<'Bersemuka di Kampus' | 'Google Meet'>('Bersemuka di Kampus');
   const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -229,17 +240,37 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
     return sortedRegistrations.filter((r) => r.status === 'completed' || r.status === 'cancelled');
   }, [sortedRegistrations]);
 
+  const availableExpertiseOptions = useMemo(() => {
+    const unique = new Set<string>();
+    mentors.forEach((m) => {
+      (m.expertise || []).forEach((exp) => {
+        const trimmed = exp.trim();
+        if (trimmed) unique.add(trimmed);
+      });
+    });
+    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+  }, [mentors]);
+
   const filteredMentors = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return mentors.filter((m) => {
       const agencyText = m.agency.toLowerCase();
+      const isInternalMentor =
+        agencyText.includes('dalaman') ||
+        agencyText.includes('internal') ||
+        agencyText.includes('hab usahawan') ||
+        agencyText.includes('umk');
       const matchesAgency =
         agencyFilter === 'all' ||
-        (agencyFilter === 'umk' && agencyText.includes('umk')) ||
-        (agencyFilter === 'insken' && agencyText.includes('insken')) ||
-        (agencyFilter === 'industry' && !agencyText.includes('umk') && !agencyText.includes('insken'));
+        (agencyFilter === 'internal' && isInternalMentor) ||
+        (agencyFilter === 'industry' && !isInternalMentor);
 
       if (!matchesAgency) return false;
+
+      const matchesExpertise =
+        expertiseFilter === 'all' || (m.expertise || []).some((exp) => exp.trim() === expertiseFilter);
+
+      if (!matchesExpertise) return false;
       if (!q) return true;
 
       return (
@@ -250,7 +281,59 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
         m.expertise.some((exp) => exp.toLowerCase().includes(q))
       );
     });
-  }, [mentors, searchQuery, agencyFilter]);
+  }, [mentors, searchQuery, agencyFilter, expertiseFilter]);
+
+  const hasActiveFilters = Boolean(
+    searchQuery.trim() || agencyFilter !== 'all' || expertiseFilter !== 'all'
+  );
+
+  const mentorPagination = usePagination(filteredMentors, 3, [
+    searchQuery,
+    agencyFilter,
+    expertiseFilter,
+    filteredMentors.length
+  ]);
+
+  const historyPagination = usePagination(sessionHistory, 3, [sessionHistory.length]);
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setAgencyFilter('all');
+    setExpertiseFilter('all');
+  };
+
+  useEffect(() => {
+    setSpotlightIndex(0);
+  }, [searchQuery, agencyFilter, expertiseFilter, filteredMentors.length]);
+
+  useEffect(() => {
+    if (
+      prefersReducedMotion ||
+      isSpotlightPaused ||
+      isSpotlightHovered ||
+      filteredMentors.length <= 1
+    ) {
+      return;
+    }
+    const timer = window.setInterval(() => {
+      setSpotlightIndex((prev) => (prev + 1) % filteredMentors.length);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [prefersReducedMotion, isSpotlightPaused, isSpotlightHovered, filteredMentors.length]);
+
+  const safeSpotlightIndex =
+    filteredMentors.length > 0 ? spotlightIndex % filteredMentors.length : 0;
+  const spotlightMentor = filteredMentors[safeSpotlightIndex] || null;
+
+  const handlePrevSpotlight = () => {
+    if (filteredMentors.length <= 1) return;
+    setSpotlightIndex((prev) => (prev - 1 + filteredMentors.length) % filteredMentors.length);
+  };
+
+  const handleNextSpotlight = () => {
+    if (filteredMentors.length <= 1) return;
+    setSpotlightIndex((prev) => (prev + 1) % filteredMentors.length);
+  };
 
   const handleSelectMentor = (mentor: MentorProfile) => {
     if (hasActiveSession) return;
@@ -379,75 +462,85 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 
   return (
     <div className="w-full space-y-4">
-      {/* Page Intro Header */}
-      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700">
+      {/* Page Intro Header & Compact Single-Line Status Summary */}
+      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         <div className="space-y-1 max-w-2xl">
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance">
             {isEn ? 'Mentor Advisory & Appointments' : 'Bimbingan & Temu Janji Mentor'}
           </h1>
           <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed">
             {isEn
-              ? 'Choose one UMK or agency mentor at a time to schedule your 1-on-1 session.'
-              : 'Pilih seorang penasihat UMK atau agensi pada satu masa untuk menempah slot anda.'}
+              ? 'Explore featured mentors above, filter by agency or expertise, and book your 1-on-1 slot.'
+              : 'Tinjau mentor tumpuan di bawah, tapis mengikut agensi atau kepakaran, dan tempah slot 1-ke-1 anda.'}
           </p>
         </div>
-      </div>
 
-      {/* Ringkasan Statistik Ringkas */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
-        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Mentors' : 'Mentor'}</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{mentors.length}</span>
-        </div>
-        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Active Session' : 'Temu Janji Aktif'}</span>
-          <span className="text-lg font-black text-teal-700 dark:text-teal-400 tabular-nums">{activeSession ? 1 : 0}</span>
-        </div>
-        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Session History' : 'Sejarah Sesi'}</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{sessionHistory.length}</span>
-        </div>
-        <div className="bg-white dark:bg-zinc-900 px-4 py-3 rounded-xl border border-slate-300 dark:border-zinc-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Shown' : 'Dipaparkan'}</span>
-          <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{filteredMentors.length}</span>
+        {/* Clean Unboxed Status Bar Replacing 4 Stat Boxes */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm font-medium text-black/75 dark:text-white/80 tabular-nums shrink-0">
+          <span className="inline-flex items-center gap-1.5 font-semibold text-black dark:text-white">
+            {activeSession ? (
+              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            ) : (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            )}
+            <span>
+              {activeSession
+                ? isEn
+                  ? '1 Active Session'
+                  : '1 Temu Janji Aktif'
+                : isEn
+                ? 'Slot Ready to Book'
+                : 'Slot Sedia Ditempah'}
+            </span>
+          </span>
+          <span aria-hidden="true" className="text-black/30 dark:text-white/30">·</span>
+          <span>
+            <strong className="font-bold text-black dark:text-white">{mentors.length}</strong>{' '}
+            {isEn ? 'Mentors' : 'Mentor'}
+          </span>
+          <span aria-hidden="true" className="text-black/30 dark:text-white/30">·</span>
+          <span>
+            <strong className="font-bold text-black dark:text-white">{sessionHistory.length}</strong>{' '}
+            {isEn ? 'Past Sessions' : 'Sejarah Sesi'}
+          </span>
         </div>
       </div>
 
       {/* ================================================================= */}
-      {/* SECTION 1 (TOP): ACTIVE APPOINTMENT MANAGEMENT CARD               */}
+      {/* SECTION 1 (TOP): COMPACT ACTIVE APPOINTMENT (WHEN PRESENT)        */}
       {/* ================================================================= */}
-      <section aria-labelledby="active-appointment-heading">
-        <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 overflow-hidden">
-          <div className="px-5 sm:px-6 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2
-                id="active-appointment-heading"
-                className="text-sm sm:text-base font-extrabold text-black dark:text-white"
-              >
-                {isEn ? 'Your Active Mentorship Appointment' : 'Temu Janji Bimbingan Aktif Anda'}
-              </h2>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-                {isEn
-                  ? 'Only 1 active appointment is allowed per account at a time.'
-                  : 'Hanya 1 temu janji aktif dibenarkan bagi setiap akaun dalam satu masa.'}
-              </p>
+      {activeSession && (
+        <section aria-labelledby="active-appointment-heading">
+          <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 overflow-hidden">
+            <div className="px-5 sm:px-6 py-3.5 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2
+                  id="active-appointment-heading"
+                  className="text-sm sm:text-base font-extrabold text-black dark:text-white"
+                >
+                  {isEn ? 'Your Active Mentorship Appointment' : 'Temu Janji Bimbingan Aktif Anda'}
+                </h2>
+                <p className="text-sm text-black/70 dark:text-white/75">
+                  {isEn
+                    ? '1 active appointment per account at a time.'
+                    : '1 temu janji aktif dibenarkan pada satu masa.'}
+                </p>
+              </div>
+
+              {(() => {
+                const meta = getStatusMeta(activeSession.status);
+                const StatusIcon = meta.icon;
+                return (
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-sm font-bold self-start sm:self-auto ${meta.className}`}
+                  >
+                    <StatusIcon className="w-3.5 h-3.5 shrink-0" />
+                    <span>{meta.label}</span>
+                  </span>
+                );
+              })()}
             </div>
 
-            {activeSession && (() => {
-              const meta = getStatusMeta(activeSession.status);
-              const StatusIcon = meta.icon;
-              return (
-                <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-bold self-start sm:self-auto ${meta.className}`}
-                >
-                  <StatusIcon className="w-3.5 h-3.5 shrink-0" />
-                  <span>{meta.label}</span>
-                </span>
-              );
-            })()}
-          </div>
-
-          {activeSession ? (
             <div className="p-5 sm:p-6 space-y-5">
               {/* Primary Appointment Details */}
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
@@ -481,7 +574,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 
                     <div>
                       <div className="text-black/60 dark:text-white/65 font-medium flex items-center gap-1.5">
-                        {activeSession.mode === 'Google Meet Maya' ? (
+                        {normalizeMentorshipMode(activeSession.mode) === 'Google Meet' ? (
                           <Video className="w-3.5 h-3.5" />
                         ) : (
                           <MapPin className="w-3.5 h-3.5" />
@@ -489,7 +582,11 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                         <span>{isEn ? 'Session Mode' : 'Mod Sesi'}</span>
                       </div>
                       <div className="font-bold text-black dark:text-white mt-1">
-                        {activeSession.mode}
+                        {normalizeMentorshipMode(activeSession.mode) === 'Google Meet'
+                          ? 'Google Meet'
+                          : isEn
+                          ? 'In-Person (Entrepreneur Hub)'
+                          : 'Bersemuka di Hab Usahawan'}
                       </div>
                       <div className="text-black/75 dark:text-white/75">
                         {activeSession.district}
@@ -601,29 +698,343 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 )}
               </div>
             </div>
-          ) : (
-            <div className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 flex items-center justify-center shrink-0">
-                  <Calendar className="w-5 h-5" />
+          </div>
+        </section>
+      )}
+
+      {/* ================================================================= */}
+      {/* SECTION 2 (TOP): AUTO-ROTATING MOVING MENTOR SPOTLIGHT            */}
+      {/* ================================================================= */}
+      <section
+        aria-labelledby="mentor-spotlight-heading"
+        onMouseEnter={() => setIsSpotlightHovered(true)}
+        onMouseLeave={() => setIsSpotlightHovered(false)}
+        onFocusCapture={() => setIsSpotlightHovered(true)}
+        onBlurCapture={() => setIsSpotlightHovered(false)}
+      >
+        <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 overflow-hidden">
+          {/* Spotlight Header & Playback Controls */}
+          <div className="px-4 sm:px-6 py-3 border-b border-slate-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <GraduationCap className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+              <h2
+                id="mentor-spotlight-heading"
+                className="text-sm sm:text-base font-extrabold text-black dark:text-white whitespace-nowrap"
+              >
+                {isEn ? 'Mentor Spotlight' : 'Tumpuan Mentor'}
+              </h2>
+              {filteredMentors.length > 0 && (
+                <span className="text-xs font-mono font-bold text-black/60 dark:text-white/65 tabular-nums">
+                  {safeSpotlightIndex + 1} / {filteredMentors.length}
+                </span>
+              )}
+            </div>
+
+            {filteredMentors.length > 1 && (
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={handlePrevSpotlight}
+                  aria-label={isEn ? 'Previous mentor' : 'Mentor sebelum'}
+                  className="p-2 rounded-lg border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSpotlightPaused((prev) => !prev)}
+                  aria-pressed={isSpotlightPaused}
+                  aria-label={
+                    isSpotlightPaused
+                      ? isEn
+                        ? 'Resume auto-rotation'
+                        : 'Sambung giliran automatik'
+                      : isEn
+                      ? 'Pause auto-rotation'
+                      : 'Jeda giliran automatik'
+                  }
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-xs font-bold text-black dark:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  {isSpotlightPaused ? (
+                    <>
+                      <Play className="w-3.5 h-3.5 shrink-0" />
+                      <span>{isEn ? 'Play' : 'Main'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Pause className="w-3.5 h-3.5 shrink-0" />
+                      <span>{isEn ? 'Pause' : 'Jeda'}</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextSpotlight}
+                  aria-label={isEn ? 'Next mentor' : 'Mentor seterusnya'}
+                  className="p-2 rounded-lg border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Spotlight Card Body */}
+          {spotlightMentor ? (
+            <div className="p-4 sm:px-6 sm:py-5">
+              <div
+                key={spotlightMentor.id}
+                className={`flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                  prefersReducedMotion ? '' : 'animate-in fade-in duration-300'
+                }`}
+              >
+                <div className="flex items-start gap-4 min-w-0 flex-1">
+                  {spotlightMentor.avatarUrl && !brokenAvatarIds[spotlightMentor.id] ? (
+                    <img
+                      src={spotlightMentor.avatarUrl}
+                      alt={spotlightMentor.name}
+                      referrerPolicy="no-referrer"
+                      onError={() =>
+                        setBrokenAvatarIds((prev) => ({ ...prev, [spotlightMentor.id]: true }))
+                      }
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-300 dark:border-zinc-600 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-center justify-center text-lg font-black text-black dark:text-white shrink-0">
+                      {getInitials(spotlightMentor.name)}
+                    </div>
+                  )}
+
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs font-semibold text-black/65 dark:text-white/70 tabular-nums">
+                      <span>{spotlightMentor.agency}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>{spotlightMentor.availableDays}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>
+                        {spotlightMentor.activeMenteesCount ?? 0} {isEn ? 'mentees' : 'usahawan'}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-black dark:text-white leading-snug">
+                        {spotlightMentor.name}
+                      </h3>
+                      <p className="text-sm font-medium text-black/75 dark:text-white/80">
+                        {spotlightMentor.title}
+                      </p>
+                    </div>
+
+                    <p className="text-sm text-black/70 dark:text-white/75 leading-relaxed line-clamp-2">
+                      {spotlightMentor.bio}
+                    </p>
+
+                    <div className="text-xs sm:text-[0.8125rem] text-black/75 dark:text-white/80 pt-0.5">
+                      <span className="font-bold text-black dark:text-white">
+                        {isEn ? 'Expertise:' : 'Kepakaran:'}{' '}
+                      </span>
+                      <span>{spotlightMentor.expertise.join(' · ')}</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-black dark:text-white">
-                    {isEn ? 'No Active Appointment' : 'Tiada Temu Janji Aktif'}
-                  </h3>
-                  <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-0.5 leading-relaxed">
-                    {isEn
-                      ? 'Select one mentor from the directory below to book your 1-on-1 coaching session.'
-                      : 'Pilih seorang mentor daripada senarai di bawah untuk menempah sesi bimbingan 1-ke-1 anda.'}
-                  </p>
+
+                <div className="shrink-0 flex md:flex-col items-center md:items-end justify-between gap-2.5 pt-2 md:pt-0 border-t md:border-t-0 border-slate-200 dark:border-zinc-700">
+                  {activeSession?.mentorId === spotlightMentor.id ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-black dark:text-white text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>{isEn ? 'Active Mentor' : 'Mentor Aktif Anda'}</span>
+                    </button>
+                  ) : hasActiveSession ? (
+                    <button
+                      type="button"
+                      disabled
+                      aria-disabled="true"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black/55 dark:text-white/55 text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
+                    >
+                      <Lock className="w-4 h-4" />
+                      <span>{isEn ? 'Limit Reached' : 'Had Penuh'}</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleSelectMentor(spotlightMentor)}
+                      className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                        selectedMentor?.id === spotlightMentor.id
+                          ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
+                          : 'bg-teal-600 hover:bg-teal-700 text-white shadow-xs'
+                      }`}
+                    >
+                      <span>
+                        {selectedMentor?.id === spotlightMentor.id
+                          ? isEn
+                            ? 'Selected Below'
+                            : 'Sedang Dipilih'
+                          : isEn
+                          ? 'Select Mentor'
+                          : 'Pilih Mentor'}
+                      </span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
-              <span className="text-sm font-bold text-black dark:text-white inline-flex items-center gap-1.5 shrink-0">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>{isEn ? 'Slot Ready to Book' : 'Sedia Untuk Ditempah'}</span>
-              </span>
+
+              {/* Spotlight Step Indicators */}
+              {filteredMentors.length > 1 && (
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5" role="tablist" aria-label={isEn ? 'Featured mentors' : 'Pilihan mentor tumpuan'}>
+                    {filteredMentors.map((m, idx) => {
+                      const isActiveSlide = idx === safeSpotlightIndex;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          role="tab"
+                          aria-selected={isActiveSlide}
+                          aria-label={m.name}
+                          onClick={() => setSpotlightIndex(idx)}
+                          className={`h-2 rounded-full transition-all cursor-pointer ${
+                            isActiveSlide
+                              ? 'w-7 bg-teal-600 dark:bg-teal-400'
+                              : 'w-2 bg-slate-300 dark:bg-zinc-600 hover:bg-slate-400 dark:hover:bg-zinc-500'
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                  <span className="text-xs text-black/60 dark:text-white/65">
+                    {prefersReducedMotion || isSpotlightPaused
+                      ? isEn
+                        ? 'Auto-rotation paused'
+                        : 'Giliran automatik dijeda'
+                      : isSpotlightHovered
+                      ? isEn
+                        ? 'Paused while viewing'
+                        : 'Dijeda semasa ditinjau'
+                      : isEn
+                      ? 'Auto-rotating every 5s'
+                      : 'Bertukar automatik setiap 5 saat'}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-6 text-center space-y-2">
+              <p className="text-sm font-bold text-black dark:text-white">
+                {isEn ? 'No Matching Mentors Found' : 'Tiada Mentor Sepadan Ditemui'}
+              </p>
+              <p className="text-sm text-black/70 dark:text-white/75">
+                {isEn
+                  ? 'Clear your filters to browse all available mentors.'
+                  : 'Set semula penapis untuk melihat semua mentor yang tersedia.'}
+              </p>
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="mt-1 px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 text-sm font-bold text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+              >
+                {isEn ? 'Reset Filters' : 'Set Semula Penapis'}
+              </button>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ================================================================= */}
+      {/* SECTION 3: INTEGRATED FILTER BAR (SEARCH + AGENCY + EXPERTISE)    */}
+      {/* ================================================================= */}
+      <section aria-label={isEn ? 'Integrated mentor filter' : 'Penapis mentor bersepadu'}>
+        <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 p-3.5 sm:px-5 sm:py-3.5 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+          <div className="flex flex-col md:flex-row md:items-center gap-2.5 flex-1 min-w-0">
+            {/* Keyword Search */}
+            <div className="relative flex-1 min-w-[210px]">
+              <Search className="w-4 h-4 text-black/55 dark:text-white/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={
+                  isEn
+                    ? 'Search mentor name, agency, or topic...'
+                    : 'Cari nama mentor, agensi atau topik...'
+                }
+                className="w-full pl-9 pr-8 py-2 text-sm rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  aria-label={isEn ? 'Clear search' : 'Kosongkan carian'}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Agency Segmented Filter */}
+            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 overflow-x-auto shrink-0">
+              {(
+                [
+                  { id: 'all', label: isEn ? 'All' : 'Semua' },
+                  { id: 'internal', label: isEn ? 'Internal Mentors' : 'Mentor Dalaman' },
+                  { id: 'industry', label: isEn ? 'Industry Experts' : 'Pakar Industri' }
+                ] as const
+              ).map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setAgencyFilter(tab.id)}
+                  className={`px-3 py-1.5 text-sm font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                    agencyFilter === tab.id
+                      ? 'bg-white dark:bg-zinc-900 text-black dark:text-white shadow-xs'
+                      : 'text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Expertise Area Filter */}
+            <div className="relative md:w-64 shrink-0">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-black/55 dark:text-white/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <select
+                value={expertiseFilter}
+                onChange={(e) => setExpertiseFilter(e.target.value)}
+                aria-label={isEn ? 'Filter by expertise' : 'Tapis mengikut bidang kepakaran'}
+                className="w-full pl-9 pr-3 py-2 rounded-xl text-sm font-medium bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
+              >
+                <option value="all">
+                  {isEn ? 'All Expertise Areas' : 'Semua Bidang Kepakaran'}
+                </option>
+                {availableExpertiseOptions.map((exp) => (
+                  <option key={exp} value={exp}>
+                    {exp}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between xl:justify-end gap-2.5 shrink-0">
+            <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 tabular-nums whitespace-nowrap">
+              {filteredMentors.length} / {mentors.length} {isEn ? 'mentors' : 'mentor'}
+            </span>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 text-xs font-bold text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+              >
+                {isEn ? 'Reset' : 'Set Semula'}
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
@@ -760,14 +1171,14 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 </label>
                 <select
                   value={mode}
-                  onChange={(e) => setMode(e.target.value as 'Bersemuka di Kampus' | 'Google Meet Maya')}
+                  onChange={(e) => setMode(e.target.value as 'Bersemuka di Kampus' | 'Google Meet')}
                   className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
                 >
                   <option value="Bersemuka di Kampus">
-                    {isEn ? 'In-Person (UMK Campus)' : 'Bersemuka di Kampus UMK'}
+                    {isEn ? 'In-Person (Entrepreneur Hub)' : 'Bersemuka di Hab Usahawan'}
                   </option>
-                  <option value="Google Meet Maya">
-                    {isEn ? 'Google Meet (Online)' : 'Google Meet Maya (Atas Talian)'}
+                  <option value="Google Meet">
+                    Google Meet
                   </option>
                 </select>
               </div>
@@ -848,61 +1259,32 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       )}
 
       {/* ================================================================= */}
-      {/* SECTION 3 (BOTTOM): MENTOR DIRECTORY LIST                         */}
+      {/* SECTION 5 (BOTTOM): MENTOR DIRECTORY LIST                         */}
       {/* ================================================================= */}
-      <section aria-labelledby="mentor-list-heading" className="space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <section aria-labelledby="mentor-list-heading" className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2
               id="mentor-list-heading"
               className="text-base sm:text-lg font-extrabold text-black dark:text-white"
             >
-              {isEn ? 'Mentor Directory' : 'Senarai Mentor'}
+              {isEn ? 'All Matching Mentors' : 'Senarai Penuh Mentor'}
             </h2>
-            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
+            <p className="text-sm text-black/70 dark:text-white/75">
               {isEn
-                ? 'Select a mentor matching your business sector and advisory needs.'
-                : 'Pilih mentor yang sepadan dengan bidang dan keperluan bimbingan anda.'}
+                ? 'Synced directly with the integrated filter above.'
+                : 'Disegerakkan terus dengan penapis bersepadu di atas.'}
             </p>
           </div>
-
-          {/* Search + Agency Filter Controls */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-            <div className="relative w-full sm:w-64">
-              <Search className="w-4 h-4 text-black/60 dark:text-white/65 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={isEn ? 'Enter search keyword' : 'Masukkan kata kunci carian'}
-                className="w-full pl-9 pr-3.5 py-2 text-sm rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-              />
-            </div>
-
-            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 overflow-x-auto">
-              {(
-                [
-                  { id: 'all', label: isEn ? 'All' : 'Semua' },
-                  { id: 'umk', label: 'UMK' },
-                  { id: 'insken', label: 'INSKEN' },
-                  { id: 'industry', label: isEn ? 'Industry' : 'Industri' }
-                ] as const
-              ).map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setAgencyFilter(tab.id)}
-                  className={`px-3 py-1.5 text-sm font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                    agencyFilter === tab.id
-                      ? 'bg-white dark:bg-zinc-900 text-black dark:text-white shadow-xs'
-                      : 'text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <span className="text-sm font-semibold text-black/70 dark:text-white/75 tabular-nums">
+            {filteredMentors.length} {isEn ? 'shown' : 'dipaparkan'}
+            {filteredMentors.length > 0 && (
+              <>
+                {' · '}
+                {isEn ? 'Page' : 'Halaman'} {mentorPagination.currentPage}/{mentorPagination.totalPages}
+              </>
+            )}
+          </span>
         </div>
 
         {/* Active Lock Notice */}
@@ -925,23 +1307,21 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
             </p>
             <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
               {isEn
-                ? 'Try clearing your search keyword or changing the agency filter.'
-                : 'Cuba tukar kata carian atau pilih penapis agensi lain.'}
+                ? 'Try clearing your search keyword or changing the agency and expertise filters.'
+                : 'Cuba tukar kata carian atau pilih penapis agensi dan kepakaran lain.'}
             </p>
             <button
               type="button"
-              onClick={() => {
-                setSearchQuery('');
-                setAgencyFilter('all');
-              }}
+              onClick={handleResetFilters}
               className="mt-2 px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 text-sm font-bold text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
             >
               {isEn ? 'Reset Filters' : 'Set Semula Penapis'}
             </button>
           </div>
         ) : (
-          <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 overflow-hidden flex flex-col divide-y divide-slate-200 dark:divide-zinc-700 h-fit">
-            {filteredMentors.map((mentor) => {
+          <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 overflow-hidden flex flex-col h-fit">
+            <div className="divide-y divide-slate-200 dark:divide-zinc-700">
+            {mentorPagination.paginatedItems.map((mentor) => {
               const isCurrentBookedMentor = activeSession?.mentorId === mentor.id;
               const isSelectedForForm = selectedMentor?.id === mentor.id && !hasActiveSession;
               const showFallbackAvatar = !mentor.avatarUrl || brokenAvatarIds[mentor.id];
@@ -1041,6 +1421,16 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 </div>
               );
             })}
+            </div>
+            <PaginationBar
+              currentPage={mentorPagination.currentPage}
+              totalItems={mentorPagination.totalItems}
+              itemsPerPage={3}
+              onPageChange={mentorPagination.setCurrentPage}
+              itemLabel={isEn ? 'mentors' : 'mentor'}
+              accent="teal"
+              variant="compact"
+            />
           </div>
         )}
       </section>
@@ -1050,7 +1440,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       {/* ================================================================= */}
       <section aria-labelledby="session-history-heading" className="pt-2">
         <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 overflow-hidden">
-          <div className="px-5 sm:px-6 py-4 border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between gap-3">
+          <div className="px-5 sm:px-6 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <History className="w-4 h-4 text-black/75 dark:text-white/75" />
               <h2
@@ -1060,6 +1450,13 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 {isEn ? 'Session History' : 'Sejarah Sesi Bimbingan'}
               </h2>
             </div>
+            {sessionHistory.length > 0 && (
+              <span className="text-sm font-semibold text-black/70 dark:text-white/75 tabular-nums">
+                {sessionHistory.length} {isEn ? 'records' : 'rekod'}
+                {' · '}
+                {isEn ? 'Page' : 'Halaman'} {historyPagination.currentPage}/{historyPagination.totalPages}
+              </span>
+            )}
           </div>
 
           {sessionHistory.length === 0 ? (
@@ -1069,51 +1466,68 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 : 'Rekod sesi bimbingan yang telah selesai atau dibatalkan akan dipaparkan di sini.'}
             </div>
           ) : (
-            <div className="divide-y divide-slate-200 dark:divide-zinc-700">
-              {sessionHistory.map((item) => {
-                const meta = getStatusMeta(item.status);
-                const StatusIcon = meta.icon;
-                return (
-                  <div
-                    key={item.id}
-                    className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <div className="space-y-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 text-sm">
-                        <span className="font-bold text-black dark:text-white">
-                          {item.mentorName}
-                        </span>
-                        <span aria-hidden="true" className="text-black/40 dark:text-white/40">
-                          &middot;
-                        </span>
-                        <span className="text-black/75 dark:text-white/75 tabular-nums">
-                          {item.preferredDate} ({item.preferredTime})
-                        </span>
-                        <span aria-hidden="true" className="text-black/40 dark:text-white/40">
-                          &middot;
-                        </span>
-                        <span className="text-black/70 dark:text-white/70">{item.mode}</span>
-                      </div>
-                      <p className="text-[0.9375rem] text-black/80 dark:text-white/80 truncate">
-                        {item.topic}
-                      </p>
-                      {item.mentorActionPlan && (
-                        <p className="text-[0.875rem] text-black/65 dark:text-white/70 whitespace-pre-line pt-1">
-                          {item.mentorActionPlan}
-                        </p>
-                      )}
-                    </div>
-
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[0.8125rem] font-bold self-start sm:self-center whitespace-nowrap shrink-0 ${meta.className}`}
+            <>
+              <div className="divide-y divide-slate-200 dark:divide-zinc-700">
+                {historyPagination.paginatedItems.map((item) => {
+                  const meta = getStatusMeta(item.status);
+                  const StatusIcon = meta.icon;
+                  return (
+                    <div
+                      key={item.id}
+                      className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
-                      <StatusIcon className="w-3.5 h-3.5 shrink-0" />
-                      <span>{meta.label}</span>
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 text-sm">
+                          <span className="font-bold text-black dark:text-white">
+                            {item.mentorName}
+                          </span>
+                          <span aria-hidden="true" className="text-black/40 dark:text-white/40">
+                            &middot;
+                          </span>
+                          <span className="text-black/75 dark:text-white/75 tabular-nums">
+                            {item.preferredDate} ({item.preferredTime})
+                          </span>
+                          <span aria-hidden="true" className="text-black/40 dark:text-white/40">
+                            &middot;
+                          </span>
+                          <span className="text-black/70 dark:text-white/70">
+                            {normalizeMentorshipMode(item.mode) === 'Google Meet'
+                              ? 'Google Meet'
+                              : isEn
+                              ? 'In-Person (Entrepreneur Hub)'
+                              : 'Bersemuka di Hab Usahawan'}
+                          </span>
+                        </div>
+                        <p className="text-[0.9375rem] text-black/80 dark:text-white/80 truncate">
+                          {item.topic}
+                        </p>
+                        {item.mentorActionPlan && (
+                          <p className="text-[0.875rem] text-black/65 dark:text-white/70 whitespace-pre-line pt-1">
+                            {item.mentorActionPlan}
+                          </p>
+                        )}
+                      </div>
+
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[0.8125rem] font-bold self-start sm:self-center whitespace-nowrap shrink-0 ${meta.className}`}
+                      >
+                        <StatusIcon className="w-3.5 h-3.5 shrink-0" />
+                        <span>{meta.label}</span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <PaginationBar
+                currentPage={historyPagination.currentPage}
+                totalItems={historyPagination.totalItems}
+                itemsPerPage={3}
+                onPageChange={historyPagination.setCurrentPage}
+                itemLabel={isEn ? 'sessions' : 'sesi'}
+                accent="teal"
+                variant="compact"
+              />
+            </>
           )}
         </div>
       </section>

@@ -103,7 +103,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
             </span>
             <span className="text-black/35 dark:text-white/35">·</span>
             <span className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 font-medium">
-              Data Rasmi Disahkan UMK &amp; TEKUN
+              Data Rasmi Hab Usahawan KBelia
             </span>
           </div>
           <h2 className="text-2xl sm:text-[1.75rem] font-bold text-black dark:text-white tracking-tight">

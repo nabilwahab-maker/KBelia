@@ -124,7 +124,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                 {language === 'en' ? 'Kiosk Maintenance & Issue Ticket' : 'Tiket Aduan & Penyelenggaraan Kiosk'}
               </h3>
               <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-                {language === 'en' ? 'Technical & Facilities Unit UMK / Kelantan PBT' : 'Unit Teknikal & Fasiliti UMK / PBT Kelantan'}
+                {language === 'en' ? 'Technical & Facilities Unit, Kelantan Youth Hub' : 'Unit Teknikal & Fasiliti Hab Usahawan KBelia'}
               </p>
             </div>
           </div>
@@ -264,7 +264,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
               <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed max-w-sm mx-auto mb-6">
                 {language === 'en'
                   ? 'The facilities technical team has been notified. An on-duty technician will contact you within 2-4 working hours.'
-                  : 'Pasukan teknikal fasiliti UMK telah dimaklumkan. Juruteknik bertugas akan menghubungi anda dalam tempoh 2-4 jam waktu bekerja.'}
+                  : 'Pasukan teknikal fasiliti Hab Usahawan telah dimaklumkan. Juruteknik bertugas akan menghubungi anda dalam tempoh 2-4 jam waktu bekerja.'}
               </p>
               <button
                 type="button"

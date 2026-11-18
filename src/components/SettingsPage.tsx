@@ -111,7 +111,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
 
   // Mentor Specific States (Non-business)
   const [mentorExpertise, setMentorExpertise] = useState(userProfile?.expertise || 'Pemasaran Digital & E-Dagang');
-  const [mentorDepartment, setMentorDepartment] = useState(userProfile?.department || 'Fakulti Keusahawanan dan Perniagaan (FKP) UMK');
+  const [mentorDepartment, setMentorDepartment] = useState(userProfile?.department || 'Unit Bimbingan & Keusahawanan Hab Usahawan KBelia');
 
   // 2. Business & Brand States
   const [settingsLogoUrl, setSettingsLogoUrl] = useState<string>(userProfile?.logoUrl || myBusiness?.logoUrl || '');
@@ -471,12 +471,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
         confetti({ particleCount: 40, spread: 50 });
         setSettingsMessage({ 
           type: 'success', 
-          text: language === 'en' ? 'Academic mentor profile and focus updated successfully!' : 'Profil mentor akademik dan bidang pengkhususan bimbingan UMK berjaya dikemaskini!' 
+          text: language === 'en' ? 'Mentor profile and focus updated successfully!' : 'Profil mentor dan bidang pengkhususan bimbingan KBelia berjaya dikemaskini!' 
         });
         showToast({
           type: 'success',
           title: language === 'en' ? 'Mentor Profile Saved!' : 'Profil Mentor Disimpan!',
-          message: language === 'en' ? 'Your official academic mentoring profile has been updated.' : 'Maklumat bimbingan akademik dan fakulti anda telah dikemas kini.'
+          message: language === 'en' ? 'Your official mentoring profile has been updated.' : 'Maklumat bimbingan dan kepakaran anda telah dikemas kini.'
         });
       } else {
         // Admin profile update: admin details and system configs
@@ -538,7 +538,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
             {isAdmin 
               ? t('settings_superadmin_badge') 
               : isMentor 
-              ? (language === 'en' ? 'UMK Academic Mentor' : 'Mentor Bimbingan UMK') 
+              ? (language === 'en' ? 'KBelia Mentor' : 'Mentor Bimbingan KBelia') 
               : t('settings_verified_account')}
           </span>
         </div>
@@ -893,7 +893,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                       isAdmin 
                         ? (language === 'ms' ? 'Pentadbir Sistem Pentadbiran' : 'System Administrator')
                         : isMentor
-                        ? (language === 'ms' ? 'Mentor Bimbingan Akademik UMK' : 'UMK Academic Mentor')
+                        ? (language === 'ms' ? 'Mentor Bimbingan KBelia' : 'KBelia Mentor')
                         : (language === 'ms' ? 'Usahawan Belia Kelantan' : 'Kelantan Youth Entrepreneur')
                     )}
                   </div>
@@ -1037,20 +1037,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <div className="flex items-center gap-2">
                   <GraduationCap className="w-4 h-4 text-black dark:text-white/75" />
                   <h5 className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">
-                    {language === 'en' ? 'Mentor Academic & Mentoring Focus' : 'Maklumat Pengkhususan & Fakulti Mentor UMK'}
+                    {language === 'en' ? 'Mentor Unit & Mentoring Focus' : 'Maklumat Pengkhususan & Unit Mentor KBelia'}
                   </h5>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-bold text-black dark:text-white mb-1.5">
-                      {language === 'en' ? 'Academic Faculty' : 'Fakulti Akademik'} <span className="text-black dark:text-white">*</span>
+                      {language === 'en' ? 'Mentoring Unit' : 'Unit / Bidang Bimbingan'} <span className="text-black dark:text-white">*</span>
                     </label>
                     <input
                       type="text"
                       value={mentorDepartment}
                       onChange={(e) => setMentorDepartment(e.target.value)}
-                      placeholder={language === 'en' ? 'Enter academic faculty' : 'Masukkan nama fakulti'}
+                      placeholder={language === 'en' ? 'Enter mentoring unit' : 'Masukkan unit atau jabatan bimbingan'}
                       className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 dark:focus:border-blue-500"
                     />
                   </div>

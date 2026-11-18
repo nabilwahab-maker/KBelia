@@ -257,7 +257,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                 </span>
               </div>
               <p className="text-sm text-black/70 dark:text-white/75 truncate">
-                {resolvedName}{resolvedBusiness ? ` · ${resolvedBusiness}` : ''} · Pengesahan penyertaan rasmi program keusahawanan UMK &amp; negeri
+                {resolvedName}{resolvedBusiness ? ` · ${resolvedBusiness}` : ''} · Pengesahan penyertaan rasmi program keusahawanan belia KBelia
               </p>
             </div>
           </div>

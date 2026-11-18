@@ -157,7 +157,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                 Perjanjian Sewa Kiosk Digital Rasmi
               </h3>
               <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
-                Pusat Keusahawanan Universiti Malaysia Kelantan (UMK) & Kerajaan Negeri Kelantan
+                Hab Pembangunan Usahawan Belia Kelantan (KBelia)
               </span>
             </div>
           </div>
@@ -184,7 +184,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
           </div>
 
           <p>
-            Perjanjian ini dimeterai antara <strong>UNIVERSITI MALAYSIA KELANTAN & KERAJAAN NEGERI KELANTAN</strong> (Pemberi Sewa) dan <strong>{booking.applicantName}</strong> bagi pihak <strong>{booking.businessName}</strong> (Penyewa Kiosk).
+            Perjanjian ini dimeterai antara <strong>HAB PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBELIA)</strong> (Pemberi Sewa) dan <strong>{booking.applicantName}</strong> bagi pihak <strong>{booking.businessName}</strong> (Penyewa Kiosk).
           </p>
 
           <ol className="list-decimal pl-4 space-y-2 text-[0.8125rem]">

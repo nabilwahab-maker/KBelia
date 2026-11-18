@@ -38,7 +38,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
   const isCreating = !mentor;
   const [name, setName] = useState(mentor?.name || '');
   const [title, setTitle] = useState(mentor?.title || '');
-  const [agency, setAgency] = useState(mentor?.agency || 'Universiti Malaysia Kelantan (UMK)');
+  const [agency, setAgency] = useState(mentor?.agency || 'Hab Usahawan KBelia (Mentor Dalaman)');
   const [phone, setPhone] = useState(mentor?.phone || '');
   const [email, setEmail] = useState(mentor?.email || '');
   const [avatarUrl, setAvatarUrl] = useState(mentor?.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg');
@@ -54,7 +54,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
     if (isOpen) {
       setName(mentor?.name || '');
       setTitle(mentor?.title || '');
-      setAgency(mentor?.agency || 'Universiti Malaysia Kelantan (UMK)');
+      setAgency(mentor?.agency || 'Hab Usahawan KBelia (Mentor Dalaman)');
       setPhone(mentor?.phone || '');
       setEmail(mentor?.email || '');
       setAvatarUrl(mentor?.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg');
@@ -125,7 +125,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 {isCreating ? 'Tambah Mentor Baharu' : isAdminEditing ? 'Edit Profil Mentor' : 'Edit Profil Saya (Mentor)'}
               </h3>
               <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-                Info bimbingan, waktu temu janji dan maklumat perhubungan rasmi UMK
+                Info bimbingan, waktu temu janji dan maklumat perhubungan rasmi KBelia
               </p>
             </div>
           </div>

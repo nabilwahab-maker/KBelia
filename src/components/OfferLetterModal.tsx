@@ -167,7 +167,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
                   PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)
                 </div>
                 <div className="text-sm text-black/70 dark:text-white/75 mt-0.5">
-                  Inisiatif Bersama Universiti Malaysia Kelantan (UMK) & Kerajaan Negeri Kelantan
+                  Inisiatif Pembangunan Usahawan Belia Negeri Kelantan (KBelia)
                 </div>
               </div>
               <div className="text-left sm:text-right text-[0.8125rem] text-black/70 dark:text-white/75 space-y-1 font-mono">

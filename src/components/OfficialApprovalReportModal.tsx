@@ -264,7 +264,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                 <div>
                   <div className="flex items-center gap-2 text-[0.8125rem] font-extrabold uppercase tracking-widest text-black">
                     <ShieldCheck className="w-4 h-4 text-black shrink-0" />
-                    <span>KERAJAAN NEGERI KELANTAN · UNIVERSITI MALAYSIA KELANTAN (UMK)</span>
+                    <span>HAB USAHAWAN BELIA KELANTAN · PORTAL KBELIA</span>
                   </div>
                   <h1 className="text-xl sm:text-2xl font-black text-black mt-1 tracking-tight">
                     RINGKASAN RASMI KELULUSAN PERMOHONAN
@@ -340,7 +340,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                             <td className="p-2.5 font-mono text-black text-[0.9375rem]">{b.applicantMyKad ? maskMyKad(b.applicantMyKad) : 'Tidak Dinyatakan'}</td>
                             <td className="p-2.5">
                               <span className="font-mono font-bold text-black">{b.slotCode}</span>
-                              <span className="block text-sm text-black/75">{b.hubLocation || 'Hab UMK Bachok'}</span>
+                              <span className="block text-sm text-black/75">{b.hubLocation || 'Hab Usahawan Bachok'}</span>
                             </td>
                             <td className="p-2.5 text-right font-mono font-bold text-black">
                               RM{b.monthlyRate || 150}
@@ -414,7 +414,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
               <div className="pt-4 border-t-2 border-slate-300 flex flex-col sm:flex-row sm:items-end justify-between gap-5 text-sm text-black">
                 <div className="flex-1">
                   <div className="font-bold text-black text-[0.9375rem]">Urusetia Pentadbiran Keusahawanan Belia</div>
-                  <div className="text-sm text-black/75">Hab Pembangunan Belia Negeri Kelantan bersama UMK</div>
+                  <div className="text-sm text-black/75">Hab Pembangunan Usahawan Belia Kelantan (KBelia)</div>
                   <div className="text-[0.8125rem] text-black/70 mt-1">Dokumen ini dijana secara rasmi melalui Portal Sistem Niaga Belia Kelantan.</div>
                 </div>
 

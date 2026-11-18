@@ -237,7 +237,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         secondaryEntity: `${m.title} · ${m.agency}`,
         userType: 'mentor',
         userTypeLabel: 'Panel Mentor',
-        locationOrAgency: m.agency || 'Universiti Malaysia Kelantan',
+        locationOrAgency: m.agency || 'Hab Usahawan KBelia',
         activitySummary: m.expertise.slice(0, 2).join(', ') || 'Bimbingan Keusahawanan',
         metricDisplay: `${assignedSessions.length} Sesi (${completedSessions} Selesai)`,
         statusLabel: m.availableDays ? 'Mentor' : 'Jadual Penuh',

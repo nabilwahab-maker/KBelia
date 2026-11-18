@@ -79,7 +79,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
         rate: `RM ${rateVal}/bulan (Subsidi KBelia)`,
         issueDate: formatDisplayDate(matchedBooking.startDate),
         expiryDate: calculateOperationEndDate(matchedBooking.startDate, matchedBooking.durationMonths),
-        issuer: 'Pusat Pembangunan Keusahawanan, Universiti Malaysia Kelantan (UMK)'
+        issuer: 'Hab Pembangunan Usahawan Belia Kelantan (KBelia)'
       };
     }
 
@@ -129,12 +129,12 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
         refCode: q,
         status: 'valid',
         recipient: `${matchedEndorsement.menteeName} (${matchedEndorsement.businessName})`,
-        kioskLocation: matchedEndorsement.grantProgramTitle || 'Surat Perakuan Mentor UMK',
+        kioskLocation: matchedEndorsement.grantProgramTitle || 'Surat Perakuan Mentor KBelia',
         district: matchedEndorsement.district || 'Kelantan',
         rate: `Syor Perakuan: ${matchedEndorsement.recommendedAmount || 'RM3,000'}`,
         issueDate: formatDisplayDate(matchedEndorsement.issuedAt),
         expiryDate: 'Sah Perakuan Mentor',
-        issuer: `${matchedEndorsement.mentorName} (${matchedEndorsement.mentorAgency || 'UMK CEED'})`
+        issuer: `${matchedEndorsement.mentorName} (${matchedEndorsement.mentorAgency || 'Hab Usahawan KBelia'})`
       };
     }
 
@@ -173,7 +173,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
         rate: 'Sijil Keahlian Usahawan Belia Rasmi',
         issueDate: `Januari ${yr}`,
         expiryDate: `Disember ${yr}`,
-        issuer: 'Kerajaan Negeri Kelantan & Universiti Malaysia Kelantan (UMK)'
+        issuer: 'Hab Pembangunan Usahawan Belia Kelantan (KBelia)'
       };
     }
 
@@ -313,7 +313,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
                 Rekod Tidak Dijumpai ({verifiedRecord.refCode})
               </div>
               <p className="text-black dark:text-white leading-relaxed">
-                Nombor rujukan ini tiada dalam senarai kelulusan aktif atau belum disahkan oleh pihak Pentadbir UMK & KBelia. Sila semak semula ejaan nombor rujukan anda.
+                Nombor rujukan ini tiada dalam senarai kelulusan aktif atau belum disahkan oleh pihak Pentadbir Portal KBelia. Sila semak semula ejaan nombor rujukan anda.
               </p>
             </div>
           </div>

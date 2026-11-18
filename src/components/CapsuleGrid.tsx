@@ -40,7 +40,7 @@ interface CapsuleGridProps {
 
 const DISTRICT_TO_HUB: Record<string, string> = {
   'Semua Jajahan': 'Semua',
-  Bachok: 'Hub UMK Bachok',
+  Bachok: 'Hab Usahawan Bachok',
   'Kota Bharu': 'Hub Belia Kota Bharu',
   Tumpat: 'Hub Kraf Tumpat',
   'Pasir Mas': 'Hub Pasir Mas',
@@ -49,7 +49,7 @@ const DISTRICT_TO_HUB: Record<string, string> = {
 
 const HUB_TO_DISTRICT: Record<string, KelantanDistrict> = {
   Semua: 'Semua Jajahan',
-  'Hub UMK Bachok': 'Bachok',
+  'Hab Usahawan Bachok': 'Bachok',
   'Hub Belia Kota Bharu': 'Kota Bharu',
   'Hub Kraf Tumpat': 'Tumpat',
   'Hub Pasir Mas': 'Pasir Mas',
@@ -95,7 +95,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
     setInternalBudget(val);
   };
 
-  const hubs = ['Semua', 'Hub UMK Bachok', 'Hub Belia Kota Bharu', 'Hub Kraf Tumpat', 'Hub Pasir Mas', 'Hub Komuniti Jeli'];
+  const hubs = ['Semua', 'Hab Usahawan Bachok', 'Hub Belia Kota Bharu', 'Hub Kraf Tumpat', 'Hub Pasir Mas', 'Hub Komuniti Jeli'];
 
   const sortOptions = buildStandardSortOptions(
     [

@@ -1,17 +1,19 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { initializeFirestore, doc, getDoc } from 'firebase/firestore';
+import { initializeFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// CRITICAL: Bind to configured firestoreDatabaseId with auto long-polling for sandbox/iframe stability
+// CRITICAL: Bind to configured firestoreDatabaseId and force HTTP long-polling so
+// sandboxed/proxied iframe environments do not fail on initial WebChannel streaming attempts.
 export const db = initializeFirestore(
-  app, 
-  { 
-    experimentalAutoDetectLongPolling: true 
-  }, 
+  app,
+  {
+    experimentalForceLongPolling: true,
+    ignoreUndefinedProperties: true
+  },
   firebaseConfig.firestoreDatabaseId
 );
 
@@ -68,15 +70,21 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-// Safe connection test on boot
+// Safe connection test on boot using getDocFromServer
 export async function testConnection() {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return;
+  }
   try {
-    const testDoc = await getDoc(doc(db, 'test', 'connection'));
+    const testDoc = await getDocFromServer(doc(db, 'test', 'connection'));
     if (testDoc.exists()) {
       console.log('Firestore connected.');
     }
   } catch (error) {
-    // Graceful silent fallback for offline / preview sandbox
+    if (error instanceof Error && error.message.includes('the client is offline')) {
+      console.warn('Please check your Firebase configuration or network connection.');
+    }
+    // Graceful silent fallback for offline / preview sandbox cache resilience
     console.debug('Firestore running with offline cache resilience.');
   }
 }

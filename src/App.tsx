@@ -2052,7 +2052,7 @@ function MainApp() {
                   <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {isMentor 
                       ? 'Akaun anda adalah akaun Mentor. Modul kawalan pentadbir sistem hanya dikhaskan kepada pihak pentadbir KBelia.'
-                      : 'Halaman ini dikhaskan kepada Pentadbir Sistem Kerajaan Negeri & UMK.'}
+                      : 'Halaman ini dikhaskan kepada Pentadbir Sistem Portal KBelia.'}
                   </p>
                 </div>
                 <button
@@ -2105,7 +2105,7 @@ function MainApp() {
                   <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {isAdmin
                       ? 'Akaun Pentadbir menggunakan modul Panel Mentor di Pusat Kawalan Pentadbir untuk melantik serta memantau mentor, manakala ruang bimbingan ini dikhaskan kepada Mentor sahaja.'
-                      : 'Hab Bimbingan Mentor dikhaskan kepada panel mentor rasmi UMK & agensi keusahawanan.'}
+                      : 'Hab Bimbingan Mentor dikhaskan kepada panel mentor dalaman & pakar industri KBelia.'}
                   </p>
                 </div>
                 <button
@@ -2173,7 +2173,7 @@ function MainApp() {
                   <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     {language === 'en'
                       ? 'You are logged in with an Academic Mentor account. Business management is reserved for youth mentees. Please use the Mentor Coaching Hub.'
-                      : 'Akaun anda adalah Mentor Bimbingan UMK. Modul pengurusan bisnes dikhaskan kepada usahawan belia. Sila gunakan Hab Mentor untuk menyemak dan membimbing usahawan.'}
+                      : 'Akaun anda adalah Mentor Bimbingan KBelia. Modul pengurusan bisnes dikhaskan kepada usahawan belia. Sila gunakan Hab Mentor untuk menyemak dan membimbing usahawan.'}
                   </p>
                 </div>
                 <button
@@ -2420,7 +2420,7 @@ function MainApp() {
       {/* 10. Kiosk Maintenance Modal */}
       <KioskMaintenanceModal
         isOpen={isMaintenanceModalOpen}
-        defaultSlotCode={myBookings[0]?.slotCode || 'CAP-UMK-01'}
+        defaultSlotCode={myBookings[0]?.slotCode || 'CAP-BCH-01'}
         defaultKioskName={myBookings[0]?.slotName || 'Kiosk Modular KBelia'}
         onClose={() => setIsMaintenanceModalOpen(false)}
       />

@@ -255,7 +255,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   <span>{isEn ? 'Active Session:' : 'Sesi Aktif:'} {user.email}</span>
                 </div>
                 <div className="text-[0.8125rem] text-black dark:text-white/75 mt-0.5">
-                  {isEn ? 'Role:' : 'Peranan:'} {isAdmin ? 'Admin KBelia' : isMentor ? 'Mentor UMK' : 'Usahawan Belia'}
+                  {isEn ? 'Role:' : 'Peranan:'} {isAdmin ? 'Admin KBelia' : isMentor ? 'Mentor KBelia' : 'Usahawan Belia'}
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -714,7 +714,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                   <span>Demo Mentor</span>
                 </div>
                 <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
-                  Dr. Wan Azhar (UMK)
+                  Dr. Wan Azhar (Mentor Dalaman)
                 </div>
               </button>
 

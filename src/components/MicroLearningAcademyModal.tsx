@@ -35,35 +35,35 @@ const COURSES: CourseModule[] = [
     keyPoints: [
       'Asingkan akaun bank peribadi dan akaun perniagaan secara mutlak.',
       'Simpan sekurang-kurangnya RM150 pada awal bulan untuk sewa kiosk bersubsidi.',
-      'Gunakan DuitNow QR untuk mengelakkan ketirisan tunai fizikal.'
+      'Gunakan pembayaran QR tanpa tunai untuk mengelakkan ketirisan tunai fizikal.'
     ],
     isCompleted: false,
-    badge: 'Lencana Kewangan Bijak UMK'
+    badge: 'Lencana Kewangan Bijak KBelia'
   },
   {
     id: '2',
-    title: 'Standard Kebersihan & Pematuhan PBT Kelantan',
+    title: 'Standard Kebersihan & Pematuhan Operasi Kiosk',
     category: 'Operasi',
     duration: '6 Minit',
     description: 'Pematuhan standard keselamatan makanan, suntikan tifoid, dan susun atur ruang niaga kiosk kapsul.',
     keyPoints: [
       'Penyewa F&B wajib mempunyai sijil suntikan tifoid yang sah.',
-      'Sisa makanan mesti dibungkus rapi dan dibuang ke tong kitar semula kampus/daerah.',
+      'Sisa makanan mesti dibungkus rapi dan dibuang ke tong kitar semula hab niaga.',
       'Pastikan suis elektrik dan soket tidak terlebih beban (overload).'
     ],
     isCompleted: false,
-    badge: 'Lencana Kebersihan Piawai MPKB'
+    badge: 'Lencana Kebersihan Piawai KBelia'
   },
   {
     id: '3',
-    title: 'Pemasaran WhatsApp Commerce & TikTok Shop Tempatan',
+    title: 'Pemasaran WhatsApp Commerce & Video Digital Tempatan',
     category: 'Pemasaran Digital',
     duration: '7 Minit',
-    description: 'Teknik menarik pelanggan sekitar kampus UMK dan penduduk jajahan berkunjung ke kiosk anda.',
+    description: 'Teknik menarik pelanggan sekitar Hab Usahawan dan komuniti jajahan berkunjung ke kiosk anda.',
     keyPoints: [
       'Gunakan pautan WhatsApp ringkas dengan mesej pesanan siap sedia.',
-      'Muat naik video pendek suasana kiosk di TikTok dengan hashtag #NiagaBeliaKelantan.',
-      'Tawarkan diskaun 10% untuk pelajar UMK yang menunjukkan kad matrik.'
+      'Muat naik video pendek suasana kiosk dengan tanda pagar #NiagaBeliaKelantan.',
+      'Tawarkan promosi pakej komuniti 10% untuk pelanggan tetap di hab niaga.'
     ],
     isCompleted: false,
     badge: 'Lencana Pemasar Digital Belia'
@@ -138,7 +138,7 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
                 Akademi Mikro-Latihan Keusahawanan Belia
               </h3>
               <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
-                Pusat Pembangunan Usahawan Universiti Malaysia Kelantan (UMK)
+                Hab Pembangunan Usahawan Belia Kelantan (KBelia)
               </span>
             </div>
           </div>

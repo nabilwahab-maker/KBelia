@@ -227,7 +227,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
 
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-white dark:bg-slate-800 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 shadow-2xs">
                 <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white" />
-                Penyewa Sah UMK
+                Penyewa Sah KBelia
               </span>
             </div>
 

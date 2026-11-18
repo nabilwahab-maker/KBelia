@@ -320,8 +320,8 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                 ? 'Manage state grant schemes, training workshops, featured highlights, and youth entrepreneurship initiatives.'
                 : 'Urus senarai skim geran, bengkel latihan, pilihan utama, dan inisiatif keusahawanan belia Kelantan.'
               : isEn
-              ? 'Join incubation tracks, digital workshops, TEKUN/MARA/UMK matching, and kiosk rental subsidies.'
-              : 'Sertai inisiatif inkubasi, bengkel digital, padanan TEKUN/MARA/UMK, dan subsidi sewa kapsul niaga.'}
+              ? 'Join incubation tracks, digital workshops, micro-financing & digital grant matching, and kiosk rental subsidies.'
+              : 'Sertai inisiatif inkubasi, bengkel digital, padanan pembiayaan mikro & geran digital, dan subsidi sewa kapsul niaga.'}
           </p>
         </div>
 

@@ -22,9 +22,9 @@ export const INITIAL_PORTAL_NEWS: PortalNews[] = [
     id: 'news-demo-01',
     title: 'Permohonan Kiosk Belia Kelantan Sesi 2026 Dibuka Dengan Subsidi Sewaan 50%',
     summary:
-      'Kerajaan Negeri bersama UMK melancarkan pengambilan baharu tapak kiosk modular berhawa dingin di Kota Bharu, Bachok, Jeli dan Tumpat untuk usahawan muda berumur 18 hingga 35 tahun.',
+      'Hab Usahawan KBelia melancarkan pengambilan baharu tapak kiosk modular berhawa dingin di Kota Bharu, Bachok, Jeli dan Tumpat untuk usahawan muda berumur 18 hingga 35 tahun.',
     content:
-      'Pentadbir Pembangunan Usahawan Belia Kelantan (KBelia) dengan sukacitanya mengumumkan pembukaan permohonan tapak Kiosk Belia Sesi 2026 bermula minggu ini.\n\nInisiatif ini menawarkan subsidi sewaan sehingga 50% bagi tempoh enam bulan pertama bagi membantu usahawan muda memulakan perniagaan fizikal tanpa beban modal permulaan yang tinggi.\n\nSetiap unit kiosk dilengkapi kemudahan asas termasuk soket elektrik 13A, capaian WiFi berkelajuan tinggi, rak paparan moden, serta kod QR DuitNow bagi rekod jualan harian.\n\nPemohon yang berminat perlu mempunyai pendaftaran perniagaan yang sah atau sedang dalam proses pengesahan SSM serta menyertakan ringkasan pelan perniagaan melalui modul Tempahan Kiosk di portal ini.',
+      'Pentadbir Pembangunan Usahawan Belia Kelantan (KBelia) dengan sukacitanya mengumumkan pembukaan permohonan tapak Kiosk Belia Sesi 2026 bermula minggu ini.\n\nInisiatif ini menawarkan subsidi sewaan sehingga 50% bagi tempoh enam bulan pertama bagi membantu usahawan muda memulakan perniagaan fizikal tanpa beban modal permulaan yang tinggi.\n\nSetiap unit kiosk dilengkapi kemudahan asas termasuk soket elektrik 13A, capaian WiFi berkelajuan tinggi, rak paparan moden, serta kod QR bayaran tanpa tunai bagi rekod jualan harian.\n\nPemohon yang berminat perlu mempunyai pendaftaran perniagaan yang sah atau sedang dalam proses pengesahan pendaftaran serta menyertakan ringkasan pelan perniagaan melalui modul Tempahan Kiosk di portal ini.',
     category: 'Pengumuman',
     imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
     status: 'published',
@@ -58,7 +58,7 @@ export const INITIAL_PORTAL_NEWS: PortalNews[] = [
     summary:
       'Lebih 40 reruai usahawan belia, sesi padanan pembekal Ruang Niaga dan pertandingan pitching dana perniagaan bakal menghimpunkan komuniti niaga muda Pantai Timur.',
     content:
-      'Karnival Usahawan Muda Kelantan edisi tahun ini bakal berlangsung selama tiga hari di perkarangan KB Sentral, Kota Bharu dengan sasaran penyertaan lebih 40 jenama belia tempatan.\n\nAntara pengisian utama termasuk Pavilion Produk F&B dan Batik Belia, klinik semakan penjenamaan oleh pensyarah keusahawanan UMK, serta sesi padanan pembekal Ruang Niaga.\n\nPenyewa kiosk sedia ada digalakkan mendaftar slot pameran melalui menu Acara & Karnival bagi mempromosikan produk masing-masing kepada pelawat dan pelabur tempatan.',
+      'Karnival Usahawan Muda Kelantan edisi tahun ini bakal berlangsung selama tiga hari di perkarangan KB Sentral, Kota Bharu dengan sasaran penyertaan lebih 40 jenama belia tempatan.\n\nAntara pengisian utama termasuk Pavilion Produk F&B dan Batik Belia, klinik semakan penjenamaan oleh panel mentor Hab Usahawan, serta sesi padanan pembekal Ruang Niaga.\n\nPenyewa kiosk sedia ada digalakkan mendaftar slot pameran melalui menu Acara & Karnival bagi mempromosikan produk masing-masing kepada pelawat dan pelabur tempatan.',
     category: 'Program & Acara',
     imageUrl: '/assets/generated/banner_kelantan_landmark_1793924253242.jpg',
     status: 'published',
@@ -88,17 +88,17 @@ export const INITIAL_PORTAL_NEWS: PortalNews[] = [
   },
   {
     id: 'news-demo-05',
-    title: 'Jadual Klinik Bimbingan Mentor UMK & Bantuan Pengesahan SSM Pantas Bulan Ini',
+    title: 'Jadual Klinik Bimbingan Mentor & Bantuan Pengesahan Perniagaan Pantas Bulan Ini',
     summary:
-      'Panel mentor dari UMK dan agensi keusahawanan membuka slot konsultasi bersemuka dan Google Meet untuk semakan kos, penjenamaan dan strategi jualan.',
+      'Panel mentor dalaman Hab Usahawan dan pakar industri membuka slot konsultasi bersemuka serta Google Meet untuk semakan kos, penjenamaan dan strategi jualan.',
     content:
-      'Usahawan belia yang ingin memperkukuh rancangan perniagaan sebelum memohon pembiayaan boleh menempah sesi Klinik Bimbingan Mentor secara dalam talian atau bersemuka di kampus.\n\nSetiap mentor akan membimbing usahawan dari aspek pengiraan margin untung, pematuhan pendaftaran SSM, serta menyediakan minit jurnal dan pelan tindakan susulan.\n\nMentor yang terlibat juga boleh mengemas kini jadual kelapangan dan mengeluarkan surat perakuan geran secara digital melalui Portal Mentor masing-masing.',
+      'Usahawan belia yang ingin memperkukuh rancangan perniagaan sebelum memohon pembiayaan mikro atau geran digital boleh menempah sesi Klinik Bimbingan Mentor secara dalam talian atau bersemuka di Hab Usahawan.\n\nSetiap mentor akan membimbing usahawan dari aspek pengiraan margin untung, pematuhan pendaftaran perniagaan, serta menyediakan minit jurnal dan pelan tindakan susulan.\n\nMentor yang terlibat juga boleh mengemas kini jadual kelapangan dan mengeluarkan surat perakuan geran secara digital melalui Portal Mentor masing-masing.',
     category: 'Info Terkini',
     imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
     status: 'published',
     isPinned: false,
     authorId: 'demo-admin-id',
-    authorName: 'Sekretariat Bimbingan UMK',
+    authorName: 'Sekretariat Bimbingan Hab Usahawan',
     publishedAt: '2026-11-02T08:45:00.000Z',
     updatedAt: '2026-11-02T08:45:00.000Z',
     createdAt: '2026-11-02T08:45:00.000Z'

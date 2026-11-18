@@ -217,7 +217,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
         rows: [
           {
             label: language === 'en' ? 'Agency / Institution' : 'Agensi / Institusi',
-            value: userProfile?.institution || userProfile?.department || 'UMK / Agensi Pembimbing',
+            value: userProfile?.institution || userProfile?.department || 'Hab Usahawan / Rakan Industri',
             icon: 'building' as const,
           },
           {

@@ -243,11 +243,20 @@ export interface MaintenanceTicket {
   updatedAt?: string;
 }
 
+export type MentorshipMode = 'Bersemuka di Kampus' | 'Google Meet' | 'Google Meet Maya';
+
+export const normalizeMentorshipMode = (mode?: string): 'Bersemuka di Kampus' | 'Google Meet' => {
+  if (!mode) return 'Bersemuka di Kampus';
+  const lower = mode.toLowerCase();
+  if (lower.includes('google meet') || lower.includes('maya')) return 'Google Meet';
+  return 'Bersemuka di Kampus';
+};
+
 export interface PublishedMentorSlot {
   id: string;
   date: string;
   time: string;
-  mode: 'Bersemuka di Kampus' | 'Google Meet Maya';
+  mode: MentorshipMode;
   createdAt: string;
 }
 
@@ -284,7 +293,7 @@ export interface MentorshipRegistration {
   challenges?: string;
   preferredDate: string;
   preferredTime: string;
-  mode: 'Bersemuka di Kampus' | 'Google Meet Maya';
+  mode: MentorshipMode;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   notes?: string;
   mentorActionPlan?: string;
@@ -301,7 +310,7 @@ export interface MentorSession {
   expertise: string;
   date: string;
   time: string;
-  mode: 'Bersemuka di Kampus' | 'Google Meet Maya';
+  mode: MentorshipMode;
   status: 'open' | 'booked';
   bookedBy?: string;
   bookedPhone?: string;

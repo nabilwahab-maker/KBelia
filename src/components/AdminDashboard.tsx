@@ -46,7 +46,8 @@ import {
   PortalNews,
   CommunityPost,
   ProductItem,
-  BookingStatus
+  BookingStatus,
+  normalizeMentorshipMode
 } from '../types';
 import { 
   updateBookingStatus, 
@@ -83,6 +84,7 @@ import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import { INITIAL_COMMUNITY_POSTS } from '../data/communityData';
 import { UserTypeReportSection } from './UserTypeReportSection';
 import { SaaSKpiCard } from './SaaSKpiCard';
+import { RoleDonutCard } from './RoleDonutCard';
 import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
 import {
   BarChart,
@@ -377,7 +379,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [showSlotForm, setShowSlotForm] = useState(false);
   const [slotCode, setSlotCode] = useState('');
   const [slotName, setSlotName] = useState('');
-  const [slotHub, setSlotHub] = useState('Hub UMK Kampus Bachok');
+  const [slotHub, setSlotHub] = useState('Hab Usahawan Bachok');
   const [slotDistrict, setSlotDistrict] = useState<KelantanDistrict>('Bachok');
   const [slotSize, setSlotSize] = useState('10ft x 10ft Smart Pod');
   const [slotMonthlyRate, setSlotMonthlyRate] = useState('150');
@@ -1150,6 +1152,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         const activeDistrictsCount = districtChartData.filter(d => d.beroperasi > 0).length;
         const availableDistricts = districtChartData.filter(d => d.tersedia > 0);
 
+        const capsuleOperatingCount = safeSlots.filter(s => s && s.status === 'occupied').length;
+        const capsuleMaintenanceCount = safeSlots.filter(s => s && s.status === 'maintenance').length;
+        const capsuleReservedCount = safeSlots.filter(s => s && s.status === 'reserved').length;
+        const capsuleStatusSegments = [
+          { name: 'Beroperasi', value: capsuleOperatingCount, color: '#2563EB' },
+          { name: 'Kosong', value: availableSlotsCount, color: '#10B981' },
+          { name: 'Selenggara', value: capsuleMaintenanceCount, color: '#F59E0B' },
+          { name: 'Ditempah', value: capsuleReservedCount, color: '#4F46E5' }
+        ];
+
         return (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -1207,10 +1219,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* Ringkasan Admin: Graf Lebar Penuh -> Dua Lajur Seimbang -> Laporan Terperinci */}
             {adminTab === 'queue' && (
               <div key="queue-analytics" className="space-y-3.5 animate-dashboard-tab">
-                {/* 1. Graf Lebar Penuh: Analitik Infrastruktur & Permohonan Negeri */}
+                {/* 1. Seksyen Analitik 2:1 — Graf Infrastruktur (2 Bahagian) + Donat Status Unit Kapsul (1 Bahagian) */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 items-stretch">
                 <div
                   style={{ '--stagger': 4 } as React.CSSProperties}
-                  className="animate-dashboard-card relative rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm overflow-hidden transition-all duration-200 flex flex-col h-fit"
+                  className="animate-dashboard-card lg:col-span-2 h-full relative rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm overflow-hidden transition-all duration-200 flex flex-col justify-between min-w-0"
                 >
                   <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
                   <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
@@ -1421,6 +1434,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </>
                     )}
                   </div>
+                </div>
+
+                <RoleDonutCard
+                  className="lg:col-span-1 h-full"
+                  title="Status Unit Kapsul"
+                  subtitle="Pecahan fizikal kesemua unit negeri"
+                  icon={Building2}
+                  accentBarClass="bg-blue-600/80 dark:bg-blue-500/80"
+                  segments={capsuleStatusSegments}
+                  centerValue={safeSlots.length}
+                  centerLabel="Jumlah Unit"
+                  valueUnit="unit"
+                  summaryPairs={[
+                    { label: 'Sedia Disewa', value: `${availableSlotsCount} unit`, dotColor: '#10B981' },
+                    { label: 'Selenggara', value: `${capsuleMaintenanceCount} unit`, dotColor: '#F59E0B' }
+                  ]}
+                  emptyState={{
+                    title: 'Tiada Unit Kapsul',
+                    description: 'Tambah slot kapsul baharu untuk memantau pecahan status operasi dan penyelenggaraan.',
+                    actionLabel: 'Urus Slot Kapsul',
+                    onAction: () => setAdminTab('slots')
+                  }}
+                  staggerIndex={5}
+                />
                 </div>
 
                 {/* 2. Dua Lajur Seimbang Kiri & Kanan (Ketinggian Sekata Tanpa Ruang Kosong) */}
@@ -3266,11 +3303,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="space-y-1">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
                 <GraduationCap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Pusat Bimbingan Mentor UMK</span>
+                <span>Hab Bimbingan Mentor KBelia</span>
               </div>
               <h3 className="text-xl font-bold text-black dark:text-white">Pemantauan Mentor &amp; Usahawan Kelantan</h3>
               <p className="text-[0.9375rem] text-black dark:text-white max-w-2xl leading-relaxed">
-                Pantau sesi janji temu bimbingan usahawan belia bersama mentor UMK dan pakar industri.
+                Pantau sesi janji temu bimbingan usahawan belia bersama mentor dalaman dan pakar industri.
               </p>
             </div>
           </div>
@@ -3663,7 +3700,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             </td>
                             <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
                               <p className="font-medium text-black dark:text-white">{m.preferredDate}</p>
-                              <p className="text-xs text-black/60 dark:text-white/65">{m.mode}</p>
+                              <p className="text-xs text-black/60 dark:text-white/65">{normalizeMentorshipMode(m.mode)}</p>
                             </td>
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <span

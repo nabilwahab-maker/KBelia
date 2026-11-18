@@ -1013,14 +1013,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       authUser = {
         uid: 'user-mentor-1',
         displayName: 'Prof. Madya Dr. Wan Azhar',
-        email: 'wanazhar@umk.edu.my',
+        email: 'wanazhar@kbelia.my',
         photoURL: '/assets/generated/avatar_mentor_umk_1793924250411.jpg',
         isDemo: true
       };
       profile = {
         userId: 'user-mentor-1',
         fullName: 'Prof. Madya Dr. Wan Azhar',
-        email: 'wanazhar@umk.edu.my',
+        email: 'wanazhar@kbelia.my',
         role: 'mentor',
         mentorId: 'mentor-1',
         phone: '60199887711',
@@ -1033,14 +1033,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       authUser = {
         uid: 'user-mentor-2',
         displayName: 'Puan Siti Aminah Binti Yusof',
-        email: 'sitiaminah.coach@insken.gov.my',
+        email: 'sitiaminah.mentor@kbelia.my',
         photoURL: '/assets/generated/usahawan_belia_wanita.jpg',
         isDemo: true
       };
       profile = {
         userId: 'user-mentor-2',
         fullName: 'Puan Siti Aminah Binti Yusof',
-        email: 'sitiaminah.coach@insken.gov.my',
+        email: 'sitiaminah.mentor@kbelia.my',
         role: 'mentor',
         mentorId: 'mentor-2',
         phone: '60129876543',
@@ -1053,14 +1053,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       authUser = {
         uid: 'user-mentor-3',
         displayName: 'En. Khairul Hafiz Bin Razali, CA',
-        email: 'khairul.audit@smeadvisor.my',
+        email: 'khairul.audit@kbelia.my',
         photoURL: '/assets/generated/avatar_admin_kelantan_1793924251898.jpg',
         isDemo: true
       };
       profile = {
         userId: 'user-mentor-3',
         fullName: 'En. Khairul Hafiz Bin Razali, CA',
-        email: 'khairul.audit@smeadvisor.my',
+        email: 'khairul.audit@kbelia.my',
         role: 'mentor',
         mentorId: 'mentor-3',
         phone: '60139123456',
@@ -1073,14 +1073,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       authUser = {
         uid: 'user-mentor-4',
         displayName: 'Ts. Dr. Norazila Binti Mat Deris',
-        email: 'norazila.fiat@umk.edu.my',
+        email: 'norazila.mentor@kbelia.my',
         photoURL: '/assets/generated/avatar_youth_female_1793924250745.jpg',
         isDemo: true
       };
       profile = {
         userId: 'user-mentor-4',
         fullName: 'Ts. Dr. Norazila Binti Mat Deris',
-        email: 'norazila.fiat@umk.edu.my',
+        email: 'norazila.mentor@kbelia.my',
         role: 'mentor',
         mentorId: 'mentor-4',
         phone: '60145556677',

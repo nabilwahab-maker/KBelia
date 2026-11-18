@@ -80,9 +80,9 @@ export const INITIAL_COMMUNITY_POSTS: CommunityPost[] = [
   },
   {
     id: 'comm-demo-04',
-    title: 'Adakah Pemohon Geran Benih Perlu Daftar Lesen PBT Terlebih Dahulu Atau Cukup SSM Sahaja?',
+    title: 'Adakah Pemohon Geran Benih Perlu Daftar Lesen Premis Terlebih Dahulu Atau Cukup SSM Sahaja?',
     content:
-      'Saya baru menjalankan perniagaan jahitan pakaian kasual dari rumah selama 4 bulan dan telah mendaftar SSM secara sah. Saya bercadang memohon Geran Benih Modal RM3,000 serta menempah satu kapsul pameran hujung minggu.\n\nBolehkah pihak Pentadbir atau Mentor mengesahkan sama ada lesen premis PBT wajib dimuat naik semasa peringkat permohonan awal geran?',
+      'Saya baru menjalankan perniagaan jahitan pakaian kasual dari rumah selama 4 bulan dan telah mendaftar SSM secara sah. Saya bercadang memohon Geran Benih Modal RM3,000 serta menempah satu kapsul pameran hujung minggu.\n\nBolehkah pihak Pentadbir atau Mentor mengesahkan sama ada lesen premis operasi wajib dimuat naik semasa peringkat permohonan awal geran?',
     category: 'Lesen & SSM',
     district: 'Machang',
     authorId: 'demo-youth-syafiq',
@@ -101,7 +101,7 @@ export const INITIAL_COMMUNITY_POSTS: CommunityPost[] = [
     id: 'comm-demo-05',
     title: 'Strategi Naikkan Jualan QR & Pesanan Ulangan Pelanggan Untuk Kiosk Makanan Petang',
     content:
-      'Kongsi sikit pengalaman saya selepas 2 bulan berniaga di Hub KB Sentral. Dulu pelanggan beli sekali sahaja, tetapi selepas kami letakkan kod QR Kad Digital KBelia bersama kupon diskaun pembelian ke-5 di bungkusan, pelanggan tetap naik hampir 35%.\n\nAda sesiapa yang mahu berkongsi teknik kandungan video pendek TikTok atau WhatsApp Broadcast yang paling berkesan untuk tarik pelanggan sekitar kampus?',
+      'Kongsi sikit pengalaman saya selepas 2 bulan berniaga di Hub KB Sentral. Dulu pelanggan beli sekali sahaja, tetapi selepas kami letakkan kod QR Kad Digital KBelia bersama kupon diskaun pembelian ke-5 di bungkusan, pelanggan tetap naik hampir 35%.\n\nAda sesiapa yang mahu berkongsi teknik kandungan video pendek atau WhatsApp Broadcast yang paling berkesan untuk tarik pelanggan sekitar hab niaga?',
     category: 'Pemasaran & Jualan',
     district: 'Kota Bharu',
     authorId: 'demo-youth-hani',
@@ -177,7 +177,7 @@ export const INITIAL_COMMUNITY_REPLIES: CommunityReply[] = [
     id: 'comm-rep-06',
     postId: 'comm-demo-04',
     content:
-      'Untuk peringkat permohonan Geran Benih Modal RM3,000, pendaftaran SSM yang aktif sudah memadai. Lesen penjaja atau permit operasi PBT hanya perlu diselesaikan selepas kelulusan penempatan tapak kapsul niaga dikeluarkan.',
+      'Untuk peringkat permohonan Geran Benih Modal RM3,000, pendaftaran SSM yang aktif sudah memadai. Lesen penjaja atau permit operasi tapak hanya perlu diselesaikan selepas kelulusan penempatan tapak kapsul niaga dikeluarkan.',
     authorId: 'mentor-wan-azhar',
     authorName: 'Dr. Wan Azhar',
     authorRole: 'mentor',
@@ -188,7 +188,7 @@ export const INITIAL_COMMUNITY_REPLIES: CommunityReply[] = [
     id: 'comm-rep-07',
     postId: 'comm-demo-05',
     content:
-      'Tip yang sangat bagus! Cuba gabungkan waktu siaran video pendek sekitar jam 4.00 petang dengan tawaran kombo pelajar selama 2 jam pertama selepas kelas tamat.',
+      'Tip yang sangat bagus! Cuba gabungkan waktu siaran video pendek sekitar jam 4.00 petang dengan tawaran kombo petang selama 2 jam pertama selepas waktu bekerja.',
     authorId: 'mentor-wan-azhar',
     authorName: 'Dr. Wan Azhar',
     authorRole: 'mentor',

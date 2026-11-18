@@ -44,7 +44,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
             pageLabel: 'Admin',
             breadcrumb: isMs ? 'Dashboard Admin' : 'Admin Dashboard',
             dashboardTitle: 'ADMIN DASHBOARD',
-            subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+            subtitle: 'HAB USAHAWAN BELIA KELANTAN',
             icon: ShieldCheck,
             iconBg: 'bg-rose-600'
           };
@@ -54,7 +54,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
             pageLabel: 'Mentor',
             breadcrumb: isMs ? 'Dashboard Mentor' : 'Mentor Dashboard',
             dashboardTitle: 'MENTOR DASHBOARD',
-            subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+            subtitle: 'HAB USAHAWAN BELIA KELANTAN',
             icon: GraduationCap,
             iconBg: 'bg-teal-600'
           };
@@ -63,7 +63,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Belia' : 'Youth',
           breadcrumb: isMs ? 'Dashboard Belia' : 'Belia Dashboard',
           dashboardTitle: 'BELIA DASHBOARD',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Store,
           iconBg: 'bg-blue-600'
         };
@@ -73,7 +73,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Belia' : 'Youth',
           breadcrumb: isMs ? 'Dashboard Belia' : 'Belia Dashboard',
           dashboardTitle: 'BELIA DASHBOARD',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Store,
           iconBg: 'bg-teal-600'
         };
@@ -83,7 +83,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: 'Mentor',
           breadcrumb: isMs ? 'Dashboard Mentor' : 'Mentor Dashboard',
           dashboardTitle: 'MENTOR DASHBOARD',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: GraduationCap,
           iconBg: 'bg-teal-600'
         };
@@ -93,7 +93,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Bimbingan' : 'Mentoring',
           breadcrumb: isMs ? 'Temu Janji & Senarai Mentor' : 'Mentor Advisory & Appointments',
           dashboardTitle: isMs ? 'BIMBINGAN MENTOR' : 'MENTOR ADVISORY',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: GraduationCap,
           iconBg: 'bg-teal-600'
         };
@@ -103,7 +103,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: 'Admin',
           breadcrumb: isMs ? 'Dashboard Admin' : 'Admin Dashboard',
           dashboardTitle: 'ADMIN DASHBOARD',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: ShieldCheck,
           iconBg: 'bg-rose-600'
         };
@@ -113,7 +113,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Kiosk Belia' : 'Modular Kiosks',
           breadcrumb: isMs ? 'Senarai & Tempahan Kiosk' : 'Modular Kiosks & Capsules',
           dashboardTitle: isMs ? 'KIOSK USAHAWAN BELIA' : 'MODULAR KIOSK DASHBOARD',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Building2,
           iconBg: 'bg-indigo-600'
         };
@@ -123,7 +123,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Senarai Kedai' : 'Directory',
           breadcrumb: isMs ? 'Senarai Usahawan Kelantan' : 'Entrepreneurs Directory',
           dashboardTitle: 'DIREKTORI USAHAWAN',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Users,
           iconBg: 'bg-emerald-600'
         };
@@ -133,7 +133,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Geran' : 'Grants',
           breadcrumb: isMs ? 'Geran dan Bantuan Modal' : 'Youth Grants & Financing',
           dashboardTitle: 'GERAN & PEMBIAYAAN BELIA',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Award,
           iconBg: 'bg-emerald-600'
         };
@@ -143,7 +143,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Acara' : 'Events',
           breadcrumb: isMs ? 'Program & Ekspo Belia' : 'Youth Events & Expo',
           dashboardTitle: 'ACARA & EKSPO DASHBOARD',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Calendar,
           iconBg: 'bg-teal-600'
         };
@@ -153,7 +153,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Ruang Niaga' : 'Ads',
           breadcrumb: isMs ? 'Ruang Iklan & Pembekal' : 'Youth Ads & Commercial',
           dashboardTitle: 'HAB IKLAN & NIAGA',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Briefcase,
           iconBg: 'bg-emerald-600'
         };
@@ -163,7 +163,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Kira Untung' : 'Calculator',
           breadcrumb: isMs ? 'Kira Kelayakan Geran' : 'Grant Eligibility Calculator',
           dashboardTitle: 'KALKULATOR KELAYAKAN',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Coins,
           iconBg: 'bg-emerald-600'
         };
@@ -173,7 +173,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: 'News',
           breadcrumb: isMs ? 'Berita & Pengumuman' : 'Official News & Updates',
           dashboardTitle: 'BERITA RASMI KBELIA',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Newspaper,
           iconBg: 'bg-indigo-600'
         };
@@ -183,7 +183,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Komuniti' : 'Community',
           breadcrumb: isMs ? 'Forum & Soal Jawab Usahawan' : 'Entrepreneur Forum & Q&A',
           dashboardTitle: 'KOMUNITI USAHAWAN KBELIA',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: MessagesSquare,
           iconBg: 'bg-blue-600'
         };
@@ -193,7 +193,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Tetapan' : 'Settings',
           breadcrumb: isMs ? 'Tetapan Akaun' : 'Account Settings',
           dashboardTitle: 'TETAPAN AKAUN',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Settings,
           iconBg: 'bg-indigo-600'
         };
@@ -203,7 +203,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
           pageLabel: isMs ? 'Dashboard' : 'Dashboard',
           breadcrumb: isMs ? 'Utama' : 'Home',
           dashboardTitle: 'BELIA DASHBOARD',
-          subtitle: 'UNIVERSITI MALAYSIA KELANTAN',
+          subtitle: 'HAB USAHAWAN BELIA KELANTAN',
           icon: Landmark,
           iconBg: 'bg-blue-600'
         };

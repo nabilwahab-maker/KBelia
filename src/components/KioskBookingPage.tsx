@@ -442,7 +442,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   Permohonan Sewa Kiosk Belia
                 </h1>
                 <p className="text-[0.9375rem] text-black/75 dark:text-white/75">
-                  Universiti Malaysia Kelantan (UMK) &amp; Kerajaan Negeri Kelantan
+                  Hab Pembangunan Usahawan Belia Kelantan (KBelia)
                 </p>
               </div>
             </div>
@@ -733,7 +733,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                           {
                             months: 6,
                             title: '6 Bulan',
-                            subtitle: 'Pakej Semester UMK',
+                            subtitle: 'Pakej Pertumbuhan',
                             total: `RM ${(monthlyRate * 6).toLocaleString()}`,
                             badge: 'Paling Popular'
                           },

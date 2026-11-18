@@ -297,7 +297,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 Permohonan Sewa Kiosk Belia
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white">
-                Universiti Malaysia Kelantan (UMK) & Kerajaan Negeri Kelantan
+                Hab Pembangunan Usahawan Belia Kelantan (KBelia)
               </p>
             </div>
           </div>
@@ -565,7 +565,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         {
                           months: 6,
                           title: '6 Bulan',
-                          subtitle: 'Pakej Semester UMK',
+                          subtitle: 'Pakej Pertumbuhan',
                           total: `RM ${(monthlyRate * 6).toLocaleString()}`,
                           badge: 'Paling Popular',
                           badgeColor: 'bg-amber-50 text-black border border-amber-200 dark:bg-amber-950/40 dark:text-white font-bold'

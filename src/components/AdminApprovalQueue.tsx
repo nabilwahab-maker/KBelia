@@ -423,7 +423,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   const handleApproveGrant = async (id: string) => {
     setActionLoading(id);
     try {
-      await onApproveGrant(id, adminNoteInput[id] || 'Bantuan dana geran diluluskan oleh panel penilai UMK & YUBK.');
+      await onApproveGrant(id, adminNoteInput[id] || 'Bantuan dana geran diluluskan oleh panel penilai Hab Usahawan KBelia.');
     } finally {
       setActionLoading(null);
     }
@@ -549,7 +549,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   const [showAddSlotModal, setShowAddSlotModal] = useState(false);
   const [slotCode, setSlotCode] = useState('');
   const [slotName, setSlotName] = useState('');
-  const [slotHub, setSlotHub] = useState('Hub UMK Kampus Bachok');
+  const [slotHub, setSlotHub] = useState('Hab Usahawan Bachok');
   const [slotDistrict, setSlotDistrict] = useState<KelantanDistrict>('Bachok');
   const [slotSize, setSlotSize] = useState('10ft x 10ft Smart Pod');
   const [slotMonthlyRate, setSlotMonthlyRate] = useState('150');

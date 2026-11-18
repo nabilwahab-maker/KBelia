@@ -68,7 +68,7 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     title: 'Pelantikan Mentor Industri Kelantan',
     message: 'Selamat bertugas kepada barisan mentor industri bagi sesi bimbingan inkubasi 2026.',
     category: 'status',
-    sender: 'Pusat Pembangunan Kerjaya UMK',
+    sender: 'Penyelaras Hab Usahawan KBelia',
     senderRole: 'admin',
     targetRole: 'mentor',
     targetUserId: '',
@@ -192,7 +192,7 @@ export function emitAdminOrMentorNotification(
       titleOrPayload.sender ||
       titleOrPayload.senderName ||
       (role === 'mentor'
-        ? 'Mentor UMK'
+        ? 'Mentor Bimbingan'
         : role === 'user'
         ? 'Usahawan Belia'
         : 'Admin KBelia');

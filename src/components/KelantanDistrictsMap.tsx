@@ -91,12 +91,12 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     district: 'Bachok',
     code: 'BCK',
     name: 'Bachok',
-    tagline: 'Hab Kampus UMK Bachok & Eko-Pelancongan',
-    popularNiche: 'Servis Mahasiswa, Percetakan & Kopi Pelajar',
+    tagline: 'Hab Usahawan Bachok & Eko-Pelancongan',
+    popularNiche: 'Servis Komuniti, Percetakan & Kopi Artisan',
     lat: 6.0094,
     lng: 102.4169,
     terrainType: 'coastal',
-    mainHubName: 'Hub UMK Kampus Bachok (Zon Keusahawanan)'
+    mainHubName: 'Hab Usahawan Bachok (Zon Keusahawanan)'
   },
   {
     district: 'Pasir Mas',
@@ -146,12 +146,12 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     district: 'Jeli',
     code: 'JLI',
     name: 'Jeli',
-    tagline: 'Hab Kampus UMK Jeli & Eko-Teknologi Banjaran Titiwangsa',
-    popularNiche: 'Produk Eko-Herba, Madu Kelulut & IT Pelajar',
+    tagline: 'Hab Usahawan Jeli & Eko-Teknologi Banjaran Titiwangsa',
+    popularNiche: 'Produk Eko-Herba, Madu Kelulut & Servis Digital',
     lat: 5.7445,
     lng: 101.8697,
     terrainType: 'green',
-    mainHubName: 'Hub Komuniti Keusahawanan Jeli (UMK Jeli)'
+    mainHubName: 'Hab Usahawan Jeli (Zon Komuniti)'
   },
   {
     district: 'Kuala Krai',
@@ -824,7 +824,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                     {isEn ? 'Urban & Commercial' : 'Bandar & Komersial'}
                   </option>
                   <option value="coastal">
-                    {isEn ? 'Coastal & Campus' : 'Pesisir & Kampus'}
+                    {isEn ? 'Coastal & Youth Hub' : 'Pesisir & Hab Belia'}
                   </option>
                   <option value="green">
                     {isEn ? 'Agro & Eco-Tourism' : 'Agro & Eko-Pelancongan'}
