@@ -476,7 +476,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         const isFree = s.status === 'available' && !s.currentTenantBusinessName;
                         return (
                           <option key={s.id} value={s.id} disabled={!isFree} className="dark:bg-slate-900">
-                            {s.code} - {s.name} ({s.hubLocation}, {s.district}) {isFree ? '· [Tersedia]' : '· [Telah Berdaftar - Penuh]'}
+                            {s.code} - {s.name} ({s.district}) {isFree ? '· [Tersedia]' : '· [Telah Berdaftar - Penuh]'}
                           </option>
                         );
                       })}

@@ -50,7 +50,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
       setName(slot.name || '');
       setHubLocation(slot.hubLocation || '');
       setDistrict(slot.district || 'Bachok');
-      setSize(slot.size || '10ft x 10ft Kiosk Pintar');
+      setSize(slot.size || '10ft x 10ft Kapsul Standard');
       setMonthlyRate(String(slot.monthlyRate ?? 150));
       setDailyRate(String(slot.dailyRate ?? 15));
       setStatus(slot.status || 'available');
@@ -105,7 +105,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
         name: trimmedName,
         hubLocation: hubLocation.trim() || slot.hubLocation,
         district,
-        size: size.trim() || '10ft x 10ft Kiosk Pintar',
+        size: size.trim() || '10ft x 10ft Kapsul Standard',
         monthlyRate: parsedMonthly,
         dailyRate: isNaN(parsedDaily) ? Math.round(parsedMonthly / 10) : parsedDaily,
         status,
@@ -198,7 +198,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 maxLength={100}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Masukkan nama kiosk"
+                placeholder="Contoh: Kapsul Niaga Belia Bachok 02"
                 className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
               />
             </div>

@@ -309,79 +309,29 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
-            {isEn ? 'Youth Grants & Programs' : 'Geran & Program Belia'}
-          </h1>
-          <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
-            {isAdminView
-              ? isEn
-                ? 'Manage state grant schemes, training workshops, featured highlights, and youth entrepreneurship initiatives.'
-                : 'Urus senarai skim geran, bengkel latihan, pilihan utama, dan inisiatif keusahawanan belia Kelantan.'
-              : isEn
-              ? 'Join incubation tracks, digital workshops, micro-financing & digital grant matching, and kiosk rental subsidies.'
-              : 'Sertai inisiatif inkubasi, bengkel digital, padanan pembiayaan mikro & geran digital, dan subsidi sewa kapsul niaga.'}
-          </p>
-        </div>
-
-        {isAdminView && onAddProgram && (
-          <button
-            type="button"
-            onClick={onAddProgram}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer dark:bg-emerald-600"
-          >
-            <Award className="w-4 h-4" />
-            <span>{isEn ? 'Add Program' : 'Terbit Program'}</span>
-          </button>
-        )}
-      </div>
-
-      {/* Summary Stats (Admin sees 3 management metrics without personal participation) */}
-      <div className={`grid ${isAdminView ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'} gap-3 h-fit items-start`}>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">
-            {isEn ? 'Active Programs' : 'Program Aktif'}
-          </span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{safePrograms.length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">
-            {isEn ? 'Grant Schemes' : 'Skim Geran'}
-          </span>
-          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">
-            {safePrograms.filter(p => p.category === 'Geran & Dana').length}
-          </span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">
-            {isAdminView
-              ? (isEn ? 'Youth Grant Applications' : 'Permohonan Geran Belia')
-              : (isEn ? 'Your Grants' : 'Permohonan Geran')}
-          </span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{visibleGrants.length}</span>
-        </div>
-        {!isAdminView && (
-          <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-            <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">
-              {isEn ? 'Registered' : 'Penyertaan Anda'}
-            </span>
-            <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{registeredIds.length}</span>
-          </div>
-        )}
+      <div>
+        <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+          {isEn ? 'Youth Grants & Programs' : 'Geran & Program Belia'}
+        </h1>
+        <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
+          {isAdminView
+            ? isEn
+              ? 'Manage state grant schemes, training workshops, featured highlights, and youth entrepreneurship initiatives.'
+              : 'Urus senarai skim geran, bengkel latihan, pilihan utama, dan inisiatif keusahawanan belia Kelantan.'
+            : isEn
+            ? 'Join incubation tracks, digital workshops, micro-financing & digital grant matching, and kiosk rental subsidies.'
+            : 'Sertai inisiatif inkubasi, bengkel digital, padanan pembiayaan mikro & geran digital, dan subsidi sewa kapsul niaga.'}
+        </p>
       </div>
 
       {/* Active Grant Applications Status & Cancel Controls (Youth Only) */}
       {!isAdminView && visibleGrants.length > 0 && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden h-fit">
-          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600 flex items-center justify-between gap-2">
+          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-600">
             <h2 className="text-sm font-extrabold text-black dark:text-white flex items-center gap-2">
               <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>{isEn ? 'Your Grant Applications' : 'Permohonan Geran Anda'}</span>
             </h2>
-            <span className="text-xs font-bold text-black/70 dark:text-white/75 tabular-nums">
-              {pendingGrants.length} {isEn ? 'Pending' : 'Dalam Semakan'}
-            </span>
           </div>
 
           <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-700">
@@ -462,6 +412,18 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           sortValue={sortBy}
           onSortChange={setSortBy}
           sortLabel={isEn ? 'Sort By' : 'Susun Mengikut'}
+          rightSlot={
+            isAdminView && onAddProgram ? (
+              <button
+                type="button"
+                onClick={onAddProgram}
+                className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
+              >
+                <Award className="w-4 h-4" />
+                <span>{isEn ? 'Add Program' : 'Terbit Program'}</span>
+              </button>
+            ) : undefined
+          }
           filterContent={
             <>
               <div>

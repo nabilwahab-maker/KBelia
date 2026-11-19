@@ -172,26 +172,6 @@ export const B2BMarketSection: React.FC = () => {
         </p>
       </div>
 
-      {/* Ringkasan Statistik Ringkas */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Total Ads' : 'Jumlah Iklan'}</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{listings.length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Supplying' : 'Membekal'}</span>
-          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{listings.filter(l => l.type === 'supply').length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Seeking' : 'Mencari'}</span>
-          <span className="text-lg font-black text-amber-700 dark:text-amber-400 tabular-nums">{listings.filter(l => l.type === 'demand').length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">{isEn ? 'Filtered' : 'Dipaparkan'}</span>
-          <span className="text-lg font-black text-teal-700 dark:text-teal-400 tabular-nums">{filteredListings.length}</span>
-        </div>
-      </div>
-
       {/* Ruang Niaga: Carian, Penapis Bersepadu, Senarai Baris & Halaman Bernombor */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
         <ReferenceTableToolbar

@@ -156,12 +156,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const movingPhotoCards = [
     {
       img: '/assets/generated/kiosk_modular_kbelia.jpg',
-      title: 'Kiosk Belia KB Sentral B1',
-      subtitle: 'Ruang Komersial Smart Pod',
+      title: 'Kapsul Niaga Belia Kota Bharu 01',
+      subtitle: 'Kapsul Niaga Standard',
       tag: 'RM20/hari',
       tagColor: 'bg-blue-600 text-white border-amber-400/40',
       location: 'Kota Bharu',
-      type: 'Kiosk Komersial'
+      type: 'Kapsul Niaga'
     },
     {
       img: '/assets/generated/batik_canting_kelantan.jpg',
@@ -174,12 +174,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     },
     {
       img: '/assets/generated/kopi_nissem_melaka.jpg',
-      title: "Kiosk F&B A1 · Kopi Nissem",
+      title: "Kapsul Niaga Belia Bachok 01 · Kopi Nissem",
       subtitle: "D'Kelate Artisan Coffee",
       tag: 'RM15/hari',
       tagColor: 'bg-blue-600 text-white border-amber-400/40',
       location: 'Bachok',
-      type: 'Kiosk F&B'
+      type: 'Kapsul Niaga'
     }
   ];
 

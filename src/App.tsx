@@ -37,7 +37,9 @@ import {
   INITIAL_BUSINESSES, 
   INITIAL_CAPSULE_SLOTS, 
   INITIAL_PRODUCTS, 
-  INITIAL_PROGRAMS 
+  INITIAL_PROGRAMS,
+  normalizeCapsuleSlot,
+  normalizeLegacySlotName
 } from './data/seedData';
 import { 
   INITIAL_MENTOR_PROFILES, 
@@ -506,7 +508,10 @@ function MainApp() {
       const priorityLists = prodAuth
         ? [firestoreSlots, demoSyncSlots, demoExtra, INITIAL_CAPSULE_SLOTS]
         : [demoSyncSlots, demoExtra, firestoreSlots, INITIAL_CAPSULE_SLOTS];
-      setSlots(mergeUniqueById<CapsuleSlot>(priorityLists, deleted));
+      const mergedSlots = mergeUniqueById<CapsuleSlot>(priorityLists, deleted).map((s) =>
+        normalizeCapsuleSlot(s)
+      );
+      setSlots(mergedSlots);
     };
 
     recomputeSlots();
@@ -1074,9 +1079,15 @@ function MainApp() {
         return;
       }
 
+      const normalizeBookingList = (list: CapsuleBooking[]) =>
+        list.map((b) => {
+          const normalizedSlotName = normalizeLegacySlotName(b.slotId || b.slotCode, b.slotName);
+          return normalizedSlotName === b.slotName ? b : { ...b, slotName: normalizedSlotName };
+        });
+
       if (isAdmin) {
         // Admin sees governance queues across BOTH production & Demo/sandbox real-time streams
-        setBookings(mergeUniqueById<CapsuleBooking>([prodBookings, demoSyncBookings, demoBookingsLocal], bookingDeleted));
+        setBookings(normalizeBookingList(mergeUniqueById<CapsuleBooking>([prodBookings, demoSyncBookings, demoBookingsLocal], bookingDeleted)));
         setGrantApplications(mergeUniqueById<GrantApplication>([prodGrants, demoSyncGrants, demoGrantsLocal], grantDeleted));
         setMaintenanceTickets(mergeUniqueById<MaintenanceTicket>([prodTickets, demoSyncTickets, demoTicketsLocal], ticketDeleted));
         setCashflowRecords([]); // Privacy isolation: personal daily cashflow belongs strictly to owner
@@ -1095,7 +1106,7 @@ function MainApp() {
       // Youth Entrepreneur: strictly scoped to own UID across BOTH production & Demo/sandbox real-time streams
       const allDemoBookings = mergeUniqueById<CapsuleBooking>([demoSyncBookings, demoBookingsLocal], bookingDeleted)
         .filter(b => b.applicantId === user.uid);
-      setBookings(prodAuth ? mergeUniqueById<CapsuleBooking>([prodBookings, allDemoBookings], bookingDeleted) : allDemoBookings);
+      setBookings(normalizeBookingList(prodAuth ? mergeUniqueById<CapsuleBooking>([prodBookings, allDemoBookings], bookingDeleted) : allDemoBookings));
 
       const allDemoGrants = mergeUniqueById<GrantApplication>([demoSyncGrants, demoGrantsLocal], grantDeleted)
         .filter(g => g.applicantId === user.uid || (user.email && g.applicantEmail?.toLowerCase() === user.email.toLowerCase()));
@@ -1347,11 +1358,11 @@ function MainApp() {
   useEffect(() => {
     if (!user || !isProductionAuthenticated() || !isAdmin) return;
     try {
-      const seeded = localStorage.getItem('kbelia_seeded_v30');
+      const seeded = localStorage.getItem('kbelia_seeded_v31');
       if (!seeded) {
         seedInitialData().then((ok) => {
           if (ok) {
-            localStorage.setItem('kbelia_seeded_v30', 'true');
+            localStorage.setItem('kbelia_seeded_v31', 'true');
           }
         });
       }

@@ -242,7 +242,7 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
               >
                 {slots.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.code} · {s.name} ({s.hubLocation}) - RM{s.monthlyRate}/bln
+                    {s.code} · {s.name} ({s.district}) - RM{s.monthlyRate}/bln
                   </option>
                 ))}
               </select>

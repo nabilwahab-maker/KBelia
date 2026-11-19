@@ -1397,8 +1397,6 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               value={totalMentees}
               subtitle={`${pendingCount} Menunggu Tindakan`}
               icon={Users}
-              trendLabel={pendingCount > 0 ? `${pendingCount} Baharu` : 'Terkawal'}
-              trendDirection={pendingCount > 0 ? 'up' : 'neutral'}
               accentColor="blue"
               isLive
               staggerIndex={0}
@@ -1410,8 +1408,6 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               value={confirmedCount}
               subtitle="Kampus & Google Meet"
               icon={Calendar}
-              trendLabel={`${completedCount} Selesai`}
-              trendDirection={confirmedCount > 0 ? 'up' : 'neutral'}
               accentColor="emerald"
               isLive
               staggerIndex={1}
@@ -1423,8 +1419,6 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               value={totalEndorsementsCount}
               subtitle="Sah Untuk Semakan Admin"
               icon={Award}
-              trendLabel="Aktif"
-              trendDirection={totalEndorsementsCount > 0 ? 'up' : 'neutral'}
               accentColor="amber"
               staggerIndex={2}
               onClick={() => handleSubTabChange('endorsements')}
@@ -1435,8 +1429,6 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               value={totalLogbookCount}
               subtitle="Nota & Tugasan Usahawan"
               icon={FileText}
-              trendLabel={`${mentorLogs.reduce((acc, l) => acc + (l.actionItems?.filter(a => a.completed).length || 0), 0)} Selesai`}
-              trendDirection={totalLogbookCount > 0 ? 'up' : 'neutral'}
               accentColor="violet"
               staggerIndex={3}
               onClick={() => handleSubTabChange('logbook')}
@@ -1578,16 +1570,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               className="animate-dashboard-card min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 flex flex-col justify-start"
             >
               <div>
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
-                    <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
-                      Temujanji Terdekat &amp; Tindakan
-                    </h3>
-                  </div>
-                  <span className="text-[0.8125rem] font-mono text-black dark:text-white bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 px-2 py-0.5 rounded shrink-0">
-                    {mentorRegistrations.slice(0, 3).length} Sesi Terkini
-                  </span>
+                <div className="flex items-center gap-2 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
+                  <Calendar className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
+                  <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
+                    Temujanji Terdekat &amp; Tindakan
+                  </h3>
                 </div>
 
                 <div className="space-y-2.5">
@@ -1701,16 +1688,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               className="animate-dashboard-card min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 flex flex-col justify-start"
             >
               <div>
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
-                  <div className="flex items-center gap-2">
-                    <Award className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0" />
-                    <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
-                      Status Perakuan Geran Usahawan
-                    </h3>
-                  </div>
-                  <span className="text-[0.8125rem] font-mono text-black dark:text-white bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded shrink-0">
-                    {mentorEndorsements.length} Diluluskan
-                  </span>
+                <div className="flex items-center gap-2 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
+                  <Award className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0" />
+                  <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
+                    Status Perakuan Geran Usahawan
+                  </h3>
                 </div>
 
                 <div className="space-y-2.5">
@@ -3611,24 +3593,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         <div key="profile" className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 p-4 sm:p-5 shadow-2xs space-y-4 animate-dashboard-tab">
           <div className="absolute inset-x-0 top-0 h-0.5 bg-teal-500/80 dark:bg-teal-400/80" />
           
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3.5 border-b border-slate-300 dark:border-slate-600">
-            <div>
-              <h3 className="text-lg font-bold text-black dark:text-white">
-                Profil & Maklumat Mentor
-              </h3>
-              <p className="text-[0.9375rem] text-black dark:text-white/75">
-                Maklumat ini dipaparkan kepada usahawan belia yang ingin memohon bimbingan perniagaan.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setIsEditProfileOpen(true)}
-              className="interactive-press interactive-lift px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-sm flex items-center gap-2 cursor-pointer dark:bg-teal-600"
-            >
-              <Edit3 className="w-4 h-4" />
-              <span>Edit Profil Saya</span>
-            </button>
+          <div className="pb-3.5 border-b border-slate-300 dark:border-slate-600">
+            <h3 className="text-lg font-bold text-black dark:text-white">
+              Profil &amp; Maklumat Mentor
+            </h3>
+            <p className="text-[0.9375rem] text-black dark:text-white/75">
+              Maklumat ini dipaparkan kepada usahawan belia yang ingin memohon bimbingan perniagaan.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
@@ -3701,6 +3672,17 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </p>
               </div>
             </div>
+          </div>
+
+          <div className="pt-3 border-t border-slate-300 dark:border-slate-600 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsEditProfileOpen(true)}
+              className="interactive-press interactive-lift px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-sm flex items-center gap-2 cursor-pointer dark:bg-teal-600"
+            >
+              <Edit3 className="w-4 h-4" />
+              <span>Edit Profil Saya</span>
+            </button>
           </div>
 
         </div>

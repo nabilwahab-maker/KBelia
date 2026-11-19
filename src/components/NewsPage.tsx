@@ -168,8 +168,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({
 
   return (
     <div className="w-full space-y-5 animate-dashboard-tab">
-      {/* Page Intro & Admin Controls */}
-      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      {/* Page Intro */}
+      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700">
         <div className="space-y-1">
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance">
             Berita Terkini Ekosistem KBelia Kelantan
@@ -178,31 +178,31 @@ export const NewsPage: React.FC<NewsPageProps> = ({
             Ikuti sorotan berita utama, hebahan geran, pembukaan kapsul niaga, dan makluman rasmi Pentadbir.
           </p>
         </div>
-
-        {isAdmin && (
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            <button
-              id="btn-news-open-admin-manager"
-              type="button"
-              onClick={() => setShowAdminManagerModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 dark:bg-blue-600"
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              <span>Urus Berita</span>
-            </button>
-            {onOpenAdminNewsTab && (
-              <button
-                type="button"
-                onClick={onOpenAdminNewsTab}
-                className="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
-              >
-                <span>Panel Admin</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-        )}
       </div>
+
+      {isAdmin && (
+        <div className="flex flex-wrap items-center justify-end gap-2.5">
+          <button
+            id="btn-news-open-admin-manager"
+            type="button"
+            onClick={() => setShowAdminManagerModal(true)}
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 dark:bg-blue-600"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            <span>Urus Berita</span>
+          </button>
+          {onOpenAdminNewsTab && (
+            <button
+              type="button"
+              onClick={onOpenAdminNewsTab}
+              className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            >
+              <span>Panel Admin</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      )}
 
       {/* 1. Berita Utama & 2. 3 Kad Sorotan Berita Terkini */}
       {featuredArticle && (

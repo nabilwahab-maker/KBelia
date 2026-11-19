@@ -36,7 +36,10 @@ import {
   INITIAL_BUSINESSES,
   INITIAL_CAPSULE_SLOTS,
   INITIAL_PRODUCTS,
-  INITIAL_PROGRAMS
+  INITIAL_PROGRAMS,
+  normalizeCapsuleSlot,
+  normalizeLegacySlotName,
+  normalizeLegacySlotSize
 } from '../data/seedData';
 import { INITIAL_PORTAL_NEWS } from '../data/newsData';
 import { INITIAL_COMMUNITY_POSTS, INITIAL_COMMUNITY_REPLIES } from '../data/communityData';
@@ -112,6 +115,36 @@ export function upgradeLocalImageCache() {
       localStorage.removeItem('kbelia_mentorship_registrations');
       localStorage.removeItem(CACHE_KEYS.DELETED_IDS);
     }
+
+    const generalCapsuleMig = localStorage.getItem('kbelia_capsule_general_v1');
+    if (!generalCapsuleMig) {
+      const demoSlotsRaw = localStorage.getItem('kbelia_demo_slots');
+      if (demoSlotsRaw) {
+        const parsedSlots: CapsuleSlot[] = JSON.parse(demoSlotsRaw);
+        if (Array.isArray(parsedSlots)) {
+          localStorage.setItem(
+            'kbelia_demo_slots',
+            JSON.stringify(parsedSlots.map((slot) => normalizeCapsuleSlot(slot)))
+          );
+        }
+      }
+      const demoBookingsRaw = localStorage.getItem('kbelia_demo_bookings');
+      if (demoBookingsRaw) {
+        const parsedBookings: CapsuleBooking[] = JSON.parse(demoBookingsRaw);
+        if (Array.isArray(parsedBookings)) {
+          localStorage.setItem(
+            'kbelia_demo_bookings',
+            JSON.stringify(
+              parsedBookings.map((b) => ({
+                ...b,
+                slotName: normalizeLegacySlotName(b.slotId || b.slotCode, b.slotName)
+              }))
+            )
+          );
+        }
+      }
+      localStorage.setItem('kbelia_capsule_general_v1', 'true');
+    }
   } catch (e) {
     console.warn('Cache upgrade notice:', e);
   }
@@ -178,7 +211,29 @@ export async function seedInitialData() {
     };
 
     for (const slot of INITIAL_CAPSULE_SLOTS) {
-      await seedIfMissing('capsule_slots', slot.id, slot);
+      if (deletedSet.has(slot.id)) continue;
+      const ref = doc(db, 'capsule_slots', slot.id);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        await setDocWithUpdatedAtFallback(ref, slot, false);
+      } else {
+        const existingData = snap.data() as Partial<CapsuleSlot>;
+        const nextName = normalizeLegacySlotName(slot.id, existingData.name);
+        const nextSize = existingData.size ? normalizeLegacySlotSize(existingData.size) : slot.size;
+        if (nextName !== existingData.name || nextSize !== existingData.size) {
+          await setDocWithUpdatedAtFallback(
+            ref,
+            {
+              ...existingData,
+              id: slot.id,
+              name: nextName,
+              size: nextSize,
+              updatedAt: new Date().toISOString()
+            },
+            true
+          );
+        }
+      }
     }
     for (const biz of INITIAL_BUSINESSES) {
       await seedIfMissing('businesses', biz.id, biz);
@@ -597,7 +652,7 @@ export async function saveCapsuleSlot(slot: Partial<CapsuleSlot> & { code: strin
     name: slot.name,
     hubLocation: slot.hubLocation || 'Hab Usahawan Bachok',
     district: slot.district || 'Bachok',
-    size: slot.size || '10ft x 10ft Smart Pod',
+    size: slot.size || '10ft x 10ft Kapsul Standard',
     monthlyRate: Number(slot.monthlyRate) || 150,
     dailyRate: Number(slot.dailyRate) || 15,
     status: slot.status || 'available',

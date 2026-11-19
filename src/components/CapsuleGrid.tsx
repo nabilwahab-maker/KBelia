@@ -177,72 +177,14 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
   return (
     <div className="w-full space-y-4">
-      
-      {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
-            Senarai Kiosk Belia Kelantan
-          </h1>
-          <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
-            Pilih dan sewa ruang niaga serba lengkap di lokasi strategik universiti dan pusat bandar untuk memulakan perniagaan anda dengan modal rendah.
-          </p>
-        </div>
-
-        {/* Quick Booking CTA or Admin Add Kiosk CTA */}
-        {isReadOnly ? (
-          onAddSlot && (
-            <button
-              onClick={onAddSlot}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
-            >
-              <Building2 className="w-4 h-4" />
-              <span>Daftar Kiosk</span>
-            </button>
-          )
-        ) : hasActiveBooking ? (
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            <button
-              type="button"
-              disabled
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-200 dark:bg-slate-700 text-black/60 dark:text-white/60 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-bold cursor-not-allowed shrink-0"
-              title="Hanya 1 tempahan kiosk aktif dibenarkan pada satu masa"
-            >
-              <Lock className="w-4 h-4" />
-              <span>Sudah Ditempah</span>
-            </button>
-            {onGoToManageBooking && (
-              <button
-                type="button"
-                onClick={onGoToManageBooking}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm transition-colors shrink-0 cursor-pointer dark:bg-blue-600"
-              >
-                <FileText className="w-4 h-4" />
-                <span>Urus Tempahan</span>
-              </button>
-            )}
-          </div>
-        ) : null}
-      </div>
-
-      {/* Ringkasan Statistik Ringkas */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Jumlah Kiosk</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{(slots || []).length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Tersedia</span>
-          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{(slots || []).filter(s => s.status === 'available').length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Disewa / Tempah</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{(slots || []).filter(s => s.status !== 'available').length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Subsidi Negeri</span>
-          <span className="text-lg font-black text-blue-700 dark:text-blue-400 tabular-nums">{subsidyRate}%</span>
-        </div>
+      {/* Header */}
+      <div>
+        <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+          Senarai Kiosk Belia Kelantan
+        </h1>
+        <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
+          Pilih dan sewa ruang niaga serba lengkap di lokasi strategik universiti dan pusat bandar untuk memulakan perniagaan anda dengan modal rendah.
+        </p>
       </div>
 
       {/* Live Google Maps Kiosk Hub Explorer */}
@@ -280,6 +222,29 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           sortValue={sortBy}
           onSortChange={setSortBy}
           sortLabel={isEn ? 'Sort By' : 'Susun Mengikut'}
+          rightSlot={
+            isReadOnly ? (
+              onAddSlot ? (
+                <button
+                  type="button"
+                  onClick={onAddSlot}
+                  className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
+                >
+                  <Building2 className="w-4 h-4" />
+                  <span>Daftar Kiosk</span>
+                </button>
+              ) : undefined
+            ) : hasActiveBooking && onGoToManageBooking ? (
+              <button
+                type="button"
+                onClick={onGoToManageBooking}
+                className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-2xs transition-colors shrink-0 cursor-pointer"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Urus Tempahan</span>
+              </button>
+            ) : undefined
+          }
           filterContent={
             <>
               <div>

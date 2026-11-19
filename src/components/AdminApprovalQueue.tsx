@@ -57,7 +57,6 @@ import {
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { EditSlotModal } from './EditSlotModal';
 import { EditBookingModal, EditGrantModal, EditMaintenanceTicketModal } from './AdminEditModals';
-import { useAnimatedMetric } from '../hooks/useMotion';
 
 interface AdminApprovalQueueProps {
   bookings: CapsuleBooking[];
@@ -92,19 +91,6 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [adminNoteInput, setAdminNoteInput] = useState<{ [key: string]: string }>({});
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-
-  const pendingBookingCount = bookings.filter(b => b.status === 'pending').length;
-  const pendingGrantCount = grantApplications.filter(g => g.status === 'pending').length;
-  const availableSlotCount = slots.filter(s => s.status === 'available').length;
-  const occupiedSlotCount = slots.filter(s => s.status === 'occupied').length;
-  const maintenanceSlotCount = slots.filter(s => s.status === 'maintenance').length;
-
-  const animPendingBookings = useAnimatedMetric(pendingBookingCount);
-  const animPendingGrants = useAnimatedMetric(pendingGrantCount);
-  const animTotalSlots = useAnimatedMetric(slots.length);
-  const animAvailableSlots = useAnimatedMetric(availableSlotCount);
-  const animOccupiedSlots = useAnimatedMetric(occupiedSlotCount);
-  const animMaintenanceSlots = useAnimatedMetric(maintenanceSlotCount);
 
   // Admin Edit / Create Modals
   const [editingBooking, setEditingBooking] = useState<CapsuleBooking | null>(null);
@@ -551,7 +537,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   const [slotName, setSlotName] = useState('');
   const [slotHub, setSlotHub] = useState('Hab Usahawan Bachok');
   const [slotDistrict, setSlotDistrict] = useState<KelantanDistrict>('Bachok');
-  const [slotSize, setSlotSize] = useState('10ft x 10ft Smart Pod');
+  const [slotSize, setSlotSize] = useState('10ft x 10ft Kapsul Standard');
   const [slotMonthlyRate, setSlotMonthlyRate] = useState('150');
   const [slotAmenities, setSlotAmenities] = useState('Palam Elektrik 13A, WiFi 500Mbps, Rak Paparan Bertingkat');
   const [slotImageUrl, setSlotImageUrl] = useState('/assets/generated/kiosk_modular_kbelia.jpg');
@@ -662,26 +648,86 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
   return (
     <div className="rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 md:p-6 shadow-xs overflow-visible animate-dashboard-tab">
-      {/* Top Controls & Navigation (Important Header Only) */}
-      <div className="-mx-5 -mt-5 md:-mx-6 md:-mt-6 px-5 pt-5 md:px-6 md:pt-6 pb-5 mb-5 kbelia-important-header border-b border-slate-300 dark:border-slate-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4 rounded-t-3xl relative overflow-hidden">
+      {/* Top Header */}
+      <div className="-mx-5 -mt-5 md:-mx-6 md:-mt-6 px-5 pt-5 md:px-6 md:pt-6 pb-4 mb-4 kbelia-important-header border-b border-slate-300 dark:border-slate-600 rounded-t-3xl relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold tracking-wider uppercase text-black dark:text-white/75">
-              <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              Pusat Kawalan & Kelulusan Rasmi Pegawai
-            </span>
-            <span className="text-black/35 dark:text-white/35">·</span>
-            <span className="text-sm text-black/70 dark:text-white/75 font-medium">
-              Panel Pengurusan Usahawan Belia Kelantan
-            </span>
-          </div>
-          <h2 className="text-2xl font-bold text-black dark:text-white tracking-tight">
-            Pusat Semakan Permohonan & Pengurusan Kiosk
-          </h2>
+        <h2 className="text-2xl font-bold text-black dark:text-white tracking-tight">
+          Pusat Semakan Permohonan &amp; Pengurusan Kiosk
+        </h2>
+        <p className="text-sm text-black/70 dark:text-white/75 mt-0.5">
+          Semak permohonan sewaan kiosk, permohonan geran belia dan penyelenggaraan fasiliti.
+        </p>
+      </div>
+
+      {/* Main Tab Segmented Controls + Quick Actions */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab('overview')}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeTab === 'overview'
+                ? 'bg-indigo-600 text-white shadow-sm dark:bg-indigo-600'
+                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            <span>Ringkasan 3-Kolum</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('kiosks')}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeTab === 'kiosks'
+                ? 'bg-blue-600 text-white shadow-sm dark:bg-blue-600'
+                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            <Store className="w-3.5 h-3.5" />
+            <span>Kiosk</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('grants')}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeTab === 'grants'
+                ? 'bg-emerald-600 text-white shadow-sm dark:bg-emerald-600'
+                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            <Coins className="w-3.5 h-3.5" />
+            <span>Geran</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('facility')}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeTab === 'facility'
+                ? 'bg-rose-600 text-white shadow-sm dark:bg-rose-600'
+                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            <Wrench className="w-3.5 h-3.5" />
+            <span>Fasiliti</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('audit')}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeTab === 'audit'
+                ? 'bg-indigo-600 text-white shadow-sm dark:bg-indigo-600'
+                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            <TrendingUp className="w-3.5 h-3.5" />
+            <span>Peta Audit</span>
+          </button>
         </div>
 
-        {/* Action Buttons: Official Report & Admin Creation */}
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -713,74 +759,6 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
         </div>
       </div>
 
-      {/* Main Tab Segmented Controls */}
-      <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
-        <button
-          type="button"
-          onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-            activeTab === 'overview'
-              ? 'bg-indigo-600 text-white shadow-sm dark:bg-indigo-600'
-              : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
-          }`}
-        >
-          <LayoutDashboard className="w-3.5 h-3.5" />
-          <span>Ringkasan 3-Kolum</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('kiosks')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-            activeTab === 'kiosks'
-              ? 'bg-blue-600 text-white shadow-sm dark:bg-blue-600'
-              : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
-          }`}
-        >
-          <Store className="w-3.5 h-3.5" />
-          <span className="tabular-nums">Kiosk ({pendingBookingCount})</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('grants')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-            activeTab === 'grants'
-              ? 'bg-emerald-600 text-white shadow-sm dark:bg-emerald-600'
-              : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
-          }`}
-        >
-          <Coins className="w-3.5 h-3.5" />
-          <span className="tabular-nums">Geran ({pendingGrantCount})</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('facility')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-            activeTab === 'facility'
-              ? 'bg-rose-600 text-white shadow-sm dark:bg-rose-600'
-              : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
-          }`}
-        >
-          <Wrench className="w-3.5 h-3.5" />
-          <span className="tabular-nums">Fasiliti ({slots.length})</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('audit')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-            activeTab === 'audit'
-              ? 'bg-indigo-600 text-white shadow-sm dark:bg-indigo-600'
-              : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
-          }`}
-        >
-          <TrendingUp className="w-3.5 h-3.5" />
-          <span>Peta Audit</span>
-        </button>
-      </div>
-
       {/* TAB 0: 3-COLUMN OVERVIEW MATCHING WIREFRAME */}
       {activeTab === 'overview' && (
         <div key="overview" className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5 mb-2 items-stretch animate-dashboard-tab">
@@ -792,16 +770,11 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           >
             <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
             <div>
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Store className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-                  <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
-                    Permohonan Sewa Kiosk
-                  </h4>
-                </div>
-                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200/80 shrink-0 tabular-nums">
-                  {animPendingBookings} Menunggu
-                </span>
+              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
+                <Store className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
+                  Permohonan Sewa Kiosk
+                </h4>
               </div>
 
               {/* Booking items list */}
@@ -885,16 +858,11 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           >
             <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
             <div>
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Coins className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
-                    Permohonan Geran & Pembiayaan
-                  </h4>
-                </div>
-                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 shrink-0 tabular-nums">
-                  {animPendingGrants} Menunggu
-                </span>
+              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
+                <Coins className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
+                  Permohonan Geran & Pembiayaan
+                </h4>
               </div>
 
               {/* Grant items list */}
@@ -978,32 +946,11 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           >
             <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
             <div>
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Wrench className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                  <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
-                    Fasiliti & Tindakan Pantas
-                  </h4>
-                </div>
-                <span className="text-[0.8125rem] font-mono font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 shrink-0 tabular-nums">
-                  {animTotalSlots} Unit Pod
-                </span>
-              </div>
-
-              {/* Status breakdown */}
-              <div className="grid grid-cols-3 gap-2 mb-4 text-center">
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
-                  <span className="text-sm text-black/70 dark:text-white/75 block font-medium">Kosong</span>
-                  <span className="font-mono text-base font-bold text-emerald-700 dark:text-emerald-300 tabular-nums">{animAvailableSlots}</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
-                  <span className="text-sm text-black/70 dark:text-white/75 block font-medium">Disewa</span>
-                  <span className="font-mono text-base font-bold text-blue-700 dark:text-blue-300 tabular-nums">{animOccupiedSlots}</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600">
-                  <span className="text-sm text-black/70 dark:text-white/75 block font-medium">Selenggara</span>
-                  <span className="font-mono text-base font-bold text-amber-700 dark:text-amber-300 tabular-nums">{animMaintenanceSlots}</span>
-                </div>
+              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
+                <Wrench className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
+                  Fasiliti & Tindakan Pantas
+                </h4>
               </div>
 
               {/* Action Buttons */}
@@ -2376,7 +2323,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="Masukkan nama kiosk"
+                  placeholder="Contoh: Kapsul Niaga Belia Bachok 02"
                   value={slotName}
                   onChange={(e) => setSlotName(e.target.value)}
                   className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"

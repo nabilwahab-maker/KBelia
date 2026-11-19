@@ -447,7 +447,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
   return (
     <div className="w-full space-y-5 animate-dashboard-tab">
       {/* Page Header */}
-      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700">
         <div className="space-y-1 max-w-2xl">
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight text-balance">
             Komuniti Usahawan Belia Kelantan
@@ -455,20 +455,6 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
           <p className="text-[0.9375rem] text-slate-600 dark:text-zinc-300 leading-relaxed">
             Ajukan soalan geran, kongsi tip operasi kapsul niaga, dan bincang peluang kerjasama antara jajahan bersama Mentor dan Pentadbir.
           </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
-          <div className="flex items-center gap-2">
-            <button
-              id="btn-community-new-post"
-              type="button"
-              onClick={openCreateModal}
-              className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Cipta Topik Baharu</span>
-            </button>
-          </div>
         </div>
       </div>
 
@@ -666,9 +652,15 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
           onSortChange={(val) => setSortBy(val as 'latest' | 'active' | 'helpful')}
           sortLabel="Susun Topik Mengikut"
           rightSlot={
-            <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400 tabular-nums whitespace-nowrap px-1">
-              {filteredPosts.length} topik
-            </span>
+            <button
+              id="btn-community-new-post"
+              type="button"
+              onClick={openCreateModal}
+              className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Cipta Topik Baharu</span>
+            </button>
           }
           filterContent={
             <div className="space-y-3">

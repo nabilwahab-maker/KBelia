@@ -114,7 +114,7 @@ import {
   parseNumericAmount,
   sortRecords
 } from '../utils/sortUtils';
-import { usePrefersReducedMotion, useAnimatedMetric } from '../hooks/useMotion';
+import { usePrefersReducedMotion } from '../hooks/useMotion';
 
 interface AdminDashboardProps {
   slots: CapsuleSlot[];
@@ -279,10 +279,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const safeBookings = bookings || [];
   const safePrograms = programs || [];
 
-  const animSettingsBizCount = useAnimatedMetric(safeBusinesses.length);
-  const animSettingsBookingCount = useAnimatedMetric(safeBookings.length);
-  const animSettingsSlotCount = useAnimatedMetric(safeSlots.length);
-
   // Filter states
   const [bookingFilter, setBookingFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [adminBookingSearch, setAdminBookingSearch] = useState('');
@@ -381,7 +377,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [slotName, setSlotName] = useState('');
   const [slotHub, setSlotHub] = useState('Hab Usahawan Bachok');
   const [slotDistrict, setSlotDistrict] = useState<KelantanDistrict>('Bachok');
-  const [slotSize, setSlotSize] = useState('10ft x 10ft Smart Pod');
+  const [slotSize, setSlotSize] = useState('10ft x 10ft Kapsul Standard');
   const [slotMonthlyRate, setSlotMonthlyRate] = useState('150');
   const [slotStatus, setSlotStatus] = useState<SlotStatus>('available');
   const [slotAmenities, setSlotAmenities] = useState('Palam Elektrik 13A, WiFi 500Mbps, Rak Paparan Bertingkat');
@@ -1170,8 +1166,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 value={pendingBookingsCount}
                 subtitle="Menunggu tindakan semakan pegawai"
                 icon={Clock}
-                trendLabel={pendingBookingsCount > 0 ? `${pendingBookingsCount} Segera` : 'Selesai'}
-                trendDirection={pendingBookingsCount > 0 ? 'down' : 'up'}
                 accentColor="amber"
                 isLive
                 staggerIndex={0}
@@ -1183,8 +1177,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 value={businesses.length}
                 subtitle="Direktori komersil belia sah SSM"
                 icon={Store}
-                trendLabel={`${safeBusinesses.filter(b => b.isFeatured).length} Pilihan`}
-                trendDirection="up"
                 accentColor="blue"
                 staggerIndex={1}
                 onClick={() => setAdminTab('businesses')}
@@ -1195,8 +1187,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 value={`${occupancyRate}%`}
                 subtitle={`${occupiedSlotsCount} drpd ${slots.length} unit beroperasi`}
                 icon={Building2}
-                trendLabel={`${availableSlotsCount} Kosong`}
-                trendDirection={occupancyRate >= 50 ? 'up' : 'neutral'}
                 accentColor="emerald"
                 isLive
                 staggerIndex={2}
@@ -1208,8 +1198,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 value={programs.length}
                 subtitle="Dana & latihan keusahawanan aktif"
                 icon={Award}
-                trendLabel={`${(grantApplications || []).length} Permohonan`}
-                trendDirection="up"
                 accentColor="violet"
                 staggerIndex={3}
                 onClick={() => setAdminTab('programs')}
@@ -1468,16 +1456,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     className="animate-dashboard-card relative min-w-0 h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm overflow-hidden transition-all duration-200 flex flex-col justify-start"
                   >
                     <div className="h-0.5 w-full bg-blue-500/80 dark:bg-blue-400/80" />
-                    <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2">
+                    <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600">
                       <div className="flex items-center gap-2">
                         <Building2 className="w-4 h-4 text-black dark:text-white/75" />
                         <h3 className="text-base font-bold text-black dark:text-white">
                           Metrik Prestasi &amp; Operasi Daerah
                         </h3>
                       </div>
-                      <span className="text-[0.8125rem] font-mono font-bold text-black dark:text-white bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 px-2.5 py-0.5 rounded">
-                        {activeDistrictsCount}/10 Daerah
-                      </span>
                     </div>
 
                     <div className="p-4 flex flex-col gap-2.5">
@@ -1532,7 +1517,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <div className="space-y-2">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <span className="text-sm font-bold text-black dark:text-white">
-                                Daerah Ada Kekosongan ({availableSlotsCount})
+                                Daerah Ada Kekosongan
                               </span>
                               <button
                                 type="button"
@@ -1611,16 +1596,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     className="animate-dashboard-card relative min-w-0 h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm overflow-hidden transition-all duration-200 flex flex-col justify-start"
                   >
                     <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
-                    <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2">
+                    <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600">
                       <div className="flex items-center gap-2">
                         <Activity className="w-4 h-4 text-black dark:text-white/75" />
                         <h3 className="text-base font-bold text-black dark:text-white">
                           Ringkasan Semakan &amp; Operasi
                         </h3>
                       </div>
-                      <span className="text-[0.8125rem] font-mono font-bold text-black dark:text-white bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 px-2.5 py-0.5 rounded">
-                        Langsung
-                      </span>
                     </div>
 
                     <div className="p-4 space-y-2.5">
@@ -2191,22 +2173,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* TAB 2: BUSINESSES DIRECTORY MANAGEMENT */}
       {adminTab === 'businesses' && (
         <div key="businesses" className="space-y-4 animate-dashboard-tab">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-lg font-bold text-black dark:text-white">Senarai Kedai &amp; Usahawan</h3>
-              <p className="text-sm text-black/75 dark:text-white/80">Urus, tambah, edit, kawal produk atau padam senarai perniagaan belia dalam direktori portal.</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setEditingBusiness(null);
-                setIsCreatingBusiness(true);
-              }}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shadow-xs transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Tambah Perniagaan</span>
-            </button>
+          <div>
+            <h3 className="text-lg font-bold text-black dark:text-white">Senarai Kedai &amp; Usahawan</h3>
+            <p className="text-sm text-black/75 dark:text-white/80">Urus, tambah, edit, kawal produk atau padam senarai perniagaan belia dalam direktori portal.</p>
           </div>
 
           <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
@@ -2232,6 +2201,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   : bizSortOptions
               }
               sortValue={bizSortPreset === 'table_column' ? '' : bizSortPreset}
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingBusiness(null);
+                    setIsCreatingBusiness(true);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors whitespace-nowrap shrink-0"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Perniagaan</span>
+                </button>
+              }
               onSortChange={(val) => {
                 if (val) setBizSortPreset(val);
               }}
@@ -2495,21 +2477,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* TAB 3: CAPSULE SLOTS MANAGEMENT */}
       {adminTab === 'slots' && (
         <div key="slots" className="space-y-4 animate-dashboard-tab">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-base font-bold text-black dark:text-white">Inventori & Pengurusan Kapsul Jajahan</h3>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Urus pendaftaran slot kiosk, tetapkan kadar sewa bulanan, atau padam unit yang tidak lagi beroperasi.</p>
-            </div>
-
-            <button
-              type="button"
-              id="btn-admin-add-slot-toggle"
-              onClick={() => setShowSlotForm(!showSlotForm)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer shrink-0"
-            >
-              <Building2 className="w-4 h-4" />
-              <span>{showSlotForm ? 'Tutup Borang' : 'Tambah Kiosk Baharu'}</span>
-            </button>
+          <div>
+            <h3 className="text-base font-bold text-black dark:text-white">Inventori & Pengurusan Kapsul Jajahan</h3>
+            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Urus pendaftaran slot kiosk, tetapkan kadar sewa bulanan, atau padam unit yang tidak lagi beroperasi.</p>
           </div>
 
           {/* New Slot Form */}
@@ -2552,7 +2522,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <input
                       type="text"
                       required
-                      placeholder="Masukkan nama kiosk"
+                      placeholder="Contoh: Kapsul Niaga Belia Bachok 02"
                       value={slotName}
                       onChange={(e) => setSlotName(e.target.value)}
                       className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium dark:focus:border-blue-500"
@@ -2686,6 +2656,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               onSortChange={(val) => {
                 if (val) setAdminSlotSortPreset(val);
               }}
+              rightSlot={
+                <button
+                  type="button"
+                  id="btn-admin-add-slot-toggle"
+                  onClick={() => setShowSlotForm(!showSlotForm)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  <Building2 className="w-4 h-4" />
+                  <span>{showSlotForm ? 'Tutup Borang' : 'Tambah Kiosk Baharu'}</span>
+                </button>
+              }
               filterContent={
                 <>
                   <div>
@@ -2946,21 +2927,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* TAB 4: PROGRAMS MANAGEMENT */}
       {adminTab === 'programs' && (
         <div key="programs" className="space-y-4 animate-dashboard-tab">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-base font-bold text-black dark:text-white">Pengurusan Inisiatif Geran & Program Belia</h3>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Terbit, kemas kini dan padam hebahan rasmi program latihan serta geran usahawan belia Kelantan.</p>
-            </div>
-
-            <button
-              type="button"
-              id="btn-admin-add-prog-toggle"
-              onClick={() => setShowProgramForm(!showProgramForm)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer shrink-0"
-            >
-              <Award className="w-4 h-4" />
-              <span>{showProgramForm ? 'Tutup Borang' : 'Terbitkan Program Baharu'}</span>
-            </button>
+          <div>
+            <h3 className="text-base font-bold text-black dark:text-white">Pengurusan Inisiatif Geran & Program Belia</h3>
+            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Terbit, kemas kini dan padam hebahan rasmi program latihan serta geran usahawan belia Kelantan.</p>
           </div>
 
           {/* New Program Form */}
@@ -3116,6 +3085,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               onSortChange={(val) => {
                 if (val) setProgSortPreset(val);
               }}
+              rightSlot={
+                <button
+                  type="button"
+                  id="btn-admin-add-prog-toggle"
+                  onClick={() => setShowProgramForm(!showProgramForm)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  <Award className="w-4 h-4" />
+                  <span>{showProgramForm ? 'Tutup Borang' : 'Terbitkan Program Baharu'}</span>
+                </button>
+              }
               filterContent={
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
@@ -3314,23 +3294,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* Mentor Management Table */}
           <div className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h4 className="text-base font-bold text-black dark:text-white flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Senarai Mentor ({mentors.length})</span>
-              </h4>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedMentorForEdit(null);
-                  setIsCreatingMentor(true);
-                }}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Mentor Baharu</span>
-              </button>
-            </div>
+            <h4 className="text-base font-bold text-black dark:text-white flex items-center gap-2">
+              <GraduationCap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Senarai Mentor</span>
+            </h4>
 
             <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
               <div className="absolute inset-x-0 top-0 h-0.5 rounded-t-2xl bg-indigo-500/80 dark:bg-indigo-400/80" />
@@ -3350,6 +3317,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 onSortChange={(val) => {
                   if (val) setMentorListSortPreset(val);
                 }}
+                rightSlot={
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedMentorForEdit(null);
+                      setIsCreatingMentor(true);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Tambah Mentor Baharu</span>
+                  </button>
+                }
               />
 
               {filteredAdminMentors.length === 0 ? (
@@ -3499,24 +3479,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* Mentee List View */}
           <div className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h4 className="text-base font-bold text-black dark:text-white">
-                  Senarai Usahawan Berdaftar Mengikut Mentor
-                </h4>
-                <span className="text-sm text-black/70 dark:text-white/75">Seluruh Kelantan · Urus jadual, status dan rekod sesi</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingMentorship(null);
-                  setIsCreatingMentorship(true);
-                }}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Sesi Bimbingan</span>
-              </button>
+            <div>
+              <h4 className="text-base font-bold text-black dark:text-white">
+                Senarai Usahawan Berdaftar Mengikut Mentor
+              </h4>
+              <span className="text-sm text-black/70 dark:text-white/75">Seluruh Kelantan · Urus jadual, status dan rekod sesi</span>
             </div>
 
             <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
@@ -3543,6 +3510,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 onSortChange={(val) => {
                   if (val) setMentorshipSortPreset(val);
                 }}
+                rightSlot={
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingMentorship(null);
+                      setIsCreatingMentorship(true);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors whitespace-nowrap shrink-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Tambah Sesi Bimbingan</span>
+                  </button>
+                }
                 filterContent={
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
@@ -4030,33 +4010,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div>
                   <h4 className="text-sm font-bold text-black dark:text-white">Kawalan Pangkalan Data & Penyelenggaraan Sesi</h4>
                   <p className="text-[0.875rem] text-black/70 dark:text-white/75">Tindakan kecemasan untuk menyegerakkan data dan memadam cache sistem.</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-center items-stretch">
-                <div
-                  style={{ '--stagger': 0 } as React.CSSProperties}
-                  className="animate-dashboard-card relative overflow-hidden p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600"
-                >
-                  <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
-                  <div className="text-xl font-bold font-mono tabular-nums text-black dark:text-white">{animSettingsBizCount}</div>
-                  <div className="text-sm text-black/70 dark:text-white/75 font-medium">Usahawan Berdaftar</div>
-                </div>
-                <div
-                  style={{ '--stagger': 1 } as React.CSSProperties}
-                  className="animate-dashboard-card relative overflow-hidden p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600"
-                >
-                  <div className="absolute inset-x-0 top-0 h-0.5 bg-amber-500/80 dark:bg-amber-400/80" />
-                  <div className="text-xl font-bold font-mono tabular-nums text-black dark:text-white">{animSettingsBookingCount}</div>
-                  <div className="text-sm text-black/70 dark:text-white/75 font-medium">Jumlah Permohonan Kiosk</div>
-                </div>
-                <div
-                  style={{ '--stagger': 2 } as React.CSSProperties}
-                  className="animate-dashboard-card relative overflow-hidden p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600"
-                >
-                  <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
-                  <div className="text-xl font-bold font-mono tabular-nums text-black dark:text-white">{animSettingsSlotCount}</div>
-                  <div className="text-sm text-black/70 dark:text-white/75 font-medium">Slot Kiosk Terkawal</div>
                 </div>
               </div>
 

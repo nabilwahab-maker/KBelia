@@ -7,7 +7,7 @@ interface SaaSKpiCardProps {
   value: string | number;
   subtitle: string;
   icon: LucideIcon;
-  trendLabel: string;
+  trendLabel?: string;
   trendDirection?: 'up' | 'down' | 'neutral';
   accentColor?: 'blue' | 'emerald' | 'amber' | 'violet';
   isLive?: boolean;
@@ -103,10 +103,12 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
             <span className={`text-xl sm:text-[1.625rem] font-extrabold font-mono tabular-nums tracking-tight leading-tight break-words ${theme.valueText}`}>
               {animatedValue}
             </span>
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[0.75rem] font-bold font-mono tabular-nums shrink-0 ${trendBadgeClass}`}>
-              <TrendIcon className="w-3 h-3" />
-              <span>{trendLabel}</span>
-            </span>
+            {trendLabel && (
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[0.75rem] font-bold font-mono tabular-nums shrink-0 ${trendBadgeClass}`}>
+                <TrendIcon className="w-3 h-3" />
+                <span>{trendLabel}</span>
+              </span>
+            )}
           </div>
         </div>
 

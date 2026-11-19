@@ -3,11 +3,9 @@ import {
   Store, 
   MessageCircle, 
   ShieldCheck, 
-  ArrowRight,
-  GraduationCap
+  ArrowRight
 } from 'lucide-react';
 import { BusinessListing, KelantanDistrict } from '../types';
-import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { showToast } from './ToastNotification';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
@@ -49,9 +47,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
   businesses = [],
   onSelectBusiness
 }) => {
-  const { userProfile, isAdmin } = useAuth();
   const { t, language } = useLanguage();
-  const isMentor = userProfile?.role === 'mentor';
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua Kategori');
   const [selectedDistrict, setSelectedDistrict] = useState<KelantanDistrict>('Semua Jajahan');
@@ -108,47 +104,13 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
     <div className="w-full space-y-4">
       
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
-            {t('directory_title')}
-          </h1>
-          <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
-            {t('directory_subtitle')}
-          </p>
-        </div>
-
-        {isMentor ? (
-          <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white rounded-xl text-sm font-bold border border-teal-200 dark:border-teal-800/70 shrink-0">
-            <GraduationCap className="w-4 h-4 text-black dark:text-white/75" />
-            <span>{t('mentor_review_mode_title')}</span>
-          </div>
-        ) : isAdmin ? (
-          <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 text-black dark:text-white rounded-xl text-sm font-bold border border-amber-200 dark:border-amber-800 shrink-0">
-            <ShieldCheck className="w-4 h-4 text-black dark:text-white/75" />
-            <span>{language === 'en' ? 'Directory Audit Mode (Admin)' : 'Mod Audit Direktori & SSM (Pentadbir)'}</span>
-          </div>
-        ) : null}
-      </div>
-
-      {/* Ringkasan Statistik Ringkas */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 h-fit items-start">
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Jumlah Usahawan</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{(businesses || []).filter(b => b.isApproved !== false).length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">SSM Disahkan</span>
-          <span className="text-lg font-black text-emerald-700 dark:text-emerald-400 tabular-nums">{(businesses || []).filter(b => b.isApproved !== false && Boolean(b.ssmNumber)).length}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Jajahan Aktif</span>
-          <span className="text-lg font-black text-black dark:text-white tabular-nums">{new Set((businesses || []).filter(b => b.isApproved !== false).map(b => b.district).filter(Boolean)).size}</span>
-        </div>
-        <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 h-fit">
-          <span className="text-xs font-semibold text-black/65 dark:text-white/70 block">Hasil Carian</span>
-          <span className="text-lg font-black text-indigo-700 dark:text-indigo-400 tabular-nums">{filteredBusinesses.length}</span>
-        </div>
+      <div>
+        <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+          {t('directory_title')}
+        </h1>
+        <p className="text-black/75 dark:text-white/75 text-[0.9375rem] mt-1 max-w-2xl leading-relaxed">
+          {t('directory_subtitle')}
+        </p>
       </div>
 
       {/* Direktori Usahawan: Carian, Penapis Bersepadu, Senarai Baris & Halaman Bernombor */}

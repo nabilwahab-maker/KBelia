@@ -391,61 +391,18 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
 
   return (
     <div className="animate-dashboard-tab space-y-4">
-      {/* Header Row: Title + Subtitle left | Eksport (.xlsx) + Catat Jualan right */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold tracking-wider uppercase text-black/75 dark:text-white/75">
-              <Coins className="w-3.5 h-3.5 text-black/75 dark:text-white/75" />
-              Buku Tunai &amp; Jualan Harian
-            </span>
-            <span className="text-black/35 dark:text-white/35">·</span>
-            <span className="text-sm text-black/70 dark:text-white/75 font-medium">
-              {kioskName}
-            </span>
-          </div>
-          <h2 className="text-lg sm:text-xl font-bold text-black dark:text-white tracking-tight">
-            Rekod Aliran Tunai &amp; Untung Bersih
-          </h2>
-          <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-            {salesRecords.length > 0
-              ? `${salesRecords.length} rekod jualan direkodkan · Pantau tunai, DuitNow QR & eksport ke Excel.`
-              : 'Catat jualan harian kiosk anda dan eksport rekod terus ke fail Excel (.xlsx).'}
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-          <button
-            type="button"
-            onClick={handleExportSales}
-            className="min-h-[40px] py-2 px-4 rounded-xl bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-black dark:text-white text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
-          >
-            <Download className="w-4 h-4 shrink-0" />
-            <span>
-              {selectedIds.length > 0
-                ? `Eksport (${selectedIds.length})`
-                : 'Eksport'}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowAddForm((prev) => !prev)}
-            className="min-h-[40px] py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 shadow-xs cursor-pointer transition-all"
-          >
-            <Plus className="w-4 h-4 shrink-0" />
-            <span>Catat Jualan</span>
-          </button>
-        </div>
+      <div>
+        <h2 className="text-lg sm:text-xl font-bold text-black dark:text-white tracking-tight">
+          Rekod Aliran Tunai &amp; Untung Bersih
+        </h2>
+        <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
+          Catat jualan harian kiosk ({kioskName}) dan eksport rekod terus ke fail Excel (.xlsx).
+        </p>
       </div>
 
-      {/* KPI Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 items-stretch">
-        <div
-          style={{ '--stagger': 0 } as React.CSSProperties}
-          className="animate-dashboard-card group relative overflow-hidden rounded-xl p-3.5 sm:p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-blue-400/70 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm flex flex-col justify-between"
-        >
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/75 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+      {/* Ringkasan Kewangan Mendatar */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 dark:divide-zinc-700 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700">
+        <div className="p-3.5 sm:p-4">
           <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 block mb-1">
             Jumlah Jualan Kasar
           </span>
@@ -454,11 +411,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
           </span>
         </div>
 
-        <div
-          style={{ '--stagger': 1 } as React.CSSProperties}
-          className="animate-dashboard-card group relative overflow-hidden rounded-xl p-3.5 sm:p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-amber-400/70 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm flex flex-col justify-between"
-        >
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-500/80 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+        <div className="p-3.5 sm:p-4">
           <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 block mb-1">
             Kos &amp; Belanja Stok
           </span>
@@ -467,33 +420,22 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
           </span>
         </div>
 
-        <div
-          style={{ '--stagger': 2 } as React.CSSProperties}
-          className="animate-dashboard-card group relative overflow-hidden rounded-xl p-3.5 sm:p-4 bg-emerald-50/75 dark:bg-emerald-950/35 border border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm flex flex-col justify-between"
-        >
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-600/80 opacity-75 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+        <div className="p-3.5 sm:p-4">
           <span className="text-xs sm:text-sm font-bold text-black dark:text-white block mb-1">
             Untung Bersih Terkumpul
           </span>
-          <span className="text-xl sm:text-2xl font-extrabold font-mono text-emerald-800 dark:text-emerald-300 tabular-nums tracking-tight">
+          <span className="text-xl sm:text-2xl font-extrabold font-mono text-emerald-700 dark:text-emerald-300 tabular-nums tracking-tight">
             {animatedNetProfit}
           </span>
         </div>
 
-        <div
-          style={{ '--stagger': 3 } as React.CSSProperties}
-          className="animate-dashboard-card group relative overflow-hidden rounded-xl p-3.5 sm:p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-indigo-400/70 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm flex flex-col justify-between"
-        >
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-indigo-600/75 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+        <div className="p-3.5 sm:p-4">
           <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 block mb-1">
             Bayaran DuitNow QR
           </span>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
-              {animatedQrPct}
-            </span>
-            <span className="text-xs sm:text-sm text-black/65 dark:text-white/70">Tanpa Tunai</span>
-          </div>
+          <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
+            {animatedQrPct}
+          </span>
         </div>
       </div>
 
@@ -661,6 +603,28 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                 <span>
                   Penapis{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
                 </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleExportSales}
+                className="min-h-[38px] px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-black dark:text-white text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors"
+              >
+                <Download className="w-4 h-4 shrink-0" />
+                <span>
+                  {selectedIds.length > 0
+                    ? `Eksport (${selectedIds.length})`
+                    : 'Eksport'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowAddForm((prev) => !prev)}
+                className="min-h-[38px] px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 shadow-xs cursor-pointer transition-all"
+              >
+                <Plus className="w-4 h-4 shrink-0" />
+                <span>{showAddForm ? 'Tutup Borang' : 'Catat Jualan'}</span>
               </button>
 
               {isFilterOpen && (

@@ -462,8 +462,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
 
   return (
     <div className="w-full space-y-4">
-      {/* Page Intro Header & Compact Single-Line Status Summary */}
-      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+      {/* Page Intro Header */}
+      <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700">
         <div className="space-y-1 max-w-2xl">
           <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance">
             {isEn ? 'Mentor Advisory & Appointments' : 'Bimbingan & Temu Janji Mentor'}
@@ -473,36 +473,6 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               ? 'Explore featured mentors above, filter by agency or expertise, and book your 1-on-1 slot.'
               : 'Tinjau mentor tumpuan di bawah, tapis mengikut agensi atau kepakaran, dan tempah slot 1-ke-1 anda.'}
           </p>
-        </div>
-
-        {/* Clean Unboxed Status Bar Replacing 4 Stat Boxes */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm font-medium text-black/75 dark:text-white/80 tabular-nums shrink-0">
-          <span className="inline-flex items-center gap-1.5 font-semibold text-black dark:text-white">
-            {activeSession ? (
-              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-            ) : (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            )}
-            <span>
-              {activeSession
-                ? isEn
-                  ? '1 Active Session'
-                  : '1 Temu Janji Aktif'
-                : isEn
-                ? 'Slot Ready to Book'
-                : 'Slot Sedia Ditempah'}
-            </span>
-          </span>
-          <span aria-hidden="true" className="text-black/30 dark:text-white/30">·</span>
-          <span>
-            <strong className="font-bold text-black dark:text-white">{mentors.length}</strong>{' '}
-            {isEn ? 'Mentors' : 'Mentor'}
-          </span>
-          <span aria-hidden="true" className="text-black/30 dark:text-white/30">·</span>
-          <span>
-            <strong className="font-bold text-black dark:text-white">{sessionHistory.length}</strong>{' '}
-            {isEn ? 'Past Sessions' : 'Sejarah Sesi'}
-          </span>
         </div>
       </div>
 

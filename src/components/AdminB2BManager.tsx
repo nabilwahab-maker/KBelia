@@ -336,13 +336,9 @@ export const AdminB2BManager: React.FC = () => {
   return (
     <div className="space-y-4 animate-dashboard-tab">
       {/* Header Banner */}
-      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-zinc-600 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-zinc-600">
         <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-            <Megaphone className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <span>Kawalan Iklan Bergambar Pentadbir</span>
-          </div>
           <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Pengurusan Ruang Niaga &amp; Iklan Bekalan
           </h3>
@@ -350,16 +346,6 @@ export const AdminB2BManager: React.FC = () => {
             Tambah iklan baharu beserta gambar produk, semak pratonton langsung kad iklan, atau kemas kini paparan Ruang Niaga usahawan belia.
           </p>
         </div>
-
-        <button
-          id="btn-admin-add-b2b"
-          type="button"
-          onClick={showForm ? () => setShowForm(false) : handleOpenCreate}
-          className="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 self-start lg:self-auto"
-        >
-          {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-          <span>{showForm ? 'Tutup Borang' : 'Tambah Iklan Bergambar'}</span>
-        </button>
       </div>
 
       {/* Create / Edit Form with Live Card Preview */}
@@ -598,6 +584,17 @@ export const AdminB2BManager: React.FC = () => {
           onSortChange={(val) => {
             if (val) setSortBy(val);
           }}
+          rightSlot={
+            <button
+              id="btn-admin-add-b2b"
+              type="button"
+              onClick={showForm ? () => setShowForm(false) : handleOpenCreate}
+              className="px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold inline-flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            >
+              {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              <span>{showForm ? 'Tutup Borang' : 'Tambah Iklan Bergambar'}</span>
+            </button>
+          }
           filterContent={
             <>
               <div>

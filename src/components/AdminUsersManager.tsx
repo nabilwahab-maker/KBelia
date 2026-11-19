@@ -266,13 +266,9 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
   return (
     <div className="space-y-4 animate-dashboard-tab">
       {/* Header */}
-      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs">
         <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
-            <Users className="w-3.5 h-3.5" />
-            <span>Kawalan Penuh Pentadbir</span>
-          </div>
           <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white">
             Pengurusan Akaun &amp; Profil Pengguna Portal
           </h3>
@@ -280,15 +276,6 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
             Tambah akaun pengguna baharu (Usahawan Belia / Mentor), kemas kini maklumat profil, atau padam akaun pengguna portal.
           </p>
         </div>
-
-        <button
-          type="button"
-          onClick={openCreateModal}
-          className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs cursor-pointer shrink-0 self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tambah Pengguna Baharu</span>
-        </button>
       </div>
 
       {/* Reference-Style Users Table Card */}
@@ -313,6 +300,16 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
           onSortChange={(val) => {
             if (val) setSortBy(val);
           }}
+          rightSlot={
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tambah Pengguna Baharu</span>
+            </button>
+          }
           filterContent={
             <>
               <div>

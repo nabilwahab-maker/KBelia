@@ -1249,25 +1249,18 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         <div className="space-y-4">
           
           {/* Compact Business Identity Summary Strip */}
-          <div className="animate-dashboard-card rounded-xl bg-white dark:bg-zinc-900 px-4 py-2.5 border border-slate-200 dark:border-zinc-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-colors hover:border-slate-300 dark:hover:border-zinc-600">
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
-              <span className="font-extrabold text-black dark:text-white text-sm">
-                {myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Usahawan Belia'}
-              </span>
-              <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-              <span className="text-black/75 dark:text-white/75">
-                {myBusiness?.district || userProfile?.district || 'Kota Bharu'}
-              </span>
-              <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-              <span className="font-mono text-[0.8125rem] font-semibold text-black/80 dark:text-white/80">
-                SSM: {myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Belum Didaftarkan'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-[0.8125rem] font-mono font-semibold text-black/75 dark:text-white/80 tabular-nums shrink-0">
-              <span>{safeProducts.length} Produk</span>
-              <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-              <span>{safeCashflow.length} Rekod Jualan</span>
-            </div>
+          <div className="animate-dashboard-card rounded-xl bg-white dark:bg-zinc-900 px-4 py-2.5 border border-slate-200 dark:border-zinc-700 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm transition-colors hover:border-slate-300 dark:hover:border-zinc-600">
+            <span className="font-extrabold text-black dark:text-white text-sm">
+              {myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Usahawan Belia'}
+            </span>
+            <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
+            <span className="text-black/75 dark:text-white/75">
+              {myBusiness?.district || userProfile?.district || 'Kota Bharu'}
+            </span>
+            <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
+            <span className="font-mono text-[0.8125rem] font-semibold text-black/80 dark:text-white/80">
+              SSM: {myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Belum Didaftarkan'}
+            </span>
           </div>
 
           {/* 4 Compact Summary KPI Metric Cards */}
@@ -1281,8 +1274,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   : 'Mula catat di Buku Tunai'
               }
               icon={TrendingUp}
-              trendLabel={safeCashflow.length > 0 ? `+${safeCashflow.length} rekod` : '0 rekod'}
-              trendDirection={safeCashflow.length > 0 ? 'up' : 'neutral'}
               accentColor="emerald"
               isLive
               staggerIndex={0}
@@ -1295,11 +1286,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               subtitle={
                 primaryBooking
                   ? `${primaryBooking.hubLocation} · ${primaryBooking.durationMonths} bln`
-                  : `${safeSlots.filter(s => s.status === 'available').length} unit kapsul tersedia`
+                  : 'Mohon slot kapsul niaga belia'
               }
               icon={Building2}
-              trendLabel={approvedBooking ? 'Aktif' : pendingBooking ? 'Semakan' : 'Kosong'}
-              trendDirection={approvedBooking ? 'up' : 'neutral'}
               accentColor="amber"
               isLive
               staggerIndex={1}
@@ -1315,14 +1304,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   : 'Tiada permohonan geran lagi'
               }
               icon={FileCheck}
-              trendLabel={
-                approvedGrants.length > 0
-                  ? `${approvedGrants.length} Diluluskan`
-                  : latestGrant
-                  ? 'Semakan'
-                  : '0 Mohon'
-              }
-              trendDirection={approvedGrants.length > 0 ? 'up' : 'neutral'}
               accentColor="blue"
               staggerIndex={2}
               onClick={() => setActiveTab('vault')}
@@ -1337,14 +1318,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   : 'Tempah sesi bimbingan mentor'
               }
               icon={Calendar}
-              trendLabel={
-                upcomingMentor
-                  ? normalizeMentorshipMode(upcomingMentor.mode) === 'Google Meet'
-                    ? 'Google Meet'
-                    : 'Hab Usahawan'
-                  : 'Sedia'
-              }
-              trendDirection={upcomingMentor ? 'up' : 'neutral'}
               accentColor="violet"
               staggerIndex={3}
               onClick={onOpenMentorshipClinic}
@@ -1642,7 +1615,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               style={{ '--stagger': 5 } as React.CSSProperties}
               className="animate-dashboard-card min-w-0 rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
             >
-              <div className="border-b border-slate-300 dark:border-zinc-600 py-3 px-4 sm:px-5 flex flex-wrap items-center justify-between gap-2.5">
+              <div className="border-b border-slate-300 dark:border-zinc-600 py-3 px-4 sm:px-5">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
@@ -1654,10 +1627,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     Ringkasan permohonan terkini dalam semakan pentadbir &amp; mentor
                   </p>
                 </div>
-
-                <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 shrink-0 tabular-nums">
-                  {pendingApprovalItems.length} Menunggu
-                </span>
               </div>
 
               <div className="p-3.5 sm:p-4 flex flex-col justify-start gap-3">
@@ -1745,7 +1714,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               className="animate-dashboard-card min-w-0 rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
             >
               {/* Card Header */}
-              <div className="border-b border-slate-300 dark:border-slate-600 py-3 px-4 sm:px-5 flex flex-wrap items-center justify-between gap-2.5">
+              <div className="border-b border-slate-300 dark:border-slate-600 py-3 px-4 sm:px-5">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <FileCheck className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
@@ -1756,15 +1725,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5">
                     Status semakan semasa Jawatankuasa KBelia
                   </p>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="font-mono text-[0.75rem] font-bold text-emerald-700 dark:text-emerald-300 tabular-nums">
-                    {stepperItems.filter(s => s.status === 'completed').length}/5
-                  </span>
-                  <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 shrink-0">
-                    {primaryBooking ? primaryBooking.slotCode : hasBusiness ? 'PROFIL-AKTIF' : 'BELUM-MOHON'}
-                  </span>
                 </div>
               </div>
 
@@ -1855,7 +1815,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             style={{ '--stagger': 7 } as React.CSSProperties}
             className="animate-dashboard-card w-full rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
           >
-            <div className="border-b border-slate-300 dark:border-slate-600 py-3 px-4 sm:px-5 flex flex-wrap items-center justify-between gap-2.5">
+            <div className="border-b border-slate-300 dark:border-slate-600 py-3 px-4 sm:px-5">
               <div className="flex items-center gap-2">
                 <Bell className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
                 <div>
@@ -1866,25 +1826,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     Senarai padat notifikasi terkini, status lesen kiosk, dan jalan pintas pengurusan perniagaan
                   </p>
                 </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[0.8125rem] font-mono font-bold text-black/75 dark:text-white/80 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 tabular-nums">
-                  {liveAlerts.length} Rekod
-                </span>
-                <button
-                  type="button"
-                  onClick={() => (onOpenSettingsTab ? onOpenSettingsTab() : setActiveTab('card'))}
-                  className="py-1.5 px-3 rounded-lg text-[0.8125rem] font-bold bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-700 transition-all cursor-pointer"
-                >
-                  Tetapan Akaun
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('products')}
-                  className="py-1.5 px-3 rounded-lg text-[0.8125rem] font-bold bg-blue-50 dark:bg-blue-950/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 hover:bg-amber-100 dark:hover:bg-blue-600 transition-all cursor-pointer"
-                >
-                  Urus Produk
-                </button>
               </div>
             </div>
 
@@ -2158,7 +2099,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
       {/* Tab 2: Products */}
       {activeTab === 'products' && (() => {
-        const inStockCount = safeProducts.filter((p) => p.inStock !== false).length;
         const activeFilterCount =
           (prodCategoryFilter !== 'Semua' ? 1 : 0) +
           (prodStockFilter !== 'all' ? 1 : 0) +
@@ -2183,42 +2123,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
         return (
         <div key="products" className="mt-4 space-y-4 animate-dashboard-tab">
-          {/* Header Row: Title + Subtitle left | Export (.xlsx) + Daftar Produk right */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-lg font-bold text-black dark:text-white tracking-tight">
-                Katalog Menu &amp; Produk Anda
-              </h3>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5 tabular-nums">
-                {safeProducts.length > 0
-                  ? `${safeProducts.length} produk disenaraikan · ${inStockCount} stok tersedia`
-                  : 'Urus senarai menu, pantau stok dan eksport rekod ke Excel.'}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              <button
-                type="button"
-                onClick={handleExportProducts}
-                className="min-h-[40px] py-2 px-4 rounded-xl bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-black dark:text-white text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors shadow-2xs"
-              >
-                <Download className="w-4 h-4 shrink-0" />
-                <span>
-                  {selectedProductIds.length > 0
-                    ? `Eksport (${selectedProductIds.length})`
-                    : 'Eksport'}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowAddProduct(!showAddProduct)}
-                className="min-h-[40px] py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 shadow-xs cursor-pointer transition-all"
-              >
-                <Plus className="w-4 h-4 shrink-0" />
-                <span>Daftar Produk</span>
-              </button>
-            </div>
+          <div>
+            <h3 className="text-lg font-bold text-black dark:text-white tracking-tight">
+              Katalog Menu &amp; Produk Anda
+            </h3>
+            <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
+              Urus senarai menu, pantau ketersediaan stok dan eksport rekod ke Excel.
+            </p>
           </div>
 
           {/* Add Product Form Box */}
@@ -2423,6 +2334,28 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     <span>
                       Penapis{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
                     </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleExportProducts}
+                    className="min-h-[38px] px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-black dark:text-white text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors"
+                  >
+                    <Download className="w-4 h-4 shrink-0" />
+                    <span>
+                      {selectedProductIds.length > 0
+                        ? `Eksport (${selectedProductIds.length})`
+                        : 'Eksport'}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowAddProduct(!showAddProduct)}
+                    className="min-h-[38px] px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 shadow-xs cursor-pointer transition-all"
+                  >
+                    <Plus className="w-4 h-4 shrink-0" />
+                    <span>{showAddProduct ? 'Tutup Borang' : 'Daftar Produk'}</span>
                   </button>
 
                   {isProdFilterOpen && (
@@ -2732,15 +2665,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       {/* Tab 3: Capsule Bookings */}
       {activeTab === 'bookings' && (
         <div key="bookings" className="mt-4 space-y-4 animate-dashboard-tab">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-base font-bold text-black dark:text-white">Rekod Permohonan Kiosk Anda</h3>
-              <p className="text-[0.9375rem] text-black dark:text-white/75">
-                {hasActiveKioskBooking
-                  ? 'Had 1 tempahan kiosk aktif sedang digunakan (1 / 1). Batalkan tempahan aktif untuk memohon unit lain.'
-                  : 'Status semakan dan kelulusan kiosk oleh pihak pengurusan (0 / 1 aktif).'}
-              </p>
-            </div>
+          <div>
+            <h3 className="text-base font-bold text-black dark:text-white">Rekod Permohonan Kiosk Anda</h3>
+            <p className="text-[0.9375rem] text-black dark:text-white/75">
+              {hasActiveKioskBooking
+                ? 'Tempahan atau sewaan kiosk aktif anda dipaparkan di bawah. Batalkan tempahan aktif jika ingin memohon unit lain.'
+                : 'Semak status permohonan dan kelulusan kiosk anda oleh pihak pengurusan.'}
+            </p>
           </div>
 
           {activeVisibleBookings.length === 0 ? (
@@ -3124,22 +3055,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           {/* Existing Maintenance Tickets List */}
           {sortedTickets.length > 0 && (
             <div className="space-y-3 pt-2">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h4 className="text-base font-bold text-black dark:text-white flex items-center gap-2">
-                  <Wrench className="w-4 h-4 text-black dark:text-white" />
-                  <span>Tiket Aduan Fasiliti Anda ({sortedTickets.length})</span>
-                </h4>
-                {onOpenMaintenanceModal && (
-                  <button
-                    type="button"
-                    onClick={onOpenMaintenanceModal}
-                    className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Aduan Baharu</span>
-                  </button>
-                )}
-              </div>
+              <h4 className="text-base font-bold text-black dark:text-white flex items-center gap-2">
+                <Wrench className="w-4 h-4 text-black dark:text-white" />
+                <span>Tiket Aduan Fasiliti Anda</span>
+              </h4>
 
               <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
                 <ReferenceTableToolbar
@@ -3155,6 +3074,18 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   sortOptions={ticketSortOptions}
                   sortValue={ticketSortBy === 'table_column' ? '' : ticketSortBy}
                   onSortChange={setTicketSortBy}
+                  rightSlot={
+                    onOpenMaintenanceModal ? (
+                      <button
+                        type="button"
+                        onClick={onOpenMaintenanceModal}
+                        className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Aduan Baharu</span>
+                      </button>
+                    ) : undefined
+                  }
                   filterContent={
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">

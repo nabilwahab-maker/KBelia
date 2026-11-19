@@ -464,7 +464,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
               </div>
               <div className="max-w-lg mx-auto space-y-1.5">
                 <h2 className="text-lg font-black text-black dark:text-white">
-                  Tempahan Kiosk Dikunci (Had 1 / 1 Aktif)
+                  Tempahan Kiosk Aktif Sedia Ada
                 </h2>
                 <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed">
                   Anda sudah mempunyai satu permohonan atau tempahan kiosk aktif ({activeBooking?.slotCode}). Hanya satu tempahan kiosk dibenarkan pada satu masa. Untuk membuat tempahan baharu, sila batalkan tempahan sedia ada terlebih dahulu.
@@ -632,7 +632,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                         {availableSlots.length > 0 ? (
                           availableSlots.map((s) => (
                             <option key={s.id} value={s.id}>
-                              {s.code} - {s.name} ({s.hubLocation}, {s.district}) · [Tersedia]
+                              {s.code} - {s.name} ({s.district}) · [Tersedia]
                             </option>
                           ))
                         ) : (
@@ -1285,7 +1285,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     Tiada Tempahan Kiosk Aktif
                   </h2>
                   <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 max-w-md mx-auto">
-                    Anda tidak mempunyai sebarang permohonan atau sewaan kiosk aktif pada masa ini (0 / 1).
+                    Anda tidak mempunyai sebarang permohonan atau sewaan kiosk aktif pada masa ini.
                   </p>
                 </div>
                 <button

@@ -7,14 +7,75 @@ import {
   acaraKarnivalBeliaImg
 } from '../utils/visualAssets';
 
+export const LEGACY_CAPSULE_NAME_BY_ID: Record<string, string> = {
+  'cap-umk-01': 'Kapsul Niaga Belia Bachok 01',
+  'cap-kb-01': 'Kapsul Niaga Belia Kota Bharu 01',
+  'cap-jeli-01': 'Kapsul Niaga Belia Jeli 01',
+  'cap-tumpat-01': 'Kapsul Niaga Belia Tumpat 01',
+  'cap-kb-02': 'Kapsul Niaga Belia Kota Bharu 02',
+  'cap-pm-01': 'Kapsul Niaga Belia Pasir Mas 01'
+};
+
+export const LEGACY_CAPSULE_NAME_MAP: Record<string, string> = {
+  'kiosk inkubator f&b a1': 'Kapsul Niaga Belia Bachok 01',
+  'kiosk belia kb sentral b1': 'Kapsul Niaga Belia Kota Bharu 01',
+  'kiosk agrotek & produk lokal c1': 'Kapsul Niaga Belia Jeli 01',
+  'kiosk kraf & batik tumpat t1': 'Kapsul Niaga Belia Tumpat 01',
+  'kiosk kreatif & digital kb b2': 'Kapsul Niaga Belia Kota Bharu 02',
+  'kiosk makanan tradisi pasir mas p1': 'Kapsul Niaga Belia Pasir Mas 01'
+};
+
+export const LEGACY_CAPSULE_SIZE_MAP: Record<string, string> = {
+  '10ft x 10ft smart kiosk': '10ft x 10ft Kapsul Standard',
+  '12ft x 10ft commercial pod': '12ft x 10ft Kapsul Standard',
+  '10ft x 10ft eco pod': '10ft x 10ft Kapsul Standard',
+  '10ft x 10ft craft pod': '10ft x 10ft Kapsul Standard',
+  '10ft x 10ft studio pod': '10ft x 10ft Kapsul Standard',
+  '10ft x 8ft culinary kiosk': '10ft x 8ft Kapsul Standard',
+  '10ft x 10ft smart pod': '10ft x 10ft Kapsul Standard',
+  '10ft x 10ft kiosk pintar': '10ft x 10ft Kapsul Standard'
+};
+
+export function normalizeLegacySlotName(slotIdOrCode?: string, currentName?: string): string {
+  const trimmed = (currentName || '').trim();
+  if (!trimmed) {
+    return (slotIdOrCode && LEGACY_CAPSULE_NAME_BY_ID[slotIdOrCode]) || 'Kapsul Niaga Belia';
+  }
+  const lower = trimmed.toLowerCase();
+  if (LEGACY_CAPSULE_NAME_MAP[lower]) {
+    return LEGACY_CAPSULE_NAME_MAP[lower];
+  }
+  return trimmed;
+}
+
+export function normalizeLegacySlotSize(currentSize?: string): string {
+  const trimmed = (currentSize || '').trim();
+  if (!trimmed) return '10ft x 10ft Kapsul Standard';
+  const lower = trimmed.toLowerCase();
+  return LEGACY_CAPSULE_SIZE_MAP[lower] || trimmed;
+}
+
+export function normalizeCapsuleSlot(slot: CapsuleSlot): CapsuleSlot {
+  const normalizedName = normalizeLegacySlotName(slot.id, slot.name);
+  const normalizedSize = slot.size ? normalizeLegacySlotSize(slot.size) : '10ft x 10ft Kapsul Standard';
+  if (normalizedName === slot.name && normalizedSize === slot.size) {
+    return slot;
+  }
+  return {
+    ...slot,
+    name: normalizedName,
+    size: normalizedSize
+  };
+}
+
 export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-umk-01',
     code: 'CAP-BCH-01',
-    name: 'Kiosk Inkubator F&B A1',
+    name: 'Kapsul Niaga Belia Bachok 01',
     hubLocation: 'Hab Usahawan Bachok (Zon Keusahawanan)',
     district: 'Bachok',
-    size: '10ft x 10ft Smart Kiosk',
+    size: '10ft x 10ft Kapsul Standard',
     monthlyRate: 150,
     dailyRate: 15,
     status: 'occupied',
@@ -27,10 +88,10 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-kb-01',
     code: 'CAP-KB-01',
-    name: 'Kiosk Belia KB Sentral B1',
+    name: 'Kapsul Niaga Belia Kota Bharu 01',
     hubLocation: 'Pusat Transformasi Belia Kota Bharu (KB Sentral)',
     district: 'Kota Bharu',
-    size: '12ft x 10ft Commercial Pod',
+    size: '12ft x 10ft Kapsul Standard',
     monthlyRate: 200,
     dailyRate: 20,
     status: 'occupied',
@@ -43,10 +104,10 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-jeli-01',
     code: 'CAP-JELI-01',
-    name: 'Kiosk Agrotek & Produk Lokal C1',
+    name: 'Kapsul Niaga Belia Jeli 01',
     hubLocation: 'Hab Usahawan Jeli (Zon Komuniti)',
     district: 'Jeli',
-    size: '10ft x 10ft Eco Pod',
+    size: '10ft x 10ft Kapsul Standard',
     monthlyRate: 130,
     dailyRate: 14,
     status: 'available',
@@ -58,10 +119,10 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-tumpat-01',
     code: 'CAP-TMP-01',
-    name: 'Kiosk Kraf & Batik Tumpat T1',
+    name: 'Kapsul Niaga Belia Tumpat 01',
     hubLocation: 'Hub Kraf & Budaya Tumpat (Pantai Sri Tujoh)',
     district: 'Tumpat',
-    size: '10ft x 10ft Craft Pod',
+    size: '10ft x 10ft Kapsul Standard',
     monthlyRate: 140,
     dailyRate: 15,
     status: 'available',
@@ -72,10 +133,10 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-kb-02',
     code: 'CAP-KB-02',
-    name: 'Kiosk Kreatif & Digital KB B2',
+    name: 'Kapsul Niaga Belia Kota Bharu 02',
     hubLocation: 'Pusat Transformasi Belia Kota Bharu (KB Sentral)',
     district: 'Kota Bharu',
-    size: '10ft x 10ft Studio Pod',
+    size: '10ft x 10ft Kapsul Standard',
     monthlyRate: 190,
     dailyRate: 18,
     status: 'occupied',
@@ -88,10 +149,10 @@ export const INITIAL_CAPSULE_SLOTS: CapsuleSlot[] = [
   {
     id: 'cap-pm-01',
     code: 'CAP-PM-01',
-    name: 'Kiosk Makanan Tradisi Pasir Mas P1',
+    name: 'Kapsul Niaga Belia Pasir Mas 01',
     hubLocation: 'Hub Niaga Belia Bandar Pasir Mas',
     district: 'Pasir Mas',
-    size: '10ft x 8ft Culinary Kiosk',
+    size: '10ft x 8ft Kapsul Standard',
     monthlyRate: 135,
     dailyRate: 14,
     status: 'available',

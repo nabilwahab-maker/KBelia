@@ -19,7 +19,6 @@ import {
   generateYouthCertificateOfficialHtml
 } from '../utils/printUtils';
 import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
-import { useAnimatedMetric } from '../hooks/useMotion';
 
 interface UserDocumentsVaultProps {
   bookings: CapsuleBooking[];
@@ -55,56 +54,17 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
   const resolvedBusiness = businessName || approvedBookings[0]?.businessName || approvedGrants[0]?.businessName;
   const resolvedDistrict = district || approvedBookings[0]?.hubLocation || 'Negeri Kelantan';
 
-  const totalDocsCount = approvedBookings.length + approvedGrants.length + 1;
-  const animatedTotalDocs = useAnimatedMetric(totalDocsCount);
-  const animatedKioskDocs = useAnimatedMetric(approvedBookings.length);
-  const animatedGrantDocs = useAnimatedMetric(approvedGrants.length);
-  const animatedCertDocs = useAnimatedMetric(1);
-
   return (
     <div className="animate-dashboard-tab relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-4 sm:p-5 shadow-sm space-y-4 h-fit">
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/80 dark:bg-blue-500/80" aria-hidden="true" />
       {/* (a) Tajuk Utama */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-slate-200 dark:border-slate-700">
-        <div>
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 text-[0.75rem] font-semibold tracking-wider uppercase text-blue-700 dark:text-blue-400">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Simpanan Dokumen Rasmi Anda
-            </span>
-            <span className="text-black/35 dark:text-white/35">·</span>
-            <span className="text-xs text-black/70 dark:text-white/75 font-medium">
-              Disimpan Selamat (PDPA 2010)
-            </span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white tracking-tight">
-            Dokumen &amp; Sijil Saya
-          </h2>
-        </div>
-      </div>
-
-      {/* (b) Jalur Statistik Ringkas */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-stretch">
-        <div style={{ '--stagger': 0 } as React.CSSProperties} className="animate-dashboard-card group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400/70 flex flex-col justify-between">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/65 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-          <p className="text-xs font-medium text-black/65 dark:text-white/70">Jumlah Dokumen</p>
-          <p className="text-lg font-extrabold font-mono tabular-nums text-black dark:text-white mt-0.5">{animatedTotalDocs}</p>
-        </div>
-        <div style={{ '--stagger': 1 } as React.CSSProperties} className="animate-dashboard-card group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-400/70 flex flex-col justify-between">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-600/65 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-          <p className="text-xs font-medium text-black/65 dark:text-white/70">Surat Kiosk</p>
-          <p className="text-lg font-extrabold font-mono tabular-nums text-emerald-700 dark:text-emerald-400 mt-0.5">{animatedKioskDocs}</p>
-        </div>
-        <div style={{ '--stagger': 2 } as React.CSSProperties} className="animate-dashboard-card group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-400/70 flex flex-col justify-between">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/65 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-          <p className="text-xs font-medium text-black/65 dark:text-white/70">Kelulusan Geran</p>
-          <p className="text-lg font-extrabold font-mono tabular-nums text-blue-700 dark:text-blue-400 mt-0.5">{animatedGrantDocs}</p>
-        </div>
-        <div style={{ '--stagger': 3 } as React.CSSProperties} className="animate-dashboard-card group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900 px-3.5 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-400/70 flex flex-col justify-between">
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-500/75 opacity-60 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-          <p className="text-xs font-medium text-black/65 dark:text-white/70">Sijil Keahlian</p>
-          <p className="text-lg font-extrabold font-mono tabular-nums text-amber-700 dark:text-amber-400 mt-0.5">{animatedCertDocs}</p>
-        </div>
+      <div className="pb-3.5 border-b border-slate-200 dark:border-slate-700">
+        <h2 className="text-xl sm:text-2xl font-bold text-black dark:text-white tracking-tight">
+          Dokumen &amp; Sijil Saya
+        </h2>
+        <p className="text-sm text-black/70 dark:text-white/75 mt-1">
+          Akses dan muat turun surat tawaran kiosk, perjanjian digital, kelulusan geran, serta sijil keahlian rasmi anda.
+        </p>
       </div>
 
       {/* (d) Senarai Menegak Dokumen Rasmi */}
