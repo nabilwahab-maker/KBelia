@@ -15,7 +15,11 @@ import {
   FileText,
   PenTool,
   History,
-  Clock
+  Clock,
+  ShieldCheck,
+  Compass,
+  ClipboardList,
+  Zap
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
@@ -126,6 +130,95 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     [myBookings]
   );
 
+  const [bookHubFilter, setBookHubFilter] = useState<string>('Semua');
+
+  const occupiedOrReservedCount = Math.max(0, safeAllSlots.length - availableSlots.length);
+
+  const rateStats = useMemo(() => {
+    const source = availableSlots.length > 0 ? availableSlots : safeAllSlots;
+    const rates = source
+      .map((s) => Number(s.monthlyRate) || 150)
+      .filter((n) => Number.isFinite(n) && n > 0);
+    if (rates.length === 0) {
+      return { min: 150, max: 150, label: 'RM 150 / bulan' };
+    }
+    const min = Math.min(...rates);
+    const max = Math.max(...rates);
+    const label =
+      min === max
+        ? `RM ${min.toLocaleString('ms-MY')} / bulan`
+        : `RM ${min.toLocaleString('ms-MY')} - RM ${max.toLocaleString('ms-MY')} / bln`;
+    return { min, max, label };
+  }, [availableSlots, safeAllSlots]);
+
+  const hubBreakdown = useMemo(() => {
+    const canonicalHubs = [
+      { hubKey: 'Hab Usahawan Bachok', shortLabel: 'Bachok', match: ['bachok', 'umk'] },
+      { hubKey: 'Hub Belia Kota Bharu', shortLabel: 'Kota Bharu', match: ['kota bharu', 'kb sentral'] },
+      { hubKey: 'Hub Kraf Tumpat', shortLabel: 'Tumpat', match: ['tumpat'] },
+      { hubKey: 'Hub Pasir Mas', shortLabel: 'Pasir Mas', match: ['pasir mas'] },
+      { hubKey: 'Hub Komuniti Jeli', shortLabel: 'Jeli', match: ['jeli'] }
+    ];
+
+    const buckets = new Map<
+      string,
+      {
+        hubKey: string;
+        shortLabel: string;
+        total: number;
+        available: number;
+        firstAvailableSlot: CapsuleSlot | null;
+      }
+    >();
+
+    for (const slot of safeAllSlots) {
+      if (!slot) continue;
+      const locLower = (slot.hubLocation || '').toLowerCase();
+      const distLower = (slot.district || '').toLowerCase();
+      const matchedCanonical = canonicalHubs.find((h) =>
+        h.match.some((kw) => locLower.includes(kw) || distLower === kw)
+      );
+
+      const hubKey = matchedCanonical?.hubKey || slot.hubLocation || slot.district || 'Lain-lain';
+      const shortLabel = matchedCanonical?.shortLabel || slot.district || slot.hubLocation || 'Lain-lain';
+      const isFree = slot.status === 'available' && !slot.currentTenantBusinessName;
+
+      const existing = buckets.get(hubKey) || {
+        hubKey,
+        shortLabel,
+        total: 0,
+        available: 0,
+        firstAvailableSlot: null
+      };
+      existing.total += 1;
+      if (isFree) {
+        existing.available += 1;
+        if (!existing.firstAvailableSlot) existing.firstAvailableSlot = slot;
+      }
+      buckets.set(hubKey, existing);
+    }
+
+    return Array.from(buckets.values()).sort((a, b) => b.available - a.available || b.total - a.total);
+  }, [safeAllSlots]);
+
+  const filteredBookAvailableSlots = useMemo(() => {
+    if (bookHubFilter === 'Semua') return availableSlots;
+    const target = hubBreakdown.find((h) => h.hubKey === bookHubFilter);
+    if (!target) return availableSlots;
+    const shortLower = target.shortLabel.toLowerCase();
+    return availableSlots.filter((slot) => {
+      const locLower = (slot.hubLocation || '').toLowerCase();
+      const distLower = (slot.district || '').toLowerCase();
+      return (
+        slot.hubLocation === target.hubKey ||
+        locLower.includes(shortLower) ||
+        distLower === shortLower ||
+        (shortLower === 'bachok' && locLower.includes('umk')) ||
+        (shortLower === 'kota bharu' && locLower.includes('kb sentral'))
+      );
+    });
+  }, [availableSlots, bookHubFilter, hubBreakdown]);
+
   // Form states for inline dedicated booking page
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedSlotId, setSelectedSlotId] = useState<string>(() => {
@@ -160,6 +253,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     if (view === 'book') {
       setSubmitted(false);
       setStep(1);
+      setBookHubFilter('Semua');
       setError(null);
       setFieldErrors({});
 
@@ -211,18 +305,23 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preselectedSlot]);
 
-  // Keep selectedSlotId synchronized with currently available slots
+  // Keep selectedSlotId synchronized with currently available slots (and active hub filter in book view)
   useEffect(() => {
+    const pool = filteredBookAvailableSlots.length > 0 ? filteredBookAvailableSlots : availableSlots;
     setSelectedSlotId((prev) => {
-      if (prev && availableSlots.some((s) => s.id === prev)) {
+      if (prev && pool.some((s) => s.id === prev)) {
         return prev;
       }
-      return availableSlots[0]?.id || '';
+      return pool[0]?.id || '';
     });
-  }, [availableSlots]);
+  }, [availableSlots, filteredBookAvailableSlots]);
 
   const currentSlot =
-    availableSlots.find((s) => s.id === selectedSlotId) || availableSlots[0] || null;
+    filteredBookAvailableSlots.find((s) => s.id === selectedSlotId) ||
+    availableSlots.find((s) => s.id === selectedSlotId) ||
+    filteredBookAvailableSlots[0] ||
+    availableSlots[0] ||
+    null;
   const isCurrentSlotAvailable = Boolean(
     currentSlot && currentSlot.status === 'available' && !currentSlot.currentTenantBusinessName
   );
@@ -385,6 +484,205 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     }
   };
 
+  const handleSelectHubFromSummary = (hubKey: string) => {
+    if (onSelectHub) {
+      onSelectHub(hubKey);
+    }
+    onChangeView('browse');
+  };
+
+  const renderSummaryMetricsBar = () => (
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200 dark:divide-zinc-700">
+        {/* Metrik 1: Kekosongan Unit Kiosk */}
+        <div className="p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
+              Kekosongan Kiosk
+            </span>
+            <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+          </div>
+          <div className="text-lg sm:text-xl font-black text-black dark:text-white tabular-nums">
+            {availableSlots.length} / {safeAllSlots.length} Unit Tersedia
+          </div>
+          <p className="text-[0.8125rem] text-black/70 dark:text-white/75 leading-snug tabular-nums">
+            {occupiedOrReservedCount} unit sedang beroperasi atau ditempah · {availableSlots.length > 0 ? 'Sedia untuk permohonan baharu' : 'Semua unit penuh sementara'}
+          </p>
+        </div>
+
+        {/* Metrik 2: Kadar Subsidi & Julat Sewa */}
+        <div className="p-4 sm:p-5 flex flex-col justify-between gap-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
+              Kadar Subsidi Belia
+            </span>
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          </div>
+          <div className="text-lg sm:text-xl font-black text-black dark:text-white tabular-nums">
+            {subsidyRate}% Subsidi · {rateStats.label}
+          </div>
+          <p className="text-[0.8125rem] text-black/70 dark:text-white/75 leading-snug tabular-nums">
+            Tempoh sewaan fleksibel 3 hingga {maxLeaseDuration} bulan · Termasuk utiliti asas hab
+          </p>
+        </div>
+
+        {/* Metrik 3: Lokasi Hab Aktif */}
+        <div className="p-4 sm:p-5 flex flex-col justify-between gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
+              Lokasi Hab ({hubBreakdown.length} Jajahan)
+            </span>
+            <MapPin className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          </div>
+          {hubBreakdown.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {hubBreakdown.map((hub) => (
+                <button
+                  key={hub.hubKey}
+                  type="button"
+                  onClick={() => handleSelectHubFromSummary(hub.hubKey)}
+                  title={`Lihat unit kiosk di ${hub.hubKey}`}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50/70 dark:hover:bg-blue-950/40 text-[0.8125rem] font-semibold text-black dark:text-white transition-colors cursor-pointer tabular-nums"
+                >
+                  <span>{hub.shortLabel}</span>
+                  <span className="text-black/60 dark:text-white/65 font-mono">
+                    {hub.available}/{hub.total}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm font-semibold text-black/75 dark:text-white/75">
+              Tiada rekod hab berdaftar buat masa ini.
+            </div>
+          )}
+          <p className="text-[0.8125rem] text-black/70 dark:text-white/75 leading-snug">
+            Klik mana-mana hab untuk melihat unit tersedia mengikut lokasi.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderApplicationGuideGrid = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+      {/* Lajur Kiri: Panduan Langkah Permohonan */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm flex flex-col">
+        <div className="px-5 py-4 border-b border-slate-200 dark:border-zinc-700 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <ClipboardList className="w-4.5 h-4.5 text-blue-600 dark:text-blue-400 shrink-0" />
+            <h2 className="text-base font-extrabold text-black dark:text-white tracking-tight">
+              Panduan Langkah Permohonan
+            </h2>
+          </div>
+          <span className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70 tabular-nums">
+            4 Peringkat
+          </span>
+        </div>
+
+        <div className="p-5 space-y-4 flex-1">
+          {[
+            {
+              num: '01',
+              title: 'Pilih Unit Kiosk & Tempoh Sewaan',
+              desc: `Pilih hab perniagaan pilihan anda bersama pakej sewaan 3, 6, atau sehingga ${maxLeaseDuration} bulan pada kadar subsidi belia.`
+            },
+            {
+              num: '02',
+              title: 'Lengkapkan Profil Perniagaan',
+              desc: 'Masukkan nama perniagaan, kategori produk atau servis, nombor telefon aktif, dan ringkasan operasi harian anda.'
+            },
+            {
+              num: '03',
+              title: 'Semakan & Kelulusan Urusetia',
+              desc: 'Pegawai penyelaras menyemak kelayakan belia dan kesesuaian unit sebelum mengesahkan tempahan anda.'
+            },
+            {
+              num: '04',
+              title: 'Surat Tawaran QR & Perjanjian Sewa',
+              desc: 'Sebaik diluluskan, Surat Tawaran Digital berkod QR dan Perjanjian Sewa Kiosk tersedia terus di halaman ini.'
+            }
+          ].map((item) => (
+            <div key={item.num} className="flex items-start gap-3.5">
+              <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-center justify-center font-mono text-[0.8125rem] font-extrabold text-black dark:text-white shrink-0 tabular-nums">
+                {item.num}
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-sm font-bold text-black dark:text-white leading-snug">
+                  {item.title}
+                </h3>
+                <p className="text-[0.8125rem] text-black/75 dark:text-white/75 leading-relaxed mt-0.5">
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Lajur Kanan: Syarat Kelayakan Belia & Kemudahan Termasuk */}
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm flex flex-col">
+        <div className="px-5 py-4 border-b border-slate-200 dark:border-zinc-700 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <h2 className="text-base font-extrabold text-black dark:text-white tracking-tight">
+              Syarat Kelayakan &amp; Kemudahan Kiosk
+            </h2>
+          </div>
+          <span className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+            Garis Panduan
+          </span>
+        </div>
+
+        <div className="p-5 space-y-5 flex-1 flex flex-col justify-between">
+          <div className="space-y-2.5">
+            <h3 className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
+              Syarat Utama Pemohon
+            </h3>
+            <ul className="space-y-2.5 text-sm text-black dark:text-white">
+              {[
+                'Terhad kepada satu (1) permohonan atau sewaan kiosk aktif bagi setiap akaun dalam satu masa.',
+                'Terbuka kepada usahawan belia negeri Kelantan yang mendaftar dan melengkapkan butiran perniagaan.',
+                'Pemohon perlu menetapkan tarikh mula operasi dan mematuhi garis panduan kebersihan serta waktu niaga hab.',
+                'Pembatalan tempahan dibenarkan secara terus sekiranya pemohon ingin menukar kepada unit atau lokasi lain.'
+              ].map((req, idx) => (
+                <li key={idx} className="flex items-start gap-2.5 text-[0.8125rem] text-black/80 dark:text-white/85 leading-relaxed">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span>{req}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="pt-4 border-t border-slate-200 dark:border-zinc-700 space-y-2.5">
+            <h3 className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
+              Kemudahan Asas Disertakan
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[0.8125rem] font-semibold text-black dark:text-white">
+              {[
+                { icon: Zap, text: 'Bekalan Elektrik 13A & Lampu' },
+                { icon: Compass, text: 'Lokasi Strategik Hab Daerah' },
+                { icon: ShieldCheck, text: 'Kawalan Keselamatan Kawasan' },
+                { icon: Store, text: 'Akses Klinik Mentor & Geran' }
+              ].map((feat) => {
+                const Icon = feat.icon;
+                return (
+                  <div
+                    key={feat.text}
+                    className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700"
+                  >
+                    <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span className="leading-snug">{feat.text}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="w-full space-y-4">
 
@@ -431,6 +729,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       {/* VIEW 2: HALAMAN KHAS TEMPAH KIOSK (NO POP-UP MODAL)               */}
       {/* ================================================================= */}
       {view === 'book' && (
+        <div className="space-y-4">
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm">
           {/* Page Header */}
           <div className="border-b border-slate-300 dark:border-zinc-600 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 kbelia-important-header">
@@ -442,17 +741,33 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                 <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
                   Permohonan Sewa Kiosk Belia
                 </h1>
+                <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/75 mt-0.5 tabular-nums">
+                  {availableSlots.length} unit tersedia · Subsidi belia {subsidyRate}% · Tempoh sehingga {maxLeaseDuration} bulan
+                </p>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => onChangeView('browse')}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer self-start sm:self-auto"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Kembali</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsConfirmingCancel(false);
+                  onChangeView('manage');
+                }}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer"
+              >
+                <ClipboardList className="w-4 h-4" />
+                <span>Urus Tempahan</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onChangeView('browse')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Kembali</span>
+              </button>
+            </div>
           </div>
 
           {hasActiveBooking ? (
@@ -618,17 +933,58 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
 
                 {step === 1 && (
                   <div className="space-y-5">
+                    {hubBreakdown.length > 0 && (
+                      <div>
+                        <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 block mb-2">
+                          Tapis Mengikut Hab Daerah
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setBookHubFilter('Semua')}
+                            className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer tabular-nums ${
+                              bookHubFilter === 'Semua'
+                                ? 'bg-blue-600 border-blue-600 text-white'
+                                : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-600 text-black dark:text-white hover:border-blue-500'
+                            }`}
+                          >
+                            Semua Hab ({availableSlots.length})
+                          </button>
+                          {hubBreakdown.map((hub) => {
+                            const active = bookHubFilter === hub.hubKey;
+                            return (
+                              <button
+                                key={hub.hubKey}
+                                type="button"
+                                disabled={hub.available === 0}
+                                onClick={() => setBookHubFilter(hub.hubKey)}
+                                className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold border transition-colors tabular-nums ${
+                                  hub.available === 0
+                                    ? 'bg-slate-100 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-black/40 dark:text-white/40 cursor-not-allowed'
+                                    : active
+                                    ? 'bg-blue-600 border-blue-600 text-white cursor-pointer'
+                                    : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-600 text-black dark:text-white hover:border-blue-500 cursor-pointer'
+                                }`}
+                              >
+                                {hub.shortLabel} ({hub.available})
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                     <div>
                       <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
                         Lokasi Kiosk *
                       </label>
                       <select
-                        value={availableSlots.length > 0 ? selectedSlotId : ''}
+                        value={filteredBookAvailableSlots.length > 0 ? selectedSlotId : ''}
                         onChange={(e) => setSelectedSlotId(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-zinc-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 focus:outline-none transition-all cursor-pointer"
                       >
-                        {availableSlots.length > 0 ? (
-                          availableSlots.map((s) => (
+                        {filteredBookAvailableSlots.length > 0 ? (
+                          filteredBookAvailableSlots.map((s) => (
                             <option key={s.id} value={s.id}>
                               {s.code} - {s.name} ({s.district}) · [Tersedia]
                             </option>
@@ -1070,6 +1426,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
             </div>
           )}
         </div>
+
+        {/* Ringkasan Kekosongan & Panduan Teratur di Halaman Mohon Kiosk */}
+        {renderSummaryMetricsBar()}
+        {renderApplicationGuideGrid()}
+        </div>
       )}
 
       {/* ================================================================= */}
@@ -1077,6 +1438,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       {/* ================================================================= */}
       {view === 'manage' && (
         <div className="space-y-4">
+          {/* KAD STATUS ATAS */}
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm">
             <div className="px-5 sm:px-6 py-4 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3 kbelia-important-header">
               <div>
@@ -1087,14 +1449,27 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   Hanya 1 tempahan kiosk aktif dibenarkan bagi setiap akaun dalam satu masa.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => onChangeView('browse')}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer self-start sm:self-auto"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Kembali</span>
-              </button>
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                {!activeBooking && (
+                  <button
+                    type="button"
+                    disabled={availableSlots.length === 0 || isMaintenanceMode}
+                    onClick={() => onChangeView('book')}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold transition-colors cursor-pointer"
+                  >
+                    <Store className="w-4 h-4" />
+                    <span>{bookingHistory.some((b) => b.status === 'cancelled') ? 'Mohon Semula' : 'Mohon Kiosk'}</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onChangeView('browse')}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Senarai Kiosk</span>
+                </button>
+              </div>
             </div>
 
             {activeBooking ? (
@@ -1273,35 +1648,74 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="p-8 sm:p-12 text-center space-y-4">
-                <Building2 className="w-10 h-10 text-black/40 dark:text-white/40 mx-auto" />
-                <div>
-                  <h2 className="text-base font-bold text-black dark:text-white">
-                    Tiada Tempahan Kiosk Aktif
-                  </h2>
-                  <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 max-w-md mx-auto">
-                    Anda tidak mempunyai sebarang permohonan atau sewaan kiosk aktif pada masa ini.
-                  </p>
+              <div className="p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-start gap-4 min-w-0">
+                  <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black/75 dark:text-white/80 flex items-center justify-center shrink-0">
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2 text-[0.8125rem] font-semibold text-black/70 dark:text-white/75">
+                      <span>Status Akaun: Belum Ada Permohonan Aktif</span>
+                      <span aria-hidden="true">·</span>
+                      <span>Kuota: 0 / 1 Unit</span>
+                    </div>
+                    <h2 className="text-base sm:text-lg font-extrabold text-black dark:text-white">
+                      Tiada Tempahan Kiosk Aktif Buat Masa Ini
+                    </h2>
+                    <p className="text-sm text-black/75 dark:text-white/75 leading-relaxed max-w-2xl">
+                      {bookingHistory.some((b) => b.status === 'cancelled')
+                        ? 'Permohonan terdahulu anda telah dibatalkan. Anda kini layak memilih dan memohon unit kiosk baharu daripada senarai hab tersedia.'
+                        : 'Semak kekosongan unit, kadar subsidi belia, dan panduan permohonan di bawah sebelum menghantar permohonan sewaan kiosk anda.'}
+                    </p>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onChangeView('browse')}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold cursor-pointer"
-                >
-                  <Store className="w-4 h-4" />
-                  <span>{bookingHistory.some((b) => b.status === 'cancelled') ? 'Pilih & Mohon Semula Kiosk' : 'Pilih Slot Kiosk'}</span>
-                </button>
+
+                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                  <button
+                    type="button"
+                    disabled={availableSlots.length === 0 || isMaintenanceMode}
+                    onClick={() => onChangeView('book')}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold transition-colors cursor-pointer"
+                  >
+                    <Store className="w-4 h-4" />
+                    <span>
+                      {bookingHistory.some((b) => b.status === 'cancelled')
+                        ? 'Mohon Semula Kiosk'
+                        : 'Mohon Kiosk Sekarang'}
+                    </span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onChangeView('browse')}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white text-sm font-bold transition-colors cursor-pointer"
+                  >
+                    <span>Lihat Senarai Unit</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
 
+          {/* JALUR RINGKASAN DATA SEBENAR */}
+          {renderSummaryMetricsBar()}
+
+          {/* GRID PANDUAN TERATUR */}
+          {renderApplicationGuideGrid()}
+
+          {/* SEJARAH PERMOHONAN & PEMBATALAN */}
           {bookingHistory.length > 0 && (
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm">
-              <div className="px-5 py-3.5 border-b border-slate-300 dark:border-zinc-600 flex items-center gap-2">
-                <History className="w-4 h-4 text-black/70 dark:text-white/75" />
-                <h2 className="text-sm font-bold text-black dark:text-white">
-                  Sejarah Permohonan &amp; Pembatalan Kiosk
-                </h2>
+              <div className="px-5 py-3.5 border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <History className="w-4 h-4 text-black/70 dark:text-white/75" />
+                  <h2 className="text-sm font-bold text-black dark:text-white">
+                    Sejarah Permohonan &amp; Pembatalan Kiosk
+                  </h2>
+                </div>
+                <span className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70 tabular-nums">
+                  {bookingHistory.length} Rekod
+                </span>
               </div>
               <div className="divide-y divide-slate-300 dark:divide-zinc-600">
                 {bookingHistory.map((item) => (
@@ -1313,7 +1727,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                       <div className="font-bold text-black dark:text-white">
                         {item.slotCode} - {item.slotName}
                       </div>
-                      <div className="text-black/70 dark:text-white/75">
+                      <div className="text-black/70 dark:text-white/75 tabular-nums">
                         {item.hubLocation} · {item.businessName} · Mula: {item.startDate}
                       </div>
                     </div>
