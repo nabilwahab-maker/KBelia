@@ -242,7 +242,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
                   <div className="pt-3.5 flex flex-wrap items-center justify-between gap-3 text-sm">
                     <div className="text-black dark:text-white text-[0.8125rem]">
-                      No. Rujukan Rasmi: <span className="font-mono font-bold text-black dark:text-white">{bookingRef}</span>
+                      Nombor Rujukan Rasmi: <span className="font-mono font-bold text-black dark:text-white">{bookingRef}</span>
                     </div>
                     {userBooking.status === 'approved' && (
                       <div className="flex items-center gap-2">

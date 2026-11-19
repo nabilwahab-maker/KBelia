@@ -13,7 +13,7 @@ export const NEWS_IMAGE_PRESETS: { label: string; url: string }[] = [
   { label: 'Smart Pod Niaga Kelantan', url: '/assets/generated/kiosk_modular_kbelia_1793924253417.jpg' },
   { label: 'Mercu Tanda Kelantan', url: '/assets/generated/banner_kelantan_landmark_1793924253242.jpg' },
   { label: 'Batik & Kraf Belia', url: '/assets/generated/batik_canting_kelantan.jpg' },
-  { label: 'Produk Kopi & F&B Lokal', url: '/assets/generated/kopi_nissem_melaka.jpg' },
+  { label: 'Produk Kopi, Makanan & Minuman Lokal', url: '/assets/generated/kopi_nissem_melaka.jpg' },
   { label: 'Agrotek Madu Kelulut', url: '/assets/generated/madu_kelulut_rimba.jpg' }
 ];
 
@@ -54,11 +54,11 @@ export const INITIAL_PORTAL_NEWS: PortalNews[] = [
   },
   {
     id: 'news-demo-03',
-    title: 'Karnival Usahawan Muda Kelantan & Sesi Pitching Produk Lokal 2026 di KB Sentral',
+    title: 'Karnival Usahawan Muda Kelantan & Sesi Pitching Produk Lokal 2026 di Kota Bharu Sentral',
     summary:
       'Lebih 40 reruai usahawan belia, sesi padanan pembekal Ruang Niaga dan pertandingan pitching dana perniagaan bakal menghimpunkan komuniti niaga muda Pantai Timur.',
     content:
-      'Karnival Usahawan Muda Kelantan edisi tahun ini bakal berlangsung selama tiga hari di perkarangan KB Sentral, Kota Bharu dengan sasaran penyertaan lebih 40 jenama belia tempatan.\n\nAntara pengisian utama termasuk Pavilion Produk F&B dan Batik Belia, klinik semakan penjenamaan oleh panel mentor Hab Usahawan, serta sesi padanan pembekal Ruang Niaga.\n\nPenyewa kiosk sedia ada digalakkan mendaftar slot pameran melalui menu Acara & Karnival bagi mempromosikan produk masing-masing kepada pelawat dan pelabur tempatan.',
+      'Karnival Usahawan Muda Kelantan edisi tahun ini bakal berlangsung selama tiga hari di perkarangan Kota Bharu Sentral dengan sasaran penyertaan lebih 40 jenama belia tempatan.\n\nAntara pengisian utama termasuk Pavilion Produk Makanan & Minuman dan Batik Belia, klinik semakan penjenamaan oleh panel mentor Hab Usahawan, serta sesi padanan pembekal Ruang Niaga.\n\nPenyewa kiosk sedia ada digalakkan mendaftar slot pameran melalui menu Acara & Karnival bagi mempromosikan produk masing-masing kepada pelawat dan pelabur tempatan.',
     category: 'Program & Acara',
     imageUrl: '/assets/generated/banner_kelantan_landmark_1793924253242.jpg',
     status: 'published',

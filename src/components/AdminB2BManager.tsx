@@ -342,9 +342,6 @@ export const AdminB2BManager: React.FC = () => {
           <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Pengurusan Ruang Niaga &amp; Iklan Bekalan
           </h3>
-          <p className="text-[0.9375rem] text-black dark:text-white/75 max-w-2xl leading-relaxed">
-            Tambah iklan baharu beserta gambar produk, semak pratonton langsung kad iklan, atau kemas kini paparan Ruang Niaga usahawan belia.
-          </p>
         </div>
       </div>
 
@@ -356,7 +353,7 @@ export const AdminB2BManager: React.FC = () => {
         >
           <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
           <div className="px-4 sm:px-5 py-3.5 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2 bg-slate-50 dark:bg-zinc-950">
-            <h4 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
+            <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2">
               <Megaphone className="w-4 h-4 text-teal-600 dark:text-teal-400" />
               <span>{editingId ? 'Edit Iklan Ruang Niaga' : 'Cipta Iklan Ruang Niaga Bergambar'}</span>
             </h4>
@@ -598,7 +595,7 @@ export const AdminB2BManager: React.FC = () => {
           filterContent={
             <>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                   Jenis Iklan
                 </label>
                 <div className="grid grid-cols-3 gap-1.5">
@@ -611,7 +608,7 @@ export const AdminB2BManager: React.FC = () => {
                       key={opt.id}
                       type="button"
                       onClick={() => setFilterType(opt.id)}
-                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                      className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                         filterType === opt.id
                           ? 'bg-indigo-600 border-indigo-600 text-white'
                           : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -623,7 +620,7 @@ export const AdminB2BManager: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                   Daerah
                 </label>
                 <select
@@ -655,7 +652,7 @@ export const AdminB2BManager: React.FC = () => {
                   setFilterType('all');
                   setDistrictFilter('Semua');
                 }}
-                className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
               >
                 Set Semula Carian &amp; Penapis
               </button>
@@ -720,7 +717,7 @@ export const AdminB2BManager: React.FC = () => {
                     >
                       <td className="py-3.5 pl-5 pr-3">
                         <div className="flex items-center gap-3 min-w-[210px]">
-                          <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-zinc-950 overflow-hidden shrink-0 border border-slate-200 dark:border-zinc-700">
+                          <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-zinc-950 overflow-hidden shrink-0 border border-slate-200 dark:border-zinc-700">
                             <PortalImage
                               src={resolveB2BImage(item)}
                               alt={item.title}
@@ -733,7 +730,7 @@ export const AdminB2BManager: React.FC = () => {
                             <p className="font-semibold text-black dark:text-white truncate max-w-[250px]">
                               {item.title}
                             </p>
-                            <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[250px]">
+                            <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[250px]">
                               {item.authorName}
                             </p>
                           </div>
@@ -741,7 +738,7 @@ export const AdminB2BManager: React.FC = () => {
                       </td>
                       <td className="py-3.5 px-3 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                             item.type === 'supply'
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                               : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
@@ -754,13 +751,13 @@ export const AdminB2BManager: React.FC = () => {
                         <p className="font-medium text-black dark:text-white whitespace-nowrap">
                           {item.authorBusiness}
                         </p>
-                        <p className="text-xs text-black/60 dark:text-white/65 whitespace-nowrap">
+                        <p className="text-[0.8125rem] text-black/60 dark:text-white/65 whitespace-nowrap">
                           {item.district}
                         </p>
                       </td>
                       <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
-                        <p className="font-mono text-xs text-black dark:text-white">+{item.whatsapp}</p>
-                        <p className="text-xs text-black/60 dark:text-white/65">{item.date}</p>
+                        <p className="font-mono text-[0.8125rem] text-black dark:text-white">+{item.whatsapp}</p>
+                        <p className="text-[0.8125rem] text-black/60 dark:text-white/65">{item.date}</p>
                       </td>
                       <td className="py-3.5 pl-2 pr-5 text-right">
                         <RowActionMenu

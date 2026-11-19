@@ -55,7 +55,8 @@ import {
   MaintenanceTicket,
   MentorshipRegistration,
   MerchantSubTab,
-  normalizeMentorshipMode
+  normalizeMentorshipMode,
+  formatBusinessCategory
 } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -118,7 +119,7 @@ const ProductRowThumbnail: React.FC<{ src?: string; alt: string; compact?: boole
     setHasError(false);
   }, [src]);
 
-  const sizeClass = compact ? 'w-10 h-10 rounded-lg' : 'w-16 h-16 rounded-lg';
+  const sizeClass = compact ? 'w-14 h-14 rounded-lg' : 'w-16 h-16 rounded-lg';
 
   if (!src || hasError) {
     return (
@@ -1102,7 +1103,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             officer: 'Pegawai Pengesah',
             status: hasSsm ? 'completed' : hasBusiness ? 'current' : 'upcoming',
             desc: hasSsm
-              ? `No. SSM (${myBusiness?.ssmNumber || userProfile?.ssmNumber}) telah direkodkan.`
+              ? `Nombor SSM (${myBusiness?.ssmNumber || userProfile?.ssmNumber}) telah direkodkan.`
               : 'Masukkan nombor SSM (jika ada) di Tetapan Akaun atau Profil Kedai.'
           },
           {
@@ -1191,7 +1192,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               id: `booking-${b.id}`,
               category: 'Sewaan Kiosk',
               title: `${b.slotCode} · ${b.hubLocation}`,
-              subtitle: `${b.businessName} · Tempoh ${b.durationMonths} bln`,
+              subtitle: `${b.businessName} · Tempoh ${b.durationMonths} bulan`,
               statusLabel: 'Menunggu Kelulusan',
               dateLabel: b.createdAt ? formatDisplayDate(b.createdAt.split('T')[0]) : 'Baharu',
               createdAt: b.createdAt || '',
@@ -1285,7 +1286,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               value={primaryBooking ? primaryBooking.slotCode : 'Belum Mohon'}
               subtitle={
                 primaryBooking
-                  ? `${primaryBooking.hubLocation} · ${primaryBooking.durationMonths} bln`
+                  ? `${primaryBooking.hubLocation} · ${primaryBooking.durationMonths} bulan`
                   : 'Mohon slot kapsul niaga belia'
               }
               icon={Building2}
@@ -1332,16 +1333,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             >
             {/* Card Header */}
             <div className="border-b border-slate-300 dark:border-zinc-600 py-3 px-4 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-              <div>
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-black dark:text-white/75" />
-                  <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                    Analitik Aliran Jualan Kiosk
-                  </h4>
-                </div>
-                <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-                  Transaksi tunai &amp; pembayaran QR (data sebenar &amp; asas sampel)
-                </p>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <BarChart3 className="w-5 h-5 text-black dark:text-white/80 shrink-0" />
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                  Analitik Aliran Jualan Kiosk
+                </h4>
               </div>
 
               {/* Chart Mode + Period Selector Tabs */}
@@ -1574,11 +1570,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             <RoleDonutCard
               className="lg:col-span-1 h-full"
               title="Saluran Bayaran & Untung"
-              subtitle="Nisbah Tunai vs QR mengikut tempoh"
               icon={Wallet}
               accentBarClass="bg-emerald-600/80 dark:bg-emerald-500/80"
               headerRight={
-                <span className="text-[0.75rem] font-mono font-semibold text-black/70 dark:text-white/75 tabular-nums">
+                <span className="text-[0.8125rem] font-mono font-semibold text-black/70 dark:text-white/75 tabular-nums">
                   {periodShortBadge}
                 </span>
               }
@@ -1615,17 +1610,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               style={{ '--stagger': 5 } as React.CSSProperties}
               className="animate-dashboard-card min-w-0 rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
             >
-              <div className="border-b border-slate-300 dark:border-zinc-600 py-3 px-4 sm:px-5">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                    <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                      Permohonan Menunggu Kelulusan
-                    </h4>
-                  </div>
-                  <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5">
-                    Ringkasan permohonan terkini dalam semakan pentadbir &amp; mentor
-                  </p>
+              <div className="border-b border-slate-300 dark:border-zinc-600 py-3.5 px-4 sm:px-5">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Clock className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                    Permohonan Menunggu Kelulusan
+                  </h4>
                 </div>
               </div>
 
@@ -1675,14 +1665,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         >
                           <div className="min-w-0 flex-1 space-y-1">
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-[0.75rem] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+                              <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
                                 {item.category}
                               </span>
                               <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-                              <span className="font-mono text-[0.75rem] text-black/65 dark:text-white/70 tabular-nums">
+                              <span className="font-mono text-[0.8125rem] text-black/65 dark:text-white/70 tabular-nums">
                                 {item.dateLabel}
                               </span>
-                              <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-800/70 text-[0.75rem] font-bold text-black dark:text-amber-200">
+                              <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-800/70 text-[0.8125rem] font-bold text-black dark:text-amber-200">
                                 {item.statusLabel}
                               </span>
                             </div>
@@ -1714,17 +1704,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               className="animate-dashboard-card min-w-0 rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
             >
               {/* Card Header */}
-              <div className="border-b border-slate-300 dark:border-slate-600 py-3 px-4 sm:px-5">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <FileCheck className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
-                    <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                      Penjejak Permohonan
-                    </h4>
-                  </div>
-                  <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5">
-                    Status semakan semasa Jawatankuasa KBelia
-                  </p>
+              <div className="border-b border-slate-300 dark:border-slate-600 py-3.5 px-4 sm:px-5">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <FileCheck className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
+                  <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                    Penjejak Permohonan
+                  </h4>
                 </div>
               </div>
 
@@ -1815,17 +1800,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             style={{ '--stagger': 7 } as React.CSSProperties}
             className="animate-dashboard-card w-full rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
           >
-            <div className="border-b border-slate-300 dark:border-slate-600 py-3 px-4 sm:px-5">
-              <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
-                <div>
-                  <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                    Ringkasan Aktiviti &amp; Laporan Semasa
-                  </h4>
-                  <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5">
-                    Senarai padat notifikasi terkini, status lesen kiosk, dan jalan pintas pengurusan perniagaan
-                  </p>
-                </div>
+            <div className="border-b border-slate-300 dark:border-slate-600 py-3.5 px-4 sm:px-5">
+              <div className="flex items-center gap-2.5">
+                <Bell className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                  Ringkasan Aktiviti &amp; Laporan Semasa
+                </h4>
               </div>
             </div>
 
@@ -1870,19 +1850,19 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   >
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={`text-xs font-bold uppercase tracking-wider ${item.tagColor}`}>{item.tag}</span>
+                        <span className={`text-[0.8125rem] font-bold uppercase tracking-wider ${item.tagColor}`}>{item.tag}</span>
                         <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-                        <span className="text-xs text-black/65 dark:text-white/70 font-mono tabular-nums">{item.time}</span>
+                        <span className="text-[0.8125rem] text-black/65 dark:text-white/70 font-mono tabular-nums">{item.time}</span>
                       </div>
                       <h5 className="text-sm font-bold text-black dark:text-white leading-snug truncate">
                         {item.title}
                       </h5>
-                      <p className="text-xs sm:text-[0.875rem] text-black/75 dark:text-white/75 truncate">
+                      <p className="text-[0.8125rem] sm:text-[0.875rem] text-black/75 dark:text-white/75 truncate">
                         {item.body}
                       </p>
                     </div>
                     {item.action && (
-                      <span className="inline-flex items-center gap-1 text-xs sm:text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 shrink-0 self-start sm:self-center">
+                      <span className="inline-flex items-center gap-1 text-[0.8125rem] sm:text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 shrink-0 self-start sm:self-center">
                         <span>Buka</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </span>
@@ -1907,14 +1887,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                 <Store className="w-5 h-5" />
               </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-black dark:text-white tracking-tight">
-                  Maklumat Asas & Jenama Perniagaan
-                </h3>
-                <p className="text-[0.9375rem] text-black dark:text-white/75">
-                  Penyelarasan profil bisnes bagi pendaftaran direktori usahawan belia Kelantan
-                </p>
-              </div>
+              <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+                Maklumat Asas &amp; Jenama Perniagaan
+              </h3>
             </div>
           </div>
 
@@ -1961,7 +1936,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer"
                 >
                   {CATEGORIES.map((c) => (
-                    <option key={c} value={c} className="dark:bg-slate-900">{c}</option>
+                    <option key={c} value={c} className="dark:bg-slate-900">{formatBusinessCategory(c)}</option>
                   ))}
                 </select>
               </div>
@@ -2124,12 +2099,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         return (
         <div key="products" className="mt-4 space-y-4 animate-dashboard-tab">
           <div>
-            <h3 className="text-lg font-bold text-black dark:text-white tracking-tight">
+            <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
               Katalog Menu &amp; Produk Anda
             </h3>
-            <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-              Urus senarai menu, pantau ketersediaan stok dan eksport rekod ke Excel.
-            </p>
           </div>
 
           {/* Add Product Form Box */}
@@ -2137,8 +2109,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden animate-dashboard-tab transition-colors">
               <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
               <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-3.5 px-5 flex items-center justify-between">
-                <h4 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <h4 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight flex items-center gap-2">
+                  <ShoppingBag className="w-4.5 h-4.5 text-blue-600 dark:text-blue-400" />
                   <span>Borang Tambah Produk Baharu</span>
                 </h4>
                 <button
@@ -2307,7 +2279,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
               <div className="flex flex-wrap items-center justify-end gap-2">
                 {selectedProductIds.length > 0 && (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/70 text-xs font-semibold text-black dark:text-white">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white">
                     <span className="tabular-nums">{selectedProductIds.length} dipilih</span>
                     <button
                       type="button"
@@ -2361,7 +2333,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   {isProdFilterOpen && (
                     <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
                       <div className="pb-3 border-b border-slate-200 dark:border-zinc-700">
-                        <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                        <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
                           <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
                           <span>Susun Mengikut</span>
                         </label>
@@ -2384,7 +2356,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                        <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
                           Kategori
                         </label>
                         <select
@@ -2401,7 +2373,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                        <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
                           Status Stok
                         </label>
                         <div className="grid grid-cols-3 gap-1.5">
@@ -2416,7 +2388,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                               key={opt.id}
                               type="button"
                               onClick={() => setProdStockFilter(opt.id)}
-                              className={`px-2 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
+                              className={`px-2 py-1.5 rounded-lg text-[0.8125rem] font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
                                 prodStockFilter === opt.id
                                   ? 'bg-blue-600 text-white border-blue-600'
                                   : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -2436,14 +2408,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             setProdStockFilter('all');
                             setProdSortBy(DEFAULT_SORT_VALUE);
                           }}
-                          className="text-xs font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
+                          className="text-[0.8125rem] font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
                         >
                           Set Semula
                         </button>
                         <button
                           type="button"
                           onClick={() => setIsProdFilterOpen(false)}
-                          className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold cursor-pointer"
                         >
                           Tutup
                         </button>
@@ -2595,7 +2567,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             </td>
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold ${
                                   isAvailable
                                     ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70'
                                     : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70'
@@ -2666,12 +2638,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       {activeTab === 'bookings' && (
         <div key="bookings" className="mt-4 space-y-4 animate-dashboard-tab">
           <div>
-            <h3 className="text-base font-bold text-black dark:text-white">Rekod Permohonan Kiosk Anda</h3>
-            <p className="text-[0.9375rem] text-black dark:text-white/75">
-              {hasActiveKioskBooking
-                ? 'Tempahan atau sewaan kiosk aktif anda dipaparkan di bawah. Batalkan tempahan aktif jika ingin memohon unit lain.'
-                : 'Semak status permohonan dan kelulusan kiosk anda oleh pihak pengurusan.'}
-            </p>
+            <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+              Rekod Permohonan Kiosk Anda
+            </h3>
           </div>
 
           {activeVisibleBookings.length === 0 ? (
@@ -2714,7 +2683,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 onSortChange={setBookingSortBy}
                 filterContent={
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                       Status Permohonan
                     </label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -2728,7 +2697,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           key={opt.id}
                           type="button"
                           onClick={() => setBookingStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                             bookingStatusFilter === opt.id
                               ? 'bg-blue-600 border-blue-600 text-white'
                               : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -2754,7 +2723,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       setBookingSearch('');
                       setBookingStatusFilter('all');
                     }}
-                    className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                    className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                   >
                     Set Semula Carian &amp; Penapis
                   </button>
@@ -2882,7 +2851,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                               <tr className="kbelia-table-row">
                                 <td className="py-3.5 pl-5 pr-3">
                                   <div className="flex items-center gap-3 min-w-[200px]">
-                                    <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
+                                    <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
                                       <PortalImage
                                         src={kioskImg}
                                         alt={`Rupa bentuk kiosk ${b.slotName}`}
@@ -2895,7 +2864,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                       <p className="font-semibold text-black dark:text-white truncate max-w-[240px]">
                                         {b.slotCode} · {b.slotName}
                                       </p>
-                                      <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[240px]">
+                                      <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[240px]">
                                         {b.businessName}
                                       </p>
                                     </div>
@@ -2905,31 +2874,31 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                   <p className="text-black dark:text-white font-medium whitespace-nowrap">
                                     {b.hubLocation}
                                   </p>
-                                  <p className="text-xs text-black/60 dark:text-white/65 whitespace-nowrap">
+                                  <p className="text-[0.8125rem] text-black/60 dark:text-white/65 whitespace-nowrap">
                                     {matchedSlot?.size || 'Unit Kiosk Belia'}
                                   </p>
                                 </td>
                                 <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
                                   <p className="font-medium text-black dark:text-white">{b.durationMonths} Bulan</p>
-                                  <p className="text-xs text-black/60 dark:text-white/65">
+                                  <p className="text-[0.8125rem] text-black/60 dark:text-white/65">
                                     Mula {formatDisplayDate(b.startDate)}
                                   </p>
                                 </td>
                                 <td className="py-3.5 px-3 whitespace-nowrap">
                                   {b.status === 'pending' && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70">
                                       <Clock className="w-3 h-3" />
                                       Dalam Semakan
                                     </span>
                                   )}
                                   {b.status === 'approved' && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70">
                                       <CheckCircle2 className="w-3 h-3" />
                                       Diluluskan
                                     </span>
                                   )}
                                   {b.status === 'rejected' && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70">
                                       <AlertCircle className="w-3 h-3" />
                                       Tidak Berjaya
                                     </span>
@@ -2959,7 +2928,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                         href={`https://wa.me/601120508890?text=${encodeURIComponent(`Salam Admin KBelia Kelantan, saya ingin bertanya mengenai permohonan kiosk slot ${b.slotCode} (${b.slotName}) bagi perniagaan ${b.businessName}.`)}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 text-black dark:text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                                        className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 text-black dark:text-white text-[0.8125rem] font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                                       >
                                         <MessageCircle className="w-3.5 h-3.5" />
                                         <span>WhatsApp Pentadbir</span>
@@ -3055,8 +3024,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           {/* Existing Maintenance Tickets List */}
           {sortedTickets.length > 0 && (
             <div className="space-y-3 pt-2">
-              <h4 className="text-base font-bold text-black dark:text-white flex items-center gap-2">
-                <Wrench className="w-4 h-4 text-black dark:text-white" />
+              <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2">
+                <Wrench className="w-4.5 h-4.5 text-black dark:text-white" />
                 <span>Tiket Aduan Fasiliti Anda</span>
               </h4>
 
@@ -3088,7 +3057,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   }
                   filterContent={
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                      <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                         Status Aduan
                       </label>
                       <div className="grid grid-cols-2 gap-1.5">
@@ -3102,7 +3071,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             key={opt.id}
                             type="button"
                             onClick={() => setTicketStatusFilter(opt.id)}
-                            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                            className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                               ticketStatusFilter === opt.id
                                 ? 'bg-blue-600 border-blue-600 text-white'
                                 : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -3128,7 +3097,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         setTicketSearch('');
                         setTicketStatusFilter('all');
                       }}
-                      className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                      className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                     >
                       Set Semula Carian &amp; Penapis
                     </button>
@@ -3192,13 +3161,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                     <p className="font-medium text-black dark:text-white truncate max-w-[260px]">
                                       {t.issueCategory}
                                     </p>
-                                    <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[300px]">
+                                    <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[300px]">
                                       {t.description}
                                     </p>
                                   </td>
                                   <td className="py-3.5 px-3 whitespace-nowrap">
                                     <span
-                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                         t.status === 'resolved'
                                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                                           : t.status === 'in_progress'
@@ -3241,7 +3210,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                       <p className="font-semibold">Keterangan Penuh Aduan:</p>
                                       <p className="text-black/75 dark:text-white/80">{t.description}</p>
                                       {t.adminNotes && (
-                                        <p className="text-xs text-black/70 dark:text-white/75 pt-1">
+                                        <p className="text-[0.8125rem] text-black/70 dark:text-white/75 pt-1">
                                           <strong className="text-black dark:text-white">Catatan Teknikal:</strong> {t.adminNotes}
                                         </p>
                                       )}
@@ -3300,7 +3269,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 <div className="p-6 space-y-4 text-sm">
                   <div className="flex justify-between items-start pb-3 border-b border-slate-300 dark:border-slate-600">
                     <div>
-                      <span className="text-black/70 dark:text-white/75 text-[0.8125rem] uppercase font-bold block">No. Rujukan Resit</span>
+                      <span className="text-black/70 dark:text-white/75 text-[0.8125rem] uppercase font-bold block">Nombor Rujukan Resit</span>
                       <span className="font-mono font-extrabold text-sm text-black dark:text-white/75">
                         REC-{selectedReceiptBooking.slotCode}-{selectedReceiptBooking.id.substring(0, 8).toUpperCase()}
                       </span>
@@ -3606,7 +3575,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 style={{ '--stagger': 0 } as React.CSSProperties}
                 className="animate-dashboard-card lg:col-span-5 flex flex-col justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-center space-y-4"
               >
-                <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-950/60 dark:border-blue-800/70 dark:text-blue-200 text-xs font-bold uppercase tracking-wider mx-auto">
+                <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-950/60 dark:border-blue-800/70 dark:text-blue-200 text-[0.8125rem] font-bold uppercase tracking-wider mx-auto">
                   <QrCode className="w-3.5 h-3.5" />
                   <span>Kad Profil Usahawan Belia</span>
                 </div>
@@ -3621,7 +3590,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <h3 className="text-xl font-extrabold text-black dark:text-white tracking-tight">
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
                     {myBusiness?.businessName || 'Nama Bisnes Belia'}
                   </h3>
                   <p className="text-sm text-black/75 dark:text-white/75 font-medium">
@@ -3645,37 +3614,39 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 className="animate-dashboard-card lg:col-span-7 flex flex-col justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-4"
               >
                 <div>
-                  <h4 className="text-sm font-bold text-black dark:text-white uppercase tracking-wider mb-3">
+                  <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight mb-3">
                     Butiran Pendaftaran &amp; Saluran Hebahan
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                     <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-xs font-medium text-black/60 dark:text-white/65 block">Jajahan Operasi</span>
+                      <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65 block">Jajahan Operasi</span>
                       <span className="font-bold text-black dark:text-white mt-0.5 block">{myBusiness?.district || 'Kota Bharu'}</span>
                     </div>
                     <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-xs font-medium text-black/60 dark:text-white/65 block">Kategori Sektor</span>
-                      <span className="font-bold text-black dark:text-white mt-0.5 block">{myBusiness?.category || 'F&B'}</span>
+                      <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65 block">Kategori Sektor</span>
+                      <span className="font-bold text-black dark:text-white mt-0.5 block">
+                        {myBusiness?.category === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : (myBusiness?.category || 'Makanan & Minuman')}
+                      </span>
                     </div>
                     <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-xs font-medium text-black/60 dark:text-white/65 block">No. WhatsApp Rasmi</span>
+                      <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65 block">Nombor WhatsApp Rasmi</span>
                       <span className="font-mono font-bold text-black dark:text-white mt-0.5 block tabular-nums">{myBusiness?.whatsapp || userProfile?.phone || '-'}</span>
                     </div>
                     <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-xs font-medium text-black/60 dark:text-white/65 block">Pendaftaran SSM</span>
+                      <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65 block">Pendaftaran SSM</span>
                       <span className="font-mono font-bold text-black dark:text-white mt-0.5 block tabular-nums">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Dalam Proses'}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/35 border border-blue-200 dark:border-blue-800/60 text-xs sm:text-sm text-black/80 dark:text-white/85 flex items-center justify-between gap-3">
+                <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/35 border border-blue-200 dark:border-blue-800/60 text-[0.8125rem] sm:text-sm text-black/80 dark:text-white/85 flex items-center justify-between gap-3">
                   <span>
                     Paparan kad digital ini disegerakkan daripada Profil Perniagaan anda untuk tujuan promosi pantas pelanggan.
                   </span>
                   <button
                     type="button"
                     onClick={() => setActiveTab('profile')}
-                    className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold whitespace-nowrap cursor-pointer shrink-0"
+                    className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold whitespace-nowrap cursor-pointer shrink-0"
                   >
                     Kemaskini Profil
                   </button>

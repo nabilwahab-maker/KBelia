@@ -95,7 +95,7 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             {isLive && <span className="kbelia-live-dot" aria-hidden="true" />}
-            <span className="text-[0.875rem] font-semibold text-black/85 dark:text-white/90 block leading-snug break-words">
+            <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white block leading-snug tracking-tight break-words">
               {title}
             </span>
           </div>
@@ -104,8 +104,8 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
               {animatedValue}
             </span>
             {trendLabel && (
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[0.75rem] font-bold font-mono tabular-nums shrink-0 ${trendBadgeClass}`}>
-                <TrendIcon className="w-3 h-3" />
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md border text-[0.8125rem] font-bold font-mono tabular-nums shrink-0 ${trendBadgeClass}`}>
+                <TrendIcon className="w-3.5 h-3.5" />
                 <span>{trendLabel}</span>
               </span>
             )}

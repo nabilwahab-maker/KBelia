@@ -2585,7 +2585,7 @@ export const INITIAL_DEMO_USERS: UserProfile[] = [
     role: 'user',
     phone: '+60139988776',
     district: 'Kota Bharu',
-    businessName: 'Studio Belia Multimedia KB',
+    businessName: 'Studio Belia Multimedia Kota Bharu',
     ssmNumber: '202403445566 (KT0298112-D)',
     avatarUrl: '/assets/generated/avatar_youth_male_1793924250192.jpg',
     createdAt: '2026-03-01T08:00:00.000Z',

@@ -179,7 +179,7 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
               PERJANJIAN PENYEWAAN KIOSK KAPSUL USAHAWAN BELIA
             </h4>
             <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-sans">
-              No. Rujukan Perjanjian: {agreementRefCode}
+              Nombor Rujukan Perjanjian: {agreementRefCode}
             </span>
           </div>
 

@@ -47,7 +47,7 @@ const COURSES: CourseModule[] = [
     duration: '6 Minit',
     description: 'Pematuhan standard keselamatan makanan, suntikan tifoid, dan susun atur ruang niaga kiosk kapsul.',
     keyPoints: [
-      'Penyewa F&B wajib mempunyai sijil suntikan tifoid yang sah.',
+      'Penyewa Makanan & Minuman wajib mempunyai sijil suntikan tifoid yang sah.',
       'Sisa makanan mesti dibungkus rapi dan dibuang ke tong kitar semula hab niaga.',
       'Pastikan suis elektrik dan soket tidak terlebih beban (overload).'
     ],
@@ -155,7 +155,7 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
         <div className="rounded-2xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/60 p-4 mb-6 flex items-center justify-between gap-4">
           <div>
             <span className="text-sm font-bold text-black dark:text-white block mb-0.5">
-              Pencapaian Kursus Mikro: {completedCount} / {courses.length} Selesai
+              Pencapaian Kursus Mikro: {completedCount} Kursus Selesai
             </span>
             <span className="text-[0.8125rem] text-black dark:text-white/75">
               Setiap lencana yang diperoleh meningkatkan skor keutamaan kelulusan dana geran sebanyak +15%!

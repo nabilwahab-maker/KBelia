@@ -81,11 +81,11 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     code: 'KBR',
     name: 'Kota Bharu',
     tagline: 'Pusat Pentadbiran & Perdagangan Komersial',
-    popularNiche: 'F&B Moden, Butik Batik & Kafe Kiosk',
+    popularNiche: 'Makanan & Minuman Moden, Butik Batik & Kafe Kiosk',
     lat: 6.1254,
     lng: 102.2386,
     terrainType: 'urban',
-    mainHubName: 'Pusat Transformasi Belia Kota Bharu (KB Sentral)'
+    mainHubName: 'Pusat Transformasi Belia Kota Bharu (Kota Bharu Sentral)'
   },
   {
     district: 'Bachok',
@@ -125,7 +125,7 @@ const KELANTAN_DISTRICTS: DistrictGeoData[] = [
     code: 'MCH',
     name: 'Machang',
     tagline: 'Pusat Pengajian Tinggi & Komuniti Setempat',
-    popularNiche: 'Peralatan Belajar, F&B & Gajet',
+    popularNiche: 'Peralatan Belajar, Makanan, Minuman & Gajet',
     lat: 5.7647,
     lng: 102.2156,
     terrainType: 'green',
@@ -246,28 +246,27 @@ const HubAdvancedMarker: React.FC<HubMarkerProps> = ({
         <InfoWindow anchor={marker} maxWidth={290} onCloseClick={onCloseInfo}>
           <div className="p-1 text-slate-900 space-y-2 min-w-[220px]">
             <div>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-blue-700">
-                Jajahan {geo.name} ({geo.code})
+              <div className="text-[0.8125rem] font-bold uppercase tracking-wider text-blue-700">
+                Jajahan {geo.name}
               </div>
               <h4 className="text-sm font-extrabold text-slate-900 leading-snug mt-0.5">
                 {geo.mainHubName}
               </h4>
             </div>
 
-            <div className="flex items-center justify-between gap-2 text-xs bg-slate-100 rounded-lg px-2.5 py-1.5">
+            <div className="flex items-center justify-between gap-2 text-[0.8125rem] bg-slate-100 rounded-lg px-2.5 py-1.5">
               <span>
-                <strong className="text-emerald-700">{stats.available}</strong> tersedia /{' '}
-                <strong>{stats.total}</strong> unit
+                <strong className="text-emerald-700">{stats.available}</strong> unit tersedia
               </span>
               <span className="font-bold text-slate-800">
-                RM{stats.minMonthlyRate}/bln
+                RM{stats.minMonthlyRate}/bulan
               </span>
             </div>
 
             <button
               type="button"
               onClick={() => onBookHub(geo.district, firstAvailable)}
-              className="w-full py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer"
+              className="w-full py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold transition-colors cursor-pointer"
             >
               {stats.available > 0 ? 'Mohon Kiosk' : 'Lihat Hab'}
             </button>
@@ -655,12 +654,9 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
             </span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Peta Hab Kiosk &amp; Kekosongan Unit Kelantan
           </h2>
-          <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
-            Klik pin lokasi hab pada peta Google Maps atau pilih jajahan untuk melihat butiran unit dan memohon tapak kiosk.
-          </p>
         </div>
 
         {/* Layer & View Toggles */}
@@ -752,7 +748,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
           filterContent={
             <>
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 shrink-0" />
                   <span>{isEn ? 'District' : 'Jajahan'}</span>
                 </label>
@@ -772,14 +768,14 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                   </option>
                   {KELANTAN_DISTRICTS.map((geo) => (
                     <option key={geo.code} value={geo.district}>
-                      {geo.name} ({geo.code})
+                      {geo.name}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                   <span>{isEn ? 'Availability Status' : 'Status Kekosongan'}</span>
                 </label>
@@ -806,7 +802,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
                   <Layers className="w-3.5 h-3.5 shrink-0" />
                   <span>{isEn ? 'Area Zone' : 'Zon Kawasan'}</span>
                 </label>
@@ -934,10 +930,10 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.8125rem] font-bold bg-blue-50 text-black dark:bg-blue-950/60 dark:text-white border border-blue-200 dark:border-blue-800/70 mb-1.5">
                       <MapPin className="w-3.5 h-3.5 text-[#EA4335]" />
                       <span>
-                        Jajahan {activeDistrictData.name} ({activeDistrictData.code})
+                        Jajahan {activeDistrictData.name}
                       </span>
                     </div>
-                    <h3 className="text-xl font-black text-black dark:text-white leading-tight">
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white leading-tight tracking-tight">
                       {activeDistrictData.mainHubName}
                     </h3>
                     <p className="text-sm sm:text-[0.9375rem] text-black/75 dark:text-white/80 mt-1">
@@ -961,7 +957,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                         {activeStats.available}
                       </span>
                       <span className="text-sm text-black/75 dark:text-white/80 font-semibold">
-                        / {activeStats.total} unit
+                        unit tersedia
                       </span>
                     </div>
                   </div>
@@ -975,7 +971,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                         RM {activeStats.minMonthlyRate}
                       </span>
                       <span className="text-sm text-black/75 dark:text-white/80 font-semibold">
-                        / bln
+                        / bulan
                       </span>
                     </div>
                   </div>
@@ -989,7 +985,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                       href={`https://www.google.com/maps/search/?api=1&query=${activeDistrictData.lat},${activeDistrictData.lng}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                      className="inline-flex items-center gap-1 text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 hover:underline"
                     >
                       <span>Buka di Google Maps</span>
                       <ExternalLink className="w-3 h-3" />
@@ -1007,11 +1003,11 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                           >
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="font-mono text-xs font-bold text-blue-700 dark:text-blue-400">
+                                <span className="font-mono text-[0.8125rem] font-bold text-blue-700 dark:text-blue-400">
                                   {slot.code}
                                 </span>
                                 <span
-                                  className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                                  className={`inline-flex items-center gap-1 text-[0.8125rem] font-bold px-2 py-0.5 rounded-full ${
                                     isAvail
                                       ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300'
                                       : 'bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-slate-200'
@@ -1034,8 +1030,8 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                               <div className="text-sm font-bold text-black dark:text-white truncate mt-0.5">
                                 {slot.name}
                               </div>
-                              <div className="text-xs text-black/70 dark:text-white/75 truncate">
-                                {slot.size} · RM{slot.monthlyRate}/bln
+                              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate">
+                                {slot.size} · RM{slot.monthlyRate}/bulan
                               </div>
                             </div>
 
@@ -1043,7 +1039,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleBookHub(activeDistrictData.district, slot)}
-                                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0 cursor-pointer transition-colors"
+                                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold shrink-0 cursor-pointer transition-colors"
                               >
                                 Mohon
                               </button>
@@ -1126,8 +1122,12 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/75 dark:text-white/80">
-                        {geo.code}
+                      <span className="text-[0.8125rem] font-bold tracking-wide text-black/75 dark:text-white/80">
+                        {geo.terrainType === 'urban'
+                          ? 'Bandar'
+                          : geo.terrainType === 'coastal'
+                            ? 'Pesisir'
+                            : 'Agro'}
                       </span>
                       <span
                         className={`text-[0.8125rem] font-bold tabular-nums px-2 py-0.5 rounded-full ${
@@ -1139,7 +1139,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                         {stats.available} kosong
                       </span>
                     </div>
-                    <h4 className="text-base font-bold text-black dark:text-white mb-1">
+                    <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white mb-1 tracking-tight">
                       {geo.name}
                     </h4>
                     <p className="text-sm text-black/75 dark:text-white/80 line-clamp-2 mb-3">
@@ -1149,7 +1149,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
 
                   <div className="pt-2.5 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-sm">
                     <span className="text-black/75 dark:text-white/80 font-medium">
-                      RM{stats.minMonthlyRate} /bln
+                      RM{stats.minMonthlyRate} /bulan
                     </span>
                     <span className="font-bold text-blue-700 dark:text-blue-400 inline-flex items-center gap-0.5">
                       Lihat di Peta <ArrowRight className="w-3.5 h-3.5" />

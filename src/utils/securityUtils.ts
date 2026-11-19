@@ -20,7 +20,7 @@ export function validateMyKad(icNumber: string): MyKadValidationResult {
   if (!/^\d{12}$/.test(cleaned)) {
     return {
       isValid: false,
-      errorMessage: 'No. Kad Pengenalan mestilah mengandungi tepat 12 digit nombor.'
+      errorMessage: 'Nombor Kad Pengenalan mestilah mengandungi tepat 12 digit nombor.'
     };
   }
 
@@ -29,11 +29,11 @@ export function validateMyKad(icNumber: string): MyKadValidationResult {
   const dayPart = parseInt(cleaned.substring(4, 6), 10);
 
   if (monthPart < 1 || monthPart > 12) {
-    return { isValid: false, errorMessage: 'Bulan kelahiran pada No. Kad Pengenalan tidak sah.' };
+    return { isValid: false, errorMessage: 'Bulan kelahiran pada Nombor Kad Pengenalan tidak sah.' };
   }
 
   if (dayPart < 1 || dayPart > 31) {
-    return { isValid: false, errorMessage: 'Hari kelahiran pada No. Kad Pengenalan tidak sah.' };
+    return { isValid: false, errorMessage: 'Hari kelahiran pada Nombor Kad Pengenalan tidak sah.' };
   }
 
   // Determine century: 00-26 is 2000s, 27-99 is 1900s

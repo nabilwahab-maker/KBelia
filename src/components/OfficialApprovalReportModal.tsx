@@ -274,7 +274,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                   </p>
                 </div>
                 <div className="text-left sm:text-right text-[0.8125rem] text-black font-mono bg-slate-50 p-3 rounded-lg border border-slate-300 shrink-0">
-                  <div><strong className="text-black font-sans text-sm">No. Rujukan:</strong> <span className="font-bold text-black">{reportRef}</span></div>
+                  <div><strong className="text-black font-sans text-sm">Nombor Rujukan:</strong> <span className="font-bold text-black">{reportRef}</span></div>
                   <div className="mt-1"><strong className="text-black font-sans text-sm">Tarikh Jana:</strong> {reportDate}</div>
                   <div className="mt-1">
                     <span className="inline-block px-2 py-0.5 rounded text-[0.8125rem] font-bold bg-emerald-100 text-black border border-emerald-200">
@@ -292,7 +292,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-300">
                   <span className="text-[0.8125rem] font-bold text-black/75 uppercase block">Jumlah Sewaan Kiosk</span>
-                  <span className="text-lg sm:text-xl font-black text-black tabular-nums">RM{totalKioskSubsidy.toLocaleString()}/bln</span>
+                  <span className="text-lg sm:text-xl font-black text-black tabular-nums">RM{totalKioskSubsidy.toLocaleString()}/bulan</span>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-300">
                   <span className="text-[0.8125rem] font-bold text-black/75 uppercase block">Geran Diluluskan</span>
@@ -323,7 +323,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                         <tr className="bg-slate-100 text-black font-bold border-b border-slate-300 text-sm">
                           <th className="p-2.5 text-center w-8">Bil</th>
                           <th className="p-2.5">Nama Pemohon & Perniagaan</th>
-                          <th className="p-2.5">No. Kad Pengenalan</th>
+                          <th className="p-2.5">Nombor Kad Pengenalan</th>
                           <th className="p-2.5">Kod Kiosk & Hab</th>
                           <th className="p-2.5 text-right">Kadar Sewa</th>
                           <th className="p-2.5">Catatan Pentadbiran</th>

@@ -489,14 +489,14 @@ export const downloadOfferLetterPdf = async (
       fallbackPdf.setFontSize(10);
       fallbackPdf.setFont('helvetica', 'normal');
       fallbackPdf.text('Portal Pembangunan Usahawan Belia Kelantan (KBelia)', 20, 32);
-      fallbackPdf.text(`No. Rujukan: ${refNumber}    Tarikh: ${formattedDate}`, 20, 38);
+      fallbackPdf.text(`Nombor Rujukan: ${refNumber}    Tarikh: ${formattedDate}`, 20, 38);
       fallbackPdf.line(20, 42, 190, 42);
 
       fallbackPdf.setFont('helvetica', 'bold');
       fallbackPdf.text('MAKLUMAT USAHAWAN & PREMIS', 20, 52);
       fallbackPdf.setFont('helvetica', 'normal');
       fallbackPdf.text(`Nama Pemohon: ${booking.applicantName}`, 25, 60);
-      fallbackPdf.text(`Perniagaan: ${booking.businessName} (${booking.businessCategory})`, 25, 67);
+      fallbackPdf.text(`Perniagaan: ${booking.businessName} (${booking.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : booking.businessCategory})`, 25, 67);
       fallbackPdf.text(`Premis Kiosk: ${booking.slotCode} - ${booking.slotName}`, 25, 74);
       fallbackPdf.text(`Hab Penempatan: ${booking.hubLocation}`, 25, 81);
       fallbackPdf.text(`Kadar Sewa: RM ${monthlyRate.toFixed(2)} / bulan (Subsidi ${safeSubsidy}%)`, 25, 88);
@@ -627,7 +627,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
               min-width: 230px;
               flex-shrink: 0;
             ">
-              <div><strong style="font-family: sans-serif; color: #000000; font-size: 11px;">NO. RUJUKAN:</strong> <span style="color: #000000; font-weight: 800;">${params.reportRef}</span></div>
+              <div><strong style="font-family: sans-serif; color: #000000; font-size: 11px;">NOMBOR RUJUKAN:</strong> <span style="color: #000000; font-weight: 800;">${params.reportRef}</span></div>
               <div style="margin-top: 3px;"><strong style="font-family: sans-serif; color: #000000; font-size: 11px;">TARIKH RASMI:</strong> <span style="color: #000000; font-weight: 700;">${params.reportDate}</span></div>
               <div style="margin-top: 5px;">
                 <span style="display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 11.5px; font-weight: 800; background: #ecfdf5; color: #000000; border: 1px solid #a7f3d0;">
@@ -650,7 +650,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
             </div>
             <div style="padding: 11px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
               <span style="font-size: 12px; font-weight: 700; color: #000000; opacity: 0.78; text-transform: uppercase; display: block;">Nilai Sewaan Kiosk</span>
-              <span style="font-size: 18px; font-weight: 900; color: #000000;">RM${totalKioskSubsidy.toLocaleString()}/bln</span>
+              <span style="font-size: 18px; font-weight: 900; color: #000000;">RM${totalKioskSubsidy.toLocaleString()}/bulan</span>
             </div>
             <div style="padding: 11px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px;">
               <span style="font-size: 12px; font-weight: 700; color: #000000; opacity: 0.78; text-transform: uppercase; display: block;">Geran Diluluskan</span>
@@ -678,7 +678,7 @@ export const generateOfficialApprovalReportHtml = (params: OfficialApprovalRepor
                   <tr style="background: #f1f5f9; color: #000000; font-weight: 800; border-bottom: 1.5px solid #cbd5e1;">
                     <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: center; width: 34px;">Bil</th>
                     <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left;">Nama Pemohon & Perniagaan</th>
-                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left; width: 130px;">No. Kad Pengenalan</th>
+                    <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left; width: 130px;">Nombor Kad Pengenalan</th>
                     <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left;">Kod Kiosk & Lokasi Hab</th>
                     <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: right; width: 95px;">Kadar Sewa</th>
                     <th style="padding: 8px 9px; border: 1px solid #cbd5e1; text-align: left;">Catatan</th>
@@ -916,7 +916,7 @@ export const downloadOfficialApprovalReportPdf = async (
       fallbackPdf.setFontSize(9);
       fallbackPdf.setFont('helvetica', 'normal');
       fallbackPdf.text('Hab Pembangunan Usahawan Belia Kelantan (KBelia)', 20, 31);
-      fallbackPdf.text(`No. Rujukan: ${params.reportRef}    Tarikh: ${params.reportDate}`, 20, 36);
+      fallbackPdf.text(`Nombor Rujukan: ${params.reportRef}    Tarikh: ${params.reportDate}`, 20, 36);
       fallbackPdf.line(20, 40, 190, 40);
 
       fallbackPdf.setFont('helvetica', 'bold');

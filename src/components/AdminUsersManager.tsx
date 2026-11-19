@@ -269,12 +269,9 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs">
         <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
         <div className="space-y-1">
-          <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white">
+          <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Pengurusan Akaun &amp; Profil Pengguna Portal
           </h3>
-          <p className="text-[0.9375rem] text-black/75 dark:text-white/80 max-w-2xl">
-            Tambah akaun pengguna baharu (Usahawan Belia / Mentor), kemas kini maklumat profil, atau padam akaun pengguna portal.
-          </p>
         </div>
       </div>
 
@@ -313,7 +310,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
           filterContent={
             <>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
                   Peranan Akaun
                 </label>
                 <div className="grid grid-cols-1 gap-1.5">
@@ -326,7 +323,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                       key={tab.id}
                       type="button"
                       onClick={() => setRoleFilter(tab.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border text-left transition-colors cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold border text-left transition-colors cursor-pointer ${
                         roleFilter === tab.id
                           ? 'bg-indigo-600 text-white border-indigo-600'
                           : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -339,7 +336,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
                   Daerah
                 </label>
                 <select
@@ -437,14 +434,14 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                             <img
                               src={u.avatarUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg'}
                               alt={u.fullName}
-                              className="w-9 h-9 rounded-lg object-cover border border-slate-200 dark:border-zinc-700 shrink-0"
+                              className="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-zinc-700 shrink-0"
                             />
                             <div className="min-w-0">
                               <div className="font-semibold text-black dark:text-white truncate max-w-[220px]">
                                 {u.fullName}
                                 {isSelf ? ' (Anda)' : ''}
                               </div>
-                              <div className="text-xs text-black/65 dark:text-white/70 truncate max-w-[220px]">
+                              <div className="text-[0.8125rem] text-black/65 dark:text-white/70 truncate max-w-[220px]">
                                 {u.email}
                               </div>
                             </div>
@@ -452,7 +449,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         </td>
                         <td className="py-3.5 px-3 whitespace-nowrap">
                           <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                               u.role === 'mentor'
                                 ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70 text-teal-800 dark:text-teal-200'
                                 : 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70 text-blue-800 dark:text-blue-200'
@@ -467,7 +464,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         <td className="py-3.5 px-3 text-black/80 dark:text-white/85 max-w-[220px] truncate">
                           {orgLabel}
                         </td>
-                        <td className="py-3.5 px-3 text-black/70 dark:text-white/75 font-mono text-xs tabular-nums whitespace-nowrap">
+                        <td className="py-3.5 px-3 text-black/70 dark:text-white/75 font-mono text-[0.8125rem] tabular-nums whitespace-nowrap">
                           {u.phone || '-'}
                         </td>
                         <td className="py-3.5 pl-2 pr-4 text-right">
@@ -636,7 +633,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">No. Pendaftaran SSM</label>
+                      <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Nombor Pendaftaran SSM</label>
                       <input
                         type="text"
                         value={ssmNumber}

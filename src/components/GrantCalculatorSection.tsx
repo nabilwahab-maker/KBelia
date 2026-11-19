@@ -82,14 +82,9 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
       {/* Header Banner */}
       <div className="rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 border border-slate-200 dark:border-zinc-700">
         <div className="max-w-2xl">
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black dark:text-white">
             {isEn ? 'Grant & Micro-Finance Eligibility Calculator' : 'Semak Kelayakan Geran & Bantuan Modal'}
           </h1>
-          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 leading-relaxed">
-            {isEn
-              ? 'Estimate your match score across micro-financing schemes, digital grants, and RM3,000 starter funds in 30 seconds.'
-              : 'Anggarkan skor padanan skim pembiayaan mikro, geran digital dan dana permulaan belia dalam 30 saat.'}
-          </p>
         </div>
       </div>
 
@@ -97,7 +92,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
         {/* Form Input Parameters (7 cols) */}
         <div className="lg:col-span-7 bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 border border-slate-300 dark:border-slate-600 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-slate-600">
-            <h2 className="text-base font-extrabold text-black dark:text-white flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-black dark:text-white/75" />
               <span>{isEn ? 'Business Profile Parameters' : 'Parameter Profil Perniagaan Anda'}</span>
             </h2>
@@ -141,7 +136,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                         : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
                     }`}
                   >
-                    {presetAge} {isEn ? 'yrs' : 'thn'}
+                    {presetAge} {isEn ? 'years' : 'tahun'}
                   </button>
                 ))}
               </div>
@@ -180,7 +175,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                 onChange={(e) => setCategory(e.target.value as BusinessCategory)}
                 className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white font-semibold focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
               >
-                <option value="Makanan & Minuman (F&B)">Makanan & Minuman (F&B)</option>
+                <option value="Makanan & Minuman (F&B)">Makanan &amp; Minuman</option>
                 <option value="Fesyen, Batik & Kraf Kelantan">Fesyen, Batik & Kraf Kelantan</option>
                 <option value="Teknologi & Servis Digital">Teknologi & Servis Digital</option>
                 <option value="Kecantikan & Kesihatan">Kecantikan & Kesihatan</option>
@@ -265,7 +260,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                         : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
                     }`}
                   >
-                    {m} {isEn ? 'mo' : 'bln'}
+                    {m} {isEn ? 'months' : 'bulan'}
                   </button>
                 ))}
               </div>
@@ -384,7 +379,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
             </div>
 
             <div>
-              <h3 className="text-base font-extrabold text-black dark:text-white">
+              <h3 className="text-lg font-extrabold text-black dark:text-white tracking-tight">
                 {score >= 80 
                   ? (isEn ? 'High Probability (Top Tier)' : 'Potensi Sangat Tinggi (Tier Utama)')
                   : (isEn ? 'Moderate Eligibility' : 'Kelayakan Sederhana')}
@@ -410,7 +405,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-2">
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="text-sm font-bold text-black dark:text-white">
+                  <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                     Geran Permulaan Hab Usahawan Belia
                   </h4>
                   <div className="text-[0.8125rem] font-extrabold text-black dark:text-white/75">
@@ -441,7 +436,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-2">
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="text-sm font-bold text-black dark:text-white">
+                  <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                     Skim Pembiayaan Mikro &amp; Geran Digital Belia
                   </h4>
                   <div className="text-[0.8125rem] font-extrabold text-black dark:text-white/75">

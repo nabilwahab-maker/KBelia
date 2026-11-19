@@ -345,12 +345,9 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
       <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs">
         <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
         <div className="space-y-1">
-          <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white">
+          <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Acara Usahawan Belia &amp; Tempahan Tapak
           </h3>
-          <p className="text-[0.9375rem] text-black/75 dark:text-white/80 max-w-2xl">
-            Terbitkan karnival, sunting lokasi atau kuota tapak, serta semak pendaftaran penyertaan peserta.
-          </p>
         </div>
       </div>
 
@@ -422,7 +419,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             filterContent={
               <>
                 <div>
-                  <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                     Kategori Acara
                   </label>
                   <select
@@ -438,7 +435,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                     Daerah
                   </label>
                   <select
@@ -465,7 +462,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
-                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <button
                         type="button"
                         onClick={() => toggleCatalogSort('title')}
@@ -475,7 +472,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                         <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <button
                         type="button"
                         onClick={() => toggleCatalogSort('category')}
@@ -485,7 +482,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                         <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <button
                         type="button"
                         onClick={() => toggleCatalogSort('district')}
@@ -495,7 +492,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                         <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <button
                         type="button"
                         onClick={() => toggleCatalogSort('booths')}
@@ -505,10 +502,10 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                         <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       Yuran
                     </th>
-                    <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <span className="sr-only">Tindakan</span>
                     </th>
                   </tr>
@@ -521,7 +518,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     >
                       <td className="py-3.5 px-4 max-w-sm">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 overflow-hidden shrink-0">
+                          <div className="w-14 h-14 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 overflow-hidden shrink-0">
                             <PortalImage
                               src={resolveEventImage(evt.category, evt.imageUrl)}
                               alt={evt.title}
@@ -534,14 +531,14 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                             <div className="font-bold text-black dark:text-white truncate">
                               {evt.title}
                             </div>
-                            <div className="text-xs text-black/65 dark:text-white/65 truncate">
+                            <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">
                               {evt.location}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold uppercase bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200">
                           {evt.category}
                         </span>
                       </td>
@@ -550,8 +547,8 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                       </td>
                       <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap tabular-nums">
                         <div>{evt.date}</div>
-                        <div className="text-xs text-black/60 dark:text-white/60">
-                          {evt.boothsAvailable}/{evt.totalBooths} tapak
+                        <div className="text-[0.8125rem] text-black/60 dark:text-white/60">
+                          Baki {evt.boothsAvailable} tapak
                         </div>
                       </td>
                       <td className="py-3.5 px-4 font-semibold text-black dark:text-white whitespace-nowrap">
@@ -623,7 +620,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             }}
             filterContent={
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                   Status Tempahan
                 </label>
                 <select
@@ -648,7 +645,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
-                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <button
                         type="button"
                         onClick={() => toggleBookingSort('userName')}
@@ -658,7 +655,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                         <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <button
                         type="button"
                         onClick={() => toggleBookingSort('eventTitle')}
@@ -668,7 +665,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                         <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </th>
-                    <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <button
                         type="button"
                         onClick={() => toggleBookingSort('status')}
@@ -678,7 +675,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                         <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </th>
-                    <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                    <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <span className="sr-only">Tindakan</span>
                     </th>
                   </tr>
@@ -698,7 +695,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                             <div className="font-bold text-black dark:text-white truncate">
                               {b.userName || 'Usahawan Belia'}
                             </div>
-                            <div className="text-xs text-black/60 dark:text-white/60 font-mono truncate">
+                            <div className="text-[0.8125rem] text-black/60 dark:text-white/60 font-mono truncate">
                               ID: {b.userId}
                             </div>
                           </div>
@@ -709,7 +706,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold border ${
                             b.status === 'booked'
                               ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
                               : 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
@@ -915,7 +912,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">No. WhatsApp Penganjur</label>
+                  <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Nombor WhatsApp Penganjur</label>
                   <input
                     type="text"
                     value={whatsappContact}

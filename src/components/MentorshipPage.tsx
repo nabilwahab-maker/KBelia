@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   XCircle,
   Lock,
-  Search,
   MapPin,
   Video,
   Send,
@@ -14,11 +13,7 @@ import {
   AlertCircle,
   History,
   UserCheck,
-  ChevronLeft,
   ChevronRight,
-  Pause,
-  Play,
-  SlidersHorizontal,
   X,
   FileText
 } from 'lucide-react';
@@ -27,6 +22,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { usePrefersReducedMotion } from '../hooks/useMotion';
 import { ModernDatePicker, ModernTimePicker, toLocalIsoDate } from './ModernDateTimePicker';
 import { PaginationBar, usePagination } from './PaginationBar';
+import { ReferenceTableToolbar } from './ReferenceTableKit';
 
 interface MentorshipPageProps {
   mentors: MentorProfile[];
@@ -126,7 +122,6 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
   const [agencyFilter, setAgencyFilter] = useState<'all' | 'internal' | 'industry'>('all');
   const [expertiseFilter, setExpertiseFilter] = useState<string>('all');
   const [spotlightIndex, setSpotlightIndex] = useState(0);
-  const [isSpotlightPaused, setIsSpotlightPaused] = useState(false);
   const [isSpotlightHovered, setIsSpotlightHovered] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState<MentorProfile | null>(null);
   const [brokenAvatarIds, setBrokenAvatarIds] = useState<Record<string, boolean>>({});
@@ -283,9 +278,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
     });
   }, [mentors, searchQuery, agencyFilter, expertiseFilter]);
 
-  const hasActiveFilters = Boolean(
-    searchQuery.trim() || agencyFilter !== 'all' || expertiseFilter !== 'all'
-  );
+  const activeFilterCount =
+    (agencyFilter !== 'all' ? 1 : 0) + (expertiseFilter !== 'all' ? 1 : 0);
 
   const mentorPagination = usePagination(filteredMentors, 3, [
     searchQuery,
@@ -309,7 +303,6 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
   useEffect(() => {
     if (
       prefersReducedMotion ||
-      isSpotlightPaused ||
       isSpotlightHovered ||
       filteredMentors.length <= 1
     ) {
@@ -319,21 +312,11 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       setSpotlightIndex((prev) => (prev + 1) % filteredMentors.length);
     }, 5000);
     return () => window.clearInterval(timer);
-  }, [prefersReducedMotion, isSpotlightPaused, isSpotlightHovered, filteredMentors.length]);
+  }, [prefersReducedMotion, isSpotlightHovered, filteredMentors.length]);
 
   const safeSpotlightIndex =
     filteredMentors.length > 0 ? spotlightIndex % filteredMentors.length : 0;
   const spotlightMentor = filteredMentors[safeSpotlightIndex] || null;
-
-  const handlePrevSpotlight = () => {
-    if (filteredMentors.length <= 1) return;
-    setSpotlightIndex((prev) => (prev - 1 + filteredMentors.length) % filteredMentors.length);
-  };
-
-  const handleNextSpotlight = () => {
-    if (filteredMentors.length <= 1) return;
-    setSpotlightIndex((prev) => (prev + 1) % filteredMentors.length);
-  };
 
   const handleSelectMentor = (mentor: MentorProfile) => {
     if (hasActiveSession) return;
@@ -465,14 +448,9 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       {/* Page Intro Header */}
       <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700">
         <div className="space-y-1 max-w-2xl">
-          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight text-balance">
             {isEn ? 'Mentor Advisory & Appointments' : 'Bimbingan & Temu Janji Mentor'}
           </h1>
-          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed">
-            {isEn
-              ? 'Explore featured mentors above, filter by agency or expertise, and book your 1-on-1 slot.'
-              : 'Tinjau mentor tumpuan di bawah, tapis mengikut agensi atau kepakaran, dan tempah slot 1-ke-1 anda.'}
-          </p>
         </div>
       </div>
 
@@ -486,15 +464,10 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               <div>
                 <h2
                   id="active-appointment-heading"
-                  className="text-sm sm:text-base font-extrabold text-black dark:text-white"
+                  className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight"
                 >
                   {isEn ? 'Your Active Mentorship Appointment' : 'Temu Janji Bimbingan Aktif Anda'}
                 </h2>
-                <p className="text-sm text-black/70 dark:text-white/75">
-                  {isEn
-                    ? '1 active appointment per account at a time.'
-                    : '1 temu janji aktif dibenarkan pada satu masa.'}
-                </p>
               </div>
 
               {(() => {
@@ -683,7 +656,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
         onBlurCapture={() => setIsSpotlightHovered(false)}
       >
         <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 overflow-hidden">
-          {/* Spotlight Header & Playback Controls */}
+          {/* Spotlight Header */}
           <div className="px-4 sm:px-6 py-3 border-b border-slate-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5 min-w-0">
               <GraduationCap className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
@@ -693,60 +666,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               >
                 {isEn ? 'Mentor Spotlight' : 'Tumpuan Mentor'}
               </h2>
-              {filteredMentors.length > 0 && (
-                <span className="text-xs font-mono font-bold text-black/60 dark:text-white/65 tabular-nums">
-                  {safeSpotlightIndex + 1} / {filteredMentors.length}
-                </span>
-              )}
             </div>
-
-            {filteredMentors.length > 1 && (
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={handlePrevSpotlight}
-                  aria-label={isEn ? 'Previous mentor' : 'Mentor sebelum'}
-                  className="p-2 rounded-lg border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white transition-colors cursor-pointer"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsSpotlightPaused((prev) => !prev)}
-                  aria-pressed={isSpotlightPaused}
-                  aria-label={
-                    isSpotlightPaused
-                      ? isEn
-                        ? 'Resume auto-rotation'
-                        : 'Sambung giliran automatik'
-                      : isEn
-                      ? 'Pause auto-rotation'
-                      : 'Jeda giliran automatik'
-                  }
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-xs font-bold text-black dark:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
-                >
-                  {isSpotlightPaused ? (
-                    <>
-                      <Play className="w-3.5 h-3.5 shrink-0" />
-                      <span>{isEn ? 'Play' : 'Main'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Pause className="w-3.5 h-3.5 shrink-0" />
-                      <span>{isEn ? 'Pause' : 'Jeda'}</span>
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleNextSpotlight}
-                  aria-label={isEn ? 'Next mentor' : 'Mentor seterusnya'}
-                  className="p-2 rounded-lg border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-black dark:text-white transition-colors cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Spotlight Card Body */}
@@ -776,7 +696,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   )}
 
                   <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs font-semibold text-black/65 dark:text-white/70 tabular-nums">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70 tabular-nums">
                       <span>{spotlightMentor.agency}</span>
                       <span aria-hidden="true">·</span>
                       <span>{spotlightMentor.availableDays}</span>
@@ -799,7 +719,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                       {spotlightMentor.bio}
                     </p>
 
-                    <div className="text-xs sm:text-[0.8125rem] text-black/75 dark:text-white/80 pt-0.5">
+                    <div className="text-[0.8125rem] text-black/75 dark:text-white/80 pt-0.5">
                       <span className="font-bold text-black dark:text-white">
                         {isEn ? 'Expertise:' : 'Kepakaran:'}{' '}
                       </span>
@@ -808,54 +728,46 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   </div>
                 </div>
 
-                <div className="shrink-0 flex md:flex-col items-center md:items-end justify-between gap-2.5 pt-2 md:pt-0 border-t md:border-t-0 border-slate-200 dark:border-zinc-700">
-                  {activeSession?.mentorId === spotlightMentor.id ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-black dark:text-white text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>{isEn ? 'Active Mentor' : 'Mentor Aktif Anda'}</span>
-                    </button>
-                  ) : hasActiveSession ? (
-                    <button
-                      type="button"
-                      disabled
-                      aria-disabled="true"
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black/55 dark:text-white/55 text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
-                    >
-                      <Lock className="w-4 h-4" />
-                      <span>{isEn ? 'Limit Reached' : 'Had Penuh'}</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handleSelectMentor(spotlightMentor)}
-                      className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                        selectedMentor?.id === spotlightMentor.id
-                          ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
-                          : 'bg-teal-600 hover:bg-teal-700 text-white shadow-xs'
-                      }`}
-                    >
-                      <span>
-                        {selectedMentor?.id === spotlightMentor.id
-                          ? isEn
-                            ? 'Selected Below'
-                            : 'Sedang Dipilih'
-                          : isEn
-                          ? 'Select Mentor'
-                          : 'Pilih Mentor'}
-                      </span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
+                {(activeSession?.mentorId === spotlightMentor.id || !hasActiveSession) && (
+                  <div className="shrink-0 flex md:flex-col items-center md:items-end justify-between gap-2.5 pt-2 md:pt-0 border-t md:border-t-0 border-slate-200 dark:border-zinc-700">
+                    {activeSession?.mentorId === spotlightMentor.id ? (
+                      <button
+                        type="button"
+                        disabled
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-black dark:text-white text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>{isEn ? 'Active Mentor' : 'Mentor Aktif Anda'}</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleSelectMentor(spotlightMentor)}
+                        className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                          selectedMentor?.id === spotlightMentor.id
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
+                            : 'bg-teal-600 hover:bg-teal-700 text-white shadow-xs'
+                        }`}
+                      >
+                        <span>
+                          {selectedMentor?.id === spotlightMentor.id
+                            ? isEn
+                              ? 'Selected Below'
+                              : 'Sedang Dipilih'
+                            : isEn
+                            ? 'Select Mentor'
+                            : 'Pilih Mentor'}
+                        </span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Spotlight Step Indicators */}
               {filteredMentors.length > 1 && (
-                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-2">
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-start gap-2">
                   <div className="flex items-center gap-1.5" role="tablist" aria-label={isEn ? 'Featured mentors' : 'Pilihan mentor tumpuan'}>
                     {filteredMentors.map((m, idx) => {
                       const isActiveSlide = idx === safeSpotlightIndex;
@@ -876,19 +788,6 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                       );
                     })}
                   </div>
-                  <span className="text-xs text-black/60 dark:text-white/65">
-                    {prefersReducedMotion || isSpotlightPaused
-                      ? isEn
-                        ? 'Auto-rotation paused'
-                        : 'Giliran automatik dijeda'
-                      : isSpotlightHovered
-                      ? isEn
-                        ? 'Paused while viewing'
-                        : 'Dijeda semasa ditinjau'
-                      : isEn
-                      ? 'Auto-rotating every 5s'
-                      : 'Bertukar automatik setiap 5 saat'}
-                  </span>
                 </div>
               )}
             </div>
@@ -915,96 +814,65 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
       </section>
 
       {/* ================================================================= */}
-      {/* SECTION 3: INTEGRATED FILTER BAR (SEARCH + AGENCY + EXPERTISE)    */}
+      {/* SECTION 3: INTEGRATED FILTER BAR (SEARCH + ICON FILTER POPOVER)   */}
       {/* ================================================================= */}
       <section aria-label={isEn ? 'Integrated mentor filter' : 'Penapis mentor bersepadu'}>
-        <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 p-3.5 sm:px-5 sm:py-3.5 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-          <div className="flex flex-col md:flex-row md:items-center gap-2.5 flex-1 min-w-0">
-            {/* Keyword Search */}
-            <div className="relative flex-1 min-w-[210px]">
-              <Search className="w-4 h-4 text-black/55 dark:text-white/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={
-                  isEn
-                    ? 'Search mentor name, agency, or topic...'
-                    : 'Cari nama mentor, agensi atau topik...'
-                }
-                className="w-full pl-9 pr-8 py-2 text-sm rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  aria-label={isEn ? 'Clear search' : 'Kosongkan carian'}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
+        <div className="rounded-2xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 overflow-visible [&>div]:border-b-0">
+          <ReferenceTableToolbar
+            accent="teal"
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder={
+              isEn
+                ? 'Search mentor name, agency, or topic...'
+                : 'Cari nama mentor, agensi atau topik...'
+            }
+            filterCount={activeFilterCount}
+            onResetFilters={() => {
+              setAgencyFilter('all');
+              setExpertiseFilter('all');
+            }}
+            filterContent={
+              <>
+                <div>
+                  <label className="block text-[0.8125rem] font-bold text-black/75 dark:text-white/80 mb-1.5">
+                    {isEn ? 'Mentor Type' : 'Kategori Mentor'}
+                  </label>
+                  <select
+                    value={agencyFilter}
+                    onChange={(e) => setAgencyFilter(e.target.value as 'all' | 'internal' | 'industry')}
+                    aria-label={isEn ? 'Mentor Type' : 'Kategori Mentor'}
+                    className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  >
+                    <option value="all">{isEn ? 'All Mentors' : 'Semua Mentor'}</option>
+                    <option value="internal">{isEn ? 'Internal Mentors' : 'Mentor Dalaman'}</option>
+                    <option value="industry">{isEn ? 'Industry Experts' : 'Pakar Industri'}</option>
+                  </select>
+                </div>
 
-            {/* Agency Segmented Filter */}
-            <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 overflow-x-auto shrink-0">
-              {(
-                [
-                  { id: 'all', label: isEn ? 'All' : 'Semua' },
-                  { id: 'internal', label: isEn ? 'Internal Mentors' : 'Mentor Dalaman' },
-                  { id: 'industry', label: isEn ? 'Industry Experts' : 'Pakar Industri' }
-                ] as const
-              ).map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setAgencyFilter(tab.id)}
-                  className={`px-3 py-1.5 text-sm font-bold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                    agencyFilter === tab.id
-                      ? 'bg-white dark:bg-zinc-900 text-black dark:text-white shadow-xs'
-                      : 'text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Expertise Area Filter */}
-            <div className="relative md:w-64 shrink-0">
-              <SlidersHorizontal className="w-3.5 h-3.5 text-black/55 dark:text-white/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <select
-                value={expertiseFilter}
-                onChange={(e) => setExpertiseFilter(e.target.value)}
-                aria-label={isEn ? 'Filter by expertise' : 'Tapis mengikut bidang kepakaran'}
-                className="w-full pl-9 pr-3 py-2 rounded-xl text-sm font-medium bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-600 cursor-pointer"
-              >
-                <option value="all">
-                  {isEn ? 'All Expertise Areas' : 'Semua Bidang Kepakaran'}
-                </option>
-                {availableExpertiseOptions.map((exp) => (
-                  <option key={exp} value={exp}>
-                    {exp}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between xl:justify-end gap-2.5 shrink-0">
-            <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 tabular-nums whitespace-nowrap">
-              {filteredMentors.length} / {mentors.length} {isEn ? 'mentors' : 'mentor'}
-            </span>
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={handleResetFilters}
-                className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 text-xs font-bold text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer whitespace-nowrap shrink-0"
-              >
-                {isEn ? 'Reset' : 'Set Semula'}
-              </button>
-            )}
-          </div>
+                <div>
+                  <label className="block text-[0.8125rem] font-bold text-black/75 dark:text-white/80 mb-1.5">
+                    {isEn ? 'Expertise Area' : 'Bidang Kepakaran'}
+                  </label>
+                  <select
+                    value={expertiseFilter}
+                    onChange={(e) => setExpertiseFilter(e.target.value)}
+                    aria-label={isEn ? 'Filter by expertise' : 'Tapis mengikut bidang kepakaran'}
+                    className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  >
+                    <option value="all">
+                      {isEn ? 'All Expertise Areas' : 'Semua Bidang Kepakaran'}
+                    </option>
+                    {availableExpertiseOptions.map((exp) => (
+                      <option key={exp} value={exp}>
+                        {exp}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            }
+          />
         </div>
       </section>
 
@@ -1246,28 +1114,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 : 'Disegerakkan terus dengan penapis bersepadu di atas.'}
             </p>
           </div>
-          <span className="text-sm font-semibold text-black/70 dark:text-white/75 tabular-nums">
-            {filteredMentors.length} {isEn ? 'shown' : 'dipaparkan'}
-            {filteredMentors.length > 0 && (
-              <>
-                {' · '}
-                {isEn ? 'Page' : 'Halaman'} {mentorPagination.currentPage}/{mentorPagination.totalPages}
-              </>
-            )}
-          </span>
         </div>
-
-        {/* Active Lock Notice */}
-        {hasActiveSession && (
-          <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 flex items-start sm:items-center gap-3 text-sm text-black dark:text-white">
-            <Lock className="w-4 h-4 text-amber-700 dark:text-amber-300 shrink-0 mt-0.5 sm:mt-0" />
-            <span>
-              {isEn
-                ? 'Mentor selection is locked while you have an active appointment. Cancel your active session above to select another mentor.'
-                : 'Pemilihan mentor lain dikunci sementara anda mempunyai temu janji aktif. Sila batalkan temu janji aktif di atas terlebih dahulu untuk memilih mentor baharu.'}
-            </span>
-          </div>
-        )}
 
         {/* Mentor Cards Grid */}
         {filteredMentors.length === 0 ? (
@@ -1328,7 +1175,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                           {mentor.name}
                         </h3>
                         <span
-                          className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 tabular-nums ${
+                          className={`px-2 py-0.5 rounded-md text-[0.8125rem] font-bold border shrink-0 tabular-nums ${
                             isCurrentBookedMentor
                               ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-700 text-black dark:text-white'
                               : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800 text-black dark:text-white'
@@ -1345,49 +1192,41 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                     </div>
                   </div>
 
-                  <div className="shrink-0 self-end sm:self-center">
-                    {isCurrentBookedMentor ? (
-                      <button
-                        type="button"
-                        disabled
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-black dark:text-white text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>{isEn ? 'Active Mentor' : 'Mentor Aktif Anda'}</span>
-                      </button>
-                    ) : hasActiveSession ? (
-                      <button
-                        type="button"
-                        disabled
-                        aria-disabled="true"
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black/50 dark:text-white/50 text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
-                      >
-                        <Lock className="w-3.5 h-3.5" />
-                        <span>{isEn ? 'Limit Reached' : 'Had Penuh'}</span>
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleSelectMentor(mentor)}
-                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                          isSelectedForForm
-                            ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
-                            : 'bg-teal-600 hover:bg-teal-700 text-white'
-                        }`}
-                      >
-                        <span>
-                          {isSelectedForForm
-                            ? isEn
-                              ? 'Selected Below Form'
-                              : 'Sedang Dipilih'
-                            : isEn
-                            ? 'Select Mentor'
-                            : 'Pilih Mentor'}
-                        </span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
+                  {(isCurrentBookedMentor || !hasActiveSession) && (
+                    <div className="shrink-0 self-end sm:self-center">
+                      {isCurrentBookedMentor ? (
+                        <button
+                          type="button"
+                          disabled
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-black dark:text-white text-sm font-bold cursor-not-allowed whitespace-nowrap shrink-0"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>{isEn ? 'Active Mentor' : 'Mentor Aktif Anda'}</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleSelectMentor(mentor)}
+                          className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                            isSelectedForForm
+                              ? 'bg-slate-900 dark:bg-white text-white dark:text-black'
+                              : 'bg-teal-600 hover:bg-teal-700 text-white'
+                          }`}
+                        >
+                          <span>
+                            {isSelectedForForm
+                              ? isEn
+                                ? 'Selected Below Form'
+                                : 'Sedang Dipilih'
+                              : isEn
+                              ? 'Select Mentor'
+                              : 'Pilih Mentor'}
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -1420,13 +1259,6 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 {isEn ? 'Session History' : 'Sejarah Sesi Bimbingan'}
               </h2>
             </div>
-            {sessionHistory.length > 0 && (
-              <span className="text-sm font-semibold text-black/70 dark:text-white/75 tabular-nums">
-                {sessionHistory.length} {isEn ? 'records' : 'rekod'}
-                {' · '}
-                {isEn ? 'Page' : 'Halaman'} {historyPagination.currentPage}/{historyPagination.totalPages}
-              </span>
-            )}
           </div>
 
           {sessionHistory.length === 0 ? (

@@ -301,9 +301,6 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
           <h3 className={`${compactHeader ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'} font-extrabold text-black dark:text-white tracking-tight`}>
             Urus Berita &amp; Pengumuman
           </h3>
-          <p className="text-[0.9375rem] text-black dark:text-white/75 max-w-2xl leading-relaxed">
-            Tambah, edit, pin berita utama atau kawal status siaran. Hanya berita berstatus Siar dipaparkan kepada Usahawan Belia dan Mentor.
-          </p>
         </div>
       </div>
 
@@ -315,7 +312,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
         >
           <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
           <div className="px-4 sm:px-5 py-3.5 border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between bg-slate-50 dark:bg-zinc-950">
-            <h4 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
+            <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2">
               <Newspaper className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <span>{editingId ? 'Edit Artikel Berita' : 'Tambah Berita & Pengumuman'}</span>
             </h4>
@@ -510,7 +507,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
           filterContent={
             <>
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                   Status Penerbitan
                 </label>
                 <select
@@ -524,7 +521,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                   Kategori
                 </label>
                 <select
@@ -539,7 +536,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                   Sorotan Utama
                 </label>
                 <select
@@ -577,7 +574,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
-                  <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                  <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                     <button
                       type="button"
                       onClick={() => toggleSort('title')}
@@ -587,7 +584,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                       <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                  <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                     <button
                       type="button"
                       onClick={() => toggleSort('category')}
@@ -597,10 +594,10 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                       <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                  <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                     Status
                   </th>
-                  <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                  <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                     <button
                       type="button"
                       onClick={() => toggleSort('date')}
@@ -610,7 +607,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                       <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
-                  <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                  <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                     <span className="sr-only">Tindakan</span>
                   </th>
                 </tr>
@@ -623,7 +620,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                   >
                     <td className="py-3.5 px-4 max-w-md">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-zinc-800 overflow-hidden shrink-0 border border-slate-200 dark:border-zinc-700">
+                        <div className="w-14 h-14 rounded-lg bg-slate-100 dark:bg-zinc-800 overflow-hidden shrink-0 border border-slate-200 dark:border-zinc-700">
                           {item.imageUrl ? (
                             <img
                               src={item.imageUrl}
@@ -641,7 +638,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                           <div className="font-bold text-black dark:text-white truncate">
                             {item.title}
                           </div>
-                          <div className="text-xs text-black/65 dark:text-white/65 truncate">
+                          <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">
                             {item.summary}
                           </div>
                         </div>
@@ -651,7 +648,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                       <div className="flex items-center gap-2">
                         <span>{item.category}</span>
                         {item.isPinned && (
-                          <span className="px-2 py-0.5 rounded-full text-[0.6875rem] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
+                          <span className="px-2 py-0.5 rounded-full text-[0.8125rem] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
                             Utama
                           </span>
                         )}
@@ -659,7 +656,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold border ${
                           item.status === 'published'
                             ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
                             : 'bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200'

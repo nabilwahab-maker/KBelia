@@ -38,7 +38,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
-import { BusinessListing, BusinessCategory, KelantanDistrict } from '../types';
+import { BusinessListing, BusinessCategory, KelantanDistrict, formatBusinessCategory } from '../types';
 import { saveBusinessListing, seedInitialData, loadLocalPortalSettings, savePortalSettingsRecord } from '../services/dataService';
 import confetti from 'canvas-confetti';
 import { ToggleSwitch } from './ToggleSwitch';
@@ -555,7 +555,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               </span>
             </div>
             <span className="text-[0.8125rem] font-mono font-extrabold text-black dark:text-white/75">
-              {completeness.percent}% {language === 'en' ? 'Completed' : 'Lengkap'} ({completeness.completedCount}/{completeness.totalCount})
+              {completeness.percent}% {language === 'en' ? 'Completed' : 'Lengkap'}
             </span>
           </div>
           <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-full overflow-hidden mb-2">
@@ -746,8 +746,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
           <div className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs transition-colors space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-base font-bold text-black dark:text-white">{t('theme_display_title')}</h3>
-                <p className="text-sm text-black/80 dark:text-white/80 mt-0.5">{t('theme_display_desc')}</p>
+                <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">{t('theme_display_title')}</h3>
               </div>
 
               {/* Compact Horizontal Segmented Tab Control */}
@@ -791,13 +790,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
               <div>
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4 text-black dark:text-white/75" />
-                  <h3 className="text-sm font-bold text-black dark:text-white">
+                  <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                     {t('lang_setting_title')}
                   </h3>
                 </div>
-                <p className="text-[0.9375rem] text-black dark:text-white mt-0.5">
-                  {t('lang_setting_desc')}
-                </p>
               </div>
 
               {/* Language Segmented Control */}
@@ -851,8 +847,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                   <Camera className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-black dark:text-white">{t('settings_profile_avatar_title')}</h3>
-                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_profile_avatar_desc')}</p>
+                  <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">{t('settings_profile_avatar_title')}</h3>
                 </div>
               </div>
             </div>
@@ -933,8 +928,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <User className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_personal_info_title')}</h4>
-                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_personal_info_desc')}</p>
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">{t('settings_personal_info_title')}</h4>
               </div>
             </div>
 
@@ -1083,8 +1077,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <Briefcase className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_business_details_title')}</h4>
-                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_business_details_desc')}</p>
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">{t('settings_business_details_title')}</h4>
               </div>
             </div>
 
@@ -1160,7 +1153,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 >
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat} className="bg-white dark:bg-slate-900 text-black dark:text-white">
-                      {cat}
+                      {formatBusinessCategory(cat)}
                     </option>
                   ))}
                 </select>
@@ -1301,8 +1294,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <Landmark className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_banking_title')}</h4>
-                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_banking_desc')}</p>
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">{t('settings_banking_title')}</h4>
               </div>
             </div>
 
@@ -1373,8 +1365,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <Bell className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_notifications_title')}</h4>
-                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_notifications_desc')}</p>
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">{t('settings_notifications_title')}</h4>
               </div>
             </div>
 
@@ -1433,8 +1424,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <Lock className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-black dark:text-white">{t('settings_security_title')}</h4>
-                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{t('settings_security_desc')}</p>
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">{t('settings_security_title')}</h4>
               </div>
             </div>
 
@@ -1551,12 +1541,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
                 <Sliders className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-black dark:text-white">
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                   {language === 'ms' ? 'Tetapan Parameter Pentadbir & Admin KBelia' : 'Secretariat & Admin Parameter Controls'}
                 </h4>
-                <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-                  {language === 'ms' ? 'Tetapan operasi peringkat pentadbiran negeri.' : 'State-level operational and administrative configuration.'}
-                </p>
               </div>
             </div>
 

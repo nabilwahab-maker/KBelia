@@ -392,18 +392,15 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   return (
     <div className="animate-dashboard-tab space-y-4">
       <div>
-        <h2 className="text-lg sm:text-xl font-bold text-black dark:text-white tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
           Rekod Aliran Tunai &amp; Untung Bersih
         </h2>
-        <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-          Catat jualan harian kiosk ({kioskName}) dan eksport rekod terus ke fail Excel (.xlsx).
-        </p>
       </div>
 
       {/* Ringkasan Kewangan Mendatar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 dark:divide-zinc-700 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700">
         <div className="p-3.5 sm:p-4">
-          <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 block mb-1">
+          <span className="text-sm sm:text-base font-extrabold text-black dark:text-white block mb-1 tracking-tight">
             Jumlah Jualan Kasar
           </span>
           <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
@@ -412,7 +409,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
         </div>
 
         <div className="p-3.5 sm:p-4">
-          <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 block mb-1">
+          <span className="text-sm sm:text-base font-extrabold text-black dark:text-white block mb-1 tracking-tight">
             Kos &amp; Belanja Stok
           </span>
           <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white/90 tabular-nums tracking-tight">
@@ -421,7 +418,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
         </div>
 
         <div className="p-3.5 sm:p-4">
-          <span className="text-xs sm:text-sm font-bold text-black dark:text-white block mb-1">
+          <span className="text-sm sm:text-base font-extrabold text-black dark:text-white block mb-1 tracking-tight">
             Untung Bersih Terkumpul
           </span>
           <span className="text-xl sm:text-2xl font-extrabold font-mono text-emerald-700 dark:text-emerald-300 tabular-nums tracking-tight">
@@ -430,7 +427,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
         </div>
 
         <div className="p-3.5 sm:p-4">
-          <span className="text-xs sm:text-sm font-semibold text-black/70 dark:text-white/75 block mb-1">
+          <span className="text-sm sm:text-base font-extrabold text-black dark:text-white block mb-1 tracking-tight">
             Bayaran DuitNow QR
           </span>
           <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
@@ -576,7 +573,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             {selectedIds.length > 0 && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/70 text-xs font-semibold text-black dark:text-white">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white">
                 <span className="tabular-nums">{selectedIds.length} dipilih</span>
                 <button
                   type="button"
@@ -588,21 +585,20 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               </div>
             )}
 
-            <div className="relative" data-cf-filter>
+            <div className="relative flex flex-wrap items-center gap-2" data-cf-filter>
               <button
                 type="button"
                 onClick={() => setIsFilterOpen((prev) => !prev)}
                 aria-expanded={isFilterOpen}
-                className={`min-h-[38px] px-3.5 py-2 rounded-xl border text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${
+                aria-label={activeFilterCount > 0 ? `Penapis (${activeFilterCount} aktif)` : 'Penapis'}
+                title={activeFilterCount > 0 ? `Penapis (${activeFilterCount} aktif)` : 'Penapis'}
+                className={`min-h-[38px] w-[38px] rounded-xl border inline-flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
                   activeFilterCount > 0
                     ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-black dark:text-white'
                     : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
                 }`}
               >
                 <SlidersHorizontal className="w-4 h-4 shrink-0" />
-                <span>
-                  Penapis{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
-                </span>
               </button>
 
               <button
@@ -630,7 +626,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               {isFilterOpen && (
                 <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
                   <div className="pb-3 border-b border-slate-200 dark:border-zinc-700">
-                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                    <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
                       <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
                       <span>Susun Mengikut</span>
                     </label>
@@ -653,7 +649,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
                       Bulan / Tempoh
                     </label>
                     <select
@@ -670,7 +666,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
                       Kategori Rekod
                     </label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -686,7 +682,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                           key={opt.id}
                           type="button"
                           onClick={() => setCategoryFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
+                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
                             categoryFilter === opt.id
                               ? 'bg-blue-600 text-white border-blue-600'
                               : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -706,14 +702,14 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                         setCategoryFilter('all');
                         setSortBy(DEFAULT_SORT_VALUE);
                       }}
-                      className="text-xs font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
+                      className="text-[0.8125rem] font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
                     >
                       Set Semula
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsFilterOpen(false)}
-                      className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold cursor-pointer"
                     >
                       Tutup
                     </button>

@@ -128,7 +128,7 @@ const INITIAL_ENDORSEMENTS: GrantEndorsementLetter[] = [
     district: 'Kota Bharu',
     recommendedAmount: 'RM3,000',
     grantProgramTitle: 'Geran Permulaan Usahawan Belia Kelantan (RM3,000)',
-    justification: 'Usahawan menunjukkan komitmen tinggi dengan rekod jualan tunai konsisten melebihi RM4,200 sebulan. Penggunaan mesin retort pembungkusan akan memanjangkan jangka hayat sambal dan sedia dipasarkan di Kiosk Belia KB Sentral.',
+    justification: 'Usahawan menunjukkan komitmen tinggi dengan rekod jualan tunai konsisten melebihi RM4,200 sebulan. Penggunaan mesin retort pembungkusan akan memanjangkan jangka hayat sambal dan sedia dipasarkan di Kiosk Belia Kota Bharu Sentral.',
     businessReadinessRemark: 'Telah menghadiri 3 sesi bimbingan penuh dan mematuhi piawaian pembungkusan label produk Hab Usahawan.',
     issuedAt: '2026-03-28',
     status: 'active',
@@ -1442,9 +1442,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               className="animate-dashboard-card lg:col-span-2 h-full w-full bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 min-w-0 flex flex-col justify-between"
             >
             <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-300 dark:border-zinc-600 mb-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <BarChart3 className="w-5 h-5 text-black dark:text-white/80 shrink-0" />
-                <h3 className="text-sm sm:text-base font-bold text-black dark:text-white tracking-tight">
+                <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                   Taburan Sesi &amp; Perakuan Seluruh Kelantan
                 </h3>
               </div>
@@ -1540,7 +1540,6 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             <RoleDonutCard
               className="lg:col-span-1 h-full"
               title="Agihan Nilai Perakuan"
-              subtitle="Pecahan surat perakuan mengikut tier"
               icon={Award}
               accentBarClass="bg-amber-500/85 dark:bg-amber-400/85"
               segments={endorsementTierSegments}
@@ -1570,9 +1569,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               className="animate-dashboard-card min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 flex flex-col justify-start"
             >
               <div>
-                <div className="flex items-center gap-2 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
-                  <Calendar className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
-                  <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
+                <div className="flex items-center gap-2.5 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
+                  <Calendar className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
+                  <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                     Temujanji Terdekat &amp; Tindakan
                   </h3>
                 </div>
@@ -1594,23 +1593,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-teal-400/70 dark:hover:border-teal-500/70 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
                       <div className="flex items-start gap-3 min-w-0 flex-1">
-                        <div className="relative w-12 h-10 shrink-0 mt-0.5">
-                          <div className="w-full h-full rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900">
-                            <PortalImage
-                              src={visuals.businessUrl}
-                              alt={reg.businessName}
-                              fallbackType="business"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-xs absolute -bottom-1 -right-1 bg-white dark:bg-slate-900">
-                            <PortalImage
-                              src={visuals.avatarUrl}
-                              alt={reg.entrepreneurName}
-                              fallbackType="avatar"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
+                        <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0 mt-0.5">
+                          <PortalImage
+                            src={visuals.businessUrl}
+                            alt={reg.businessName}
+                            fallbackType="business"
+                            className="w-full h-full object-cover"
+                          />
                         </div>
 
                         <div className="min-w-0 flex-1 space-y-1">
@@ -1688,9 +1677,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               className="animate-dashboard-card min-w-0 bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm transition-all duration-200 flex flex-col justify-start"
             >
               <div>
-                <div className="flex items-center gap-2 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
-                  <Award className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0" />
-                  <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
+                <div className="flex items-center gap-2.5 pb-2.5 border-b border-slate-300 dark:border-slate-600 mb-3">
+                  <Award className="w-4.5 h-4.5 text-black/80 dark:text-white/80 shrink-0" />
+                  <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                     Status Perakuan Geran Usahawan
                   </h3>
                 </div>
@@ -1747,12 +1736,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Direktori Ringkas Usahawan Mentee (Reference Table) */}
             <div className="space-y-3">
               <div>
-                <h3 className="text-[0.8125rem] font-bold text-black dark:text-white uppercase tracking-wider">
+                <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                   Direktori Ringkas Usahawan Mentee
                 </h3>
-                <p className="text-[0.875rem] text-black/70 dark:text-white/75">
-                  Senarai usahawan belia di bawah pemantauan {currentMentor.name}
-                </p>
               </div>
 
               <div className="rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xs overflow-visible">
@@ -1783,7 +1769,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   filterContent={
                     <>
                       <div>
-                        <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                        <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                           Status Bimbingan
                         </label>
                         <select
@@ -1798,7 +1784,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                        <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                           Daerah
                         </label>
                         <select
@@ -1825,7 +1811,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
-                          <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                             <button
                               type="button"
                               onClick={() => {
@@ -1839,7 +1825,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               <ArrowUpDown className="w-3 h-3" />
                             </button>
                           </th>
-                          <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                             <button
                               type="button"
                               onClick={() => {
@@ -1853,10 +1839,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               <ArrowUpDown className="w-3 h-3" />
                             </button>
                           </th>
-                          <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                             Perakuan Geran
                           </th>
-                          <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                          <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                             <button
                               type="button"
                               onClick={() => {
@@ -1870,7 +1856,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               <ArrowUpDown className="w-3 h-3" />
                             </button>
                           </th>
-                          <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                          <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                             <span className="sr-only">Tindakan</span>
                           </th>
                         </tr>
@@ -1891,7 +1877,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <tr key={mentee.id} className="kbelia-table-row">
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                  <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
                                     <PortalImage
                                       src={visuals.businessUrl}
                                       alt={mentee.businessName}
@@ -1901,16 +1887,16 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                   </div>
                                   <div className="min-w-0">
                                     <div className="font-bold text-black dark:text-white truncate">{mentee.entrepreneurName}</div>
-                                    <div className="text-xs text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
+                                    <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
                                   </div>
                                 </div>
                               </td>
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="text-black/85 dark:text-white/85 font-medium truncate">{mentee.district}</div>
-                                <div className="text-xs text-black/60 dark:text-white/60 truncate">{mentee.topic}</div>
+                                <div className="text-[0.8125rem] text-black/60 dark:text-white/60 truncate">{mentee.topic}</div>
                               </td>
                               <td className="py-3.5 px-4 whitespace-nowrap">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                   hasEndorsement
                                     ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
                                     : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black/70 dark:text-white/75'
@@ -1919,7 +1905,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                 </span>
                               </td>
                               <td className="py-3.5 px-4 whitespace-nowrap">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold border ${
                                   mentee.status === 'confirmed'
                                     ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-200'
                                     : mentee.status === 'completed'
@@ -1990,18 +1976,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           {/* =================================================================== */}
           <section id="mentor-applications-section" className="space-y-3.5 scroll-mt-24">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center">
-                    <Users className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-base sm:text-lg font-black text-black dark:text-white tracking-tight">
-                    Permohonan Bimbingan
-                  </h3>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center shrink-0">
+                  <Users className="w-4 h-4" />
                 </div>
-                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
-                  Senarai permohonan aktif (rekod selesai boleh ditapis melalui Penapis). Klik baris atau menu tiga titik untuk butiran &amp; tindakan.
-                </p>
+                <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+                  Permohonan Bimbingan
+                </h3>
               </div>
 
               <span className="text-[0.8125rem] font-mono font-bold tabular-nums px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70 self-start sm:self-auto">
@@ -2037,7 +2018,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 filterContent={
                   <>
                     <div>
-                      <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                      <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                         Status Permohonan
                       </label>
                       <select
@@ -2052,7 +2033,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                      <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                         Mod Sesi
                       </label>
                       <select
@@ -2088,7 +2069,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <button
                             type="button"
                             onClick={() => {
@@ -2102,7 +2083,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <button
                             type="button"
                             onClick={() => {
@@ -2116,10 +2097,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           Daerah
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <button
                             type="button"
                             onClick={() => {
@@ -2133,7 +2114,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
-                        <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <span className="sr-only">Tindakan</span>
                         </th>
                       </tr>
@@ -2167,7 +2148,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             >
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                  <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
                                     <PortalImage
                                       src={visuals.businessUrl}
                                       alt={mentee.businessName}
@@ -2177,13 +2158,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                   </div>
                                   <div className="min-w-0">
                                     <div className="font-bold text-black dark:text-white truncate">{mentee.entrepreneurName}</div>
-                                    <div className="text-xs text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
+                                    <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
                                   </div>
                                 </div>
                               </td>
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="font-medium text-black dark:text-white truncate">{mentee.topic}</div>
-                                <div className="text-xs text-black/60 dark:text-white/60 tabular-nums truncate">
+                                <div className="text-[0.8125rem] text-black/60 dark:text-white/60 tabular-nums truncate">
                                   {mentee.preferredDate ? `${mentee.preferredDate} · ${mentee.preferredTime || '10:00 AM'}` : mentee.businessCategory || 'Perniagaan Belia'}
                                 </div>
                               </td>
@@ -2192,7 +2173,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               </td>
                               <td className="py-3.5 px-4 whitespace-nowrap">
                                 <span
-                                  className={`inline-flex items-center text-xs font-bold px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
+                                  className={`inline-flex items-center text-[0.8125rem] font-bold px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
                                     isCompleted
                                       ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
                                       : isConfirmed
@@ -2367,18 +2348,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           {/* =================================================================== */}
           <section id="mentor-schedule-section" className="space-y-4 scroll-mt-24">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/70 flex items-center justify-center">
-                    <Calendar className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-base sm:text-lg font-black text-black dark:text-white tracking-tight">
-                    Jadual
-                  </h3>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/70 flex items-center justify-center shrink-0">
+                  <Calendar className="w-4 h-4" />
                 </div>
-                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
-                  Takwim sesi temujanji aktif bersemuka di bilik bimbingan Hab Usahawan serta sesi Google Meet.
-                </p>
+                <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+                  Jadual
+                </h3>
               </div>
 
               <button
@@ -2413,7 +2389,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 }}
                 filterContent={
                   <div>
-                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                       Mod Temujanji
                     </label>
                     <select
@@ -2440,7 +2416,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <button
                             type="button"
                             onClick={() => {
@@ -2454,7 +2430,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <button
                             type="button"
                             onClick={() => {
@@ -2468,13 +2444,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           Mod &amp; Lokasi
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           Daerah
                         </th>
-                        <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <span className="sr-only">Tindakan</span>
                         </th>
                       </tr>
@@ -2504,7 +2480,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             >
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                  <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
                                     <PortalImage
                                       src={visuals.businessUrl}
                                       alt={mentee.businessName}
@@ -2514,16 +2490,16 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                   </div>
                                   <div className="min-w-0">
                                     <div className="font-bold text-black dark:text-white truncate">{mentee.entrepreneurName}</div>
-                                    <div className="text-xs text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
+                                    <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
                                   </div>
                                 </div>
                               </td>
                               <td className="py-3.5 px-4 whitespace-nowrap tabular-nums">
                                 <div className="font-semibold text-black dark:text-white">{mentee.preferredDate || 'Akan Ditetapkan'}</div>
-                                <div className="text-xs text-black/60 dark:text-white/60">{mentee.preferredTime || '10:00 AM'}</div>
+                                <div className="text-[0.8125rem] text-black/60 dark:text-white/60">{mentee.preferredTime || '10:00 AM'}</div>
                               </td>
                               <td className="py-3.5 px-4 whitespace-nowrap">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-200 border border-teal-200 dark:border-teal-800">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-200 border border-teal-200 dark:border-teal-800">
                                   {mentee.meetingLink || normalizeMentorshipMode(mentee.mode) === 'Google Meet'
                                     ? 'Google Meet'
                                     : 'Bilik Bimbingan Hab Usahawan'}
@@ -2652,18 +2628,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           {/* =================================================================== */}
           <section id="mentor-action-plans-section" className="space-y-4 scroll-mt-24">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center">
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-base sm:text-lg font-black text-black dark:text-white tracking-tight">
-                    Nota Bimbingan Usahawan
-                  </h3>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4" />
                 </div>
-                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
-                  Panduan bimbingan, sasaran jualan, dan pelan susulan usahawan.
-                </p>
+                <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+                  Nota Bimbingan Usahawan
+                </h3>
               </div>
 
               <span className="text-[0.8125rem] font-mono font-bold tabular-nums px-3 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70 self-start sm:self-auto">
@@ -2696,7 +2667,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 }}
                 filterContent={
                   <div>
-                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                       Daerah
                     </label>
                     <select
@@ -2724,7 +2695,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <button
                             type="button"
                             onClick={() => {
@@ -2738,7 +2709,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <button
                             type="button"
                             onClick={() => {
@@ -2752,13 +2723,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           Daerah
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           Status
                         </th>
-                        <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <span className="sr-only">Tindakan</span>
                         </th>
                       </tr>
@@ -2785,7 +2756,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             >
                               <td className="py-3.5 px-4 max-w-xs">
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                  <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
                                     <PortalImage
                                       src={visuals.businessUrl}
                                       alt={mentee.businessName}
@@ -2795,7 +2766,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                   </div>
                                   <div className="min-w-0">
                                     <div className="font-bold text-black dark:text-white truncate">{mentee.entrepreneurName}</div>
-                                    <div className="text-xs text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
+                                    <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">{mentee.businessName}</div>
                                   </div>
                                 </div>
                               </td>
@@ -2806,7 +2777,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                 {mentee.district || 'Kelantan'}
                               </td>
                               <td className="py-3.5 px-4 whitespace-nowrap">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
                                   Tersimpan
                                 </span>
                               </td>
@@ -2887,16 +2858,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           {/* Header Action Banner */}
           <div className="relative overflow-hidden p-4 sm:p-5 kbelia-important-header dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="absolute inset-x-0 top-0 h-0.5 bg-teal-500/80 dark:bg-teal-400/80" />
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Award className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
-                <h3 className="text-base font-bold text-black dark:text-white">
-                  Pengeluaran Surat Perakuan Rasmi Geran Belia
-                </h3>
-              </div>
-              <p className="text-[0.9375rem] text-black dark:text-white max-w-2xl leading-relaxed">
-                Mentor berdaftar boleh menilai usahawan dan mengeluarkan Surat Sokongan Geran. Dokumen bertandatangan rasmi ini diperlukan oleh pihak admin KBelia untuk meluluskan Geran Permulaan (RM3,000) dan Geran Pemangkin (RM5,000).
-              </p>
+            <div className="flex items-center gap-2.5">
+              <Award className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
+              <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+                Pengeluaran Surat Perakuan Rasmi Geran Belia
+              </h3>
             </div>
 
             <button
@@ -2911,16 +2877,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
           {/* List of Issued Endorsements (Reference Table) */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex items-center gap-2">
-                <FileCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                <h4 className="text-sm font-bold text-black dark:text-white">
-                  Senarai Surat Perakuan Geran yang Telah Dikeluarkan ({filteredEndorsements.length})
-                </h4>
-              </div>
-              <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
-                Disahkan oleh Hab Pembangunan Usahawan Belia Kelantan
-              </span>
+            <div className="flex items-center gap-2">
+              <FileCheck className="w-4.5 h-4.5 text-teal-600 dark:text-teal-400 shrink-0" />
+              <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                Senarai Surat Perakuan Geran yang Telah Dikeluarkan ({filteredEndorsements.length})
+              </h4>
             </div>
 
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
@@ -2948,7 +2909,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 }}
                 filterContent={
                   <div>
-                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                       Jumlah Geran Disyorkan
                     </label>
                     <select
@@ -2974,7 +2935,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <button
                             type="button"
                             onClick={() => {
@@ -2988,13 +2949,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           Program &amp; Jumlah Geran
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           Daerah
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <button
                             type="button"
                             onClick={() => {
@@ -3008,10 +2969,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
-                        <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           Status
                         </th>
-                        <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                        <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                           <span className="sr-only">Tindakan</span>
                         </th>
                       </tr>
@@ -3022,17 +2983,17 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <td className="py-3.5 px-4 max-w-xs">
                             <div className="flex items-center gap-3 min-w-0">
                               <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
-                                <Award className="w-5 h-5" />
+                                <FileText className="w-5 h-5" />
                               </div>
                               <div className="min-w-0">
                                 <div className="font-bold text-black dark:text-white truncate">{item.menteeName}</div>
-                                <div className="text-xs text-black/60 dark:text-white/60 font-mono truncate">{item.endorsementCode}</div>
+                                <div className="text-[0.8125rem] text-black/60 dark:text-white/60 font-mono truncate">{item.endorsementCode}</div>
                               </div>
                             </div>
                           </td>
                           <td className="py-3.5 px-4 max-w-xs">
                             <div className="font-medium text-black dark:text-white truncate">{item.businessName}</div>
-                            <div className="text-xs text-black/65 dark:text-white/65 truncate">{item.grantProgramTitle} ({item.recommendedAmount})</div>
+                            <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">{item.grantProgramTitle} ({item.recommendedAmount})</div>
                           </td>
                           <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
                             {item.district}
@@ -3041,7 +3002,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             {item.issuedAt}
                           </td>
                           <td className="py-3.5 px-4 whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+                            <span className="inline-flex items-center gap-1 text-[0.8125rem] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
                               <Check className="w-3 h-3" />
                               <span>Disahkan Rasmi</span>
                             </span>
@@ -3089,16 +3050,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           
           <div className="relative overflow-hidden p-4 sm:p-5 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="absolute inset-x-0 top-0 h-0.5 bg-teal-500/80 dark:bg-teal-400/80" />
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
-                <h3 className="text-base font-bold text-black dark:text-white">
-                  Rekod Sesi Bimbingan &amp; Tugasan Usahawan
-                </h3>
-              </div>
-              <p className="text-[0.9375rem] text-black dark:text-white max-w-2xl leading-relaxed">
-                Catatkan nota perbincangan sesi bimbingan, sasaran peniaga, dan senarai tugasan penting usahawan. Anda boleh menyemak kemajuan tugasan secara berterusan supaya sasaran bisnes tercapai.
-              </p>
+            <div className="flex items-center gap-2.5">
+              <FileText className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
+              <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+                Rekod Sesi Bimbingan &amp; Tugasan Usahawan
+              </h3>
             </div>
 
             <button
@@ -3133,7 +3089,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               }}
               filterContent={
                 <div>
-                  <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                  <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                     Status Tugasan
                   </label>
                   <select
@@ -3158,7 +3114,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
-                      <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                         <button
                           type="button"
                           onClick={() => {
@@ -3172,10 +3128,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <ArrowUpDown className="w-3 h-3" />
                         </button>
                       </th>
-                      <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                         Topik Bimbingan
                       </th>
-                      <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                         <button
                           type="button"
                           onClick={() => {
@@ -3189,10 +3145,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <ArrowUpDown className="w-3 h-3" />
                         </button>
                       </th>
-                      <th className="py-3 px-4 text-xs font-semibold text-black/60 dark:text-white/65">
+                      <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                         Kemajuan Tugasan
                       </th>
-                      <th className="py-3 px-4 w-14 text-right text-xs font-semibold text-black/60 dark:text-white/65">
+                      <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                         <span className="sr-only">Tindakan</span>
                       </th>
                     </tr>
@@ -3219,7 +3175,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           >
                             <td className="py-3.5 px-4 max-w-xs">
                               <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                                <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
                                   <PortalImage
                                     src={visuals.businessUrl}
                                     alt={log.businessName}
@@ -3229,7 +3185,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                 </div>
                                 <div className="min-w-0">
                                   <div className="font-bold text-black dark:text-white truncate">{log.menteeName}</div>
-                                  <div className="text-xs text-black/65 dark:text-white/65 truncate">{log.businessName}</div>
+                                  <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">{log.businessName}</div>
                                 </div>
                               </div>
                             </td>
@@ -3242,7 +3198,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <td className="py-3.5 px-4 whitespace-nowrap">
                               <div className="inline-flex items-center gap-2">
                                 <span
-                                  className={`inline-flex items-center text-xs font-bold tabular-nums px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
+                                  className={`inline-flex items-center text-[0.8125rem] font-bold tabular-nums px-2.5 py-0.5 rounded-full border whitespace-nowrap ${
                                     totalTasks > 0 && doneTasks === totalTasks
                                       ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
                                       : 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-200'
@@ -3302,7 +3258,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                       <button
                                         type="button"
                                         onClick={() => openEditLogModal(log)}
-                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-semibold bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                                       >
                                         <Edit3 className="w-3.5 h-3.5" />
                                         <span>Sunting Rekod</span>
@@ -3310,7 +3266,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                       <button
                                         type="button"
                                         onClick={() => handleDeleteLogEntry(log)}
-                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors cursor-pointer"
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[0.8125rem] font-semibold bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors cursor-pointer"
                                       >
                                         <Trash2 className="w-3.5 h-3.5" />
                                         <span>Padam Rekod</span>
@@ -3333,7 +3289,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                         <button
                                           type="button"
                                           onClick={() => handleOpenInlineNewTask(log.id)}
-                                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white transition-colors cursor-pointer"
+                                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-teal-600 hover:bg-teal-700 text-white transition-colors cursor-pointer"
                                         >
                                           <Plus className="w-3.5 h-3.5" />
                                           <span>Tambah Tugasan</span>
@@ -3343,7 +3299,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                   </div>
 
                                   {(!log.actionItems || log.actionItems.length === 0) ? (
-                                    <div className="p-3 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 bg-white/70 dark:bg-zinc-900/50 text-xs text-black/70 dark:text-white/70 flex items-center justify-between gap-2 flex-wrap">
+                                    <div className="p-3 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 bg-white/70 dark:bg-zinc-900/50 text-[0.8125rem] text-black/70 dark:text-white/70 flex items-center justify-between gap-2 flex-wrap">
                                       <span>Belum ada tugasan direkodkan untuk sesi ini.</span>
                                       {!inlineNewTaskDrafts[log.id]?.isOpen && (
                                         <button
@@ -3405,14 +3361,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                                 <button
                                                   type="button"
                                                   onClick={() => setEditingInlineTask(null)}
-                                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-black/75 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                                  className="px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold text-black/75 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
                                                 >
                                                   Batal
                                                 </button>
                                                 <button
                                                   type="button"
                                                   onClick={handleSaveInlineTaskEdit}
-                                                  className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
+                                                  className="px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
                                                 >
                                                   Simpan Tugasan
                                                 </button>
@@ -3488,7 +3444,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
                                   {inlineNewTaskDrafts[log.id]?.isOpen && (
                                     <div className="p-3 rounded-xl border border-teal-500/70 bg-white dark:bg-zinc-900 space-y-2.5 shadow-xs">
-                                      <div className="text-xs font-bold text-black dark:text-white">
+                                      <div className="text-[0.8125rem] font-bold text-black dark:text-white">
                                         Tambah Tugasan Baharu
                                       </div>
                                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
@@ -3545,14 +3501,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                               [log.id]: { isOpen: false, task: '', dueDate: '' }
                                             }))
                                           }
-                                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-black/75 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                                          className="px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold text-black/75 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
                                         >
                                           Batal
                                         </button>
                                         <button
                                           type="button"
                                           onClick={() => handleSaveInlineNewTask(log.id)}
-                                          className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
+                                          className="px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-teal-600 hover:bg-teal-700 text-white cursor-pointer"
                                         >
                                           Tambah Tugasan
                                         </button>
@@ -3760,7 +3716,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     onChange={(e) => setNewEndorsementCategory(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-black dark:text-white focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
                   >
-                    <option value="Makanan & Minuman (F&B)">Makanan & Minuman (F&B)</option>
+                    <option value="Makanan & Minuman (F&B)">Makanan &amp; Minuman</option>
                     <option value="Fesyen, Batik & Kraf Kelantan">Fesyen, Batik & Kraf Kelantan</option>
                     <option value="Teknologi & Servis Digital">Teknologi & Servis Digital</option>
                     <option value="Kecantikan & Kesihatan">Kecantikan & Kesihatan</option>
@@ -3956,7 +3912,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Letterhead */}
             <div className="text-center space-y-1 pb-4 border-b-2 border-slate-900">
               <div className="flex items-center justify-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-800 text-white flex items-center justify-center font-black text-xs">
+                <div className="px-2.5 h-10 rounded-xl bg-emerald-800 text-white flex items-center justify-center font-black text-[0.8125rem] shrink-0">
                   KBELIA
                 </div>
                 <div className="text-left">
@@ -3976,7 +3932,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Reference Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[0.8125rem] gap-2 pt-1 font-mono">
               <div>
-                <span className="text-black/70 font-sans">No. Rujukan: </span>
+                <span className="text-black/70 font-sans">Nombor Rujukan: </span>
                 <strong className="text-black">{selectedEndorsementForView.endorsementCode}</strong>
               </div>
               <div>
@@ -4190,14 +4146,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     <label className="block text-sm font-bold text-black dark:text-white">
                       Senarai Tugasan ({newLogTasks.length})
                     </label>
-                    <p className="text-xs text-black/65 dark:text-white/65">
+                    <p className="text-[0.8125rem] text-black/65 dark:text-white/65">
                       Tambah, sunting, atau padam seberapa banyak tugasan untuk sesi ini.
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={handleAddModalTaskRow}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-2xs transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[0.8125rem] font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-2xs transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Tambah Tugasan</span>
@@ -4205,7 +4161,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
 
                 {newLogTasks.length === 0 ? (
-                  <div className="p-3.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/70 dark:bg-slate-800/40 text-xs text-black/70 dark:text-white/75 flex flex-wrap items-center justify-between gap-2">
+                  <div className="p-3.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/70 dark:bg-slate-800/40 text-[0.8125rem] text-black/70 dark:text-white/75 flex flex-wrap items-center justify-between gap-2">
                     <span>Tiada tugasan ditambah. Tekan Tambah Tugasan jika ada tindakan susulan.</span>
                     <button
                       type="button"
@@ -4240,7 +4196,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                 {taskRow.completed && <Check className="w-3.5 h-3.5" />}
                               </button>
                             )}
-                            <span className="text-xs font-bold text-black/70 dark:text-white/75">
+                            <span className="text-[0.8125rem] font-bold text-black/70 dark:text-white/75">
                               Tugasan #{idx + 1}
                               {taskRow.completed ? ' (Selesai)' : ''}
                             </span>
@@ -4250,7 +4206,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             onClick={() => handleRemoveModalTaskRow(taskRow.id)}
                             aria-label={`Padam tugasan ${idx + 1}`}
                             title="Padam baris tugasan"
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[0.8125rem] font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             <span>Padam</span>

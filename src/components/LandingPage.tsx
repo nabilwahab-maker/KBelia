@@ -35,7 +35,7 @@ import {
   Moon
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
-import { CapsuleSlot, BusinessListing, YouthProgram } from '../types';
+import { CapsuleSlot, BusinessListing, YouthProgram, formatBusinessCategory } from '../types';
 import { INITIAL_CAPSULE_SLOTS } from '../data/seedData';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -103,7 +103,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       subtitle: 'Hab Usahawan Bachok & Kota Bharu',
       description: 'Kiosk pasang-siap lengkap soket 13A, Wi-Fi 500Mbps, dan kawalan keselamatan serendah RM15/hari.',
       badge: 'Kekosongan Sedia',
-      location: 'Hab Usahawan Bachok & KB Sentral',
+      location: 'Hab Usahawan Bachok & Kota Bharu Sentral',
       imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
       stat: `${slots.length} Kiosk Strategik`,
       ctaText: 'Mohon Kiosk',
@@ -126,10 +126,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       title: 'Kafe Artisan & Masakan Warisan Moden',
       subtitle: "D'Kelate Artisan Coffee & Akok Tart - Ahmad Faizul",
       description: 'Gabungan kopi barista espresso serta kuih tradisi Akok Tart dan Kopi Nissem Melaka di kiosk inkubator belia.',
-      badge: 'Inkubasi F&B Berjaya',
+      badge: 'Inkubasi Makanan & Minuman Berjaya',
       location: 'Hab Usahawan Bachok',
       imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
-      stat: 'Inkubasi F&B Aktif',
+      stat: 'Inkubasi Makanan & Minuman Aktif',
       ctaText: 'Lihat Menu',
       onAction: () => navigateToPage('login')
     }
@@ -843,12 +843,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>4 Langkah Mudah</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance tracking-tight">
               Langkah Mula Beroperasi
             </h2>
-            <p className="text-[0.9375rem] text-black dark:text-white/75">
-              Pendaftaran pantas dan percuma untuk semua usahawan belia Kelantan.
-            </p>
           </RevealBlock>
 
           <RevealBlock delayMs={80} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
@@ -861,7 +858,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <UserCheck className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
-              <h4 className="font-extrabold text-base text-black dark:text-white">Daftar Akaun</h4>
+              <h4 className="font-extrabold text-lg text-black dark:text-white tracking-tight">Daftar Akaun</h4>
               <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
                 Cipta akaun percuma dengan emel atau Google untuk akses portal belia Kelantan.
               </p>
@@ -875,7 +872,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <Briefcase className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
-              <h4 className="font-extrabold text-base text-black dark:text-white">Lengkapkan Profil</h4>
+              <h4 className="font-extrabold text-lg text-black dark:text-white tracking-tight">Lengkapkan Profil</h4>
               <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
                 Isi maklumat kedai, muat naik katalog produk, logo jenama, dan pautan WhatsApp.
               </p>
@@ -889,7 +886,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <Building2 className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
-              <h4 className="font-extrabold text-base text-black dark:text-white">Pilih Kiosk & Geran</h4>
+              <h4 className="font-extrabold text-lg text-black dark:text-white tracking-tight">Pilih Kiosk & Geran</h4>
               <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
                 Tempah slot kiosk bersubsidi di daerah anda atau mohon Geran Permulaan.
               </p>
@@ -903,7 +900,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <TrendingUp className="w-5 h-5 text-black/70 dark:text-white/75" />
               </div>
-              <h4 className="font-extrabold text-base text-black dark:text-white">Tingkatkan Prestasi</h4>
+              <h4 className="font-extrabold text-lg text-black dark:text-white tracking-tight">Tingkatkan Prestasi</h4>
               <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
                 Terima bimbingan mentor, pantau jualan harian, dan luaskan capaian pelanggan.
               </p>
@@ -942,7 +939,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110 animate-float-gentle">
                 <Building2 className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
+              <h3 className="text-xl font-extrabold text-black dark:text-white tracking-tight transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
                 {isBM ? 'Kiosk Belia Modular' : 'Modular Capsule Kiosks'}
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
@@ -967,7 +964,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110 animate-float-gentle-alt">
                 <Store className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
+              <h3 className="text-xl font-extrabold text-black dark:text-white tracking-tight transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
                 {isBM ? 'Direktori Pasaran Digital' : 'Digital Market Directory'}
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
@@ -992,7 +989,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/80 text-black dark:text-white/75 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110 animate-float-gentle">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-black dark:text-white transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
+              <h3 className="text-xl font-extrabold text-black dark:text-white tracking-tight transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
                 {isBM ? 'Geran & Modal Permulaan' : 'Grants & Seed Capital'}
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
@@ -1029,12 +1026,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <Building2 className="w-3.5 h-3.5" />
                 <span>Lokasi Pilihan</span>
               </div>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance tracking-tight">
                 Kiosk Belia Sedia Dimohon
               </h2>
-              <p className="text-[0.9375rem] text-black dark:text-white/75 mt-1">
-                Tapak strategik lengkap dengan elektrik dan internet.
-              </p>
             </div>
           </RevealBlock>
 
@@ -1071,7 +1065,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                     <div className="p-5 sm:p-6 space-y-3">
                       <div>
-                        <h4 className="text-base sm:text-lg font-bold text-black dark:text-white leading-snug group-hover:text-black dark:group-hover:text-white transition-colors">{slot.name}</h4>
+                        <h4 className="text-lg font-extrabold text-black dark:text-white leading-snug tracking-tight group-hover:text-black dark:group-hover:text-white transition-colors">{slot.name}</h4>
                         <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1 line-clamp-2">{slot.hubLocation}</p>
                       </div>
 
@@ -1120,12 +1114,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <Store className="w-3.5 h-3.5" />
                 <span>Direktori Produk Tempatan</span>
               </div>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance tracking-tight">
                 Karya & Produk Belia Kelantan
               </h2>
-              <p className="text-[0.9375rem] text-black dark:text-white/75 mt-1">
-                Sokong produk usahawan muda merentasi pelbagai sektor.
-              </p>
             </div>
           </RevealBlock>
 
@@ -1141,11 +1132,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <img
                       src={biz.logoUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${biz.id}`}
                       alt={biz.businessName}
-                      className="w-12 h-12 rounded-lg object-cover bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 shrink-0"
+                      className="w-14 h-14 rounded-xl object-cover bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 shrink-0"
                     />
                     <div className="min-w-0">
-                      <div className="text-[0.8125rem] text-black dark:text-white/75 font-bold uppercase tracking-wide">{biz.category}</div>
-                      <h4 className="text-sm font-bold text-black dark:text-white truncate group-hover:text-black dark:group-hover:text-white transition-colors">
+                      <div className="text-[0.8125rem] text-black dark:text-white/75 font-bold uppercase tracking-wide">{formatBusinessCategory(biz.category)}</div>
+                      <h4 className="text-base font-extrabold text-black dark:text-white truncate tracking-tight group-hover:text-black dark:group-hover:text-white transition-colors">
                         {biz.businessName}
                       </h4>
                       <div className="text-[0.8125rem] text-black/70 dark:text-white/75 flex items-center gap-1">

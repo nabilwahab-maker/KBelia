@@ -39,7 +39,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { NotificationDropdown } from './NotificationDropdown';
 import { showToast } from './ToastNotification';
-import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab, MentorSubTab } from '../types';
+import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab, MentorSubTab, formatBusinessCategory } from '../types';
 
 export type UMKTab = 
   | 'home' 
@@ -257,7 +257,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
           icon: 'pin' as const,
         },
         {
-          label: language === 'en' ? 'SSM Status / No.' : 'Status / No. SSM',
+          label: language === 'en' ? 'SSM Status / Number' : 'Status / Nombor SSM',
           value: ssmValue,
           icon: 'file' as const,
         },
@@ -483,7 +483,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                       {slot.name} ({slot.code})
                                     </span>
                                     <span className="text-[0.8125rem] text-black/75 dark:text-white/80 tabular-nums">
-                                      {slot.district} · RM{slot.monthlyRate}/bln
+                                      {slot.district} · RM{slot.monthlyRate}/bulan
                                     </span>
                                   </div>
                                   <span className={`text-[0.8125rem] font-bold px-2 py-0.5 rounded ${
@@ -524,7 +524,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                       {biz.businessName}
                                     </span>
                                     <span className="text-[0.8125rem] text-black/75 dark:text-white/80">
-                                      {biz.category} · {biz.district}
+                                      {formatBusinessCategory(biz.category)} · {biz.district}
                                     </span>
                                   </div>
                                   <span className="text-[0.8125rem] font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white">
@@ -861,7 +861,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         src={avatarSrc}
                         alt={displayName}
                         referrerPolicy="no-referrer"
-                        className="w-12 h-12 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0"
+                        className="w-14 h-14 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0"
                       />
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-bold text-black dark:text-white leading-snug break-words">
@@ -870,11 +870,11 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         <div className="text-[0.8125rem] text-black/75 dark:text-white/80 break-all mt-0.5">
                           {user.email}
                         </div>
-                        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold">
+                        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] font-semibold">
                           <span className="text-teal-700 dark:text-teal-400">{roleLabel}</span>
                           <span className="text-slate-400 dark:text-slate-500">•</span>
                           <span className="inline-flex items-center gap-1 text-black/75 dark:text-white/75 font-medium">
-                            <Clock className="w-3 h-3 shrink-0" />
+                            <Clock className="w-3.5 h-3.5 shrink-0" />
                             <span>{isDemoSession ? 'Mod Demo Ujian' : t('active_session')}</span>
                           </span>
                         </div>
@@ -884,7 +884,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
                   {/* Ringkasan Maklumat Khusus Mengikut Peranan */}
                   <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl mb-2.5 border border-slate-300 dark:border-slate-600">
-                    <div className="text-[0.75rem] font-bold uppercase tracking-wider text-black/70 dark:text-white/75 mb-2">
+                    <div className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/70 dark:text-white/75 mb-2">
                       {roleDetails.sectionTitle}
                     </div>
                     <div className="space-y-2">

@@ -988,7 +988,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...customData
       };
     } else if (type === 'merchant_harith') {
-      // Fixed UID alignment: demo-tenant-3 matches biz-03 (Studio Belia Multimedia KB)
+      // Fixed UID alignment: demo-tenant-3 matches biz-03 (Studio Belia Multimedia Kota Bharu)
       authUser = {
         uid: 'demo-tenant-3',
         displayName: 'Muhammad Harith Bin Yusoff',
@@ -1003,7 +1003,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: 'user',
         phone: '+60139988776',
         district: 'Kota Bharu',
-        businessName: 'Studio Belia Multimedia KB',
+        businessName: 'Studio Belia Multimedia Kota Bharu',
         ssmNumber: '202403445566 (KT0298112-D)',
         avatarUrl: '/assets/generated/avatar_youth_male_1793924250192.jpg',
         createdAt: new Date().toISOString(),

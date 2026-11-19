@@ -101,12 +101,8 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
               <TrendingUp className="w-4 h-4 text-black dark:text-white/80" />
               Impak Ekonomi Belia Negeri Kelantan
             </span>
-            <span className="text-black/35 dark:text-white/35">·</span>
-            <span className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 font-medium">
-              Data Rasmi Hab Usahawan KBelia
-            </span>
           </div>
-          <h2 className="text-2xl sm:text-[1.75rem] font-bold text-black dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Statistik &amp; Analitik Komuniti Usahawan Belia
           </h2>
         </div>
@@ -145,7 +141,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
         {/* Metric 1 */}
         <div className="rounded-xl p-4 sm:p-5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 transition-all hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[0.9375rem] font-semibold text-black/85 dark:text-white/90">
+            <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">
               Kiosk Beroperasi
             </span>
             <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 flex items-center justify-center text-blue-600 dark:text-blue-400">
@@ -157,7 +153,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
               {liveKiosksOccupied}
             </span>
             <span className="text-sm font-medium text-black/75 dark:text-white/80">
-              / {Math.max(45, liveKiosksOccupied + 7)} Unit
+              Unit
             </span>
           </div>
           <span className="inline-flex items-center gap-1 text-[0.8125rem] sm:text-sm font-medium text-black/80 dark:text-white/80 mt-1.5">
@@ -169,7 +165,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
         {/* Metric 2 */}
         <div className="rounded-xl p-4 sm:p-5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 transition-all hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[0.9375rem] font-semibold text-black/85 dark:text-white/90">
+            <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">
               Dana Geran Disalurkan
             </span>
             <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
@@ -190,7 +186,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
         {/* Metric 3 */}
         <div className="rounded-xl p-4 sm:p-5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 transition-all hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[0.9375rem] font-semibold text-black/85 dark:text-white/90">
+            <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">
               Usahawan Belia Aktif
             </span>
             <div className="w-9 h-9 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center text-teal-600 dark:text-teal-400">
@@ -214,7 +210,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
         {/* Metric 4 */}
         <div className="rounded-xl p-4 sm:p-5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 transition-all hover:-translate-y-0.5">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[0.9375rem] font-semibold text-black/85 dark:text-white/90">
+            <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">
               Penjimatan Subsidi Sewa
             </span>
             <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 flex items-center justify-center text-amber-600 dark:text-amber-400">
@@ -241,7 +237,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch w-full min-w-0">
             {/* Left (7 Cols): Segmented Distribution Bars */}
             <div className="xl:col-span-7 flex flex-col gap-3 w-full min-w-0">
-              <span className="text-[0.9375rem] font-bold text-black dark:text-white block mb-1">
+              <span className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight block mb-1">
                 Taburan Usahawan Mengikut Bidang Niaga
               </span>
 
@@ -292,12 +288,9 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
             <div className="xl:col-span-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 p-5 sm:p-6 flex flex-col justify-between w-full min-w-0">
               <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-300 dark:border-slate-700">
                 <div>
-                  <h3 className="text-[0.9375rem] sm:text-base font-bold text-black dark:text-white">
+                  <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                     Graf Peratusan Sektor
                   </h3>
-                  <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80">
-                    Klik segmen untuk melihat butiran
-                  </p>
                 </div>
                 <span className="text-[0.8125rem] font-mono font-bold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white tabular-nums">
                   {totalEntrepreneurs} Peniaga
@@ -435,11 +428,8 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
         /* Growth Trend Chart: Upgraded to Full Taller Tightly-Spaced Recharts BarChart with Dual Y-Axis */
         <div className="pt-4 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-            <span className="text-[0.9375rem] sm:text-base font-bold text-black dark:text-white">
+            <span className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
               Prestasi Pertumbuhan Suku Tahunan Ekonomi Belia
-            </span>
-            <span className="text-sm font-medium text-black/75 dark:text-white/80">
-              Dana Geran Benih (RM Ribu) &amp; Bilangan Usahawan Aktif
             </span>
           </div>
 
@@ -546,8 +536,7 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
             </ResponsiveContainer>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm text-black/75 dark:text-white/80 pt-3.5">
-            <span>Data merangkumi rekod langsung geran, usahawan, dan asas suku tahunan.</span>
+          <div className="flex items-center justify-end gap-2 text-sm text-black/75 dark:text-white/80 pt-3.5">
             <span className="font-bold text-black dark:text-white">
               Pertumbuhan +180% Tahun ke Tahun
             </span>

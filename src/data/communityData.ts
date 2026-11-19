@@ -101,7 +101,7 @@ export const INITIAL_COMMUNITY_POSTS: CommunityPost[] = [
     id: 'comm-demo-05',
     title: 'Strategi Naikkan Jualan QR & Pesanan Ulangan Pelanggan Untuk Kiosk Makanan Petang',
     content:
-      'Kongsi sikit pengalaman saya selepas 2 bulan berniaga di Hub KB Sentral. Dulu pelanggan beli sekali sahaja, tetapi selepas kami letakkan kod QR Kad Digital KBelia bersama kupon diskaun pembelian ke-5 di bungkusan, pelanggan tetap naik hampir 35%.\n\nAda sesiapa yang mahu berkongsi teknik kandungan video pendek atau WhatsApp Broadcast yang paling berkesan untuk tarik pelanggan sekitar hab niaga?',
+      'Kongsi sikit pengalaman saya selepas 2 bulan berniaga di Hab Kota Bharu Sentral. Dulu pelanggan beli sekali sahaja, tetapi selepas kami letakkan kod QR Kad Digital KBelia bersama kupon diskaun pembelian ke-5 di bungkusan, pelanggan tetap naik hampir 35%.\n\nAda sesiapa yang mahu berkongsi teknik kandungan video pendek atau WhatsApp Broadcast yang paling berkesan untuk tarik pelanggan sekitar hab niaga?',
     category: 'Pemasaran & Jualan',
     district: 'Kota Bharu',
     authorId: 'demo-youth-hani',

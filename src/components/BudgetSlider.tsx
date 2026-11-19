@@ -27,7 +27,7 @@ export const BudgetSlider: React.FC<BudgetSliderProps> = ({
       <div className="flex items-center justify-between text-sm font-bold text-black dark:text-white mb-2">
         <span>{label}:</span>
         <span className="font-extrabold text-black dark:text-white bg-amber-100 dark:bg-emerald-600 border border-emerald-200 dark:border-emerald-800/70 px-2 py-0.5 rounded font-mono">
-          RM {value} /bln
+          RM {value} /bulan
         </span>
       </div>
 

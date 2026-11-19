@@ -121,21 +121,22 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
               type="button"
               onClick={() => setIsFilterOpen((prev) => !prev)}
               aria-expanded={isFilterOpen}
-              className={`min-h-[38px] px-3.5 py-2 rounded-xl border text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${
+              aria-label={filterCount > 0 ? `Penapis (${filterCount} aktif)` : 'Penapis'}
+              title={filterCount > 0 ? `Penapis (${filterCount} aktif)` : 'Penapis'}
+              className={`min-h-[38px] w-[38px] rounded-xl border inline-flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
                 filterCount > 0
                   ? theme.activeFilter
                   : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
               }`}
             >
               <SlidersHorizontal className="w-4 h-4 shrink-0" />
-              <span>Penapis{filterCount > 0 ? ` (${filterCount})` : ''}</span>
             </button>
 
             {isFilterOpen && (
               <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-40 space-y-3.5 text-left">
                 {hasSortControl && sortOptions && onSortChange && (
                   <div className={filterContent ? 'pb-3 border-b border-slate-200 dark:border-zinc-700' : ''}>
-                    <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
+                    <label className="block text-[0.8125rem] font-bold text-black/75 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
                       <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${theme.sortIcon}`} />
                       <span>{sortLabel}</span>
                     </label>
@@ -160,7 +161,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
                     <button
                       type="button"
                       onClick={onResetFilters}
-                      className="text-xs font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
+                      className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
                     >
                       Set Semula
                     </button>
@@ -170,7 +171,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsFilterOpen(false)}
-                    className={`px-3 py-1.5 rounded-lg text-white text-xs font-bold cursor-pointer transition-colors ${theme.closeBtn}`}
+                    className={`px-3 py-1.5 rounded-lg text-white text-[0.8125rem] font-bold cursor-pointer transition-colors ${theme.closeBtn}`}
                   >
                     Tutup
                   </button>

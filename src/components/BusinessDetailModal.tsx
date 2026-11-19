@@ -13,7 +13,7 @@ import {
   Sparkles,
   ShoppingBag
 } from 'lucide-react';
-import { BusinessListing, ProductItem } from '../types';
+import { BusinessListing, ProductItem, formatBusinessCategory } from '../types';
 import { showToast } from './ToastNotification';
 
 interface BusinessDetailModalProps {
@@ -89,7 +89,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
           {/* District & Category pill */}
           <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-20">
             <span className="px-3 py-1 rounded text-sm font-bold bg-amber-100 text-black border border-amber-200 shadow-xs">
-              {business.category}
+              {formatBusinessCategory(business.category)}
             </span>
             <span className="px-3 py-1 rounded text-sm font-semibold bg-white text-black border border-slate-300 shadow-xs">
               Jajahan {business.district}

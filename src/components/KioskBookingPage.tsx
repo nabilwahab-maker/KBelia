@@ -22,7 +22,8 @@ import {
   CapsuleSlot,
   CapsuleBooking,
   BusinessCategory,
-  PortalSettings
+  PortalSettings,
+  formatBusinessCategory
 } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { createCapsuleBooking, updateBookingStatus } from '../services/dataService';
@@ -438,12 +439,9 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                 <Store className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-xl font-black text-black dark:text-white tracking-tight">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
                   Permohonan Sewa Kiosk Belia
                 </h1>
-                <p className="text-[0.9375rem] text-black/75 dark:text-white/75">
-                  Hab Pembangunan Usahawan Belia Kelantan (KBelia)
-                </p>
               </div>
             </div>
 
@@ -528,7 +526,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                 Pegawai penyelaras sedang menyemak permohonan anda. Sebaik diluluskan, Surat Tawaran Digital berkod QR akan tersedia di halaman Urus &amp; Batal Tempahan.
               </p>
               <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 text-sm text-black dark:text-white max-w-sm mx-auto">
-                No. Rujukan Anda: <strong>KBN-{currentSlot?.code}-{new Date().getFullYear()}</strong>
+                Nombor Rujukan Anda: <strong>KBN-{currentSlot?.code}-{new Date().getFullYear()}</strong>
               </div>
               <div className="pt-2 flex flex-wrap justify-center gap-3">
                 <button
@@ -870,7 +868,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                         >
                           {CATEGORIES.map((c) => (
                             <option key={c} value={c}>
-                              {c}
+                              {formatBusinessCategory(c)}
                             </option>
                           ))}
                         </select>
@@ -973,12 +971,9 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     <div className="p-5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 space-y-4">
                       <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-zinc-600">
                         <div>
-                          <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">
+                          <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                             Ringkasan Pakej Permohonan Kiosk
                           </h4>
-                          <p className="text-sm text-black/70 dark:text-white/75">
-                            Sila semak maklumat sebelum pengesahan akhir
-                          </p>
                         </div>
                         <span className="px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-amber-100 text-black border border-amber-300 dark:bg-blue-600 dark:text-white">
                           Pakej {durationMonths} Bulan
@@ -1133,7 +1128,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   <div className="flex-1 min-w-0 space-y-4 w-full">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <span className="font-mono text-xs font-bold text-black/70 dark:text-white/75">
+                        <span className="font-mono text-[0.8125rem] font-bold text-black/70 dark:text-white/75">
                           {activeBooking.slotCode}
                         </span>
                         <h2 className="text-lg font-black text-black dark:text-white">
@@ -1322,7 +1317,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                         {item.hubLocation} · {item.businessName} · Mula: {item.startDate}
                       </div>
                     </div>
-                    <span className="px-2.5 py-1 rounded-lg border border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-950/50 text-black dark:text-white font-bold text-xs self-start sm:self-auto">
+                    <span className="px-2.5 py-1 rounded-lg border border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-950/50 text-black dark:text-white font-bold text-[0.8125rem] self-start sm:self-auto">
                       {item.status === 'cancelled' ? 'Dibatalkan' : 'Tidak Berjaya'}
                     </span>
                   </div>

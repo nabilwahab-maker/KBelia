@@ -28,7 +28,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
   isOpen,
   onClose,
   defaultSlotCode = 'CAP-KB-01',
-  defaultKioskName = 'Hub Belia KB Sentral'
+  defaultKioskName = 'Hab Belia Kota Bharu Sentral'
 }) => {
   const { language } = useLanguage();
   const { user, userProfile } = useAuth();
@@ -95,7 +95,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
       showToast({
         type: 'success',
         title: language === 'en' ? 'Maintenance Ticket Submitted' : 'Tiket Aduan Diterima',
-        message: `No. Rujukan: ${created.id}`
+        message: `Nombor Rujukan: ${created.id}`
       });
     } catch (err: any) {
       setErrorMsg(err?.message || (language === 'en'

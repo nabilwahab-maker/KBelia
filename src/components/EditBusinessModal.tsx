@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X, Save, Loader2, Edit3, AlertCircle, CheckCircle2, Star } from 'lucide-react';
-import { BusinessCategory, BusinessListing, KelantanDistrict } from '../types';
+import { BusinessCategory, BusinessListing, KelantanDistrict, formatBusinessCategory } from '../types';
 import { saveBusinessListing } from '../services/dataService';
 
 const CATEGORIES: BusinessCategory[] = [
@@ -241,7 +241,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
                 className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer"
               >
                 {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>{formatBusinessCategory(c)}</option>
                 ))}
               </select>
             </div>

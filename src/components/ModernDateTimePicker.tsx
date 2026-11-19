@@ -615,7 +615,7 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
                     setIsRangeMode(false);
                     setRangeDraftStart(null);
                   }}
-                  className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                  className={`py-1.5 px-2.5 rounded-lg text-[0.8125rem] font-bold transition-colors cursor-pointer ${
                     !isRangeMode
                       ? 'bg-white dark:bg-slate-900 text-black dark:text-white shadow-2xs'
                       : 'text-black/65 dark:text-white/65 hover:text-black dark:hover:text-white'
@@ -629,7 +629,7 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
                     setIsRangeMode(true);
                     setRangeDraftStart(null);
                   }}
-                  className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                  className={`py-1.5 px-2.5 rounded-lg text-[0.8125rem] font-bold transition-colors cursor-pointer ${
                     isRangeMode
                       ? 'bg-white dark:bg-slate-900 text-black dark:text-white shadow-2xs'
                       : 'text-black/65 dark:text-white/65 hover:text-black dark:hover:text-white'
@@ -643,7 +643,7 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
             {/* Quick Shortcuts Strip */}
             {defaultQuickShortcuts.length > 0 && (
               <div className="space-y-1.5">
-                <div className="text-[0.75rem] font-bold text-black/60 dark:text-white/65 px-0.5">
+                <div className="text-[0.8125rem] font-bold text-black/60 dark:text-white/65 px-0.5">
                   {quickDates && quickDates.length > 0
                     ? isEn
                       ? 'Suggested Available Dates'
@@ -664,7 +664,7 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
                           setRangeDraftStart(null);
                           setIsOpen(false);
                         }}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
+                        className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border transition-colors cursor-pointer ${
                           isSelected
                             ? accentClasses.activeChip
                             : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -680,7 +680,7 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
 
             {/* Range helper prompt */}
             {allowRange && isRangeMode && (
-              <div className="text-xs font-semibold text-black/75 dark:text-white/80 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+              <div className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/80 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
                 {rangeDraftStart
                   ? isEn
                     ? `Start: ${formatSingleDateHuman(rangeDraftStart, { shortMonth: true, isEn })}, click end date`
@@ -744,7 +744,7 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
               {weekdayHeaders.map((w) => (
                 <div
                   key={w}
-                  className="py-1 text-xs font-bold text-black/55 dark:text-white/60 uppercase"
+                  className="py-1 text-[0.8125rem] font-bold text-black/55 dark:text-white/60 uppercase"
                 >
                   {w}
                 </div>
@@ -825,13 +825,13 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
                     setRangeDraftStart(null);
                     setIsOpen(false);
                   }}
-                  className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer inline-flex items-center gap-1"
+                  className="px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer inline-flex items-center gap-1"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>{isEn ? 'Clear' : 'Kosongkan'}</span>
                 </button>
               ) : (
-                <span className="text-xs font-medium text-black/60 dark:text-white/65 truncate">
+                <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65 truncate">
                   {value ? value : isEn ? 'Pick a date' : 'Pilih tarikh'}
                 </span>
               )}
@@ -839,7 +839,7 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-black dark:text-white cursor-pointer"
+                className="px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-black dark:text-white cursor-pointer"
               >
                 {isEn ? 'Done' : 'Tutup'}
               </button>
@@ -1153,7 +1153,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                     setActiveTarget('start');
                     commitTime(startTime, endTime, false);
                   }}
-                  className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                  className={`py-1.5 px-2.5 rounded-lg text-[0.8125rem] font-bold transition-colors cursor-pointer ${
                     !isRange
                       ? 'bg-white dark:bg-slate-900 text-black dark:text-white shadow-2xs'
                       : 'text-black/65 dark:text-white/65 hover:text-black dark:hover:text-white'
@@ -1167,7 +1167,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                     setIsRange(true);
                     commitTime(startTime, endTime, true);
                   }}
-                  className={`py-1.5 px-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                  className={`py-1.5 px-2.5 rounded-lg text-[0.8125rem] font-bold transition-colors cursor-pointer ${
                     isRange
                       ? 'bg-white dark:bg-slate-900 text-black dark:text-white shadow-2xs'
                       : 'text-black/65 dark:text-white/65 hover:text-black dark:hover:text-white'
@@ -1180,7 +1180,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
 
             {/* Quick Time Slot Pills */}
             <div className="space-y-1.5">
-              <div className="text-[0.75rem] font-bold text-black/60 dark:text-white/65 px-0.5">
+              <div className="text-[0.8125rem] font-bold text-black/60 dark:text-white/65 px-0.5">
                 {isEn ? 'Quick Time Slots' : 'Pil Slot Masa Pantas'}
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -1194,7 +1194,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                         onChange(slot.value);
                         setIsOpen(false);
                       }}
-                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold tabular-nums border transition-colors cursor-pointer ${
+                      className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold tabular-nums border transition-colors cursor-pointer ${
                         isActive
                           ? accentClasses.selected
                           : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -1219,10 +1219,10 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                       : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
                   }`}
                 >
-                  <div className="text-[0.6875rem] font-bold text-black/60 dark:text-white/65 uppercase">
+                  <div className="text-[0.8125rem] font-bold text-black/60 dark:text-white/65 uppercase">
                     {isEn ? 'Start' : 'Masa Mula'}
                   </div>
-                  <div className="text-xs font-extrabold tabular-nums text-black dark:text-white mt-0.5">
+                  <div className="text-[0.8125rem] font-extrabold tabular-nums text-black dark:text-white mt-0.5">
                     {formatSingleTime(startTime, formatStyle)}
                   </div>
                 </button>
@@ -1235,10 +1235,10 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                       : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
                   }`}
                 >
-                  <div className="text-[0.6875rem] font-bold text-black/60 dark:text-white/65 uppercase">
+                  <div className="text-[0.8125rem] font-bold text-black/60 dark:text-white/65 uppercase">
                     {isEn ? 'End' : 'Masa Tamat'}
                   </div>
-                  <div className="text-xs font-extrabold tabular-nums text-black dark:text-white mt-0.5">
+                  <div className="text-[0.8125rem] font-extrabold tabular-nums text-black dark:text-white mt-0.5">
                     {formatSingleTime(endTime, formatStyle)}
                   </div>
                 </button>
@@ -1248,7 +1248,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
             {/* Interactive Hour, Minute & Meridiem Selector */}
             <div className="space-y-2.5 pt-1 border-t border-slate-200 dark:border-slate-700">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-black/65 dark:text-white/70">
+                <span className="text-[0.8125rem] font-bold text-black/65 dark:text-white/70">
                   {isRange
                     ? activeTarget === 'start'
                       ? isEn
@@ -1269,7 +1269,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                       key={mer}
                       type="button"
                       onClick={() => updateCurrentEditing({ meridiem: mer })}
-                      className={`px-2.5 py-1 rounded-md text-xs font-bold cursor-pointer transition-colors ${
+                      className={`px-2.5 py-1 rounded-md text-[0.8125rem] font-bold cursor-pointer transition-colors ${
                         currentEditing.meridiem === mer
                           ? accentClasses.selected
                           : 'text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white'
@@ -1283,7 +1283,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
 
               {/* Hours 6x2 Grid */}
               <div>
-                <div className="text-[0.6875rem] font-semibold text-black/55 dark:text-white/60 mb-1">
+                <div className="text-[0.8125rem] font-semibold text-black/55 dark:text-white/60 mb-1">
                   {isEn ? 'Hour' : 'Jam'}
                 </div>
                 <div className="grid grid-cols-6 gap-1">
@@ -1292,7 +1292,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                       key={h}
                       type="button"
                       onClick={() => updateCurrentEditing({ hour12: h })}
-                      className={`h-8 rounded-lg text-xs font-bold tabular-nums border transition-colors cursor-pointer ${
+                      className={`h-8 rounded-lg text-[0.8125rem] font-bold tabular-nums border transition-colors cursor-pointer ${
                         currentEditing.hour12 === h
                           ? accentClasses.selected
                           : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -1307,7 +1307,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
               {/* Minutes 4-chip + 5-min fine stepper */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[0.6875rem] font-semibold text-black/55 dark:text-white/60">
+                  <span className="text-[0.8125rem] font-semibold text-black/55 dark:text-white/60">
                     {isEn ? 'Minute' : 'Minit'}
                   </span>
                   <div className="inline-flex items-center gap-1">
@@ -1318,11 +1318,11 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                           minute: (currentEditing.minute + 55) % 60
                         })
                       }
-                      className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-black dark:text-white cursor-pointer"
+                      className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[0.8125rem] font-bold text-black dark:text-white cursor-pointer"
                     >
                       -5m
                     </button>
-                    <span className="text-xs font-bold tabular-nums px-1 text-black dark:text-white">
+                    <span className="text-[0.8125rem] font-bold tabular-nums px-1 text-black dark:text-white">
                       :{String(currentEditing.minute).padStart(2, '0')}
                     </span>
                     <button
@@ -1332,7 +1332,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                           minute: (currentEditing.minute + 5) % 60
                         })
                       }
-                      className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-black dark:text-white cursor-pointer"
+                      className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[0.8125rem] font-bold text-black dark:text-white cursor-pointer"
                     >
                       +5m
                     </button>
@@ -1344,7 +1344,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                       key={m}
                       type="button"
                       onClick={() => updateCurrentEditing({ minute: m })}
-                      className={`h-8 rounded-lg text-xs font-bold tabular-nums border transition-colors cursor-pointer ${
+                      className={`h-8 rounded-lg text-[0.8125rem] font-bold tabular-nums border transition-colors cursor-pointer ${
                         currentEditing.minute === m
                           ? accentClasses.selected
                           : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -1359,7 +1359,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
 
             {/* Footer */}
             <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
-              <span className="text-xs font-bold tabular-nums text-black dark:text-white truncate">
+              <span className="text-[0.8125rem] font-bold tabular-nums text-black dark:text-white truncate">
                 {value ||
                   (isRange
                     ? `${formatSingleTime(startTime, formatStyle)} - ${formatSingleTime(endTime, formatStyle)}`
@@ -1371,7 +1371,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                   commitTime(startTime, endTime, isRange);
                   setIsOpen(false);
                 }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer shrink-0"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer shrink-0"
               >
                 <Check className="w-3.5 h-3.5" />
                 <span>{isEn ? 'Done' : 'Selesai'}</span>

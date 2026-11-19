@@ -128,7 +128,7 @@ export const INITIAL_MENTORSHIP_REGISTRATIONS: MentorshipRegistration[] = [
     entrepreneurName: 'Muhammad Harith Bin Yusoff',
     entrepreneurPhone: '60139988776',
     entrepreneurEmail: 'harith.multimedia@gmail.com',
-    businessName: 'Studio Belia Multimedia KB',
+    businessName: 'Studio Belia Multimedia Kota Bharu',
     district: 'Kota Bharu',
     businessCategory: 'Teknologi & Servis Digital',
     topic: 'Penembusan Pasaran Cenderamata Korporat & Eksport',

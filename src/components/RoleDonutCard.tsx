@@ -25,7 +25,7 @@ export interface RoleDonutEmptyState {
 
 interface RoleDonutCardProps {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   icon: LucideIcon;
   accentBarClass?: string;
   headerRight?: React.ReactNode;
@@ -67,17 +67,19 @@ export const RoleDonutCard: React.FC<RoleDonutCardProps> = ({
       {accentBarClass && <div className={`h-0.5 w-full shrink-0 ${accentBarClass}`} aria-hidden="true" />}
 
       {/* Header */}
-      <div className="border-b border-slate-300 dark:border-zinc-600 py-3 px-4 flex items-start justify-between gap-2.5">
+      <div className="border-b border-slate-300 dark:border-zinc-600 py-3 px-4 flex items-center justify-between gap-2.5">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <Icon className="w-4 h-4 text-black dark:text-white/80 shrink-0" />
-            <h4 className="text-sm sm:text-base font-bold text-black dark:text-white leading-snug truncate">
+            <Icon className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
+            <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white leading-snug tracking-tight truncate">
               {title}
             </h4>
           </div>
-          <p className="text-[0.8125rem] sm:text-sm text-black/70 dark:text-white/75 mt-0.5 leading-snug">
-            {subtitle}
-          </p>
+          {subtitle && (
+            <p className="text-[0.8125rem] sm:text-sm text-black/70 dark:text-white/75 mt-0.5 leading-snug">
+              {subtitle}
+            </p>
+          )}
         </div>
         {headerRight && <div className="shrink-0">{headerRight}</div>}
       </div>
@@ -125,7 +127,7 @@ export const RoleDonutCard: React.FC<RoleDonutCardProps> = ({
                                 {formattedValue} · {pct}%
                               </div>
                               {item.secondaryLabel && (
-                                <div className="text-[0.75rem] text-white/75 mt-0.5">{item.secondaryLabel}</div>
+                                <div className="text-[0.8125rem] text-white/80 mt-0.5">{item.secondaryLabel}</div>
                               )}
                             </div>
                           );
@@ -142,7 +144,7 @@ export const RoleDonutCard: React.FC<RoleDonutCardProps> = ({
                 <span className="font-mono tabular-nums text-lg sm:text-xl font-black text-black dark:text-white leading-none tracking-tight">
                   {centerValue}
                 </span>
-                <span className="text-[0.75rem] font-semibold text-black/65 dark:text-white/70 mt-1 leading-tight max-w-[96px]">
+                <span className="text-[0.8125rem] font-semibold text-black/70 dark:text-white/75 mt-1 leading-tight max-w-[104px]">
                   {centerLabel}
                 </span>
               </div>
@@ -168,7 +170,7 @@ export const RoleDonutCard: React.FC<RoleDonutCardProps> = ({
                       </span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 font-mono tabular-nums text-black/80 dark:text-white/85">
-                      <span className="text-xs text-black/65 dark:text-white/70">
+                      <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
                         {seg.secondaryLabel ||
                           (valueUnit === 'RM'
                             ? `RM ${seg.value.toLocaleString('ms-MY')}`
@@ -198,7 +200,7 @@ export const RoleDonutCard: React.FC<RoleDonutCardProps> = ({
               <button
                 type="button"
                 onClick={emptyState.onAction}
-                className="mt-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer"
+                className="mt-1 px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer"
               >
                 {emptyState.actionLabel}
               </button>
@@ -208,7 +210,7 @@ export const RoleDonutCard: React.FC<RoleDonutCardProps> = ({
       </div>
 
       {/* Footer Summary Strip */}
-      <div className="px-4 py-2.5 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 grid grid-cols-2 gap-2 text-xs sm:text-[0.8125rem]">
+      <div className="px-4 py-2.5 border-t border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 grid grid-cols-2 gap-2 text-[0.8125rem]">
         {summaryPairs.map((pair, idx) => (
           <div
             key={pair.label}

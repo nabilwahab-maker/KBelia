@@ -17,7 +17,7 @@ import {
   Store,
   Check
 } from 'lucide-react';
-import { CapsuleSlot, BusinessCategory, PortalSettings } from '../types';
+import { CapsuleSlot, BusinessCategory, PortalSettings, formatBusinessCategory } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { createCapsuleBooking } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
@@ -448,7 +448,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 Pegawai kami sedang menyemak permohonan anda. Sila semak status terkini di Dashboard anda. Sebaik diluluskan, Surat Tawaran Rasmi berkod QR akan terus tersedia.
               </p>
               <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-sm text-black dark:text-white mb-6 max-w-sm mx-auto">
-                No. Rujukan Anda: <strong>KBN-{currentSlot?.code}-{new Date().getFullYear()}</strong>
+                Nombor Rujukan Anda: <strong>KBN-{currentSlot?.code}-{new Date().getFullYear()}</strong>
               </div>
               <button
                 type="button"
@@ -699,7 +699,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer dark:focus:border-blue-500"
                       >
                         {CATEGORIES.map((c) => (
-                          <option key={c} value={c} className="dark:bg-slate-900">{c}</option>
+                          <option key={c} value={c} className="dark:bg-slate-900">{formatBusinessCategory(c)}</option>
                         ))}
                       </select>
                     </div>

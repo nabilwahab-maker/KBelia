@@ -579,7 +579,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       emitAdminOrMentorNotification({
         title: `Kiosk Niaga Baharu: ${slotCode.toUpperCase()}`,
-        message: `${slotName} di jajahan ${slotDistrict} kini dibuka untuk permohonan usahawan belia Kelantan (RM${slotMonthlyRate}/bln).`,
+        message: `${slotName} di jajahan ${slotDistrict} kini dibuka untuk permohonan usahawan belia Kelantan (RM${slotMonthlyRate}/bulan).`,
         type: 'kiosk',
         senderRole: 'admin',
         sender: 'Pentadbir KBelia'
@@ -651,12 +651,9 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
       {/* Top Header */}
       <div className="-mx-5 -mt-5 md:-mx-6 md:-mt-6 px-5 pt-5 md:px-6 md:pt-6 pb-4 mb-4 kbelia-important-header border-b border-slate-300 dark:border-slate-600 rounded-t-3xl relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
-        <h2 className="text-2xl font-bold text-black dark:text-white tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
           Pusat Semakan Permohonan &amp; Pengurusan Kiosk
         </h2>
-        <p className="text-sm text-black/70 dark:text-white/75 mt-0.5">
-          Semak permohonan sewaan kiosk, permohonan geran belia dan penyelenggaraan fasiliti.
-        </p>
       </div>
 
       {/* Main Tab Segmented Controls + Quick Actions */}
@@ -770,9 +767,9 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           >
             <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
             <div>
-              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <Store className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-                <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
+              <div className="flex items-center gap-2.5 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
+                <Store className="w-4.5 h-4.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                   Permohonan Sewa Kiosk
                 </h4>
               </div>
@@ -858,10 +855,10 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           >
             <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
             <div>
-              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <Coins className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
-                  Permohonan Geran & Pembiayaan
+              <div className="flex items-center gap-2.5 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
+                <Coins className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                  Permohonan Geran &amp; Pembiayaan
                 </h4>
               </div>
 
@@ -946,10 +943,10 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           >
             <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
             <div>
-              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <Wrench className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
-                  Fasiliti & Tindakan Pantas
+              <div className="flex items-center gap-2.5 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
+                <Wrench className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                  Fasiliti &amp; Tindakan Pantas
                 </h4>
               </div>
 
@@ -1006,12 +1003,9 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
         <div key="kiosks" className="space-y-4 animate-dashboard-tab">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h4 className="text-base font-bold text-black dark:text-white">
+              <h4 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
                 Senarai Permohonan Sewaan Kiosk
               </h4>
-              <p className="text-sm text-black/70 dark:text-white/75">
-                Semak cadangan perniagaan, ubah status kelulusan, sunting atau padam rekod permohonan.
-              </p>
             </div>
             <button
               type="button"
@@ -1048,7 +1042,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               }}
               filterContent={
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                     Status Permohonan
                   </label>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -1062,7 +1056,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         key={opt.id}
                         type="button"
                         onClick={() => setStatusFilter(opt.id)}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                        className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                           statusFilter === opt.id
                             ? 'bg-indigo-600 border-indigo-600 text-white'
                             : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -1090,7 +1084,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                       setStatusFilter('all');
                       setBookingSortPreset(DEFAULT_SORT_VALUE);
                     }}
-                    className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                    className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                   >
                     Set Semula Carian &amp; Penapis
                   </button>
@@ -1156,7 +1150,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             <tr className="kbelia-table-row">
                               <td className="py-3.5 pl-5 pr-3">
                                 <div className="flex items-center gap-3 min-w-[210px]">
-                                  <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
+                                  <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
                                     <PortalImage
                                       src={resolveBookingKioskImage(booking, slots)}
                                       alt={`Reka bentuk kiosk ${booking.slotName}`}
@@ -1169,24 +1163,24 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                     <p className="font-semibold text-black dark:text-white truncate max-w-[240px]">
                                       {booking.slotCode} · {booking.businessName}
                                     </p>
-                                    <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[240px]">
+                                    <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[240px]">
                                       {booking.applicantName}
                                     </p>
                                   </div>
                                 </div>
                               </td>
                               <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
-                                {booking.businessCategory}
+                                {booking.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : booking.businessCategory}
                               </td>
                               <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
                                 <p className="font-medium text-black dark:text-white">{booking.hubLocation}</p>
-                                <p className="text-xs text-black/60 dark:text-white/65">
-                                  {booking.durationMonths} bln · Mula {formatDisplayDate(booking.startDate)}
+                                <p className="text-[0.8125rem] text-black/60 dark:text-white/65">
+                                  {booking.durationMonths} bulan · Mula {formatDisplayDate(booking.startDate)}
                                 </p>
                               </td>
                               <td className="py-3.5 px-3 whitespace-nowrap">
                                 <span
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                     booking.status === 'approved'
                                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                                       : booking.status === 'rejected'
@@ -1341,12 +1335,9 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
         <div key="grants" className="space-y-4 animate-dashboard-tab">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h4 className="text-base font-bold text-black dark:text-white">
+              <h4 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
                 Senarai Permohonan Geran &amp; Pembiayaan Belia
               </h4>
-              <p className="text-sm text-black/70 dark:text-white/75">
-                Nilai kelayakan permohonan geran, ubah status kelulusan, sunting atau padam rekod geran.
-              </p>
             </div>
             <button
               type="button"
@@ -1383,7 +1374,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               }}
               filterContent={
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                     Status Permohonan Geran
                   </label>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -1397,7 +1388,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         key={opt.id}
                         type="button"
                         onClick={() => setStatusFilter(opt.id)}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                        className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                           statusFilter === opt.id
                             ? 'bg-indigo-600 border-indigo-600 text-white'
                             : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -1425,7 +1416,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                       setStatusFilter('all');
                       setGrantSortPreset(DEFAULT_SORT_VALUE);
                     }}
-                    className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                    className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                   >
                     Set Semula Carian &amp; Penapis
                   </button>
@@ -1492,13 +1483,13 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                               <td className="py-3.5 pl-5 pr-3">
                                 <div className="flex items-center gap-3 min-w-[200px]">
                                   <div className="w-10 h-10 rounded-xl shrink-0 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
-                                    <Coins className="w-4 h-4" />
+                                    <FileText className="w-4 h-4" />
                                   </div>
                                   <div className="min-w-0">
                                     <p className="font-semibold text-black dark:text-white truncate max-w-[240px]">
                                       {grant.businessName}
                                     </p>
-                                    <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[240px]">
+                                    <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[240px]">
                                       {grant.applicantName}
                                     </p>
                                   </div>
@@ -1508,7 +1499,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                 <p className="font-medium text-black dark:text-white truncate max-w-[240px]">
                                   {grant.programTitle}
                                 </p>
-                                <p className="text-xs text-black/60 dark:text-white/65 whitespace-nowrap">
+                                <p className="text-[0.8125rem] text-black/60 dark:text-white/65 whitespace-nowrap">
                                   {grant.businessCategory} · SSM: {grant.ssmNumber || 'Dikecualikan'}
                                 </p>
                               </td>
@@ -1517,7 +1508,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                               </td>
                               <td className="py-3.5 px-3 whitespace-nowrap">
                                 <span
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                     grant.status === 'approved'
                                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                                       : grant.status === 'rejected'
@@ -1673,12 +1664,9 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h4 className="text-base font-bold text-black dark:text-white">
+                <h4 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
                   Kawalan Fasiliti &amp; Status Unit Kiosk ({slots.length})
                 </h4>
-                <p className="text-sm text-black/70 dark:text-white/75">
-                  Tukar status operasi unit kiosk, sunting spesifikasi atau padam unit yang tidak lagi aktif.
-                </p>
               </div>
               <button
                 type="button"
@@ -1712,7 +1700,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 }}
                 filterContent={
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                       Status Unit Kiosk
                     </label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -1726,7 +1714,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           key={opt.id}
                           type="button"
                           onClick={() => setSlotStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                             slotStatusFilter === opt.id
                               ? 'bg-indigo-600 border-indigo-600 text-white'
                               : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -1753,7 +1741,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                       setSlotStatusFilter('all');
                       setSlotSortPreset(DEFAULT_SORT_VALUE);
                     }}
-                    className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                    className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                   >
                     Set Semula Carian &amp; Penapis
                   </button>
@@ -1817,7 +1805,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           >
                             <td className="py-3.5 pl-5 pr-3">
                               <div className="flex items-center gap-3 min-w-[200px]">
-                                <div className="w-11 h-11 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 shrink-0">
+                                <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 shrink-0">
                                   <PortalImage
                                     src={resolveSlotImage(slot)}
                                     alt={slot.name}
@@ -1830,7 +1818,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                   <p className="font-semibold text-black dark:text-white truncate max-w-[240px]">
                                     {slot.code} · {slot.name}
                                   </p>
-                                  <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[240px]">
+                                  <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[240px]">
                                     {slot.size}
                                   </p>
                                 </div>
@@ -1840,16 +1828,16 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                               <p className="font-medium text-black dark:text-white whitespace-nowrap">
                                 {slot.hubLocation}
                               </p>
-                              <p className="text-xs text-black/60 dark:text-white/65 whitespace-nowrap">
+                              <p className="text-[0.8125rem] text-black/60 dark:text-white/65 whitespace-nowrap">
                                 {slot.district}
                               </p>
                             </td>
                             <td className="py-3.5 px-3 font-mono font-bold text-black dark:text-white tabular-nums whitespace-nowrap">
-                              RM{slot.monthlyRate}/bln
+                              RM{slot.monthlyRate}/bulan
                             </td>
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                   slot.status === 'available'
                                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                                     : slot.status === 'maintenance'
@@ -1928,13 +1916,10 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           <div className="space-y-3 pt-2">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h4 className="text-base font-bold text-black dark:text-white flex items-center gap-2">
-                  <Wrench className="w-4 h-4 text-black dark:text-white/75" />
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2">
+                  <Wrench className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
                   <span>Tiket Aduan Penyelenggaraan Penyewa ({maintenanceTickets.length})</span>
                 </h4>
-                <p className="text-sm text-black/70 dark:text-white/75">
-                  Kemas kini status baik pulih, sunting atau padam aduan kerosakan teknikal.
-                </p>
               </div>
               <button
                 type="button"
@@ -1976,7 +1961,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   }}
                   filterContent={
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                      <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                         Status Tiket Aduan
                       </label>
                       <div className="grid grid-cols-2 gap-1.5">
@@ -1990,7 +1975,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             key={opt.id}
                             type="button"
                             onClick={() => setTicketStatusFilter(opt.id)}
-                            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                            className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                               ticketStatusFilter === opt.id
                                 ? 'bg-indigo-600 border-indigo-600 text-white'
                                 : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -2017,7 +2002,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         setTicketStatusFilter('all');
                         setTicketSortPreset(DEFAULT_SORT_VALUE);
                       }}
-                      className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                      className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                     >
                       Set Semula Carian &amp; Penapis
                     </button>
@@ -2079,7 +2064,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                         <p className="font-semibold text-black dark:text-white truncate max-w-[220px]">
                                           {ticket.slotCode} · {ticket.kioskName}
                                         </p>
-                                        <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[220px]">
+                                        <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[220px]">
                                           {ticket.reporterName}
                                         </p>
                                       </div>
@@ -2089,13 +2074,13 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                     <p className="font-medium text-black dark:text-white truncate max-w-[240px]">
                                       {ticket.issueCategory}
                                     </p>
-                                    <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[280px]">
+                                    <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[280px]">
                                       {ticket.description}
                                     </p>
                                   </td>
                                   <td className="py-3.5 px-3 whitespace-nowrap">
                                     <span
-                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                         ticket.status === 'resolved'
                                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                                           : ticket.status === 'in_progress'
@@ -2162,7 +2147,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                   <tr className="bg-slate-50/70 dark:bg-zinc-950/60">
                                     <td colSpan={4} className="px-5 py-3.5 space-y-2.5">
                                       <p className="text-sm text-black dark:text-white leading-relaxed">{ticket.description}</p>
-                                      <p className="text-xs text-black/70 dark:text-white/75">
+                                      <p className="text-[0.8125rem] text-black/70 dark:text-white/75">
                                         Pelapor: <strong className="text-black dark:text-white">{ticket.reporterName}</strong> ({ticket.reporterPhone})
                                       </p>
                                       {onUpdateTicketStatus && ticket.status !== 'resolved' && (
@@ -2171,7 +2156,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                             <button
                                               type="button"
                                               onClick={() => onUpdateTicketStatus(ticket.id, 'in_progress', 'Juruteknik telah ditugaskan untuk pemeriksaan.')}
-                                              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+                                              className="px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
                                             >
                                               Tugaskan Juruteknik
                                             </button>
@@ -2179,7 +2164,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                           <button
                                             type="button"
                                             onClick={() => onUpdateTicketStatus(ticket.id, 'resolved', 'Kerja baik pulih selesai dan disahkan.')}
-                                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                                            className="px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
                                           >
                                             Tandakan Selesai
                                           </button>

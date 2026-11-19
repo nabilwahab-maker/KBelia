@@ -12,7 +12,7 @@ import {
   FileCheck2,
   FileText
 } from 'lucide-react';
-import { BusinessCategory, GrantApplication, PortalSettings } from '../types';
+import { BusinessCategory, GrantApplication, PortalSettings, formatBusinessCategory } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { createGrantApplication } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
@@ -372,7 +372,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                       className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer dark:focus:border-blue-500"
                     >
                       {CATEGORIES.map((c) => (
-                        <option key={c} value={c} className="dark:bg-slate-900">{c}</option>
+                        <option key={c} value={c} className="dark:bg-slate-900">{formatBusinessCategory(c)}</option>
                       ))}
                     </select>
                   </div>

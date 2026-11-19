@@ -62,12 +62,8 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
               <Calculator className="w-3.5 h-3.5 text-black dark:text-white/75" />
               {t('calc_badge')}
             </span>
-            <span className="text-black/35 dark:text-white/35">·</span>
-            <span className="text-sm text-black/70 dark:text-white/75 font-medium">
-              {t('calc_subtitle')}
-            </span>
           </div>
-          <h2 className="text-2xl font-bold text-black dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             {t('calc_heading')}
           </h2>
         </div>
@@ -280,7 +276,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                 <Sparkles className="w-3.5 h-3.5" />
                 {t('grant_recommendation_title')}
               </div>
-              <h4 className="text-sm font-bold text-black dark:text-white">
+              <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                 {recommendedGrant.title} ({recommendedGrant.amount})
               </h4>
               <p className="text-[0.9375rem] text-black dark:text-white mt-1 leading-relaxed">

@@ -162,14 +162,9 @@ export const B2BMarketSection: React.FC = () => {
     <div className="w-full space-y-4">
       {/* Compact Standardized Module Header */}
       <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700">
-        <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
           {isEn ? 'Supply Network & Commercial Ads' : 'Rangkaian Bekalan & Ruang Niaga'}
         </h1>
-        <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
-          {isEn
-            ? 'Browse verified local products, source wholesale goods, and connect with partner merchants across Kelantan.'
-            : 'Teroka produk tempatan, dapatkan stok borong, dan hubungi rakan niaga di seluruh Kelantan.'}
-        </p>
       </div>
 
       {/* Ruang Niaga: Carian, Penapis Bersepadu, Senarai Baris & Halaman Bernombor */}
@@ -191,14 +186,14 @@ export const B2BMarketSection: React.FC = () => {
           filterContent={
             <>
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                   {isEn ? 'Listing Type' : 'Jenis Iklan'}
                 </label>
                 <div className="grid grid-cols-3 gap-1 rounded-xl bg-slate-50 dark:bg-zinc-950 p-1 border border-slate-200 dark:border-zinc-700">
                   <button
                     type="button"
                     onClick={() => setFilterType('all')}
-                    className={`px-2 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    className={`px-2 py-1.5 text-[0.8125rem] font-bold rounded-lg transition-colors cursor-pointer ${
                       filterType === 'all'
                         ? 'bg-white dark:bg-zinc-800 text-black dark:text-white shadow-2xs border border-slate-200 dark:border-zinc-600'
                         : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -209,7 +204,7 @@ export const B2BMarketSection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFilterType('demand')}
-                    className={`px-2 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    className={`px-2 py-1.5 text-[0.8125rem] font-bold rounded-lg transition-colors cursor-pointer ${
                       filterType === 'demand'
                         ? 'bg-teal-600 text-white shadow-2xs dark:bg-teal-600'
                         : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -220,7 +215,7 @@ export const B2BMarketSection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFilterType('supply')}
-                    className={`px-2 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    className={`px-2 py-1.5 text-[0.8125rem] font-bold rounded-lg transition-colors cursor-pointer ${
                       filterType === 'supply'
                         ? 'bg-teal-600 text-white shadow-2xs dark:bg-teal-600'
                         : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
@@ -232,7 +227,7 @@ export const B2BMarketSection: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                   {isEn ? 'District' : 'Daerah'}
                 </label>
                 <select
@@ -272,7 +267,7 @@ export const B2BMarketSection: React.FC = () => {
                   setFilterType('all');
                   setFilterDistrict('all');
                 }}
-                className="mt-3 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-black dark:text-white transition-colors cursor-pointer"
+                className="mt-3 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-black dark:text-white transition-colors cursor-pointer"
               >
                 {isEn ? 'Reset Filters' : 'Set Semula Penapis'}
               </button>
@@ -303,7 +298,7 @@ export const B2BMarketSection: React.FC = () => {
                           {item.title}
                         </h3>
                         <span
-                          className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${
+                          className={`px-2 py-0.5 rounded-md text-[0.8125rem] font-bold border shrink-0 ${
                             item.type === 'supply'
                               ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-800'
                               : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800'

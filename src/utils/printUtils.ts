@@ -975,7 +975,7 @@ const buildOfficialLetterheadShell = (options: {
         </div>
       </div>
       <div class="lh-meta">
-        <div class="lh-meta-label">No. Rujukan Rasmi</div>
+        <div class="lh-meta-label">Nombor Rujukan Rasmi</div>
         <div class="lh-meta-val">${escapeHtml(options.refNumber)}</div>
         <div class="lh-meta-label">Tarikh Dokumen</div>
         <div class="lh-meta-val">${escapeHtml(options.issueDate)}</div>
@@ -1054,8 +1054,8 @@ export const generateTenancyAgreementOfficialHtml = (
     <div class="section-title">Jadual A: Butiran Penyewa &amp; Premis Kiosk</div>
     <table class="info-table">
       <tr><th>Nama Penuh Penyewa</th><td><strong>${escapeHtml(booking.applicantName)}</strong></td></tr>
-      <tr><th>Nama Perniagaan / Jenama</th><td>${escapeHtml(booking.businessName)} (${escapeHtml(booking.businessCategory)})</td></tr>
-      <tr><th>No. Telefon &amp; E-mel</th><td>${escapeHtml(booking.applicantPhone)} · ${escapeHtml(booking.applicantEmail)}</td></tr>
+      <tr><th>Nama Perniagaan / Jenama</th><td>${escapeHtml(booking.businessName)} (${escapeHtml(booking.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : booking.businessCategory)})</td></tr>
+      <tr><th>Nombor Telefon &amp; E-mel</th><td>${escapeHtml(booking.applicantPhone)} · ${escapeHtml(booking.applicantEmail)}</td></tr>
       <tr><th>Kod &amp; Nama Unit Kiosk</th><td><strong>${escapeHtml(booking.slotCode)}</strong> - ${escapeHtml(booking.slotName)}</td></tr>
       <tr><th>Lokasi Hab Penempatan</th><td>${escapeHtml(booking.hubLocation)}, Kelantan</td></tr>
       <tr><th>Tempoh Sewaan Sah</th><td>${escapeHtml(booking.durationMonths)} Bulan (${escapeHtml(startDisp)} hingga ${escapeHtml(endDisp)})</td></tr>
@@ -1114,11 +1114,11 @@ export const generateGrantApprovalOfficialHtml = (grant: GrantApplication): stri
     </p>
     <table class="info-table">
       <tr><th>Nama Pemohon</th><td><strong>${escapeHtml(grant.applicantName)}</strong></td></tr>
-      <tr><th>Nama Perniagaan &amp; Kategori</th><td>${escapeHtml(grant.businessName)} (${escapeHtml(grant.businessCategory)})</td></tr>
+      <tr><th>Nama Perniagaan &amp; Kategori</th><td>${escapeHtml(grant.businessName)} (${escapeHtml(grant.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : grant.businessCategory)})</td></tr>
       <tr><th>Jajahan Operasi</th><td>${escapeHtml(grant.district || 'Kelantan')} ${grant.ssmNumber ? `· SSM: ${escapeHtml(grant.ssmNumber)}` : ''}</td></tr>
       <tr><th>Skim / Program Geran</th><td><strong>${escapeHtml(grant.programTitle)}</strong></td></tr>
       <tr><th>Jumlah Peruntukan Diluluskan</th><td><strong style="font-size:15px;">${escapeHtml(amountText)}</strong></td></tr>
-      <tr><th>Akaun Bank Penerima</th><td>${escapeHtml(grant.bankName)} · No. Akaun: ${escapeHtml(grant.bankAccountNumber)}</td></tr>
+      <tr><th>Akaun Bank Penerima</th><td>${escapeHtml(grant.bankName)} · Nombor Akaun: ${escapeHtml(grant.bankAccountNumber)}</td></tr>
       <tr><th>Tujuan Penggunaan Dana</th><td>${escapeHtml(grant.fundPurpose || 'Pembangunan perniagaan, pembelian peralatan & modal pusingan')}</td></tr>
       <tr><th>Catatan Kelulusan Pegawai</th><td>${escapeHtml(grant.adminNotes || 'Permohonan diluluskan untuk penyaluran peruntukan geran mengikut tatacara kewangan semasa.')}</td></tr>
     </table>
@@ -1212,9 +1212,9 @@ export const generateYouthCertificateOfficialHtml = (params: {
         Telah didaftarkan secara sah di bawah Ekosistem Pemerkasaan Usahawan Belia Kelantan (KBelia) bersama Hab Usahawan Belia dan layak mengakses fasiliti kiosk bersubsidi, klinik mentor, serta skim geran & pembiayaan mikro.
       </p>
       <table class="info-table" style="text-align:left; margin-top:12px;">
-        <tr><th>No. Pendaftaran Keahlian</th><td><strong>${escapeHtml(params.refCode)}</strong></td></tr>
+        <tr><th>Nombor Pendaftaran Keahlian</th><td><strong>${escapeHtml(params.refCode)}</strong></td></tr>
         <tr><th>Jajahan Operasi</th><td>${escapeHtml(params.district || 'Negeri Kelantan')}</td></tr>
-        <tr><th>No. Pendaftaran Perniagaan</th><td>${escapeHtml(params.ssmNumber || 'Dalam Rekod Portal KBelia')}</td></tr>
+        <tr><th>Nombor Pendaftaran Perniagaan</th><td>${escapeHtml(params.ssmNumber || 'Dalam Rekod Portal KBelia')}</td></tr>
         <tr><th>Tarikh Pengesahan</th><td>${escapeHtml(issued)}</td></tr>
       </table>
     </div>

@@ -172,13 +172,13 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
               </div>
               <div className="text-left sm:text-right text-[0.8125rem] text-black/70 dark:text-white/75 space-y-1 font-mono">
                 <div className="flex items-center sm:justify-end gap-1.5">
-                  <span>No. Ruj:</span>
+                  <span>Nombor Rujukan:</span>
                   <span className="font-bold text-black dark:text-white">{refNumber}</span>
                   <button
                     type="button"
                     onClick={handleCopyRef}
                     className="p-1 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
-                    title="Salin No. Rujukan"
+                    title="Salin Nombor Rujukan"
                   >
                     {isCopied ? <Check className="w-3.5 h-3.5 text-black dark:text-white" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
@@ -192,7 +192,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
               <div className="text-black/70 text-[0.8125rem] uppercase tracking-wider font-semibold">Kepada Usahawan:</div>
               <div className="font-bold text-black dark:text-white text-base">{booking.applicantName}</div>
               <div className="text-black dark:text-white font-medium">
-                {booking.businessName} <span className="text-black/70 dark:text-white/75">({booking.businessCategory})</span>
+                {booking.businessName} <span className="text-black/70 dark:text-white/75">({booking.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : booking.businessCategory})</span>
               </div>
               <div className="text-black/70 dark:text-white/75 text-sm">
                 {booking.applicantEmail} · {booking.applicantPhone}
@@ -287,7 +287,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
               title="Salin Nombor Rujukan Rasmi"
             >
               {isCopied ? <Check className="w-3.5 h-3.5 text-black" /> : <Copy className="w-3.5 h-3.5 text-black/70" />}
-              <span>{isCopied ? 'Disalin!' : 'Salin No. Ruj'}</span>
+              <span>{isCopied ? 'Disalin!' : 'Salin Nombor Rujukan'}</span>
             </button>
 
             <button

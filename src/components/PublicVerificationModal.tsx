@@ -273,7 +273,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-emerald-200/60 dark:border-emerald-900/60 text-sm">
               <div>
-                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">No. Siri Rujukan:</span>
+                <span className="text-black/70 dark:text-white/75 block text-[0.8125rem]">Nombor Siri Rujukan:</span>
                 <span className="font-mono font-bold text-black dark:text-white">{verifiedRecord.refCode}</span>
               </div>
               <div>

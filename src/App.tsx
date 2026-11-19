@@ -2470,7 +2470,7 @@ export function App() {
       <LanguageProvider>
         <ConfirmDeleteProvider>
           {quotaExceeded && (
-            <div className="bg-amber-50 border-b border-amber-200 text-amber-900 px-4 py-2.5 text-xs md:text-sm text-center sticky top-0 z-50 shadow-sm flex items-center justify-center gap-3">
+            <div className="bg-amber-50 border-b border-amber-200 text-amber-900 px-4 py-2.5 text-[0.8125rem] md:text-sm text-center sticky top-0 z-50 shadow-sm flex items-center justify-center gap-3">
               <span>
                 Google Maps Platform quota reached. If you are the app owner, visit{' '}
                 <a
@@ -2486,7 +2486,7 @@ export function App() {
               <button
                 type="button"
                 onClick={() => setQuotaExceeded(false)}
-                className="text-xs font-bold px-2 py-0.5 rounded border border-amber-300 hover:bg-amber-100 cursor-pointer shrink-0"
+                className="text-[0.8125rem] font-bold px-2 py-0.5 rounded border border-amber-300 hover:bg-amber-100 cursor-pointer shrink-0"
               >
                 Tutup
               </button>

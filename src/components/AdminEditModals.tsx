@@ -23,6 +23,7 @@ import {
   KelantanDistrict,
   MaintenanceTicket,
   MentorProfile,
+  formatBusinessCategory,
   MentorshipRegistration,
   ProductItem,
   normalizeMentorshipMode
@@ -242,7 +243,7 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
               >
                 {slots.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.code} · {s.name} ({s.district}) - RM{s.monthlyRate}/bln
+                    {s.code} · {s.name} ({s.district}) - RM{s.monthlyRate}/bulan
                   </option>
                 ))}
               </select>
@@ -306,7 +307,7 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
                 className={`${inputClass} cursor-pointer`}
               >
                 {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>{formatBusinessCategory(c)}</option>
                 ))}
               </select>
             </div>
@@ -652,7 +653,7 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
                 className={`${inputClass} cursor-pointer`}
               >
                 {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>{formatBusinessCategory(c)}</option>
                 ))}
               </select>
             </div>
@@ -671,7 +672,7 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">No. Pendaftaran SSM</label>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Nombor Pendaftaran SSM</label>
               <input
                 type="text"
                 value={ssmNumber}
@@ -691,7 +692,7 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">No. Akaun Bank</label>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Nombor Akaun Bank</label>
               <input
                 type="text"
                 value={bankAccountNumber}
@@ -929,7 +930,7 @@ export const EditMaintenanceTicketModal: React.FC<EditMaintenanceTicketModalProp
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">No. Telefon Pelapor</label>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Nombor Telefon Pelapor</label>
               <input
                 type="text"
                 value={reporterPhone}
@@ -1223,7 +1224,7 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">No. Telefon</label>
+              <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Nombor Telefon</label>
               <input
                 type="text"
                 value={entrepreneurPhone}
@@ -1617,7 +1618,7 @@ export const ManageBusinessProductsModal: React.FC<ManageBusinessProductsModalPr
                     <img
                       src={prod.imageUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                       alt={prod.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0"
+                      className="w-14 h-14 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0"
                     />
                     <div className="min-w-0">
                       <div className="font-bold text-sm text-black dark:text-white truncate">{prod.name}</div>

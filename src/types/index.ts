@@ -45,6 +45,11 @@ export type BusinessCategory =
   | 'Pertanian & Agrotek'
   | 'Runcit & Gaya Hidup';
 
+export function formatBusinessCategory(category?: string): string {
+  if (!category) return 'Makanan & Minuman';
+  return category === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : category;
+}
+
 export type KelantanDistrict = 
   | 'Semua Jajahan'
   | 'Kota Bharu'

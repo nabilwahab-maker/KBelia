@@ -47,7 +47,8 @@ import {
   CommunityPost,
   ProductItem,
   BookingStatus,
-  normalizeMentorshipMode
+  normalizeMentorshipMode,
+  formatBusinessCategory
 } from '../types';
 import { 
   updateBookingStatus, 
@@ -498,7 +499,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       emitAdminOrMentorNotification({
         title: `Slot Kiosk Baharu: ${slotCode}`,
-        message: `${slotName} di jajahan ${slotDistrict} kini dibuka untuk permohonan sewaan usahawan (RM${slotMonthlyRate}/bln).`,
+        message: `${slotName} di jajahan ${slotDistrict} kini dibuka untuk permohonan sewaan usahawan (RM${slotMonthlyRate}/bulan).`,
         type: 'kiosk',
         senderRole: 'admin',
         targetRole: 'youth',
@@ -1185,7 +1186,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <SaaSKpiCard
                 title="Kadar Terisi Kapsul"
                 value={`${occupancyRate}%`}
-                subtitle={`${occupiedSlotsCount} drpd ${slots.length} unit beroperasi`}
+                subtitle={`${occupiedSlotsCount} unit beroperasi`}
                 icon={Building2}
                 accentColor="emerald"
                 isLive
@@ -1215,16 +1216,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 >
                   <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
                   <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="w-5 h-5 text-black dark:text-white/80" />
-                        <h3 className="text-base font-bold text-black dark:text-white">
-                          Analitik Infrastruktur &amp; Permohonan Negeri
-                        </h3>
-                      </div>
-                      <p className="text-[0.9375rem] text-black/75 dark:text-white/80 mt-0.5">
-                        Statistik langsung hab kapsul seluruh Kelantan dan aliran kelulusan
-                      </p>
+                    <div className="flex items-center gap-2.5">
+                      <BarChart3 className="w-5 h-5 text-black dark:text-white/80 shrink-0" />
+                      <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                        Analitik Infrastruktur &amp; Permohonan Negeri
+                      </h3>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600 self-start sm:self-auto">
@@ -1427,7 +1423,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <RoleDonutCard
                   className="lg:col-span-1 h-full"
                   title="Status Unit Kapsul"
-                  subtitle="Pecahan fizikal kesemua unit negeri"
                   icon={Building2}
                   accentBarClass="bg-blue-600/80 dark:bg-blue-500/80"
                   segments={capsuleStatusSegments}
@@ -1456,10 +1451,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     className="animate-dashboard-card relative min-w-0 h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm overflow-hidden transition-all duration-200 flex flex-col justify-start"
                   >
                     <div className="h-0.5 w-full bg-blue-500/80 dark:bg-blue-400/80" />
-                    <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-black dark:text-white/75" />
-                        <h3 className="text-base font-bold text-black dark:text-white">
+                    <div className="px-4 py-3.5 border-b border-slate-300 dark:border-zinc-600">
+                      <div className="flex items-center gap-2.5">
+                        <Building2 className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
+                        <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                           Metrik Prestasi &amp; Operasi Daerah
                         </h3>
                       </div>
@@ -1477,7 +1472,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               {bookingApprovalRate}%
                             </span>
                             <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
-                              {approvedBookingsCount}/{safeBookings.length}
+                              {approvedBookingsCount} diluluskan
                             </span>
                           </div>
                         </div>
@@ -1491,7 +1486,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               {grantApprovalRate}%
                             </span>
                             <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
-                              {approvedGrantsCount}/{totalGrantsCount}
+                              {approvedGrantsCount} diluluskan
                             </span>
                           </div>
                         </div>
@@ -1502,7 +1497,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </div>
                           <div className="mt-1 flex items-baseline justify-between gap-2">
                             <span className="text-lg font-extrabold font-mono text-black dark:text-white tabular-nums">
-                              {activeDistrictsCount}/10
+                              {activeDistrictsCount} Daerah
                             </span>
                             <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 tabular-nums">
                               {occupiedSlotsCount} unit aktif
@@ -1596,10 +1591,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     className="animate-dashboard-card relative min-w-0 h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:border-slate-400/80 dark:hover:border-zinc-500 shadow-sm overflow-hidden transition-all duration-200 flex flex-col justify-start"
                   >
                     <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
-                    <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-600">
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-black dark:text-white/75" />
-                        <h3 className="text-base font-bold text-black dark:text-white">
+                    <div className="px-4 py-3.5 border-b border-slate-300 dark:border-zinc-600">
+                      <div className="flex items-center gap-2.5">
+                        <Activity className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
+                        <h3 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                           Ringkasan Semakan &amp; Operasi
                         </h3>
                       </div>
@@ -1807,8 +1802,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div key="bookings" className="space-y-4 animate-dashboard-tab">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-black dark:text-white">Senarai Permohonan Sewaan Kapsul</h3>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Semak cadangan perniagaan dan sahkan kelulusan peruntukan kiosk.</p>
+              <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+                Senarai Permohonan Sewaan Kapsul
+              </h3>
             </div>
             <button
               type="button"
@@ -1846,7 +1842,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               }}
               filterContent={
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                     Status Permohonan
                   </label>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -1860,7 +1856,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         key={opt.id}
                         type="button"
                         onClick={() => setBookingFilter(opt.id)}
-                        className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                        className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                           bookingFilter === opt.id
                             ? 'bg-indigo-600 border-indigo-600 text-white'
                             : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -1886,7 +1882,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       setBookingFilter('all');
                       setAdminBookingSortPreset(DEFAULT_SORT_VALUE);
                     }}
-                    className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                    className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                   >
                     Set Semula Carian &amp; Penapis
                   </button>
@@ -1979,7 +1975,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <tr className="kbelia-table-row">
                               <td className="py-3.5 pl-5 pr-3">
                                 <div className="flex items-center gap-3 min-w-[200px]">
-                                  <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
+                                  <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
                                     <PortalImage
                                       src={resolveBookingKioskImage(b, safeSlots)}
                                       alt={`Reka bentuk kiosk ${b.slotName}`}
@@ -1992,24 +1988,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                     <p className="font-semibold text-black dark:text-white truncate max-w-[230px]">
                                       {b.slotCode} · {b.businessName}
                                     </p>
-                                    <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[230px]">
+                                    <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[230px]">
                                       {b.slotName}
                                     </p>
                                   </div>
                                 </div>
                               </td>
                               <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
-                                {b.businessCategory}
+                                {b.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : b.businessCategory}
                               </td>
                               <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
                                 <p className="font-medium text-black dark:text-white">{b.applicantName}</p>
-                                <p className="text-xs text-black/60 dark:text-white/65">
-                                  {b.hubLocation} · {b.durationMonths} bln
+                                <p className="text-[0.8125rem] text-black/60 dark:text-white/65">
+                                  {b.hubLocation} · {b.durationMonths} bulan
                                 </p>
                               </td>
                               <td className="py-3.5 px-3 whitespace-nowrap">
                                 <span
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                     b.status === 'approved'
                                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                                       : b.status === 'rejected'
@@ -2084,15 +2080,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 <td colSpan={5} className="px-5 py-4 space-y-3">
                                   <div className="grid sm:grid-cols-3 gap-3 bg-white dark:bg-zinc-900 p-3.5 rounded-xl text-sm text-black dark:text-white/80 border border-slate-200 dark:border-zinc-700">
                                     <div>
-                                      <span className="text-black/60 dark:text-white/65 block text-xs">Pemohon:</span>
+                                      <span className="text-black/60 dark:text-white/65 block text-[0.8125rem]">Pemohon:</span>
                                       <strong className="text-black dark:text-white">{b.applicantName}</strong>
                                     </div>
                                     <div>
-                                      <span className="text-black/60 dark:text-white/65 block text-xs">E-mel / Telefon:</span>
-                                      <span className="font-mono text-xs text-black dark:text-white">{b.applicantEmail} · {b.applicantPhone}</span>
+                                      <span className="text-black/60 dark:text-white/65 block text-[0.8125rem]">E-mel / Telefon:</span>
+                                      <span className="font-mono text-[0.8125rem] text-black dark:text-white">{b.applicantEmail} · {b.applicantPhone}</span>
                                     </div>
                                     <div>
-                                      <span className="text-black/60 dark:text-white/65 block text-xs">Tempoh &amp; Tarikh Mula:</span>
+                                      <span className="text-black/60 dark:text-white/65 block text-[0.8125rem]">Tempoh &amp; Tarikh Mula:</span>
                                       <span className="text-black dark:text-white tabular-nums">{b.durationMonths} Bulan (Mulai {b.startDate})</span>
                                     </div>
                                   </div>
@@ -2107,7 +2103,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   {b.status === 'pending' && (
                                     <div className="pt-1 space-y-3">
                                       <div>
-                                        <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1">
+                                        <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1">
                                           Catatan Pentadbir
                                         </label>
                                         <input
@@ -2124,7 +2120,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                           type="button"
                                           onClick={() => handleRejectBooking(b)}
                                           disabled={loading}
-                                          className="px-3.5 py-1.5 bg-rose-50 dark:bg-rose-950/80 hover:bg-rose-100 text-black dark:text-white border border-rose-200 dark:border-rose-800 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                                          className="px-3.5 py-1.5 bg-rose-50 dark:bg-rose-950/80 hover:bg-rose-100 text-black dark:text-white border border-rose-200 dark:border-rose-800 font-bold text-[0.8125rem] rounded-xl transition-colors cursor-pointer"
                                         >
                                           Tolak Permohonan
                                         </button>
@@ -2132,7 +2128,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                           type="button"
                                           onClick={() => handleApproveBooking(b)}
                                           disabled={loading}
-                                          className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                                          className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[0.8125rem] rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                                         >
                                           <CheckCircle2 className="w-3.5 h-3.5" />
                                           <span>Luluskan Permohonan</span>
@@ -2174,8 +2170,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {adminTab === 'businesses' && (
         <div key="businesses" className="space-y-4 animate-dashboard-tab">
           <div>
-            <h3 className="text-lg font-bold text-black dark:text-white">Senarai Kedai &amp; Usahawan</h3>
-            <p className="text-sm text-black/75 dark:text-white/80">Urus, tambah, edit, kawal produk atau padam senarai perniagaan belia dalam direktori portal.</p>
+            <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+              Senarai Kedai &amp; Usahawan
+            </h3>
           </div>
 
           <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
@@ -2220,7 +2217,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               filterContent={
                 <>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                       Status Paparan
                     </label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -2234,7 +2231,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           key={opt.id}
                           type="button"
                           onClick={() => setBizStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                             bizStatusFilter === opt.id
                               ? 'bg-indigo-600 border-indigo-600 text-white'
                               : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -2246,7 +2243,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                       Daerah
                     </label>
                     <select
@@ -2278,7 +2275,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     setBizDistrictFilter('Semua');
                     setBizSortPreset(DEFAULT_SORT_VALUE);
                   }}
-                  className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Set Semula Carian &amp; Penapis
                 </button>
@@ -2373,24 +2370,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 <img
                                   src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                                   alt={biz.businessName}
-                                  className="w-11 h-11 rounded-xl object-cover border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 shrink-0"
+                                  className="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 shrink-0"
                                 />
                                 <div className="min-w-0">
                                   <p className="font-semibold text-black dark:text-white truncate max-w-[230px]">
                                     {biz.businessName}
                                   </p>
-                                  <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[230px]">
+                                  <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[230px]">
                                     {biz.ownerName}
                                   </p>
                                 </div>
                               </div>
                             </td>
                             <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
-                              {biz.category}
+                              {formatBusinessCategory(biz.category)}
                             </td>
                             <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
                               <p className="font-medium text-black dark:text-white">{biz.district}</p>
-                              <p className="text-xs text-black/60 dark:text-white/65">
+                              <p className="text-[0.8125rem] text-black/60 dark:text-white/65">
                                 SSM: {biz.ssmNumber || 'Tiada'}
                               </p>
                             </td>
@@ -2400,7 +2397,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <div className="flex items-center gap-1.5">
                                 <span
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                     biz.isApproved
                                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                                       : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700'
@@ -2409,7 +2406,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   {biz.isApproved ? 'Aktif' : 'Tersembunyi'}
                                 </span>
                                 {biz.isFeatured && (
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70">
                                     Pilihan
                                   </span>
                                 )}
@@ -2478,8 +2475,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {adminTab === 'slots' && (
         <div key="slots" className="space-y-4 animate-dashboard-tab">
           <div>
-            <h3 className="text-base font-bold text-black dark:text-white">Inventori & Pengurusan Kapsul Jajahan</h3>
-            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Urus pendaftaran slot kiosk, tetapkan kadar sewa bulanan, atau padam unit yang tidak lagi beroperasi.</p>
+            <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+              Inventori &amp; Pengurusan Kapsul Jajahan
+            </h3>
           </div>
 
           {/* New Slot Form */}
@@ -2487,8 +2485,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden animate-dashboard-tab transition-colors">
               <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
               <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-3.5 px-5 flex items-center justify-between">
-                <h4 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <h4 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight flex items-center gap-2">
+                  <Building2 className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Borang Tambah Kiosk Baharu</span>
                 </h4>
                 <button
@@ -2670,7 +2668,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               filterContent={
                 <>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                       Status Kapsul
                     </label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -2684,7 +2682,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           key={opt.id}
                           type="button"
                           onClick={() => setAdminSlotStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                             adminSlotStatusFilter === opt.id
                               ? 'bg-indigo-600 border-indigo-600 text-white'
                               : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -2696,7 +2694,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                       Daerah
                     </label>
                     <select
@@ -2728,7 +2726,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     setAdminSlotDistrictFilter('Semua');
                     setAdminSlotSortPreset(DEFAULT_SORT_VALUE);
                   }}
-                  className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Set Semula Carian &amp; Penapis
                 </button>
@@ -2817,7 +2815,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <tr key={s.id} className="kbelia-table-row">
                           <td className="py-3.5 pl-5 pr-3">
                             <div className="flex items-center gap-3 min-w-[200px]">
-                              <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
+                              <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
                                 <PortalImage
                                   src={resolveSlotImage(s)}
                                   alt={s.name}
@@ -2830,7 +2828,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 <p className="font-semibold text-black dark:text-white truncate max-w-[230px]">
                                   {s.code} · {s.name}
                                 </p>
-                                <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[230px]">
+                                <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[230px]">
                                   {s.size}{s.currentTenantBusinessName ? ` · Penyewa: ${s.currentTenantBusinessName}` : ''}
                                 </p>
                               </div>
@@ -2838,14 +2836,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </td>
                           <td className="py-3.5 px-3 whitespace-nowrap">
                             <p className="font-medium text-black dark:text-white">{s.hubLocation}</p>
-                            <p className="text-xs text-black/60 dark:text-white/65">{s.district}</p>
+                            <p className="text-[0.8125rem] text-black/60 dark:text-white/65">{s.district}</p>
                           </td>
                           <td className="py-3.5 px-3 font-mono font-bold text-black dark:text-white tabular-nums whitespace-nowrap">
-                            RM{s.monthlyRate}/bln
+                            RM{s.monthlyRate}/bulan
                           </td>
                           <td className="py-3.5 px-3 whitespace-nowrap">
                             <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                 s.status === 'available'
                                   ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                                   : s.status === 'occupied'
@@ -2928,8 +2926,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {adminTab === 'programs' && (
         <div key="programs" className="space-y-4 animate-dashboard-tab">
           <div>
-            <h3 className="text-base font-bold text-black dark:text-white">Pengurusan Inisiatif Geran & Program Belia</h3>
-            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Terbit, kemas kini dan padam hebahan rasmi program latihan serta geran usahawan belia Kelantan.</p>
+            <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+              Pengurusan Inisiatif Geran &amp; Program Belia
+            </h3>
           </div>
 
           {/* New Program Form */}
@@ -2937,8 +2936,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden animate-dashboard-tab transition-colors">
               <div className="h-0.5 w-full bg-indigo-500/80 dark:bg-indigo-400/80" />
               <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-3.5 px-5 flex items-center justify-between">
-                <h4 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white flex items-center gap-2">
-                  <Award className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <h4 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight flex items-center gap-2">
+                  <Award className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Borang Terbit Program Keusahawanan Baharu</span>
                 </h4>
                 <button
@@ -3098,7 +3097,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               }
               filterContent={
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                     Kategori Program
                   </label>
                   <select
@@ -3129,7 +3128,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     setProgCategoryFilter('Semua');
                     setProgSortPreset(DEFAULT_SORT_VALUE);
                   }}
-                  className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Set Semula Carian &amp; Penapis
                 </button>
@@ -3202,7 +3201,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <tr key={p.id} className="kbelia-table-row">
                           <td className="py-3.5 pl-5 pr-3">
                             <div className="flex items-center gap-3 min-w-[200px]">
-                              <div className="w-11 h-11 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 shrink-0">
+                              <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 shrink-0">
                                 <PortalImage
                                   src={resolveProgramImage(p)}
                                   alt={p.title}
@@ -3215,14 +3214,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 <p className="font-semibold text-black dark:text-white truncate max-w-[260px]">
                                   {p.title}
                                 </p>
-                                <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[260px]">
+                                <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[260px]">
                                   {p.description}
                                 </p>
                               </div>
                             </div>
                           </td>
                           <td className="py-3.5 px-3 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/70">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/70">
                               {p.category}
                             </span>
                           </td>
@@ -3231,7 +3230,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </td>
                           <td className="py-3.5 px-3 whitespace-nowrap">
                             <p className="font-medium text-black dark:text-white">{p.date || '-'}</p>
-                            <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[180px]">{p.location || '-'}</p>
+                            <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[180px]">{p.location || '-'}</p>
                           </td>
                           <td className="py-3.5 pl-2 pr-5 text-right">
                             <RowActionMenu
@@ -3280,22 +3279,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div key="mentors" className="space-y-4 animate-dashboard-tab">
           <div className="relative overflow-hidden kbelia-important-header p-5 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-300 dark:border-slate-600">
             <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
                 <GraduationCap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Hab Bimbingan Mentor KBelia</span>
               </div>
-              <h3 className="text-xl font-bold text-black dark:text-white">Pemantauan Mentor &amp; Usahawan Kelantan</h3>
-              <p className="text-[0.9375rem] text-black dark:text-white max-w-2xl leading-relaxed">
-                Pantau sesi janji temu bimbingan usahawan belia bersama mentor dalaman dan pakar industri.
-              </p>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+                Pemantauan Mentor &amp; Usahawan Kelantan
+              </h3>
             </div>
           </div>
 
           {/* Mentor Management Table */}
           <div className="space-y-3">
-            <h4 className="text-base font-bold text-black dark:text-white flex items-center gap-2">
-              <GraduationCap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2">
+              <GraduationCap className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400" />
               <span>Senarai Mentor</span>
             </h4>
 
@@ -3409,7 +3407,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   <img
                                     src={m.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg'}
                                     alt={m.name}
-                                    className="w-11 h-11 rounded-xl object-cover border border-slate-200 dark:border-zinc-700 shrink-0"
+                                    className="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-zinc-700 shrink-0"
                                   />
                                   <span className="font-semibold text-black dark:text-white truncate max-w-[220px]">
                                     {m.name}
@@ -3420,16 +3418,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 <p className="font-medium text-black dark:text-white truncate max-w-[240px]">
                                   {m.agency.split('(')[0].trim()}
                                 </p>
-                                <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[240px]">
+                                <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[240px]">
                                   {m.title}
                                 </p>
                               </td>
                               <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 text-indigo-700 dark:text-indigo-300">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 text-indigo-700 dark:text-indigo-300">
                                   {menteeCount} Usahawan
                                 </span>
                               </td>
-                              <td className="py-3.5 px-3 font-mono text-xs text-black/75 dark:text-white/80 whitespace-nowrap">
+                              <td className="py-3.5 px-3 font-mono text-[0.8125rem] text-black/75 dark:text-white/80 whitespace-nowrap">
                                 {m.email}
                               </td>
                               <td className="py-3.5 pl-2 pr-5 text-right">
@@ -3480,10 +3478,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* Mentee List View */}
           <div className="space-y-3">
             <div>
-              <h4 className="text-base font-bold text-black dark:text-white">
+              <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                 Senarai Usahawan Berdaftar Mengikut Mentor
               </h4>
-              <span className="text-sm text-black/70 dark:text-white/75">Seluruh Kelantan · Urus jadual, status dan rekod sesi</span>
             </div>
 
             <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
@@ -3525,7 +3522,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 }
                 filterContent={
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
                       Status Sesi Bimbingan
                     </label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -3539,7 +3536,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           key={opt.id}
                           type="button"
                           onClick={() => setMentorshipStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer transition-colors ${
+                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                             mentorshipStatusFilter === opt.id
                               ? 'bg-indigo-600 border-indigo-600 text-white'
                               : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
@@ -3567,7 +3564,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         setMentorshipStatusFilter('all');
                         setMentorshipSortPreset(DEFAULT_SORT_VALUE);
                       }}
-                      className="mt-1 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                      className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
                     >
                       Set Semula Carian &amp; Penapis
                     </button>
@@ -3664,7 +3661,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   <p className="font-semibold text-black dark:text-white truncate max-w-[230px]">
                                     {m.entrepreneurName}
                                   </p>
-                                  <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[230px]">
+                                  <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[230px]">
                                     {m.businessName} · {m.district}
                                   </p>
                                 </div>
@@ -3674,17 +3671,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               <p className="font-medium text-black dark:text-white truncate max-w-[220px]">
                                 {m.mentorName}
                               </p>
-                              <p className="text-xs text-black/60 dark:text-white/65 truncate max-w-[220px]">
+                              <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[220px]">
                                 {m.topic}
                               </p>
                             </td>
                             <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
                               <p className="font-medium text-black dark:text-white">{m.preferredDate}</p>
-                              <p className="text-xs text-black/60 dark:text-white/65">{normalizeMentorshipMode(m.mode)}</p>
+                              <p className="text-[0.8125rem] text-black/60 dark:text-white/65">{normalizeMentorshipMode(m.mode)}</p>
                             </td>
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
                                   m.status === 'completed'
                                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
                                     : m.status === 'confirmed'
@@ -3807,15 +3804,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* Header Banner */}
           <div className="relative overflow-hidden kbelia-important-header p-5 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-300 dark:border-slate-600">
             <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white border border-indigo-200 dark:border-indigo-800/70 text-[0.8125rem] font-bold uppercase tracking-wider">
                 <Shield className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Pengurusan Sistem Pentadbir</span>
               </div>
-              <h3 className="text-xl font-bold text-black dark:text-white">Tetapan Sistem & Profil Pentadbir</h3>
-              <p className="text-[0.9375rem] text-black dark:text-white max-w-2xl leading-relaxed">
-                Kawalan menyeluruh untuk parameter sewaan kiosk kapsul, pengurusan perhubungan urusetia, pembersihan cache sesi dan penyelarasan data usahawan belia.
-              </p>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+                Tetapan Sistem &amp; Profil Pentadbir
+              </h3>
             </div>
             <div className="shrink-0 flex items-center gap-2">
               <span className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-xl text-sm font-semibold flex items-center gap-1.5">
@@ -3850,10 +3846,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center font-bold">
                   <UserCheck className="w-4 h-4" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-black dark:text-white">Profil Pentadbir &amp; Saluran Sokongan Rasmi</h4>
-                  <p className="text-[0.875rem] text-black/70 dark:text-white/75">Maklumat pentadbir yang mengurus portal dan kelulusan usahawan.</p>
-                </div>
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                  Profil Pentadbir &amp; Saluran Sokongan Rasmi
+                </h4>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -3930,10 +3925,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center justify-center font-bold">
                   <Sliders className="w-4 h-4" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-black dark:text-white">Tetapan &amp; Parameter Operasi Portal KBelia</h4>
-                  <p className="text-[0.875rem] text-black/70 dark:text-white/75">Konfigurasi subsidi sewaan, had tempoh dan status pelayan portal.</p>
-                </div>
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                  Tetapan &amp; Parameter Operasi Portal KBelia
+                </h4>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -4007,10 +4001,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold">
                   <Database className="w-4 h-4" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-black dark:text-white">Kawalan Pangkalan Data & Penyelenggaraan Sesi</h4>
-                  <p className="text-[0.875rem] text-black/70 dark:text-white/75">Tindakan kecemasan untuk menyegerakkan data dan memadam cache sistem.</p>
-                </div>
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+                  Kawalan Pangkalan Data &amp; Penyelenggaraan Sesi
+                </h4>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">

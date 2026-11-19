@@ -289,14 +289,9 @@ export const EventsSection: React.FC = () => {
       {/* Section Header */}
       <div className="rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 border border-slate-200 dark:border-zinc-700">
         <div className="max-w-2xl">
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black dark:text-white">
             {isEn ? 'Youth Events & Carnivals' : 'Acara & Karnival Belia Kelantan'}
           </h1>
-          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 leading-relaxed">
-            {isEn
-              ? 'Explore our flagship upcoming carnival, book popup stalls, and join hands-on workshops across Kelantan.'
-              : 'Terokai acara utama terdekat, tempah tapak gerai jualan, dan sertai bengkel keusahawanan seluruh Kelantan.'}
-          </p>
         </div>
       </div>
 
@@ -331,7 +326,7 @@ export const EventsSection: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none" />
                   <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 text-white">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-blue-200">
+                    <div className="text-[0.8125rem] font-semibold uppercase tracking-wider text-blue-200">
                       {isEn ? 'Featured Upcoming Event' : 'Sorotan Acara Utama'} · {featuredEvent.district}
                     </div>
                     <div className="text-sm font-medium text-white/90 mt-0.5 truncate">
@@ -343,7 +338,7 @@ export const EventsSection: React.FC = () => {
                 {/* Butiran Lengkap & Tindakan Pantas Acara Utama */}
                 <div className="lg:col-span-6 p-5 sm:p-6 flex flex-col justify-between gap-4">
                   <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold text-blue-700 dark:text-blue-400">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] font-semibold text-blue-700 dark:text-blue-400">
                       <span>{getEventCategoryLabel(featuredEvent.category, isEn)}</span>
                       <span aria-hidden="true">·</span>
                       <span className="tabular-nums">{featuredEvent.date}</span>
@@ -379,7 +374,7 @@ export const EventsSection: React.FC = () => {
                       <div className="flex items-start gap-2 min-w-0">
                         <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                         <div className="min-w-0">
-                          <span className="block text-xs font-medium text-black/60 dark:text-white/65">
+                          <span className="block text-[0.8125rem] font-medium text-black/60 dark:text-white/65">
                             {isEn ? 'Date & Time' : 'Tarikh & Masa'}
                           </span>
                           <span className="font-semibold text-black dark:text-white tabular-nums block truncate">
@@ -391,7 +386,7 @@ export const EventsSection: React.FC = () => {
                       <div className="flex items-start gap-2 min-w-0">
                         <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                         <div className="min-w-0">
-                          <span className="block text-xs font-medium text-black/60 dark:text-white/65">
+                          <span className="block text-[0.8125rem] font-medium text-black/60 dark:text-white/65">
                             {isEn ? 'Venue' : 'Lokasi Acara'}
                           </span>
                           <span className="font-semibold text-black dark:text-white block truncate" title={featuredEvent.location}>
@@ -401,13 +396,13 @@ export const EventsSection: React.FC = () => {
                       </div>
 
                       <div className="sm:col-span-2 pt-1 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs sm:text-sm tabular-nums">
+                        <div className="flex items-center justify-between text-[0.8125rem] sm:text-sm tabular-nums">
                           <span className="font-semibold text-black dark:text-white inline-flex items-center gap-1.5">
                             <Store className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                             <span>
                               {isEn
-                                ? `${featuredRemaining} of ${featuredEvent.totalBooths} stalls remaining`
-                                : `Baki ${featuredRemaining} daripada ${featuredEvent.totalBooths} tapak gerai`}
+                                ? `${featuredRemaining} stalls remaining`
+                                : `Baki ${featuredRemaining} tapak gerai`}
                             </span>
                           </span>
                           <span className="font-semibold text-black/70 dark:text-white/75">
@@ -493,14 +488,9 @@ export const EventsSection: React.FC = () => {
             {upcomingHighlightEvents.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2 px-0.5">
-                  <h2 className="text-base font-bold text-black dark:text-white">
+                  <h2 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
                     {isEn ? 'Upcoming Event Highlights' : 'Sorotan Acara Akan Datang'}
                   </h2>
-                  <span className="text-xs font-semibold text-black/60 dark:text-white/65 tabular-nums">
-                    {isEn
-                      ? `${upcomingHighlightEvents.length} nearest events`
-                      : `${upcomingHighlightEvents.length} acara terdekat`}
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-stretch">
@@ -531,7 +521,7 @@ export const EventsSection: React.FC = () => {
 
                         <div className="p-4 flex-1 flex flex-col justify-between gap-3.5">
                           <div className="space-y-2">
-                            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs font-semibold text-black/65 dark:text-white/70 tabular-nums">
+                            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70 tabular-nums">
                               <span className="text-blue-700 dark:text-blue-400">
                                 {getEventCategoryLabel(evt.category, isEn)}
                               </span>
@@ -550,7 +540,7 @@ export const EventsSection: React.FC = () => {
                                   {evt.location} ({evt.district})
                                 </span>
                               </div>
-                              <div className="flex items-center justify-between gap-2 text-xs sm:text-sm">
+                              <div className="flex items-center justify-between gap-2 text-[0.8125rem] sm:text-sm">
                                 <span className={`inline-flex items-center gap-1.5 font-semibold ${
                                   ended
                                     ? 'text-black/60 dark:text-white/60'
@@ -561,8 +551,8 @@ export const EventsSection: React.FC = () => {
                                   <Store className="w-4 h-4 shrink-0" />
                                   <span>
                                     {isEn
-                                      ? `${remainingBooths}/${evt.totalBooths} stalls left`
-                                      : `Baki ${remainingBooths}/${evt.totalBooths} tapak`}
+                                      ? `${remainingBooths} stalls left`
+                                      : `Baki ${remainingBooths} tapak`}
                                   </span>
                                 </span>
                                 <span className="text-black/65 dark:text-white/70 truncate max-w-[130px]" title={evt.fee}>
@@ -664,7 +654,7 @@ export const EventsSection: React.FC = () => {
           filterContent={
             <>
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                   {isEn ? 'Category' : 'Kategori Acara'}
                 </label>
                 <select
@@ -681,7 +671,7 @@ export const EventsSection: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                   {isEn ? 'District' : 'Daerah'}
                 </label>
                 <select
@@ -704,7 +694,7 @@ export const EventsSection: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-black/70 dark:text-white/75 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
                   {isEn ? 'Availability Status' : 'Status Ketersediaan'}
                 </label>
                 <select
@@ -761,16 +751,16 @@ export const EventsSection: React.FC = () => {
                             {evt.title}
                           </h3>
                           {ended ? (
-                            <span className="px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 bg-slate-100 text-black/75 border-slate-300 dark:bg-zinc-800 dark:text-white/80 dark:border-zinc-600">
+                            <span className="px-2 py-0.5 rounded-md text-[0.8125rem] font-bold border shrink-0 bg-slate-100 text-black/75 border-slate-300 dark:bg-zinc-800 dark:text-white/80 dark:border-zinc-600">
                               {isEn ? 'Ended' : 'Telah Selesai'}
                             </span>
                           ) : full ? (
-                            <span className="px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800">
+                            <span className="px-2 py-0.5 rounded-md text-[0.8125rem] font-bold border shrink-0 bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800">
                               {isEn ? 'Slots Full' : 'Slot Penuh'}
                             </span>
                           ) : (
                             <span
-                              className={`px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${
+                              className={`px-2 py-0.5 rounded-md text-[0.8125rem] font-bold border shrink-0 ${
                                 isBooked
                                   ? 'bg-emerald-50 text-black border-emerald-300 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-700'
                                   : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/60 dark:text-white dark:border-amber-800/70'
@@ -781,7 +771,7 @@ export const EventsSection: React.FC = () => {
                           )}
                         </div>
                         <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                          {evt.date} · {evt.location} ({evt.district}) · {remainingBooths}/{evt.totalBooths} tapak · {evt.fee}
+                          {evt.date} · {evt.location} ({evt.district}) · Baki {remainingBooths} tapak · {evt.fee}
                         </p>
                       </div>
                     </div>

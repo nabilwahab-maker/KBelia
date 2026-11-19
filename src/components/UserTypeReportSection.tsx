@@ -143,7 +143,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         grantTotal > 0
           ? `RM ${grantTotal.toLocaleString('ms-MY')}`
           : latestBooking?.monthlyRate
-          ? `RM ${latestBooking.monthlyRate}/bln`
+          ? `RM ${latestBooking.monthlyRate}/bulan`
           : biz.ssmNumber || 'Berdaftar';
 
       const statusLabel = latestGrant?.status === 'approved' || latestBooking?.status === 'approved'
@@ -172,7 +172,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         metricDisplay,
         statusLabel,
         statusTone,
-        detailLine: `Kategori: ${biz.category} · No. SSM: ${biz.ssmNumber || 'Dalam Proses'} · Telefon: ${biz.ownerPhone || biz.whatsapp || '-'}`,
+        detailLine: `Kategori: ${biz.category === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : biz.category} · Nombor SSM: ${biz.ssmNumber || 'Dalam Proses'} · Telefon: ${biz.ownerPhone || biz.whatsapp || '-'}`,
         modifiedMs: Math.max(
           getModifiedTimestamp(biz),
           latestBooking ? getModifiedTimestamp(latestBooking) : 0,
@@ -193,11 +193,11 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         userType: 'usahawan',
         userTypeLabel: 'Usahawan Belia',
         locationOrAgency: b.hubLocation || 'Hab KBelia',
-        activitySummary: `Permohonan Kiosk ${b.slotCode} (${b.durationMonths} bln)`,
-        metricDisplay: `RM ${(b.monthlyRate || 150).toLocaleString('ms-MY')}/bln`,
+        activitySummary: `Permohonan Kiosk ${b.slotCode} (${b.durationMonths} bulan)`,
+        metricDisplay: `RM ${(b.monthlyRate || 150).toLocaleString('ms-MY')}/bulan`,
         statusLabel: b.status === 'approved' ? 'Diluluskan' : b.status === 'pending' ? 'Dalam Semakan' : 'Ditolak',
         statusTone: b.status === 'approved' ? 'emerald' : b.status === 'pending' ? 'amber' : 'indigo',
-        detailLine: `Kategori: ${b.businessCategory} · Tarikh Mula: ${b.startDate || '-'} · Telefon: ${b.applicantPhone || '-'}`,
+        detailLine: `Kategori: ${b.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : b.businessCategory} · Tarikh Mula: ${b.startDate || '-'} · Telefon: ${b.applicantPhone || '-'}`,
         modifiedMs: getModifiedTimestamp(b)
       });
     });
@@ -372,13 +372,10 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
       <div className="px-4 py-3.5 sm:px-5 sm:py-4 border-b border-slate-200 dark:border-zinc-700">
         <div className="flex items-center gap-2">
           <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-          <h3 className="text-base sm:text-lg font-bold text-black dark:text-white">
+          <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
             Laporan Data Terkumpul Mengikut Jenis Pengguna
           </h3>
         </div>
-        <p className="text-sm text-black/75 dark:text-white/80 mt-0.5">
-          Susunan bersepadu rekod Usahawan Belia, Panel Mentor, dan Komuniti Awam
-        </p>
       </div>
 
       <div className="p-4 sm:p-5 space-y-4">
@@ -393,7 +390,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                 ) : (
                   <PieChartIcon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 )}
-                <h4 className="text-[0.9375rem] font-bold text-black dark:text-white">
+                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
                   Komposisi Jenis Pengguna
                 </h4>
               </div>
@@ -401,7 +398,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => setChartMode('bar')}
-                  className={`px-2.5 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                  className={`px-2.5 py-1 rounded-md text-[0.8125rem] font-bold transition-colors cursor-pointer whitespace-nowrap ${
                     chartMode === 'bar'
                       ? 'bg-indigo-600 text-white'
                       : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
@@ -412,7 +409,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => setChartMode('donut')}
-                  className={`px-2.5 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                  className={`px-2.5 py-1 rounded-md text-[0.8125rem] font-bold transition-colors cursor-pointer whitespace-nowrap ${
                     chartMode === 'donut'
                       ? 'bg-indigo-600 text-white'
                       : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
@@ -592,7 +589,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             >
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Usahawan Belia</span>
+                <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">Usahawan Belia</span>
                 <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                   <Store className="w-4 h-4" />
                 </div>
@@ -622,7 +619,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             >
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-teal-600/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Panel Mentor</span>
+                <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">Panel Mentor</span>
                 <div className="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                   <GraduationCap className="w-4 h-4" />
                 </div>
@@ -652,7 +649,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             >
               <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-500/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.9375rem] font-bold text-black dark:text-white">Komuniti &amp; Awam</span>
+                <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">Komuniti &amp; Awam</span>
                 <div className="w-9 h-9 rounded-lg bg-amber-500 text-black flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
                   <MessageSquare className="w-4 h-4" />
                 </div>
@@ -689,7 +686,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             onSortChange={setSortBy}
             filterContent={
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/70 dark:text-white/75 mb-1.5">
                   Jenis Pengguna
                 </label>
                 <div className="grid grid-cols-1 gap-1.5">
@@ -705,7 +702,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                       key={tab.id}
                       type="button"
                       onClick={() => setSelectedType(tab.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border text-left transition-colors cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold border text-left transition-colors cursor-pointer ${
                         selectedType === tab.id
                           ? 'bg-blue-600 text-white border-blue-600'
                           : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -769,12 +766,12 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                               <div className="font-semibold text-black dark:text-white leading-snug">
                                 {rec.displayName}
                               </div>
-                              <div className="text-xs text-black/65 dark:text-white/70 truncate max-w-[220px]">
+                              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate max-w-[220px]">
                                 {rec.secondaryEntity}
                               </div>
                             </td>
                             <td className="py-3.5 px-3 whitespace-nowrap">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold text-black dark:text-white ${badgeStyle}`}>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.8125rem] font-semibold text-black dark:text-white ${badgeStyle}`}>
                                 {rec.userTypeLabel}
                               </span>
                             </td>
@@ -788,7 +785,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                               {rec.metricDisplay}
                             </td>
                             <td className="py-3.5 px-3 text-center whitespace-nowrap">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${statusBg}`}>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.8125rem] font-semibold ${statusBg}`}>
                                 {rec.statusLabel}
                               </span>
                             </td>

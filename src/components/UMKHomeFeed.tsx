@@ -33,7 +33,7 @@ import {
   Users
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
-import { CapsuleSlot, BusinessListing, YouthProgram, CapsuleBooking, GrantApplication, KelantanDistrict } from '../types';
+import { CapsuleSlot, BusinessListing, YouthProgram, CapsuleBooking, GrantApplication, KelantanDistrict, formatBusinessCategory } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { KelantanDistrictsMap } from './KelantanDistrictsMap';
@@ -168,11 +168,10 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       {/* 2. KAUNTER PERKHIDMATAN PANTAS 1-KLIK */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <div className="text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white flex items-center gap-2">
+          <div className="text-base sm:text-lg font-extrabold tracking-tight text-black dark:text-white flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-600"></span>
             <span>{t('quick_desk_title')}</span>
           </div>
-          <span className="text-[0.8125rem] text-black/70 dark:text-white/75">{t('quick_desk_subtitle')}</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 w-full min-w-0">
@@ -188,12 +187,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
+              <h3 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight">
                 {t('card_kiosk_title')}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
-                {t('card_kiosk_sub')}
-              </p>
             </div>
           </div>
 
@@ -211,12 +207,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
+              <h3 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight">
                 {t('card_grant_title')}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
-                {t('card_grant_sub')}
-              </p>
             </div>
           </div>
 
@@ -231,12 +224,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
+              <h3 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight">
                 {t('card_academy_title')}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
-                {t('card_academy_sub')}
-              </p>
             </div>
           </div>
 
@@ -251,12 +241,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
+              <h3 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight">
                 {t('card_mentor_title')}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
-                {t('card_mentor_sub')}
-              </p>
             </div>
           </div>
 
@@ -271,12 +258,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
+              <h3 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight">
                 {t('card_status_title')}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
-                {t('card_status_sub')}
-              </p>
             </div>
           </div>
 
@@ -291,12 +275,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
+              <h3 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight">
                 {t('card_pos_title')}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
-                {t('card_pos_sub')}
-              </p>
             </div>
           </div>
 
@@ -311,12 +292,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
+              <h3 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight">
                 {language === 'en' ? 'Ruang Niaga Supplier Matching' : 'Padanan Pembekal Ruang Niaga'}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
-                {language === 'en' ? 'Find & supply business raw materials.' : 'Cari & bekal bahan mentah.'}
-              </p>
             </div>
           </div>
 
@@ -331,12 +309,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
               </div>
             </div>
             <div>
-              <h3 className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white group-hover:text-black dark:group-hover:text-white">
+              <h3 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight">
                 {t('card_maintenance_title')}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5 line-clamp-1">
-                {t('card_maintenance_sub')}
-              </p>
             </div>
           </div>
 
@@ -637,12 +612,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       {/* 6. JADUAL KAPSUL NIAGA TERSEDIA */}
       <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-300 dark:border-slate-600 shadow-xs overflow-hidden transition-colors">
         <div className="bg-white dark:bg-slate-800 p-5 sm:p-6 border-b border-slate-300 dark:border-slate-600">
-          <h2 className="text-base font-extrabold text-black dark:text-white">
+          <h2 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
             {t('slots_list_heading')}
           </h2>
-          <p className="text-[0.9375rem] text-black dark:text-white mt-0.5">
-            {language === 'en' ? 'Youth modular kiosk availability schedule by hub' : 'Jadual ketersediaan kiosk modular belia mengikut hab tumpuan'}
-          </p>
         </div>
 
         <div className="overflow-x-auto w-full min-w-0 scrollbar-thin">
@@ -663,7 +635,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   <tr key={slot.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-16 h-12 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                        <div className="w-16 h-14 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
                           <PortalImage
                             src={resolveSlotImage(slot)}
                             alt={slot.name}
@@ -733,12 +705,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       {/* 7. DIREKTORI USAHAWAN BELIA PILIHAN */}
       <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-300 dark:border-slate-600 p-5 sm:p-6 shadow-xs transition-colors w-full min-w-0">
         <div className="mb-4">
-          <h2 className="text-base font-extrabold text-black dark:text-white">
+          <h2 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
             {language === 'en' ? 'Local Youth Entrepreneurs' : 'Usahawan Belia Tempatan'}
           </h2>
-          <p className="text-[0.9375rem] text-black dark:text-white mt-0.5">
-            {language === 'en' ? 'Support products & services produced by Kelantan youth community' : 'Sokong produk & perkhidmatan keluaran komuniti belia Kelantan'}
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5 w-full min-w-0">
@@ -759,7 +728,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                     src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                     alt={biz.businessName}
                     referrerPolicy="no-referrer"
-                    className="w-12 h-12 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0 group-hover:scale-105 transition-transform"
+                    className="w-14 h-14 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0 group-hover:scale-105 transition-transform"
                   />
                   <div className="overflow-hidden flex-1">
                     <div className="flex items-center gap-1">
@@ -774,7 +743,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                       </span>
                     </div>
                     <div className="text-[0.8125rem] text-black dark:text-white font-semibold truncate mt-0.5">
-                      {biz.category}
+                      {formatBusinessCategory(biz.category)}
                     </div>
                     <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate flex items-center gap-1 mt-1">
                       <MapPin className="w-3 h-3 text-black dark:text-white/75 shrink-0" />

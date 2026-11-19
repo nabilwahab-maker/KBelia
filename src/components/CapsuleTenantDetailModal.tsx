@@ -190,7 +190,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
               </div>
               <div>
                 <span className="text-[0.8125rem] text-black/70 dark:text-white/75 block uppercase font-semibold">Kadar Sewa:</span>
-                <strong className="text-black dark:text-white/75 font-bold tabular-nums">RM{slot.monthlyRate}/bln</strong>
+                <strong className="text-black dark:text-white/75 font-bold tabular-nums">RM{slot.monthlyRate}/bulan</strong>
               </div>
               <div>
                 <span className="text-[0.8125rem] text-black/70 dark:text-white/75 block uppercase font-semibold">Jajahan:</span>
