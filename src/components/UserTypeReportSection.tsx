@@ -3,7 +3,7 @@ import {
   Users,
   Store,
   GraduationCap,
-  MessageSquare,
+  ShieldCheck,
   PieChart as PieChartIcon,
   BarChart3,
   FileText
@@ -45,7 +45,7 @@ import {
 import { useAnimatedMetric, usePrefersReducedMotion } from '../hooks/useMotion';
 import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
 
-export type ReportUserTypeKey = 'all' | 'usahawan' | 'mentor' | 'komuniti';
+export type ReportUserTypeKey = 'all' | 'belia' | 'mentor' | 'admin';
 
 interface UserTypeReportRecord {
   id: string;
@@ -76,7 +76,7 @@ interface UserTypeReportSectionProps {
 }
 
 const USER_TYPE_COLORS: Record<Exclude<ReportUserTypeKey, 'all'>, { fill: string; label: string; badgeBg: string }> = {
-  usahawan: {
+  belia: {
     fill: '#2563EB',
     label: 'Usahawan Belia',
     badgeBg: 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70'
@@ -86,10 +86,10 @@ const USER_TYPE_COLORS: Record<Exclude<ReportUserTypeKey, 'all'>, { fill: string
     label: 'Panel Mentor',
     badgeBg: 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70'
   },
-  komuniti: {
-    fill: '#D97706',
-    label: 'Komuniti & Awam',
-    badgeBg: 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/70'
+  admin: {
+    fill: '#4F46E5',
+    label: 'Admin Sistem',
+    badgeBg: 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800/70'
   }
 };
 
@@ -99,7 +99,11 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
   grantApplications = [],
   mentors = [],
   mentorshipRegistrations = [],
-  communityPosts = []
+  maintenanceTickets = [],
+  programs = [],
+  newsItems = [],
+  communityPosts = [],
+  portalSettings
 }) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const [selectedType, setSelectedType] = useState<ReportUserTypeKey>('all');
@@ -165,7 +169,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         id: `usr-biz-${biz.id}`,
         displayName: biz.ownerName || 'Usahawan Belia',
         secondaryEntity: biz.businessName,
-        userType: 'usahawan',
+        userType: 'belia',
         userTypeLabel: 'Usahawan Belia',
         locationOrAgency: biz.district || 'Kelantan',
         activitySummary: activityParts.join(' · '),
@@ -190,7 +194,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         id: `usr-bk-${b.id}`,
         displayName: b.applicantName,
         secondaryEntity: b.businessName,
-        userType: 'usahawan',
+        userType: 'belia',
         userTypeLabel: 'Usahawan Belia',
         locationOrAgency: b.hubLocation || 'Hab KBelia',
         activitySummary: `Permohonan Kiosk ${b.slotCode} (${b.durationMonths} bulan)`,
@@ -210,7 +214,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         id: `usr-gr-${g.id}`,
         displayName: g.applicantName,
         secondaryEntity: g.businessName,
-        userType: 'usahawan',
+        userType: 'belia',
         userTypeLabel: 'Usahawan Belia',
         locationOrAgency: g.district || 'Kelantan',
         activitySummary: `Permohonan ${g.programTitle}`,
@@ -247,22 +251,60 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
       });
     });
 
-    // 3. Komuniti & Pelawat Awam
+    // 3. Penglibatan Forum Dalaman Mengikut Peranan (Belia / Mentor / Admin)
     communityPosts.forEach((post) => {
+      const roleKey: Exclude<ReportUserTypeKey, 'all'> =
+        post.authorRole === 'admin'
+          ? 'admin'
+          : post.authorRole === 'mentor'
+          ? 'mentor'
+          : 'belia';
       records.push({
         id: `usr-com-${post.id}`,
-        displayName: post.authorName || 'Ahli Komuniti',
+        displayName: post.authorName || (roleKey === 'admin' ? 'Admin Portal' : roleKey === 'mentor' ? 'Panel Mentor' : 'Usahawan Belia'),
         secondaryEntity: post.title,
-        userType: 'komuniti',
-        userTypeLabel: 'Komuniti & Awam',
+        userType: roleKey,
+        userTypeLabel: USER_TYPE_COLORS[roleKey].label,
         locationOrAgency: `${post.district} · ${post.category}`,
-        activitySummary: `Topik Komuniti (${post.category})`,
+        activitySummary: `Perbincangan Portal (${post.category})`,
         metricDisplay: `${post.replyCount || 0} Balasan · ${post.helpfulCount || 0} Sokong`,
         statusLabel: post.status === 'resolved' ? 'Terjawab' : 'Aktif',
         statusTone: post.status === 'resolved' ? 'emerald' : 'blue',
         detailLine: post.content.slice(0, 160) + (post.content.length > 160 ? '...' : ''),
         modifiedMs: getModifiedTimestamp(post)
       });
+    });
+
+    // 4. Rekod Tadbir Urus Admin Sistem (Pentadbir Utama & Urusetia Portal)
+    const chiefAdminName = portalSettings?.adminOfficerName || 'Pentadbir Sistem KBelia';
+    records.push({
+      id: 'usr-adm-chief',
+      displayName: chiefAdminName,
+      secondaryEntity: 'Pentadbir Utama Portal KBelia Kelantan',
+      userType: 'admin',
+      userTypeLabel: 'Admin Sistem',
+      locationOrAgency: 'Kompleks Kota Darulnaim, Kota Bharu',
+      activitySummary: 'Pengurusan Kiosk, Kelulusan Geran & Audit Portal',
+      metricDisplay: `${bookings.length + grantApplications.length} Semakan`,
+      statusLabel: portalSettings?.systemStatus === 'maintenance' ? 'Penyelenggaraan' : 'Aktif',
+      statusTone: portalSettings?.systemStatus === 'maintenance' ? 'amber' : 'indigo',
+      detailLine: `Menguruskan ${businesses.length} perniagaan belia berdaftar serta penjadualan slot kiosk.`,
+      modifiedMs: Date.now()
+    });
+
+    records.push({
+      id: 'usr-adm-urusetia',
+      displayName: 'Urusetia Pengurusan KBelia',
+      secondaryEntity: 'Unit Pemantauan Program, Aduan & Siaran Berita',
+      userType: 'admin',
+      userTypeLabel: 'Admin Sistem',
+      locationOrAgency: 'Unit Pembangunan Ekonomi Belia',
+      activitySummary: `Seliaan ${programs.length} Skim & ${maintenanceTickets.length} Aduan Teknikal`,
+      metricDisplay: `${programs.length} Skim · ${newsItems.length} Berita`,
+      statusLabel: 'Aktif',
+      statusTone: 'indigo',
+      detailLine: `Menyelaras ${newsItems.length} pengumuman rasmi dan ${maintenanceTickets.length} tiket penyelenggaraan kiosk.`,
+      modifiedMs: Date.now() - 1000
     });
 
     return records;
@@ -272,14 +314,18 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
     grantApplications,
     mentors,
     mentorshipRegistrations,
-    communityPosts
+    maintenanceTickets,
+    programs,
+    newsItems,
+    communityPosts,
+    portalSettings
   ]);
 
   const countsByType = useMemo(() => {
     const counts = {
-      usahawan: 0,
+      belia: 0,
       mentor: 0,
-      komuniti: 0
+      admin: 0
     };
     consolidatedRecords.forEach((r) => {
       counts[r.userType] += 1;
@@ -289,12 +335,12 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
 
   const totalCount = Math.max(1, consolidatedRecords.length);
 
-  const animatedUsahawanCount = useAnimatedMetric(countsByType.usahawan);
+  const animatedBeliaCount = useAnimatedMetric(countsByType.belia);
   const animatedMentorCount = useAnimatedMetric(countsByType.mentor);
-  const animatedKomunitiCount = useAnimatedMetric(countsByType.komuniti);
-  const animatedUsahawanPct = useAnimatedMetric(`${Math.round((countsByType.usahawan / totalCount) * 100)}%`);
+  const animatedAdminCount = useAnimatedMetric(countsByType.admin);
+  const animatedBeliaPct = useAnimatedMetric(`${Math.round((countsByType.belia / totalCount) * 100)}%`);
   const animatedMentorPct = useAnimatedMetric(`${Math.round((countsByType.mentor / totalCount) * 100)}%`);
-  const animatedKomunitiPct = useAnimatedMetric(`${Math.round((countsByType.komuniti / totalCount) * 100)}%`);
+  const animatedAdminPct = useAnimatedMetric(`${Math.round((countsByType.admin / totalCount) * 100)}%`);
 
   const donutChartData = useMemo(
     () =>
@@ -302,11 +348,11 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         key,
         name: USER_TYPE_COLORS[key].label,
         shortLabel:
-          key === 'usahawan'
-            ? 'Usahawan'
+          key === 'belia'
+            ? 'Belia'
             : key === 'mentor'
             ? 'Mentor'
-            : 'Komuniti',
+            : 'Admin',
         count: countsByType[key],
         percentage: Math.round((countsByType[key] / totalCount) * 100),
         color: USER_TYPE_COLORS[key].fill
@@ -579,10 +625,10 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 items-stretch">
             <button
               type="button"
-              onClick={() => setSelectedType(selectedType === 'usahawan' ? 'all' : 'usahawan')}
+              onClick={() => setSelectedType(selectedType === 'belia' ? 'all' : 'belia')}
               style={{ '--stagger': 0 } as React.CSSProperties}
               className={`animate-dashboard-card group relative overflow-hidden h-full p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-pointer flex flex-col justify-between gap-2.5 ${
-                selectedType === 'usahawan'
+                selectedType === 'belia'
                   ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-600 ring-1 ring-blue-500/40'
                   : 'bg-slate-50/80 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 hover:bg-blue-50/40 dark:hover:bg-zinc-800/70 hover:border-blue-400/70'
               }`}
@@ -596,10 +642,10 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
               </div>
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
-                  {animatedUsahawanCount}
+                  {animatedBeliaCount}
                 </span>
                 <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {animatedUsahawanPct}
+                  {animatedBeliaPct}
                 </span>
               </div>
               <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
@@ -639,31 +685,31 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
 
             <button
               type="button"
-              onClick={() => setSelectedType(selectedType === 'komuniti' ? 'all' : 'komuniti')}
+              onClick={() => setSelectedType(selectedType === 'admin' ? 'all' : 'admin')}
               style={{ '--stagger': 2 } as React.CSSProperties}
               className={`animate-dashboard-card group relative overflow-hidden h-full p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-pointer flex flex-col justify-between gap-2.5 ${
-                selectedType === 'komuniti'
-                  ? 'bg-amber-50/90 dark:bg-amber-950/40 border-amber-600 ring-1 ring-amber-500/40'
-                  : 'bg-slate-50/80 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 hover:bg-amber-50/40 dark:hover:bg-zinc-800/70 hover:border-amber-400/70'
+                selectedType === 'admin'
+                  ? 'bg-indigo-50/90 dark:bg-indigo-950/40 border-indigo-600 ring-1 ring-indigo-500/40'
+                  : 'bg-slate-50/80 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 hover:bg-indigo-50/40 dark:hover:bg-zinc-800/70 hover:border-indigo-400/70'
               }`}
             >
-              <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-500/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-indigo-600/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
               <div className="flex items-center justify-between gap-2">
-                <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">Komuniti &amp; Awam</span>
-                <div className="w-9 h-9 rounded-lg bg-amber-500 text-black flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
-                  <MessageSquare className="w-4 h-4" />
+                <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">Admin Sistem</span>
+                <div className="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
+                  <ShieldCheck className="w-4 h-4" />
                 </div>
               </div>
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
-                  {animatedKomunitiCount}
+                  {animatedAdminCount}
                 </span>
                 <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {animatedKomunitiPct}
+                  {animatedAdminPct}
                 </span>
               </div>
               <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
-                {communityPosts.length} topik perbincangan forum komuniti
+                Pentadbir &amp; urusetia · {programs.length} program · {newsItems.length} siaran
               </p>
             </button>
           </div>
@@ -693,9 +739,9 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                   {(
                     [
                       { id: 'all', label: `Semua (${consolidatedRecords.length})` },
-                      { id: 'usahawan', label: `Usahawan (${countsByType.usahawan})` },
+                      { id: 'belia', label: `Belia (${countsByType.belia})` },
                       { id: 'mentor', label: `Mentor (${countsByType.mentor})` },
-                      { id: 'komuniti', label: `Komuniti (${countsByType.komuniti})` }
+                      { id: 'admin', label: `Admin (${countsByType.admin})` }
                     ] as const
                   ).map((tab) => (
                     <button

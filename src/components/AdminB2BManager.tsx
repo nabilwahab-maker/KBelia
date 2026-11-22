@@ -565,7 +565,7 @@ export const AdminB2BManager: React.FC = () => {
           accent="indigo"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder="Cari iklan, perniagaan atau daerah..."
+          searchPlaceholder="Cari iklan, syarikat atau daerah..."
           filterCount={activeFilterCount}
           onResetFilters={() => {
             setFilterType('all');

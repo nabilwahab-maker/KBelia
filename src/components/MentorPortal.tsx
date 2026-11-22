@@ -1865,7 +1865,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   accent="teal"
                   searchValue={overviewSearch}
                   onSearchChange={setOverviewSearch}
-                  searchPlaceholder="Cari usahawan, perniagaan, topik atau daerah..."
+                  searchPlaceholder="Cari usahawan, topik atau daerah..."
                   filterCount={
                     (overviewStatusFilter !== 'all' ? 1 : 0) +
                     (overviewDistrictFilter !== 'all' ? 1 : 0) +
@@ -2114,7 +2114,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 accent="teal"
                 searchValue={searchQuery}
                 onSearchChange={setSearchQuery}
-                searchPlaceholder="Cari usahawan, perniagaan, topik atau daerah..."
+                searchPlaceholder="Cari usahawan, topik atau daerah..."
                 filterCount={
                   (statusFilter !== 'all' ? 1 : 0) +
                   (modeFilter !== 'all' ? 1 : 0) +
@@ -2491,7 +2491,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 accent="teal"
                 searchValue={scheduleSearch}
                 onSearchChange={setScheduleSearch}
-                searchPlaceholder="Cari usahawan, topik atau tarikh sesi..."
+                searchPlaceholder="Cari usahawan, topik atau tarikh..."
                 filterCount={(scheduleModeFilter !== 'all' ? 1 : 0) + (scheduleSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
                 onResetFilters={() => {
                   setScheduleModeFilter('all');
@@ -2766,7 +2766,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 accent="teal"
                 searchValue={actionPlansSearch}
                 onSearchChange={setActionPlansSearch}
-                searchPlaceholder="Cari usahawan, topik atau kandungan nota..."
+                searchPlaceholder="Cari usahawan, topik atau nota..."
                 filterCount={
                   (actionPlansDistrictFilter !== 'all' ? 1 : 0) +
                   (actionPlansSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
@@ -3024,7 +3024,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 accent="teal"
                 searchValue={endorsementsSearch}
                 onSearchChange={setEndorsementsSearch}
-                searchPlaceholder="Cari nama usahawan, kod perakuan atau daerah..."
+                searchPlaceholder="Cari usahawan, kod atau daerah..."
                 filterCount={
                   (endorsementsGrantFilter !== 'all' ? 1 : 0) +
                   (endorsementsSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
@@ -3207,7 +3207,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               accent="teal"
               searchValue={logsSearch}
               onSearchChange={setLogsSearch}
-              searchPlaceholder="Cari usahawan, topik atau tarikh sesi..."
+              searchPlaceholder="Cari usahawan, topik atau tarikh..."
               filterCount={(logsStatusFilter !== 'all' ? 1 : 0) + (logsSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
               onResetFilters={() => {
                 setLogsStatusFilter('all');

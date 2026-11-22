@@ -116,7 +116,7 @@ import {
 } from 'lucide-react';
 
 function MainApp() {
-  const { user, userProfile, isAdmin, isMentor, isYouth: isAuthenticatedYouth, openLoginModal } = useAuth();
+  const { user, userProfile, isAdmin, isMentor, isYouth: isAuthenticatedYouth, loading: authLoading } = useAuth();
   const { t, language } = useLanguage();
   const isYouth = !isAdmin && !isMentor;
   const { theme } = useTheme();
@@ -227,6 +227,14 @@ function MainApp() {
     window.addEventListener('kbelia_session_terminated', handleSessionTerminated);
     return () => window.removeEventListener('kbelia_session_terminated', handleSessionTerminated);
   }, []);
+
+  // Strict Portal Auth Guard: Only 'landing', 'login', and 'register' are accessible without an authenticated account
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user && activeTab !== 'landing' && activeTab !== 'login' && activeTab !== 'register') {
+      setActiveTab('login');
+    }
+  }, [authLoading, user, activeTab]);
 
   // Core States
   const [slots, setSlots] = useState<CapsuleSlot[]>(INITIAL_CAPSULE_SLOTS);
@@ -668,27 +676,29 @@ function MainApp() {
       }
     });
 
-    const unsubProd = onSnapshot(
-      collection(db, 'products'),
-      (snapshot) => {
-        const loaded: ProductItem[] = [];
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          const seedProd = INITIAL_PRODUCTS.find(p => p.id === docSnap.id);
-          loaded.push({
-            id: docSnap.id,
-            ...data,
-            imageUrl: normalizeAsset(data.imageUrl, seedProd?.imageUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg')
-          } as ProductItem);
-        });
-        firestoreProd = loaded;
-        recomputeProd();
-      },
-      (err) => {
-        console.debug('Products listener notice:', err?.message || err);
-        recomputeProd();
-      }
-    );
+    const unsubProd = user && auth.currentUser
+      ? onSnapshot(
+          collection(db, 'products'),
+          (snapshot) => {
+            const loaded: ProductItem[] = [];
+            snapshot.forEach((docSnap) => {
+              const data = docSnap.data();
+              const seedProd = INITIAL_PRODUCTS.find(p => p.id === docSnap.id);
+              loaded.push({
+                id: docSnap.id,
+                ...data,
+                imageUrl: normalizeAsset(data.imageUrl, seedProd?.imageUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg')
+              } as ProductItem);
+            });
+            firestoreProd = loaded;
+            recomputeProd();
+          },
+          (err) => {
+            console.debug('Products listener notice:', err?.message || err);
+            recomputeProd();
+          }
+        )
+      : () => {};
 
     const unsubDemoProd = subscribeDemoSyncCollection<ProductItem>('product', (items, delIds) => {
       demoSyncProd = items;
@@ -1421,7 +1431,25 @@ function MainApp() {
         (b.status === 'pending' || b.status === 'approved')
     );
 
+  const promptBeliaLoginForAction = (message: string) => {
+    showToast({
+      type: 'info',
+      title: language === 'en' ? 'Belia Login Required' : 'Log Masuk Belia Diperlukan',
+      message
+    });
+    setActiveTab('login');
+  };
+
   const handleOpenBookingForSlot = (slot: CapsuleSlot) => {
+    if (!user) {
+      promptBeliaLoginForAction(
+        language === 'en'
+          ? 'Please sign in with a Belia account to view full kiosk details or submit an application.'
+          : 'Sila log masuk akaun Belia Kelantan untuk melihat butiran penuh kiosk atau membuat permohonan.'
+      );
+      return;
+    }
+
     // If slot is occupied, reserved, or has an active tenant, display the Tenant & Capsule details dossier
     const isOccupied = slot.status !== 'available' || Boolean(slot.currentTenantBusinessName);
     if (isOccupied) {
@@ -1442,11 +1470,6 @@ function MainApp() {
       return;
     }
 
-    if (!user) {
-      openLoginModal();
-      return;
-    }
-
     if (hasActiveYouthBooking) {
       showToast({
         type: 'warning',
@@ -1464,22 +1487,34 @@ function MainApp() {
   };
 
   const handleOpenTenantDetail = (slot: CapsuleSlot) => {
+    if (!user) {
+      promptBeliaLoginForAction(
+        language === 'en'
+          ? 'Please sign in with a Belia account to view tenant details.'
+          : 'Sila log masuk akaun Belia Kelantan untuk melihat profil penyewa kiosk.'
+      );
+      return;
+    }
     setSelectedSlotForTenantDetail(slot);
     setIsTenantDetailModalOpen(true);
   };
 
   const handleOpenNewBooking = () => {
+    if (!user) {
+      promptBeliaLoginForAction(
+        language === 'en'
+          ? 'Please sign in with a Belia account to apply for a kiosk.'
+          : 'Sila log masuk akaun Belia Kelantan untuk memohon tapak kiosk.'
+      );
+      return;
+    }
+
     if (isAdmin || isMentor) {
       showToast({
         type: 'warning',
         title: 'Batas Peranan Sistem',
         message: 'Borang permohonan tapak kiosk dikhaskan untuk Usahawan Belia sahaja.'
       });
-      return;
-    }
-
-    if (!user) {
-      openLoginModal();
       return;
     }
 
@@ -1501,6 +1536,15 @@ function MainApp() {
   };
 
   const handleOpenGrantModal = (programTitle?: string, amount?: string) => {
+    if (!user) {
+      promptBeliaLoginForAction(
+        language === 'en'
+          ? 'Please sign in with a Belia account to apply for grants.'
+          : 'Sila log masuk akaun Belia Kelantan untuk membuat permohonan geran.'
+      );
+      return;
+    }
+
     if (isAdmin || isMentor) {
       showToast({
         type: 'warning',
@@ -1535,6 +1579,14 @@ function MainApp() {
   };
 
   const handleOpenBusinessDetail = (biz: BusinessListing) => {
+    if (!user) {
+      promptBeliaLoginForAction(
+        language === 'en'
+          ? 'Please sign in with a Belia account to inspect entrepreneur product details.'
+          : 'Sila log masuk akaun Belia Kelantan untuk melihat butiran produk dan berhubung dengan rakan usahawan.'
+      );
+      return;
+    }
     setSelectedBusinessForDetail(biz);
     setIsBusinessDetailModalOpen(true);
   };
@@ -1650,6 +1702,19 @@ function MainApp() {
           products={products.filter(p => selectedBusinessForDetail && p.businessId === selectedBusinessForDetail.id)}
         />
 
+        <LoginModal />
+      </div>
+    );
+  }
+
+  // Hard Auth Guard: Prevent any unauthenticated access to internal portal/dashboard modules
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-black dark:text-white font-sans antialiased transition-colors duration-200">
+        <LoginPage
+          setActiveTab={setActiveTab}
+          onOpenBooking={handleOpenNewBooking}
+        />
         <LoginModal />
       </div>
     );
@@ -1928,7 +1993,7 @@ function MainApp() {
                   <Lock className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Direktori Awam Disekat</h3>
+                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Direktori Usahawan Disekat</h3>
                   <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
                     Untuk keselamatan dan batas peranan, Mentor hanya melihat usahawan mentee di bawah seliaan sendiri di Portal Mentor.
                   </p>

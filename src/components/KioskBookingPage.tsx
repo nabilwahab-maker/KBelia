@@ -15,9 +15,10 @@ import {
   PenTool,
   Clock,
   ShieldCheck,
-  Compass,
   ClipboardList,
   Zap,
+  Wifi,
+  Maximize2,
   Printer,
   Download,
   Wrench,
@@ -27,6 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
+  ChevronUp,
   MoreHorizontal,
   Search,
   SlidersHorizontal,
@@ -171,9 +173,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     [myBookings]
   );
 
-  const [bookHubFilter, setBookHubFilter] = useState<string>('Semua');
-
-  const occupiedOrReservedCount = Math.max(0, safeAllSlots.length - availableSlots.length);
+  const [isGoodToKnowExpanded, setIsGoodToKnowExpanded] = useState(false);
 
   const rateStats = useMemo(() => {
     const source = availableSlots.length > 0 ? availableSlots : safeAllSlots;
@@ -191,74 +191,6 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
         : `RM ${min.toLocaleString('ms-MY')} - RM ${max.toLocaleString('ms-MY')} / bln`;
     return { min, max, label };
   }, [availableSlots, safeAllSlots]);
-
-  const hubBreakdown = useMemo(() => {
-    const canonicalHubs = [
-      { hubKey: 'Hab Usahawan Bachok', shortLabel: 'Bachok', match: ['bachok', 'umk'] },
-      { hubKey: 'Hub Belia Kota Bharu', shortLabel: 'Kota Bharu', match: ['kota bharu', 'kb sentral'] },
-      { hubKey: 'Hub Kraf Tumpat', shortLabel: 'Tumpat', match: ['tumpat'] },
-      { hubKey: 'Hub Pasir Mas', shortLabel: 'Pasir Mas', match: ['pasir mas'] },
-      { hubKey: 'Hub Komuniti Jeli', shortLabel: 'Jeli', match: ['jeli'] }
-    ];
-
-    const buckets = new Map<
-      string,
-      {
-        hubKey: string;
-        shortLabel: string;
-        total: number;
-        available: number;
-        firstAvailableSlot: CapsuleSlot | null;
-      }
-    >();
-
-    for (const slot of safeAllSlots) {
-      if (!slot) continue;
-      const locLower = (slot.hubLocation || '').toLowerCase();
-      const distLower = (slot.district || '').toLowerCase();
-      const matchedCanonical = canonicalHubs.find((h) =>
-        h.match.some((kw) => locLower.includes(kw) || distLower === kw)
-      );
-
-      const hubKey = matchedCanonical?.hubKey || slot.hubLocation || slot.district || 'Lain-lain';
-      const shortLabel = matchedCanonical?.shortLabel || slot.district || slot.hubLocation || 'Lain-lain';
-      const isFree = slot.status === 'available' && !slot.currentTenantBusinessName;
-
-      const existing = buckets.get(hubKey) || {
-        hubKey,
-        shortLabel,
-        total: 0,
-        available: 0,
-        firstAvailableSlot: null
-      };
-      existing.total += 1;
-      if (isFree) {
-        existing.available += 1;
-        if (!existing.firstAvailableSlot) existing.firstAvailableSlot = slot;
-      }
-      buckets.set(hubKey, existing);
-    }
-
-    return Array.from(buckets.values()).sort((a, b) => b.available - a.available || b.total - a.total);
-  }, [safeAllSlots]);
-
-  const filteredBookAvailableSlots = useMemo(() => {
-    if (bookHubFilter === 'Semua') return availableSlots;
-    const target = hubBreakdown.find((h) => h.hubKey === bookHubFilter);
-    if (!target) return availableSlots;
-    const shortLower = target.shortLabel.toLowerCase();
-    return availableSlots.filter((slot) => {
-      const locLower = (slot.hubLocation || '').toLowerCase();
-      const distLower = (slot.district || '').toLowerCase();
-      return (
-        slot.hubLocation === target.hubKey ||
-        locLower.includes(shortLower) ||
-        distLower === shortLower ||
-        (shortLower === 'bachok' && locLower.includes('umk')) ||
-        (shortLower === 'kota bharu' && locLower.includes('kb sentral'))
-      );
-    });
-  }, [availableSlots, bookHubFilter, hubBreakdown]);
 
   // Form states for inline dedicated booking page
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -560,7 +492,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     if (view === 'book') {
       setSubmitted(false);
       setStep(1);
-      setBookHubFilter('Semua');
+      setIsGoodToKnowExpanded(false);
       setError(null);
       setFieldErrors({});
 
@@ -597,38 +529,41 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     }
   }, [view, businessName, businessCategory, phone, icNumber, pitchNotes, selectedSlotId]);
 
-  // Sync preselectedSlot when explicitly selected from browse view
+  // Sync preselectedSlot when explicitly selected from Peta Hab
   useEffect(() => {
     if (
       preselectedSlot &&
       preselectedSlot.status === 'available' &&
       !preselectedSlot.currentTenantBusinessName
     ) {
-      const matched = availableSlots.find((s) => s.id === preselectedSlot.id);
-      if (matched) {
-        setSelectedSlotId(matched.id);
-      }
+      setSelectedSlotId(preselectedSlot.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preselectedSlot]);
 
-  // Keep selectedSlotId synchronized with currently available slots (and active hub filter in book view)
+  // Keep selectedSlotId synchronized with currently available slots
   useEffect(() => {
-    const pool = filteredBookAvailableSlots.length > 0 ? filteredBookAvailableSlots : availableSlots;
+    if (
+      preselectedSlot &&
+      preselectedSlot.status === 'available' &&
+      !preselectedSlot.currentTenantBusinessName
+    ) {
+      return;
+    }
     setSelectedSlotId((prev) => {
-      if (prev && pool.some((s) => s.id === prev)) {
+      if (prev && availableSlots.some((s) => s.id === prev)) {
         return prev;
       }
-      return pool[0]?.id || '';
+      return availableSlots[0]?.id || '';
     });
-  }, [availableSlots, filteredBookAvailableSlots]);
+  }, [availableSlots, preselectedSlot]);
 
   const currentSlot =
-    filteredBookAvailableSlots.find((s) => s.id === selectedSlotId) ||
-    availableSlots.find((s) => s.id === selectedSlotId) ||
-    filteredBookAvailableSlots[0] ||
-    availableSlots[0] ||
-    null;
+    (preselectedSlot &&
+    preselectedSlot.status === 'available' &&
+    !preselectedSlot.currentTenantBusinessName
+      ? availableSlots.find((s) => s.id === preselectedSlot.id) || preselectedSlot
+      : availableSlots.find((s) => s.id === selectedSlotId) || availableSlots[0]) || null;
   const isCurrentSlotAvailable = Boolean(
     currentSlot && currentSlot.status === 'available' && !currentSlot.currentTenantBusinessName
   );
@@ -703,6 +638,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
 
     if (isMaintenanceMode) {
       setError('Sistem permohonan baharu sedang diselenggara buat sementara waktu. Sila cuba sebentar lagi.');
+      return;
+    }
+
+    if (!currentSlot) {
+      setError('Tiada unit kiosk dipilih. Sila pilih unit dari Peta Kiosk.');
       return;
     }
 
@@ -791,205 +731,6 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     }
   };
 
-  const handleSelectHubFromSummary = (hubKey: string) => {
-    if (onSelectHub) {
-      onSelectHub(hubKey);
-    }
-    onChangeView('browse');
-  };
-
-  const renderSummaryMetricsBar = () => (
-    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm">
-      <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200 dark:divide-zinc-700">
-        {/* Metrik 1: Kekosongan Unit Kiosk */}
-        <div className="p-4 sm:p-5 flex flex-col justify-between gap-1.5">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
-              Kekosongan Kiosk
-            </span>
-            <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-          </div>
-          <div className="text-lg sm:text-xl font-black text-black dark:text-white tabular-nums">
-            {availableSlots.length} / {safeAllSlots.length} Unit Tersedia
-          </div>
-          <p className="text-[0.8125rem] text-black/70 dark:text-white/75 leading-snug tabular-nums">
-            {occupiedOrReservedCount} unit sedang beroperasi atau ditempah · {availableSlots.length > 0 ? 'Sedia untuk permohonan baharu' : 'Semua unit penuh sementara'}
-          </p>
-        </div>
-
-        {/* Metrik 2: Kadar Subsidi & Julat Sewa */}
-        <div className="p-4 sm:p-5 flex flex-col justify-between gap-1.5">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
-              Kadar Subsidi Belia
-            </span>
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-          </div>
-          <div className="text-lg sm:text-xl font-black text-black dark:text-white tabular-nums">
-            {subsidyRate}% Subsidi · {rateStats.label}
-          </div>
-          <p className="text-[0.8125rem] text-black/70 dark:text-white/75 leading-snug tabular-nums">
-            Tempoh sewaan fleksibel 3 hingga {maxLeaseDuration} bulan · Termasuk utiliti asas hab
-          </p>
-        </div>
-
-        {/* Metrik 3: Lokasi Hab Aktif */}
-        <div className="p-4 sm:p-5 flex flex-col justify-between gap-2">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
-              Lokasi Hab ({hubBreakdown.length} Jajahan)
-            </span>
-            <MapPin className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-          </div>
-          {hubBreakdown.length > 0 ? (
-            <div className="flex flex-wrap gap-1.5">
-              {hubBreakdown.map((hub) => (
-                <button
-                  key={hub.hubKey}
-                  type="button"
-                  onClick={() => handleSelectHubFromSummary(hub.hubKey)}
-                  title={`Lihat unit kiosk di ${hub.hubKey}`}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50/70 dark:hover:bg-blue-950/40 text-[0.8125rem] font-semibold text-black dark:text-white transition-colors cursor-pointer tabular-nums"
-                >
-                  <span>{hub.shortLabel}</span>
-                  <span className="text-black/60 dark:text-white/65 font-mono">
-                    {hub.available}/{hub.total}
-                  </span>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="text-sm font-semibold text-black/75 dark:text-white/75">
-              Tiada rekod hab berdaftar buat masa ini.
-            </div>
-          )}
-          <p className="text-[0.8125rem] text-black/70 dark:text-white/75 leading-snug">
-            Klik mana-mana hab untuk melihat unit tersedia mengikut lokasi.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderApplicationGuideGrid = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-      {/* Lajur Kiri: Panduan Langkah Permohonan */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm flex flex-col">
-        <div className="px-5 py-4 border-b border-slate-200 dark:border-zinc-700 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <ClipboardList className="w-4.5 h-4.5 text-blue-600 dark:text-blue-400 shrink-0" />
-            <h2 className="text-base font-extrabold text-black dark:text-white tracking-tight">
-              Panduan Langkah Permohonan
-            </h2>
-          </div>
-          <span className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70 tabular-nums">
-            4 Peringkat
-          </span>
-        </div>
-
-        <div className="p-5 space-y-4 flex-1">
-          {[
-            {
-              num: '01',
-              title: 'Pilih Unit Kiosk & Tempoh Sewaan',
-              desc: `Pilih hab perniagaan pilihan anda bersama pakej sewaan 3, 6, atau sehingga ${maxLeaseDuration} bulan pada kadar subsidi belia.`
-            },
-            {
-              num: '02',
-              title: 'Lengkapkan Profil Perniagaan',
-              desc: 'Masukkan nama perniagaan, kategori produk atau servis, nombor telefon aktif, dan ringkasan operasi harian anda.'
-            },
-            {
-              num: '03',
-              title: 'Semakan & Kelulusan Urusetia',
-              desc: 'Pegawai penyelaras menyemak kelayakan belia dan kesesuaian unit sebelum mengesahkan tempahan anda.'
-            },
-            {
-              num: '04',
-              title: 'Surat Tawaran QR & Perjanjian Sewa',
-              desc: 'Sebaik diluluskan, Surat Tawaran Digital berkod QR dan Perjanjian Sewa Kiosk tersedia terus di halaman ini.'
-            }
-          ].map((item) => (
-            <div key={item.num} className="flex items-start gap-3.5">
-              <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 flex items-center justify-center font-mono text-[0.8125rem] font-extrabold text-black dark:text-white shrink-0 tabular-nums">
-                {item.num}
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-sm font-bold text-black dark:text-white leading-snug">
-                  {item.title}
-                </h3>
-                <p className="text-[0.8125rem] text-black/75 dark:text-white/75 leading-relaxed mt-0.5">
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Lajur Kanan: Syarat Kelayakan Belia & Kemudahan Termasuk */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm flex flex-col">
-        <div className="px-5 py-4 border-b border-slate-200 dark:border-zinc-700 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <ShieldCheck className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h2 className="text-base font-extrabold text-black dark:text-white tracking-tight">
-              Syarat Kelayakan &amp; Kemudahan Kiosk
-            </h2>
-          </div>
-          <span className="text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
-            Garis Panduan
-          </span>
-        </div>
-
-        <div className="p-5 space-y-5 flex-1 flex flex-col justify-between">
-          <div className="space-y-2.5">
-            <h3 className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
-              Syarat Utama Pemohon
-            </h3>
-            <ul className="space-y-2.5 text-sm text-black dark:text-white">
-              {[
-                'Terhad kepada satu (1) permohonan atau sewaan kiosk aktif bagi setiap akaun dalam satu masa.',
-                'Terbuka kepada usahawan belia negeri Kelantan yang mendaftar dan melengkapkan butiran perniagaan.',
-                'Pemohon perlu menetapkan tarikh mula operasi dan mematuhi garis panduan kebersihan serta waktu niaga hab.',
-                'Pembatalan tempahan dibenarkan secara terus sekiranya pemohon ingin menukar kepada unit atau lokasi lain.'
-              ].map((req, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-[0.8125rem] text-black/80 dark:text-white/85 leading-relaxed">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                  <span>{req}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="pt-4 border-t border-slate-200 dark:border-zinc-700 space-y-2.5">
-            <h3 className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70">
-              Kemudahan Asas Disertakan
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[0.8125rem] font-semibold text-black dark:text-white">
-              {[
-                { icon: Zap, text: 'Bekalan Elektrik 13A & Lampu' },
-                { icon: Compass, text: 'Lokasi Strategik Hab Daerah' },
-                { icon: ShieldCheck, text: 'Kawalan Keselamatan Kawasan' },
-                { icon: Store, text: 'Akses Klinik Mentor & Geran' }
-              ].map((feat) => {
-                const Icon = feat.icon;
-                return (
-                  <div
-                    key={feat.text}
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700"
-                  >
-                    <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-                    <span className="leading-snug">{feat.text}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="w-full space-y-4">
 
@@ -1033,25 +774,19 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       )}
 
       {/* ================================================================= */}
-      {/* VIEW 2: HALAMAN KHAS TEMPAH KIOSK (NO POP-UP MODAL)               */}
+      {/* VIEW 2: PERMOHONAN SEWA KIOSK (SUSUN ATUR DUA LAJUR MODEN)        */}
       {/* ================================================================= */}
       {view === 'book' && (
         <div className="space-y-4">
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden shadow-sm">
-          {/* Page Header */}
-          <div className="border-b border-slate-300 dark:border-zinc-600 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 kbelia-important-header">
+          {/* Bar Atas Ringkas Tanpa Teks Penerangan Berlebihan */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
                 <Store className="w-5 h-5" />
               </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
-                  Permohonan Sewa Kiosk Belia
-                </h1>
-                <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/75 mt-0.5 tabular-nums">
-                  {availableSlots.length} unit tersedia · Subsidi belia {subsidyRate}% · Tempoh sehingga {maxLeaseDuration} bulan
-                </p>
-              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+                Permohonan Sewa Kiosk Belia
+              </h1>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
@@ -1061,7 +796,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   setIsConfirmingCancel(false);
                   onChangeView('manage');
                 }}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer whitespace-nowrap"
               >
                 <ClipboardList className="w-4 h-4" />
                 <span>Urus Tempahan</span>
@@ -1069,16 +804,16 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
               <button
                 type="button"
                 onClick={() => onChangeView('browse')}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer whitespace-nowrap"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Kembali</span>
+                <span>Peta Kiosk</span>
               </button>
             </div>
           </div>
 
           {hasActiveBooking ? (
-            <div className="p-6 sm:p-10 text-center space-y-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-6 sm:p-10 text-center space-y-4 shadow-2xs">
               <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700 text-black dark:text-white flex items-center justify-center mx-auto">
                 <Lock className="w-7 h-7" />
               </div>
@@ -1087,7 +822,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   Tempahan Kiosk Aktif Sedia Ada
                 </h2>
                 <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed">
-                  Anda sudah mempunyai satu permohonan atau tempahan kiosk aktif ({activeBooking?.slotCode}). Hanya satu tempahan kiosk dibenarkan pada satu masa. Untuk membuat tempahan baharu, sila batalkan tempahan sedia ada terlebih dahulu.
+                  Anda sudah mempunyai tempahan aktif ({activeBooking?.slotCode}). Batalkan tempahan sedia ada terlebih dahulu untuk memohon unit baharu.
                 </p>
               </div>
               <div className="pt-2 flex flex-wrap justify-center gap-3">
@@ -1104,21 +839,18 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => onChangeView('browse')}
-                  className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer"
                 >
-                  Senarai Kiosk
+                  Peta Kiosk
                 </button>
               </div>
             </div>
           ) : !user ? (
-            <div className="p-8 sm:p-12 text-center space-y-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-8 sm:p-12 text-center space-y-4 shadow-2xs">
               <LogIn className="w-10 h-10 text-black dark:text-white/75 mx-auto" />
               <h2 className="text-base font-bold text-black dark:text-white">
-                Log Masuk Diperlukan untuk Memohon
+                Log Masuk Diperlukan
               </h2>
-              <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-md mx-auto">
-                Sila log masuk ke akaun KBelia anda terlebih dahulu supaya status permohonan dan surat tawaran dapat dipautkan ke profil anda.
-              </p>
               <button
                 type="button"
                 onClick={() => openLoginModal()}
@@ -1128,27 +860,25 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
               </button>
             </div>
           ) : isMaintenanceMode ? (
-            <div className="p-8 sm:p-12 text-center space-y-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-8 sm:p-12 text-center space-y-4 shadow-2xs">
               <AlertCircle className="w-10 h-10 text-black/70 dark:text-white/75 mx-auto" />
               <h2 className="text-base font-bold text-black dark:text-white">
                 Permohonan Kiosk Ditutup Sementara
               </h2>
-              <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-md mx-auto">
-                {portalSettings?.portalAnnouncement ||
-                  'Sistem sedang menjalani penyelenggaraan berjadual. Sila cuba sebentar lagi.'}
-              </p>
+              {portalSettings?.portalAnnouncement && (
+                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-md mx-auto">
+                  {portalSettings.portalAnnouncement}
+                </p>
+              )}
             </div>
           ) : submitted ? (
-            <div className="p-8 sm:p-12 text-center space-y-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-8 sm:p-12 text-center space-y-4 shadow-2xs">
               <CheckCircle2 className="w-12 h-12 text-emerald-600 dark:text-emerald-400 mx-auto" />
               <h2 className="text-lg font-black text-black dark:text-white">
-                Permohonan Kiosk Berjaya Dihantar!
+                Permohonan Kiosk Berjaya Dihantar
               </h2>
-              <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-lg mx-auto leading-relaxed">
-                Pegawai penyelaras sedang menyemak permohonan anda. Sebaik diluluskan, Surat Tawaran Digital berkod QR akan tersedia di halaman Urus &amp; Batal Tempahan.
-              </p>
-              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 text-sm text-black dark:text-white max-w-sm mx-auto">
-                Nombor Rujukan Anda: <strong>KBN-{currentSlot?.code}-{new Date().getFullYear()}</strong>
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 text-sm text-black dark:text-white max-w-sm mx-auto tabular-nums">
+                Nombor Rujukan: <strong>KBN-{currentSlot?.code}-{new Date().getFullYear()}</strong>
               </div>
               <div className="pt-2 flex flex-wrap justify-center gap-3">
                 <button
@@ -1168,575 +898,608 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     setSubmitted(false);
                     onChangeView('browse');
                   }}
-                  className="py-2.5 px-5 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+                  className="py-2.5 px-5 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
                 >
-                  Kembali
+                  Peta Kiosk
                 </button>
               </div>
             </div>
+          ) : !currentSlot ? (
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-8 sm:p-12 text-center space-y-4 shadow-2xs">
+              <Building2 className="w-10 h-10 text-black/45 dark:text-white/50 mx-auto" />
+              <h2 className="text-base font-bold text-black dark:text-white">
+                Tiada Unit Kiosk Tersedia Buat Masa Ini
+              </h2>
+              <button
+                type="button"
+                onClick={() => onChangeView('browse')}
+                className="py-2.5 px-6 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer"
+              >
+                Peta Kiosk
+              </button>
+            </div>
           ) : (
-            <div>
-              {/* 3-Step Stepper */}
-              <div className="bg-slate-50 dark:bg-zinc-950 px-6 py-4 border-b border-slate-300 dark:border-zinc-600">
-                <div className="flex items-center justify-between max-w-lg mx-auto">
+            <div className="space-y-4">
+              {/* Penunjuk 3 Langkah Mendatar Gaya Rujukan */}
+              <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 px-4 sm:px-8 py-4 shadow-2xs">
+                <div className="flex items-center justify-between max-w-2xl mx-auto">
                   {[
-                    { num: 1, title: 'Pakej & Lokasi' },
-                    { num: 2, title: 'Profil Usahawan' },
-                    { num: 3, title: 'Prapapar & Sah' }
-                  ].map((item, idx) => (
-                    <div key={item.num} className="flex flex-col items-center gap-1.5 flex-1">
-                      <div className="flex items-center w-full">
-                        <div
-                          className={`w-full h-0.5 transition-colors ${
-                            idx === 0
-                              ? 'opacity-0'
-                              : step >= item.num
-                              ? 'bg-blue-600'
-                              : 'bg-slate-300 dark:bg-zinc-700'
-                          }`}
-                        />
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8125rem] font-bold transition-all shrink-0 ${
-                            step > item.num
-                              ? 'bg-blue-600 text-white shadow-xs'
-                              : step === item.num
-                              ? 'bg-blue-600 text-white ring-4 ring-blue-500/30 shadow-xs'
-                              : 'bg-slate-200 dark:bg-zinc-800 text-black/70 dark:text-white/75 border border-slate-300 dark:border-zinc-600'
+                    { num: 1 as const, title: 'Unit & Tempoh' },
+                    { num: 2 as const, title: 'Butiran Perniagaan' },
+                    { num: 3 as const, title: 'Pengesahan' }
+                  ].map((item, idx) => {
+                    const isCompleted = step > item.num;
+                    const isActive = step === item.num;
+                    const canJumpBack = isCompleted;
+                    return (
+                      <React.Fragment key={item.num}>
+                        <button
+                          type="button"
+                          disabled={!canJumpBack}
+                          onClick={() => {
+                            if (canJumpBack) {
+                              setError(null);
+                              setStep(item.num);
+                            }
+                          }}
+                          className={`flex items-center gap-2.5 shrink-0 transition-opacity ${
+                            canJumpBack ? 'cursor-pointer hover:opacity-85' : 'cursor-default'
                           }`}
                         >
-                          {step > item.num ? <Check className="w-4 h-4 stroke-[3]" /> : item.num}
-                        </div>
-                        <div
-                          className={`w-full h-0.5 transition-colors ${
-                            idx === 2
-                              ? 'opacity-0'
-                              : step > item.num
-                              ? 'bg-blue-600'
-                              : 'bg-slate-300 dark:bg-zinc-700'
-                          }`}
-                        />
-                      </div>
-                      <span
-                        className={`text-[0.8125rem] font-bold text-center leading-tight ${
-                          step === item.num
-                            ? 'text-black dark:text-white font-extrabold'
-                            : 'text-black/70 dark:text-white/75'
-                        }`}
-                      >
-                        {item.title}
-                      </span>
-                    </div>
-                  ))}
+                          <div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all shrink-0 tabular-nums ${
+                              isCompleted
+                                ? 'bg-emerald-600 text-white'
+                                : isActive
+                                ? 'bg-blue-600 text-white ring-4 ring-blue-500/20'
+                                : 'bg-slate-100 dark:bg-zinc-800 text-black/60 dark:text-white/65 border border-slate-200 dark:border-zinc-700'
+                            }`}
+                          >
+                            {isCompleted ? <Check className="w-4 h-4 stroke-[2.5]" /> : item.num}
+                          </div>
+                          <span
+                            className={`text-sm whitespace-nowrap hidden sm:inline ${
+                              isActive
+                                ? 'font-extrabold text-black dark:text-white'
+                                : isCompleted
+                                ? 'font-bold text-black/85 dark:text-white/85'
+                                : 'font-semibold text-black/55 dark:text-white/55'
+                            }`}
+                          >
+                            {item.title}
+                          </span>
+                        </button>
+                        {idx < 2 && (
+                          <div
+                            className={`flex-1 mx-3 sm:mx-4 border-t-2 ${
+                              step > item.num
+                                ? 'border-emerald-500 dark:border-emerald-500'
+                                : 'border-dashed border-slate-300 dark:border-zinc-700'
+                            }`}
+                          />
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="p-5 sm:p-6 max-w-4xl mx-auto">
-                {error && (
-                  <div className="mb-5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-sm text-black dark:text-white flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    <span>{error}</span>
-                  </div>
-                )}
-
-                {step === 1 && (
-                  <div className="space-y-5">
-                    {hubBreakdown.length > 0 && (
-                      <div>
-                        <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 block mb-2">
-                          Tapis Mengikut Hab Daerah
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => setBookHubFilter('Semua')}
-                            className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer tabular-nums ${
-                              bookHubFilter === 'Semua'
-                                ? 'bg-blue-600 border-blue-600 text-white'
-                                : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-600 text-black dark:text-white hover:border-blue-500'
-                            }`}
-                          >
-                            Semua Hab ({availableSlots.length})
-                          </button>
-                          {hubBreakdown.map((hub) => {
-                            const active = bookHubFilter === hub.hubKey;
-                            return (
-                              <button
-                                key={hub.hubKey}
-                                type="button"
-                                disabled={hub.available === 0}
-                                onClick={() => setBookHubFilter(hub.hubKey)}
-                                className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold border transition-colors tabular-nums ${
-                                  hub.available === 0
-                                    ? 'bg-slate-100 dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 text-black/40 dark:text-white/40 cursor-not-allowed'
-                                    : active
-                                    ? 'bg-blue-600 border-blue-600 text-white cursor-pointer'
-                                    : 'bg-slate-50 dark:bg-zinc-950 border-slate-300 dark:border-zinc-600 text-black dark:text-white hover:border-blue-500 cursor-pointer'
-                                }`}
-                              >
-                                {hub.shortLabel} ({hub.available})
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
-                        Lokasi Kiosk *
-                      </label>
-                      <select
-                        value={filteredBookAvailableSlots.length > 0 ? selectedSlotId : ''}
-                        onChange={(e) => setSelectedSlotId(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-zinc-900 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 focus:outline-none transition-all cursor-pointer"
-                      >
-                        {filteredBookAvailableSlots.length > 0 ? (
-                          filteredBookAvailableSlots.map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.code} - {s.name} ({s.district}) · [Tersedia]
-                            </option>
-                          ))
-                        ) : (
-                          <option value="" disabled>
-                            Tiada unit kiosk tersedia buat masa ini
-                          </option>
-                        )}
-                      </select>
+              {/* Susun Atur 2 Lajur (Kiri: Borang & Info Unit, Kanan: Ringkasan Melekit) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                {/* LAJUR KIRI (8/12) */}
+                <div className="lg:col-span-8 space-y-4">
+                  {error && (
+                    <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-sm text-black dark:text-white flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                      <span>{error}</span>
                     </div>
+                  )}
 
-                    {currentSlot && (
-                      <div className="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 flex flex-col sm:flex-row gap-4 items-start h-fit">
-                        <div className="w-full sm:w-48 shrink-0 aspect-[4/3] sm:h-36 rounded-xl overflow-hidden border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900">
-                          <PortalImage
-                            src={resolveSlotImage(currentSlot)}
-                            alt={`Reka bentuk kiosk ${currentSlot.name}`}
-                            fallbackType="kiosk"
-                            fallbackLabel={currentSlot.code}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
+                  {step === 1 && (
+                    <>
+                      {/* Kad Unit Dipilih dari Peta Hab (Dikunci Tanpa Pilihan Lokasi Lain) */}
+                      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-5 shadow-2xs space-y-5">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start">
+                          <div className="w-full sm:w-52 shrink-0 aspect-[4/3] sm:h-36 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800">
+                            <PortalImage
+                              src={resolveSlotImage(currentSlot)}
+                              alt={currentSlot.name}
+                              fallbackType="kiosk"
+                              fallbackLabel={currentSlot.code}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
 
-                        <div className="flex-1 min-w-0 flex flex-col gap-3 justify-between">
-                          <div className="flex flex-wrap items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white">
+                          <div className="flex-1 min-w-0 w-full space-y-3">
+                            <div>
+                              <div className="flex items-center gap-2 text-xs font-semibold text-black/60 dark:text-white/65">
+                                <span className="font-mono font-bold text-blue-700 dark:text-blue-400">
                                   {currentSlot.code}
                                 </span>
-                                {currentSlot.size && (
-                                  <span className="text-[0.8125rem] text-black/70 dark:text-white/75">
-                                    · {currentSlot.size}
-                                  </span>
-                                )}
+                                <span aria-hidden="true">·</span>
+                                <span className="truncate">{currentSlot.hubLocation}</span>
                               </div>
-                              <h3 className="text-base font-bold text-black dark:text-white mt-0.5">
+                              <h2 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight mt-0.5">
                                 {currentSlot.name}
-                              </h3>
-                              <p className="text-[0.9375rem] text-black/75 dark:text-white/75 flex items-center gap-1 mt-0.5">
-                                <MapPin className="w-3.5 h-3.5 shrink-0" />
-                                <span>
-                                  {currentSlot.hubLocation} ({currentSlot.district})
-                                </span>
+                              </h2>
+                              <p className="text-sm text-black/70 dark:text-white/75 flex items-center gap-1.5 mt-1">
+                                <MapPin className="w-4 h-4 shrink-0" />
+                                <span>{currentSlot.district}</span>
                               </p>
                             </div>
-                            <span
-                              className={`px-3 py-1 rounded-lg text-[0.8125rem] font-bold border shrink-0 ${
-                                isCurrentSlotAvailable
-                                  ? 'bg-emerald-50 text-black dark:bg-emerald-950 dark:text-white border-emerald-300 dark:border-emerald-700'
-                                  : 'bg-rose-50 text-black dark:bg-rose-950 dark:text-white border-rose-300 dark:border-rose-700'
-                              }`}
+
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-200 dark:border-zinc-700 text-xs sm:text-[13px]">
+                              <div className="space-y-0.5">
+                                <span className="text-black/55 dark:text-white/60 block">Saiz</span>
+                                <span className="font-bold text-black dark:text-white flex items-center gap-1.5 tabular-nums">
+                                  <Maximize2 className="w-3.5 h-3.5 text-black/60 dark:text-white/65 shrink-0" />
+                                  <span className="truncate">{currentSlot.size || '8×8 kaki'}</span>
+                                </span>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-black/55 dark:text-white/60 block">Kuasa</span>
+                                <span className="font-bold text-black dark:text-white flex items-center gap-1.5">
+                                  <Zap className="w-3.5 h-3.5 text-black/60 dark:text-white/65 shrink-0" />
+                                  <span>13A</span>
+                                </span>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-black/55 dark:text-white/60 block">Internet</span>
+                                <span className="font-bold text-black dark:text-white flex items-center gap-1.5">
+                                  <Wifi className="w-3.5 h-3.5 text-black/60 dark:text-white/65 shrink-0" />
+                                  <span>Wi-Fi</span>
+                                </span>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-black/55 dark:text-white/60 block">Subsidi</span>
+                                <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5 tabular-nums">
+                                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                                  <span>{subsidyRate}%</span>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Maklumat Penting Boleh Lipat */}
+                        <div className="pt-4 border-t border-slate-200 dark:border-zinc-700 space-y-2.5">
+                          <h3 className="text-sm font-extrabold text-black dark:text-white">
+                            Maklumat Penting
+                          </h3>
+                          <ul className="space-y-1.5 text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/75 leading-relaxed">
+                            <li>Terhad kepada satu (1) permohonan atau sewaan aktif bagi setiap akaun.</li>
+                            <li>Pembatalan tempahan dibenarkan secara terus pada halaman Urus Tempahan.</li>
+                            {isGoodToKnowExpanded && (
+                              <>
+                                <li>Sewaan termasuk bekalan elektrik 13A, lampu asas, dan kawalan keselamatan hab.</li>
+                                <li>Surat Tawaran Digital berkod QR tersedia sebaik sahaja diluluskan urusetia.</li>
+                              </>
+                            )}
+                          </ul>
+                          <div className="pt-1">
+                            <button
+                              type="button"
+                              onClick={() => setIsGoodToKnowExpanded((prev) => !prev)}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 text-xs font-bold text-black dark:text-white transition-colors cursor-pointer"
                             >
-                              {isCurrentSlotAvailable ? 'Tersedia untuk Belia' : 'Unit Telah Berdaftar / Penuh'}
-                            </span>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-3 text-sm pt-2.5 border-t border-slate-300 dark:border-zinc-600">
-                            <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600">
-                              <span className="text-black/70 dark:text-white/75 text-[0.8125rem] font-medium block">
-                                Kadar Pasaran Biasa:
-                              </span>
-                              <span className="line-through text-black/70 dark:text-white/75 font-semibold text-sm tabular-nums">
-                                RM {marketRate} / bulan
-                              </span>
-                            </div>
-                            <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800">
-                              <span className="text-black dark:text-white text-[0.8125rem] font-bold block">
-                                Kadar Subsidi Belia ({subsidyRate}%):
-                              </span>
-                              <span className="text-sm sm:text-base font-black text-black dark:text-white tabular-nums">
-                                RM {monthlyRate} / bulan
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="text-[0.8125rem] text-black/75 dark:text-white/75">
-                            <strong className="text-black dark:text-white">Kemudahan Termasuk:</strong>{' '}
-                            {currentSlot.amenities?.join(', ') || 'Elektrik, Wi-Fi Jalur Lebar & Kawalan Keselamatan'}
+                              <span>{isGoodToKnowExpanded ? 'Tutup' : 'Baca lagi'}</span>
+                              {isGoodToKnowExpanded ? (
+                                <ChevronUp className="w-3.5 h-3.5" />
+                              ) : (
+                                <ChevronDown className="w-3.5 h-3.5" />
+                              )}
+                            </button>
                           </div>
                         </div>
                       </div>
-                    )}
 
-                    {/* Duration Cards */}
-                    <div>
-                      <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
-                        Tempoh Sewaan Kiosk *
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {[
-                          {
-                            months: 3,
-                            title: '3 Bulan',
-                            subtitle: 'Pakej Permulaan',
-                            total: `RM ${(monthlyRate * 3).toLocaleString()}`,
-                            badge: 'Uji Pasaran'
-                          },
-                          {
-                            months: 6,
-                            title: '6 Bulan',
-                            subtitle: 'Pakej Pertumbuhan',
-                            total: `RM ${(monthlyRate * 6).toLocaleString()}`,
-                            badge: 'Paling Popular'
-                          },
-                          {
-                            months: 12,
-                            title: '12 Bulan',
-                            subtitle: 'Pakej Tahunan Penuh',
-                            total: `RM ${(monthlyRate * 12).toLocaleString()}`,
-                            badge: 'Jimat & Stabil'
-                          }
-                        ]
-                          .filter((pkg) => pkg.months <= maxLeaseDuration)
-                          .map((pkg) => {
-                            const isSelected = durationMonths === pkg.months;
-                            return (
-                              <button
-                                key={pkg.months}
-                                type="button"
-                                onClick={() => setDurationMonths(pkg.months)}
-                                className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between ${
-                                  isSelected
-                                    ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/60 ring-1 ring-blue-500/30 shadow-xs'
-                                    : 'border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 hover:border-blue-400/70'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between gap-1 mb-2">
-                                  <span className="text-[0.8125rem] font-bold text-black/75 dark:text-white/80">
-                                    {pkg.badge}
-                                  </span>
-                                  <div
-                                    className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                                      isSelected
-                                        ? 'border-blue-600 bg-blue-600 text-white'
-                                        : 'border-slate-300 dark:border-zinc-600'
-                                    }`}
-                                  >
-                                    {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
+                      {/* Pilihan Tempoh Sewaan & Tarikh Mula */}
+                      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-5 space-y-4 shadow-2xs">
+                        <h3 className="text-base font-extrabold text-black dark:text-white">
+                          Tempoh Sewaan *
+                        </h3>
+
+                        <div className="space-y-2.5">
+                          {[
+                            {
+                              months: 3,
+                              title: '3 Bulan',
+                              subtitle: 'Pakej Permulaan'
+                            },
+                            {
+                              months: 6,
+                              title: '6 Bulan',
+                              subtitle: 'Paling Popular'
+                            },
+                            {
+                              months: 12,
+                              title: '12 Bulan',
+                              subtitle: 'Pakej Tahunan'
+                            }
+                          ]
+                            .filter((pkg) => pkg.months <= maxLeaseDuration)
+                            .map((pkg) => {
+                              const isSelected = durationMonths === pkg.months;
+                              const pkgTotal = monthlyRate * pkg.months;
+                              return (
+                                <button
+                                  key={pkg.months}
+                                  type="button"
+                                  onClick={() => setDurationMonths(pkg.months)}
+                                  className={`w-full p-3.5 sm:px-4 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                                    isSelected
+                                      ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 ring-1 ring-blue-500/25'
+                                      : 'border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 hover:border-blue-400/70'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3 min-w-0">
+                                    <div
+                                      className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                                        isSelected
+                                          ? 'bg-blue-600 border-blue-600 text-white'
+                                          : 'border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900'
+                                      }`}
+                                    >
+                                      {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                                    </div>
+                                    <div className="min-w-0">
+                                      <div className="text-sm font-extrabold text-black dark:text-white">
+                                        {pkg.title}
+                                      </div>
+                                      <div className="text-xs text-black/65 dark:text-white/70">
+                                        {pkg.subtitle}
+                                      </div>
+                                    </div>
                                   </div>
-                                </div>
-                                <div>
-                                  <div className="font-extrabold text-sm text-black dark:text-white">
-                                    {pkg.title}
+
+                                  <div className="text-right shrink-0 tabular-nums">
+                                    <div className="text-sm font-black text-blue-700 dark:text-blue-400">
+                                      RM {pkgTotal.toLocaleString('ms-MY')}
+                                    </div>
+                                    <div className="text-xs text-black/60 dark:text-white/65">
+                                      RM {monthlyRate.toLocaleString('ms-MY')} / bln
+                                    </div>
                                   </div>
-                                  <div className="text-[0.8125rem] text-black/70 dark:text-white/75">
-                                    {pkg.subtitle}
-                                  </div>
-                                </div>
-                                <div className="mt-2.5 pt-2 border-t border-slate-300 dark:border-zinc-600 flex items-baseline justify-between">
-                                  <span className="text-[0.8125rem] text-black/70 dark:text-white/75">Jumlah:</span>
-                                  <span className="text-sm font-black text-black dark:text-white tabular-nums">
-                                    {pkg.total}
-                                  </span>
-                                </div>
-                              </button>
-                            );
-                          })}
+                                </button>
+                              );
+                            })}
+                        </div>
+
+                        <div className="pt-3 border-t border-slate-200 dark:border-zinc-700">
+                          <label className="text-sm font-bold text-black dark:text-white block mb-2">
+                            Tarikh Mula Operasi *
+                          </label>
+                          <ModernDatePicker
+                            value={startDate}
+                            onChange={setStartDate}
+                            valueFormat="iso"
+                            minDate={todayISO}
+                            placeholder="Pilih tarikh mula operasi"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {step === 2 && (
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-5 sm:p-6 space-y-5 shadow-2xs">
+                      <h2 className="text-base sm:text-lg font-extrabold text-black dark:text-white">
+                        Butiran Perniagaan
+                      </h2>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 block mb-1.5">
+                            Nama Perniagaan *
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              required
+                              placeholder="Nama perniagaan"
+                              value={businessName}
+                              onChange={(e) => {
+                                setBusinessName(e.target.value);
+                                if (fieldErrors.businessName)
+                                  setFieldErrors((prev) => ({ ...prev, businessName: '' }));
+                              }}
+                              className={`w-full pl-4 pr-10 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border ${
+                                fieldErrors.businessName
+                                  ? 'border-rose-500 focus:ring-rose-500'
+                                  : 'border-slate-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 focus:border-blue-600 focus:ring-blue-500/25'
+                              } text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 font-medium focus:outline-none focus:ring-2 transition-all`}
+                            />
+                            {businessName.trim() && !fieldErrors.businessName && (
+                              <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            )}
+                          </div>
+                          {fieldErrors.businessName && (
+                            <p className="mt-1.5 text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1 font-medium">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              {fieldErrors.businessName}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 block mb-1.5">
+                            Kategori *
+                          </label>
+                          <select
+                            value={businessCategory}
+                            onChange={(e) => setBusinessCategory(e.target.value as BusinessCategory)}
+                            className="w-full px-4 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all cursor-pointer"
+                          >
+                            {CATEGORIES.map((c) => (
+                              <option key={c} value={c}>
+                                {formatBusinessCategory(c)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 block mb-1.5">
+                            Nombor Telefon *
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="tel"
+                              required
+                              placeholder="01X-XXXXXXX"
+                              value={phone}
+                              onChange={(e) => {
+                                setPhone(e.target.value);
+                                if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: '' }));
+                              }}
+                              className={`w-full pl-4 pr-10 py-2.5 rounded-xl text-sm font-mono bg-slate-50 dark:bg-zinc-950 border ${
+                                fieldErrors.phone
+                                  ? 'border-rose-500 focus:ring-rose-500'
+                                  : 'border-slate-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 focus:border-blue-600 focus:ring-blue-500/25'
+                              } text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 transition-all`}
+                            />
+                            {phone.trim() && validateMalaysianPhone(phone) && !fieldErrors.phone && (
+                              <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            )}
+                          </div>
+                          {fieldErrors.phone && (
+                            <p className="mt-1.5 text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1 font-medium">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              {fieldErrors.phone}
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 block mb-1.5">
+                            No. Kad Pengenalan
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              maxLength={14}
+                              placeholder="XXXXXX-XX-XXXX"
+                              value={icNumber}
+                              onChange={(e) => {
+                                setIcNumber(e.target.value);
+                                if (fieldErrors.icNumber)
+                                  setFieldErrors((prev) => ({ ...prev, icNumber: '' }));
+                              }}
+                              className={`w-full pl-4 pr-10 py-2.5 rounded-xl text-sm font-mono bg-slate-50 dark:bg-zinc-950 border ${
+                                fieldErrors.icNumber
+                                  ? 'border-rose-500 focus:ring-rose-500'
+                                  : 'border-slate-200 dark:border-zinc-700 focus:bg-white dark:focus:bg-zinc-900 focus:border-blue-600 focus:ring-blue-500/25'
+                              } text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 transition-all`}
+                            />
+                            {icNumber.trim() && validateMyKad(icNumber).isValid && !fieldErrors.icNumber && (
+                              <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            )}
+                          </div>
+                          {fieldErrors.icNumber && (
+                            <p className="mt-1.5 text-xs text-rose-600 dark:text-rose-400 flex items-center gap-1 font-medium">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              {fieldErrors.icNumber}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold uppercase tracking-wider text-black/65 dark:text-white/70 block mb-1.5">
+                          Penerangan Produk &amp; Operasi
+                        </label>
+                        <textarea
+                          rows={3}
+                          placeholder="Ringkasan produk atau servis harian"
+                          value={pitchNotes}
+                          onChange={(e) => setPitchNotes(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/25 focus:outline-none transition-all"
+                        />
                       </div>
                     </div>
+                  )}
 
-                    {/* Start Date */}
-                    <div>
-                      <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
-                        Tarikh Mula Operasi *
-                      </label>
-                      <ModernDatePicker
-                        value={startDate}
-                        onChange={setStartDate}
-                        valueFormat="iso"
-                        minDate={todayISO}
-                        placeholder="Pilih tarikh mula operasi"
-                      />
-                    </div>
+                  {step === 3 && (
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-5 sm:p-6 space-y-5 shadow-2xs">
+                      <h2 className="text-base sm:text-lg font-extrabold text-black dark:text-white">
+                        Pengesahan Permohonan
+                      </h2>
 
-                    <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-zinc-600">
-                      <button
-                        type="button"
-                        onClick={() => onChangeView('browse')}
-                        className="py-2.5 px-5 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-700 transition-all cursor-pointer"
-                      >
-                        Batal
-                      </button>
-                      <button
-                        type="button"
-                        disabled={!isCurrentSlotAvailable}
-                        onClick={handleNextStep}
-                        className="py-2.5 px-6 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center gap-2 cursor-pointer"
-                      >
-                        <span>Seterusnya</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {step === 2 && (
-                  <div className="space-y-5">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div>
-                        <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
-                          Nama Perniagaan *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="Masukkan nama perniagaan"
-                          value={businessName}
-                          onChange={(e) => {
-                            setBusinessName(e.target.value);
-                            if (fieldErrors.businessName)
-                              setFieldErrors((prev) => ({ ...prev, businessName: '' }));
-                          }}
-                          className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border ${
-                            fieldErrors.businessName
-                              ? 'border-rose-500 focus:ring-rose-500'
-                              : 'border-slate-300 dark:border-zinc-600 focus:bg-white dark:focus:bg-zinc-900 focus:border-blue-600 focus:ring-blue-500/30'
-                          } text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 font-medium focus:outline-none focus:ring-2 transition-all`}
-                        />
-                        {fieldErrors.businessName && (
-                          <p className="mt-1.5 text-sm text-black dark:text-white/75 flex items-center gap-1 font-medium">
-                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                            {fieldErrors.businessName}
-                          </p>
+                      <div className="p-4 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-xs text-black/60 dark:text-white/65 block">Nama Perniagaan</span>
+                          <span className="font-bold text-black dark:text-white">{businessName}</span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-black/60 dark:text-white/65 block">Kategori</span>
+                          <span className="font-semibold text-black dark:text-white">
+                            {formatBusinessCategory(businessCategory)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-black/60 dark:text-white/65 block">Nombor Telefon</span>
+                          <span className="font-mono font-semibold text-black dark:text-white">{phone}</span>
+                        </div>
+                        {icNumber.trim() && (
+                          <div>
+                            <span className="text-xs text-black/60 dark:text-white/65 block">No. Kad Pengenalan</span>
+                            <span className="font-mono font-semibold text-black dark:text-white">{icNumber}</span>
+                          </div>
+                        )}
+                        {pitchNotes.trim() && (
+                          <div className="sm:col-span-2 pt-2 border-t border-slate-200 dark:border-zinc-700">
+                            <span className="text-xs text-black/60 dark:text-white/65 block">Penerangan Produk</span>
+                            <span className="text-black/85 dark:text-white/85">{pitchNotes}</span>
+                          </div>
                         )}
                       </div>
 
-                      <div>
-                        <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
-                          Kategori Perniagaan *
-                        </label>
-                        <select
-                          value={businessCategory}
-                          onChange={(e) => setBusinessCategory(e.target.value as BusinessCategory)}
-                          className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer"
+                      <label className="flex items-start gap-3 p-4 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-950 cursor-pointer hover:border-blue-500 transition-colors select-none">
+                        <input
+                          type="checkbox"
+                          checked={pdpaConsent}
+                          onChange={(e) => setPdpaConsent(e.target.checked)}
+                          className="mt-0.5 h-4.5 w-4.5 rounded border-slate-300 accent-blue-600 cursor-pointer shrink-0"
+                        />
+                        <span className="text-sm text-black dark:text-white leading-relaxed">
+                          Saya mengesahkan semua maklumat di atas adalah benar dan bersetuju ia diproses bagi permohonan kiosk ini.
+                        </span>
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* LAJUR KANAN MELEKIT (4/12): RINGKASAN PERMOHONAN & SEWAAN */}
+                <aside className="lg:col-span-4 lg:sticky lg:top-24">
+                  <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-5 space-y-5 shadow-2xs">
+                    <h2 className="text-base font-extrabold text-black dark:text-white tracking-tight">
+                      Ringkasan Permohonan
+                    </h2>
+
+                    <div className="rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 p-4 space-y-3.5">
+                      <div className="grid grid-cols-2 gap-3 pb-3 border-b border-slate-200 dark:border-zinc-700">
+                        <div>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                            Tarikh Mula
+                          </span>
+                          <span className="text-sm font-extrabold text-black dark:text-white tabular-nums mt-0.5 block">
+                            {formatDisplayDate(startDate)}
+                          </span>
+                        </div>
+                        <div className="border-l border-slate-200 dark:border-zinc-700 pl-3">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                            Tarikh Tamat
+                          </span>
+                          <span className="text-sm font-extrabold text-black dark:text-white tabular-nums mt-0.5 block">
+                            {calculateOperationEndDate(startDate, durationMonths)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm pb-3 border-b border-slate-200 dark:border-zinc-700 tabular-nums">
+                        <span className="text-black/65 dark:text-white/70 font-medium">Tempoh Sewaan</span>
+                        <span className="font-extrabold text-black dark:text-white">{durationMonths} Bulan</span>
+                      </div>
+
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                          Unit Dipilih
+                        </span>
+                        <div className="text-sm font-extrabold text-black dark:text-white leading-snug">
+                          {currentSlot.code} · {currentSlot.name}
+                        </div>
+                        <div className="text-xs text-black/65 dark:text-white/70">
+                          {currentSlot.hubLocation}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => onChangeView('browse')}
+                          className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline pt-1 inline-block cursor-pointer"
                         >
-                          {CATEGORIES.map((c) => (
-                            <option key={c} value={c}>
-                              {formatBusinessCategory(c)}
-                            </option>
-                          ))}
-                        </select>
+                          Tukar di Peta Kiosk
+                        </button>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div>
-                        <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
-                          Nombor Telefon *
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          placeholder="Masukkan nombor telefon"
-                          value={phone}
-                          onChange={(e) => {
-                            setPhone(e.target.value);
-                            if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: '' }));
-                          }}
-                          className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-zinc-950 border ${
-                            fieldErrors.phone
-                              ? 'border-rose-500 focus:ring-rose-500'
-                              : 'border-slate-300 dark:border-zinc-600 focus:bg-white dark:focus:bg-zinc-900 focus:border-blue-600 focus:ring-blue-500/30'
-                          } text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 transition-all`}
-                        />
-                        {fieldErrors.phone && (
-                          <p className="mt-1.5 text-sm text-black dark:text-white/75 flex items-center gap-1 font-medium">
-                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                            {fieldErrors.phone}
-                          </p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
-                          Nombor Kad Pengenalan
-                        </label>
-                        <input
-                          type="text"
-                          maxLength={14}
-                          placeholder="Masukkan nombor kad pengenalan"
-                          value={icNumber}
-                          onChange={(e) => {
-                            setIcNumber(e.target.value);
-                            if (fieldErrors.icNumber)
-                              setFieldErrors((prev) => ({ ...prev, icNumber: '' }));
-                          }}
-                          className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-zinc-950 border ${
-                            fieldErrors.icNumber
-                              ? 'border-rose-500 focus:ring-rose-500'
-                              : 'border-slate-300 dark:border-zinc-600 focus:bg-white dark:focus:bg-zinc-900 focus:border-blue-600 focus:ring-blue-500/30'
-                          } text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:outline-none focus:ring-2 transition-all`}
-                        />
-                        {fieldErrors.icNumber && (
-                          <p className="mt-1.5 text-sm text-black dark:text-white/75 flex items-center gap-1 font-medium">
-                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                            {fieldErrors.icNumber}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white block mb-2">
-                        Penerangan Produk dan Operasi
-                      </label>
-                      <textarea
-                        rows={3}
-                        placeholder="Masukkan penerangan ringkas produk dan operasi"
-                        value={pitchNotes}
-                        onChange={(e) => setPitchNotes(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/30 focus:outline-none transition-all"
-                      />
-                    </div>
-
-                    <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-zinc-600">
-                      <button
-                        type="button"
-                        onClick={() => setStep(1)}
-                        className="py-2.5 px-5 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-700 transition-all cursor-pointer flex items-center gap-2"
-                      >
-                        <ArrowLeft className="w-4 h-4" />
-                        <span>Kembali</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleNextStep}
-                        className="py-2.5 px-6 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer"
-                      >
-                        <span>Seterusnya</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {step === 3 && (
-                  <div className="space-y-5">
-                    <div className="p-5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-300 dark:border-zinc-600">
-                        <div>
-                          <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
-                            Ringkasan Pakej Permohonan Kiosk
-                          </h4>
-                        </div>
-                        <span className="px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-amber-100 text-black border border-amber-300 dark:bg-blue-600 dark:text-white">
-                          Pakej {durationMonths} Bulan
+                    <div className="space-y-2.5 text-sm tabular-nums">
+                      <h3 className="text-sm font-extrabold text-black dark:text-white">
+                        Ringkasan Sewaan
+                      </h3>
+                      <div className="flex items-center justify-between text-black/75 dark:text-white/75">
+                        <span>Kadar Pasaran</span>
+                        <span className="font-semibold line-through">
+                          RM {marketRate.toLocaleString('ms-MY')}
                         </span>
                       </div>
+                      <div className="flex items-center justify-between text-black/75 dark:text-white/75">
+                        <span>Subsidi Belia ({subsidyRate}%)</span>
+                        <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+                          - RM {Math.max(0, marketRate - monthlyRate).toLocaleString('ms-MY')}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-black/75 dark:text-white/75">
+                        <span>Utiliti Asas Hab</span>
+                        <span className="font-semibold">Termasuk</span>
+                      </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-[0.9375rem]">
-                        <div>
-                          <span className="text-black/70 dark:text-white/75 text-sm block font-medium">
-                            Premis Kiosk:
-                          </span>
-                          <span className="font-semibold text-black dark:text-white">
-                            {currentSlot?.code} - {currentSlot?.name}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-black/70 dark:text-white/75 text-sm block font-medium">
-                            Lokasi Hab:
-                          </span>
-                          <span className="font-semibold text-black dark:text-white">
-                            {currentSlot?.hubLocation}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-black/70 dark:text-white/75 text-sm block font-medium">
-                            Nama Perniagaan:
-                          </span>
-                          <span className="font-semibold text-black dark:text-white">{businessName}</span>
-                        </div>
-                        <div>
-                          <span className="text-black/70 dark:text-white/75 text-sm block font-medium">
-                            Kategori Bisnes:
-                          </span>
-                          <span className="font-medium text-black dark:text-white">{businessCategory}</span>
-                        </div>
-                        <div>
-                          <span className="text-black/70 dark:text-white/75 text-sm block font-medium">
-                            Kadar Sewa Bersubsidi:
-                          </span>
-                          <span className="font-bold text-black dark:text-white text-base tabular-nums">
-                            RM {monthlyRate} / bulan
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-black/70 dark:text-white/75 text-sm block font-medium">
-                            Tarikh Mula:
-                          </span>
-                          <span className="font-medium text-black dark:text-white">{startDate}</span>
-                        </div>
+                      <div className="pt-2.5 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+                        <span className="font-extrabold text-emerald-700 dark:text-emerald-400">
+                          Sewa Bulanan
+                        </span>
+                        <span className="text-lg font-black text-emerald-700 dark:text-emerald-400">
+                          RM {monthlyRate.toLocaleString('ms-MY')}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs font-semibold text-black/65 dark:text-white/70">
+                        <span>Jumlah ({durationMonths} Bulan)</span>
+                        <span className="font-bold text-black dark:text-white">
+                          RM {(monthlyRate * durationMonths).toLocaleString('ms-MY')}
+                        </span>
                       </div>
                     </div>
 
-                    <label className="flex items-start gap-3 p-4 rounded-xl border border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 cursor-pointer hover:border-blue-500 transition-all select-none">
-                      <input
-                        type="checkbox"
-                        checked={pdpaConsent}
-                        onChange={(e) => setPdpaConsent(e.target.checked)}
-                        className="mt-1 h-4.5 w-4.5 rounded border-slate-300 text-black dark:text-white focus:ring-blue-500/30 cursor-pointer shrink-0"
-                      />
-                      <div className="text-sm text-black dark:text-white leading-relaxed">
-                        <strong className="text-black dark:text-white font-semibold block mb-0.5">
-                          Persetujuan:
-                        </strong>
-                        Saya mengesahkan semua maklumat di atas adalah benar dan bersetuju ia diproses bagi permohonan kiosk ini.
-                      </div>
-                    </label>
+                    <div className="space-y-2 pt-1">
+                      {step < 3 ? (
+                        <button
+                          type="button"
+                          disabled={step === 1 && !isCurrentSlotAvailable}
+                          onClick={handleNextStep}
+                          className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <span>Seterusnya</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={loading || !pdpaConsent || !isCurrentSlotAvailable}
+                          onClick={handleSubmit}
+                          className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>{loading ? 'Menghantar...' : 'Hantar Permohonan'}</span>
+                        </button>
+                      )}
 
-                    <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-zinc-600">
-                      <button
-                        type="button"
-                        onClick={() => setStep(2)}
-                        className="py-2.5 px-5 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-700 transition-all cursor-pointer flex items-center gap-2"
-                      >
-                        <ArrowLeft className="w-4 h-4" />
-                        <span>Kembali</span>
-                      </button>
-                      <button
-                        type="button"
-                        disabled={loading || !pdpaConsent}
-                        onClick={handleSubmit}
-                        className="py-2.5 px-6 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all shadow-sm flex items-center gap-2 cursor-pointer"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>
-                          {loading
-                            ? 'Menghantar...'
-                            : 'Hantar Permohonan'}
-                        </span>
-                      </button>
+                      {step > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setError(null);
+                            setStep(step === 3 ? 2 : 1);
+                          }}
+                          className="w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <ArrowLeft className="w-4 h-4" />
+                          <span>Kembali</span>
+                        </button>
+                      )}
                     </div>
                   </div>
-                )}
+                </aside>
               </div>
             </div>
           )}
-        </div>
-
-        {/* Ringkasan Kekosongan & Panduan Teratur di Halaman Mohon Kiosk */}
-        {renderSummaryMetricsBar()}
-        {renderApplicationGuideGrid()}
         </div>
       )}
 
@@ -2293,13 +2056,16 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
 
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Cari... */}
-                  <div className="relative w-full sm:w-56">
+                  <div
+                    style={{ ['--search-fit-w' as string]: '180px' }}
+                    className="relative w-full sm:w-[var(--search-fit-w)] sm:max-w-full min-w-0"
+                  >
                     <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       value={recordSearch}
                       onChange={(e) => setRecordSearch(e.target.value)}
-                      placeholder="Cari..."
+                      placeholder="Cari rekod..."
                       className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
                     />
                     {recordSearch && (

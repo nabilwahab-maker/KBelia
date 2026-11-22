@@ -34,6 +34,12 @@ const TOOLBAR_ACCENTS: Record<
   }
 };
 
+export const getSearchInputWidth = (placeholder: string): string => {
+  const length = placeholder.trim().length;
+  const px = Math.min(420, Math.max(240, Math.round(length * 7.6 + 80)));
+  return `${px}px`;
+};
+
 interface ReferenceTableToolbarProps {
   searchValue: string;
   onSearchChange: (val: string) => void;
@@ -89,9 +95,14 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
     };
   }, [isFilterOpen]);
 
+  const fitWidth = getSearchInputWidth(searchPlaceholder);
+
   return (
     <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-200 dark:border-zinc-700">
-      <div className="relative w-full sm:w-72 min-w-0">
+      <div
+        style={{ ['--search-fit-w' as string]: fitWidth }}
+        className="relative w-full sm:w-[var(--search-fit-w)] sm:max-w-full min-w-0"
+      >
         <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           type="text"

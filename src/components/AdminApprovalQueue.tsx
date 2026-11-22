@@ -1025,7 +1025,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               accent="indigo"
               searchValue={searchQuery}
               onSearchChange={setSearchQuery}
-              searchPlaceholder="Cari pemohon, perniagaan atau kod kiosk..."
+              searchPlaceholder="Cari pemohon, syarikat atau kod..."
               filterCount={(statusFilter !== 'all' ? 1 : 0) + (bookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
               onResetFilters={() => {
                 setStatusFilter('all');
@@ -1357,7 +1357,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               accent="indigo"
               searchValue={searchQuery}
               onSearchChange={setSearchQuery}
-              searchPlaceholder="Cari pemohon, perniagaan atau program geran..."
+              searchPlaceholder="Cari pemohon, syarikat atau geran..."
               filterCount={(statusFilter !== 'all' ? 1 : 0) + (grantSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
               onResetFilters={() => {
                 setStatusFilter('all');
@@ -1944,7 +1944,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   accent="indigo"
                   searchValue={ticketSearch}
                   onSearchChange={setTicketSearch}
-                  searchPlaceholder="Cari kod kiosk, pelapor atau kategori aduan..."
+                  searchPlaceholder="Cari kiosk, pelapor atau aduan..."
                   filterCount={(ticketStatusFilter !== 'all' ? 1 : 0) + (ticketSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
                   onResetFilters={() => {
                     setTicketStatusFilter('all');

@@ -13,7 +13,6 @@ import {
   ShieldCheck, 
   LogIn, 
   UserPlus, 
-  GraduationCap,
   Phone,
   MapPin,
   Sparkles,
@@ -64,7 +63,6 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
   const { 
     registerNewUser, 
     loginWithGoogle, 
-    loginAsDemoUser,
     authError, 
     clearAuthError 
   } = useAuth();
@@ -168,18 +166,6 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
     }
   };
 
-  const handleDemoAdmin = () => {
-    clearAuthError();
-    loginAsDemoUser('admin');
-    setTimeout(() => setActiveTab('admin'), 500);
-  };
-
-  const handleDemoMentor = () => {
-    clearAuthError();
-    loginAsDemoUser('mentor_wanazhar');
-    setTimeout(() => setActiveTab('mentor'), 500);
-  };
-
   return (
     <div 
       id="kbelia-register-page" 
@@ -223,10 +209,12 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             {/* HEADING & SUBTITLE */}
             <div className="mb-6 sm:mb-8 text-left">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-black dark:text-white tracking-tight">
-                {isEn ? 'Sign Up' : 'Daftar Akaun'}
+                {isEn ? 'Belia Account Sign Up' : 'Daftar Akaun Belia'}
               </h1>
               <p className="text-[0.9375rem] lg:text-base text-black/70 dark:text-white/75 mt-2 font-normal leading-relaxed">
-                {isEn ? 'Enter your email and password to sign up!' : 'Masukkan maklumat dan kata laluan anda untuk mendaftar!'}
+                {isEn
+                  ? 'Register specifically as a Kelantan Youth Entrepreneur (Mentor & Admin accounts are managed internally by administrators).'
+                  : 'Pendaftaran khusus untuk Usahawan Belia Kelantan sahaja (akaun Mentor & Admin diuruskan secara dalaman oleh pentadbir).'}
               </p>
             </div>
 
@@ -478,40 +466,24 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
 
           </div>
 
-          {/* BOTTOM QUICK DEMO TESTING FOOTER */}
+          {/* BOTTOM PORTAL ROLE NOTICE & LOGIN REDIRECT */}
           <div className="w-full pt-4 border-t border-slate-300 dark:border-slate-600 space-y-2.5">
-            <div className="flex items-center justify-between text-[0.8125rem] font-semibold text-black/70 dark:text-white/75">
-              <span>{isEn ? 'Quick Testing Demo Accounts:' : 'Akaun Pengujian Pantas (Demo):'}</span>
-              <span className="text-[0.8125rem] text-black/70 dark:text-white/75">1-Klik Terus Masuk</span>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[0.8125rem]">
+              <span className="text-black/75 dark:text-white/80 font-medium">
+                {isEn
+                  ? 'Signing in as Mentor or System Admin?'
+                  : 'Pengguna Mentor atau Admin Sistem?'}
+              </span>
               <button
                 type="button"
-                onClick={handleDemoMentor}
-                className="p-2.5 bg-slate-50 hover:bg-amber-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
+                onClick={() => {
+                  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                  setActiveTab('login');
+                }}
+                className="inline-flex items-center gap-1.5 font-bold text-blue-700 dark:text-blue-300 hover:underline cursor-pointer shrink-0"
               >
-                <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
-                  <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                  <span>Demo Mentor</span>
-                </div>
-                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
-                  Dr. Wan Azhar (Mentor Dalaman)
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleDemoAdmin}
-                className="p-2.5 bg-slate-50 hover:bg-amber-50/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
-              >
-                <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
-                  <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                  <span>Demo Admin</span>
-                </div>
-                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
-                  Admin KBelia
-                </div>
+                <LogIn className="w-3.5 h-3.5" />
+                <span>{isEn ? 'Sign In at Main Portal →' : 'Log Masuk di Portal Utama →'}</span>
               </button>
             </div>
 

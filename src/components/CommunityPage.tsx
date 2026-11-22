@@ -634,7 +634,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
           accent="blue"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder="Cari tajuk, isi perbincangan, daerah atau penulis..."
+          searchPlaceholder="Cari tajuk, topik atau penulis..."
           filterCount={activeFilterCount}
           onResetFilters={() => {
             setSelectedCategory('Semua');

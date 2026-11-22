@@ -9,7 +9,7 @@ import {
   ArrowUpDown,
   X
 } from 'lucide-react';
-import { RowActionMenu } from './ReferenceTableKit';
+import { RowActionMenu, getSearchInputWidth } from './ReferenceTableKit';
 import { KioskDailySale } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
@@ -550,13 +550,16 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
         {/* Search & Filter Toolbar */}
         <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-700">
-          <div className="relative w-full sm:w-72">
+          <div
+            style={{ ['--search-fit-w' as string]: getSearchInputWidth('Cari tarikh atau catatan...') }}
+            className="relative w-full sm:w-[var(--search-fit-w)] sm:max-w-full min-w-0"
+          >
             <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={salesSearch}
               onChange={(e) => setSalesSearch(e.target.value)}
-              placeholder="Cari tarikh atau catatan jualan..."
+              placeholder="Cari tarikh atau catatan..."
               className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
             />
             {salesSearch && (

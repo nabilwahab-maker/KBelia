@@ -37,11 +37,11 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
   const rawWhatsapp = business.whatsapp || business.ownerPhone || '';
   const cleanWhatsapp = typeof rawWhatsapp === 'string' ? rawWhatsapp.replace(/[^0-9]/g, '') : '';
 
-  const createWhatsAppOrderLink = (productName?: string) => {
+  const createWhatsAppPeerLink = (productName?: string) => {
     if (!cleanWhatsapp) return '#';
     const text = productName 
-      ? `Assalamualaikum/Hai ${business.businessName}, saya melihat produk *${productName}* di Portal KBelia Kelantan dan berminat untuk membuat pesanan / pertanyaan.`
-      : `Assalamualaikum/Hai ${business.businessName}, saya ingin membuat pertanyaan mengenai perniagaan anda melalui Portal KBelia Kelantan.`;
+      ? `Assalamualaikum/Hai ${business.businessName}, saya rakan usahawan Belia dari Portal KBelia Kelantan dan ingin bertanya atau berhubung mengenai produk *${productName}*.`
+      : `Assalamualaikum/Hai ${business.businessName}, saya rakan usahawan Belia dari Portal KBelia Kelantan dan ingin berhubung mengenai perniagaan anda.`;
     return `https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(text)}`;
   };
 
@@ -169,14 +169,14 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
           {/* Social and Contact Links */}
           <div className="flex flex-wrap items-center gap-3">
             <a
-              href={createWhatsAppOrderLink()}
+              href={createWhatsAppPeerLink()}
               target={cleanWhatsapp ? '_blank' : undefined}
               rel={cleanWhatsapp ? 'noopener noreferrer' : undefined}
               onClick={handleMissingWhatsappClick}
               className="flex-1 min-w-[200px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
-              <span>Hubungi / Tempah Terus via WhatsApp</span>
+              <span>Hubungi Rakan Belia via WhatsApp</span>
             </a>
 
             {business.instagram && (
@@ -238,14 +238,14 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                           RM{prod.price.toFixed(2)}
                         </span>
                         <a
-                          href={createWhatsAppOrderLink(prod.name)}
+                          href={createWhatsAppPeerLink(prod.name)}
                           target={cleanWhatsapp ? '_blank' : undefined}
                           rel={cleanWhatsapp ? 'noopener noreferrer' : undefined}
                           onClick={handleMissingWhatsappClick}
                           className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 hover:bg-emerald-100 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 font-bold text-[0.8125rem] flex items-center gap-1 transition-colors"
                         >
                           <MessageCircle className="w-3 h-3 text-black dark:text-white/75" />
-                          <span>Order</span>
+                          <span>Hubungi Rakan Belia</span>
                         </a>
                       </div>
                     </div>

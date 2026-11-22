@@ -476,7 +476,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
           accent="indigo"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder="Cari tajuk, ringkasan atau kategori..."
+          searchPlaceholder="Cari tajuk atau kategori..."
           filterCount={activeFilterCount}
           onResetFilters={() => {
             setStatusFilter('all');

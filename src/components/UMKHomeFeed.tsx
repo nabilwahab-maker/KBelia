@@ -714,8 +714,8 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
           {filteredBusinesses.slice(0, 6).map((biz) => {
             const cleanPhone = (biz.whatsapp || biz.ownerPhone || '601155552026').replace(/[^0-9]/g, '');
             const waMsg = language === 'en'
-              ? `Hello entrepreneur ${encodeURIComponent(biz.businessName)}, I saw your business on the KBelia Kelantan Directory and I'm interested in your products.`
-              : `Salam usahawan ${encodeURIComponent(biz.businessName)}, saya melihat profil anda di Direktori KBelia Kelantan dan berminat dengan produk anda.`;
+              ? `Hello entrepreneur ${encodeURIComponent(biz.businessName)}, I am a fellow Belia member on the KBelia Kelantan Portal and would like to connect regarding your products.`
+              : `Salam usahawan ${encodeURIComponent(biz.businessName)}, saya rakan Belia di Portal KBelia Kelantan dan ingin bertanya serta berhubung mengenai produk anda.`;
             const waUrl = `https://wa.me/${cleanPhone}?text=${waMsg}`;
 
             return (

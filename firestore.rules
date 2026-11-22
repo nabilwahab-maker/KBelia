@@ -720,10 +720,10 @@ service cloud.firestore {
       allow delete: if isAdmin() && isValidId(grantId);
     }
 
-    // 7. Products Collection
+    // 7. Products Collection (Signed-In Portal Members Only)
     match /products/{productId} {
-      allow get: if isValidId(productId);
-      allow list: if true;
+      allow get: if isValidId(productId) && isSignedIn();
+      allow list: if isSignedIn();
       allow create: if isSignedIn() && isValidId(productId) && isValidProduct(incoming()) && (
         isAdmin() || incoming().ownerId == request.auth.uid
       );

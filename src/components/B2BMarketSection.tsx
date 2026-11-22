@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
+  ArrowRight,
+  Building2,
+  Calendar,
+  MapPin,
   Megaphone,
-  MessageCircle
+  MessageCircle,
+  Sparkles,
+  User,
+  X
 } from 'lucide-react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { B2BListing } from '../types';
@@ -23,6 +30,9 @@ import { resolveB2BImage } from '../utils/visualAssets';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
+
+const ITEMS_PER_PAGE = 6;
+const SPOTLIGHT_ROTATE_MS = 6000;
 
 export const B2BMarketSection: React.FC = () => {
   const { language } = useLanguage();
@@ -105,6 +115,44 @@ export const B2BMarketSection: React.FC = () => {
   const [filterDistrict, setFilterDistrict] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
+  const [spotlightIndex, setSpotlightIndex] = useState<number>(0);
+  const [isSpotlightPaused, setIsSpotlightPaused] = useState<boolean>(false);
+  const [detailListing, setDetailListing] = useState<B2BListing | null>(null);
+
+  const spotlightCount = listings.length;
+  const safeSpotlightIndex = spotlightCount > 0 ? spotlightIndex % spotlightCount : 0;
+  const spotlightListing = spotlightCount > 0 ? listings[safeSpotlightIndex] : null;
+
+  useEffect(() => {
+    if (spotlightCount <= 1 || isSpotlightPaused || detailListing) return;
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setSpotlightIndex((prev) => (prev + 1) % spotlightCount);
+    }, SPOTLIGHT_ROTATE_MS);
+
+    return () => window.clearInterval(timer);
+  }, [spotlightCount, isSpotlightPaused, detailListing]);
+
+  useEffect(() => {
+    if (!detailListing) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setDetailListing(null);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [detailListing]);
+
+  const buildWhatsAppHref = (item: B2BListing) =>
+    `https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20Ruang%20Niaga%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`;
 
   const sortOptions = buildStandardSortOptions(
     [
@@ -145,7 +193,7 @@ export const B2BMarketSection: React.FC = () => {
     }
   );
 
-  const pagination = usePagination(filteredListings, 7, [
+  const pagination = usePagination(filteredListings, ITEMS_PER_PAGE, [
     searchQuery,
     filterType,
     filterDistrict,
@@ -159,20 +207,141 @@ export const B2BMarketSection: React.FC = () => {
     (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   return (
-    <div className="w-full space-y-4">
-      {/* Compact Standardized Module Header */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700">
+    <div className="w-full space-y-5">
+      {/* Header */}
+      <div>
         <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
           {isEn ? 'Supply Network & Commercial Ads' : 'Rangkaian Bekalan & Ruang Niaga'}
         </h1>
+        <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl">
+          {isEn
+            ? 'Connect directly with Kelantan youth wholesale suppliers, local product makers, and commercial kiosk partners.'
+            : 'Terokai tawaran pembekal borong, bahan mentah kiosk, dan permintaan rakan niaga usahawan belia di seluruh Kelantan.'}
+        </p>
       </div>
 
-      {/* Ruang Niaga: Carian, Penapis Bersepadu, Senarai Baris & Halaman Bernombor */}
+      {/* Rotating Featured Spotlight Carousel */}
+      {spotlightListing && (
+        <section
+          aria-label={isEn ? 'Featured Supply Spotlight' : 'Sorotan Pilihan Utama'}
+          onMouseEnter={() => setIsSpotlightPaused(true)}
+          onMouseLeave={() => setIsSpotlightPaused(false)}
+          onFocus={() => setIsSpotlightPaused(true)}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+              setIsSpotlightPaused(false);
+            }
+          }}
+          className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 overflow-hidden shadow-2xs"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+            <div
+              onClick={() => setDetailListing(spotlightListing)}
+              className="lg:col-span-5 relative min-h-[220px] sm:min-h-[260px] bg-slate-100 dark:bg-zinc-800 overflow-hidden cursor-pointer group"
+            >
+              <PortalImage
+                key={spotlightListing.id}
+                src={resolveB2BImage(spotlightListing)}
+                alt={spotlightListing.title}
+                fallbackType="b2b"
+                fallbackLabel={spotlightListing.authorBusiness}
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+              />
+            </div>
+
+            <div className="lg:col-span-7 p-5 sm:p-6 lg:p-7 flex flex-col justify-between gap-5">
+              <div className="space-y-3" aria-live="polite">
+                <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-1 text-teal-700 dark:text-teal-400">
+                    <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                    <span>{isEn ? 'Featured Spotlight' : 'Sorotan Pilihan Utama'}</span>
+                  </span>
+                  <span className="text-black/30 dark:text-white/30">·</span>
+                  <span
+                    className={
+                      spotlightListing.type === 'supply'
+                        ? 'text-emerald-700 dark:text-emerald-400'
+                        : 'text-amber-700 dark:text-amber-400'
+                    }
+                  >
+                    {spotlightListing.type === 'supply'
+                      ? (isEn ? 'Supplying' : 'Membekal')
+                      : (isEn ? 'Seeking' : 'Mencari')}
+                  </span>
+                </div>
+
+                <h2
+                  onClick={() => setDetailListing(spotlightListing)}
+                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight leading-snug text-balance cursor-pointer hover:text-teal-700 dark:hover:text-teal-400 transition-colors"
+                >
+                  {spotlightListing.title}
+                </h2>
+
+                <p className="text-sm sm:text-base text-black/70 dark:text-white/75 leading-relaxed line-clamp-3">
+                  {spotlightListing.description}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={buildWhatsAppHref(spotlightListing)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-2xs transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => setDetailListing(spotlightListing)}
+                    className="py-2 px-3 rounded-xl text-sm font-bold text-teal-700 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/40 transition-colors inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  >
+                    <span>{isEn ? 'View Details' : 'Lihat Butiran'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {spotlightCount > 1 && (
+                  <div
+                    className="flex items-center gap-1.5"
+                    role="tablist"
+                    aria-label={isEn ? 'Spotlight slides' : 'Slaid sorotan'}
+                  >
+                    {listings.map((item, idx) => {
+                      const isActiveSlide = idx === safeSpotlightIndex;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          role="tab"
+                          aria-selected={isActiveSlide}
+                          aria-label={`${isEn ? 'Show listing' : 'Papar iklan'} ${idx + 1}: ${item.title}`}
+                          onClick={() => setSpotlightIndex(idx)}
+                          className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                            isActiveSlide
+                              ? 'w-6 bg-teal-600 dark:bg-teal-400'
+                              : 'w-2.5 bg-slate-200 dark:bg-zinc-700 hover:bg-slate-300 dark:hover:bg-zinc-600'
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Ruang Niaga: Single Integrated Toolbar + 3-Column Visual Card Grid */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
         <ReferenceTableToolbar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder={isEn ? 'Search ad title, business or district...' : 'Cari tajuk iklan, perniagaan atau daerah...'}
+          searchPlaceholder={isEn ? 'Search ad or district...' : 'Cari iklan atau daerah...'}
           filterCount={activeFilterCount}
           onResetFilters={() => {
             setFilterType('all');
@@ -252,7 +421,7 @@ export const B2BMarketSection: React.FC = () => {
           }
         />
 
-        {/* Senarai Menegak Ruang Niaga */}
+        {/* Grid Kad Visual 3-Lajur Ruang Niaga */}
         {filteredListings.length === 0 ? (
           <div className="py-12 px-4 text-center">
             <Megaphone className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-3" />
@@ -266,6 +435,7 @@ export const B2BMarketSection: React.FC = () => {
                   setSearchQuery('');
                   setFilterType('all');
                   setFilterDistrict('all');
+                  setSortBy(DEFAULT_SORT_VALUE);
                 }}
                 className="mt-3 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-black dark:text-white transition-colors cursor-pointer"
               >
@@ -275,63 +445,83 @@ export const B2BMarketSection: React.FC = () => {
           </div>
         ) : (
           <>
-            <div className="flex flex-col divide-y divide-slate-200 dark:divide-zinc-700">
+            <div className="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
               {pagination.paginatedItems.map((item) => (
-                <div
+                <article
                   key={item.id}
-                  className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors"
+                  onClick={() => setDetailListing(item)}
+                  className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-teal-500 dark:hover:border-zinc-500 transition-colors flex flex-col justify-between overflow-hidden cursor-pointer group"
                 >
-                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-zinc-800 overflow-hidden border border-slate-200 dark:border-zinc-700 shrink-0">
+                  <div>
+                    <div className="aspect-[16/10] w-full bg-slate-100 dark:bg-zinc-800 border-b border-slate-100 dark:border-zinc-800 overflow-hidden">
                       <PortalImage
                         src={resolveB2BImage(item)}
                         alt={item.title}
                         fallbackType="b2b"
                         fallbackLabel={item.authorBusiness}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
                       />
                     </div>
 
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
-                          {item.title}
-                        </h3>
+                    <div className="p-4 sm:p-5 pb-3">
+                      <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[0.8125rem] font-bold border shrink-0 ${
+                          className={`uppercase tracking-wider font-bold ${
                             item.type === 'supply'
-                              ? 'bg-emerald-50 text-black border-emerald-200 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-800'
-                              : 'bg-amber-50 text-black border-amber-200 dark:bg-amber-950/50 dark:text-white dark:border-amber-800'
+                              ? 'text-emerald-700 dark:text-emerald-400'
+                              : 'text-amber-700 dark:text-amber-400'
                           }`}
                         >
                           {item.type === 'supply'
                             ? (isEn ? 'Supplying' : 'Membekal')
                             : (isEn ? 'Seeking' : 'Mencari')}
                         </span>
+                        <span className="text-black/30 dark:text-white/30">·</span>
+                        <span className="text-black/65 dark:text-white/70 truncate">
+                          {item.authorBusiness}
+                        </span>
                       </div>
-                      <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                        {item.authorBusiness} ({item.authorName}) · {item.district} · {item.date} · {item.description}
+
+                      <h3 className="text-base sm:text-lg font-bold text-black dark:text-white leading-snug line-clamp-2 mt-1.5 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors">
+                        {item.title}
+                      </h3>
+
+                      <p className="text-sm text-black/65 dark:text-white/70 leading-relaxed line-clamp-2 mt-1.5">
+                        {item.description}
                       </p>
+
+                      <div className="mt-3 text-xs text-black/60 dark:text-white/65 truncate tabular-nums">
+                        {item.district} · {item.date}
+                      </div>
                     </div>
                   </div>
 
-                  <a
-                    href={`https://wa.me/${item.whatsapp}?text=Salam%20${encodeURIComponent(item.authorName)},%20saya%20melihat%20iklan%20Ruang%20Niaga%20anda%20di%20Portal%20KBelia:%20${encodeURIComponent(item.title)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="py-2 px-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-lg shadow-xs transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 self-end sm:self-center"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>
-                  </a>
-                </div>
+                  {/* Card Footer: View Details + Direct WhatsApp CTA */}
+                  <div className="px-4 sm:px-5 py-3.5 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between gap-2.5">
+                    <span className="text-xs font-semibold text-teal-700 dark:text-teal-400 inline-flex items-center gap-1 group-hover:underline whitespace-nowrap">
+                      <span>{isEn ? 'Details' : 'Butiran'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+
+                    <a
+                      href={buildWhatsAppHref(item)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="py-1.5 px-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>{isEn ? 'Contact' : 'Hubungi'}</span>
+                    </a>
+                  </div>
+                </article>
               ))}
             </div>
 
             <PaginationBar
               currentPage={pagination.currentPage}
               totalItems={pagination.totalItems}
-              itemsPerPage={7}
+              itemsPerPage={ITEMS_PER_PAGE}
               onPageChange={pagination.setCurrentPage}
               itemLabel={isEn ? 'listings' : 'iklan ruang niaga'}
               accent="teal"
@@ -339,6 +529,148 @@ export const B2BMarketSection: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* B2B Listing Full Details Modal */}
+      {detailListing && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-[2px]"
+          onClick={() => setDetailListing(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="b2b-detail-modal-title"
+        >
+          <div
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative aspect-[16/9] w-full bg-slate-100 dark:bg-zinc-800 border-b border-slate-200 dark:border-zinc-700 shrink-0 overflow-hidden">
+              <PortalImage
+                src={resolveB2BImage(detailListing)}
+                alt={detailListing.title}
+                fallbackType="b2b"
+                fallbackLabel={detailListing.authorBusiness}
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => setDetailListing(null)}
+                aria-label={isEn ? 'Close details' : 'Tutup butiran'}
+                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 dark:bg-zinc-900/95 text-black dark:text-white border border-slate-200 dark:border-zinc-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 sm:p-6 space-y-5">
+              <div>
+                <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold uppercase tracking-wider">
+                  <span
+                    className={
+                      detailListing.type === 'supply'
+                        ? 'text-emerald-700 dark:text-emerald-400'
+                        : 'text-amber-700 dark:text-amber-400'
+                    }
+                  >
+                    {detailListing.type === 'supply'
+                      ? (isEn ? 'Supplying Wholesale' : 'Membekal Borong')
+                      : (isEn ? 'Seeking Supplier' : 'Mencari Pembekal')}
+                  </span>
+                  <span className="text-black/30 dark:text-white/30">·</span>
+                  <span className="text-black/60 dark:text-white/65">
+                    {detailListing.district}
+                  </span>
+                </div>
+                <h2
+                  id="b2b-detail-modal-title"
+                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight mt-1.5 text-balance"
+                >
+                  {detailListing.title}
+                </h2>
+              </div>
+
+              {/* Structured Business Facts Strip */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-y border-slate-200 dark:border-zinc-700 py-4 text-sm">
+                <div className="flex items-start gap-2.5">
+                  <Building2 className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                      {isEn ? 'Business Name' : 'Nama Perniagaan'}
+                    </span>
+                    <span className="font-semibold text-black dark:text-white">
+                      {detailListing.authorBusiness}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <User className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                      {isEn ? 'Contact Person' : 'Rakan Niaga'}
+                    </span>
+                    <span className="font-semibold text-black dark:text-white">
+                      {detailListing.authorName}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                      {isEn ? 'District' : 'Daerah Operasi'}
+                    </span>
+                    <span className="font-semibold text-black dark:text-white">
+                      {detailListing.district}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <Calendar className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                      {isEn ? 'Posted' : 'Tarikh Siaran'}
+                    </span>
+                    <span className="font-semibold text-black dark:text-white tabular-nums">
+                      {detailListing.date}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-black/55 dark:text-white/60">
+                  {isEn ? 'Supply & Trade Details' : 'Huraian Bekalan & Permintaan'}
+                </h3>
+                <p className="text-sm sm:text-base text-black/75 dark:text-white/80 leading-relaxed whitespace-pre-line">
+                  {detailListing.description}
+                </p>
+              </div>
+            </div>
+
+            <div className="px-5 sm:px-6 py-4 bg-slate-50 dark:bg-zinc-950/60 border-t border-slate-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setDetailListing(null)}
+                className="py-2 px-4 rounded-xl text-sm font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer whitespace-nowrap"
+              >
+                {isEn ? 'Close' : 'Tutup'}
+              </button>
+
+              <a
+                href={buildWhatsAppHref(detailListing)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi via WhatsApp'}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

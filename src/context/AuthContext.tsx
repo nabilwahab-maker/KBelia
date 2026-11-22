@@ -38,7 +38,6 @@ export type DemoAccountType =
   | 'merchant_faizul'
   | 'merchant_syafiqah'
   | 'merchant_harith'
-  | 'guest'
   | 'mentor_wanazhar'
   | 'mentor_sitiaminah'
   | 'mentor_khairul'
@@ -62,7 +61,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isMentor: boolean;
   isYouth: boolean;
-  userRole: 'admin' | 'mentor' | 'user' | 'guest';
+  userRole: 'admin' | 'mentor' | 'user' | null;
   isDemoSession: boolean;
   loading: boolean;
   authError: string | null;
@@ -1090,16 +1089,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...customData
       };
     } else {
-      const guestId = `guest-${Date.now()}`;
+      const demoId = `demo-belia-${Date.now()}`;
       authUser = {
-        uid: guestId,
-        displayName: 'Usahawan Belia (Pelawat Demo)',
+        uid: demoId,
+        displayName: 'Usahawan Belia Kelantan (Demo)',
         email: 'belia.kelantan@niaga.my',
         photoURL: '/assets/generated/avatar_youth_male_1793924250192.jpg',
         isDemo: true
       };
       profile = {
-        userId: guestId,
+        userId: demoId,
         fullName: 'Usahawan Belia Kelantan',
         email: 'belia.kelantan@niaga.my',
         role: 'user',
@@ -1229,8 +1228,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
   const isMentor = Boolean(user && !isAdmin && userProfile?.role === 'mentor');
   const isYouth = Boolean(user && !isAdmin && !isMentor);
-  const userRole: 'admin' | 'mentor' | 'user' | 'guest' = !user
-    ? 'guest'
+  const userRole: 'admin' | 'mentor' | 'user' | null = !user
+    ? null
     : isAdmin
     ? 'admin'
     : isMentor

@@ -41,6 +41,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useScrollReveal } from '../hooks/useMotion';
+import { showToast } from './ToastNotification';
 
 const RevealBlock: React.FC<{
   children: React.ReactNode;
@@ -79,9 +80,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onSelectBusiness,
   onOpenGrantModal
 }) => {
-  const { userProfile, openLoginModal } = useAuth();
+  const { user } = useAuth();
   const { language, setLanguage } = useLanguage();
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
   const isBM = language === 'ms';
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -93,6 +94,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     setActiveTab(tab);
+  };
+
+  const requireBeliaLogin = (message: string) => {
+    showToast({
+      type: 'info',
+      title: isBM ? 'Log Masuk Belia Diperlukan' : 'Belia Login Required',
+      message
+    });
+    navigateToPage('login');
   };
 
   // 5 Rich Visual Slides for the Automatic Moving Carousel (Maintained as original)
@@ -130,7 +140,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       location: 'Hab Usahawan Bachok',
       imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
       stat: 'Inkubasi Makanan & Minuman Aktif',
-      ctaText: 'Lihat Menu',
+      ctaText: 'Masuk Portal Belia',
       onAction: () => navigateToPage('login')
     }
   ];
@@ -476,10 +486,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div
                 key={`marquee-${idx}`}
                 onClick={() => {
+                  if (!user) {
+                    requireBeliaLogin(
+                      isBM
+                        ? 'Sila log masuk akaun Belia Kelantan untuk meneroka kiosk dan direktori produk usahawan.'
+                        : 'Please sign in with a Belia account to access the full kiosk and entrepreneur product directory.'
+                    );
+                    return;
+                  }
                   if (card.title.includes('Kiosk') || card.title.includes('Kapsul')) {
-                    setActiveTab('academic');
+                    navigateToPage('academic');
                   } else {
-                    setActiveTab('hepa');
+                    navigateToPage('hepa');
                   }
                 }}
                 className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-blue-400/70 rounded-xl overflow-hidden transition-colors cursor-pointer shadow-2xs group"
@@ -622,8 +640,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-black dark:text-white block">Direktori Pasaran Digital</span>
-                    <span className="text-black dark:text-white text-sm">Pamerkan katalog produk kepada pelanggan di seluruh negeri.</span>
+                    <span className="font-bold text-black dark:text-white block">Direktori Produk Belia</span>
+                    <span className="text-black dark:text-white text-sm">Pamerkan katalog produk kepada rakan usahawan belia, mentor, dan pentadbir di seluruh negeri.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
@@ -902,7 +920,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <h4 className="font-extrabold text-lg text-black dark:text-white tracking-tight">Tingkatkan Prestasi</h4>
               <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
-                Terima bimbingan mentor, pantau jualan harian, dan luaskan capaian pelanggan.
+                Terima bimbingan mentor, pantau jualan harian, dan luaskan jaringan rakan niaga belia.
               </p>
             </div>
 
@@ -965,12 +983,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <Store className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-extrabold text-black dark:text-white tracking-tight transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
-                {isBM ? 'Direktori Pasaran Digital' : 'Digital Market Directory'}
+                {isBM ? 'Direktori Produk Belia' : 'Youth Product Directory'}
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
                 {isBM 
-                  ? 'Katalog rasmi yang memaparkan produk makanan, kraftangan batik, servis digital, dan hasil pertanian belia Kelantan.'
-                  : 'Official catalog showcasing youth-crafted products from heritage delicacies to batik and digital services.'}
+                  ? 'Katalog dalaman portal yang memaparkan produk makanan, kraftangan batik, servis digital, dan hasil pertanian usahawan belia Kelantan.'
+                  : 'Internal portal catalog showcasing youth-crafted products from heritage delicacies to batik and digital services.'}
               </p>
               <div className="pt-2">
                 <button
@@ -978,7 +996,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={() => navigateToPage('login')}
                   className="text-sm font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
                 >
-                  <span>{isBM ? 'Lihat Usahawan' : 'Browse Directory'}</span>
+                  <span>{isBM ? 'Masuk Portal Belia' : 'Enter Belia Portal'}</span>
                   <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </button>
               </div>
@@ -1024,11 +1042,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div>
               <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
                 <Building2 className="w-3.5 h-3.5" />
-                <span>Lokasi Pilihan</span>
+                <span>{isBM ? 'Pratonton Lokasi Pilihan' : 'Selected Locations Preview'}</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance tracking-tight">
                 Kiosk Belia Sedia Dimohon
               </h2>
+              <p className="text-sm text-black/70 dark:text-white/75 mt-1.5">
+                {isBM
+                  ? 'Pratonton ekosistem · Log masuk akaun Belia untuk melihat butiran penuh & membuat permohonan kiosk.'
+                  : 'Ecosystem preview · Sign in with a Belia account to view full details & submit kiosk applications.'}
+              </p>
             </div>
           </RevealBlock>
 
@@ -1042,7 +1065,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               return displaySlots.map((slot) => (
                 <div 
                   key={slot.id} 
-                  onClick={() => onSelectSlot(slot)}
+                  onClick={() => {
+                    if (!user) {
+                      requireBeliaLogin(
+                        isBM
+                          ? 'Sila log masuk akaun Belia Kelantan untuk melihat butiran penuh kiosk atau membuat permohonan.'
+                          : 'Please sign in with a Belia account to view kiosk details or submit an application.'
+                      );
+                      return;
+                    }
+                    onSelectSlot(slot);
+                  }}
                   className="kbelia-glass-card interactive-card rounded-2xl overflow-hidden hover:border-blue-400/70 hover:shadow-md transition-all flex flex-col justify-between h-full group cursor-pointer"
                 >
                   <div>
@@ -1091,6 +1124,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         RM{slot.dailyRate} <span className="text-sm text-black/70 dark:text-white/75 font-normal">/ hari</span>
                       </div>
                     </div>
+                    {!user && (
+                      <span className="text-[0.8125rem] font-bold text-blue-700 dark:text-blue-300 inline-flex items-center gap-1">
+                        <span>{isBM ? 'Log Masuk Belia' : 'Belia Login'}</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </span>
+                    )}
                   </div>
 
                 </div>
@@ -1112,11 +1151,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div>
               <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
                 <Store className="w-3.5 h-3.5" />
-                <span>Direktori Produk Tempatan</span>
+                <span>{isBM ? 'Pratonton Direktori Produk' : 'Product Directory Preview'}</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance tracking-tight">
                 Karya & Produk Belia Kelantan
               </h2>
+              <p className="text-sm text-black/70 dark:text-white/75 mt-1.5">
+                {isBM
+                  ? 'Pratonton produk · Log masuk akaun Belia untuk mengakses katalog produk penuh dan berhubung dengan rakan usahawan.'
+                  : 'Product preview · Sign in with a Belia account to explore the full product catalog and connect with fellow youth entrepreneurs.'}
+              </p>
             </div>
           </RevealBlock>
 
@@ -1124,7 +1168,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {businesses.slice(0, 3).map((biz) => (
               <div 
                 key={biz.id}
-                onClick={() => onSelectBusiness(biz)}
+                onClick={() => {
+                  if (!user) {
+                    requireBeliaLogin(
+                      isBM
+                        ? 'Sila log masuk akaun Belia Kelantan untuk mengakses katalog produk penuh dan butiran perniagaan.'
+                        : 'Please sign in with a Belia account to inspect full product catalogs and business details.'
+                    );
+                    return;
+                  }
+                  onSelectBusiness(biz);
+                }}
                 className="kbelia-glass-card interactive-card rounded-2xl p-5 sm:p-6 hover:border-blue-400/70 hover:shadow-md transition-all flex flex-col justify-between group cursor-pointer"
               >
                 <div className="space-y-3">
@@ -1151,11 +1205,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 mt-3 flex items-center justify-between text-sm">
-                  <span className="text-black dark:text-white/75 text-[0.8125rem]">{biz.ownerName}</span>
-                  <span className="text-[0.8125rem] font-semibold text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/70">
-                    {biz.district}
-                  </span>
+                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 mt-3 flex items-center justify-between text-sm gap-2">
+                  <span className="text-black dark:text-white/75 text-[0.8125rem] truncate">{biz.ownerName}</span>
+                  {!user ? (
+                    <span className="text-[0.8125rem] font-bold text-blue-700 dark:text-blue-300 inline-flex items-center gap-1 shrink-0">
+                      <span>{isBM ? 'Log Masuk Belia' : 'Belia Login'}</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </span>
+                  ) : (
+                    <span className="text-[0.8125rem] font-semibold text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/70 shrink-0">
+                      {biz.district}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}

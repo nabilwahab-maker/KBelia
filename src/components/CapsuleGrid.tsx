@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   Clock,
   ArrowRight,
-  FileText,
   Eye,
   ExternalLink,
   SlidersHorizontal,
@@ -220,8 +219,8 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           onSearchChange={setSearchQuery}
           searchPlaceholder={
             isEn
-              ? 'Search kiosk code, name, hub or district...'
-              : 'Cari kod kiosk, nama, hab atau jajahan...'
+              ? 'Search kiosk, hub or district...'
+              : 'Cari kod kiosk, hab atau jajahan...'
           }
           filterCount={activeFilterCount}
           onResetFilters={handleResetFiltersOnly}
@@ -230,25 +229,14 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           onSortChange={setSortBy}
           sortLabel={isEn ? 'Sort By' : 'Susun Mengikut'}
           rightSlot={
-            isReadOnly ? (
-              onAddSlot ? (
-                <button
-                  type="button"
-                  onClick={onAddSlot}
-                  className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
-                >
-                  <Building2 className="w-4 h-4" />
-                  <span>Daftar Kiosk</span>
-                </button>
-              ) : undefined
-            ) : hasActiveBooking && onGoToManageBooking ? (
+            isReadOnly && onAddSlot ? (
               <button
                 type="button"
-                onClick={onGoToManageBooking}
-                className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-2xs transition-colors shrink-0 cursor-pointer"
+                onClick={onAddSlot}
+                className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
               >
-                <FileText className="w-4 h-4" />
-                <span>Urus Kiosk Saya</span>
+                <Building2 className="w-4 h-4" />
+                <span>Daftar Kiosk</span>
               </button>
             ) : undefined
           }

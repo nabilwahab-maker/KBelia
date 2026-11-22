@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface DashboardBannerHeaderProps {
   activeTab: UMKTab;
-  role: 'belia' | 'mentor' | 'admin' | 'public';
+  role: 'belia' | 'mentor' | 'admin';
   userName?: string;
   onNavigateHome?: () => void;
   onNavigateTab?: (tab: UMKTab) => void;

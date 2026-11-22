@@ -202,8 +202,8 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                 const rawPhone = biz.whatsapp || biz.ownerPhone || '';
                 const cleanPhone = typeof rawPhone === 'string' ? rawPhone.replace(/[^0-9]/g, '') : '';
                 const waGreeting = language === 'en'
-                  ? `Hello ${biz.businessName}, I saw your business profile on the Kelantan Youth Portal.`
-                  : `Assalamualaikum ${biz.businessName}, saya melihat perniagaan anda di Portal NiagaBelia Kelantan.`;
+                  ? `Hello ${biz.businessName}, I am a fellow Belia entrepreneur from the Kelantan Youth Portal and would like to connect.`
+                  : `Assalamualaikum ${biz.businessName}, saya rakan usahawan Belia dari Portal KBelia Kelantan dan ingin berhubung dengan perniagaan anda.`;
                 const waLink = cleanPhone
                   ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waGreeting)}`
                   : '#';

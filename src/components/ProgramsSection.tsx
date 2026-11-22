@@ -2,11 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   Award,
   ArrowRight,
+  Building2,
+  Calendar,
   CheckCircle2,
-  X,
-  XCircle,
   Clock,
-  Star
+  MapPin,
+  Star,
+  X,
+  XCircle
 } from 'lucide-react';
 import { GrantApplication, YouthProgram } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -36,6 +39,8 @@ interface ProgramsSectionProps {
   isReadOnly?: boolean;
 }
 
+const ITEMS_PER_PAGE = 6;
+
 export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   programs = [],
   grantApplications = [],
@@ -58,6 +63,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   const [activeNotice, setActiveNotice] = useState<string | null>(null);
   const [cancellingGrantId, setCancellingGrantId] = useState<string | null>(null);
   const [editingProgram, setEditingProgram] = useState<YouthProgram | null>(null);
+  const [detailProgram, setDetailProgram] = useState<YouthProgram | null>(null);
 
   const storageKey = `kbelia_program_registrations_${user?.uid || 'guest'}`;
   const [registeredIds, setRegisteredIds] = useState<string[]>(() => {
@@ -78,13 +84,27 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
     }
   }, [storageKey]);
 
-  const categoryOptions = [
-    { key: 'Semua', label: isEn ? 'All Categories' : 'Semua Kategori' },
-    { key: 'Geran & Dana', label: isEn ? 'Grants & Funding' : 'Geran & Dana' },
-    { key: 'Bengkel & Latihan', label: isEn ? 'Workshops & Training' : 'Bengkel & Latihan' },
-    { key: 'Pameran & Ekspo', label: isEn ? 'Expos & Exhibitions' : 'Pameran & Ekspo' },
-    { key: 'Pitching & Inkubasi', label: isEn ? 'Pitching & Incubation' : 'Pitching & Inkubasi' }
-  ];
+  useEffect(() => {
+    if (!detailProgram) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setDetailProgram(null);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [detailProgram]);
+
+  const categoryOptions = useMemo(
+    () => [
+      { key: 'Semua', label: isEn ? 'All Categories' : 'Semua Kategori' },
+      { key: 'Geran & Dana', label: isEn ? 'Grants & Funding' : 'Geran & Dana' },
+      { key: 'Bengkel & Latihan', label: isEn ? 'Workshops & Training' : 'Bengkel & Latihan' },
+      { key: 'Pameran & Ekspo', label: isEn ? 'Expos & Exhibitions' : 'Pameran & Ekspo' },
+      { key: 'Pitching & Inkubasi', label: isEn ? 'Pitching & Incubation' : 'Pitching & Inkubasi' }
+    ],
+    [isEn]
+  );
 
   const sortOptions = useMemo(
     () =>
@@ -109,6 +129,11 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   );
 
   const safePrograms = programs || [];
+
+  const spotlightProgram = useMemo(() => {
+    if (safePrograms.length === 0) return null;
+    return safePrograms.find((p) => p?.isFeatured) || safePrograms[0];
+  }, [safePrograms]);
 
   const filteredPrograms = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -142,7 +167,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
     });
   }, [safePrograms, selectedCategory, featuredFilter, searchQuery, sortBy]);
 
-  const pagination = usePagination(filteredPrograms, 7, [
+  const pagination = usePagination(filteredPrograms, ITEMS_PER_PAGE, [
     searchQuery,
     selectedCategory,
     featuredFilter,
@@ -188,6 +213,9 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   const handleDeleteProgramConfirm = async (prog: YouthProgram) => {
     try {
       await deleteProgram(prog.id);
+      if (detailProgram?.id === prog.id) {
+        setDetailProgram(null);
+      }
       showToast({
         type: 'info',
         title: isEn ? 'Program Deleted' : 'Program Dipadam',
@@ -288,13 +316,148 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   const visibleGrants = (grantApplications || []).filter((g) => g && g.status !== 'cancelled');
   const pendingGrants = visibleGrants.filter((g) => g.status === 'pending');
 
+  const getProgramStatus = (prog: YouthProgram) => {
+    const isGrant = prog.category === 'Geran & Dana';
+    const isRegistered = !isGrant && registeredIds.includes(prog.id);
+    const matchingPendingGrant = isGrant
+      ? pendingGrants.find(
+          (g) =>
+            g.programId === prog.id ||
+            g.programTitle.trim().toLowerCase() === prog.title.trim().toLowerCase()
+        )
+      : undefined;
+    return { isGrant, isRegistered, matchingPendingGrant };
+  };
+
+  const renderProgramActionControls = (
+    prog: YouthProgram,
+    variant: 'card' | 'spotlight' | 'modal' = 'card'
+  ) => {
+    const { isGrant, isRegistered, matchingPendingGrant } = getProgramStatus(prog);
+
+    if (isAdminView) {
+      if (variant === 'modal') {
+        return (
+          <button
+            type="button"
+            onClick={() => {
+              setDetailProgram(null);
+              setEditingProgram(prog);
+            }}
+            className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold inline-flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
+          >
+            <span>{isEn ? 'Edit Program' : 'Edit Program'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        );
+      }
+
+      return (
+        <RowActionMenu
+          ariaLabel={`Tindakan untuk ${prog.title}`}
+          items={[
+            {
+              label: isEn ? 'Edit Program' : 'Edit Program',
+              onClick: () => setEditingProgram(prog)
+            },
+            {
+              label: prog.isFeatured
+                ? (isEn ? 'Unmark Featured' : 'Nyah-tanda Utama')
+                : (isEn ? 'Mark Featured' : 'Tandakan Utama'),
+              tone: 'accent',
+              onClick: () => handleToggleFeaturedProgram(prog)
+            },
+            {
+              label: isEn ? 'Delete Program' : 'Padam Program',
+              tone: 'danger',
+              dividerBefore: true,
+              onClick: () =>
+                confirmDelete({
+                  itemName: prog.title,
+                  itemType: isEn ? 'Grant & Program' : 'Program & Geran',
+                  onConfirm: () => handleDeleteProgramConfirm(prog)
+                })
+            }
+          ]}
+        />
+      );
+    }
+
+    if (matchingPendingGrant) {
+      return (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="py-1.5 px-2.5 bg-amber-50 dark:bg-amber-950/50 text-black dark:text-white border border-amber-300 dark:border-amber-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 whitespace-nowrap">
+            <Clock className="w-3.5 h-3.5 shrink-0" />
+            <span>{isEn ? 'Pending' : 'Disemak'}</span>
+          </span>
+          {onCancelGrant && (
+            <button
+              type="button"
+              disabled={cancellingGrantId === matchingPendingGrant.id}
+              onClick={() => handleCancelGrantClick(matchingPendingGrant)}
+              className="py-1.5 px-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+            >
+              <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+              <span>
+                {cancellingGrantId === matchingPendingGrant.id
+                  ? (isEn ? 'Cancelling...' : 'Membatalkan...')
+                  : (isEn ? 'Cancel' : 'Batal')}
+              </span>
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    if (isRegistered) {
+      return (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="py-1.5 px-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 whitespace-nowrap">
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+            <span>{isEn ? 'Registered' : 'Didaftarkan'}</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => handleCancelProgramRegistration(prog)}
+            className="py-1.5 px-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+          >
+            <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+            <span>{isEn ? 'Cancel' : 'Batal'}</span>
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          if (variant === 'modal') {
+            setDetailProgram(null);
+          }
+          handleProgramAction(prog);
+        }}
+        className={`${
+          variant === 'card' ? 'py-1.5 px-3 text-xs' : 'py-2.5 px-4 text-sm'
+        } bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0`}
+      >
+        <span>
+          {isGrant
+            ? (isEn ? 'Apply Grant' : 'Mohon Geran')
+            : (isEn ? 'Join Program' : 'Daftar Program')}
+        </span>
+        <ArrowRight className="w-3.5 h-3.5" />
+      </button>
+    );
+  };
+
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-5">
       {/* Notice Banner */}
       {activeNotice && (
         <div className="p-4 bg-white dark:bg-slate-800 text-black dark:text-white rounded-xl border border-emerald-200 dark:border-emerald-800 flex items-center justify-between gap-3 shadow-xs">
           <div className="flex items-center gap-2.5 text-sm font-medium">
-            <CheckCircle2 className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{activeNotice}</span>
           </div>
           <button
@@ -309,10 +472,17 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
       )}
 
       {/* Header */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
-          {isEn ? 'Youth Grants & Programs' : 'Geran & Program Belia'}
-        </h1>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+            {isEn ? 'Youth Grants & Programs' : 'Geran & Program Belia'}
+          </h1>
+          <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl">
+            {isEn
+              ? 'Explore active business funding schemes, hands-on workshops, expos, and startup pitching tracks across Kelantan.'
+              : 'Terokai skim pembiayaan perniagaan belia, bengkel kemahiran, ekspo jualan, dan program inkubasi usahawan di seluruh Kelantan.'}
+          </p>
+        </div>
       </div>
 
       {/* Active Grant Applications Status & Cancel Controls (Youth Only) */}
@@ -335,21 +505,22 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                   className="p-3.5 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div className="w-16 h-16 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center shrink-0 text-emerald-700 dark:text-emerald-300">
-                      <Award className="w-6 h-6" />
+                    <div className="w-12 h-12 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center shrink-0 text-emerald-700 dark:text-emerald-300">
+                      <Award className="w-5 h-5" />
                     </div>
-                    <div className="min-w-0 flex-1 space-y-1">
+                    <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="font-bold text-sm sm:text-base text-black dark:text-white truncate">
                           {grant.programTitle}
                         </span>
+                        <span className="text-xs font-semibold text-black/40 dark:text-white/40">·</span>
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[0.8125rem] font-bold border shrink-0 ${
+                          className={`text-xs font-bold shrink-0 ${
                             grant.status === 'approved'
-                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border-emerald-300 dark:border-emerald-700'
+                              ? 'text-emerald-700 dark:text-emerald-400'
                               : grant.status === 'rejected'
-                              ? 'bg-rose-50 dark:bg-rose-950/60 text-black dark:text-white border-rose-300 dark:border-rose-700'
-                              : 'bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border-amber-300 dark:border-amber-700'
+                              ? 'text-rose-700 dark:text-rose-400'
+                              : 'text-amber-700 dark:text-amber-400'
                           }`}
                         >
                           {grant.status === 'approved'
@@ -387,15 +558,99 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
         </div>
       )}
 
-      {/* Programs List Card with Integrated Toolbar & Pagination */}
+      {/* Featured Spotlight Hero Card */}
+      {spotlightProgram && (
+        <section
+          aria-label={isEn ? 'Featured Spotlight' : 'Sorotan Pilihan Utama'}
+          className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 overflow-hidden shadow-2xs"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+            <div
+              onClick={() => setDetailProgram(spotlightProgram)}
+              className="lg:col-span-5 relative min-h-[220px] sm:min-h-[260px] bg-slate-100 dark:bg-zinc-800 overflow-hidden cursor-pointer group"
+            >
+              <PortalImage
+                src={resolveProgramImage(spotlightProgram)}
+                alt={spotlightProgram.title}
+                fallbackType="program"
+                fallbackLabel={spotlightProgram.category}
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+              />
+            </div>
+
+            <div className="lg:col-span-7 p-5 sm:p-6 lg:p-7 flex flex-col justify-between gap-5">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                    <Star className="w-3.5 h-3.5 fill-current shrink-0" />
+                    <span>{isEn ? 'Featured Spotlight' : 'Sorotan Pilihan Utama'}</span>
+                    <span className="text-black/30 dark:text-white/30">·</span>
+                    <span className="text-black/65 dark:text-white/70">
+                      {spotlightProgram.category}
+                    </span>
+                  </div>
+                </div>
+
+                <h2
+                  onClick={() => setDetailProgram(spotlightProgram)}
+                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight leading-snug text-balance cursor-pointer hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                >
+                  {spotlightProgram.title}
+                </h2>
+
+                <p className="text-sm sm:text-base text-black/70 dark:text-white/75 leading-relaxed line-clamp-3">
+                  {spotlightProgram.description ||
+                    (isEn
+                      ? 'Official youth entrepreneurship initiative open for eligible Kelantan youth founders.'
+                      : 'Inisiatif rasmi keusahawanan belia yang dibuka kepada usahawan muda Kelantan yang layak.')}
+                </p>
+
+                <div className="pt-3 border-t border-slate-100 dark:border-zinc-800 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm text-black/70 dark:text-white/75 tabular-nums">
+                  {spotlightProgram.grantAmount && (
+                    <span className="font-extrabold text-emerald-700 dark:text-emerald-400">
+                      {spotlightProgram.grantAmount}
+                    </span>
+                  )}
+                  {spotlightProgram.grantAmount && (
+                    <span className="text-black/30 dark:text-white/30">·</span>
+                  )}
+                  <span>{spotlightProgram.date}</span>
+                  <span className="text-black/30 dark:text-white/30">·</span>
+                  <span>{spotlightProgram.location}</span>
+                  <span className="text-black/30 dark:text-white/30">·</span>
+                  <span className="text-black/60 dark:text-white/65">{spotlightProgram.organizer}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div
+                  className="flex flex-wrap items-center gap-3"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {renderProgramActionControls(spotlightProgram, 'spotlight')}
+                  <button
+                    type="button"
+                    onClick={() => setDetailProgram(spotlightProgram)}
+                    className="py-2 px-3 rounded-xl text-sm font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  >
+                    <span>{isEn ? 'View Details' : 'Lihat Butiran'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Catalog Container: Integrated Toolbar + Visual Card Grid */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+        {/* Preserved Integrated Toolbar (Search, Filter, Sort, Admin Add) */}
         <ReferenceTableToolbar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder={
-            isEn
-              ? 'Search program title, category or organizer...'
-              : 'Cari tajuk program, kategori atau lokasi...'
+            isEn ? 'Search program or location...' : 'Cari program atau lokasi...'
           }
           filterCount={activeFilterCount}
           onResetFilters={handleResetFilters}
@@ -408,7 +663,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
               <button
                 type="button"
                 onClick={onAddProgram}
-                className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
+                className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer whitespace-nowrap"
               >
                 <Award className="w-4 h-4" />
                 <span>{isEn ? 'Add Program' : 'Terbit Program'}</span>
@@ -490,146 +745,98 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           </div>
         ) : (
           <>
-            <div className="flex flex-col divide-y divide-slate-200 dark:divide-zinc-700">
-              {pagination.paginatedItems.map((prog) => {
-                const isGrant = prog.category === 'Geran & Dana';
-                const isRegistered = !isGrant && registeredIds.includes(prog.id);
-                const matchingPendingGrant = isGrant
-                  ? pendingGrants.find(
-                      (g) =>
-                        g.programId === prog.id ||
-                        g.programTitle.trim().toLowerCase() === prog.title.trim().toLowerCase()
-                    )
-                  : undefined;
+            {/* Visual 3-Column Program Card Grid */}
+            <div className="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+              {pagination.paginatedItems.map((prog) => (
+                <article
+                  key={prog.id}
+                  id={`program-card-${prog.id}`}
+                  onClick={() => setDetailProgram(prog)}
+                  className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-zinc-500 transition-colors flex flex-col justify-between overflow-hidden cursor-pointer group"
+                >
+                  <div>
+                    <div className="aspect-[16/10] w-full bg-slate-100 dark:bg-zinc-800 border-b border-slate-100 dark:border-zinc-800 overflow-hidden">
+                      <PortalImage
+                        src={resolveProgramImage(prog)}
+                        alt={prog.title}
+                        fallbackType="program"
+                        fallbackLabel={prog.category}
+                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                      />
+                    </div>
 
-                return (
-                  <div
-                    key={prog.id}
-                    id={`program-card-${prog.id}`}
-                    className="p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors"
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shrink-0">
-                        <PortalImage
-                          src={resolveProgramImage(prog)}
-                          alt={prog.title}
-                          fallbackType="program"
-                          fallbackLabel={prog.category}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2 min-w-0">
-                          <h3 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
-                            {prog.title}
-                          </h3>
-                          <span className="px-2 py-0.5 bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 rounded-md text-[0.8125rem] font-semibold shrink-0">
-                            {prog.category}
-                          </span>
-                          {prog.isFeatured && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-md text-[0.8125rem] font-bold shrink-0">
-                              <Star className="w-3 h-3 fill-current" />
+                    <div className="p-4 sm:p-5 pb-3">
+                      <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
+                        <span className="text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                          {prog.category}
+                        </span>
+                        {prog.isFeatured && (
+                          <>
+                            <span className="text-black/30 dark:text-white/30">·</span>
+                            <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400">
+                              <Star className="w-3 h-3 fill-current shrink-0" />
                               <span>{isEn ? 'Featured' : 'Pilihan Utama'}</span>
                             </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                          {prog.grantAmount ? `${prog.grantAmount} · ` : ''}{prog.date} · {prog.location} · {prog.organizer}
-                        </p>
+                          </>
+                        )}
+                      </div>
+
+                      <h3 className="font-bold text-black dark:text-white text-base sm:text-lg leading-snug line-clamp-2 mt-1.5 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                        {prog.title}
+                      </h3>
+
+                      <p className="text-sm text-black/65 dark:text-white/70 leading-relaxed line-clamp-2 mt-1.5">
+                        {prog.description ||
+                          (isEn
+                            ? 'Open for eligible youth entrepreneurs across Kelantan districts.'
+                            : 'Terbuka kepada usahawan belia Kelantan yang memenuhi syarat kelayakan.')}
+                      </p>
+
+                      <div className="mt-3 text-xs text-black/60 dark:text-white/65 truncate tabular-nums">
+                        {prog.date} · {prog.location}
                       </div>
                     </div>
+                  </div>
 
-                    <div className="shrink-0 self-end sm:self-center">
-                      {isAdminView ? (
-                        <RowActionMenu
-                          ariaLabel={`Tindakan untuk ${prog.title}`}
-                          items={[
-                            {
-                              label: isEn ? 'Edit Program' : 'Edit Program',
-                              onClick: () => setEditingProgram(prog)
-                            },
-                            {
-                              label: prog.isFeatured
-                                ? (isEn ? 'Unmark Featured' : 'Nyah-tanda Utama')
-                                : (isEn ? 'Mark Featured' : 'Tandakan Utama'),
-                              tone: 'accent',
-                              onClick: () => handleToggleFeaturedProgram(prog)
-                            },
-                            {
-                              label: isEn ? 'Delete Program' : 'Padam Program',
-                              tone: 'danger',
-                              dividerBefore: true,
-                              onClick: () =>
-                                confirmDelete({
-                                  itemName: prog.title,
-                                  itemType: isEn ? 'Grant & Program' : 'Program & Geran',
-                                  onConfirm: () => handleDeleteProgramConfirm(prog)
-                                })
-                            }
-                          ]}
-                        />
-                      ) : matchingPendingGrant ? (
-                        <div className="flex items-center gap-2">
-                          <div className="py-2 px-3 bg-amber-50 dark:bg-amber-950/50 text-black dark:text-white border border-amber-300 dark:border-amber-700 rounded-lg text-[0.8125rem] font-bold inline-flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 shrink-0" />
-                            <span>{isEn ? 'Pending' : 'Disemak'}</span>
-                          </div>
-                          {onCancelGrant && (
-                            <button
-                              type="button"
-                              disabled={cancellingGrantId === matchingPendingGrant.id}
-                              onClick={() => handleCancelGrantClick(matchingPendingGrant)}
-                              className="py-2 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-[0.8125rem] font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-                            >
-                              <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-                              <span>
-                                {cancellingGrantId === matchingPendingGrant.id
-                                  ? (isEn ? 'Cancelling...' : 'Membatalkan...')
-                                  : (isEn ? 'Cancel Request' : 'Batal Permohonan')}
-                              </span>
-                            </button>
-                          )}
-                        </div>
-                      ) : isRegistered ? (
-                        <div className="flex items-center gap-2">
-                          <div className="py-2 px-3 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-lg text-[0.8125rem] font-bold inline-flex items-center gap-1.5">
-                            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                            <span>{isEn ? 'Registered' : 'Didaftarkan'}</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleCancelProgramRegistration(prog)}
-                            className="py-2 px-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-[0.8125rem] font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
-                          >
-                            <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-                            <span>{isEn ? 'Cancel Join' : 'Batal Penyertaan'}</span>
-                          </button>
-                        </div>
+                  {/* Card Footer: Tabular Grant Value / View Details + Direct Integrated Card Actions */}
+                  <div className="px-4 sm:px-5 py-3.5 border-t border-slate-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-2.5">
+                    <div className="min-w-0">
+                      {prog.grantAmount ? (
+                        <span className="text-sm font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums block truncate">
+                          {prog.grantAmount}
+                        </span>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleProgramAction(prog)}
-                          className="py-2 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
-                        >
-                          <span>
-                            {isGrant
-                              ? (isEn ? 'Apply Grant' : 'Mohon Geran')
-                              : (isEn ? 'Join Program' : 'Daftar Program')}
-                          </span>
+                        <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 inline-flex items-center gap-1 group-hover:underline">
+                          <span>{isEn ? 'View Details' : 'Lihat Butiran'}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
+                        </span>
                       )}
                     </div>
+
+                    <div
+                      className="flex items-center gap-2 shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {prog.grantAmount && (
+                        <button
+                          type="button"
+                          onClick={() => setDetailProgram(prog)}
+                          className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline px-1.5 py-1 cursor-pointer whitespace-nowrap"
+                        >
+                          {isEn ? 'Details' : 'Butiran'}
+                        </button>
+                      )}
+                      {renderProgramActionControls(prog, 'card')}
+                    </div>
                   </div>
-                );
-              })}
+                </article>
+              ))}
             </div>
 
             <PaginationBar
               currentPage={pagination.currentPage}
               totalItems={pagination.totalItems}
-              itemsPerPage={7}
+              itemsPerPage={ITEMS_PER_PAGE}
               onPageChange={pagination.setCurrentPage}
               itemLabel={isEn ? 'programs' : 'program'}
               accent="blue"
@@ -637,6 +844,141 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           </>
         )}
       </div>
+
+      {/* Program & Grant Full Details Modal */}
+      {detailProgram && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-[2px]"
+          onClick={() => setDetailProgram(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="program-detail-modal-title"
+        >
+          <div
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative aspect-[16/9] w-full bg-slate-100 dark:bg-zinc-800 border-b border-slate-200 dark:border-zinc-700 shrink-0 overflow-hidden">
+              <PortalImage
+                src={resolveProgramImage(detailProgram)}
+                alt={detailProgram.title}
+                fallbackType="program"
+                fallbackLabel={detailProgram.category}
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => setDetailProgram(null)}
+                aria-label={isEn ? 'Close details' : 'Tutup butiran'}
+                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 dark:bg-zinc-900/95 text-black dark:text-white border border-slate-200 dark:border-zinc-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 sm:p-6 space-y-5">
+              <div>
+                <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold uppercase tracking-wider">
+                  <span className="text-blue-600 dark:text-blue-400">
+                    {detailProgram.category}
+                  </span>
+                  {detailProgram.isFeatured && (
+                    <>
+                      <span className="text-black/30 dark:text-white/30">·</span>
+                      <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400">
+                        <Star className="w-3.5 h-3.5 fill-current shrink-0" />
+                        <span>{isEn ? 'Featured' : 'Pilihan Utama'}</span>
+                      </span>
+                    </>
+                  )}
+                </div>
+                <h2
+                  id="program-detail-modal-title"
+                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight mt-1.5 text-balance"
+                >
+                  {detailProgram.title}
+                </h2>
+              </div>
+
+              {/* Structured Key Facts Strip */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-y border-slate-200 dark:border-zinc-700 py-4 text-sm">
+                <div className="flex items-start gap-2.5">
+                  <Calendar className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                      {isEn ? 'Schedule / Closing' : 'Tarikh / Tempoh'}
+                    </span>
+                    <span className="font-semibold text-black dark:text-white tabular-nums">
+                      {detailProgram.date}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                      {isEn ? 'Location' : 'Lokasi'}
+                    </span>
+                    <span className="font-semibold text-black dark:text-white">
+                      {detailProgram.location}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <Building2 className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                      {isEn ? 'Organizer' : 'Penganjur'}
+                    </span>
+                    <span className="font-semibold text-black dark:text-white">
+                      {detailProgram.organizer}
+                    </span>
+                  </div>
+                </div>
+
+                {detailProgram.grantAmount && (
+                  <div className="flex items-start gap-2.5">
+                    <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
+                        {isEn ? 'Funding Value' : 'Nilai Bantuan'}
+                      </span>
+                      <span className="font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums">
+                        {detailProgram.grantAmount}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-black/55 dark:text-white/60">
+                  {isEn ? 'Program Details & Eligibility' : 'Huraian & Maklumat Program'}
+                </h3>
+                <p className="text-sm sm:text-base text-black/75 dark:text-white/80 leading-relaxed whitespace-pre-line">
+                  {detailProgram.description ||
+                    (isEn
+                      ? 'Open to registered Kelantan youth entrepreneurs. Submit your application to receive official secretariat review.'
+                      : 'Terbuka kepada usahawan belia Kelantan yang berdaftar. Hantar permohonan atau pendaftaran untuk semakan lanjut pihak urus setia.')}
+                </p>
+              </div>
+            </div>
+
+            <div className="px-5 sm:px-6 py-4 bg-slate-50 dark:bg-zinc-950/60 border-t border-slate-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setDetailProgram(null)}
+                className="py-2 px-4 rounded-xl text-sm font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer whitespace-nowrap"
+              >
+                {isEn ? 'Close' : 'Tutup'}
+              </button>
+              <div>{renderProgramActionControls(detailProgram, 'modal')}</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Program Modal (Admin) */}
       <EditProgramModal

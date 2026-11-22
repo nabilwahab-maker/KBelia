@@ -69,7 +69,7 @@ import { EditProductModal } from './EditProductModal';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { PaginationBar, usePagination } from './PaginationBar';
-import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
+import { ReferenceTableToolbar, RowActionMenu, getSearchInputWidth } from './ReferenceTableKit';
 import { SaaSKpiCard } from './SaaSKpiCard';
 import { RoleDonutCard } from './RoleDonutCard';
 import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
@@ -613,8 +613,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
         {(() => {
           const merchantDisplayName = userProfile?.fullName || user.displayName || (isMs ? 'Usahawan Belia' : 'Youth Entrepreneur');
-          const approvedBooking = safeBookings.find(b => b.status === 'approved');
-          const pendingBooking = safeBookings.find(b => b.status === 'pending');
           const bizLabel = myBusiness?.businessName || (isMs ? 'Profil Perniagaan Belia' : 'Youth Business Profile');
           const districtLabel = myBusiness?.district || 'Kota Bharu';
 
@@ -646,27 +644,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           };
           const currentHeader = headerMap[activeTab] || headerMap.overview;
 
-          const handleQuickAction = () => {
-            if (activeTab === 'cashflow') {
-              setActiveTab('overview');
-            } else if (approvedBooking) {
-              setActiveTab('cashflow');
-            } else if (onOpenBookingModal) {
-              onOpenBookingModal();
-            } else if (onOpenBookingTab) {
-              onOpenBookingTab('browse');
-            } else {
-              setActiveTab('overview');
-            }
-          };
-
-          const quickActionLabel =
-            activeTab === 'cashflow'
-              ? (isMs ? 'Lihat Ringkasan' : 'View Overview')
-              : approvedBooking
-                ? (isMs ? 'Catat Jualan' : 'Record Sales')
-                : (isMs ? 'Mohon Kiosk' : 'Apply Kiosk');
-
           return (
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="min-w-0">
@@ -690,34 +667,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     </>
                   )}
                 </p>
-              </div>
-
-              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3.5 sm:gap-4 lg:border-l lg:border-sky-200/80 dark:lg:border-sky-800/50 lg:pl-5 shrink-0">
-                <div className="flex items-center gap-3 text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 font-medium tabular-nums">
-                  <span>
-                    {isMs ? 'Kiosk: ' : 'Kiosk: '}
-                    {approvedBooking ? (
-                      <span className="font-mono font-semibold text-slate-900 dark:text-white">{approvedBooking.slotCode}</span>
-                    ) : pendingBooking ? (
-                      <span className="font-semibold text-amber-700 dark:text-amber-300">{isMs ? 'Menunggu' : 'Pending'}</span>
-                    ) : (
-                      <span className="text-slate-500 dark:text-slate-400">{isMs ? 'Belum Dimohon' : 'Not Applied'}</span>
-                    )}
-                  </span>
-                  <span className="h-4 w-px bg-sky-200/90 dark:bg-sky-800/70" aria-hidden="true" />
-                  <span>
-                    <span className="font-semibold text-slate-900 dark:text-white">{safeCashflow.length}</span>{' '}
-                    {isMs ? 'Rekod Jualan' : 'Sales Records'}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleQuickAction}
-                  className="px-4 py-2 rounded-lg text-xs sm:text-[13px] font-semibold bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white dark:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  {quickActionLabel}
-                </button>
               </div>
             </div>
           );
@@ -2111,7 +2060,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
             {/* Search & Filter Toolbar */}
             <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-700">
-              <div className="relative w-full sm:w-72">
+              <div
+                style={{ ['--search-fit-w' as string]: getSearchInputWidth('Cari produk atau kategori...') }}
+                className="relative w-full sm:w-[var(--search-fit-w)] sm:max-w-full min-w-0"
+              >
                 <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
@@ -2592,7 +2544,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
                 <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/35 border border-blue-200 dark:border-blue-800/60 text-[0.8125rem] sm:text-sm text-black/80 dark:text-white/85 flex items-center justify-between gap-3">
                   <span>
-                    Paparan kad digital ini disegerakkan daripada Profil Perniagaan anda untuk tujuan promosi pantas pelanggan.
+                    Paparan kad digital ini disegerakkan daripada Profil Perniagaan anda untuk rujukan rakan niaga belia, mentor, dan semakan portal.
                   </span>
                   <button
                     type="button"

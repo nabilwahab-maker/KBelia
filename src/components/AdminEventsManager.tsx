@@ -396,7 +396,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             accent="indigo"
             searchValue={catalogSearch}
             onSearchChange={setCatalogSearch}
-            searchPlaceholder="Cari tajuk acara, lokasi atau daerah..."
+            searchPlaceholder="Cari tajuk acara atau daerah..."
             filterCount={
               (catalogCategoryFilter !== 'all' ? 1 : 0) +
               (catalogDistrictFilter !== 'all' ? 1 : 0) +
@@ -600,7 +600,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             accent="indigo"
             searchValue={bookingSearch}
             onSearchChange={setBookingSearch}
-            searchPlaceholder="Cari nama peserta, acara atau ID..."
+            searchPlaceholder="Cari peserta, acara atau ID..."
             filterCount={
               (bookingStatusFilter !== 'all' ? 1 : 0) +
               (bookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)

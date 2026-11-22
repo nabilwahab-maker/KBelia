@@ -639,7 +639,7 @@ export const EventsSection: React.FC = () => {
           accent="blue"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder={isEn ? 'Search event title, location or organizer...' : 'Cari tajuk acara, lokasi atau penganjur...'}
+          searchPlaceholder={isEn ? 'Search event title or location...' : 'Cari tajuk acara atau lokasi...'}
           filterCount={activeFilterCount}
           onResetFilters={() => {
             setSelectedCategory('all');

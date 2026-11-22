@@ -610,8 +610,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       });
       showToast(
         !biz.isApproved
-          ? `${biz.businessName} kini dipaparkan dalam direktori.`
-          : `${biz.businessName} disembunyikan daripada direktori awam.`,
+          ? `${biz.businessName} kini dipaparkan dalam direktori portal Belia.`
+          : `${biz.businessName} disembunyikan daripada direktori portal Belia.`,
         'info'
       );
       onRefresh();
@@ -1875,7 +1875,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               accent="indigo"
               searchValue={adminBookingSearch}
               onSearchChange={setAdminBookingSearch}
-              searchPlaceholder="Cari pemohon, perniagaan atau kod kapsul..."
+              searchPlaceholder="Cari pemohon, syarikat atau kod..."
               filterCount={(bookingFilter !== 'all' ? 1 : 0) + (adminBookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
               onResetFilters={() => {
                 setBookingFilter('all');
@@ -2231,7 +2231,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               accent="indigo"
               searchValue={bizSearch}
               onSearchChange={setBizSearch}
-              searchPlaceholder="Cari nama perniagaan, pemilik atau kategori..."
+              searchPlaceholder="Cari perniagaan atau kategori..."
               filterCount={
                 (bizStatusFilter !== 'all' ? 1 : 0) +
                 (bizDistrictFilter !== 'Semua' ? 1 : 0) +
@@ -2684,7 +2684,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               accent="indigo"
               searchValue={adminSlotSearch}
               onSearchChange={setAdminSlotSearch}
-              searchPlaceholder="Cari kod kapsul, nama, hab atau daerah..."
+              searchPlaceholder="Cari kod, nama, hab atau daerah..."
               filterCount={
                 (adminSlotStatusFilter !== 'all' ? 1 : 0) +
                 (adminSlotDistrictFilter !== 'Semua' ? 1 : 0) +
@@ -3119,7 +3119,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               accent="indigo"
               searchValue={progSearch}
               onSearchChange={setProgSearch}
-              searchPlaceholder="Cari tajuk program, kategori atau keterangan..."
+              searchPlaceholder="Cari tajuk atau kategori program..."
               filterCount={(progCategoryFilter !== 'Semua' ? 1 : 0) + (progSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
               onResetFilters={() => {
                 setProgCategoryFilter('Semua');
@@ -3353,7 +3353,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 accent="indigo"
                 searchValue={mentorListSearch}
                 onSearchChange={setMentorListSearch}
-                searchPlaceholder="Cari nama mentor, agensi atau jawatan..."
+                searchPlaceholder="Cari mentor, agensi atau jawatan..."
                 filterCount={mentorListSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0}
                 onResetFilters={() => setMentorListSortPreset(DEFAULT_SORT_VALUE)}
                 sortOptions={
@@ -3539,7 +3539,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 accent="indigo"
                 searchValue={mentorshipSearch}
                 onSearchChange={setMentorshipSearch}
-                searchPlaceholder="Cari usahawan, perniagaan, mentor atau topik..."
+                searchPlaceholder="Cari usahawan, mentor atau topik..."
                 filterCount={
                   (mentorshipStatusFilter !== 'all' ? 1 : 0) +
                   (mentorshipSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
