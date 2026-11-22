@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   LayoutDashboard,
   ShieldCheck,
@@ -8,6 +8,7 @@ import {
   Search,
   GraduationCap,
   Calendar,
+  CalendarDays,
   Network,
   Coins,
   ChevronDown,
@@ -28,6 +29,15 @@ import { UMKTab } from './UMKHeader';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { MerchantSubTab, AdminSubTab, MentorSubTab } from '../types';
+import { subscribeCrossTabSync } from '../services/realtimeSync';
+import {
+  SidebarNotificationContextData,
+  computeSidebarActionableIds,
+  getSidebarUserKey,
+  getUnseenMenuCount,
+  loadSeenSidebarIds,
+  markSidebarMenusSeen
+} from '../utils/sidebarNotifications';
 
 interface UMKSidebarProps {
   activeTab: UMKTab;
@@ -43,6 +53,7 @@ interface UMKSidebarProps {
   onSelectAdminSubTab?: (subTab: AdminSubTab) => void;
   mentorSubTab?: MentorSubTab;
   onSelectMentorSubTab?: (subTab: MentorSubTab) => void;
+  notificationData?: Omit<SidebarNotificationContextData, 'isAdmin' | 'isMentor' | 'isYouth'>;
 }
 
 export const UMKSidebar: React.FC<UMKSidebarProps> = ({
@@ -57,15 +68,97 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   adminSubTab = 'queue',
   onSelectAdminSubTab,
   mentorSubTab = 'overview',
-  onSelectMentorSubTab
+  onSelectMentorSubTab,
+  notificationData
 }) => {
-  const { userProfile, isAdmin } = useAuth();
+  const { user, userProfile, isAdmin } = useAuth();
   const { t, language } = useLanguage();
   const [sidebarSearch, setSidebarSearch] = useState('');
+  const [localSyncTick, setLocalSyncTick] = useState(0);
 
   const isMs = language === 'ms';
   const isMentor = userProfile?.role === 'mentor';
   const isYouth = !isAdmin && !isMentor;
+
+  const sidebarUserKey = getSidebarUserKey(
+    notificationData?.userId || user?.uid || userProfile?.userId,
+    notificationData?.userEmail || user?.email || userProfile?.email
+  );
+  const [seenByMenu, setSeenByMenu] = useState<Record<string, string[]>>(() =>
+    loadSeenSidebarIds(sidebarUserKey)
+  );
+
+  useEffect(() => {
+    setSeenByMenu(loadSeenSidebarIds(sidebarUserKey));
+  }, [sidebarUserKey]);
+
+  useEffect(() => {
+    const bump = () => setLocalSyncTick((n) => n + 1);
+    window.addEventListener('kbelia_notifications_updated', bump);
+    window.addEventListener('storage', bump);
+    const unsubCross = subscribeCrossTabSync(() => bump());
+    return () => {
+      window.removeEventListener('kbelia_notifications_updated', bump);
+      window.removeEventListener('storage', bump);
+      unsubCross();
+    };
+  }, []);
+
+  const itemIdsByMenu = useMemo(
+    () =>
+      computeSidebarActionableIds({
+        ...notificationData,
+        userId: notificationData?.userId || user?.uid || undefined,
+        userEmail: notificationData?.userEmail || user?.email || undefined,
+        isAdmin,
+        isMentor,
+        isYouth
+      }),
+    [notificationData, user?.uid, user?.email, isAdmin, isMentor, isYouth, localSyncTick]
+  );
+
+  const getCount = (menuKey: string): number =>
+    getUnseenMenuCount(menuKey, itemIdsByMenu, seenByMenu);
+
+  const markSeen = (menuKeys: string[]) => {
+    setSeenByMenu((prev) => markSidebarMenusSeen(sidebarUserKey, menuKeys, itemIdsByMenu, prev));
+  };
+
+  const renderCountBadge = (count: number, onActiveSolidBg = false) => {
+    if (count <= 0) return null;
+    const colorClass = onActiveSolidBg
+      ? 'bg-white text-blue-700 dark:bg-white dark:text-blue-700'
+      : isAdmin
+        ? 'bg-indigo-600 text-white dark:bg-indigo-400 dark:text-slate-950'
+        : isMentor
+          ? 'bg-teal-600 text-white dark:bg-teal-400 dark:text-slate-950'
+          : 'bg-blue-600 text-white dark:bg-sky-400 dark:text-slate-950';
+    return (
+      <span
+        aria-label={`${count} ${isMs ? 'perkara baharu' : 'pending items'}`}
+        className={`min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold tabular-nums inline-flex items-center justify-center shrink-0 leading-none ${colorClass}`}
+      >
+        {count > 99 ? '99+' : count}
+      </span>
+    );
+  };
+
+  const renderMiniBadge = (count: number) => {
+    if (count <= 0) return null;
+    const colorClass = isAdmin
+      ? 'bg-indigo-600 text-white dark:bg-indigo-400 dark:text-slate-950'
+      : isMentor
+        ? 'bg-teal-600 text-white dark:bg-teal-400 dark:text-slate-950'
+        : 'bg-blue-600 text-white dark:bg-sky-400 dark:text-slate-950';
+    return (
+      <span
+        aria-label={`${count} ${isMs ? 'perkara baharu' : 'pending items'}`}
+        className={`absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full text-[10px] font-bold tabular-nums inline-flex items-center justify-center leading-none ring-2 ring-white dark:ring-zinc-950 ${colorClass}`}
+      >
+        {count > 9 ? '9+' : count}
+      </span>
+    );
+  };
 
   // Determine whether the active route belongs inside Category 1's accordion for each role
   const isYouthAccordionRoute =
@@ -117,14 +210,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
   // Shared design tokens for uniform 3-category navigation across all 3 roles
   const navBtnBase =
-    'w-full flex items-center justify-between px-3 py-2.25 text-[0.9375rem] font-semibold rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
+    'w-full flex items-center justify-between gap-2 px-3 py-2.25 text-[0.9375rem] font-semibold rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
   const navBtnActive =
     'bg-amber-50/90 dark:bg-[#1E4B85]/15 text-black dark:text-white border-blue-200 dark:border-blue-800/70 shadow-xs ring-1 ring-blue-500/30 font-bold';
   const navBtnIdle =
     'border-transparent text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
 
   const subNavBtnBase =
-    'w-full flex items-center gap-2 px-2.5 py-2 text-sm rounded-lg transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
+    'w-full flex items-center justify-between gap-2 px-2.5 py-2 text-sm rounded-lg transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
   const subNavBtnActive = 'bg-blue-600 text-white font-bold shadow-xs dark:bg-blue-600';
   const subNavBtnIdle =
     'text-black dark:text-white/80 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
@@ -134,12 +227,35 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const categoryDividerClass = 'pt-3 border-t border-slate-300 dark:border-zinc-600 space-y-1';
 
   const miniBtnBase =
-    'p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
+    'relative p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
   const miniBtnActive =
     'bg-amber-50 dark:bg-[#1E4B85]/15 text-black dark:text-white border-blue-200 dark:border-blue-800/70 shadow-xs ring-1 ring-blue-500/30 font-bold';
   const miniBtnIdle =
     'border-transparent text-black/70 dark:text-white/75 hover:bg-amber-50/70 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
   const miniDivider = <div className="w-8 h-px bg-slate-300 dark:bg-zinc-600 my-0.5" />;
+
+  const adminAccordionTotal =
+    getCount('admin:queue') +
+    getCount('admin:bookings') +
+    getCount('admin:businesses') +
+    getCount('admin:slots') +
+    getCount('admin:news') +
+    getCount('admin:b2b') +
+    getCount('admin:events') +
+    getCount('admin:users') +
+    getCount('admin:settings');
+
+  const mentorAccordionTotal =
+    getCount('mentor:overview') +
+    getCount('mentor:sessions') +
+    getCount('mentor:logbook');
+
+  const youthAccordionTotal =
+    getCount('youth:overview') +
+    getCount('youth:profile') +
+    getCount('youth:products') +
+    getCount('youth:vault') +
+    getCount('youth:card');
 
   // =========================================================================
   // 1. COLLAPSED SIDEBAR VIEW (Desktop Mini Icon Rail - 3 Aligned Groups)
@@ -157,6 +273,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['admin:queue']);
                   setActiveTab('admin');
                   if (onSelectAdminSubTab) onSelectAdminSubTab('queue');
                 }}
@@ -164,31 +281,41 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 className={`${miniBtnBase} ${isAdminAccordionRoute ? miniBtnActive : miniBtnIdle}`}
               >
                 <ShieldCheck className="w-5 h-5" />
+                {renderMiniBadge(adminAccordionTotal)}
               </button>
 
               <button
                 type="button"
-                onClick={() => setActiveTab('academic')}
+                onClick={() => {
+                  markSeen(['admin:academic']);
+                  setActiveTab('academic');
+                }}
                 title={t('nav_kiosk_monitoring')}
                 className={`${miniBtnBase} ${activeTab === 'academic' ? miniBtnActive : miniBtnIdle}`}
               >
                 <Building2 className="w-5 h-5" />
+                {renderMiniBadge(getCount('admin:academic'))}
               </button>
 
               {miniDivider}
 
               <button
                 type="button"
-                onClick={() => setActiveTab('ceed')}
+                onClick={() => {
+                  markSeen(['admin:ceed']);
+                  setActiveTab('ceed');
+                }}
                 title={t('nav_grant_monitoring')}
                 className={`${miniBtnBase} ${activeTab === 'ceed' ? miniBtnActive : miniBtnIdle}`}
               >
                 <Award className="w-5 h-5" />
+                {renderMiniBadge(getCount('admin:ceed'))}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['admin:programs']);
                   setActiveTab('admin');
                   if (onSelectAdminSubTab) onSelectAdminSubTab('programs');
                 }}
@@ -198,11 +325,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Network className="w-5 h-5" />
+                {renderMiniBadge(getCount('admin:programs'))}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['admin:mentors']);
                   setActiveTab('admin');
                   if (onSelectAdminSubTab) onSelectAdminSubTab('mentors');
                 }}
@@ -212,22 +341,28 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <GraduationCap className="w-5 h-5" />
+                {renderMiniBadge(getCount('admin:mentors'))}
               </button>
 
               {miniDivider}
 
               <button
                 type="button"
-                onClick={() => setActiveTab('hepa')}
+                onClick={() => {
+                  markSeen(['admin:hepa']);
+                  setActiveTab('hepa');
+                }}
                 title={t('nav_audit_ssm')}
                 className={`${miniBtnBase} ${activeTab === 'hepa' ? miniBtnActive : miniBtnIdle}`}
               >
                 <Store className="w-5 h-5" />
+                {renderMiniBadge(getCount('admin:hepa'))}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['admin:news']);
                   setActiveTab('admin');
                   if (onSelectAdminSubTab) onSelectAdminSubTab('news');
                 }}
@@ -237,11 +372,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Newspaper className="w-5 h-5" />
+                {renderMiniBadge(getCount('admin:news'))}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['admin:b2b']);
                   setActiveTab('admin');
                   if (onSelectAdminSubTab) onSelectAdminSubTab('b2b');
                 }}
@@ -251,11 +388,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Megaphone className="w-5 h-5" />
+                {renderMiniBadge(getCount('admin:b2b'))}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['admin:events']);
                   setActiveTab('admin');
                   if (onSelectAdminSubTab) onSelectAdminSubTab('events');
                 }}
@@ -265,11 +404,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Calendar className="w-5 h-5" />
+                {renderMiniBadge(getCount('admin:events'))}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['admin:users']);
                   setActiveTab('admin');
                   if (onSelectAdminSubTab) onSelectAdminSubTab('users');
                 }}
@@ -279,6 +420,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Users className="w-5 h-5" />
+                {renderMiniBadge(getCount('admin:users'))}
               </button>
             </>
           )}
@@ -289,6 +431,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['mentor:overview']);
                   setActiveTab('mentor');
                   if (onSelectMentorSubTab) onSelectMentorSubTab('overview');
                 }}
@@ -301,11 +444,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <LayoutDashboard className="w-5 h-5" />
+                {renderMiniBadge(getCount('mentor:overview'))}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['mentor:sessions']);
                   setActiveTab('mentor');
                   if (onSelectMentorSubTab) onSelectMentorSubTab('sessions');
                 }}
@@ -315,11 +460,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Calendar className="w-5 h-5" />
+                {renderMiniBadge(getCount('mentor:sessions'))}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['mentor:logbook']);
                   setActiveTab('mentor');
                   if (onSelectMentorSubTab) onSelectMentorSubTab('logbook');
                 }}
@@ -329,6 +476,23 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <FileText className="w-5 h-5" />
+                {renderMiniBadge(getCount('mentor:logbook'))}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  markSeen(['mentor:schedule']);
+                  setActiveTab('mentor');
+                  if (onSelectMentorSubTab) onSelectMentorSubTab('schedule');
+                }}
+                title={isMs ? 'Jadual' : 'Schedule'}
+                className={`${miniBtnBase} ${
+                  activeTab === 'mentor' && mentorSubTab === 'schedule' ? miniBtnActive : miniBtnIdle
+                }`}
+              >
+                <CalendarDays className="w-5 h-5" />
+                {renderMiniBadge(getCount('mentor:schedule'))}
               </button>
 
               {miniDivider}
@@ -336,6 +500,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['mentor:endorsements']);
                   setActiveTab('mentor');
                   if (onSelectMentorSubTab) onSelectMentorSubTab('endorsements');
                 }}
@@ -345,6 +510,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Award className="w-5 h-5" />
+                {renderMiniBadge(getCount('mentor:endorsements'))}
               </button>
 
               {miniDivider}
@@ -352,15 +518,17 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['mentor:profile']);
                   setActiveTab('mentor');
                   if (onSelectMentorSubTab) onSelectMentorSubTab('profile');
                 }}
-                title={isMs ? 'Profil & Jadual' : 'Profile & Schedule'}
+                title={isMs ? 'Profil Mentor' : 'Mentor Profile'}
                 className={`${miniBtnBase} ${
                   activeTab === 'mentor' && mentorSubTab === 'profile' ? miniBtnActive : miniBtnIdle
                 }`}
               >
                 <Sliders className="w-5 h-5" />
+                {renderMiniBadge(getCount('mentor:profile'))}
               </button>
             </>
           )}
@@ -371,6 +539,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['youth:overview']);
                   setActiveTab('merchant');
                   if (onSelectMerchantSubTab) onSelectMerchantSubTab('overview');
                 }}
@@ -378,20 +547,26 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 className={`${miniBtnBase} ${isYouthAccordionRoute ? miniBtnActive : miniBtnIdle}`}
               >
                 <LayoutDashboard className="w-5 h-5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab('academic')}
-                title={t('nav_my_kiosk')}
-                className={`${miniBtnBase} ${activeTab === 'academic' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Building2 className="w-5 h-5" />
+                {renderMiniBadge(youthAccordionTotal)}
               </button>
 
               <button
                 type="button"
                 onClick={() => {
+                  markSeen(['youth:academic']);
+                  setActiveTab('academic');
+                }}
+                title={t('nav_my_kiosk')}
+                className={`${miniBtnBase} ${activeTab === 'academic' ? miniBtnActive : miniBtnIdle}`}
+              >
+                <Building2 className="w-5 h-5" />
+                {renderMiniBadge(getCount('youth:academic'))}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  markSeen(['youth:cashflow']);
                   setActiveTab('merchant');
                   if (onSelectMerchantSubTab) onSelectMerchantSubTab('cashflow');
                 }}
@@ -401,55 +576,76 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 }`}
               >
                 <Coins className="w-5 h-5" />
+                {renderMiniBadge(getCount('youth:cashflow'))}
               </button>
 
               {miniDivider}
 
               <button
                 type="button"
-                onClick={() => setActiveTab('ceed')}
+                onClick={() => {
+                  markSeen(['youth:ceed']);
+                  setActiveTab('ceed');
+                }}
                 title={t('nav_grant_application')}
                 className={`${miniBtnBase} ${activeTab === 'ceed' ? miniBtnActive : miniBtnIdle}`}
               >
                 <Award className="w-5 h-5" />
+                {renderMiniBadge(getCount('youth:ceed'))}
               </button>
 
               <button
                 type="button"
-                onClick={() => setActiveTab('mentorship')}
+                onClick={() => {
+                  markSeen(['youth:mentorship']);
+                  setActiveTab('mentorship');
+                }}
                 title={t('nav_mentor_clinic')}
                 className={`${miniBtnBase} ${activeTab === 'mentorship' ? miniBtnActive : miniBtnIdle}`}
               >
                 <GraduationCap className="w-5 h-5" />
+                {renderMiniBadge(getCount('youth:mentorship'))}
               </button>
 
               <button
                 type="button"
-                onClick={() => setActiveTab('b2b')}
+                onClick={() => {
+                  markSeen(['youth:b2b']);
+                  setActiveTab('b2b');
+                }}
                 title={isMs ? 'Ruang Niaga' : 'Ruang Niaga Marketplace'}
                 className={`${miniBtnBase} ${activeTab === 'b2b' ? miniBtnActive : miniBtnIdle}`}
               >
                 <Network className="w-5 h-5" />
+                {renderMiniBadge(getCount('youth:b2b'))}
               </button>
 
               <button
                 type="button"
-                onClick={() => setActiveTab('events')}
+                onClick={() => {
+                  markSeen(['youth:events']);
+                  setActiveTab('events');
+                }}
                 title={isMs ? 'Acara & Karnival' : 'Events & Expo'}
                 className={`${miniBtnBase} ${activeTab === 'events' ? miniBtnActive : miniBtnIdle}`}
               >
                 <Calendar className="w-5 h-5" />
+                {renderMiniBadge(getCount('youth:events'))}
               </button>
 
               {miniDivider}
 
               <button
                 type="button"
-                onClick={() => setActiveTab('hepa')}
+                onClick={() => {
+                  markSeen(['youth:hepa']);
+                  setActiveTab('hepa');
+                }}
                 title={t('directory')}
                 className={`${miniBtnBase} ${activeTab === 'hepa' ? miniBtnActive : miniBtnIdle}`}
               >
                 <Store className="w-5 h-5" />
+                {renderMiniBadge(getCount('youth:hepa'))}
               </button>
             </>
           )}
@@ -578,12 +774,6 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
       icon: ShoppingBag
     },
     {
-      id: 'bookings',
-      label: isMs ? 'Kiosk Saya' : 'My Capsules',
-      keywords: 'kiosk kapsul niaga tempahan sewa bookings',
-      icon: Building2
-    },
-    {
       id: 'vault',
       label: isMs ? 'Dokumen Saya' : 'Legal Docs',
       keywords: 'dokumen saya surat tawaran perjanjian vault documents',
@@ -615,11 +805,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     matchesSearch('audit usahawan direktori semakan ssm audit');
 
   const mentorCat1HasMatches =
-    matchesSearch('portal mentor hab bimbingan mentor hub') || filteredMentorAccordion.length > 0;
+    matchesSearch('portal mentor hab bimbingan mentor hub') ||
+    filteredMentorAccordion.length > 0 ||
+    matchesSearch('jadual kalendar temu janji slot bimbingan schedule calendar');
   const mentorCat2HasMatches =
     matchesSearch('perakuan geran dana sokongan surat kelulusan benih pemangkin endorsements');
   const mentorCat3HasMatches =
-    matchesSearch('profil jadual kelapangan mentor waktu bimbingan profile schedule');
+    matchesSearch('profil mentor kepakaran maklumat mentor profile');
 
   const youthCat1HasMatches =
     matchesSearch('papan pemuka usahawan belia dashboard') ||
@@ -721,6 +913,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         if (isAdminAccordionRoute) {
                           setIsAdminDashboardAccordionOpen(!isAdminDashboardAccordionOpen);
                         } else {
+                          markSeen(['admin:queue']);
                           navigateAndClose(() => {
                             setActiveTab('admin');
                             if (onSelectAdminSubTab) onSelectAdminSubTab('queue');
@@ -740,15 +933,18 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         />
                         <span className="truncate whitespace-nowrap">{t('nav_admin_control')}</span>
                       </div>
-                      <ChevronDown
-                        className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                          isAdminDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
-                        } ${
-                          isAdminAccordionRoute
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75'
-                        }`}
-                      />
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {!isAdminDashboardAccordionOpen && !query && renderCountBadge(adminAccordionTotal)}
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
+                            isAdminDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
+                          } ${
+                            isAdminAccordionRoute
+                              ? 'text-black dark:text-white/75'
+                              : 'text-black/70 dark:text-white/75'
+                          }`}
+                        />
+                      </div>
                     </button>
 
                     {(isAdminDashboardAccordionOpen || (Boolean(query) && filteredAdminAccordion.length > 0)) && (
@@ -758,26 +954,31 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                           const isSubActive =
                             (activeTab === 'home' && isAdmin && adminSubTab === item.id) ||
                             (activeTab === 'admin' && adminSubTab === item.id);
+                          const itemCount = getCount(`admin:${item.id}`);
                           return (
                             <button
                               key={item.id}
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                markSeen([`admin:${item.id}`]);
                                 navigateAndClose(() => {
                                   setActiveTab('admin');
                                   if (onSelectAdminSubTab) onSelectAdminSubTab(item.id);
-                                })
-                              }
+                                });
+                              }}
                               className={`${subNavBtnBase} ${isSubActive ? subNavBtnActive : subNavBtnIdle}`}
                             >
-                              <Icon
-                                className={`w-3.5 h-3.5 shrink-0 ${
-                                  isSubActive
-                                    ? 'text-white'
-                                    : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                                }`}
-                              />
-                              <span className="truncate whitespace-nowrap">{item.label}</span>
+                              <span className="flex items-center gap-2 min-w-0">
+                                <Icon
+                                  className={`w-3.5 h-3.5 shrink-0 ${
+                                    isSubActive
+                                      ? 'text-white'
+                                      : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
+                                  }`}
+                                />
+                                <span className="truncate whitespace-nowrap">{item.label}</span>
+                              </span>
+                              {renderCountBadge(itemCount, isSubActive)}
                             </button>
                           );
                         })}
@@ -789,7 +990,10 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 {matchesSearch('pemantauan kiosk jajahan semakan status kekosongan monitoring') && (
                   <button
                     type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('academic'))}
+                    onClick={() => {
+                      markSeen(['admin:academic']);
+                      navigateAndClose(() => setActiveTab('academic'));
+                    }}
                     className={`${navBtnBase} ${activeTab === 'academic' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -802,6 +1006,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_kiosk_monitoring')}</span>
                     </div>
+                    {renderCountBadge(getCount('admin:academic'))}
                   </button>
                 )}
               </div>
@@ -817,7 +1022,10 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 {matchesSearch('pemantauan status geran peruntukan dana bantuan belia grant') && (
                   <button
                     type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('ceed'))}
+                    onClick={() => {
+                      markSeen(['admin:ceed']);
+                      navigateAndClose(() => setActiveTab('ceed'));
+                    }}
                     className={`${navBtnBase} ${activeTab === 'ceed' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -830,18 +1038,20 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_grant_monitoring')}</span>
                     </div>
+                    {renderCountBadge(getCount('admin:ceed'))}
                   </button>
                 )}
 
                 {matchesSearch('inisiatif geran program dana kelantan programs') && (
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
+                      markSeen(['admin:programs']);
                       navigateAndClose(() => {
                         setActiveTab('admin');
                         if (onSelectAdminSubTab) onSelectAdminSubTab('programs');
-                      })
-                    }
+                      });
+                    }}
                     className={`${navBtnBase} ${
                       activeTab === 'admin' && adminSubTab === 'programs' ? navBtnActive : navBtnIdle
                     }`}
@@ -858,18 +1068,20 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Inisiatif Geran' : 'Grant Initiatives'}
                       </span>
                     </div>
+                    {renderCountBadge(getCount('admin:programs'))}
                   </button>
                 )}
 
                 {matchesSearch('panel mentor bimbingan dalaman rakan industri kbelia mentors') && (
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
+                      markSeen(['admin:mentors']);
                       navigateAndClose(() => {
                         setActiveTab('admin');
                         if (onSelectAdminSubTab) onSelectAdminSubTab('mentors');
-                      })
-                    }
+                      });
+                    }}
                     className={`${navBtnBase} ${
                       activeTab === 'admin' && adminSubTab === 'mentors' ? navBtnActive : navBtnIdle
                     }`}
@@ -886,6 +1098,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Panel Mentor' : 'Mentor Panel'}
                       </span>
                     </div>
+                    {renderCountBadge(getCount('admin:mentors'))}
                   </button>
                 )}
               </div>
@@ -901,7 +1114,10 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 {matchesSearch('audit usahawan direktori semakan ssm audit') && (
                   <button
                     type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('hepa'))}
+                    onClick={() => {
+                      markSeen(['admin:hepa']);
+                      navigateAndClose(() => setActiveTab('hepa'));
+                    }}
                     className={`${navBtnBase} ${activeTab === 'hepa' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -914,6 +1130,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_audit_ssm')}</span>
                     </div>
+                    {renderCountBadge(getCount('admin:hepa'))}
                   </button>
                 )}
               </div>
@@ -942,6 +1159,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         if (isMentorAccordionRoute) {
                           setIsMentorDashboardAccordionOpen(!isMentorDashboardAccordionOpen);
                         } else {
+                          markSeen(['mentor:overview']);
                           navigateAndClose(() => {
                             setActiveTab('mentor');
                             if (onSelectMentorSubTab) onSelectMentorSubTab('overview');
@@ -961,15 +1179,18 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         />
                         <span className="truncate whitespace-nowrap">{t('nav_mentorship_hub')}</span>
                       </div>
-                      <ChevronDown
-                        className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                          isMentorDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
-                        } ${
-                          isMentorAccordionRoute
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75'
-                        }`}
-                      />
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {!isMentorDashboardAccordionOpen && !query && renderCountBadge(mentorAccordionTotal)}
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
+                            isMentorDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
+                          } ${
+                            isMentorAccordionRoute
+                              ? 'text-black dark:text-white/75'
+                              : 'text-black/70 dark:text-white/75'
+                          }`}
+                        />
+                      </div>
                     </button>
 
                     {(isMentorDashboardAccordionOpen || (Boolean(query) && filteredMentorAccordion.length > 0)) && (
@@ -979,32 +1200,67 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                           const isSubActive =
                             (activeTab === 'home' && isMentor && mentorSubTab === item.id) ||
                             (activeTab === 'mentor' && mentorSubTab === item.id);
+                          const itemCount = getCount(`mentor:${item.id}`);
                           return (
                             <button
                               key={item.id}
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                markSeen([`mentor:${item.id}`]);
                                 navigateAndClose(() => {
                                   setActiveTab('mentor');
                                   if (onSelectMentorSubTab) onSelectMentorSubTab(item.id);
-                                })
-                              }
+                                });
+                              }}
                               className={`${subNavBtnBase} ${isSubActive ? subNavBtnActive : subNavBtnIdle}`}
                             >
-                              <Icon
-                                className={`w-3.5 h-3.5 shrink-0 ${
-                                  isSubActive
-                                    ? 'text-white'
-                                    : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                                }`}
-                              />
-                              <span className="truncate whitespace-nowrap">{item.label}</span>
+                              <span className="flex items-center gap-2 min-w-0">
+                                <Icon
+                                  className={`w-3.5 h-3.5 shrink-0 ${
+                                    isSubActive
+                                      ? 'text-white'
+                                      : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
+                                  }`}
+                                />
+                                <span className="truncate whitespace-nowrap">{item.label}</span>
+                              </span>
+                              {renderCountBadge(itemCount, isSubActive)}
                             </button>
                           );
                         })}
                       </div>
                     )}
                   </div>
+                )}
+
+                {matchesSearch('jadual kalendar temu janji slot bimbingan schedule calendar') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      markSeen(['mentor:schedule']);
+                      navigateAndClose(() => {
+                        setActiveTab('mentor');
+                        if (onSelectMentorSubTab) onSelectMentorSubTab('schedule');
+                      });
+                    }}
+                    className={`${navBtnBase} ${
+                      activeTab === 'mentor' && mentorSubTab === 'schedule' ? navBtnActive : navBtnIdle
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <CalendarDays
+                        className={`w-4 h-4 shrink-0 ${
+                          activeTab === 'mentor' && mentorSubTab === 'schedule'
+                            ? 'text-black dark:text-white/75'
+                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
+                        }`}
+                      />
+                      <span className="truncate whitespace-nowrap">
+                        {isMs ? 'Jadual' : 'Schedule'}
+                      </span>
+                    </div>
+                    {renderCountBadge(getCount('mentor:schedule'))}
+                  </button>
                 )}
               </div>
             )}
@@ -1019,12 +1275,13 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 {matchesSearch('perakuan geran dana sokongan surat kelulusan benih pemangkin endorsements') && (
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
+                      markSeen(['mentor:endorsements']);
                       navigateAndClose(() => {
                         setActiveTab('mentor');
                         if (onSelectMentorSubTab) onSelectMentorSubTab('endorsements');
-                      })
-                    }
+                      });
+                    }}
                     className={`${navBtnBase} ${
                       activeTab === 'mentor' && mentorSubTab === 'endorsements'
                         ? navBtnActive
@@ -1043,6 +1300,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Sokongan Geran' : 'Grant Endorsements'}
                       </span>
                     </div>
+                    {renderCountBadge(getCount('mentor:endorsements'))}
                   </button>
                 )}
 
@@ -1056,15 +1314,16 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                   {isMs ? 'PROFIL MENTOR' : 'MENTOR PROFILE'}
                 </div>
 
-                {matchesSearch('profil jadual kelapangan mentor waktu bimbingan profile schedule') && (
+                {matchesSearch('profil mentor kepakaran maklumat mentor profile') && (
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
+                      markSeen(['mentor:profile']);
                       navigateAndClose(() => {
                         setActiveTab('mentor');
                         if (onSelectMentorSubTab) onSelectMentorSubTab('profile');
-                      })
-                    }
+                      });
+                    }}
                     className={`${navBtnBase} ${
                       activeTab === 'mentor' && mentorSubTab === 'profile' ? navBtnActive : navBtnIdle
                     }`}
@@ -1078,9 +1337,10 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         }`}
                       />
                       <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Profil & Jadual' : 'Profile & Schedule'}
+                        {isMs ? 'Profil Mentor' : 'Mentor Profile'}
                       </span>
                     </div>
+                    {renderCountBadge(getCount('mentor:profile'))}
                   </button>
                 )}
               </div>
@@ -1109,6 +1369,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         if (isYouthAccordionRoute) {
                           setIsDashboardAccordionOpen(!isDashboardAccordionOpen);
                         } else {
+                          markSeen(['youth:overview']);
                           navigateAndClose(() => {
                             setActiveTab('merchant');
                             if (onSelectMerchantSubTab) onSelectMerchantSubTab('overview');
@@ -1128,15 +1389,18 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         />
                         <span className="truncate whitespace-nowrap">{t('dashboard')}</span>
                       </div>
-                      <ChevronDown
-                        className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                          isDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
-                        } ${
-                          isYouthAccordionRoute
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75'
-                        }`}
-                      />
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {!isDashboardAccordionOpen && !query && renderCountBadge(youthAccordionTotal)}
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
+                            isDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
+                          } ${
+                            isYouthAccordionRoute
+                              ? 'text-black dark:text-white/75'
+                              : 'text-black/70 dark:text-white/75'
+                          }`}
+                        />
+                      </div>
                     </button>
 
                     {(isDashboardAccordionOpen || (Boolean(query) && filteredYouthAccordion.length > 0)) && (
@@ -1146,26 +1410,31 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                           const isSubActive =
                             (activeTab === 'home' && isYouth && merchantSubTab === item.id) ||
                             (activeTab === 'merchant' && merchantSubTab === item.id);
+                          const itemCount = getCount(`youth:${item.id}`);
                           return (
                             <button
                               key={item.id}
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
+                                markSeen([`youth:${item.id}`]);
                                 navigateAndClose(() => {
                                   setActiveTab('merchant');
                                   if (onSelectMerchantSubTab) onSelectMerchantSubTab(item.id);
-                                })
-                              }
+                                });
+                              }}
                               className={`${subNavBtnBase} ${isSubActive ? subNavBtnActive : subNavBtnIdle}`}
                             >
-                              <Icon
-                                className={`w-3.5 h-3.5 shrink-0 ${
-                                  isSubActive
-                                    ? 'text-white'
-                                    : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                                }`}
-                              />
-                              <span className="truncate whitespace-nowrap">{item.label}</span>
+                              <span className="flex items-center gap-2 min-w-0">
+                                <Icon
+                                  className={`w-3.5 h-3.5 shrink-0 ${
+                                    isSubActive
+                                      ? 'text-white'
+                                      : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
+                                  }`}
+                                />
+                                <span className="truncate whitespace-nowrap">{item.label}</span>
+                              </span>
+                              {renderCountBadge(itemCount, isSubActive)}
                             </button>
                           );
                         })}
@@ -1177,7 +1446,10 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 {matchesSearch('tempahan kiosk kapsul modular sewa tapak premis booking my kiosk') && (
                   <button
                     type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('academic'))}
+                    onClick={() => {
+                      markSeen(['youth:academic']);
+                      navigateAndClose(() => setActiveTab('academic'));
+                    }}
                     className={`${navBtnBase} ${activeTab === 'academic' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -1190,18 +1462,20 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_my_kiosk')}</span>
                     </div>
+                    {renderCountBadge(getCount('youth:academic'))}
                   </button>
                 )}
 
                 {matchesSearch('jualan aliran tunai pos rekod harian untung sales cashflow') && (
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
+                      markSeen(['youth:cashflow']);
                       navigateAndClose(() => {
                         setActiveTab('merchant');
                         if (onSelectMerchantSubTab) onSelectMerchantSubTab('cashflow');
-                      })
-                    }
+                      });
+                    }}
                     className={`${navBtnBase} ${
                       activeTab === 'merchant' && merchantSubTab === 'cashflow'
                         ? navBtnActive
@@ -1218,6 +1492,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_sales_pos')}</span>
                     </div>
+                    {renderCountBadge(getCount('youth:cashflow'))}
                   </button>
                 )}
               </div>
@@ -1233,7 +1508,10 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 {matchesSearch('permohonan geran benih pembiayaan modal grant') && (
                   <button
                     type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('ceed'))}
+                    onClick={() => {
+                      markSeen(['youth:ceed']);
+                      navigateAndClose(() => setActiveTab('ceed'));
+                    }}
                     className={`${navBtnBase} ${activeTab === 'ceed' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -1246,13 +1524,17 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_grant_application')}</span>
                     </div>
+                    {renderCountBadge(getCount('youth:ceed'))}
                   </button>
                 )}
 
                 {matchesSearch('sesi bimbingan mentor konsultasi mentoring clinic') && (
                   <button
                     type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('mentorship'))}
+                    onClick={() => {
+                      markSeen(['youth:mentorship']);
+                      navigateAndClose(() => setActiveTab('mentorship'));
+                    }}
                     className={`${navBtnBase} ${activeTab === 'mentorship' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -1265,13 +1547,17 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('nav_mentor_clinic')}</span>
                     </div>
+                    {renderCountBadge(getCount('youth:mentorship'))}
                   </button>
                 )}
 
                 {matchesSearch('ruang niaga iklan peluang pembekal market trade') && (
                   <button
                     type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('b2b'))}
+                    onClick={() => {
+                      markSeen(['youth:b2b']);
+                      navigateAndClose(() => setActiveTab('b2b'));
+                    }}
                     className={`${navBtnBase} ${activeTab === 'b2b' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -1286,13 +1572,17 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Ruang Niaga' : 'Ruang Niaga Marketplace'}
                       </span>
                     </div>
+                    {renderCountBadge(getCount('youth:b2b'))}
                   </button>
                 )}
 
                 {matchesSearch('acara karnival ekspo bengkel jadual events') && (
                   <button
                     type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('events'))}
+                    onClick={() => {
+                      markSeen(['youth:events']);
+                      navigateAndClose(() => setActiveTab('events'));
+                    }}
                     className={`${navBtnBase} ${activeTab === 'events' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -1307,6 +1597,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                         {isMs ? 'Acara & Karnival' : 'Events & Expo'}
                       </span>
                     </div>
+                    {renderCountBadge(getCount('youth:events'))}
                   </button>
                 )}
               </div>
@@ -1322,7 +1613,10 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                 {matchesSearch('direktori usahawan kelantan bisnes produk kedai servis ssm directory') && (
                   <button
                     type="button"
-                    onClick={() => navigateAndClose(() => setActiveTab('hepa'))}
+                    onClick={() => {
+                      markSeen(['youth:hepa']);
+                      navigateAndClose(() => setActiveTab('hepa'));
+                    }}
                     className={`${navBtnBase} ${activeTab === 'hepa' ? navBtnActive : navBtnIdle}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -1335,6 +1629,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       />
                       <span className="truncate whitespace-nowrap">{t('directory')}</span>
                     </div>
+                    {renderCountBadge(getCount('youth:hepa'))}
                   </button>
                 )}
               </div>

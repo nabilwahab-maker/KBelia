@@ -1020,87 +1020,137 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   return (
     <div className="w-full space-y-3.5">
       
-      {/* Admin Subheader & Quick Action Bar */}
-      <div className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Autonomous Ambient Glowing Orbs */}
-        <div className="pointer-events-none absolute -top-14 -left-10 w-56 h-56 rounded-full bg-indigo-500/14 dark:bg-indigo-500/16 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-rose-500/12 dark:bg-rose-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
+      {/* Admin Hero: Indigo-Arang (Structured Operations Bar) */}
+      <div className="relative overflow-hidden kbelia-ambient-sheen-soft rounded-2xl bg-gradient-to-br from-slate-100/95 via-indigo-50/45 to-zinc-100/90 dark:from-zinc-950 dark:via-slate-900/95 dark:to-indigo-950/40 border border-slate-300/80 dark:border-indigo-900/55 p-4 sm:p-5 transition-colors">
+        {/* Softened Ambient Orbs */}
+        <div className="pointer-events-none absolute -top-14 -left-10 w-52 h-52 rounded-full bg-indigo-500/7 dark:bg-indigo-500/9 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-16 right-8 w-48 h-48 rounded-full bg-slate-400/8 dark:bg-slate-500/8 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
 
-        <div className="relative z-10">
-          {(() => {
-            const adminDisplayName = userProfile?.fullName || user?.displayName || (isMs ? 'Pentadbir Sistem' : 'System Admin');
-            const adminHeaderMap: Record<AdminSubTab, { prefix: string; accent: string }> = {
-              queue: {
-                prefix: isMs ? 'Giliran Semakan & ' : 'Review & ',
-                accent: isMs ? 'Kelulusan' : 'Approval Queue'
-              },
-              bookings: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Tempahan Kiosk' : 'Kiosk Bookings'
-              },
-              businesses: {
-                prefix: isMs ? 'Direktori & Audit ' : 'Entrepreneur Directory & ',
-                accent: isMs ? 'Usahawan' : 'Audit'
-              },
-              slots: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Slot Kiosk' : 'Kiosk Slots'
-              },
-              programs: {
-                prefix: isMs ? 'Pengurusan Geran & ' : 'Manage Grants & ',
-                accent: isMs ? 'Inisiatif' : 'Initiatives'
-              },
-              mentors: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Panel Mentor' : 'Mentor Panel'
-              },
-              news: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Berita Rasmi' : 'Official News'
-              },
-              b2b: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Ruang Niaga' : 'Ruang Niaga Ads'
-              },
-              events: {
-                prefix: isMs ? 'Pengurusan Acara & ' : 'Manage Events & ',
-                accent: isMs ? 'Tempahan' : 'Bookings'
-              },
-              users: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Pengguna Portal' : 'Portal Users'
-              },
-              sync: {
-                prefix: isMs ? 'Penyelarasan & ' : 'Database ',
-                accent: isMs ? 'Segerak Data' : 'Data Sync'
-              },
-              settings: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Tetapan Operasi' : 'Operations Settings'
-              }
-            };
-            const currentAdminHeader = adminHeaderMap[adminTab] || adminHeaderMap.queue;
-            return (
-              <>
-                <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+        {(() => {
+          const adminDisplayName = userProfile?.fullName || user?.displayName || (isMs ? 'Pentadbir Sistem' : 'System Admin');
+          const pendingBookingsCount = safeBookings.filter(b => b && b.status === 'pending').length;
+          const pendingGrantsCount = (grantApplications || []).filter(g => g.status === 'pending').length;
+          const openTicketsCount = (maintenanceTickets || []).filter(t => t.status !== 'resolved').length;
+
+          const adminHeaderMap: Record<AdminSubTab, { prefix: string; accent: string }> = {
+            queue: {
+              prefix: isMs ? 'Giliran Semakan & ' : 'Review & ',
+              accent: isMs ? 'Kelulusan' : 'Approval Queue'
+            },
+            bookings: {
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Tempahan Kiosk' : 'Kiosk Bookings'
+            },
+            businesses: {
+              prefix: isMs ? 'Direktori & Audit ' : 'Entrepreneur Directory & ',
+              accent: isMs ? 'Usahawan' : 'Audit'
+            },
+            slots: {
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Slot Kiosk' : 'Kiosk Slots'
+            },
+            programs: {
+              prefix: isMs ? 'Pengurusan Geran & ' : 'Manage Grants & ',
+              accent: isMs ? 'Inisiatif' : 'Initiatives'
+            },
+            mentors: {
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Panel Mentor' : 'Mentor Panel'
+            },
+            news: {
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Berita Rasmi' : 'Official News'
+            },
+            b2b: {
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Ruang Niaga' : 'Ruang Niaga Ads'
+            },
+            events: {
+              prefix: isMs ? 'Pengurusan Acara & ' : 'Manage Events & ',
+              accent: isMs ? 'Tempahan' : 'Bookings'
+            },
+            users: {
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Pengguna Portal' : 'Portal Users'
+            },
+            sync: {
+              prefix: isMs ? 'Penyelarasan & ' : 'Database ',
+              accent: isMs ? 'Segerak Data' : 'Data Sync'
+            },
+            settings: {
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Tetapan Operasi' : 'Operations Settings'
+            }
+          };
+          const currentAdminHeader = adminHeaderMap[adminTab] || adminHeaderMap.queue;
+          const targetTab: AdminSubTab = adminTab === 'queue' ? 'users' : 'queue';
+          const actionLabel =
+            adminTab === 'queue'
+              ? (isMs ? 'Urus Pengguna' : 'Manage Users')
+              : (isMs ? 'Semak Giliran' : 'Review Queue');
+
+          return (
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">
+                  {isMs ? 'Pusat Kawalan Negeri · Kelantan' : 'State Operations Hub · Kelantan'}
+                </p>
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                   {currentAdminHeader.prefix}
-                  <span className="kbelia-title-shimmer">{currentAdminHeader.accent}</span>
+                  <span className="text-indigo-700 dark:text-indigo-400">{currentAdminHeader.accent}</span>
                 </h1>
-                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1 max-w-2xl">
+                <p className="text-[0.9375rem] text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
                   {isMs ? (
                     <>
-                      Selamat kembali, <span className="font-semibold text-black dark:text-white">{adminDisplayName}</span>
+                      Selamat kembali, <span className="font-semibold text-slate-900 dark:text-white">{adminDisplayName}</span>
                     </>
                   ) : (
                     <>
-                      Welcome back, <span className="font-semibold text-black dark:text-white">{adminDisplayName}</span>
+                      Welcome back, <span className="font-semibold text-slate-900 dark:text-white">{adminDisplayName}</span>
                     </>
                   )}
                 </p>
-              </>
-            );
-          })()}
-        </div>
+              </div>
+
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-5 shrink-0">
+                <div className="flex items-center divide-x divide-slate-300/80 dark:divide-zinc-700/80 tabular-nums">
+                  <div className="pr-4 sm:pr-5 text-center">
+                    <div className="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white leading-none">
+                      {pendingBookingsCount}
+                    </div>
+                    <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-1">
+                      {isMs ? 'Tempahan' : 'Bookings'}
+                    </div>
+                  </div>
+                  <div className="px-4 sm:px-5 text-center">
+                    <div className="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white leading-none">
+                      {pendingGrantsCount}
+                    </div>
+                    <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-1">
+                      {isMs ? 'Geran' : 'Grants'}
+                    </div>
+                  </div>
+                  <div className="pl-4 sm:pl-5 text-center">
+                    <div className="text-xl sm:text-2xl font-black font-mono text-slate-900 dark:text-white leading-none">
+                      {openTicketsCount}
+                    </div>
+                    <div className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-1">
+                      {isMs ? 'Aduan' : 'Tickets'}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setAdminTab(targetTab)}
+                  className="px-4 py-2 rounded-lg text-xs sm:text-[13px] font-semibold bg-slate-900 hover:bg-indigo-950 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white dark:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  {actionLabel}
+                </button>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* 4 Compact Summary KPI Cards */}

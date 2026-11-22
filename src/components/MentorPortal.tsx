@@ -71,6 +71,7 @@ import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { useLanguage } from '../context/LanguageContext';
 import { MentorProfileEditModal } from './MentorProfileEditModal';
+import { MentorScheduleCalendar } from './MentorScheduleCalendar';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast as triggerToast } from './ToastNotification';
 import { SaaSKpiCard } from './SaaSKpiCard';
@@ -847,6 +848,44 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     showToast(`Status temujanji ${mentee.entrepreneurName} dikemas kini kepada: ${newStatus === 'confirmed' ? 'Disahkan' : newStatus === 'completed' ? 'Selesai' : 'Dibatalkan'}`);
   };
 
+  const handleOpenCreateSlotWithPrefill = (prefillDate?: string, prefillTime?: string) => {
+    if (prefillDate) setNewSlotDate(prefillDate);
+    if (prefillTime) setNewSlotTime(prefillTime);
+    setIsNewSlotModalOpen(true);
+  };
+
+  const handleDeletePublishedSlot = (slotId: string) => {
+    const slotStorageKey = `kbelia_mentor_published_slots_${currentMentor.id}`;
+    let existingLocal: PublishedMentorSlot[] = [];
+    try {
+      const raw = localStorage.getItem(slotStorageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) existingLocal = parsed;
+      }
+    } catch {
+      // ignore
+    }
+    const merged = [...(currentMentor.publishedSlots || []), ...existingLocal].filter(
+      (slot, idx, arr) =>
+        slot &&
+        slot.id !== slotId &&
+        arr.findIndex((s) => s.id === slot.id || (s.date === slot.date && s.time === slot.time)) === idx
+    );
+    try {
+      localStorage.setItem(slotStorageKey, JSON.stringify(merged));
+    } catch {
+      // ignore
+    }
+    const updatedMentor: MentorProfile = {
+      ...currentMentor,
+      publishedSlots: merged
+    };
+    void saveMentorProfileRecord(updatedMentor).catch(console.error);
+    onUpdateMentor?.(updatedMentor);
+    showToast(!isEn ? 'Slot bimbingan terbuka berjaya dipadam.' : 'Open mentorship slot removed.');
+  };
+
   const getPlusDaysIso = (offsetDays: number) => {
     const dt = new Date();
     dt.setDate(dt.getDate() + offsetDays);
@@ -1245,59 +1284,139 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         </div>
       )}
 
-      {/* 1. MENTOR PORTAL HEADER STRIP WITH AMBIENT GLOW & SHEEN */}
-      <div className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-        {/* Autonomous Ambient Glowing Orbs */}
-        <div className="pointer-events-none absolute -top-14 -left-10 w-56 h-56 rounded-full bg-teal-500/14 dark:bg-teal-500/16 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-cyan-500/12 dark:bg-cyan-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
+      {/* 1. MENTOR PORTAL HEADER: Teal-Pasir Seni Bina Moden */}
+      <div className="relative overflow-hidden kbelia-ambient-sheen-soft rounded-2xl bg-[#FCFBF8] dark:bg-zinc-950 border border-stone-200/90 dark:border-teal-900/50 p-5 sm:p-6 transition-colors shadow-2xs">
+        {/* Whisper-quiet geometric architectural lines on the right */}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 320 180"
+          fill="none"
+          className="pointer-events-none absolute right-0 top-0 h-full w-72 text-teal-800/10 dark:text-teal-400/10"
+          preserveAspectRatio="none"
+        >
+          <path d="M120 0L240 180M165 0L285 180M210 0L320 165M255 0L320 98M75 180L195 0" stroke="currentColor" strokeWidth="1" />
+          <circle cx="268" cy="36" r="52" stroke="currentColor" strokeWidth="1" />
+        </svg>
 
-        <div className="relative z-10 space-y-1">
-          {(() => {
-            const mentorDisplayName = currentMentor?.name || userProfile?.fullName || 'Mentor';
-            const mentorHeaderMap: Record<MentorSubTab, { prefix: string; accent: string }> = {
-              overview: {
-                prefix: !isEn ? 'Ringkasan & ' : 'Mentorship ',
-                accent: !isEn ? 'Prestasi Bimbingan' : 'Performance'
-              },
-              sessions: {
-                prefix: !isEn ? 'Pengurusan ' : 'Manage ',
-                accent: !isEn ? 'Sesi Bimbingan' : 'Coaching Sessions'
-              },
-              endorsements: {
-                prefix: !isEn ? 'Pengeluaran ' : 'Issue ',
-                accent: !isEn ? 'Perakuan Geran' : 'Grant Endorsements'
-              },
-              logbook: {
-                prefix: !isEn ? 'Jurnal & ' : 'Session ',
-                accent: !isEn ? 'Rekod Sesi' : 'Logbook & Notes'
-              },
-              profile: {
-                prefix: !isEn ? 'Pengurusan ' : 'Manage ',
-                accent: !isEn ? 'Profil & Jadual' : 'Profile & Schedule'
-              }
-            };
-            const currentMentorHeader = mentorHeaderMap[currentSubTab] || mentorHeaderMap.overview;
-            return (
-              <>
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
+        {(() => {
+          const mentorDisplayName = currentMentor?.name || userProfile?.fullName || 'Mentor';
+          const pendingSessionsCount = mentorRegistrations.filter(r => r.status === 'pending').length;
+          const activeSessionsCount = mentorRegistrations.filter(r => r.status === 'pending' || r.status === 'confirmed').length;
+          const scheduleLabel = currentMentor?.availableDays || (!isEn ? 'Isnin–Jumaat · 9:00 PG' : 'Mon–Fri · 9:00 AM');
+          let localSlotCount = 0;
+          try {
+            const raw = localStorage.getItem(`kbelia_mentor_published_slots_${currentMentor.id}`);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) localSlotCount = parsed.length;
+            }
+          } catch {
+            // ignore
+          }
+          const openSlotsCount = Math.max(currentMentor?.publishedSlots?.length || 0, localSlotCount);
+
+          const mentorHeaderMap: Record<MentorSubTab, { prefix: string; accent: string }> = {
+            overview: {
+              prefix: !isEn ? 'Ringkasan & ' : 'Mentorship ',
+              accent: !isEn ? 'Prestasi Bimbingan' : 'Performance'
+            },
+            sessions: {
+              prefix: !isEn ? 'Pengurusan ' : 'Manage ',
+              accent: !isEn ? 'Sesi Bimbingan' : 'Coaching Sessions'
+            },
+            schedule: {
+              prefix: !isEn ? 'Pengurusan ' : 'Manage ',
+              accent: !isEn ? 'Jadual & Kalendar' : 'Schedule & Calendar'
+            },
+            endorsements: {
+              prefix: !isEn ? 'Pengeluaran ' : 'Issue ',
+              accent: !isEn ? 'Perakuan Geran' : 'Grant Endorsements'
+            },
+            logbook: {
+              prefix: !isEn ? 'Jurnal & ' : 'Session ',
+              accent: !isEn ? 'Rekod Sesi' : 'Logbook & Notes'
+            },
+            profile: {
+              prefix: !isEn ? 'Pengurusan ' : 'Manage ',
+              accent: !isEn ? 'Profil Mentor' : 'Mentor Profile'
+            }
+          };
+          const currentMentorHeader = mentorHeaderMap[currentSubTab] || mentorHeaderMap.overview;
+          const targetActionTab: MentorSubTab =
+            currentSubTab === 'schedule'
+              ? 'sessions'
+              : currentSubTab === 'sessions'
+              ? 'schedule'
+              : 'schedule';
+          const actionLabel =
+            currentSubTab === 'schedule'
+              ? (!isEn ? 'Semak Sesi' : 'Review Sessions')
+              : (!isEn ? 'Buka Jadual' : 'Open Schedule');
+
+          return (
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+              {/* Left Editorial Zone */}
+              <div className="min-w-0">
+                <p className="text-xs sm:text-[13px] font-semibold text-teal-700 dark:text-teal-400 tracking-tight">
+                  {!isEn ? 'Panel Mentor · Hab Usahawan KBelia' : 'Mentor Panel · KBelia Entrepreneur Hub'}
+                </p>
+                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white mt-1 leading-tight">
                   {currentMentorHeader.prefix}
-                  <span className="kbelia-title-shimmer">{currentMentorHeader.accent}</span>
+                  <span className="text-teal-700 dark:text-teal-400">{currentMentorHeader.accent}</span>
                 </h1>
-                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
+                <p className="text-[0.9375rem] text-stone-600 dark:text-stone-300 mt-1.5 max-w-2xl leading-relaxed">
                   {!isEn ? (
                     <>
-                      Selamat kembali, <span className="font-semibold text-black dark:text-white">{mentorDisplayName}</span>
+                      Selamat kembali, <span className="font-semibold text-slate-900 dark:text-white">{mentorDisplayName}</span> &middot; {scheduleLabel}
                     </>
                   ) : (
                     <>
-                      Welcome back, <span className="font-semibold text-black dark:text-white">{mentorDisplayName}</span>
+                      Welcome back, <span className="font-semibold text-slate-900 dark:text-white">{mentorDisplayName}</span> &middot; {scheduleLabel}
                     </>
                   )}
                 </p>
-              </>
-            );
-          })()}
-        </div>
+              </div>
+
+              {/* Right 3-Column Tabular Metrics + Crisp Deep-Teal CTA */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 lg:gap-6 shrink-0">
+                <div className="grid grid-cols-3 divide-x divide-stone-200 dark:divide-teal-900/60 tabular-nums">
+                  <div className="pr-4 sm:px-4 first:pl-0 text-left sm:text-center">
+                    <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-none">
+                      {activeSessionsCount}
+                    </div>
+                    <div className="text-xs font-medium text-stone-500 dark:text-stone-400 mt-1 whitespace-nowrap">
+                      {!isEn ? 'Sesi Aktif' : 'Active'}
+                    </div>
+                  </div>
+                  <div className="px-4 text-left sm:text-center">
+                    <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-none">
+                      {pendingSessionsCount}
+                    </div>
+                    <div className="text-xs font-medium text-stone-500 dark:text-stone-400 mt-1 whitespace-nowrap">
+                      {!isEn ? 'Menunggu' : 'Pending'}
+                    </div>
+                  </div>
+                  <div className="pl-4 sm:px-4 text-left sm:text-center">
+                    <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-none">
+                      {openSlotsCount}
+                    </div>
+                    <div className="text-xs font-medium text-stone-500 dark:text-stone-400 mt-1 whitespace-nowrap">
+                      {!isEn ? 'Slot Terbuka' : 'Open Slots'}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleSubTabChange(targetActionTab)}
+                  className="self-start sm:self-auto px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white shadow-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  {actionLabel}
+                </button>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* ===================================================================== */}
@@ -2847,6 +2966,22 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           </section>
 
         </div>
+      )}
+
+      {/* ===================================================================== */}
+      {/* TAB 1B: JADUAL KALENDAR TEMU JANJI & SLOT MENTOR                      */}
+      {/* ===================================================================== */}
+      {currentSubTab === 'schedule' && (
+        <MentorScheduleCalendar
+          currentMentor={currentMentor}
+          registrations={mentorRegistrations}
+          businesses={businesses}
+          isEn={isEn}
+          onStatusChange={handleStatusChange}
+          onOpenNotesModal={handleOpenNotesModal}
+          onOpenCreateSlotModal={handleOpenCreateSlotWithPrefill}
+          onDeletePublishedSlot={handleDeletePublishedSlot}
+        />
       )}
 
       {/* ===================================================================== */}

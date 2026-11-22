@@ -694,6 +694,38 @@ html.dark .kbelia-ambient-sheen::after {
   );
 }
 
+.kbelia-ambient-sheen-soft {
+  position: relative;
+  overflow: hidden;
+}
+
+.kbelia-ambient-sheen-soft::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 44%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 100%
+  );
+  transform: translate3d(-160%, 0, 0) skewX(-22deg);
+  animation: kbeliaSheenSweep 10.5s ease-in-out infinite;
+  pointer-events: none;
+  will-change: transform, opacity;
+  z-index: 1;
+}
+
+html.dark .kbelia-ambient-sheen-soft::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 100%
+  );
+}
+
 .kbelia-title-shimmer {
   color: #000000;
 }
@@ -791,6 +823,7 @@ html.dark .kbelia-live-dot::after {
 
   .kbelia-skeleton-box::after,
   .kbelia-ambient-sheen::after,
+  .kbelia-ambient-sheen-soft::after,
   .kbelia-live-dot::before {
     animation: none;
     display: none;

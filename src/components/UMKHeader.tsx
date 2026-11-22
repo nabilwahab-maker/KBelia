@@ -140,9 +140,10 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
       const mentorQuickLinks = [
         { id: 'overview' as MentorSubTab, label: 'Ringkasan Dashboard Mentor', desc: 'KPI, carta daerah & temujanji terdekat' },
         { id: 'sessions' as MentorSubTab, label: 'Sesi Bimbingan & Mentee', desc: 'Senarai permohonan, jadual & pelan bimbingan' },
+        { id: 'schedule' as MentorSubTab, label: 'Jadual & Kalendar Mentor', desc: 'Paparan kalendar temu janji & slot bimbingan' },
         { id: 'endorsements' as MentorSubTab, label: 'Surat Sokongan Geran', desc: 'Keluarkan & semak sokongan geran rasmi' },
         { id: 'logbook' as MentorSubTab, label: 'Rekod Sesi Bimbingan', desc: 'Nota bimbingan & senarai semak tugasan' },
-        { id: 'profile' as MentorSubTab, label: 'Profil & Jadual Masa Mentor', desc: 'Kemas kini profil & hari bimbingan' }
+        { id: 'profile' as MentorSubTab, label: 'Profil Mentor', desc: 'Kemas kini profil & maklumat mentor' }
       ].filter(item => item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q));
       return { matchedSlots: [], matchedBiz: [], matchedProg: [], mentorQuickLinks, totalCount: mentorQuickLinks.length };
     }
@@ -767,6 +768,14 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                         >
                           <Calendar className="w-4 h-4 text-black dark:text-white/75" />
                           <span>Sesi Bimbingan</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('schedule'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Calendar className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+                          <span>Jadual</span>
                         </button>
                         <button
                           type="button"

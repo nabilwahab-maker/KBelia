@@ -178,10 +178,20 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   return (
     <div className="w-full space-y-4">
       {/* Header */}
-      <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
           Senarai Kiosk Belia Kelantan
         </h1>
+        {!isReadOnly && onGoToManageBooking && (
+          <button
+            type="button"
+            onClick={onGoToManageBooking}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+          >
+            <Building2 className="w-4 h-4" />
+            <span>{hasActiveBooking ? 'Urus Kiosk Saya' : 'Kiosk Saya'}</span>
+          </button>
+        )}
       </div>
 
       {/* Live Google Maps Kiosk Hub Explorer */}
@@ -238,7 +248,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                 className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-2xs transition-colors shrink-0 cursor-pointer"
               >
                 <FileText className="w-4 h-4" />
-                <span>Urus Tempahan</span>
+                <span>Urus Kiosk Saya</span>
               </button>
             ) : undefined
           }

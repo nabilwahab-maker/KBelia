@@ -34,7 +34,7 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
       case 'admin':
         return isMs ? 'Dashboard Admin' : 'Admin Dashboard';
       case 'academic':
-        return isMs ? 'Senarai & Tempahan Kiosk' : 'Modular Kiosks & Capsules';
+        return isMs ? 'Kiosk Saya' : 'My Kiosk';
       case 'hepa':
         return isMs ? 'Senarai Usahawan Kelantan' : 'Entrepreneurs Directory';
       case 'ceed':

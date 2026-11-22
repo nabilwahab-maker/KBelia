@@ -22,11 +22,8 @@ import {
   MapPin,
   Check,
   Briefcase,
-  Printer,
   Download,
-  Wrench,
   XCircle,
-  PenTool,
   X,
   TrendingUp,
   BarChart3,
@@ -63,19 +60,14 @@ import { useLanguage } from '../context/LanguageContext';
 import { 
   saveBusinessListing, 
   saveProduct, 
-  deleteProduct,
-  updateBookingStatus,
-  createMaintenanceTicket,
-  loadLocalPortalSettings
+  deleteProduct
 } from '../services/dataService';
-import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { KioskCashflowTracker } from './KioskCashflowTracker';
 import { UserDocumentsVault } from './UserDocumentsVault';
 import { ImageDropzone } from './ImageDropzone';
 import { EditProductModal } from './EditProductModal';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
-import { resolveBookingKioskImage } from '../utils/visualAssets';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { SaaSKpiCard } from './SaaSKpiCard';
@@ -94,12 +86,8 @@ import {
   LabelList
 } from 'recharts';
 import {
-  formatDisplayDate,
-  calculateOperationEndDate,
-  openAndPrintDocument,
-  generateOfficialReceiptHtml
+  formatDisplayDate
 } from '../utils/printUtils';
-import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { exportProductsToExcel } from '../utils/excelExport';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
@@ -152,7 +140,7 @@ interface MerchantPortalProps {
   onViewOfferLetter?: (booking: CapsuleBooking) => void;
   onOpenTenancyAgreement?: (booking: CapsuleBooking) => void;
   onOpenVerification?: (refCode?: string) => void;
-  onOpenBookingTab?: () => void;
+  onOpenBookingTab?: (targetView?: 'browse' | 'book' | 'manage') => void;
   onOpenBookingModal?: () => void;
   onOpenSettingsTab?: () => void;
   onOpenMentorshipClinic?: () => void;
@@ -292,19 +280,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   }>({ key: 'createdAt', dir: 'desc' });
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
 
-  // Booking action states
-  const [selectedReceiptBooking, setSelectedReceiptBooking] = useState<CapsuleBooking | null>(null);
-  const [inlineCancelBookingId, setInlineCancelBookingId] = useState<string | null>(null);
-  const [cancellingBooking, setCancellingBooking] = useState(false);
-  const [maintenanceComplaintBooking, setMaintenanceComplaintBooking] = useState<CapsuleBooking | null>(null);
-  const [complaintType, setComplaintType] = useState('Bekalan Elektrik 13A & Lampu');
-  const [complaintNotes, setComplaintNotes] = useState('');
-  const [submittingComplaint, setSubmittingComplaint] = useState(false);
-  const [complaintSuccess, setComplaintSuccess] = useState<string | null>(null);
-
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [expandedBookingIds, setExpandedBookingIds] = useState<string[]>([]);
 
   React.useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -327,24 +304,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     };
   }, []);
 
-  // Bookings & Tickets search, filter, sort
-  const [bookingSearch, setBookingSearch] = useState('');
-  const [bookingStatusFilter, setBookingStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
-  const [bookingSortBy, setBookingSortBy] = useState<string>(DEFAULT_SORT_VALUE);
-  const [bookingSort, setBookingSort] = useState<{
-    key: 'slotName' | 'hubLocation' | 'startDate' | 'status';
-    dir: 'asc' | 'desc';
-  }>({ key: 'status', dir: 'asc' });
-
-  const [ticketSearch, setTicketSearch] = useState('');
-  const [ticketStatusFilter, setTicketStatusFilter] = useState<'all' | 'received' | 'in_progress' | 'resolved'>('all');
-  const [ticketSortBy, setTicketSortBy] = useState<string>(DEFAULT_SORT_VALUE);
-  const [ticketSort, setTicketSort] = useState<{
-    key: 'slotCode' | 'issueCategory' | 'status';
-    dir: 'asc' | 'desc';
-  }>({ key: 'status', dir: 'asc' });
-  const [expandedTicketIds, setExpandedTicketIds] = useState<string[]>([]);
-
   const productSortOptions = React.useMemo(
     () =>
       buildStandardSortOptions(
@@ -361,168 +320,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       ),
     []
   );
-
-  const bookingSortOptions = React.useMemo(
-    () =>
-      buildStandardSortOptions(
-        [
-          { value: 'status_pending', label: 'Status (Dalam Semakan Dahulu)' },
-          { value: 'start_date_asc', label: 'Tarikh Mula Operasi (Terdekat)' }
-        ],
-        false,
-        {
-          asc: 'Nama Kiosk (A - Z)',
-          desc: 'Nama Kiosk (Z - A)'
-        }
-      ),
-    []
-  );
-
-  const ticketSortOptions = React.useMemo(
-    () =>
-      buildStandardSortOptions(
-        [
-          { value: 'status_received', label: 'Status (Diterima Dahulu)' },
-          { value: 'category_asc', label: 'Kategori Isu (A - Z)' }
-        ],
-        false,
-        {
-          asc: 'Unit Kiosk (A - Z)',
-          desc: 'Unit Kiosk (Z - A)'
-        }
-      ),
-    []
-  );
-
-  const toggleBookingExpand = (id: string) => {
-    setExpandedBookingIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const toggleBookingSort = (key: 'slotName' | 'hubLocation' | 'startDate' | 'status') => {
-    setBookingSortBy('table_column');
-    setBookingSort((prev) =>
-      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
-    );
-  };
-
-  const toggleTicketSort = (key: 'slotCode' | 'issueCategory' | 'status') => {
-    setTicketSortBy('table_column');
-    setTicketSort((prev) =>
-      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
-    );
-  };
-
-  const hasActiveKioskBooking = safeBookings.some(
-    (b) => b.status === 'pending' || b.status === 'approved'
-  );
-  const hasCancelledKioskBooking = safeBookings.some(
-    (b) => b.status === 'cancelled'
-  );
-  const bookingOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2, cancelled: 3 };
-  const activeVisibleBookings = React.useMemo(() => {
-    return [...safeBookings]
-      .filter((b) => b.status !== 'cancelled')
-      .sort((a, b) => (bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4));
-  }, [safeBookings]);
-
-  const filteredBookings = React.useMemo(() => {
-    const q = bookingSearch.trim().toLowerCase();
-    const list = activeVisibleBookings.filter((b) => {
-      if (bookingStatusFilter !== 'all' && b.status !== bookingStatusFilter) return false;
-      if (!q) return true;
-      return (
-        (b.slotCode || '').toLowerCase().includes(q) ||
-        (b.slotName || '').toLowerCase().includes(q) ||
-        (b.hubLocation || '').toLowerCase().includes(q) ||
-        (b.businessName || '').toLowerCase().includes(q)
-      );
-    });
-    if (bookingSortBy === 'table_column') {
-      const dirMult = bookingSort.dir === 'asc' ? 1 : -1;
-      return [...list].sort((a, b) => {
-        if (bookingSort.key === 'slotName') {
-          return `${a.slotCode} ${a.slotName}`.localeCompare(`${b.slotCode} ${b.slotName}`) * dirMult;
-        }
-        if (bookingSort.key === 'hubLocation') {
-          return (a.hubLocation || '').localeCompare(b.hubLocation || '') * dirMult;
-        }
-        if (bookingSort.key === 'startDate') {
-          return (a.startDate || '').localeCompare(b.startDate || '') * dirMult;
-        }
-        return ((bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4)) * dirMult;
-      });
-    }
-    return sortRecords(list, {
-      sortBy: bookingSortBy,
-      getName: (b) => `${b.slotCode || ''} ${b.slotName || ''}`.trim(),
-      customCompare: (a, b, mode) => {
-        if (mode === 'status_pending') return (bookingOrder[a.status] ?? 4) - (bookingOrder[b.status] ?? 4);
-        if (mode === 'start_date_asc') return (a.startDate || '').localeCompare(b.startDate || '');
-        return null;
-      }
-    });
-  }, [activeVisibleBookings, bookingSearch, bookingStatusFilter, bookingSortBy, bookingSort]);
-
-  const bookingsPagination = usePagination(filteredBookings, 7, [
-    bookingSearch,
-    bookingStatusFilter,
-    bookingSortBy,
-    bookingSort.key,
-    bookingSort.dir,
-    filteredBookings.length
-  ]);
-
-  const ticketOrder: Record<string, number> = { received: 0, in_progress: 1, resolved: 2 };
-  const sortedTickets = React.useMemo(() => {
-    return [...safeTickets].sort(
-      (a, b) => (ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3)
-    );
-  }, [safeTickets]);
-
-  const filteredTickets = React.useMemo(() => {
-    const q = ticketSearch.trim().toLowerCase();
-    const list = sortedTickets.filter((t) => {
-      if (ticketStatusFilter !== 'all' && t.status !== ticketStatusFilter) return false;
-      if (!q) return true;
-      return (
-        (t.slotCode || '').toLowerCase().includes(q) ||
-        (t.issueCategory || '').toLowerCase().includes(q) ||
-        (t.description || '').toLowerCase().includes(q)
-      );
-    });
-    if (ticketSortBy === 'table_column') {
-      const dirMult = ticketSort.dir === 'asc' ? 1 : -1;
-      return [...list].sort((a, b) => {
-        if (ticketSort.key === 'slotCode') {
-          return (a.slotCode || '').localeCompare(b.slotCode || '') * dirMult;
-        }
-        if (ticketSort.key === 'issueCategory') {
-          return (a.issueCategory || '').localeCompare(b.issueCategory || '') * dirMult;
-        }
-        return ((ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3)) * dirMult;
-      });
-    }
-    return sortRecords(list, {
-      sortBy: ticketSortBy,
-      getName: (t) => t.slotCode || t.kioskName || '',
-      customCompare: (a, b, mode) => {
-        if (mode === 'status_received') return (ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3);
-        if (mode === 'category_asc') return (a.issueCategory || '').localeCompare(b.issueCategory || '');
-        return null;
-      }
-    });
-  }, [sortedTickets, ticketSearch, ticketStatusFilter, ticketSortBy, ticketSort]);
-
-  const ticketsPagination = usePagination(filteredTickets, 7, [
-    ticketSearch,
-    ticketStatusFilter,
-    ticketSortBy,
-    ticketSort.key,
-    ticketSort.dir,
-    filteredTickets.length
-  ]);
 
   const productCategories = React.useMemo(() => {
     const set = new Set<string>();
@@ -805,70 +602,126 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   return (
     <div className="w-full space-y-3.5">
       
-      {/* Clean Single-Elevation Header with Ambient Glow & Sheen */}
-      <div 
-        id="merchant-portal-header" 
-        className="relative overflow-hidden kbelia-ambient-sheen rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 border border-slate-200 dark:border-zinc-700 p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 transition-colors"
+      {/* Clean Single-Elevation Hero: Biru-Zamrud (Horizontal Business Focus Split) */}
+      <div
+        id="merchant-portal-header"
+        className="relative overflow-hidden kbelia-ambient-sheen-soft rounded-2xl bg-gradient-to-br from-sky-50/90 via-white to-emerald-50/75 dark:from-slate-900/95 dark:via-zinc-950 dark:to-emerald-950/35 border border-sky-200/80 dark:border-sky-800/55 p-4 sm:p-5 transition-colors"
       >
-        {/* Autonomous Ambient Glowing Orbs */}
-        <div className="pointer-events-none absolute -top-14 -left-10 w-56 h-56 rounded-full bg-blue-500/14 dark:bg-blue-500/16 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-16 right-8 w-52 h-52 rounded-full bg-emerald-500/12 dark:bg-emerald-500/14 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
+        {/* Softened Ambient Orbs */}
+        <div className="pointer-events-none absolute -top-14 -left-10 w-52 h-52 rounded-full bg-sky-400/7 dark:bg-sky-500/9 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-16 right-8 w-48 h-48 rounded-full bg-emerald-400/7 dark:bg-emerald-500/8 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
 
-        <div className="relative z-10">
-          {(() => {
-            const merchantDisplayName = userProfile?.fullName || user.displayName || (isMs ? 'Usahawan Belia' : 'Youth Entrepreneur');
-            const headerMap: Record<MerchantSubTab, { prefix: string; accent: string }> = {
-              overview: {
-                prefix: isMs ? 'Ringkasan & ' : 'Business Overview & ',
-                accent: isMs ? 'Prestasi Bisnes' : 'Performance'
-              },
-              profile: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Profil Kedai' : 'Business Profile'
-              },
-              products: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Produk Saya' : 'My Products'
-              },
-              bookings: {
-                prefix: isMs ? 'Pengurusan ' : 'Manage ',
-                accent: isMs ? 'Kiosk Saya' : 'My Kiosks'
-              },
-              cashflow: {
-                prefix: isMs ? 'Rekod Jualan & ' : 'Sales & ',
-                accent: isMs ? 'Aliran Tunai' : 'Cashflow Tracker'
-              },
-              vault: {
-                prefix: isMs ? 'Peti Dokumen & ' : 'Document Vault & ',
-                accent: isMs ? 'Rekod Rasmi' : 'Official Records'
-              },
-              card: {
-                prefix: isMs ? 'Perkongsian ' : 'Share ',
-                accent: isMs ? 'Kad Digital' : 'Digital Card'
-              }
-            };
-            const currentHeader = headerMap[activeTab] || headerMap.overview;
-            return (
-              <>
-                <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+        {(() => {
+          const merchantDisplayName = userProfile?.fullName || user.displayName || (isMs ? 'Usahawan Belia' : 'Youth Entrepreneur');
+          const approvedBooking = safeBookings.find(b => b.status === 'approved');
+          const pendingBooking = safeBookings.find(b => b.status === 'pending');
+          const bizLabel = myBusiness?.businessName || (isMs ? 'Profil Perniagaan Belia' : 'Youth Business Profile');
+          const districtLabel = myBusiness?.district || 'Kota Bharu';
+
+          const headerMap: Record<MerchantSubTab, { prefix: string; accent: string }> = {
+            overview: {
+              prefix: isMs ? 'Ringkasan & ' : 'Business Overview & ',
+              accent: isMs ? 'Prestasi Bisnes' : 'Performance'
+            },
+            profile: {
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Profil Kedai' : 'Business Profile'
+            },
+            products: {
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Produk Saya' : 'My Products'
+            },
+            cashflow: {
+              prefix: isMs ? 'Rekod Jualan & ' : 'Sales & ',
+              accent: isMs ? 'Aliran Tunai' : 'Cashflow Tracker'
+            },
+            vault: {
+              prefix: isMs ? 'Peti Dokumen & ' : 'Document Vault & ',
+              accent: isMs ? 'Rekod Rasmi' : 'Official Records'
+            },
+            card: {
+              prefix: isMs ? 'Perkongsian ' : 'Share ',
+              accent: isMs ? 'Kad Digital' : 'Digital Card'
+            }
+          };
+          const currentHeader = headerMap[activeTab] || headerMap.overview;
+
+          const handleQuickAction = () => {
+            if (activeTab === 'cashflow') {
+              setActiveTab('overview');
+            } else if (approvedBooking) {
+              setActiveTab('cashflow');
+            } else if (onOpenBookingModal) {
+              onOpenBookingModal();
+            } else if (onOpenBookingTab) {
+              onOpenBookingTab('browse');
+            } else {
+              setActiveTab('overview');
+            }
+          };
+
+          const quickActionLabel =
+            activeTab === 'cashflow'
+              ? (isMs ? 'Lihat Ringkasan' : 'View Overview')
+              : approvedBooking
+                ? (isMs ? 'Catat Jualan' : 'Record Sales')
+                : (isMs ? 'Mohon Kiosk' : 'Apply Kiosk');
+
+          return (
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 mb-1">
+                  <span className="truncate font-medium">{bizLabel}</span>
+                  <span aria-hidden="true">·</span>
+                  <span className="shrink-0">{districtLabel}</span>
+                </div>
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                   {currentHeader.prefix}
-                  <span className="kbelia-title-shimmer">{currentHeader.accent}</span>
+                  <span className="text-blue-700 dark:text-sky-400">{currentHeader.accent}</span>
                 </h1>
-                <p className="text-[0.9375rem] text-black/75 dark:text-white/75 mt-1">
+                <p className="text-[0.9375rem] text-slate-600 dark:text-slate-300 mt-1">
                   {isMs ? (
                     <>
-                      Selamat kembali, <span className="font-semibold text-black dark:text-white">{merchantDisplayName}</span>
+                      Selamat kembali, <span className="font-semibold text-slate-900 dark:text-white">{merchantDisplayName}</span>
                     </>
                   ) : (
                     <>
-                      Welcome back, <span className="font-semibold text-black dark:text-white">{merchantDisplayName}</span>
+                      Welcome back, <span className="font-semibold text-slate-900 dark:text-white">{merchantDisplayName}</span>
                     </>
                   )}
                 </p>
-              </>
-            );
-          })()}
-        </div>
+              </div>
+
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3.5 sm:gap-4 lg:border-l lg:border-sky-200/80 dark:lg:border-sky-800/50 lg:pl-5 shrink-0">
+                <div className="flex items-center gap-3 text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 font-medium tabular-nums">
+                  <span>
+                    {isMs ? 'Kiosk: ' : 'Kiosk: '}
+                    {approvedBooking ? (
+                      <span className="font-mono font-semibold text-slate-900 dark:text-white">{approvedBooking.slotCode}</span>
+                    ) : pendingBooking ? (
+                      <span className="font-semibold text-amber-700 dark:text-amber-300">{isMs ? 'Menunggu' : 'Pending'}</span>
+                    ) : (
+                      <span className="text-slate-500 dark:text-slate-400">{isMs ? 'Belum Dimohon' : 'Not Applied'}</span>
+                    )}
+                  </span>
+                  <span className="h-4 w-px bg-sky-200/90 dark:bg-sky-800/70" aria-hidden="true" />
+                  <span>
+                    <span className="font-semibold text-slate-900 dark:text-white">{safeCashflow.length}</span>{' '}
+                    {isMs ? 'Rekod Jualan' : 'Sales Records'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleQuickAction}
+                  className="px-4 py-2 rounded-lg text-xs sm:text-[13px] font-semibold bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white dark:text-slate-950 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  {quickActionLabel}
+                </button>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Alert Messages */}
@@ -1160,7 +1013,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             time: latestTicket.status === 'resolved' ? 'Selesai' : latestTicket.status === 'in_progress' ? 'Diproses' : 'Diterima',
             title: `Aduan ${latestTicket.slotCode}: ${latestTicket.issueCategory}`,
             body: latestTicket.description,
-            action: () => setActiveTab('bookings')
+            action: () => onOpenBookingTab?.('manage')
           });
         }
         if (latestGrant) {
@@ -1197,7 +1050,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               dateLabel: b.createdAt ? formatDisplayDate(b.createdAt.split('T')[0]) : 'Baharu',
               createdAt: b.createdAt || '',
               actionLabel: 'Lihat Kiosk',
-              onAction: () => setActiveTab('bookings')
+              onAction: () => onOpenBookingTab?.('manage')
             })),
           ...grantApplications
             .filter((g) => g.status === 'pending')
@@ -1236,7 +1089,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               dateLabel: t.createdAt ? formatDisplayDate(t.createdAt.split('T')[0]) : 'Baharu',
               createdAt: t.createdAt || '',
               actionLabel: 'Semak Tiket',
-              onAction: () => setActiveTab('bookings')
+              onAction: () => onOpenBookingTab?.('manage')
             }))
         ].sort((a, b) => {
           const tsA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -1293,7 +1146,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               accentColor="amber"
               isLive
               staggerIndex={1}
-              onClick={() => setActiveTab('bookings')}
+              onClick={() =>
+                onOpenBookingTab?.(primaryBooking || safeTickets.length > 0 ? 'manage' : 'browse')
+              }
             />
 
             <SaaSKpiCard
@@ -1635,7 +1490,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                         <button
                           type="button"
-                          onClick={() => (onOpenBookingTab ? onOpenBookingTab() : onOpenBookingModal ? onOpenBookingModal() : setActiveTab('bookings'))}
+                          onClick={() => (onOpenBookingTab ? onOpenBookingTab('browse') : onOpenBookingModal?.())}
                           className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer"
                         >
                           Mohon Kiosk
@@ -2633,910 +2488,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         </div>
         );
       })()}
-
-      {/* Tab 3: Capsule Bookings */}
-      {activeTab === 'bookings' && (
-        <div key="bookings" className="mt-4 space-y-4 animate-dashboard-tab">
-          <div>
-            <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
-              Rekod Permohonan Kiosk Anda
-            </h3>
-          </div>
-
-          {activeVisibleBookings.length === 0 ? (
-            <div className="p-8 text-center bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
-              <Building2 className="w-10 h-10 text-black/35 dark:text-white/35 mx-auto mb-2" />
-              <h4 className="text-sm font-bold text-black dark:text-white">
-                {hasCancelledKioskBooking ? 'Tiada Permohonan Kiosk Aktif' : 'Tiada Permohonan Kiosk'}
-              </h4>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5 mb-4 max-w-md mx-auto">
-                {hasCancelledKioskBooking
-                  ? 'Permohonan terdahulu anda telah dibatalkan. Pilih unit kiosk baharu di halaman Tempahan Kiosk untuk memohon semula.'
-                  : 'Anda belum memohon sewaan slot kiosk belia. Pilih unit kiosk yang tersedia di halaman Tempahan Kiosk.'}
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  if (onOpenBookingTab) onOpenBookingTab();
-                  else if (onOpenBookingModal) onOpenBookingModal();
-                }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors cursor-pointer interactive-press dark:bg-blue-600"
-              >
-                <Building2 className="w-4 h-4" />
-                <span>{hasCancelledKioskBooking ? 'Mohon Semula Kiosk' : 'Mohon Kiosk'}</span>
-              </button>
-            </div>
-          ) : (
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
-              <ReferenceTableToolbar
-                accent="blue"
-                searchValue={bookingSearch}
-                onSearchChange={setBookingSearch}
-                searchPlaceholder="Cari kod kiosk, nama slot atau lokasi..."
-                filterCount={(bookingStatusFilter !== 'all' ? 1 : 0) + (bookingSortBy !== DEFAULT_SORT_VALUE ? 1 : 0)}
-                onResetFilters={() => {
-                  setBookingStatusFilter('all');
-                  setBookingSortBy(DEFAULT_SORT_VALUE);
-                }}
-                sortOptions={bookingSortOptions}
-                sortValue={bookingSortBy === 'table_column' ? '' : bookingSortBy}
-                onSortChange={setBookingSortBy}
-                filterContent={
-                  <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
-                      Status Permohonan
-                    </label>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {([
-                        { id: 'all', label: 'Semua' },
-                        { id: 'pending', label: 'Dalam Semakan' },
-                        { id: 'approved', label: 'Diluluskan' },
-                        { id: 'rejected', label: 'Tidak Berjaya' }
-                      ] as const).map((opt) => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setBookingStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                            bookingStatusFilter === opt.id
-                              ? 'bg-blue-600 border-blue-600 text-white'
-                              : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                }
-              />
-
-              {filteredBookings.length === 0 ? (
-                <div className="py-12 px-6 text-center space-y-2">
-                  <Building2 className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
-                  <p className="text-sm font-bold text-black dark:text-white">
-                    Tiada permohonan sepadan dengan carian atau penapis.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setBookingSearch('');
-                      setBookingStatusFilter('all');
-                    }}
-                    className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
-                  >
-                    Set Semula Carian &amp; Penapis
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left border-collapse">
-                      <thead>
-                        <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
-                          <th className="py-3 pl-5 pr-3">
-                            <button
-                              type="button"
-                              onClick={() => toggleBookingSort('slotName')}
-                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Kiosk</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => toggleBookingSort('hubLocation')}
-                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Lokasi &amp; Saiz</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => toggleBookingSort('startDate')}
-                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Tempoh &amp; Mula</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => toggleBookingSort('status')}
-                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Status</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 pl-2 pr-5 w-12 text-right">
-                            <span className="sr-only">Tindakan</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
-                        {bookingsPagination.paginatedItems.map((b) => {
-                          const matchedSlot = safeSlots.find(
-                            (s) => (b.slotId && s.id === b.slotId) || (b.slotCode && s.code === b.slotCode)
-                          );
-                          const kioskImg = resolveBookingKioskImage(b, safeSlots);
-                          const isExpanded = expandedBookingIds.includes(b.id);
-
-                          const actionItems = [
-                            {
-                              label: isExpanded ? 'Tutup Butiran' : 'Lihat Butiran',
-                              onClick: () => toggleBookingExpand(b.id)
-                            },
-                            {
-                              label: 'Resit Rasmi Bayaran',
-                              onClick: () => setSelectedReceiptBooking(b)
-                            },
-                            ...(b.status === 'approved' && onViewOfferLetter
-                              ? [
-                                  {
-                                    label: 'Surat Tawaran',
-                                    tone: 'accent' as const,
-                                    onClick: () => onViewOfferLetter(b)
-                                  }
-                                ]
-                              : []),
-                            ...(b.status === 'approved' && onOpenTenancyAgreement
-                              ? [
-                                  {
-                                    label: 'Perjanjian Sewa Kiosk',
-                                    onClick: () => onOpenTenancyAgreement(b)
-                                  }
-                                ]
-                              : []),
-                            ...(b.status === 'approved' && onOpenVerification
-                              ? [
-                                  {
-                                    label: 'Sahkan Lesen QR',
-                                    onClick: () => onOpenVerification(`KBN-${b.slotCode}`)
-                                  }
-                                ]
-                              : []),
-                            {
-                              label: 'Aduan Kiosk',
-                              onClick: () => {
-                                setMaintenanceComplaintBooking(b);
-                                setComplaintSuccess(null);
-                                setComplaintNotes('');
-                              }
-                            },
-                            ...(b.status === 'pending' || b.status === 'approved'
-                              ? [
-                                  {
-                                    label: 'Batalkan Tempahan',
-                                    tone: 'danger' as const,
-                                    dividerBefore: true,
-                                    onClick: () => {
-                                      setExpandedBookingIds((prev) =>
-                                        prev.includes(b.id) ? prev : [...prev, b.id]
-                                      );
-                                      setInlineCancelBookingId(b.id);
-                                    }
-                                  }
-                                ]
-                              : [])
-                          ];
-
-                          return (
-                            <React.Fragment key={b.id}>
-                              <tr className="kbelia-table-row">
-                                <td className="py-3.5 pl-5 pr-3">
-                                  <div className="flex items-center gap-3 min-w-[200px]">
-                                    <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
-                                      <PortalImage
-                                        src={kioskImg}
-                                        alt={`Rupa bentuk kiosk ${b.slotName}`}
-                                        fallbackType="kiosk"
-                                        fallbackLabel={b.slotCode}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                    <div className="min-w-0">
-                                      <p className="font-semibold text-black dark:text-white truncate max-w-[240px]">
-                                        {b.slotCode} · {b.slotName}
-                                      </p>
-                                      <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[240px]">
-                                        {b.businessName}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="py-3.5 px-3">
-                                  <p className="text-black dark:text-white font-medium whitespace-nowrap">
-                                    {b.hubLocation}
-                                  </p>
-                                  <p className="text-[0.8125rem] text-black/60 dark:text-white/65 whitespace-nowrap">
-                                    {matchedSlot?.size || 'Unit Kiosk Belia'}
-                                  </p>
-                                </td>
-                                <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
-                                  <p className="font-medium text-black dark:text-white">{b.durationMonths} Bulan</p>
-                                  <p className="text-[0.8125rem] text-black/60 dark:text-white/65">
-                                    Mula {formatDisplayDate(b.startDate)}
-                                  </p>
-                                </td>
-                                <td className="py-3.5 px-3 whitespace-nowrap">
-                                  {b.status === 'pending' && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70">
-                                      <Clock className="w-3 h-3" />
-                                      Dalam Semakan
-                                    </span>
-                                  )}
-                                  {b.status === 'approved' && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70">
-                                      <CheckCircle2 className="w-3 h-3" />
-                                      Diluluskan
-                                    </span>
-                                  )}
-                                  {b.status === 'rejected' && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70">
-                                      <AlertCircle className="w-3 h-3" />
-                                      Tidak Berjaya
-                                    </span>
-                                  )}
-                                </td>
-                                <td className="py-3.5 pl-2 pr-5 text-right">
-                                  <RowActionMenu
-                                    ariaLabel={`Tindakan untuk ${b.slotCode}`}
-                                    items={actionItems}
-                                  />
-                                </td>
-                              </tr>
-
-                              {isExpanded && (
-                                <tr className="bg-slate-50/70 dark:bg-zinc-950/60">
-                                  <td colSpan={5} className="px-5 py-4 space-y-3">
-                                    <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-black/75 dark:text-white/80 tabular-nums">
-                                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                        <span>Tempoh Operasi: <strong className="text-black dark:text-white">{b.durationMonths} Bulan</strong></span>
-                                        <span>·</span>
-                                        <span>Mula: <strong className="text-black dark:text-white">{formatDisplayDate(b.startDate)}</strong></span>
-                                        <span>·</span>
-                                        <span>Akhir: <strong className="text-black dark:text-white">{calculateOperationEndDate(b.startDate, b.durationMonths)}</strong></span>
-                                      </div>
-
-                                      <a
-                                        href={`https://wa.me/601120508890?text=${encodeURIComponent(`Salam Admin KBelia Kelantan, saya ingin bertanya mengenai permohonan kiosk slot ${b.slotCode} (${b.slotName}) bagi perniagaan ${b.businessName}.`)}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800 text-black dark:text-white text-[0.8125rem] font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
-                                      >
-                                        <MessageCircle className="w-3.5 h-3.5" />
-                                        <span>WhatsApp Pentadbir</span>
-                                      </a>
-                                    </div>
-
-                                    {b.adminNotes && (
-                                      <div className="text-sm text-black dark:text-white bg-white dark:bg-zinc-900 p-3 rounded-xl border border-slate-200 dark:border-zinc-700">
-                                        <span className="font-bold block mb-0.5">Catatan Pentadbir:</span>
-                                        <p>{b.adminNotes}</p>
-                                      </div>
-                                    )}
-
-                                    {(b.status === 'pending' || b.status === 'approved') && inlineCancelBookingId === b.id && (
-                                      <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                        <div className="text-sm text-black dark:text-white">
-                                          <span className="font-bold">Sahkan pembatalan tempahan slot {b.slotCode}?</span>{' '}
-                                          <span className="text-black/75 dark:text-white/75">
-                                            Slot ini akan dilepaskan dan anda boleh memilih kiosk lain selepas pembatalan.
-                                          </span>
-                                        </div>
-                                        <div className="flex items-center gap-2 shrink-0">
-                                          <button
-                                            type="button"
-                                            disabled={cancellingBooking}
-                                            onClick={async () => {
-                                              try {
-                                                setCancellingBooking(true);
-                                                await updateBookingStatus(
-                                                  b.id,
-                                                  'cancelled',
-                                                  'Tempahan dibatalkan oleh usahawan.',
-                                                  b.slotId,
-                                                  b.businessName,
-                                                  b.applicantId,
-                                                  b
-                                                );
-                                                showToast({
-                                                  type: 'info',
-                                                  title: 'Tempahan Kiosk Dibatalkan',
-                                                  message: `Tempahan slot ${b.slotCode} telah dibatalkan. Anda kini boleh memohon unit kiosk lain.`
-                                                });
-                                                setInlineCancelBookingId(null);
-                                                onRefresh();
-                                              } catch {
-                                                showToast({
-                                                  type: 'error',
-                                                  title: 'Ralat Pembatalan',
-                                                  message: 'Gagal membatalkan tempahan. Sila cuba lagi.'
-                                                });
-                                              } finally {
-                                                setCancellingBooking(false);
-                                              }
-                                            }}
-                                            className="px-3.5 py-2 rounded-lg text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 cursor-pointer"
-                                          >
-                                            {cancellingBooking ? 'Memproses...' : 'Ya, Batalkan'}
-                                          </button>
-                                          <button
-                                            type="button"
-                                            disabled={cancellingBooking}
-                                            onClick={() => setInlineCancelBookingId(null)}
-                                            className="px-3.5 py-2 rounded-lg text-sm font-semibold text-black dark:text-white bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
-                                          >
-                                            Kekalkan
-                                          </button>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </td>
-                                </tr>
-                              )}
-                            </React.Fragment>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <PaginationBar
-                    currentPage={bookingsPagination.currentPage}
-                    totalItems={bookingsPagination.totalItems}
-                    itemsPerPage={7}
-                    onPageChange={bookingsPagination.setCurrentPage}
-                    itemLabel="sewaan kiosk"
-                    accent="blue"
-                  />
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Existing Maintenance Tickets List */}
-          {sortedTickets.length > 0 && (
-            <div className="space-y-3 pt-2">
-              <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2">
-                <Wrench className="w-4.5 h-4.5 text-black dark:text-white" />
-                <span>Tiket Aduan Fasiliti Anda</span>
-              </h4>
-
-              <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
-                <ReferenceTableToolbar
-                  accent="blue"
-                  searchValue={ticketSearch}
-                  onSearchChange={setTicketSearch}
-                  searchPlaceholder="Cari kod kiosk, kategori atau aduan..."
-                  filterCount={(ticketStatusFilter !== 'all' ? 1 : 0) + (ticketSortBy !== DEFAULT_SORT_VALUE ? 1 : 0)}
-                  onResetFilters={() => {
-                    setTicketStatusFilter('all');
-                    setTicketSortBy(DEFAULT_SORT_VALUE);
-                  }}
-                  sortOptions={ticketSortOptions}
-                  sortValue={ticketSortBy === 'table_column' ? '' : ticketSortBy}
-                  onSortChange={setTicketSortBy}
-                  rightSlot={
-                    onOpenMaintenanceModal ? (
-                      <button
-                        type="button"
-                        onClick={onOpenMaintenanceModal}
-                        className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>Aduan Baharu</span>
-                      </button>
-                    ) : undefined
-                  }
-                  filterContent={
-                    <div>
-                      <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
-                        Status Aduan
-                      </label>
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {([
-                          { id: 'all', label: 'Semua' },
-                          { id: 'received', label: 'Diterima' },
-                          { id: 'in_progress', label: 'Sedang Dibaiki' },
-                          { id: 'resolved', label: 'Selesai' }
-                        ] as const).map((opt) => (
-                          <button
-                            key={opt.id}
-                            type="button"
-                            onClick={() => setTicketStatusFilter(opt.id)}
-                            className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                              ticketStatusFilter === opt.id
-                                ? 'bg-blue-600 border-blue-600 text-white'
-                                : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
-                            }`}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  }
-                />
-
-                {filteredTickets.length === 0 ? (
-                  <div className="py-10 px-6 text-center space-y-2">
-                    <Wrench className="w-8 h-8 text-black/30 dark:text-white/30 mx-auto" />
-                    <p className="text-sm font-bold text-black dark:text-white">
-                      Tiada tiket aduan sepadan dengan carian anda.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTicketSearch('');
-                        setTicketStatusFilter('all');
-                      }}
-                      className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
-                    >
-                      Set Semula Carian &amp; Penapis
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm text-left border-collapse">
-                        <thead>
-                          <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
-                            <th className="py-3 pl-5 pr-3">
-                              <button
-                                type="button"
-                                onClick={() => toggleTicketSort('slotCode')}
-                                className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                              >
-                                <span>Unit Kiosk</span>
-                                <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                              </button>
-                            </th>
-                            <th className="py-3 px-3">
-                              <button
-                                type="button"
-                                onClick={() => toggleTicketSort('issueCategory')}
-                                className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                              >
-                                <span>Kategori &amp; Keterangan</span>
-                                <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                              </button>
-                            </th>
-                            <th className="py-3 px-3">
-                              <button
-                                type="button"
-                                onClick={() => toggleTicketSort('status')}
-                                className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                              >
-                                <span>Status</span>
-                                <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                              </button>
-                            </th>
-                            <th className="py-3 pl-2 pr-5 w-12 text-right">
-                              <span className="sr-only">Tindakan</span>
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
-                          {ticketsPagination.paginatedItems.map((t) => {
-                            const isTicketExpanded = expandedTicketIds.includes(t.id);
-                            return (
-                              <React.Fragment key={t.id}>
-                                <tr className="kbelia-table-row">
-                                  <td className="py-3.5 pl-5 pr-3 whitespace-nowrap">
-                                    <div className="flex items-center gap-3">
-                                      <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
-                                        <Wrench className="w-4 h-4" />
-                                      </div>
-                                      <span className="font-semibold text-black dark:text-white">{t.slotCode}</span>
-                                    </div>
-                                  </td>
-                                  <td className="py-3.5 px-3">
-                                    <p className="font-medium text-black dark:text-white truncate max-w-[260px]">
-                                      {t.issueCategory}
-                                    </p>
-                                    <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[300px]">
-                                      {t.description}
-                                    </p>
-                                  </td>
-                                  <td className="py-3.5 px-3 whitespace-nowrap">
-                                    <span
-                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
-                                        t.status === 'resolved'
-                                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
-                                          : t.status === 'in_progress'
-                                          ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/70'
-                                          : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
-                                      }`}
-                                    >
-                                      {t.status === 'resolved' ? 'Selesai' : t.status === 'in_progress' ? 'Sedang Dibaiki' : 'Diterima'}
-                                    </span>
-                                  </td>
-                                  <td className="py-3.5 pl-2 pr-5 text-right">
-                                    <RowActionMenu
-                                      ariaLabel={`Tindakan untuk tiket ${t.slotCode}`}
-                                      items={[
-                                        {
-                                          label: isTicketExpanded ? 'Tutup Butiran' : 'Lihat Butiran',
-                                          onClick: () =>
-                                            setExpandedTicketIds((prev) =>
-                                              prev.includes(t.id)
-                                                ? prev.filter((item) => item !== t.id)
-                                                : [...prev, t.id]
-                                            )
-                                        },
-                                        ...(onOpenMaintenanceModal
-                                          ? [
-                                              {
-                                                label: 'Buat Aduan Baharu',
-                                                tone: 'accent' as const,
-                                                onClick: onOpenMaintenanceModal
-                                              }
-                                            ]
-                                          : [])
-                                      ]}
-                                    />
-                                  </td>
-                                </tr>
-                                {isTicketExpanded && (
-                                  <tr className="bg-slate-50/70 dark:bg-zinc-950/60">
-                                    <td colSpan={4} className="px-5 py-3.5 text-sm text-black dark:text-white space-y-1.5">
-                                      <p className="font-semibold">Keterangan Penuh Aduan:</p>
-                                      <p className="text-black/75 dark:text-white/80">{t.description}</p>
-                                      {t.adminNotes && (
-                                        <p className="text-[0.8125rem] text-black/70 dark:text-white/75 pt-1">
-                                          <strong className="text-black dark:text-white">Catatan Teknikal:</strong> {t.adminNotes}
-                                        </p>
-                                      )}
-                                    </td>
-                                  </tr>
-                                )}
-                              </React.Fragment>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <PaginationBar
-                      currentPage={ticketsPagination.currentPage}
-                      totalItems={ticketsPagination.totalItems}
-                      itemsPerPage={7}
-                      onPageChange={ticketsPagination.setCurrentPage}
-                      itemLabel="tiket aduan"
-                      accent="blue"
-                    />
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Inline 2-step cancellation is used above (zero pop-up modal) */}
-
-          {/* MODAL 1: OFFICIAL RECEIPT (RESIT RASMI BAYARAN KBELIA) */}
-          {selectedReceiptBooking && (
-            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
-              <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden text-black dark:text-white">
-                
-                {/* Receipt Header */}
-                <div className="p-5 kbelia-important-header border-b border-slate-300 dark:border-slate-600 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black shadow-xs dark:bg-emerald-600">
-                      <span className="text-base font-black">KB</span>
-                    </div>
-                    <div>
-                      <h4 className="font-black text-sm uppercase tracking-wide text-black dark:text-white">Resit Rasmi Bayaran Subsidi Kiosk</h4>
-                      <p className="text-[0.875rem] text-black dark:text-white/75 font-semibold">Pengurusan Pembangunan Usahawan Belia Kelantan</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedReceiptBooking(null)}
-                    className="p-1.5 text-black/70 hover:text-black dark:text-white/75 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* Receipt Content */}
-                <div className="p-6 space-y-4 text-sm">
-                  <div className="flex justify-between items-start pb-3 border-b border-slate-300 dark:border-slate-600">
-                    <div>
-                      <span className="text-black/70 dark:text-white/75 text-[0.8125rem] uppercase font-bold block">Nombor Rujukan Resit</span>
-                      <span className="font-mono font-extrabold text-sm text-black dark:text-white/75">
-                        REC-{selectedReceiptBooking.slotCode}-{selectedReceiptBooking.id.substring(0, 8).toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-black/70 dark:text-white/75 text-[0.8125rem] uppercase font-bold block">Tarikh Permohonan</span>
-                      <span className="font-semibold text-black dark:text-white">{formatDisplayDate(selectedReceiptBooking.createdAt?.split('T')[0])}</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-black/70 dark:text-white/75">Nama Usahawan:</span>
-                      <span className="font-bold text-black dark:text-white">{selectedReceiptBooking.applicantName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-black/70 dark:text-white/75">Jenama Perniagaan:</span>
-                      <span className="font-bold text-black dark:text-white">{selectedReceiptBooking.businessName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-black/70 dark:text-white/75">Kiosk Diberikan:</span>
-                      <span className="font-bold text-black dark:text-white/75">{selectedReceiptBooking.slotCode} ({selectedReceiptBooking.slotName})</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-black/70 dark:text-white/75">Lokasi Hab:</span>
-                      <span className="font-semibold text-black dark:text-white">{selectedReceiptBooking.hubLocation}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-black/70 dark:text-white/75">Tempoh Perjanjian:</span>
-                      <span className="font-semibold text-black dark:text-white">{selectedReceiptBooking.durationMonths} Bulan ({formatDisplayDate(selectedReceiptBooking.startDate)} hingga {calculateOperationEndDate(selectedReceiptBooking.startDate, selectedReceiptBooking.durationMonths)})</span>
-                    </div>
-                  </div>
-
-                  {/* Fee Breakdown */}
-                  {(() => {
-                    const rate = Number(selectedReceiptBooking.monthlyRate || 150);
-                    return (
-                  <div className="border border-slate-300 dark:border-slate-600 rounded-2xl overflow-hidden">
-                    <table className="w-full text-left text-sm">
-                      <thead className="bg-slate-50 dark:bg-slate-800 text-black dark:text-white font-bold border-b border-slate-300 dark:border-slate-600">
-                        <tr>
-                          <th className="p-3">Keterangan Urusniaga</th>
-                          <th className="p-3 text-right">Jumlah (RM)</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-300 dark:divide-slate-600">
-                        <tr>
-                          <td className="p-3 font-medium">Yuran Komitmen Sewaan Kiosk Modular Subsidi Belia (Sebulan)</td>
-                          <td className="p-3 text-right font-mono font-bold tabular-nums">{rate.toFixed(2)}</td>
-                        </tr>
-                        <tr>
-                          <td className="p-3 font-medium">Deposit Kebersihan & Keselamatan Utiliti Elektrik 13A</td>
-                          <td className="p-3 text-right font-mono font-bold tabular-nums">50.00</td>
-                        </tr>
-                        <tr className="bg-emerald-50 dark:bg-emerald-950/40 text-black dark:text-white font-bold">
-                          <td className="p-3">Subsidi Kerajaan Negeri Kelantan (Kadar Khas)</td>
-                          <td className="p-3 text-right font-mono tabular-nums">-50.00</td>
-                        </tr>
-                        <tr className="bg-blue-600 text-white font-extrabold text-sm dark:bg-blue-600">
-                          <td className="p-3">JUMLAH DIBAYAR</td>
-                          <td className="p-3 text-right font-mono tabular-nums text-white">RM {rate.toFixed(2)}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                    );
-                  })()}
-
-                  <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center gap-2 text-black dark:text-white text-[0.8125rem] font-semibold">
-                    <CheckCircle2 className="w-4 h-4 text-black dark:text-white/75 shrink-0" />
-                    <span>Status Transaksi: Berjaya & Sah Diperakui Sistem Perakaunan Bersepadu KBelia.</span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="pt-2 flex flex-wrap items-center justify-end gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const receiptRef = `REC-${selectedReceiptBooking.slotCode}-${selectedReceiptBooking.id.substring(0, 8).toUpperCase()}`;
-                        const subsidyRate = loadLocalPortalSettings().portalSubsidyRate ?? 50;
-                        const html = generateOfficialReceiptHtml(selectedReceiptBooking, receiptRef, subsidyRate);
-                        void openAndPrintDocument(html, `Resit_Rasmi_${selectedReceiptBooking.slotCode}`);
-                      }}
-                      className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl flex items-center gap-2 shadow-xs cursor-pointer dark:bg-blue-600"
-                    >
-                      <Printer className="w-4 h-4 text-white" />
-                      <span>Cetak Salinan Resit</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        const receiptRef = `REC-${selectedReceiptBooking.slotCode}-${selectedReceiptBooking.id.substring(0, 8).toUpperCase()}`;
-                        const subsidyRate = loadLocalPortalSettings().portalSubsidyRate ?? 50;
-                        const html = generateOfficialReceiptHtml(selectedReceiptBooking, receiptRef, subsidyRate);
-                        const ok = await downloadHtmlAsPdf(html, `Resit_Rasmi_${selectedReceiptBooking.slotCode}_${receiptRef}`);
-                        if (ok) {
-                          showToast('Fail PDF resit rasmi berjaya dimuat turun.', 'success');
-                        } else {
-                          showToast('Gagal menjana fail PDF resit. Sila gunakan butang Cetak.', 'error');
-                        }
-                      }}
-                      className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl flex items-center gap-2 shadow-xs cursor-pointer"
-                    >
-                      <Download className="w-4 h-4 text-white" />
-                      <span>Muat Turun PDF</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedReceiptBooking(null)}
-                      className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-bold text-sm rounded-xl cursor-pointer"
-                    >
-                      Tutup
-                    </button>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          )}
-
-          {/* MODAL 2: ADUAN & PENYELENGGARAAN FASILITI KIOSK */}
-          {maintenanceComplaintBooking && (
-            <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
-              <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden text-black dark:text-white">
-                <div className="p-5 kbelia-important-header dark:bg-slate-800 flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-black dark:text-white flex items-center justify-center font-bold">
-                      <Wrench className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h4 className="font-extrabold text-sm text-black dark:text-white">Borang Aduan Fasiliti Kiosk</h4>
-                      <p className="text-[0.875rem] text-black dark:text-white">Slot {maintenanceComplaintBooking.slotCode} • {maintenanceComplaintBooking.hubLocation}</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setMaintenanceComplaintBooking(null)}
-                    className="p-1.5 text-black/70 hover:text-black dark:text-white/75 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="p-6 space-y-4 text-sm">
-                  {complaintSuccess ? (
-                    <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl text-black dark:text-white space-y-2">
-                      <div className="flex items-center gap-2 font-bold text-sm">
-                        <CheckCircle2 className="w-5 h-5 text-black dark:text-white" />
-                        <span>Aduan Berjaya Dihantar!</span>
-                      </div>
-                      <p className="text-[0.9375rem] text-black dark:text-white">
-                        {complaintSuccess} Pihak pengurusan fasiliti hab akan mengambil tindakan segera dalam tempoh 24 jam.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setMaintenanceComplaintBooking(null)}
-                        className="w-full mt-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold cursor-pointer"
-                      >
-                        Selesai & Tutup
-                      </button>
-                    </div>
-                  ) : (
-                    <form
-                      onSubmit={async (e) => {
-                        e.preventDefault();
-                        if (!complaintNotes.trim()) return;
-                        const categoryMap: Record<string, MaintenanceTicket['issueCategory']> = {
-                          'Bekalan Elektrik 13A & Lampu': 'Elektrik & Suis',
-                          'Kunci & Roller Shutter Kiosk': 'Pintu & Kunci',
-                          'Sistem Paip & Saliran Air': 'Paip & Air',
-                          'Wi-Fi Hab & Rangkaian Internet': 'Lain-lain',
-                          'Kebersihan & Pelupusan Sisa': 'Lain-lain',
-                          'Lain-lain Isu Fizikal': 'Lain-lain'
-                        };
-                        try {
-                          setSubmittingComplaint(true);
-                          const created = await createMaintenanceTicket({
-                            ownerId: user.uid,
-                            slotCode: maintenanceComplaintBooking.slotCode,
-                            kioskName: maintenanceComplaintBooking.slotName,
-                            reporterName: userProfile?.fullName || user.displayName || maintenanceComplaintBooking.applicantName,
-                            reporterPhone: userProfile?.phone || maintenanceComplaintBooking.applicantPhone || '-',
-                            issueCategory: categoryMap[complaintType] || 'Lain-lain',
-                            description: `[${complaintType}] ${complaintNotes.trim()}`
-                          });
-                          setComplaintSuccess(`Tiket aduan ${created.id} didaftarkan bagi kategori "${complaintType}".`);
-                          emitAdminOrMentorNotification({
-                            title: `Tiket Aduan Fasiliti: ${maintenanceComplaintBooking.slotCode}`,
-                            message: `${userProfile?.fullName || user.displayName || maintenanceComplaintBooking.applicantName} melaporkan isu "${complaintType}" di ${maintenanceComplaintBooking.slotName}.`,
-                            senderRole: 'user',
-                            targetRole: 'admin',
-                            targetUserId: '',
-                            sender: userProfile?.fullName || user.displayName || 'Usahawan Belia',
-                            type: 'kiosk',
-                            actionTab: 'admin'
-                          });
-                          showToast({
-                            type: 'success',
-                            title: 'Aduan Fasiliti Diterima',
-                            message: `Tiket ${created.id} telah dihantar ke Pentadbir Hab.`
-                          });
-                          onRefresh();
-                        } catch {
-                          showToast('Gagal menghantar aduan fasiliti. Sila cuba lagi.', 'error');
-                        } finally {
-                          setSubmittingComplaint(false);
-                        }
-                      }}
-                      className="space-y-3.5"
-                    >
-                      <div>
-                        <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
-                          Jenis Kerosakan *
-                        </label>
-                        <select
-                          value={complaintType}
-                          onChange={(e) => setComplaintType(e.target.value)}
-                          className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
-                        >
-                          <option value="Bekalan Elektrik 13A & Lampu">Bekalan Elektrik 13A & Lampu Kiosk</option>
-                          <option value="Kunci & Roller Shutter Kiosk">Kunci & Pintu Pengatup (Roller Shutter)</option>
-                          <option value="Sistem Paip & Saliran Air">Sistem Paip & Saliran Sinki</option>
-                          <option value="Wi-Fi Hab & Rangkaian Internet">Wi-Fi Hab & Rangkaian Internet Terputus</option>
-                          <option value="Kebersihan & Pelupusan Sisa">Kebersihan Tapak & Tong Sampah</option>
-                          <option value="Lain-lain Isu Fizikal">Lain-lain Isu Fizikal</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
-                          Penerangan Masalah *
-                        </label>
-                        <textarea
-                          rows={3}
-                          required
-                          value={complaintNotes}
-                          onChange={(e) => setComplaintNotes(e.target.value)}
-                          placeholder="Masukkan penerangan masalah"
-                          className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
-                        />
-                      </div>
-
-                      <div className="pt-2 flex items-center justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setMaintenanceComplaintBooking(null)}
-                          className="px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white rounded-xl font-bold cursor-pointer"
-                        >
-                          Batal
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={submittingComplaint}
-                          className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 dark:bg-rose-600"
-                        >
-                          <Wrench className="w-3.5 h-3.5" />
-                          <span>{submittingComplaint ? 'Menghantar...' : 'Hantar Aduan Sekarang'}</span>
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Tab: Kiosk Cashflow Tracker */}
       {activeTab === 'cashflow' && (

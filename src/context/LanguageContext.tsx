@@ -34,7 +34,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     search_no_results: 'Tiada carian dijumpai untuk',
 
     // Sidebar items by role
-    nav_my_kiosk: 'Tempahan Kiosk',
+    nav_my_kiosk: 'Kiosk Saya',
     nav_sales_pos: 'Rekod Jualan',
     nav_grant_application: 'Geran Belia',
     nav_mentor_clinic: 'Bimbingan',
@@ -364,7 +364,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     search_no_results: 'No matches found for',
 
     // Sidebar items by role
-    nav_my_kiosk: 'Kiosk Booking',
+    nav_my_kiosk: 'My Kiosk',
     nav_sales_pos: 'Cash Flow',
     nav_grant_application: 'Youth Grant',
     nav_mentor_clinic: 'Mentoring',

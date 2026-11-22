@@ -1709,6 +1709,28 @@ function MainApp() {
             setMentorSubTab(sub);
             navigateWithSkeleton('mentor', sub);
           }}
+          notificationData={{
+            userId: user?.uid,
+            userEmail: user?.email || userProfile?.email,
+            myBusiness,
+            myProducts,
+            myBookings,
+            myGrants: myYouthGrants,
+            myMentorships: scopedMentorRegistrations,
+            cashflowRecords,
+            businesses,
+            bookings,
+            slots: enrichedSlots,
+            grantApplications,
+            mentorshipRegistrations: scopedMentorRegistrations,
+            maintenanceTickets,
+            newsItems,
+            portalSettings,
+            currentMentor: isMentor
+              ? mentors.find((m) => m.id === (userProfile?.mentorId || mentors[0]?.id)) || mentors[0] || null
+              : null,
+            grantEndorsements
+          }}
         />
 
         {/* Center/Right Dynamic Body */}
@@ -1809,8 +1831,8 @@ function MainApp() {
                       setIsVerificationModalOpen(true);
                     }}
                     onOpenBookingModal={handleOpenNewBooking}
-                    onOpenBookingTab={() => {
-                      const targetView: KioskPageView = hasActiveYouthBooking ? 'manage' : 'browse';
+                    onOpenBookingTab={(viewOverride) => {
+                      const targetView: KioskPageView = viewOverride || (hasActiveYouthBooking ? 'manage' : 'browse');
                       setKioskPageView(targetView);
                       navigateWithSkeleton('academic', targetView);
                     }}
@@ -1872,6 +1894,7 @@ function MainApp() {
               <KioskBookingPage
                 slots={enrichedSlots}
                 bookings={bookings}
+                maintenanceTickets={maintenanceTickets}
                 portalSettings={portalSettings}
                 view={kioskPageView}
                 onChangeView={setKioskPageView}
@@ -1888,6 +1911,11 @@ function MainApp() {
                   setSelectedBookingForTenancy(booking);
                   setIsTenancyModalOpen(true);
                 }}
+                onOpenVerification={(refCode) => {
+                  setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');
+                  setIsVerificationModalOpen(true);
+                }}
+                onOpenMaintenanceModal={() => { if (isYouth) setIsMaintenanceModalOpen(true); }}
               />
             )
           )}
@@ -2217,8 +2245,8 @@ function MainApp() {
                     setIsVerificationModalOpen(true);
                   }}
                   onOpenBookingModal={handleOpenNewBooking}
-                  onOpenBookingTab={() => {
-                    const targetView: KioskPageView = hasActiveYouthBooking ? 'manage' : 'browse';
+                  onOpenBookingTab={(viewOverride) => {
+                    const targetView: KioskPageView = viewOverride || (hasActiveYouthBooking ? 'manage' : 'browse');
                     setKioskPageView(targetView);
                     navigateWithSkeleton('academic', targetView);
                   }}

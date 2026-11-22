@@ -358,7 +358,6 @@ export type MerchantSubTab =
   | 'overview'   // Ringkasan Eksekutif
   | 'profile'    // Profil Perniagaan
   | 'products'   // Katalog Produk
-  | 'bookings'   // Permohonan Kapsul
   | 'cashflow'   // Buku Tunai Jualan
   | 'vault'      // Buat Dokumen Sah
   | 'card';      // Kad Digital WhatsApp Link
@@ -380,9 +379,10 @@ export type AdminSubTab =
 export type MentorSubTab = 
   | 'overview'       // Ringkasan Dashboard Eksekutif Mentor
   | 'sessions'       // Sesi Bimbingan Mentee
+  | 'schedule'       // Kalendar Jadual & Slot Bimbingan Mentor
   | 'endorsements'   // Perakuan Rasmi Geran Belia
   | 'logbook'        // Log Jurnal Minit & Pelan Tindakan
-  | 'profile';       // Profil & Waktu Bimbingan
+  | 'profile';       // Profil Mentor
 
 export type NewsCategory =
   | 'Pengumuman'
