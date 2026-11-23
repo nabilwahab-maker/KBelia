@@ -44,6 +44,7 @@ import {
   MaintenanceTicket,
   formatBusinessCategory
 } from '../types';
+import { KBeliaLogo } from './KBeliaLogo';
 import { useAuth } from '../context/AuthContext';
 import {
   createCapsuleBooking,
@@ -2423,8 +2424,8 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
             {/* Receipt Header */}
             <div className="p-5 kbelia-important-header border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black shadow-xs">
-                  <span className="text-base font-black">KB</span>
+                <div className="p-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center">
+                  <KBeliaLogo size="sm" showWordmark={false} />
                 </div>
                 <div>
                   <h4 className="font-black text-sm uppercase tracking-wide text-black dark:text-white">

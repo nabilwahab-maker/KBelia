@@ -102,6 +102,36 @@ html.dark {
   font-variant-numeric: tabular-nums;
 }
 
+/* Editorial typography pairings for KBelia landing & brand lockups */
+.font-display {
+  font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.font-editorial {
+  font-family: 'Plus Jakarta Sans', 'Public Sans', system-ui, sans-serif;
+}
+
+/* Signature Landing Canvas: Soft Warm Obsidian-Charcoal + Blended Emerald & Songket Gold */
+.kbelia-editorial-dark {
+  background-color: #101614;
+  background-image:
+    radial-gradient(ellipse 75% 55% at 12% 4%, rgba(16, 118, 86, 0.34) 0%, rgba(16, 118, 86, 0.08) 48%, transparent 78%),
+    radial-gradient(ellipse 65% 50% at 88% 12%, rgba(201, 141, 38, 0.2) 0%, rgba(168, 118, 34, 0.05) 45%, transparent 74%),
+    radial-gradient(ellipse 80% 50% at 50% 62%, rgba(15, 78, 58, 0.22) 0%, transparent 72%),
+    linear-gradient(180deg, #101614 0%, #131B18 45%, #111815 100%);
+  color: #F4F1EA;
+}
+
+/* Alternative Light Editorial Canvas: Warm Ivory + Sage Emerald & Soft Sand Gold */
+.kbelia-editorial-light {
+  background-color: #F7F5F0;
+  background-image:
+    radial-gradient(ellipse 75% 55% at 10% 4%, rgba(16, 118, 86, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 65% 50% at 90% 10%, rgba(217, 164, 65, 0.16) 0%, transparent 68%),
+    linear-gradient(180deg, #F7F5F0 0%, #F1EEE6 55%, #F7F5F0 100%);
+  color: #16221D;
+}
+
 /* IMPORTANT HEADERS ONLY: Modern Cobalt Blue & Indigo/Emerald soft radial wash */
 .kbelia-important-header,
 .kbelia-corner-glow-tl {

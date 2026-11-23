@@ -1592,7 +1592,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               </div>
                             ) : (
                               <p className="text-[0.8125rem] text-black/75 dark:text-white/80">
-                                Kesemua 10 jajahan telah penuh ditempah buat masa ini.
+                                Tapak di rangkaian seluruh negeri Kelantan telah penuh ditempah buat masa ini.
                               </p>
                             )}
                           </div>

@@ -25,6 +25,7 @@ import { useAuth, ADMIN_EMAIL } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { UMKTab } from './UMKHeader';
+import { KBeliaLogo } from './KBeliaLogo';
 import { KelantanDistrict } from '../types';
 
 interface LoginPageProps {
@@ -235,14 +236,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <span>{isEn ? 'Back' : 'Kembali'}</span>
             </button>
 
-            {/* Mobile-only brand badge */}
-            <div className="lg:hidden flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-xs dark:bg-blue-600">
-                KB
-              </div>
-              <span className="font-extrabold text-[0.8125rem] text-black dark:text-white tracking-tight">
-                KBelia
-              </span>
+            {/* Mobile-only official brand logo */}
+            <div className="lg:hidden">
+              <KBeliaLogo size="sm" />
             </div>
           </div>
 
@@ -828,14 +824,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <div className="absolute w-22 h-22 rounded-full border border-blue-300/20 border-t-blue-400/75 animate-login-orbit-reverse pointer-events-none" />
 
               {/* Brand Mark Lockup */}
-              <div className="relative flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-900/70 backdrop-blur-md border border-slate-700/80 shadow-xl shadow-slate-950/60">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-blue-500/30 border border-blue-400/40">
-                  <span>K</span>
-                  <span className="text-blue-100 text-base ml-0.5">B</span>
-                </div>
-                <span className="text-2xl xl:text-3xl font-black text-white tracking-tight">
-                  KBelia
-                </span>
+              <div className="relative flex items-center px-5 py-3.5 rounded-2xl bg-[#111916]/80 backdrop-blur-md border border-emerald-500/25 shadow-xl shadow-slate-950/60">
+                <KBeliaLogo size="lg" tone="onDark" />
               </div>
             </div>
 

@@ -38,6 +38,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { NotificationDropdown } from './NotificationDropdown';
+import { KBeliaLogo } from './KBeliaLogo';
 import { showToast } from './ToastNotification';
 import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab, MentorSubTab, formatBusinessCategory } from '../types';
 
@@ -295,14 +296,12 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
             className={`flex items-center gap-2.5 hover:opacity-95 transition-opacity text-left shrink-0 cursor-pointer ${isSidebarCollapsed ? 'justify-center' : ''}`}
             title="KBelia - Kembali ke Laman Utama"
           >
-            <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-xs shrink-0 dark:bg-blue-600 kbelia-ambient-sheen">
-              <span className="font-extrabold text-white relative z-10">KB</span>
-            </div>
+            <KBeliaLogo size="sm" showWordmark={false} />
 
             {!isSidebarCollapsed && (
               <div className="leading-tight">
                 <div className="flex items-center gap-2">
-                  <span className="text-base font-bold tracking-tight text-black dark:text-white">
+                  <span className="font-display text-base font-bold tracking-tight text-black dark:text-white">
                     KBelia
                   </span>
                 </div>

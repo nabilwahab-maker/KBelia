@@ -25,6 +25,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { UMKTab } from './UMKHeader';
+import { KBeliaLogo } from './KBeliaLogo';
 import { KelantanDistrict } from '../types';
 
 interface RegisterPageProps {
@@ -192,14 +193,9 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               <span>{isEn ? 'Back' : 'Kembali'}</span>
             </button>
 
-            {/* Mobile-only brand badge */}
-            <div className="lg:hidden flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-xs dark:bg-blue-600">
-                KB
-              </div>
-              <span className="font-extrabold text-[0.8125rem] text-black dark:text-white tracking-tight">
-                KBelia
-              </span>
+            {/* Mobile-only official brand logo */}
+            <div className="lg:hidden">
+              <KBeliaLogo size="sm" />
             </div>
           </div>
 
@@ -526,16 +522,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
           <div className="relative z-10 flex flex-col items-center text-center max-w-xs xl:max-w-sm mx-auto">
             
             {/* BRAND EMBLEM */}
-            <div className="animate-hero-float-slow">
-              <div className="flex items-center gap-3 mb-3.5">
-                <div className="w-13 h-13 xl:w-15 xl:h-15 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-xl xl:text-2xl shadow-md shadow-amber-500/20 border border-blue-600 dark:bg-blue-600">
-                  <span>K</span>
-                  <span className="text-white text-base xl:text-lg ml-0.5">B</span>
-                </div>
-                <span className="text-2xl xl:text-3xl font-black text-black dark:text-white tracking-tight">
-                  KBelia
-                </span>
-              </div>
+            <div className="animate-hero-float-slow mb-3.5">
+              <KBeliaLogo size="xl" />
             </div>
 
             {/* SUBTITLE MOTTO */}

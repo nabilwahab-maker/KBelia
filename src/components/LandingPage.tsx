@@ -1,47 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Building2, 
-  Store, 
-  Award, 
-  ArrowRight, 
-  CheckCircle2, 
-  MapPin, 
-  Sparkles, 
-  ShieldCheck, 
-  ChevronRight, 
+import {
+  ArrowRight,
+  ChevronRight,
   ChevronLeft,
-  LogIn, 
-  Globe, 
+  LogIn,
+  Globe,
   Clock,
-  Zap,
-  Wifi,
-  XCircle,
-  TrendingUp,
-  BookOpen,
-  Users,
-  FileText,
-  UserCheck,
-  Video,
+  MapPin,
   Mail,
   Phone,
   X,
-  ExternalLink,
-  Briefcase,
-  Check,
-  Shield,
-  Layers,
-  ShoppingBag,
   Sun,
-  Moon
+  Moon,
+  Compass,
+  Video,
+  Camera
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
 import { CapsuleSlot, BusinessListing, YouthProgram, formatBusinessCategory } from '../types';
 import { INITIAL_CAPSULE_SLOTS } from '../data/seedData';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
 import { useScrollReveal } from '../hooks/useMotion';
 import { showToast } from './ToastNotification';
+import { KBeliaLogo } from './KBeliaLogo';
+import heroArtisanImg from '../assets/images/kbelia_hero_kiosk_artisan_1795363091257.jpg';
+import communityHubImg from '../assets/images/kbelia_community_hub_1795363091755.jpg';
 
 const RevealBlock: React.FC<{
   children: React.ReactNode;
@@ -75,19 +59,46 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   setActiveTab,
   slots,
   businesses,
-  programs,
   onSelectSlot,
   onSelectBusiness,
-  onOpenGrantModal
 }) => {
   const { user } = useAuth();
   const { language, setLanguage } = useLanguage();
-  const { isDark, toggleTheme } = useTheme();
   const isBM = language === 'ms';
+
+  // Signature landing atmosphere defaults to soft warm obsidian-charcoal with emerald & gold gradients
+  const [isEditorialDark, setIsEditorialDark] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('kbelia_landing_tone');
+      if (saved === 'light' || saved === 'dark') {
+        return saved === 'dark';
+      }
+    } catch {
+      // ignore storage failure
+    }
+    return true;
+  });
+
+  const toggleEditorialTone = () => {
+    setIsEditorialDark(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('kbelia_landing_tone', next ? 'dark' : 'light');
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
+
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [legalModalType, setLegalModalType] = useState<'privacy' | 'terms' | null>(null);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+
+  const markImageFailed = (key: string) => {
+    setFailedImages(prev => (prev[key] ? prev : { ...prev, [key]: true }));
+  };
 
   const navigateToPage = (tab: UMKTab) => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -99,1449 +110,1232 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const requireBeliaLogin = (message: string) => {
     showToast({
       type: 'info',
-      title: isBM ? 'Log Masuk Belia Diperlukan' : 'Belia Login Required',
-      message
+      title: isBM ? 'Akses Komuniti KBelia' : 'KBelia Community Access',
+      message,
     });
     navigateToPage('login');
   };
 
-  // 5 Rich Visual Slides for the Automatic Moving Carousel (Maintained as original)
-  const heroSlides = [
-    {
-      id: 'slide-1',
-      title: 'Kiosk Belia Modular Pintar',
-      subtitle: 'Hab Usahawan Bachok & Kota Bharu',
-      description: 'Kiosk pasang-siap lengkap soket 13A, Wi-Fi 500Mbps, dan kawalan keselamatan serendah RM15/hari.',
-      badge: 'Kekosongan Sedia',
-      location: 'Hab Usahawan Bachok & Kota Bharu Sentral',
-      imageUrl: '/assets/generated/kiosk_modular_kbelia.jpg',
-      stat: `${slots.length} Kiosk Strategik`,
-      ctaText: 'Mohon Kiosk',
-      onAction: () => navigateToPage('login')
-    },
-    {
-      id: 'slide-2',
-      title: 'Batik Belia Kontemporari & Streetwear',
-      subtitle: 'Koleksi Fesyen Usahawan Muda - Nur Syafiqah (Kota Bharu)',
-      description: 'Batik canting kontemporari dengan motif flora moden pada kemeja cuban dan beg kanvas untuk pasaran eksport.',
-      badge: 'Usahawan Kraf Bimbingan KBelia',
-      location: 'Kota Bharu',
-      imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
-      stat: 'Berdaftar Sah',
-      ctaText: 'Lihat Direktori',
-      onAction: () => navigateToPage('login')
-    },
-    {
-      id: 'slide-3',
-      title: 'Kafe Artisan & Masakan Warisan Moden',
-      subtitle: "D'Kelate Artisan Coffee & Akok Tart - Ahmad Faizul",
-      description: 'Gabungan kopi barista espresso serta kuih tradisi Akok Tart dan Kopi Nissem Melaka di kiosk inkubator belia.',
-      badge: 'Inkubasi Makanan & Minuman Berjaya',
-      location: 'Hab Usahawan Bachok',
-      imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
-      stat: 'Inkubasi Makanan & Minuman Aktif',
-      ctaText: 'Masuk Portal Belia',
-      onAction: () => navigateToPage('login')
-    }
-  ];
+  // Hero visual showcase slides (warm human storytelling, free of internal jargon)
+  const heroSlides = isBM
+    ? [
+        {
+          id: 'slide-1',
+          location: 'Kota Bharu · Seni & Kraf Tempatan',
+          title: 'Ruang Karya & Niaga Anak Muda',
+          description:
+            'Tapak jualan moden yang menghimpunkan penggiat kraf, makanan warisan, dan jenama gaya hidup belia di bawah satu bumbung.',
+          imageUrl: heroArtisanImg,
+          ctaText: 'Terokai Ruang',
+          onAction: () => {
+            const el = document.getElementById('kiosk');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          },
+        },
+        {
+          id: 'slide-2',
+          location: 'Kota Bharu · Fesyen & Tekstil',
+          title: 'Warisan Batik Kontemporari',
+          description:
+            'Sentuhan moden daripada pereka muda tempatan yang membawa identiti seni Pantai Timur ke pasaran yang lebih luas.',
+          imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
+          ctaText: 'Lihat Karya Belia',
+          onAction: () => {
+            const el = document.getElementById('direktori');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          },
+        },
+        {
+          id: 'slide-3',
+          location: 'Bachok · Kopi & Hidangan Artisan',
+          title: 'Cita Rasa Generasi Baharu',
+          description:
+            'Suasana komuniti yang mesra pengunjung untuk anak muda menguji konsep kedai pertama mereka dengan sokongan rakan niaga.',
+          imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
+          ctaText: 'Sertai Komuniti',
+          onAction: () => navigateToPage('register'),
+        },
+      ]
+    : [
+        {
+          id: 'slide-1',
+          location: 'Kota Bharu · Local Craft & Trade',
+          title: 'Real Spaces for Young Makers',
+          description:
+            'Warm, accessible storefronts bringing together young artisans, heritage food creators, and contemporary lifestyle brands.',
+          imageUrl: heroArtisanImg,
+          ctaText: 'Explore Spaces',
+          onAction: () => {
+            const el = document.getElementById('kiosk');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          },
+        },
+        {
+          id: 'slide-2',
+          location: 'Kota Bharu · Contemporary Fashion',
+          title: 'Modern Kelantan Batik Expressions',
+          description:
+            'Fresh collections crafted by young local designers sharing East Coast heritage with a wider community.',
+          imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
+          ctaText: 'Browse Creators',
+          onAction: () => {
+            const el = document.getElementById('direktori');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          },
+        },
+        {
+          id: 'slide-3',
+          location: 'Bachok · Artisan Coffee & Kitchen',
+          title: 'Neighborhood Flavors Reimagined',
+          description:
+            'A supportive setting where emerging founders test their first physical concept alongside fellow youth entrepreneurs.',
+          imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
+          ctaText: 'Join Community',
+          onAction: () => navigateToPage('register'),
+        },
+      ];
 
-  // Automatic slide rotation (moves automatically every 3.8 seconds)
   useEffect(() => {
-    if (!isAutoPlaying || isHovered) return;
+    if (isHovered) return;
     const interval = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % heroSlides.length);
-    }, 3800);
+    }, 4500);
     return () => clearInterval(interval);
-  }, [isAutoPlaying, isHovered, heroSlides.length]);
+  }, [isHovered, heroSlides.length]);
 
-  const handleNextSlide = () => {
-    setCurrentSlide(prev => (prev + 1) % heroSlides.length);
-  };
+  const activeSlide = heroSlides[currentSlide];
 
-  const handlePrevSlide = () => {
-    setCurrentSlide(prev => (prev - 1 + heroSlides.length) % heroSlides.length);
-  };
-
-  // Continuous auto-moving horizontal photo strip cards
-  const movingPhotoCards = [
+  // Editorial community photography ribbon
+  const galleryRibbon = [
     {
-      img: '/assets/generated/kiosk_modular_kbelia.jpg',
-      title: 'Kapsul Niaga Belia Kota Bharu 01',
-      subtitle: 'Kapsul Niaga Standard',
-      tag: 'RM20/hari',
-      tagColor: 'bg-blue-600 text-white border-amber-400/40',
-      location: 'Kota Bharu',
-      type: 'Kapsul Niaga'
+      id: 'rib-1',
+      img: heroArtisanImg,
+      title: isBM ? 'Kraf Anyaman & Kayu' : 'Handwoven Craft Studio',
+      meta: 'Kota Bharu · Kraf',
+      target: 'academic' as UMKTab,
     },
     {
+      id: 'rib-2',
       img: '/assets/generated/batik_canting_kelantan.jpg',
-      title: 'Batik Belia Kontemporari',
-      subtitle: 'Fesyen & Kraf Moden',
-      tag: '',
-      tagColor: '',
-      location: 'Kota Bharu',
-      type: 'Kraf & Fesyen'
+      title: isBM ? 'Batik Kontemporari Belia' : 'Contemporary Youth Batik',
+      meta: 'Kota Bharu · Fesyen',
+      target: 'hepa' as UMKTab,
     },
     {
+      id: 'rib-3',
       img: '/assets/generated/kopi_nissem_melaka.jpg',
-      title: "Kapsul Niaga Belia Bachok 01 · Kopi Nissem",
-      subtitle: "D'Kelate Artisan Coffee",
-      tag: 'RM15/hari',
-      tagColor: 'bg-blue-600 text-white border-amber-400/40',
-      location: 'Bachok',
-      type: 'Kapsul Niaga'
-    }
+      title: isBM ? 'Kopi Artisan & Kuih Warisan' : 'Artisan Coffee & Delicacies',
+      meta: 'Bachok · Kulinari',
+      target: 'hepa' as UMKTab,
+    },
+    {
+      id: 'rib-4',
+      img: communityHubImg,
+      title: isBM ? 'Laman Komuniti Usahawan' : 'Entrepreneur Courtyard Hub',
+      meta: 'Kelantan · Ruang Niaga',
+      target: 'academic' as UMKTab,
+    },
+    {
+      id: 'rib-5',
+      img: '/assets/generated/akok_kelantan_tradisi.jpg',
+      title: isBM ? 'Kuih Tradisi Sentuhan Muda' : 'Heritage Delicacy Reimagined',
+      meta: 'Pasir Mas · Makanan',
+      target: 'hepa' as UMKTab,
+    },
+    {
+      id: 'rib-6',
+      img: '/assets/generated/kiosk_modular_kbelia.jpg',
+      title: isBM ? 'Tapak Jualan Sedia Masuk' : 'Ready-to-Open Kiosk Bays',
+      meta: 'Bachok · Hab Belia',
+      target: 'academic' as UMKTab,
+    },
   ];
 
-  const activeSlideData = heroSlides[currentSlide];
+  // Ecosystem story chapters (natural human phrasing without internal module details)
+  const storyChapters = isBM
+    ? [
+        {
+          num: '01',
+          title: 'Ruang Niaga Sedia Masuk',
+          body: 'Tapak jualan fizikal yang tersusun dan moden di lokasi tumpuan sekitar negeri, membantu anak muda melangkah terus tanpa bebanan kos premis awal yang tinggi.',
+        },
+        {
+          num: '02',
+          title: 'Bimbingan & Perkongsian Amali',
+          body: 'Sesi perkongsian santai serta bimbingan praktikal bersama pengamal berpengalaman untuk membantu anda mengurus operasi harian, membina jenama, dan memahami pelanggan dengan lebih yakin.',
+        },
+        {
+          num: '03',
+          title: 'Sokongan Urusan Perniagaan',
+          body: 'Himpunan panduan ringkas yang teratur supaya perniagaan baharu dapat bermula secara sah, kemas, dan diyakini oleh pelanggan setempat mahupun luar.',
+        },
+        {
+          num: '04',
+          title: 'Laluan Sokongan & Perkembangan',
+          body: 'Maklumat peluang pembiayaan dan sokongan komuniti dihimpunkan di satu tempat bersama gambaran kemajuan yang mudah difahami pada setiap peringkat pertumbuhan.',
+        },
+      ]
+    : [
+        {
+          num: '01',
+          title: 'Welcoming Retail Spaces',
+          body: 'Thoughtfully prepared physical booths across key community hubs, helping young entrepreneurs open their doors without heavy upfront property commitments.',
+        },
+        {
+          num: '02',
+          title: 'Practical Guidance & Shared Craft',
+          body: 'Approachable workshops and one-on-one sharing sessions that build everyday confidence in storytelling, customer connection, and sustainable operations.',
+        },
+        {
+          num: '03',
+          title: 'Clear Foundations for New Ventures',
+          body: 'Step-by-step guidance organized in plain language so emerging businesses can establish clean, trustworthy operations right from day one.',
+        },
+        {
+          num: '04',
+          title: 'Support Pathways & Steady Growth',
+          body: 'Financial support opportunities and simple progress reflections gathered in one calm space, helping founders make steady decisions as they grow.',
+        },
+      ];
+
+  // Pick 3 showcase kiosk slots cleanly
+  const displaySlots = (() => {
+    const av = slots.filter(slot => slot.status === 'available');
+    const fallbackAvailable = INITIAL_CAPSULE_SLOTS.filter(s => s.status === 'available');
+    const combined = [...av, ...fallbackAvailable.filter(f => !av.some(a => a.id === f.id))];
+    return (combined.length >= 3 ? combined : slots).slice(0, 3);
+  })();
+
+  const leadSlot = displaySlots[0];
+  const secondarySlots = displaySlots.slice(1, 3);
+
+  // Local theme token classes matching Soft Warm Obsidian-Emerald+Gold vs Warm Ivory+Emerald
+  const surfaceTextPrimary = isEditorialDark ? 'text-[#F4F1EA]' : 'text-[#16221D]';
+  const surfaceTextMuted = isEditorialDark ? 'text-[#B8B4AA]' : 'text-[#4F5A55]';
+  const hairlineBorder = isEditorialDark ? 'border-[#E5B85C]/15' : 'border-[#0B6E52]/14';
+  const hairlineBorderStrong = isEditorialDark ? 'border-[#E5B85C]/25' : 'border-[#0B6E52]/22';
+  const cardSurface = isEditorialDark
+    ? 'bg-[#17201D]/85 border border-[#E5B85C]/16 hover:border-emerald-400/45'
+    : 'bg-white/90 border border-[#0B6E52]/14 hover:border-[#0B6E52]/40 shadow-[0_6px_24px_-12px_rgba(16,42,33,0.12)]';
+  const softAccentWash = isEditorialDark
+    ? 'bg-gradient-to-br from-[#162922]/90 via-[#151F1C]/90 to-[#272115]/85'
+    : 'bg-gradient-to-br from-[#EDF5F1] via-[#F7F4EC] to-[#F5EBD6]';
 
   return (
-    <div id="kbelia-landing-root" className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-black dark:text-white flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white transition-colors duration-200">
-      
-      {/* 2. LANDING NAVBAR */}
-      <header className="sticky top-0 z-40 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-md border-b border-slate-300 dark:border-zinc-600 shadow-xs transition-colors">
-        <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
-          
-          {/* Logo & Identity */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-xs dark:bg-blue-600 kbelia-ambient-sheen">
-              <span className="relative z-10">KB</span>
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-base font-extrabold tracking-tight text-black dark:text-white">KBelia</span>
-              </div>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 font-normal hidden sm:block">
-                {isBM ? 'Portal Usahawan & Kiosk Belia Kelantan' : 'Kelantan Youth Entrepreneurship & Capsule Kiosks'}
-              </p>
-            </div>
-          </div>
+    <div
+      id="kbelia-landing-root"
+      className={`min-h-screen flex flex-col font-editorial antialiased transition-colors duration-300 ${
+        isEditorialDark ? 'kbelia-editorial-dark' : 'kbelia-editorial-light'
+      } selection:bg-emerald-600 selection:text-white`}
+    >
+      {/* ================================================================= */}
+      {/* 1. CLEAN 3-ZONE EDITORIAL TOP BAR                                 */}
+      {/* ================================================================= */}
+      <header
+        className={`sticky top-0 z-40 h-16 backdrop-blur-md border-b transition-colors duration-300 ${
+          isEditorialDark
+            ? 'bg-[#101614]/88 border-[#E5B85C]/15'
+            : 'bg-[#F7F5F0]/90 border-[#0B6E52]/15'
+        }`}
+      >
+        <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12 h-full flex items-center justify-between gap-8">
+          {/* Zone 1: Single Official Brand Lockup */}
+          <a
+            href="#hero"
+            className="whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg"
+            aria-label="KBelia Kelantan"
+          >
+            <KBeliaLogo size="md" tone={isEditorialDark ? 'onDark' : 'onLight'} />
+          </a>
 
-          {/* Quick Nav Anchors to Landing Sections */}
-          <nav className="hidden lg:flex items-center gap-6 text-sm font-bold text-black dark:text-white">
-            <a href="#hero" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Utama' : 'Home'}</a>
-            <a href="#kiosk" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Kiosk Modular' : 'Modular Kiosks'}</a>
-            <a href="#direktori" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Direktori Usahawan' : 'Directory'}</a>
-            <a href="#inisiatif" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">{isBM ? 'Inisiatif Teras' : 'Initiatives'}</a>
+          {/* Zone 2: Concise Single-Line Text Links */}
+          <nav
+            aria-label={isBM ? 'Navigasi utama' : 'Primary navigation'}
+            className={`hidden md:flex items-center gap-7 text-sm font-medium ${surfaceTextMuted}`}
+          >
+            <a
+              href="#hero"
+              className={`whitespace-nowrap shrink-0 hover:underline underline-offset-4 transition-colors ${
+                isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+              }`}
+            >
+              {isBM ? 'Utama' : 'Home'}
+            </a>
+            <a
+              href="#inisiatif"
+              className={`whitespace-nowrap shrink-0 hover:underline underline-offset-4 transition-colors ${
+                isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+              }`}
+            >
+              {isBM ? 'Pendekatan' : 'Approach'}
+            </a>
+            <a
+              href="#kiosk"
+              className={`whitespace-nowrap shrink-0 hover:underline underline-offset-4 transition-colors ${
+                isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+              }`}
+            >
+              {isBM ? 'Ruang Niaga' : 'Spaces'}
+            </a>
+            <a
+              href="#direktori"
+              className={`whitespace-nowrap shrink-0 hover:underline underline-offset-4 transition-colors ${
+                isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+              }`}
+            >
+              {isBM ? 'Karya Belia' : 'Creators'}
+            </a>
           </nav>
 
-          {/* Actions: Mod Gelap/Cerah, Penukar Bahasa (BM|EN), Butang Daftar, Butang Log Masuk */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
-            
-            {/* Animated Theme Switcher */}
+          {/* Zone 3: Theme Switcher, Language Switch & Primary Action */}
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
               id="landing-darkmode-toggle"
               type="button"
-              onClick={toggleTheme}
-              className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 transition-all duration-300 cursor-pointer shadow-2xs group focus:outline-none interactive-press hover:scale-105 active:scale-95"
-              title={isDark ? (isBM ? "Tukar ke Mod Cerah" : "Switch to Light Mode") : (isBM ? "Tukar ke Mod Gelap" : "Switch to Dark Mode")}
-              aria-label="Tukar tema sistem"
+              onClick={toggleEditorialTone}
+              className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                isEditorialDark
+                  ? 'bg-[#18221F] border-[#E5B85C]/20 text-[#E5B85C] hover:bg-[#1F2C28]'
+                  : 'bg-white border-[#0B6E52]/20 text-[#0B6E52] hover:bg-[#EDF5F1]'
+              }`}
+              title={
+                isEditorialDark
+                  ? isBM
+                    ? 'Tukar ke Suasana Cerah Hangat'
+                    : 'Switch to Warm Ivory'
+                  : isBM
+                    ? 'Tukar ke Suasana Gelap Lembut'
+                    : 'Switch to Soft Charcoal'
+              }
+              aria-label={isBM ? 'Tukar suasana warna' : 'Switch color mood'}
             >
-              <div className="relative w-5 h-5 flex items-center justify-center overflow-hidden">
-                <Sun
-                  className={`w-4 h-4 text-black dark:text-white absolute transition-all duration-500 ease-out transform ${
-                    isDark 
-                      ? 'rotate-90 scale-0 opacity-0 pointer-events-none' 
-                      : 'rotate-0 scale-100 opacity-100'
-                  }`}
-                />
-                <Moon
-                  className={`w-4 h-4 text-black/70 dark:text-white/75 absolute transition-all duration-500 ease-out transform ${
-                    isDark 
-                      ? 'rotate-0 scale-100 opacity-100' 
-                      : '-rotate-90 scale-0 opacity-0 pointer-events-none'
-                  }`}
-                />
-              </div>
-              <span className="sr-only">{isDark ? 'Mod Gelap Aktif' : 'Mod Cerah Aktif'}</span>
+              {isEditorialDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            {/* Penukar Bahasa Global */}
-            <div className="flex items-center bg-slate-50 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-300 dark:border-slate-600 text-[0.8125rem] font-bold">
+            <div
+              className={`flex items-center p-0.5 rounded-lg border text-xs font-semibold shrink-0 ${
+                isEditorialDark
+                  ? 'bg-[#18221F] border-[#E5B85C]/20'
+                  : 'bg-white border-[#0B6E52]/20'
+              }`}
+            >
               <button
                 type="button"
                 onClick={() => setLanguage('ms')}
-                className={`px-2 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
-                  isBM ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600' : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
+                className={`px-2.5 py-1.5 rounded-md transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  isBM
+                    ? 'bg-emerald-700 text-white'
+                    : `${surfaceTextMuted} ${isEditorialDark ? 'hover:text-white' : 'hover:text-slate-900'}`
                 }`}
-                title="Bahasa Melayu (Rasmi)"
               >
                 BM
               </button>
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`px-2 py-1 rounded transition-all duration-150 active:scale-95 cursor-pointer ${
-                  !isBM ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600' : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
+                className={`px-2.5 py-1.5 rounded-md transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  !isBM
+                    ? 'bg-emerald-700 text-white'
+                    : `${surfaceTextMuted} ${isEditorialDark ? 'hover:text-white' : 'hover:text-slate-900'}`
                 }`}
-                title="English (International)"
               >
                 EN
               </button>
             </div>
 
-            {/* Butang Daftar */}
-            <button
-              type="button"
-              id="landing-register-nav-btn"
-              onClick={() => navigateToPage('register')}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 text-sm font-bold transition-all cursor-pointer interactive-press interactive-lift group"
-            >
-              <Users className="w-3.5 h-3.5 text-black dark:text-white/75 transition-transform duration-200 group-hover:scale-110" />
-              <span>{isBM ? 'Daftar' : 'Register'}</span>
-            </button>
-
-            {/* Butang Log Masuk */}
             <button
               type="button"
               id="landing-login-btn"
               onClick={() => navigateToPage('login')}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-all cursor-pointer interactive-press interactive-lift group dark:bg-blue-600 kbelia-ambient-sheen"
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                isEditorialDark
+                  ? 'bg-emerald-700 hover:bg-emerald-600 text-[#F4F1EA]'
+                  : 'bg-[#0B6E52] hover:bg-[#085640] text-white'
+              }`}
             >
-              <LogIn className="relative z-10 w-3.5 h-3.5 text-white transition-transform duration-200 group-hover:translate-x-0.5" />
-              <span className="relative z-10">{isBM ? 'Log Masuk' : 'Log In'}</span>
+              <LogIn className="w-3.5 h-3.5" />
+              <span>{isBM ? 'Log Masuk' : 'Sign In'}</span>
             </button>
           </div>
-
         </div>
       </header>
 
-      {/* 3. HERO SECTION & CAROUSEL VISUAL (Important Header: Top-Left Soft Sky Glow + Grid & Ambient Orbs) */}
-      <section id="hero" className="kbelia-important-header relative overflow-hidden pt-10 pb-14 sm:pt-16 sm:pb-20 border-b border-slate-300 dark:border-zinc-600 text-black dark:text-white transition-colors">
-        {/* Subtle SVG Grid, Ambient Radial Orbs & Diagonal Sheen */}
-        <div className="absolute -inset-8 bg-grid-pattern animate-ambient-grid opacity-80 pointer-events-none" aria-hidden="true" />
-        <div className="kbelia-ambient-sheen absolute inset-0 pointer-events-none" aria-hidden="true" />
-        <div className="absolute -top-24 left-1/4 w-96 h-96 bg-blue-500/14 dark:bg-blue-500/12 rounded-full blur-3xl pointer-events-none animate-ambient-orb-a" aria-hidden="true" />
-        <div className="absolute bottom-12 right-1/4 w-80 h-80 bg-indigo-500/12 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none animate-ambient-orb-b" aria-hidden="true" />
+      {/* ================================================================= */}
+      {/* 2. ASYMMETRICAL EDITORIAL HERO                                    */}
+      {/* ================================================================= */}
+      <section id="hero" className={`relative pt-10 pb-14 sm:pt-14 sm:pb-20 border-b ${hairlineBorder}`}>
+        <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            {/* Left Editorial Narrative (5 columns) */}
+            <div className="lg:col-span-5 space-y-6">
+              <p className={`text-xs sm:text-sm font-semibold tracking-wide ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
+                {isBM
+                  ? 'Kelantan Darul Naim · Komuniti & Keusahawanan Belia'
+                  : 'Kelantan · Youth Craft, Trade & Community'}
+              </p>
 
-        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 text-center space-y-6">
-          
-          {/* Headline & Subhead */}
-          <div className="max-w-4xl mx-auto space-y-4 animate-fade-in">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-black dark:text-white leading-[1.12] text-balance">
-              {isBM ? (
-                <>
-                  Platform Bersepadu{' '}
-                  <span className="kbelia-title-shimmer">Usahawan Belia Kelantan</span>
-                </>
-              ) : (
-                <>
-                  Integrated Kelantan{' '}
-                  <span className="kbelia-title-shimmer">Youth Entrepreneurship Platform</span>
-                </>
-              )}
-            </h1>
-            <p className="text-base sm:text-lg text-black dark:text-white font-normal leading-relaxed max-w-2xl mx-auto">
-              {isBM
-                ? 'Sewa kiosk modular, pamerkan produk di direktori negeri, dan mohon geran dalam satu portal rasmi.'
-                : 'Rent modular kiosks across Kelantan, list products in the state directory, and apply for grants in one portal.'}
-            </p>
-          </div>
-
-          {/* ========================================================================= */}
-          {/* PAMERAN GAMBAR BERGERAK AUTOMATIK (HERO CAROUSEL WITH AUTO-SLIDE) */}
-          {/* ========================================================================= */}
-          <div 
-            id="sorotan-gambar"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            className="pt-4 w-full mx-auto text-left relative"
-          >
-            {/* Carousel Frame Card */}
-            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-300 dark:border-slate-600 bg-slate-950 text-white group">
-              
-              {/* Background Slide Image with Fade Animation */}
-              <div className="relative h-[420px] sm:h-[520px] lg:h-[560px] w-full overflow-hidden">
-                {heroSlides.map((slide, index) => (
-                  <div
-                    key={slide.id}
-                    className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                      index === currentSlide ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0 pointer-events-none'
-                    }`}
-                  >
-                    <img 
-                      src={slide.imageUrl} 
-                      alt={slide.title}
-                      className={`w-full h-full object-cover object-center ${index === currentSlide ? 'animate-hero-ken-burns' : ''}`}
-                    />
-                    {/* Deep gradient overlay for extreme text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/65 to-slate-900/30" />
-                  </div>
-                ))}
-              </div>
-
-              {/* Top Controls Bar within Slide */}
-              <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-auto">
-                <div className="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-white/15 text-[0.8125rem]">
-                  <span className="px-2 py-0.5 rounded font-bold text-[0.8125rem] bg-blue-600 text-white border border-blue-400/40">
-                    {activeSlideData.badge}
-                  </span>
-                  <span className="text-white/40 text-[0.8125rem] hidden sm:inline">·</span>
-                  <span className="text-white/90 font-bold text-[0.8125rem] flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {activeSlideData.location}
-                  </span>
-                </div>
-              </div>
-
-              {/* Prev / Next Arrow Navigation */}
-              <button
-                type="button"
-                onClick={handlePrevSlide}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-slate-900/75 hover:bg-slate-900 text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-md"
-                title="Gambar Sebelum"
+              <h1
+                className={`font-display font-bold tracking-tight leading-[1.08] text-balance ${surfaceTextPrimary}`}
+                style={{ fontSize: 'clamp(2.25rem, 4vw, 3.65rem)' }}
               >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
+                {isBM
+                  ? 'Ruang Nyata Untuk Generasi Niaga Belia Kelantan'
+                  : 'A Living Ground for Young Kelantan Entrepreneurs'}
+              </h1>
 
-              <button
-                type="button"
-                onClick={handleNextSlide}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-slate-900/75 hover:bg-slate-900 text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer shadow-md"
-                title="Gambar Seterusnya"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+              <p className={`text-base sm:text-[1.0625rem] leading-relaxed max-w-xl ${surfaceTextMuted}`}>
+                {isBM
+                  ? 'Dari tapak jualan fizikal hingga ke jaringan bimbingan komuniti, kami menghimpunkan keperluan asas agar anak muda lebih berani melangkah dalam dunia perniagaan.'
+                  : 'From welcoming physical storefronts to shared community guidance, we bring together everyday essentials so young founders can take their first step with confidence.'}
+              </p>
 
-              {/* Bottom Content Overlay for Current Slide */}
-              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 z-20 space-y-3">
-                <div className="max-w-2xl space-y-1.5">
-                  <div className="text-white/90 text-[0.8125rem] font-bold uppercase tracking-wider">
-                    {activeSlideData.subtitle}
-                  </div>
-                  <h3 className="text-xl sm:text-3xl font-extrabold text-white leading-tight">
-                    {activeSlideData.title}
-                  </h3>
-                  <p className="text-[0.9375rem] text-white line-clamp-2 leading-relaxed">
-                    {activeSlideData.description}
-                  </p>
-                </div>
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <button
+                  type="button"
+                  id="landing-register-nav-btn"
+                  onClick={() => navigateToPage('register')}
+                  className={`inline-flex items-center gap-2.5 px-6 py-3 rounded-lg text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 interactive-press ${
+                    isEditorialDark
+                      ? 'bg-[#E5B85C] hover:bg-[#EDC878] text-[#111916]'
+                      : 'bg-[#0B6E52] hover:bg-[#085640] text-white'
+                  }`}
+                >
+                  <span>{isBM ? 'Mulakan Langkah' : 'Get Started'}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
 
-                {/* Actions & Interactive Slide Selectors */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1 border-t border-white/15">
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={activeSlideData.onAction}
-                      className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition-colors flex items-center gap-2 cursor-pointer active:scale-98 dark:bg-blue-600 dark:hover:bg-blue-500"
-                    >
-                      <span>{activeSlideData.ctaText}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  {/* Dot / Slide Selectors */}
-                  <div className="flex items-center gap-2">
-                    {heroSlides.map((slide, i) => (
-                      <button
-                        key={slide.id}
-                        type="button"
-                        onClick={() => setCurrentSlide(i)}
-                        className={`transition-all duration-300 h-2 rounded-full cursor-pointer hover:scale-105 active:scale-95 ${
-                          i === currentSlide 
-                            ? 'w-8 bg-amber-400 shadow-xs' 
-                            : 'w-2 bg-white/40 hover:bg-white'
-                        }`}
-                        title={`Slide ${i + 1}: ${slide.title}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-
+                <a
+                  href="#kiosk"
+                  className={`inline-flex items-center gap-1.5 px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-4 ${surfaceTextPrimary}`}
+                >
+                  <span>{isBM ? 'Terokai Ruang Niaga' : 'Browse Spaces'}</span>
+                  <ChevronRight className="w-4 h-4" />
+                </a>
               </div>
 
-              {/* Progress Line Indicator at bottom edge */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-30">
-                <div 
-                  className="h-full bg-blue-600 transition-all duration-500 dark:bg-blue-600"
-                  style={{ width: `${((currentSlide + 1) / heroSlides.length) * 100}%` }}
-                />
+              {/* Clean Typographic Context Strip (Unboxed) */}
+              <div className={`pt-6 border-t ${hairlineBorder} flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm ${surfaceTextMuted}`}>
+                <span>{isBM ? 'Rangkaian Seluruh Negeri Kelantan' : 'Statewide Network Across Kelantan'}</span>
+                <span aria-hidden="true">·</span>
+                <span>{isBM ? 'Tapak Fizikal & Komuniti' : 'Physical & Community Spaces'}</span>
+                <span aria-hidden="true">·</span>
+                <span>{isBM ? 'Sokongan Berterusan' : 'Ongoing Guidance'}</span>
               </div>
-
             </div>
 
-          </div>
+            {/* Right Full-Bleed Visual Showcase Carousel (7 columns) */}
+            <div
+              className="lg:col-span-7"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              <div
+                className={`relative rounded-2xl overflow-hidden border ${hairlineBorderStrong} shadow-2xl group`}
+              >
+                <div className="relative aspect-[16/11] sm:aspect-[16/10] w-full overflow-hidden bg-[#15201C]">
+                  {heroSlides.map((slide, index) => (
+                    <div
+                      key={slide.id}
+                      className={`absolute inset-0 transition-opacity duration-700 ease-out ${
+                        index === currentSlide
+                          ? 'opacity-100 z-10'
+                          : 'opacity-0 z-0 pointer-events-none'
+                      }`}
+                    >
+                      {!failedImages[`hero-${slide.id}`] ? (
+                        <img
+                          src={slide.imageUrl}
+                          alt={slide.title}
+                          referrerPolicy="no-referrer"
+                          onError={() => markImageFailed(`hero-${slide.id}`)}
+                          className={`w-full h-full object-cover object-center ${
+                            index === currentSlide ? 'animate-hero-ken-burns' : ''
+                          }`}
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-[#14362B] via-[#1C2A24] to-[#3B2E17] flex items-center justify-center p-8 text-[#F4F1EA]">
+                          <div className="text-center space-y-2">
+                            <KBeliaLogo size="xl" tone="onDark" />
+                            <p className="text-sm text-[#C2BDB2]">{slide.title}</p>
+                          </div>
+                        </div>
+                      )}
+                      {/* Measured contrast scrim */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0B100E]/92 via-[#0B100E]/35 to-transparent" />
+                    </div>
+                  ))}
+                </div>
 
+                {/* Prev / Next Clean Controls */}
+                <button
+                  type="button"
+                  onClick={() => setCurrentSlide(prev => (prev - 1 + heroSlides.length) % heroSlides.length)}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#101614]/75 hover:bg-[#101614] text-[#F4F1EA] flex items-center justify-center border border-white/20 transition-opacity opacity-85 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer"
+                  aria-label={isBM ? 'Gambar sebelumnya' : 'Previous photo'}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentSlide(prev => (prev + 1) % heroSlides.length)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#101614]/75 hover:bg-[#101614] text-[#F4F1EA] flex items-center justify-center border border-white/20 transition-opacity opacity-85 sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer"
+                  aria-label={isBM ? 'Gambar seterusnya' : 'Next photo'}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+
+                {/* Caption & Slide Controls */}
+                <div className="absolute bottom-0 inset-x-0 z-20 p-5 sm:p-7 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                  <div className="space-y-1.5 max-w-lg">
+                    <p className="text-xs font-medium text-[#E5B85C]">{activeSlide.location}</p>
+                    <h2 className="font-display text-xl sm:text-2xl font-bold text-[#F4F1EA] leading-snug">
+                      {activeSlide.title}
+                    </h2>
+                    <p className="text-sm text-[#D6D2C9] line-clamp-2 leading-relaxed">
+                      {activeSlide.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4 shrink-0">
+                    <button
+                      type="button"
+                      onClick={activeSlide.onAction}
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#F4F1EA] hover:text-[#E5B85C] transition-colors cursor-pointer whitespace-nowrap"
+                    >
+                      <span>{activeSlide.ctaText}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      {heroSlides.map((slide, idx) => (
+                        <button
+                          key={slide.id}
+                          type="button"
+                          onClick={() => setCurrentSlide(idx)}
+                          aria-label={`${idx + 1}: ${slide.title}`}
+                          className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                            idx === currentSlide
+                              ? 'w-7 bg-[#E5B85C]'
+                              : 'w-2 bg-white/40 hover:bg-white/75'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 3B. REEL GAMBAR BERGERAK BERTERUSAN (CONTINUOUS HORIZONTAL MARQUEE TICKER) */}
-      {/* ========================================================================= */}
-      <section className="py-6 bg-white dark:bg-zinc-900 text-black dark:text-white overflow-hidden border-b border-slate-300 dark:border-zinc-600 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ShoppingBag className="w-4 h-4 text-black dark:text-white/75" />
-            <h3 className="text-sm sm:text-[0.9375rem] font-bold tracking-wide uppercase text-black dark:text-white">
-              Galeri Kiosk & Produk Tempatan
-            </h3>
+      {/* ================================================================= */}
+      {/* 3. FLOWING COMMUNITY PHOTOGRAPHY RIBBON                           */}
+      {/* ================================================================= */}
+      <section className={`py-8 overflow-hidden border-b ${hairlineBorder}`}>
+        <div className="max-w-[1380px] mx-auto px-4 sm:px-8 lg:px-12 mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold">
+            <Camera className={`w-4 h-4 ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#0B6E52]'}`} />
+            <span className={surfaceTextPrimary}>
+              {isBM ? 'Wajah & Suasana Komuniti Niaga Tempatan' : 'Moments From Our Local Makers'}
+            </span>
           </div>
+          <span className={`text-xs hidden sm:inline ${surfaceTextMuted}`}>
+            {isBM ? 'Klik mana-mana sorotan untuk masuk ke portal' : 'Select any highlight to enter the portal'}
+          </span>
         </div>
 
-        {/* Marquee Track Container */}
-        <div className="relative w-full overflow-hidden mask-[linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
-          <div className="animate-marquee-left flex gap-4 pr-4 py-2">
-            {/* Duplicated for seamless infinite looping across wide viewports */}
-            {[...movingPhotoCards, ...movingPhotoCards, ...movingPhotoCards, ...movingPhotoCards].map((card, idx) => (
-              <div
-                key={`marquee-${idx}`}
+        <div className="relative w-full overflow-hidden mask-[linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+          <div className="animate-marquee-left flex gap-5 pr-5 py-1">
+            {[...galleryRibbon, ...galleryRibbon].map((item, idx) => (
+              <button
+                type="button"
+                key={`${item.id}-${idx}`}
                 onClick={() => {
                   if (!user) {
                     requireBeliaLogin(
                       isBM
-                        ? 'Sila log masuk akaun Belia Kelantan untuk meneroka kiosk dan direktori produk usahawan.'
-                        : 'Please sign in with a Belia account to access the full kiosk and entrepreneur product directory.'
+                        ? 'Sila log masuk untuk melihat direktori penuh usahawan dan lokasi kiosk.'
+                        : 'Please sign in to explore the full community directory and kiosk locations.'
                     );
                     return;
                   }
-                  if (card.title.includes('Kiosk') || card.title.includes('Kapsul')) {
-                    navigateToPage('academic');
-                  } else {
-                    navigateToPage('hepa');
-                  }
+                  navigateToPage(item.target);
                 }}
-                className="w-64 sm:w-72 shrink-0 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:border-blue-400/70 rounded-xl overflow-hidden transition-colors cursor-pointer shadow-2xs group"
+                className="w-64 sm:w-72 shrink-0 text-left group cursor-pointer focus-visible:outline-none"
               >
-                <div className="relative h-36 overflow-hidden">
-                  <img
-                    src={card.img}
-                    alt={card.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur px-2 py-0.5 rounded text-[0.8125rem] font-bold text-white border border-white/10 flex items-center gap-1">
-                    <MapPin className="w-2.5 h-2.5 text-white" />
-                    <span>{card.location}</span>
-                  </div>
-                  {card.tag && (
-                    <div className="absolute top-2 right-2">
-                      <span className={`px-2 py-0.5 rounded text-[0.8125rem] font-bold border shadow-xs ${card.tagColor}`}>
-                        {card.tag}
-                      </span>
-                    </div>
+                <div className={`relative aspect-[16/10] rounded-xl overflow-hidden border ${hairlineBorder} bg-[#18211E]`}>
+                  {!failedImages[`rib-${item.id}`] ? (
+                    <img
+                      src={item.img}
+                      alt={item.title}
+                      referrerPolicy="no-referrer"
+                      onError={() => markImageFailed(`rib-${item.id}`)}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-900/60 to-amber-900/40" />
                   )}
-                  <div className="absolute bottom-2 left-2 bg-slate-900/75 backdrop-blur px-1.5 py-0.5 rounded text-[0.8125rem] font-mono font-bold text-white/85 uppercase">
-                    {card.type}
+                </div>
+                <div className="pt-2.5 px-0.5 space-y-0.5">
+                  <div className={`text-xs ${surfaceTextMuted}`}>{item.meta}</div>
+                  <div className={`text-sm font-semibold truncate ${surfaceTextPrimary} group-hover:underline underline-offset-4`}>
+                    {item.title}
                   </div>
                 </div>
-
-                <div className="p-3 space-y-1">
-                  <h4 className="text-sm font-bold text-black dark:text-white truncate group-hover:text-black dark:group-hover:text-white transition-colors">
-                    {card.title}
-                  </h4>
-                  <p className="text-[0.875rem] text-black/70 dark:text-white truncate">
-                    {card.subtitle}
-                  </p>
-                </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 4. PROBLEM VS SOLUTION (CHECKLIST ITEM 4) */}
-      {/* ========================================================================= */}
-      <section id="masalah-solusi" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
-        <div className="absolute inset-0 bg-dot-pattern opacity-45 pointer-events-none" aria-hidden="true" />
-        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <RevealBlock className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
-            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-              <Layers className="w-3.5 h-3.5" />
-              <span>Cabaran & Penyelesaian</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-              Cabaran Lazim vs. Solusi KBelia
-            </h2>
-            <p className="text-[0.9375rem] text-black dark:text-white/75">
-              Menangani halangan utama usahawan muda Kelantan memulakan operasi perniagaan.
-            </p>
-          </RevealBlock>
+      {/* ================================================================= */}
+      {/* 4. ASYMMETRICAL ECOSYSTEM NARRATIVE (REPLACES RIGID BOX GRIDS)     */}
+      {/* ================================================================= */}
+      <section id="inisiatif" className={`py-16 sm:py-24 border-b ${hairlineBorder}`}>
+        <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+            {/* Left Lead Story Column (5 columns) */}
+            <RevealBlock className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
+              <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
+                {isBM ? 'Pendekatan KBelia' : 'The KBelia Approach'}
+              </p>
 
-          <RevealBlock delayMs={80} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            
-            {/* Column 1: Cabaran Tradisional */}
-            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-7 sm:p-8 rounded-2xl bg-rose-50/50 dark:bg-rose-950/15 border border-rose-200/80 dark:border-rose-900/50 space-y-5">
-              <div className="flex items-center gap-3 pb-3 border-b border-rose-200/80 dark:border-rose-900/50">
-                <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-black dark:text-white flex items-center justify-center font-bold">
-                  <XCircle className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-base text-black dark:text-white">Cabaran Lazim Belia</h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white/75 font-medium">Kekangan memulakan operasi tradisional</p>
-                </div>
-              </div>
-
-              <ul className="space-y-4 text-sm sm:text-[0.9375rem] text-black dark:text-white">
-                <li className="flex items-start gap-3">
-                  <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Sewa Premis Tinggi</span>
-                    <span className="text-black/70 dark:text-white/75 text-sm">Deposit 3+1 bulan dan sewa ribuan ringgit membebankan modal awal.</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Prosedur SSM & Lesen PBT</span>
-                    <span className="text-black/70 dark:text-white/75 text-sm">Ketiadaan panduan berpusat melambatkan pendaftaran syarikat dan lesen.</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Capaian Pasaran Terhad</span>
-                    <span className="text-black/70 dark:text-white/75 text-sm">Sukar menembusi pasaran luar jajahan tanpa direktori rasmi.</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Kekurangan Bimbingan Mentor</span>
-                    <span className="text-black/70 dark:text-white/75 text-sm">Beroperasi tanpa nasihat mentor berpengalaman meningkatkan risiko kegagalan.</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <XCircle className="w-4 h-4 text-black/70 dark:text-white/75 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Maklumat Geran Tersebar</span>
-                    <span className="text-black/70 dark:text-white/75 text-sm">Info geran sukar dicapai dan semakan status memakan masa lama.</span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 2: Solusi Pintar KBelia */}
-            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-7 sm:p-8 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/15 border border-emerald-200/80 dark:border-emerald-900/50 space-y-5">
-              <div className="flex items-center gap-3 pb-3 border-b border-emerald-200/80 dark:border-emerald-900/50">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-black dark:text-white flex items-center justify-center font-bold">
-                  <CheckCircle2 className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-base text-black dark:text-white">Solusi Bersepadu KBelia</h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white/75 font-medium">Ekosistem keusahawanan negeri</p>
-                </div>
-              </div>
-
-              <ul className="space-y-4 text-sm sm:text-[0.9375rem] text-black dark:text-white">
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Kiosk Modular Bersubsidi</span>
-                    <span className="text-black dark:text-white text-sm">Sewa RM12–RM25/hari di zon strategik lengkap elektrik 13A dan Wi-Fi.</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Panduan SSM & Lesen</span>
-                    <span className="text-black dark:text-white text-sm">Rujukan tersusun bagi pendaftaran SSM, sijil Halal, dan lesen PBT.</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Direktori Produk Belia</span>
-                    <span className="text-black dark:text-white text-sm">Pamerkan katalog produk kepada rakan usahawan belia, mentor, dan pentadbir di seluruh negeri.</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Hab Mentor & Kemahiran</span>
-                    <span className="text-black dark:text-white text-sm">Padanan mentor industri serta latihan pemasaran digital dan kewangan.</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-black dark:text-white shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-black dark:text-white block">Penjejak Status Geran</span>
-                    <span className="text-black dark:text-white text-sm">Pantau kelulusan Geran Permulaan terus di papan pemuka.</span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-          </RevealBlock>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 5. CIRI-CIRI UTAMA (CORE FEATURES - ASYMMETRIC BENTO GRID) */}
-      {/* ========================================================================= */}
-      <section id="ciri-utama" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 transition-colors">
-        <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" aria-hidden="true" />
-        <div className="absolute top-1/3 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-
-        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <RevealBlock className="text-center max-w-3xl mx-auto space-y-2.5 mb-12">
-            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-              <Zap className="w-3.5 h-3.5" />
-              <span>Modul Utama</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-              5 Ciri Utama Portal KBelia
-            </h2>
-            <p className="text-[0.9375rem] text-black dark:text-white/75">
-              Infrastruktur digital lengkap daripada analitik jualan hingga pematuhan rasmi.
-            </p>
-          </RevealBlock>
-
-          <RevealBlock delayMs={80} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            
-            {/* Feature 1: Business Analytics (Wide Bento Card - col-span-2) */}
-            <div className="lg:col-span-2 kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
-              <div className="space-y-3 max-w-lg relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle">
-                  <TrendingUp className="w-6 h-6" />
-                </div>
-                <h3 className="font-extrabold text-lg text-black dark:text-white">
-                  {isBM ? 'Analitik & Laporan Jualan' : 'Business Analytics & Reporting'}
-                </h3>
-                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-                  {isBM
-                    ? 'Pantau jualan harian, urus inventori produk, dan jana laporan prestasi ringkas untuk semakan pembiaya.'
-                    : 'Track daily sales, manage product inventory, and export concise performance reports.'}
-                </p>
-                <div className="pt-1 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>{isBM ? 'Graf visual & eksport PDF' : 'Visual charts & PDF export'}</span>
-                </div>
-              </div>
-
-              {/* Subtle Decorative Vector SVG Chart Illustration */}
-              <div className="shrink-0 w-full sm:w-48 h-28 rounded-xl bg-blue-50/70 dark:bg-zinc-900 border border-blue-200/70 dark:border-zinc-600 p-3 flex items-end justify-between gap-1.5 pointer-events-none select-none" aria-hidden="true">
-                <svg viewBox="0 0 180 80" className="w-full h-full">
-                  <defs>
-                    <linearGradient id="bentoChartGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#2563EB" stopOpacity="0.35" />
-                      <stop offset="100%" stopColor="#4F46E5" stopOpacity="0.04" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M5,68 L35,52 L65,58 L95,34 L125,38 L155,16 L175,20 L175,78 L5,78 Z" fill="url(#bentoChartGrad)" />
-                  <path d="M5,68 L35,52 L65,58 L95,34 L125,38 L155,16 L175,20" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="95" cy="34" r="3.5" fill="#4F46E5" stroke="#FFFFFF" strokeWidth="1.5" />
-                  <circle cx="155" cy="16" r="4" fill="#10B981" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Feature 2: Funding & Grant Tracker */}
-            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-amber-300 dark:hover:border-amber-500/40 space-y-3 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle-alt">
-                <Award className="w-6 h-6" />
-              </div>
-              <h3 className="font-extrabold text-base text-black dark:text-white">
-                {isBM ? 'Penjejak Geran & Dana' : 'Funding & Grant Tracker'}
-              </h3>
-              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
+              <h2 className={`font-display text-3xl sm:text-4xl font-bold leading-[1.15] text-balance ${surfaceTextPrimary}`}>
                 {isBM
-                  ? 'Akses Dana Pemula Niaga, Geran Digital, serta skim Pembiayaan Mikro untuk usahawan belia.'
-                  : 'Access starter capital funds, Digital Grants, and Micro-Financing schemes for youth entrepreneurs.'}
-              </p>
-              <div className="pt-2 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>{isBM ? 'Semakan status terus' : 'Direct status tracking'}</span>
-              </div>
-            </div>
-
-            {/* Feature 3: Mentorship & Networking */}
-            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 space-y-3 group">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle">
-                <Users className="w-6 h-6" />
-              </div>
-              <h3 className="font-extrabold text-base text-black dark:text-white">
-                {isBM ? 'Hab Mentor & Rangkaian' : 'Mentorship & Networking Hub'}
-              </h3>
-              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-                {isBM
-                  ? 'Padanan bersama mentor industri dan rangkaian kerjasama dengan usahawan belia Kelantan.'
-                  : 'Connect with experienced mentors and build networks across Kelantan youth entrepreneurs.'}
-              </p>
-              <div className="pt-2 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
-                <Video className="w-3.5 h-3.5" />
-                <span>{isBM ? 'Sesi 1-ke-1 & berkumpulan' : '1-on-1 & group coaching'}</span>
-              </div>
-            </div>
-
-            {/* Feature 4: Upskilling & Academy (Wide Bento Card - col-span-2) */}
-            <div className="lg:col-span-2 kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
-              <div className="space-y-3 max-w-lg relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle-alt">
-                  <BookOpen className="w-6 h-6" />
-                </div>
-                <h3 className="font-extrabold text-lg text-black dark:text-white">
-                  {isBM ? 'Akademi Kemahiran Belia' : 'Upskilling & Academy Module'}
-                </h3>
-                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-                  {isBM
-                    ? 'Latihan praktikal TikTok Shop Ads, fotografi produk, penjenamaan, dan asas perakaunan.'
-                    : 'Practical workshops covering TikTok Shop Ads, product photography, branding, and bookkeeping.'}
-                </p>
-                <div className="pt-1 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
-                  <Award className="w-3.5 h-3.5" />
-                  <span>{isBM ? 'Sijil penyertaan rasmi' : 'Official completion certificate'}</span>
-                </div>
-              </div>
-
-              {/* Subtle Decorative Vector SVG Academy Accent */}
-              <div className="shrink-0 w-full sm:w-44 h-24 rounded-xl bg-indigo-50/80 dark:bg-zinc-900 border border-indigo-200/70 dark:border-zinc-600 p-3 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
-                <svg viewBox="0 0 140 70" className="w-full h-full">
-                  <rect x="8" y="12" width="124" height="46" rx="8" fill="none" stroke="#4F46E5" strokeOpacity="0.4" strokeWidth="1.5" strokeDasharray="4 3" />
-                  <rect x="18" y="22" width="36" height="26" rx="5" fill="#4F46E5" fillOpacity="0.16" />
-                  <polygon points="32,29 32,41 42,35" fill="#4F46E5" />
-                  <line x1="64" y1="27" x2="120" y2="27" stroke="#4F46E5" strokeOpacity="0.65" strokeWidth="3" strokeLinecap="round" />
-                  <line x1="64" y1="37" x2="108" y2="37" stroke="#94A3B8" strokeOpacity="0.45" strokeWidth="2.5" strokeLinecap="round" />
-                  <line x1="64" y1="45" x2="96" y2="45" stroke="#94A3B8" strokeOpacity="0.35" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Feature 5: Compliance & SSM Guide */}
-            <div className="kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 space-y-3 group">
-              <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="font-extrabold text-base text-black dark:text-white">
-                {isBM ? 'Panduan Pendaftaran & Lesen' : 'Compliance & Licensing Guide'}
-              </h3>
-              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-                {isBM
-                  ? 'Panduan pendaftaran perniagaan, pematuhan cukai, pensijilan halal, dan pelesenan operasi.'
-                  : 'Interactive guidance for business registration, tax compliance, halal certification, and operating permits.'}
-              </p>
-              <div className="pt-2 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>{isBM ? 'Templat & senarai semak' : 'Templates & checklists'}</span>
-              </div>
-            </div>
-
-            {/* Feature 6: Kiosk Modular IoT Hub (Wide Bento Card - col-span-2) */}
-            <div className="lg:col-span-2 kbelia-glass-card interactive-card relative overflow-hidden p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 flex flex-col sm:flex-row sm:items-center justify-between gap-6 group">
-              <div className="space-y-3 max-w-lg relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center font-bold group-hover:scale-105 transition-transform animate-float-gentle-alt">
-                  <Building2 className="w-6 h-6" />
-                </div>
-                <h3 className="font-extrabold text-lg text-black dark:text-white">
-                  {isBM ? 'Hab Kiosk Modular Pintar' : 'Modular Capsule IoT Hub'}
-                </h3>
-                <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-                  {isBM
-                    ? 'Kunci digital pintar, pemantauan status kiosk dalam talian, dan sokongan teknikal berpusat.'
-                    : 'Smart digital access, live kiosk occupancy tracking, and centralized technical support.'}
-                </p>
-                <div className="pt-1 text-sm font-bold text-black dark:text-white/75 flex items-center gap-1.5">
-                  <Wifi className="w-3.5 h-3.5" />
-                  <span>{isBM ? 'Pengurusan sewaan automatik' : 'Automated lease management'}</span>
-                </div>
-              </div>
-
-              {/* Subtle Decorative Vector SVG Modular Kiosk Node */}
-              <div className="shrink-0 w-full sm:w-44 h-24 rounded-xl bg-emerald-50/70 dark:bg-zinc-900 border border-emerald-200/70 dark:border-zinc-600 p-3 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
-                <svg viewBox="0 0 140 70" className="w-full h-full">
-                  <rect x="20" y="16" width="38" height="38" rx="6" fill="#2563EB" fillOpacity="0.14" stroke="#2563EB" strokeWidth="1.5" />
-                  <rect x="82" y="16" width="38" height="38" rx="6" fill="#10B981" fillOpacity="0.14" stroke="#10B981" strokeWidth="1.5" />
-                  <line x1="58" y1="35" x2="82" y2="35" stroke="#2563EB" strokeWidth="1.8" strokeDasharray="3 3" />
-                  <circle cx="39" cy="35" r="5" fill="#2563EB" stroke="#FFFFFF" strokeWidth="1.5" />
-                  <circle cx="101" cy="35" r="5" fill="#10B981" />
-                </svg>
-              </div>
-            </div>
-
-          </RevealBlock>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 6. LANGKAH BERMULA */}
-      {/* ========================================================================= */}
-      <section className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
-        <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <RevealBlock className="text-center max-w-3xl mx-auto space-y-2.5 mb-14">
-            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>4 Langkah Mudah</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance tracking-tight">
-              Langkah Mula Beroperasi
-            </h2>
-          </RevealBlock>
-
-          <RevealBlock delayMs={80} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-            
-            {/* Step 1 */}
-            <div className="kbelia-glass-card interactive-card p-6 rounded-2xl relative space-y-3 hover:border-blue-400/70 dark:hover:border-blue-400/70">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-teal-600 text-white font-black text-sm flex items-center justify-center shadow-xs dark:bg-teal-600">
-                  1
-                </div>
-                <UserCheck className="w-5 h-5 text-black/70 dark:text-white/75" />
-              </div>
-              <h4 className="font-extrabold text-lg text-black dark:text-white tracking-tight">Daftar Akaun</h4>
-              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
-                Cipta akaun percuma dengan emel atau Google untuk akses portal belia Kelantan.
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="kbelia-glass-card interactive-card p-6 rounded-2xl relative space-y-3 hover:border-blue-400/70 dark:hover:border-blue-400/70">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-xs dark:bg-blue-600">
-                  2
-                </div>
-                <Briefcase className="w-5 h-5 text-black/70 dark:text-white/75" />
-              </div>
-              <h4 className="font-extrabold text-lg text-black dark:text-white tracking-tight">Lengkapkan Profil</h4>
-              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
-                Isi maklumat kedai, muat naik katalog produk, logo jenama, dan pautan WhatsApp.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="kbelia-glass-card interactive-card p-6 rounded-2xl relative space-y-3 hover:border-amber-300 dark:hover:border-amber-500/40">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-amber-500 text-white font-black text-sm flex items-center justify-center shadow-xs">
-                  3
-                </div>
-                <Building2 className="w-5 h-5 text-black/70 dark:text-white/75" />
-              </div>
-              <h4 className="font-extrabold text-lg text-black dark:text-white tracking-tight">Pilih Kiosk & Geran</h4>
-              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
-                Tempah slot kiosk bersubsidi di daerah anda atau mohon Geran Permulaan.
-              </p>
-            </div>
-
-            {/* Step 4 */}
-            <div className="kbelia-glass-card interactive-card p-6 rounded-2xl relative space-y-3 hover:border-emerald-300 dark:hover:border-emerald-500/40">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-xs dark:bg-indigo-600">
-                  4
-                </div>
-                <TrendingUp className="w-5 h-5 text-black/70 dark:text-white/75" />
-              </div>
-              <h4 className="font-extrabold text-lg text-black dark:text-white tracking-tight">Tingkatkan Prestasi</h4>
-              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
-                Terima bimbingan mentor, pantau jualan harian, dan luaskan jaringan rakan niaga belia.
-              </p>
-            </div>
-
-          </RevealBlock>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 7. TIGA INISIATIF TERAS */}
-      {/* ========================================================================= */}
-      <section id="inisiatif" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 text-black dark:text-white transition-colors">
-        <div className="absolute inset-0 bg-dot-pattern opacity-40 pointer-events-none" aria-hidden="true" />
-        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          
-          <RevealBlock className="text-center max-w-2xl mx-auto space-y-2.5 mb-12">
-            <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-              <Shield className="w-3.5 h-3.5" />
-              <span>{isBM ? 'Inisiatif Negeri' : 'State Pillars'}</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-              {isBM ? 'Teras Ekosistem KBelia' : 'KBelia Ecosystem Pillars'}
-            </h2>
-            <p className="text-[0.9375rem] text-black dark:text-white/75">
-              {isBM 
-                ? 'Menangani keperluan tapak operasi, pemasaran digital, dan bimbingan.'
-                : 'Designed to lower retail overhead, boost digital reach, and provide mentorship.'}
-            </p>
-          </RevealBlock>
-
-          <RevealBlock delayMs={80} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {/* Pillar 1: Kiosk Modular */}
-            <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all duration-300 space-y-4 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110 animate-float-gentle">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-extrabold text-black dark:text-white tracking-tight transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
-                {isBM ? 'Kiosk Belia Modular' : 'Modular Capsule Kiosks'}
-              </h3>
-              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-                {isBM 
-                  ? 'Ruang pasang-siap di lokasi tumpuan lengkap elektrik, Wi-Fi 500Mbps, dan keselamatan serendah RM12–RM25/hari.'
-                  : 'Turnkey retail pods at high-footfall hubs with power, 500Mbps Wi-Fi, and security from RM12/day.'}
-              </p>
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => navigateToPage('login')}
-                  className="text-sm font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
-                >
-                  <span>{isBM ? 'Semak Lokasi' : 'View Locations'}</span>
-                  <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-                </button>
-              </div>
-            </div>
-
-            {/* Pillar 2: Direktori Digital */}
-            <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-blue-400/70 dark:hover:border-blue-400/70 transition-all duration-300 space-y-4 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-zinc-900 text-black dark:text-white/75 border border-amber-300 dark:border-zinc-600 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110 animate-float-gentle-alt">
-                <Store className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-extrabold text-black dark:text-white tracking-tight transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
-                {isBM ? 'Direktori Produk Belia' : 'Youth Product Directory'}
-              </h3>
-              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-                {isBM 
-                  ? 'Katalog dalaman portal yang memaparkan produk makanan, kraftangan batik, servis digital, dan hasil pertanian usahawan belia Kelantan.'
-                  : 'Internal portal catalog showcasing youth-crafted products from heritage delicacies to batik and digital services.'}
-              </p>
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => navigateToPage('login')}
-                  className="text-sm font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
-                >
-                  <span>{isBM ? 'Masuk Portal Belia' : 'Enter Belia Portal'}</span>
-                  <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-                </button>
-              </div>
-            </div>
-
-            {/* Pillar 3: Geran & Bantuan */}
-            <div className="kbelia-glass-card interactive-card p-6 sm:p-7 rounded-2xl hover:border-amber-300 dark:hover:border-amber-500/40 transition-all duration-300 space-y-4 group">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/80 text-black dark:text-white/75 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center font-bold transition-transform duration-200 group-hover:scale-110 animate-float-gentle">
-                <Award className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-extrabold text-black dark:text-white tracking-tight transition-colors duration-200 group-hover:text-black dark:group-hover:text-white">
-                {isBM ? 'Geran & Modal Permulaan' : 'Grants & Seed Capital'}
-              </h3>
-              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-                {isBM 
-                  ? 'Akses Geran Permulaan Belia, geran digitalisasi, serta latihan intensif bersama mentor industri bagi memperkukuh operasi anda.'
-                  : 'Fast-tracked youth seed grants, digitalization subsidies, and structured mentorship programs.'}
-              </p>
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => navigateToPage('login')}
-                  className="text-sm font-bold text-black dark:text-white/75 hover:text-black flex items-center gap-1.5 transition-all duration-200 cursor-pointer interactive-press dark:hover:text-white"
-                >
-                  <span>{isBM ? 'Maklumat Skim' : 'View Schemes'}</span>
-                  <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-                </button>
-              </div>
-            </div>
-
-          </RevealBlock>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 8. PREVIEW KIOSK MODULAR */}
-      {/* ========================================================================= */}
-      <section id="kiosk" className="py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 transition-colors">
-        <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          
-          <RevealBlock className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-                <Building2 className="w-3.5 h-3.5" />
-                <span>{isBM ? 'Pratonton Lokasi Pilihan' : 'Selected Locations Preview'}</span>
-              </div>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance tracking-tight">
-                Kiosk Belia Sedia Dimohon
+                  ? 'Mengapa Anak Muda Perlukan Lebih Daripada Sekadar Tapak'
+                  : 'Why Young Founders Need More Than Just a Stall'}
               </h2>
-              <p className="text-sm text-black/70 dark:text-white/75 mt-1.5">
+
+              <p className={`text-[0.95rem] sm:text-base leading-relaxed ${surfaceTextMuted}`}>
                 {isBM
-                  ? 'Pratonton ekosistem · Log masuk akaun Belia untuk melihat butiran penuh & membuat permohonan kiosk.'
-                  : 'Ecosystem preview · Sign in with a Belia account to view full details & submit kiosk applications.'}
+                  ? 'Memulakan perniagaan buat kali pertama sering mencabar. KBelia dibina untuk merapatkan jurang antara idea di atas kertas dengan realiti jualan harian melalui ruang fizikal, panduan tersusun, dan sokongan komuniti setempat.'
+                  : 'Starting a venture for the first time can feel daunting. KBelia bridges the space between an early sketch and an open shopfront through accessible booths, practical guidance, and a welcoming network.'}
               </p>
+
+              <div className={`relative aspect-[16/10] rounded-2xl overflow-hidden border ${hairlineBorderStrong} mt-2`}>
+                {!failedImages['story-hub'] ? (
+                  <img
+                    src={communityHubImg}
+                    alt={isBM ? 'Suasana hab komuniti usahawan belia Kelantan' : 'Kelantan youth entrepreneur courtyard hub'}
+                    referrerPolicy="no-referrer"
+                    onError={() => markImageFailed('story-hub')}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[#16382C] to-[#322714]" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B100E]/75 via-transparent to-transparent" />
+                <p className="absolute bottom-3.5 left-4 right-4 text-xs sm:text-sm text-[#F4F1EA]/90 font-medium">
+                  {isBM
+                    ? 'Interaksi harian antara pengasas muda, mentor komuniti, dan pengunjung tempatan.'
+                    : 'Daily conversations uniting young makers, mentors, and neighborhood visitors.'}
+                </p>
+              </div>
+            </RevealBlock>
+
+            {/* Right Flowing Editorial List (7 columns, unboxed with hairline dividers) */}
+            <RevealBlock delayMs={80} className="lg:col-span-7">
+              <div className={`border-t ${hairlineBorder}`}>
+                {storyChapters.map(chapter => (
+                  <article
+                    key={chapter.num}
+                    className={`py-7 sm:py-8 border-b ${hairlineBorder} grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-6 items-baseline group`}
+                  >
+                    <div className="sm:col-span-2">
+                      <span
+                        className={`font-display text-2xl sm:text-3xl font-bold tabular-nums ${
+                          isEditorialDark ? 'text-[#E5B85C]' : 'text-[#0B6E52]'
+                        }`}
+                      >
+                        {chapter.num}.
+                      </span>
+                    </div>
+                    <div className="sm:col-span-10 space-y-2">
+                      <h3 className={`font-display text-xl sm:text-2xl font-bold ${surfaceTextPrimary}`}>
+                        {chapter.title}
+                      </h3>
+                      <p className={`text-[0.95rem] sm:text-base leading-relaxed ${surfaceTextMuted}`}>
+                        {chapter.body}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </RevealBlock>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================= */}
+      {/* 5. ASYMMETRICAL SPACES SHOWCASE (#kiosk)                          */}
+      {/* ================================================================= */}
+      <section id="kiosk" className={`py-16 sm:py-24 border-b ${hairlineBorder}`}>
+        <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12 space-y-10">
+          <RevealBlock className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-2 max-w-2xl">
+              <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
+                {isBM ? 'Lokasi Tumpuan Negeri' : 'Featured Community Hubs'}
+              </p>
+              <h2 className={`font-display text-3xl sm:text-4xl font-bold text-balance ${surfaceTextPrimary}`}>
+                {isBM ? 'Ruang Niaga Sedia Diterokai' : 'Spaces Ready for Your Next Chapter'}
+              </h2>
             </div>
+
+            <button
+              type="button"
+              onClick={() => navigateToPage('login')}
+              className={`inline-flex items-center gap-2 text-sm font-semibold cursor-pointer whitespace-nowrap shrink-0 hover:underline underline-offset-4 ${
+                isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'
+              }`}
+            >
+              <span>{isBM ? 'Log masuk untuk memohon ruang' : 'Sign in to explore full availability'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </RevealBlock>
 
-          <RevealBlock delayMs={80} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-            {(() => {
-              const av = slots.filter((slot) => slot.status === 'available');
-              const fallbackAvailable = INITIAL_CAPSULE_SLOTS.filter((s) => s.status === 'available');
-              const combined = [...av, ...fallbackAvailable.filter((f) => !av.some((a) => a.id === f.id))];
-              const displaySlots = combined.length >= 3 ? combined.slice(0, 3) : slots.slice(0, 3);
-              
-              return displaySlots.map((slot) => (
-                <div 
-                  key={slot.id} 
+          {/* Asymmetric 12-Col Layout: 1 Large Feature + 2 Stacked Features */}
+          <RevealBlock delayMs={80} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            {leadSlot && (
+              <div
+                onClick={() => {
+                  if (!user) {
+                    requireBeliaLogin(
+                      isBM
+                        ? 'Sila log masuk akaun Belia untuk melihat butiran penuh ruang niaga dan membuat tempahan.'
+                        : 'Please sign in with a Belia account to view space details and book.'
+                    );
+                    return;
+                  }
+                  onSelectSlot(leadSlot);
+                }}
+                className={`lg:col-span-7 rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 cursor-pointer group ${cardSurface}`}
+              >
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#18211E]">
+                  <img
+                    src={leadSlot.imageUrl || '/assets/generated/kiosk_modular_kbelia.jpg'}
+                    alt={leadSlot.name}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D1311]/70 via-transparent to-transparent" />
+                </div>
+
+                <div className="p-6 sm:p-8 space-y-4">
+                  <div className={`flex items-center gap-2 text-xs sm:text-sm ${surfaceTextMuted}`}>
+                    <MapPin className="w-3.5 h-3.5 shrink-0" />
+                    <span>{leadSlot.district}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{leadSlot.size}</span>
+                  </div>
+
+                  <div>
+                    <h3 className={`font-display text-2xl font-bold ${surfaceTextPrimary}`}>
+                      {leadSlot.name}
+                    </h3>
+                    <p className={`text-sm sm:text-[0.95rem] mt-1.5 leading-relaxed ${surfaceTextMuted}`}>
+                      {leadSlot.hubLocation}
+                    </p>
+                  </div>
+
+                  <div className={`pt-4 border-t ${hairlineBorder} flex items-center justify-between gap-4`}>
+                    <div>
+                      <span className={`text-xs block ${surfaceTextMuted}`}>
+                        {isBM ? 'Kadar penyertaan bermula' : 'Accessible participation from'}
+                      </span>
+                      <span className={`font-display text-lg font-bold tabular-nums ${surfaceTextPrimary}`}>
+                        RM{leadSlot.dailyRate}{' '}
+                        <span className={`text-sm font-normal ${surfaceTextMuted}`}>
+                          / {isBM ? 'hari' : 'day'}
+                        </span>
+                      </span>
+                    </div>
+
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-sm font-semibold ${
+                        isEditorialDark ? 'text-[#E5B85C]' : 'text-[#0B6E52]'
+                      }`}
+                    >
+                      <span>{isBM ? 'Lihat Ruang' : 'Explore Space'}</span>
+                      <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="lg:col-span-5 flex flex-col gap-6">
+              {secondarySlots.map(slot => (
+                <div
+                  key={slot.id}
                   onClick={() => {
                     if (!user) {
                       requireBeliaLogin(
                         isBM
-                          ? 'Sila log masuk akaun Belia Kelantan untuk melihat butiran penuh kiosk atau membuat permohonan.'
-                          : 'Please sign in with a Belia account to view kiosk details or submit an application.'
+                          ? 'Sila log masuk akaun Belia untuk melihat butiran penuh ruang niaga dan membuat tempahan.'
+                          : 'Please sign in with a Belia account to view space details and book.'
                       );
                       return;
                     }
                     onSelectSlot(slot);
                   }}
-                  className="kbelia-glass-card interactive-card rounded-2xl overflow-hidden hover:border-blue-400/70 hover:shadow-md transition-all flex flex-col justify-between h-full group cursor-pointer"
+                  className={`flex-1 rounded-2xl overflow-hidden flex flex-col sm:flex-row lg:flex-col xl:flex-row transition-all duration-300 cursor-pointer group ${cardSurface}`}
                 >
-                  <div>
-                    <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-zinc-800">
-                      <img 
-                        src={slot.imageUrl || '/assets/generated/kiosk_modular_kbelia.jpg'} 
-                        alt={slot.name} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
-                      />
-                      <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur px-2.5 py-1 rounded-md text-[0.8125rem] font-bold text-white shadow-xs flex items-center gap-1 border border-white/10">
-                        <MapPin className="w-3 h-3 text-white" />
-                        <span>{slot.district}</span>
-                      </div>
-                      <div className="absolute top-3 right-3">
-                        <span className="px-2.5 py-1 rounded-md text-[0.8125rem] font-bold border border-emerald-400/30 bg-emerald-900/85 text-white shadow-xs inline-block">
-                          Kekosongan Sedia
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="p-5 sm:p-6 space-y-3">
-                      <div>
-                        <h4 className="text-lg font-extrabold text-black dark:text-white leading-snug tracking-tight group-hover:text-black dark:group-hover:text-white transition-colors">{slot.name}</h4>
-                        <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-1 line-clamp-2">{slot.hubLocation}</p>
-                      </div>
-
-                      {/* Amenities */}
-                      <div className="text-sm text-black/70 dark:text-white/75 flex items-center gap-2 pt-1 border-t border-slate-300 dark:border-zinc-600">
-                        <span className="flex items-center gap-1 text-black dark:text-white">
-                          <Zap className="w-3 h-3 text-black/70 dark:text-white/75" /> Elektrik
-                        </span>
-                        <span aria-hidden="true" className="text-black/35 dark:text-white/35">·</span>
-                        <span className="flex items-center gap-1 text-black dark:text-white">
-                          <Wifi className="w-3 h-3 text-black dark:text-white" /> WiFi 500M
-                        </span>
-                        <span aria-hidden="true" className="text-black/35 dark:text-white/35">·</span>
-                        <span className="text-black/70 dark:text-white/75">{slot.size}</span>
-                      </div>
-                    </div>
+                  <div className="sm:w-44 lg:w-full xl:w-44 h-44 sm:h-auto lg:h-40 xl:h-auto shrink-0 overflow-hidden bg-[#18211E]">
+                    <img
+                      src={slot.imageUrl || '/assets/generated/kiosk_modular_kbelia.jpg'}
+                      alt={slot.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                    />
                   </div>
 
-                  <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-3 flex items-center justify-between border-t border-slate-300 dark:border-zinc-600">
-                    <div>
-                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold">Kadar Sewaan Bersubsidi</div>
-                      <div className="text-sm sm:text-base font-extrabold text-black dark:text-white/75 tabular-nums">
-                        RM{slot.dailyRate} <span className="text-sm text-black/70 dark:text-white/75 font-normal">/ hari</span>
+                  <div className="p-5 sm:p-6 flex flex-col justify-between flex-1 gap-3">
+                    <div className="space-y-1.5">
+                      <div className={`text-xs ${surfaceTextMuted}`}>
+                        {slot.district} · {slot.size}
                       </div>
+                      <h3 className={`font-display text-lg font-bold leading-snug ${surfaceTextPrimary}`}>
+                        {slot.name}
+                      </h3>
+                      <p className={`text-sm line-clamp-2 ${surfaceTextMuted}`}>
+                        {slot.hubLocation}
+                      </p>
                     </div>
-                    {!user && (
-                      <span className="text-[0.8125rem] font-bold text-blue-700 dark:text-blue-300 inline-flex items-center gap-1">
-                        <span>{isBM ? 'Log Masuk Belia' : 'Belia Login'}</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
+
+                    <div className={`pt-3 border-t ${hairlineBorder} flex items-center justify-between text-sm`}>
+                      <span className={`font-bold tabular-nums ${surfaceTextPrimary}`}>
+                        RM{slot.dailyRate}
+                        <span className={`font-normal text-xs ${surfaceTextMuted}`}>
+                          {' '}
+                          / {isBM ? 'hari' : 'day'}
+                        </span>
                       </span>
-                    )}
+                      <span
+                        className={`inline-flex items-center gap-1 font-semibold ${
+                          isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'
+                        }`}
+                      >
+                        <span>{isBM ? 'Butiran' : 'Details'}</span>
+                        <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </div>
                   </div>
-
                 </div>
-              ));
-            })()}
+              ))}
+            </div>
           </RevealBlock>
-
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 9. PREVIEW DIREKTORI USAHAWAN BELIA */}
-      {/* ========================================================================= */}
-      <section id="direktori" className="relative overflow-hidden py-16 sm:py-24 border-b border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-950 transition-colors">
-        <div className="absolute inset-0 bg-grid-pattern opacity-45 pointer-events-none" aria-hidden="true" />
-        <div className="relative z-10 max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          
-          <RevealBlock className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white/75">
-                <Store className="w-3.5 h-3.5" />
-                <span>{isBM ? 'Pratonton Direktori Produk' : 'Product Directory Preview'}</span>
-              </div>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white mt-1 text-balance tracking-tight">
-                Karya & Produk Belia Kelantan
+      {/* ================================================================= */}
+      {/* 6. CREATOR DIRECTORY SPOTLIGHT (#direktori)                       */}
+      {/* ================================================================= */}
+      <section id="direktori" className={`py-16 sm:py-24 border-b ${hairlineBorder}`}>
+        <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12 space-y-10">
+          <RevealBlock className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-2 max-w-2xl">
+              <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
+                {isBM ? 'Jenama & Karya Tempatan' : 'Youth-Founded Brands'}
+              </p>
+              <h2 className={`font-display text-3xl sm:text-4xl font-bold text-balance ${surfaceTextPrimary}`}>
+                {isBM ? 'Kenali Pengasas Muda Kelantan' : 'Meet Local Youth Creators'}
               </h2>
-              <p className="text-sm text-black/70 dark:text-white/75 mt-1.5">
+              <p className={`text-sm sm:text-base ${surfaceTextMuted}`}>
                 {isBM
-                  ? 'Pratonton produk · Log masuk akaun Belia untuk mengakses katalog produk penuh dan berhubung dengan rakan usahawan.'
-                  : 'Product preview · Sign in with a Belia account to explore the full product catalog and connect with fellow youth entrepreneurs.'}
+                  ? 'Himpunan jenama ciptaan generasi belia untuk diterokai, dihubungi, dan disokong bersama.'
+                  : 'Original local businesses built by young Kelantan founders, ready for you to discover and support.'}
               </p>
             </div>
           </RevealBlock>
 
-          <RevealBlock delayMs={80} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {businesses.slice(0, 3).map((biz) => (
-              <div 
-                key={biz.id}
-                onClick={() => {
-                  if (!user) {
-                    requireBeliaLogin(
-                      isBM
-                        ? 'Sila log masuk akaun Belia Kelantan untuk mengakses katalog produk penuh dan butiran perniagaan.'
-                        : 'Please sign in with a Belia account to inspect full product catalogs and business details.'
-                    );
-                    return;
-                  }
-                  onSelectBusiness(biz);
-                }}
-                className="kbelia-glass-card interactive-card rounded-2xl p-5 sm:p-6 hover:border-blue-400/70 hover:shadow-md transition-all flex flex-col justify-between group cursor-pointer"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={biz.logoUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${biz.id}`}
-                      alt={biz.businessName}
-                      className="w-14 h-14 rounded-xl object-cover bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 shrink-0"
-                    />
-                    <div className="min-w-0">
-                      <div className="text-[0.8125rem] text-black dark:text-white/75 font-bold uppercase tracking-wide">{formatBusinessCategory(biz.category)}</div>
-                      <h4 className="text-base font-extrabold text-black dark:text-white truncate tracking-tight group-hover:text-black dark:group-hover:text-white transition-colors">
-                        {biz.businessName}
-                      </h4>
-                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-black dark:text-white" />
-                        <span>{biz.district}</span>
+          <RevealBlock delayMs={80} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {businesses.slice(0, 3).map((biz, idx) => {
+              const fallbackPhoto =
+                idx === 0
+                  ? '/assets/generated/kopi_nissem_melaka.jpg'
+                  : idx === 1
+                    ? '/assets/generated/batik_canting_kelantan.jpg'
+                    : '/assets/generated/akok_kelantan_tradisi.jpg';
+              const displayImg =
+                biz.logoUrl && !biz.logoUrl.includes('dicebear') ? biz.logoUrl : fallbackPhoto;
+
+              return (
+                <article
+                  key={biz.id}
+                  onClick={() => {
+                    if (!user) {
+                      requireBeliaLogin(
+                        isBM
+                          ? 'Sila log masuk akaun Belia untuk melihat profil penuh usahawan dan produk mereka.'
+                          : 'Please sign in with a Belia account to explore creator profiles and catalogs.'
+                      );
+                      return;
+                    }
+                    onSelectBusiness(biz);
+                  }}
+                  className={`rounded-2xl p-6 flex flex-col justify-between gap-5 transition-all duration-300 cursor-pointer group ${cardSurface}`}
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3.5">
+                      <img
+                        src={displayImg}
+                        alt={biz.businessName}
+                        referrerPolicy="no-referrer"
+                        className={`w-14 h-14 rounded-xl object-cover shrink-0 border ${hairlineBorder}`}
+                      />
+                      <div className="min-w-0">
+                        <div className={`text-xs truncate ${surfaceTextMuted}`}>
+                          {formatBusinessCategory(biz.category)} · {biz.district}
+                        </div>
+                        <h3 className={`font-display text-lg font-bold truncate ${surfaceTextPrimary}`}>
+                          {biz.businessName}
+                        </h3>
                       </div>
                     </div>
+
+                    <p className={`text-sm sm:text-[0.9375rem] leading-relaxed line-clamp-2 ${surfaceTextMuted}`}>
+                      {biz.description || biz.tagline}
+                    </p>
                   </div>
 
-                  <p className="text-[0.9375rem] text-black dark:text-white line-clamp-2">
-                    {biz.description || biz.tagline}
-                  </p>
-                </div>
-
-                <div className="pt-3 border-t border-slate-300 dark:border-zinc-600 mt-3 flex items-center justify-between text-sm gap-2">
-                  <span className="text-black dark:text-white/75 text-[0.8125rem] truncate">{biz.ownerName}</span>
-                  {!user ? (
-                    <span className="text-[0.8125rem] font-bold text-blue-700 dark:text-blue-300 inline-flex items-center gap-1 shrink-0">
-                      <span>{isBM ? 'Log Masuk Belia' : 'Belia Login'}</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
+                  <div className={`pt-4 border-t ${hairlineBorder} flex items-center justify-between gap-3 text-sm`}>
+                    <span className={`truncate font-medium ${surfaceTextPrimary}`}>{biz.ownerName}</span>
+                    <span
+                      className={`inline-flex items-center gap-1 font-semibold shrink-0 ${
+                        isEditorialDark ? 'text-[#E5B85C]' : 'text-[#0B6E52]'
+                      }`}
+                    >
+                      <span>{isBM ? 'Terokai' : 'View'}</span>
+                      <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                     </span>
-                  ) : (
-                    <span className="text-[0.8125rem] font-semibold text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/70 shrink-0">
-                      {biz.district}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+                  </div>
+                </article>
+              );
+            })}
           </RevealBlock>
-
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 10. FINAL CALL TO ACTION */}
-      {/* ========================================================================= */}
-      <section className="kbelia-important-header relative overflow-hidden py-16 sm:py-24 text-black dark:text-white border-b border-slate-300 dark:border-zinc-600 transition-colors">
-        <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" aria-hidden="true" />
-        <div className="absolute -bottom-24 left-1/3 w-96 h-96 bg-blue-500/12 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-        <RevealBlock className="relative z-10 max-w-4xl w-full mx-auto px-4 sm:px-8 text-center space-y-5">
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-black dark:text-white text-balance">
-            Mulakan Langkah Anda Hari Ini
-          </h2>
-          <p className="text-[0.9375rem] text-black dark:text-white max-w-xl mx-auto leading-relaxed">
-            Sertai usahawan muda Kelantan yang menggunakan fasiliti kiosk modular, bimbingan mentor, dan direktori negeri.
-          </p>
+      {/* ================================================================= */}
+      {/* 7. SIMPLE JOURNEY & INVITATION CTA                                */}
+      {/* ================================================================= */}
+      <section className={`py-16 sm:py-24 border-b ${hairlineBorder}`}>
+        <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12">
+          <RevealBlock className={`rounded-3xl p-8 sm:p-12 lg:p-16 border ${hairlineBorderStrong} ${softAccentWash} space-y-10`}>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+              <div className="lg:col-span-7 space-y-3">
+                <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
+                  {isBM ? 'Permulaan Yang Ringkas' : 'Simple Way to Begin'}
+                </p>
+                <h2 className={`font-display text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.12] text-balance ${surfaceTextPrimary}`}>
+                  {isBM
+                    ? 'Langkah Pertama Anda Bermula Di Sini'
+                    : 'Your Next Chapter Starts With One Step'}
+                </h2>
+                <p className={`text-base max-w-xl leading-relaxed ${surfaceTextMuted}`}>
+                  {isBM
+                    ? 'Sertai komuniti usahawan muda Kelantan untuk mengakses ruang niaga, jaringan bimbingan, dan peluang sokongan negeri.'
+                    : 'Join Kelantan youth entrepreneurs building authentic businesses with shared physical spaces and community support.'}
+                </p>
+              </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <button
-              type="button"
-              id="landing-cta-register-btn"
-              onClick={() => navigateToPage('register')}
-              className="px-6 py-3 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm transition-colors flex items-center gap-2 cursor-pointer active:scale-98 dark:bg-teal-600"
-            >
-              <Users className="w-4 h-4" />
-              <span>{isBM ? 'Daftar Percuma' : 'Register Free'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => navigateToPage('login')}
-              className="px-6 py-3 rounded-lg bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white font-bold text-sm border border-slate-300 dark:border-slate-600 shadow-2xs transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
-            >
-              <LogIn className="w-4 h-4 text-black dark:text-white/75" />
-              <span>{isBM ? 'Log Masuk' : 'Log In'}</span>
-            </button>
-          </div>
+              <div className="lg:col-span-5 flex flex-wrap lg:justify-end gap-3">
+                <button
+                  type="button"
+                  id="landing-cta-register-btn"
+                  onClick={() => navigateToPage('register')}
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 interactive-press ${
+                    isEditorialDark
+                      ? 'bg-[#E5B85C] hover:bg-[#EDC878] text-[#111916]'
+                      : 'bg-[#0B6E52] hover:bg-[#085640] text-white'
+                  }`}
+                >
+                  <span>{isBM ? 'Daftar Akaun Belia' : 'Create Youth Account'}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigateToPage('login')}
+                  className={`inline-flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-semibold border transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                    isEditorialDark
+                      ? 'border-[#E5B85C]/30 text-[#F4F1EA] hover:bg-white/5'
+                      : 'border-[#0B6E52]/30 text-[#16221D] hover:bg-white/70'
+                  }`}
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>{isBM ? 'Log Masuk' : 'Sign In'}</span>
+                </button>
+              </div>
+            </div>
 
-          <div className="pt-2 text-sm text-black dark:text-white/75 flex items-center justify-center gap-4">
-            <span className="flex items-center gap-1">
-              <Check className="w-3.5 h-3.5 text-black dark:text-white/75" />
-              <span>Inisiatif Kerajaan Negeri</span>
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <Check className="w-3.5 h-3.5 text-black dark:text-white/75" />
-              <span>Tiada Caj Tersembunyi</span>
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <Check className="w-3.5 h-3.5 text-black dark:text-white/75" />
-              <span>Semakan Digital Pantas</span>
-            </span>
-          </div>
-        </RevealBlock>
+            {/* Clean 3-Moment Journey Strip */}
+            <div className={`pt-8 border-t ${hairlineBorder} grid grid-cols-1 md:grid-cols-3 gap-6`}>
+              <div className="space-y-1.5">
+                <div className={`text-xs font-semibold ${isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'}`}>
+                  01 · {isBM ? 'Daftar Profil' : 'Set Up Profile'}
+                </div>
+                <p className={`text-sm leading-relaxed ${surfaceTextMuted}`}>
+                  {isBM
+                    ? 'Cipta akaun usahawan muda dalam beberapa minit untuk membuka akses penuh komuniti.'
+                    : 'Create your youth entrepreneur account in minutes to unlock full community access.'}
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <div className={`text-xs font-semibold ${isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'}`}>
+                  02 · {isBM ? 'Pilih Ruang & Kongsi Karya' : 'Choose Space & Share'}
+                </div>
+                <p className={`text-sm leading-relaxed ${surfaceTextMuted}`}>
+                  {isBM
+                    ? 'Terokai tapak jualan mengikut daerah pilihan serta tonjolkan produk anda di direktori.'
+                    : 'Explore booths in your preferred district and introduce your brand in the directory.'}
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <div className={`text-xs font-semibold ${isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'}`}>
+                  03 · {isBM ? 'Berkembang Bersama' : 'Grow Together'}
+                </div>
+                <p className={`text-sm leading-relaxed ${surfaceTextMuted}`}>
+                  {isBM
+                    ? 'Manfaatkan sesi perkongsian dan peluang sokongan untuk mengukuhkan langkah perniagaan.'
+                    : 'Tap into mentoring conversations and support pathways to grow steadily.'}
+                </p>
+              </div>
+            </div>
+          </RevealBlock>
+        </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 11. COMPREHENSIVE INSTITUTIONAL FOOTER */}
-      {/* ========================================================================= */}
-      <footer className="bg-white dark:bg-zinc-950 text-black dark:text-white text-sm border-t border-slate-300 dark:border-zinc-600">
-
-        {/* 4-Column Footer Content */}
-        <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          
-          {/* Col 1: Identity & Intro */}
+      {/* ================================================================= */}
+      {/* 8. QUIET INSTITUTIONAL FOOTER                                     */}
+      {/* ================================================================= */}
+      <footer className={`text-sm transition-colors ${isEditorialDark ? 'bg-[#0C110F]' : 'bg-[#EFECE4]'}`}>
+        <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-xs dark:bg-blue-600">
-                KB
-              </div>
-              <span className="text-base font-black text-black dark:text-white tracking-tight">KBelia Kelantan</span>
-            </div>
-            <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed">
-              Portal rasmi kiosk modular, direktori pasaran, dan geran usahawan belia Negeri Kelantan.
+            <KBeliaLogo size="md" tone={isEditorialDark ? 'onDark' : 'onLight'} />
+            <p className={`text-sm leading-relaxed ${surfaceTextMuted}`}>
+              {isBM
+                ? 'Inisiatif pembangunan keusahawanan, ruang niaga, dan komuniti belia Negeri Kelantan.'
+                : 'Kelantan youth entrepreneurship, retail space, and community development initiative.'}
             </p>
-            <div className="pt-2 text-[0.8125rem] text-black/70 dark:text-white/75">
+            <p className={`text-xs ${surfaceTextMuted}`}>
               Kompleks Kota Darulnaim, 15503 Kota Bharu, Kelantan Darul Naim.
-            </div>
+            </p>
           </div>
 
-          {/* Col 2: Navigation Links */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-black dark:text-white">Navigasi Portal</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 className={`font-semibold text-sm ${surfaceTextPrimary}`}>
+              {isBM ? 'Navigasi' : 'Navigation'}
+            </h4>
+            <ul className={`space-y-2 text-sm ${surfaceTextMuted}`}>
               <li>
-                <a href="#hero" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Laman Utama</a>
+                <a href="#hero" className="hover:underline underline-offset-4">
+                  {isBM ? 'Utama' : 'Home'}
+                </a>
               </li>
               <li>
-                <button type="button" onClick={() => navigateToPage('register')} className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer">Daftar Akaun Usahawan</button>
+                <a href="#inisiatif" className="hover:underline underline-offset-4">
+                  {isBM ? 'Pendekatan KBelia' : 'Our Approach'}
+                </a>
               </li>
               <li>
-                <button type="button" onClick={() => navigateToPage('login')} className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer">Log Masuk Sistem</button>
+                <a href="#kiosk" className="hover:underline underline-offset-4">
+                  {isBM ? 'Ruang Niaga' : 'Retail Spaces'}
+                </a>
               </li>
               <li>
-                <a href="#kiosk" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Kiosk Belia Modular</a>
+                <a href="#direktori" className="hover:underline underline-offset-4">
+                  {isBM ? 'Karya Belia' : 'Youth Creators'}
+                </a>
               </li>
               <li>
-                <a href="#direktori" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Direktori Usahawan</a>
-              </li>
-              <li>
-                <a href="#ciri-utama" className="hover:text-black dark:text-white dark:hover:text-white transition-colors">Ciri-Ciri Utama</a>
+                <button
+                  type="button"
+                  onClick={() => navigateToPage('login')}
+                  className="hover:underline underline-offset-4 cursor-pointer text-left"
+                >
+                  {isBM ? 'Log Masuk Portal' : 'Portal Sign In'}
+                </button>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Legal & Policy */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-black dark:text-white">Perundangan</h4>
-            <ul className="space-y-2 text-sm">
+            <h4 className={`font-semibold text-sm ${surfaceTextPrimary}`}>
+              {isBM ? 'Dasar & Garis Panduan' : 'Policies & Guidelines'}
+            </h4>
+            <ul className={`space-y-2 text-sm ${surfaceTextMuted}`}>
               <li>
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer"
+                  className="hover:underline underline-offset-4 cursor-pointer text-left"
                 >
-                  Dasar Privasi
+                  {isBM ? 'Dasar Privasi' : 'Privacy Policy'}
                 </button>
               </li>
               <li>
                 <button
                   type="button"
                   onClick={() => setLegalModalType('terms')}
-                  className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer"
+                  className="hover:underline underline-offset-4 cursor-pointer text-left"
                 >
-                  Terma & Syarat
+                  {isBM ? 'Terma & Syarat' : 'Terms & Conditions'}
                 </button>
               </li>
               <li>
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer"
+                  className="hover:underline underline-offset-4 cursor-pointer text-left"
                 >
-                  Keselamatan Data
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => setLegalModalType('terms')}
-                  className="hover:text-black dark:text-white dark:hover:text-white transition-colors text-left cursor-pointer"
-                >
-                  Penafian Rasmi
+                  {isBM ? 'Keselamatan Maklumat' : 'Data Protection'}
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Col 4: Contact & Socials */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-sm text-black dark:text-white">Hubungi Pentadbir</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2 text-black dark:text-white">
-                <Phone className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                <span>+60 9-748 1000 (Pejabat Pentadbiran)</span>
+            <h4 className={`font-semibold text-sm ${surfaceTextPrimary}`}>
+              {isBM ? 'Hubungi Urusetia' : 'Secretariat'}
+            </h4>
+            <div className={`space-y-2 text-sm ${surfaceTextMuted}`}>
+              <div className="flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 shrink-0" />
+                <span>+60 9-748 1000</span>
               </div>
-              <div className="flex items-center gap-2 text-black dark:text-white">
-                <Mail className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+              <div className="flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5 shrink-0" />
                 <span>urusetia@kbelia.kelantan.gov.my</span>
               </div>
-              <div className="flex items-center gap-2 text-black dark:text-white">
-                <Clock className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
-                <span>Ahad - Rabu: 8.00 pagi - 5.00 petang</span>
-              </div>
-            </div>
-
-            {/* Social Media Links */}
-            <div className="pt-2">
-              <div className="text-[0.8125rem] uppercase font-bold text-black dark:text-white/75 mb-2">Ikuti Media Sosial</div>
               <div className="flex items-center gap-2">
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
-                  title="Facebook KBelia"
-                >
-                  <Globe className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
-                  title="Instagram KBelia"
-                >
-                  <Sparkles className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://tiktok.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
-                  title="TikTok KBelia"
-                >
-                  <Video className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://wa.me/601123456789"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-transparent flex items-center justify-center text-black dark:text-white hover:text-black dark:hover:text-white transition-colors"
-                  title="WhatsApp Khidmat Bantuan"
-                >
-                  <Phone className="w-4 h-4" />
-                </a>
+                <Clock className="w-3.5 h-3.5 shrink-0" />
+                <span>{isBM ? 'Ahad - Rabu: 8.00 pagi - 5.00 petang' : 'Sun - Wed: 8.00 am - 5.00 pm'}</span>
               </div>
             </div>
-          </div>
 
-        </div>
-
-        {/* Bottom Bar: Copyright */}
-        <div className="border-t border-slate-300 dark:border-slate-600 py-6 text-center text-[0.8125rem] text-black/70 dark:text-white/75">
-          <div className="max-w-[1550px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p>
-              Hak Cipta Terpelihara © {new Date().getFullYear()} Kerajaan Negeri Kelantan · Inisiatif Ekonomi Belia.
-            </p>
-            <div className="flex items-center gap-3">
-              <span className="text-black dark:text-white/75">Versi 2.4.0</span>
-              <span>•</span>
-              <button 
-                type="button" 
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
-                className="hover:text-black dark:text-white dark:hover:text-white transition-colors cursor-pointer"
+            <div className="flex items-center gap-2 pt-1">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Laman Komuniti"
+                className={`w-8 h-8 rounded-lg border ${hairlineBorder} flex items-center justify-center ${surfaceTextMuted} hover:text-emerald-400 transition-colors`}
               >
-                Kembali ke Atas ↑
-              </button>
+                <Globe className="w-4 h-4" />
+              </a>
+              <a
+                href="https://tiktok.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Saluran Video Komuniti"
+                className={`w-8 h-8 rounded-lg border ${hairlineBorder} flex items-center justify-center ${surfaceTextMuted} hover:text-emerald-400 transition-colors`}
+              >
+                <Video className="w-4 h-4" />
+              </a>
+              <a
+                href="https://wa.me/601123456789"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Talian Bantuan"
+                className={`w-8 h-8 rounded-lg border ${hairlineBorder} flex items-center justify-center ${surfaceTextMuted} hover:text-emerald-400 transition-colors`}
+              >
+                <Compass className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </div>
 
+        <div className={`border-t ${hairlineBorder} py-5 text-xs ${surfaceTextMuted}`}>
+          <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p>
+              {isBM
+                ? `Hak Cipta Terpelihara © ${new Date().getFullYear()} Portal KBelia Kelantan · Inisiatif Pembangunan Ekonomi Belia`
+                : `Copyright © ${new Date().getFullYear()} KBelia Kelantan Portal · Youth Economic Initiative`}
+            </p>
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="hover:underline underline-offset-4 cursor-pointer"
+            >
+              {isBM ? 'Kembali ke Atas ↑' : 'Back to Top ↑'}
+            </button>
+          </div>
+        </div>
       </footer>
 
-
-
-      {/* ========================================================================= */}
-      {/* MODAL 2: LEGAL & PRIVACY VIEWER (CHECKLIST ITEM 12) */}
-      {/* ========================================================================= */}
+      {/* ================================================================= */}
+      {/* LEGAL & PRIVACY MODAL                                             */}
+      {/* ================================================================= */}
       {legalModalType && (
         <div
-          className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
           onClick={() => setLegalModalType(null)}
         >
           <div
-            className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden my-8"
-            onClick={(e) => e.stopPropagation()}
+            className={`relative w-full max-w-2xl rounded-2xl shadow-2xl border ${hairlineBorderStrong} overflow-hidden my-8 ${
+              isEditorialDark ? 'bg-[#141D1A] text-[#F4F1EA]' : 'bg-[#FBF9F5] text-[#16221D]'
+            }`}
+            onClick={e => e.stopPropagation()}
           >
-            <div className="p-5 kbelia-important-header dark:bg-slate-800 text-black dark:text-white flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
-              <h3 className="font-extrabold text-base text-black dark:text-white">
-                {legalModalType === 'privacy' ? 'Dasar Privasi & Perlindungan Data' : 'Terma & Syarat Perkhidmatan'}
+            <div className={`p-5 flex items-center justify-between border-b ${hairlineBorder}`}>
+              <h3 className="font-display font-bold text-lg">
+                {legalModalType === 'privacy'
+                  ? isBM
+                    ? 'Dasar Privasi & Perlindungan Data'
+                    : 'Privacy & Data Protection Policy'
+                  : isBM
+                    ? 'Terma & Syarat Penggunaan'
+                    : 'Terms & Conditions'}
               </h3>
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}
-                className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-600 text-black dark:text-white hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                className={`p-1.5 rounded-lg border ${hairlineBorder} cursor-pointer`}
+                aria-label={isBM ? 'Tutup' : 'Close'}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 text-sm text-black dark:text-white space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed">
+            <div className={`p-6 text-sm space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed ${surfaceTextMuted}`}>
               {legalModalType === 'privacy' ? (
                 <>
-                  <p className="font-bold text-black dark:text-white">
-                    1. Pengenalan & Komitmen Privasi
-                  </p>
+                  <p className={`font-semibold ${surfaceTextPrimary}`}>1. Komitmen Privasi</p>
                   <p>
-                    Portal KBelia diuruskan oleh Pentadbir KBelia Negeri Kelantan. Kami komited untuk melindungi data peribadi anda mengikut Akta Perlindungan Data Peribadi 2010 (PDPA) Malaysia.
+                    Portal KBelia Negeri Kelantan komited untuk melindungi maklumat peribadi pengguna selaras dengan Akta Perlindungan Data Peribadi 2010 (PDPA).
                   </p>
-                  <p className="font-bold text-black dark:text-white">
-                    2. Pengumpulan Data Peribadi
-                  </p>
+                  <p className={`font-semibold ${surfaceTextPrimary}`}>2. Tujuan Penggunaan Maklumat</p>
                   <p>
-                    Data yang dikumpulkan termasuk nama penuh, nombor kad pengenalan, nombor pendaftaran SSM, lokasi perniagaan, nombor telefon dan maklumat akaun bank pemohon bagi tujuan penyaluran geran dan pengurusan sewaan kiosk.
-                  </p>
-                  <p className="font-bold text-black dark:text-white">
-                    3. Keselamatan & Perlindungan Data
-                  </p>
-                  <p>
-                    Semua maklumat disimpan dalam pelayan awan berpusat berstandard keselamatan tinggi. Kami tidak akan menjual atau berkongsi maklumat anda dengan mana-mana pihak ketiga tanpa kebenaran bertulis.
+                    Maklumat pendaftaran hanya digunakan bagi tujuan pengurusan penyertaan ruang niaga, bimbingan keusahawanan, dan urusan rasmi program belia negeri.
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="font-bold text-black dark:text-white">
-                    1. Syarat Kelayakan Pengguna
-                  </p>
+                  <p className={`font-semibold ${surfaceTextPrimary}`}>1. Kelayakan Penyertaan</p>
                   <p>
-                    Pengguna mestilah warganegara Malaysia berumur antara 18 hingga 40 tahun yang beroperasi atau menetap di negeri Kelantan Darul Naim.
+                    Terbuka kepada belia warganegara Malaysia berumur antara 18 hingga 40 tahun yang menetap atau menjalankan usaha niaga di Negeri Kelantan.
                   </p>
-                  <p className="font-bold text-black dark:text-white">
-                    2. Tanggungjawab Penyewa Kiosk
-                  </p>
+                  <p className={`font-semibold ${surfaceTextPrimary}`}>2. Tatasusila Komuniti</p>
                   <p>
-                    Penyewa bertanggungjawab menjaga kebersihan, keselamatan peralatan, dan mematuhi peraturan waktu operasi yang ditetapkan oleh pihak pengurusan hab dan pihak berkuasa tempatan (PBT).
-                  </p>
-                  <p className="font-bold text-black dark:text-white">
-                    3. Integriti Permohonan Geran
-                  </p>
-                  <p>
-                    Sebarang maklumat palsu dalam permohonan Geran Permulaan boleh mengakibatkan pembatalan geran serta-merta dan tindakan undang-undang di bawah peraturan pentadbiran negeri.
+                    Setiap peserta bertanggungjawab menjaga kebersihan ruang bersama serta mematuhi garis panduan pengurusan hab dan pihak berkuasa tempatan.
                   </p>
                 </>
               )}
             </div>
 
-            <div className="p-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-300 dark:border-slate-600 text-right">
+            <div className={`p-4 border-t ${hairlineBorder} text-right`}>
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition-colors cursor-pointer dark:bg-blue-600"
+                className="px-5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-sm rounded-lg transition-colors cursor-pointer"
               >
-                Saya Faham & Setuju
+                {isBM ? 'Saya Faham & Tutup' : 'I Understand & Close'}
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 };

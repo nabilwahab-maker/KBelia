@@ -94,7 +94,7 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
   {
     id: 'notif-admin-2',
     title: 'Laporan Kuota Kiosk Bulanan Sedia Dijana',
-    message: 'Kadar sewaan dan pematuhan sewa kiosk bagi semua jajahan boleh dijana dalam format PDF.',
+    message: 'Kadar sewaan dan pematuhan sewa kiosk bagi rangkaian seluruh negeri Kelantan boleh dijana dalam format PDF.',
     category: 'announcement',
     sender: 'Bahagian Kewangan KBelia',
     senderRole: 'system',
