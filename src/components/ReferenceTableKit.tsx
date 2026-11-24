@@ -2,8 +2,10 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, SlidersHorizontal, MoreHorizontal, X, ArrowUpDown } from 'lucide-react';
 import { ToolbarSortOption } from '../utils/sortUtils';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
-type ToolbarAccent = 'blue' | 'indigo' | 'teal';
+type ToolbarAccent = 'blue' | 'indigo' | 'teal' | 'amber' | 'emerald';
 
 const TOOLBAR_ACCENTS: Record<
   ToolbarAccent,
@@ -15,22 +17,34 @@ const TOOLBAR_ACCENTS: Record<
   }
 > = {
   blue: {
-    inputFocus: 'focus:ring-blue-500/30 focus:border-blue-600',
-    activeFilter: 'bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-black dark:text-white',
-    sortIcon: 'text-blue-600 dark:text-blue-400',
-    closeBtn: 'bg-blue-600 hover:bg-blue-700'
+    inputFocus: 'focus:ring-[#38BDF8]/25 focus:border-[#1D4ED8] dark:focus:border-[#38BDF8]',
+    activeFilter: 'bg-[#EEF4FA] dark:bg-[#15212D] border-[#1D4ED8]/35 dark:border-[#38BDF8]/40 text-[#0F1E2E] dark:text-[#F1F6FA]',
+    sortIcon: 'text-[#1D4ED8] dark:text-[#38BDF8]',
+    closeBtn: 'bg-[#1D4ED8] hover:bg-[#1E40AF] dark:bg-[#0EA5E9] dark:text-[#07111A]'
   },
   indigo: {
-    inputFocus: 'focus:ring-indigo-500/30 focus:border-indigo-600',
-    activeFilter: 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-300 dark:border-indigo-700 text-black dark:text-white',
-    sortIcon: 'text-indigo-600 dark:text-indigo-400',
-    closeBtn: 'bg-indigo-600 hover:bg-indigo-700'
+    inputFocus: 'focus:ring-[#D98A4E]/25 focus:border-[#9A5628] dark:focus:border-[#D98A4E]',
+    activeFilter: 'bg-[#F5EFE6] dark:bg-[#2A231C] border-[#9A5628]/40 dark:border-[#D98A4E]/45 text-[#231F1C] dark:text-[#F5F2EC]',
+    sortIcon: 'text-[#9A5628] dark:text-[#D98A4E]',
+    closeBtn: 'bg-[#9A5628] hover:bg-[#7D451F] dark:bg-[#D98A4E] dark:text-[#141312]'
   },
   teal: {
-    inputFocus: 'focus:ring-teal-500/30 focus:border-teal-600',
-    activeFilter: 'bg-teal-50 dark:bg-teal-950/50 border-teal-300 dark:border-teal-700 text-black dark:text-white',
-    sortIcon: 'text-teal-600 dark:text-teal-400',
-    closeBtn: 'bg-teal-600 hover:bg-teal-700'
+    inputFocus: 'focus:ring-[#10B981]/25 focus:border-[#0B6E52] dark:focus:border-[#34D399]',
+    activeFilter: 'bg-[#EBF7F2] dark:bg-[#13261F] border-[#0B6E52]/35 dark:border-[#34D399]/40 text-[#0F241C] dark:text-[#F4F1EA]',
+    sortIcon: 'text-[#0B6E52] dark:text-[#34D399]',
+    closeBtn: 'bg-[#0B6E52] hover:bg-[#095A43] dark:bg-[#10B981] dark:text-[#08120E]'
+  },
+  amber: {
+    inputFocus: 'focus:ring-[#D98A4E]/25 focus:border-[#9A5628] dark:focus:border-[#D98A4E]',
+    activeFilter: 'bg-[#F5EFE6] dark:bg-[#2A231C] border-[#9A5628]/40 dark:border-[#D98A4E]/45 text-[#231F1C] dark:text-[#F5F2EC]',
+    sortIcon: 'text-[#9A5628] dark:text-[#D98A4E]',
+    closeBtn: 'bg-[#9A5628] hover:bg-[#7D451F] dark:bg-[#D98A4E] dark:text-[#141312]'
+  },
+  emerald: {
+    inputFocus: 'focus:ring-[#10B981]/25 focus:border-[#0B6E52] dark:focus:border-[#34D399]',
+    activeFilter: 'bg-[#EBF7F2] dark:bg-[#13261F] border-[#0B6E52]/35 dark:border-[#34D399]/40 text-[#0F241C] dark:text-[#F4F1EA]',
+    sortIcon: 'text-[#0B6E52] dark:text-[#34D399]',
+    closeBtn: 'bg-[#0B6E52] hover:bg-[#095A43] dark:bg-[#10B981] dark:text-[#08120E]'
   }
 };
 
@@ -67,13 +81,16 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
   onSortChange,
   sortLabel = 'Susun Mengikut',
   rightSlot,
-  accent = 'blue'
+  accent
 }) => {
+  const { isAdmin, isMentor } = useAuth();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const hasSortControl = Boolean(sortOptions && sortOptions.length > 0 && sortValue !== undefined && onSortChange);
   const hasPopoverBody = Boolean(filterContent || hasSortControl);
-  const theme = TOOLBAR_ACCENTS[accent];
+  const resolvedAccent: ToolbarAccent =
+    accent || (isAdmin ? 'amber' : isMentor ? 'blue' : 'emerald');
+  const theme = TOOLBAR_ACCENTS[resolvedAccent];
 
   useEffect(() => {
     if (!isFilterOpen) return;
@@ -98,25 +115,25 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
   const fitWidth = getSearchInputWidth(searchPlaceholder);
 
   return (
-    <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-200 dark:border-zinc-700">
+    <div className="p-3.5 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-200/75 dark:border-white/10">
       <div
         style={{ ['--search-fit-w' as string]: fitWidth }}
         className="relative w-full sm:w-[var(--search-fit-w)] sm:max-w-full min-w-0"
       >
-        <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <Search className="w-4 h-4 text-slate-400 dark:text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           type="text"
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={searchPlaceholder}
-          className={`w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 transition-all ${theme.inputFocus}`}
+          className={`w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-white/70 dark:bg-black/25 border border-slate-200/80 dark:border-white/12 text-slate-900 dark:text-[#F5F3EE] placeholder:text-slate-400 dark:placeholder:text-stone-500 focus:bg-white dark:focus:bg-black/40 focus:outline-none focus:ring-2 transition-all ${theme.inputFocus}`}
         />
         {searchValue && (
           <button
             type="button"
             onClick={() => onSearchChange('')}
             aria-label="Kosongkan carian"
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white cursor-pointer"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -137,24 +154,24 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
               className={`min-h-[38px] w-[38px] rounded-xl border inline-flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
                 filterCount > 0
                   ? theme.activeFilter
-                  : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
+                  : 'bg-white/75 dark:bg-white/5 border-slate-200/80 dark:border-white/12 text-slate-700 dark:text-stone-200 hover:bg-slate-100/80 dark:hover:bg-white/10'
               }`}
             >
               <SlidersHorizontal className="w-4 h-4 shrink-0" />
             </button>
 
             {isFilterOpen && (
-              <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-40 space-y-3.5 text-left">
+              <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#171817] border border-slate-200 dark:border-white/12 shadow-xl p-4 z-40 space-y-3.5 text-left">
                 {hasSortControl && sortOptions && onSortChange && (
-                  <div className={filterContent ? 'pb-3 border-b border-slate-200 dark:border-zinc-700' : ''}>
-                    <label className="block text-[0.8125rem] font-bold text-black/75 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                  <div className={filterContent ? 'pb-3 border-b border-slate-200/75 dark:border-white/10' : ''}>
+                    <label className="block text-[0.8125rem] font-semibold text-slate-700 dark:text-stone-200 mb-1.5 flex items-center gap-1.5">
                       <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${theme.sortIcon}`} />
                       <span>{sortLabel}</span>
                     </label>
                     <select
                       value={sortValue}
                       onChange={(e) => onSortChange(e.target.value)}
-                      className={`w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer focus:outline-none focus:ring-2 ${theme.inputFocus}`}
+                      className={`w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/12 text-slate-900 dark:text-[#F5F3EE] font-medium cursor-pointer focus:outline-none focus:ring-2 ${theme.inputFocus}`}
                     >
                       {sortOptions.map((opt) => (
                         <option key={opt.value} value={opt.value}>
@@ -167,12 +184,12 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
 
                 {filterContent}
 
-                <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-2">
+                <div className="pt-2 border-t border-slate-200/75 dark:border-white/10 flex flex-wrap items-center justify-between gap-2">
                   {onResetFilters ? (
                     <button
                       type="button"
                       onClick={onResetFilters}
-                      className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
+                      className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300 hover:text-slate-900 dark:hover:text-white hover:underline cursor-pointer"
                     >
                       Set Semula
                     </button>
@@ -182,7 +199,7 @@ export const ReferenceTableToolbar: React.FC<ReferenceTableToolbarProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsFilterOpen(false)}
-                    className={`px-3 py-1.5 rounded-lg text-white text-[0.8125rem] font-bold cursor-pointer transition-colors ${theme.closeBtn}`}
+                    className={`px-3.5 py-1.5 rounded-xl text-white text-[0.8125rem] font-semibold cursor-pointer transition-colors whitespace-nowrap shrink-0 ${theme.closeBtn}`}
                   >
                     Tutup
                   </button>
@@ -213,6 +230,8 @@ export const RowActionMenu: React.FC<RowActionMenuProps> = ({
   items,
   ariaLabel = 'Tindakan baris'
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [isOpen, setIsOpen] = useState(false);
   const [menuPos, setMenuPos] = useState<{ top: number; left: number; maxHeight: number; ready: boolean }>({
     top: 0,
@@ -321,7 +340,7 @@ export const RowActionMenu: React.FC<RowActionMenuProps> = ({
                     item.tone === 'danger'
                       ? 'font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50'
                       : item.tone === 'accent'
-                      ? 'font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40'
+                      ? `font-semibold ${roleTheme.accentTextClass} ${roleTheme.rowHoverClass}`
                       : 'font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
                   }`}
                 >
@@ -350,7 +369,7 @@ export const RowActionMenu: React.FC<RowActionMenuProps> = ({
         }}
         aria-expanded={isOpen}
         aria-label={ariaLabel}
-        className="w-8 h-8 rounded-lg inline-flex items-center justify-center shrink-0 text-black/60 dark:text-white/65 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
+        className="w-8 h-8 rounded-xl inline-flex items-center justify-center shrink-0 text-black/60 dark:text-white/65 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>

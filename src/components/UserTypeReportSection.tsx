@@ -44,6 +44,9 @@ import {
 } from '../utils/sortUtils';
 import { useAnimatedMetric, usePrefersReducedMotion } from '../hooks/useMotion';
 import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const adminTheme = getRoleTheme('admin');
 
 export type ReportUserTypeKey = 'all' | 'belia' | 'mentor' | 'admin';
 
@@ -57,7 +60,7 @@ interface UserTypeReportRecord {
   activitySummary: string;
   metricDisplay: string;
   statusLabel: string;
-  statusTone: 'emerald' | 'blue' | 'amber' | 'indigo';
+  statusTone: 'emerald' | 'blue' | 'amber' | 'bronze';
   detailLine: string;
   modifiedMs: number;
 }
@@ -75,21 +78,21 @@ interface UserTypeReportSectionProps {
   portalSettings?: PortalSettings;
 }
 
-const USER_TYPE_COLORS: Record<Exclude<ReportUserTypeKey, 'all'>, { fill: string; label: string; badgeBg: string }> = {
+const USER_TYPE_COLORS: Record<Exclude<ReportUserTypeKey, 'all'>, { fill: string; label: string; textTone: string }> = {
   belia: {
-    fill: '#2563EB',
+    fill: '#10B981',
     label: 'Usahawan Belia',
-    badgeBg: 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70'
+    textTone: 'text-[#0B6E52] dark:text-[#34D399]'
   },
   mentor: {
-    fill: '#0D9488',
+    fill: '#2563EB',
     label: 'Panel Mentor',
-    badgeBg: 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70'
+    textTone: 'text-[#1D4ED8] dark:text-[#38BDF8]'
   },
   admin: {
-    fill: '#4F46E5',
-    label: 'Admin Sistem',
-    badgeBg: 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800/70'
+    fill: '#D98A4E',
+    label: 'Penyelaras Rangkaian',
+    textTone: 'text-[#9A5628] dark:text-[#D98A4E]'
   }
 };
 
@@ -199,8 +202,8 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         locationOrAgency: b.hubLocation || 'Hab KBelia',
         activitySummary: `Permohonan Kiosk ${b.slotCode} (${b.durationMonths} bulan)`,
         metricDisplay: `RM ${(b.monthlyRate || 150).toLocaleString('ms-MY')}/bulan`,
-        statusLabel: b.status === 'approved' ? 'Diluluskan' : b.status === 'pending' ? 'Dalam Semakan' : 'Ditolak',
-        statusTone: b.status === 'approved' ? 'emerald' : b.status === 'pending' ? 'amber' : 'indigo',
+        statusLabel: b.status === 'approved' ? 'Diluluskan' : b.status === 'pending' ? 'Dalam Semakan' : 'Tidak Diluluskan',
+        statusTone: b.status === 'approved' ? 'emerald' : b.status === 'pending' ? 'amber' : 'bronze',
         detailLine: `Kategori: ${b.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : b.businessCategory} · Tarikh Mula: ${b.startDate || '-'} · Telefon: ${b.applicantPhone || '-'}`,
         modifiedMs: getModifiedTimestamp(b)
       });
@@ -219,8 +222,8 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         locationOrAgency: g.district || 'Kelantan',
         activitySummary: `Permohonan ${g.programTitle}`,
         metricDisplay: g.amount || g.grantAmount || 'RM 3,000',
-        statusLabel: g.status === 'approved' ? 'Diluluskan' : g.status === 'pending' ? 'Dalam Semakan' : 'Ditolak',
-        statusTone: g.status === 'approved' ? 'emerald' : g.status === 'pending' ? 'amber' : 'indigo',
+        statusLabel: g.status === 'approved' ? 'Diluluskan' : g.status === 'pending' ? 'Dalam Semakan' : 'Tidak Diluluskan',
+        statusTone: g.status === 'approved' ? 'emerald' : g.status === 'pending' ? 'amber' : 'bronze',
         detailLine: `Kategori: ${g.businessCategory} · Bank: ${g.bankName || '-'}`,
         modifiedMs: getModifiedTimestamp(g)
       });
@@ -275,35 +278,35 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
       });
     });
 
-    // 4. Rekod Tadbir Urus Admin Sistem (Pentadbir Utama & Urusetia Portal)
-    const chiefAdminName = portalSettings?.adminOfficerName || 'Pentadbir Sistem KBelia';
+    // 4. Rekod Penyelaras Rangkaian (Pentadbir Utama & Urusetia)
+    const chiefAdminName = portalSettings?.adminOfficerName || 'Penyelaras Utama KBelia';
     records.push({
       id: 'usr-adm-chief',
       displayName: chiefAdminName,
-      secondaryEntity: 'Pentadbir Utama Portal KBelia Kelantan',
+      secondaryEntity: 'Penyelaras Utama Rangkaian KBelia Kelantan',
       userType: 'admin',
-      userTypeLabel: 'Admin Sistem',
+      userTypeLabel: 'Penyelaras Rangkaian',
       locationOrAgency: 'Kompleks Kota Darulnaim, Kota Bharu',
-      activitySummary: 'Pengurusan Kiosk, Kelulusan Geran & Audit Portal',
+      activitySummary: 'Penyelarasan Ruang Niaga & Sokongan Usahawan',
       metricDisplay: `${bookings.length + grantApplications.length} Semakan`,
-      statusLabel: portalSettings?.systemStatus === 'maintenance' ? 'Penyelenggaraan' : 'Aktif',
-      statusTone: portalSettings?.systemStatus === 'maintenance' ? 'amber' : 'indigo',
-      detailLine: `Menguruskan ${businesses.length} perniagaan belia berdaftar serta penjadualan slot kiosk.`,
+      statusLabel: portalSettings?.systemStatus === 'maintenance' ? 'Penjagaan' : 'Aktif',
+      statusTone: portalSettings?.systemStatus === 'maintenance' ? 'amber' : 'bronze',
+      detailLine: `Menyelaras ${businesses.length} perniagaan belia berdaftar serta penjadualan ruang niaga.`,
       modifiedMs: Date.now()
     });
 
     records.push({
       id: 'usr-adm-urusetia',
       displayName: 'Urusetia Pengurusan KBelia',
-      secondaryEntity: 'Unit Pemantauan Program, Aduan & Siaran Berita',
+      secondaryEntity: 'Unit Pemantauan Program, Aduan & Siaran Komuniti',
       userType: 'admin',
-      userTypeLabel: 'Admin Sistem',
+      userTypeLabel: 'Penyelaras Rangkaian',
       locationOrAgency: 'Unit Pembangunan Ekonomi Belia',
-      activitySummary: `Seliaan ${programs.length} Skim & ${maintenanceTickets.length} Aduan Teknikal`,
-      metricDisplay: `${programs.length} Skim · ${newsItems.length} Berita`,
+      activitySummary: `Seliaan ${programs.length} Inisiatif & ${maintenanceTickets.length} Penjagaan`,
+      metricDisplay: `${programs.length} Inisiatif · ${newsItems.length} Siaran`,
       statusLabel: 'Aktif',
-      statusTone: 'indigo',
-      detailLine: `Menyelaras ${newsItems.length} pengumuman rasmi dan ${maintenanceTickets.length} tiket penyelenggaraan kiosk.`,
+      statusTone: 'bronze',
+      detailLine: `Menyelaras ${newsItems.length} pengumuman rasmi dan ${maintenanceTickets.length} laporan penjagaan kemudahan.`,
       modifiedMs: Date.now() - 1000
     });
 
@@ -412,467 +415,426 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         };
 
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 shadow-sm">
-      <div className="h-0.5 w-full bg-indigo-600/80 dark:bg-indigo-500/80" aria-hidden="true" />
+    <section className={`relative overflow-hidden rounded-2xl border backdrop-blur-xs transition-colors ${adminTheme.surfaceClass}`}>
       {/* Header */}
-      <div className="px-4 py-3.5 sm:px-5 sm:py-4 border-b border-slate-200 dark:border-zinc-700">
-        <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-          <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
-            Laporan Data Terkumpul Mengikut Jenis Pengguna
+      <div className={`px-4 py-4 sm:px-5 border-b ${adminTheme.dividerClass}`}>
+        <div className="flex items-center gap-2.5">
+          <FileText className={`w-5 h-5 ${adminTheme.accentTextClass}`} />
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-[#F5F2EC] tracking-tight">
+            Perkembangan Komuniti Mengikut Peranan
           </h3>
         </div>
       </div>
 
-      <div className="p-4 sm:p-5 space-y-4">
-        {/* Balanced Vertical Stack: Full-Width Chart on Top + 3 Equal-Width/Height Cards Below */}
-        <div className="space-y-4">
-          {/* Top Tier: Full-Width Bar/Donut Chart + Compact 3-Column Bottom Legend */}
-          <div className="w-full min-w-0 rounded-xl bg-slate-50/80 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 p-4 flex flex-col justify-start">
-            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-zinc-700">
-              <div className="flex items-center gap-2">
-                {chartMode === 'bar' ? (
-                  <BarChart3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                ) : (
-                  <PieChartIcon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                )}
-                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
-                  Komposisi Jenis Pengguna
-                </h4>
-              </div>
-              <div className="inline-flex items-center gap-1 p-0.5 bg-white dark:bg-zinc-900 rounded-lg border border-slate-200 dark:border-zinc-700">
-                <button
-                  type="button"
-                  onClick={() => setChartMode('bar')}
-                  className={`px-2.5 py-1 rounded-md text-[0.8125rem] font-bold transition-colors cursor-pointer whitespace-nowrap ${
-                    chartMode === 'bar'
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
-                  }`}
-                >
-                  Graf Bar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setChartMode('donut')}
-                  className={`px-2.5 py-1 rounded-md text-[0.8125rem] font-bold transition-colors cursor-pointer whitespace-nowrap ${
-                    chartMode === 'donut'
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
-                  }`}
-                >
-                  Donut
-                </button>
-              </div>
-            </div>
-
-            <div className="relative h-[224px] min-h-[224px] w-full min-w-0 my-2 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-              <ResponsiveContainer width="100%" height={224} minWidth={0} initialDimension={{ width: 640, height: 224 }}>
-                {chartMode === 'bar' ? (
-                  <BarChart
-                    data={donutChartData}
-                    barCategoryGap="24%"
-                    margin={{ top: 26, right: 20, left: -4, bottom: 6 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                    <XAxis dataKey="name" tick={{ fontSize: 12.5, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
-                    <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} />
-                    <Tooltip
-                      cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const d = payload[0].payload as typeof donutChartData[number];
-                          return (
-                            <div className="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-sm shadow-xl border border-slate-700">
-                              <div className="font-bold text-white">{d.name}</div>
-                              <div className="font-mono tabular-nums text-white/90">
-                                {d.count} Rekod ({d.percentage}%)
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Bar
-                      dataKey="count"
-                      fill="#2563EB"
-                      radius={[6, 6, 0, 0]}
-                      maxBarSize={72}
-                      minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
-                      isAnimationActive={!prefersReducedMotion}
-                      animationDuration={650}
-                      shape={(barProps: unknown) => (
-                        <AnimatedShimmerBar
-                          {...(barProps as AnimatedShimmerBarProps)}
-                          radius={6}
-                          reducedMotion={prefersReducedMotion}
-                        />
-                      )}
-                      onClick={(data) => {
-                        const clickedKey = (data as unknown as { key?: Exclude<ReportUserTypeKey, 'all'> })?.key;
-                        if (clickedKey) {
-                          setSelectedType(selectedType === clickedKey ? 'all' : clickedKey);
-                        }
-                      }}
-                      className="cursor-pointer"
-                    >
-                      {donutChartData.map((entry) => (
-                        <Cell
-                          key={entry.key}
-                          fill={entry.color}
-                          opacity={selectedType === 'all' || selectedType === entry.key ? 1 : 0.4}
-                        />
-                      ))}
-                      <LabelList
-                        dataKey="count"
-                        position="top"
-                        formatter={(val: unknown) => String(Number(val) || 0)}
-                        className="fill-slate-900 dark:fill-slate-100 font-mono"
-                        style={{ fontSize: 12.5, fontWeight: 700 }}
-                      />
-                    </Bar>
-                  </BarChart>
-                ) : (
-                  <PieChart>
-                    <Pie
-                      data={donutChartData}
-                      dataKey="count"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={2}
-                      strokeWidth={2}
-                      stroke="#FFFFFF"
-                      isAnimationActive={!prefersReducedMotion}
-                      animationDuration={650}
-                      onClick={(_, idx) => {
-                        const clicked = donutChartData[idx];
-                        if (clicked) {
-                          setSelectedType(selectedType === clicked.key ? 'all' : clicked.key);
-                        }
-                      }}
-                      className="cursor-pointer outline-none"
-                    >
-                      {donutChartData.map((entry) => (
-                        <Cell
-                          key={entry.key}
-                          fill={entry.color}
-                          opacity={selectedType === 'all' || selectedType === entry.key ? 1 : 0.45}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const d = payload[0].payload as typeof donutChartData[number];
-                          return (
-                            <div className="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-sm shadow-xl border border-slate-700">
-                              <div className="font-bold text-white">{d.name}</div>
-                              <div className="font-mono tabular-nums text-white/90">
-                                {d.count} Rekod ({d.percentage}%)
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                  </PieChart>
-                )}
-              </ResponsiveContainer>
-
-              {chartMode === 'donut' && (
-                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                  <span className="text-[0.8125rem] font-semibold text-black/75 dark:text-white/80 truncate max-w-[125px]">
-                    {activeDonutFocus.label}
-                  </span>
-                  <span className="text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums leading-tight">
-                    {activeDonutFocus.percentage}%
-                  </span>
-                  <span className="text-[0.8125rem] font-medium text-black/75 dark:text-white/80 tabular-nums">
-                    {activeDonutFocus.count} Rekod
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-slate-300 dark:border-zinc-700">
-              {donutChartData.map((entry) => (
-                <button
-                  key={entry.key}
-                  type="button"
-                  onClick={() => setSelectedType(selectedType === entry.key ? 'all' : entry.key)}
-                  className={`flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-[0.8125rem] font-medium cursor-pointer transition-colors ${
-                    selectedType === entry.key
-                      ? 'bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 font-bold text-black dark:text-white shadow-2xs'
-                      : 'text-black/80 dark:text-white/80 hover:bg-white/70 dark:hover:bg-zinc-900/70 hover:text-black dark:hover:text-white'
-                  }`}
-                >
-                  <span className="flex items-center gap-2 min-w-0">
-                    <span className="w-2.5 h-2.5 rounded-xs shrink-0" style={{ backgroundColor: entry.color }} />
-                    <span className="truncate">{entry.name}</span>
-                  </span>
-                  <span className="font-mono font-bold tabular-nums shrink-0">{entry.percentage}%</span>
-                </button>
-              ))}
-            </div>
+      {/* Chart Zone (Unboxed single-elevation inside section) */}
+      <div className={`p-4 sm:p-5 border-b ${adminTheme.dividerClass}`}>
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
+          <div className="flex items-center gap-2">
+            {chartMode === 'bar' ? (
+              <BarChart3 className={`w-4 h-4 ${adminTheme.accentTextClass}`} />
+            ) : (
+              <PieChartIcon className={`w-4 h-4 ${adminTheme.accentTextClass}`} />
+            )}
+            <h4 className="text-base font-bold text-slate-900 dark:text-[#F5F2EC] tracking-tight">
+              Komposisi Peranan Komuniti
+            </h4>
           </div>
-
-          {/* Bottom Tier: 3 Equal-Width, Equal-Height Summary Cards in a Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 items-stretch">
+          <div className={`inline-flex items-center gap-1 p-1 rounded-xl border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
             <button
               type="button"
-              onClick={() => setSelectedType(selectedType === 'belia' ? 'all' : 'belia')}
-              style={{ '--stagger': 0 } as React.CSSProperties}
-              className={`animate-dashboard-card group relative overflow-hidden h-full p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-pointer flex flex-col justify-between gap-2.5 ${
-                selectedType === 'belia'
-                  ? 'bg-blue-50/90 dark:bg-blue-950/40 border-blue-600 ring-1 ring-blue-500/40'
-                  : 'bg-slate-50/80 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 hover:bg-blue-50/40 dark:hover:bg-zinc-800/70 hover:border-blue-400/70'
+              onClick={() => setChartMode('bar')}
+              className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                chartMode === 'bar'
+                  ? adminTheme.segmentedActiveClass
+                  : 'text-slate-600 dark:text-stone-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-600/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">Usahawan Belia</span>
-                <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
-                  <Store className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
-                  {animatedBeliaCount}
-                </span>
-                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {animatedBeliaPct}
-                </span>
-              </div>
-              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
-                {businesses.length} perniagaan · {bookings.length} tempahan · {grantApplications.length} geran
-              </p>
+              Lajur
             </button>
-
             <button
               type="button"
-              onClick={() => setSelectedType(selectedType === 'mentor' ? 'all' : 'mentor')}
-              style={{ '--stagger': 1 } as React.CSSProperties}
-              className={`animate-dashboard-card group relative overflow-hidden h-full p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-pointer flex flex-col justify-between gap-2.5 ${
-                selectedType === 'mentor'
-                  ? 'bg-teal-50/90 dark:bg-teal-950/40 border-teal-600 ring-1 ring-teal-500/40'
-                  : 'bg-slate-50/80 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 hover:bg-teal-50/40 dark:hover:bg-zinc-800/70 hover:border-teal-400/70'
+              onClick={() => setChartMode('donut')}
+              className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                chartMode === 'donut'
+                  ? adminTheme.segmentedActiveClass
+                  : 'text-slate-600 dark:text-stone-300 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              <div className="absolute top-0 left-0 right-0 h-0.5 bg-teal-600/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">Panel Mentor</span>
-                <div className="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
-                  <GraduationCap className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
-                  {animatedMentorCount}
-                </span>
-                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {animatedMentorPct}
-                </span>
-              </div>
-              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
-                {mentors.length} mentor · {mentorshipRegistrations.length} sesi bimbingan
-              </p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSelectedType(selectedType === 'admin' ? 'all' : 'admin')}
-              style={{ '--stagger': 2 } as React.CSSProperties}
-              className={`animate-dashboard-card group relative overflow-hidden h-full p-4 rounded-xl border text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-pointer flex flex-col justify-between gap-2.5 ${
-                selectedType === 'admin'
-                  ? 'bg-indigo-50/90 dark:bg-indigo-950/40 border-indigo-600 ring-1 ring-indigo-500/40'
-                  : 'bg-slate-50/80 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 hover:bg-indigo-50/40 dark:hover:bg-zinc-800/70 hover:border-indigo-400/70'
-              }`}
-            >
-              <div className="absolute top-0 left-0 right-0 h-0.5 bg-indigo-600/80 opacity-65 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white tracking-tight">Admin Sistem</span>
-                <div className="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-2xl sm:text-[1.75rem] font-extrabold font-mono text-black dark:text-white tabular-nums leading-none">
-                  {animatedAdminCount}
-                </span>
-                <span className="text-sm font-mono font-bold text-black/80 dark:text-white/85 tabular-nums">
-                  {animatedAdminPct}
-                </span>
-              </div>
-              <p className="text-[0.8125rem] sm:text-sm text-black/75 dark:text-white/80 leading-snug">
-                Pentadbir &amp; urusetia · {programs.length} program · {newsItems.length} siaran
-              </p>
+              Donut
             </button>
           </div>
         </div>
 
-        {/* Reference-Style Unified User-Type Data Table Card */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
-          <ReferenceTableToolbar
-            accent="indigo"
-            searchValue={searchQuery}
-            onSearchChange={setSearchQuery}
-            searchPlaceholder="Cari nama, perniagaan atau daerah..."
-            filterCount={(selectedType !== 'all' ? 1 : 0) + (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0)}
-            onResetFilters={() => {
-              setSelectedType('all');
-              setSortBy(DEFAULT_SORT_VALUE);
-            }}
-            sortOptions={reportSortOptions}
-            sortValue={sortBy}
-            onSortChange={setSortBy}
-            filterContent={
-              <div>
-                <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/70 dark:text-white/75 mb-1.5">
-                  Jenis Pengguna
-                </label>
-                <div className="grid grid-cols-1 gap-1.5">
-                  {(
-                    [
-                      { id: 'all', label: `Semua (${consolidatedRecords.length})` },
-                      { id: 'belia', label: `Belia (${countsByType.belia})` },
-                      { id: 'mentor', label: `Mentor (${countsByType.mentor})` },
-                      { id: 'admin', label: `Admin (${countsByType.admin})` }
-                    ] as const
-                  ).map((tab) => (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setSelectedType(tab.id)}
-                      className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold border text-left transition-colors cursor-pointer ${
-                        selectedType === tab.id
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            }
-          />
-
-          {filteredRecords.length === 0 ? (
-            <div className="p-10 text-center space-y-2">
-              <Users className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
-              <p className="text-sm font-bold text-black dark:text-white">Tiada Rekod Pengguna Dijumpai</p>
-              <p className="text-sm text-black/70 dark:text-white/75">
-                Cuba pilih penapis jenis pengguna lain atau tukar kata kunci carian anda.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
-                      <th className="py-3 pl-4 pr-2 w-12 text-center">Bil</th>
-                      <th className="py-3 px-3">Nama &amp; Entiti</th>
-                      <th className="py-3 px-3">Jenis Pengguna</th>
-                      <th className="py-3 px-3">Daerah / Agensi</th>
-                      <th className="py-3 px-3">Ringkasan Aktiviti</th>
-                      <th className="py-3 px-3 text-right">Metrik</th>
-                      <th className="py-3 px-3 text-center">Status</th>
-                      <th className="py-3 pl-2 pr-4 w-12 text-right">
-                        <span className="sr-only">Tindakan</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-black dark:text-white">
-                    {pagination.paginatedItems.map((rec, idx) => {
-                      const rowNumber = (pagination.currentPage - 1) * 6 + idx + 1;
-                      const isExpanded = expandedRowId === rec.id;
-                      const badgeStyle = USER_TYPE_COLORS[rec.userType].badgeBg;
-                      const statusBg =
-                        rec.statusTone === 'emerald'
-                          ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/70 text-emerald-700 dark:text-emerald-300'
-                          : rec.statusTone === 'amber'
-                          ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/70 text-amber-700 dark:text-amber-300'
-                          : rec.statusTone === 'blue'
-                          ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70 text-blue-700 dark:text-blue-300'
-                          : 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800/70 text-indigo-700 dark:text-indigo-300';
-
+        <div className="relative h-[220px] min-h-[220px] w-full min-w-0 my-1 [&_.recharts-cartesian-axis-tick_text]:fill-slate-600 dark:[&_.recharts-cartesian-axis-tick_text]:fill-stone-300">
+          <ResponsiveContainer width="100%" height={220} minWidth={0} initialDimension={{ width: 640, height: 220 }}>
+            {chartMode === 'bar' ? (
+              <BarChart
+                data={donutChartData}
+                barCategoryGap="24%"
+                margin={{ top: 26, right: 20, left: -4, bottom: 6 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(168, 162, 158, 0.22)" />
+                <XAxis dataKey="name" tick={{ fontSize: 12.5, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, (dataMax: number) => Math.max(dataMax, 4)]} allowDecimals={false} tick={{ fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  cursor={{ fill: 'rgba(217, 138, 78, 0.10)' }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const d = payload[0].payload as typeof donutChartData[number];
                       return (
-                        <React.Fragment key={rec.id}>
-                          <tr className="kbelia-table-row">
-                            <td className="py-3.5 pl-4 pr-2 text-center font-mono text-black/75 dark:text-white/75 tabular-nums">
-                              {rowNumber}
-                            </td>
-                            <td className="py-3.5 px-3">
-                              <div className="font-semibold text-black dark:text-white leading-snug">
-                                {rec.displayName}
-                              </div>
-                              <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate max-w-[220px]">
-                                {rec.secondaryEntity}
-                              </div>
-                            </td>
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.8125rem] font-semibold text-black dark:text-white ${badgeStyle}`}>
-                                {rec.userTypeLabel}
-                              </span>
-                            </td>
-                            <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
-                              {rec.locationOrAgency}
-                            </td>
-                            <td className="py-3.5 px-3 text-black/80 dark:text-white/85 max-w-[240px]">
-                              <span className="line-clamp-2">{rec.activitySummary}</span>
-                            </td>
-                            <td className="py-3.5 px-3 text-right font-mono font-bold text-black dark:text-white tabular-nums whitespace-nowrap">
-                              {rec.metricDisplay}
-                            </td>
-                            <td className="py-3.5 px-3 text-center whitespace-nowrap">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[0.8125rem] font-semibold ${statusBg}`}>
-                                {rec.statusLabel}
-                              </span>
-                            </td>
-                            <td className="py-3.5 pl-2 pr-4 text-right whitespace-nowrap">
-                              <RowActionMenu
-                                ariaLabel={`Tindakan untuk ${rec.displayName}`}
-                                items={[
-                                  {
-                                    label: isExpanded ? 'Tutup Maklumat' : 'Lihat Maklumat Tambahan',
-                                    onClick: () => setExpandedRowId(isExpanded ? null : rec.id)
-                                  }
-                                ]}
-                              />
-                            </td>
-                          </tr>
-                          {isExpanded && (
-                            <tr className="bg-slate-50/80 dark:bg-zinc-950/70">
-                              <td colSpan={8} className="px-6 py-3.5 text-sm text-black dark:text-white border-t border-slate-200 dark:border-zinc-700">
-                                <span className="font-bold mr-2">Maklumat Tambahan:</span>
-                                <span>{rec.detailLine}</span>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
+                        <div className={`px-3.5 py-2 rounded-xl text-sm shadow-xl border ${adminTheme.tooltipBgClass}`}>
+                          <div className="font-bold">{d.name}</div>
+                          <div className="font-mono tabular-nums opacity-90">
+                            {d.count} Rekod ({d.percentage}%)
+                          </div>
+                        </div>
                       );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                    }
+                    return null;
+                  }}
+                />
+                <Bar
+                  dataKey="count"
+                  fill={adminTheme.chartPrimary}
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={72}
+                  minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
+                  isAnimationActive={!prefersReducedMotion}
+                  animationDuration={650}
+                  shape={(barProps: unknown) => (
+                    <AnimatedShimmerBar
+                      {...(barProps as AnimatedShimmerBarProps)}
+                      radius={6}
+                      reducedMotion={prefersReducedMotion}
+                    />
+                  )}
+                  onClick={(data) => {
+                    const clickedKey = (data as unknown as { key?: Exclude<ReportUserTypeKey, 'all'> })?.key;
+                    if (clickedKey) {
+                      setSelectedType(selectedType === clickedKey ? 'all' : clickedKey);
+                    }
+                  }}
+                  className="cursor-pointer"
+                >
+                  {donutChartData.map((entry) => (
+                    <Cell
+                      key={entry.key}
+                      fill={entry.color}
+                      opacity={selectedType === 'all' || selectedType === entry.key ? 1 : 0.4}
+                    />
+                  ))}
+                  <LabelList
+                    dataKey="count"
+                    position="top"
+                    formatter={(val: unknown) => String(Number(val) || 0)}
+                    className="fill-slate-800 dark:fill-stone-200 font-mono"
+                    style={{ fontSize: 12.5, fontWeight: 700 }}
+                  />
+                </Bar>
+              </BarChart>
+            ) : (
+              <PieChart>
+                <Pie
+                  data={donutChartData}
+                  dataKey="count"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={2}
+                  strokeWidth={2}
+                  stroke="#FFFFFF"
+                  isAnimationActive={!prefersReducedMotion}
+                  animationDuration={650}
+                  onClick={(_, idx) => {
+                    const clicked = donutChartData[idx];
+                    if (clicked) {
+                      setSelectedType(selectedType === clicked.key ? 'all' : clicked.key);
+                    }
+                  }}
+                  className="cursor-pointer outline-none"
+                >
+                  {donutChartData.map((entry) => (
+                    <Cell
+                      key={entry.key}
+                      fill={entry.color}
+                      opacity={selectedType === 'all' || selectedType === entry.key ? 1 : 0.45}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const d = payload[0].payload as typeof donutChartData[number];
+                      return (
+                        <div className={`px-3.5 py-2 rounded-xl text-sm shadow-xl border ${adminTheme.tooltipBgClass}`}>
+                          <div className="font-bold">{d.name}</div>
+                          <div className="font-mono tabular-nums opacity-90">
+                            {d.count} Rekod ({d.percentage}%)
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+              </PieChart>
+            )}
+          </ResponsiveContainer>
 
-              <PaginationBar
-                currentPage={pagination.currentPage}
-                totalItems={pagination.totalItems}
-                itemsPerPage={6}
-                onPageChange={pagination.setCurrentPage}
-                itemLabel="rekod pengguna"
-                accent="blue"
-              />
-            </>
+          {chartMode === 'donut' && (
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+              <span className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300 truncate max-w-[125px]">
+                {activeDonutFocus.label}
+              </span>
+              <span className="text-2xl font-extrabold font-mono text-slate-900 dark:text-[#F5F2EC] tabular-nums leading-tight">
+                {activeDonutFocus.percentage}%
+              </span>
+              <span className="text-[0.8125rem] font-medium text-slate-600 dark:text-stone-400 tabular-nums">
+                {activeDonutFocus.count} Rekod
+              </span>
+            </div>
           )}
         </div>
+      </div>
+
+      {/* Hairline-Divided 3-Column Role Filter Strip (No Nested Card Boxes) */}
+      <div className={`grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x ${adminTheme.dividerClass} border-b`}>
+        <button
+          type="button"
+          onClick={() => setSelectedType(selectedType === 'belia' ? 'all' : 'belia')}
+          className={`px-5 py-4 text-left transition-colors cursor-pointer flex flex-col justify-between gap-2 ${
+            selectedType === 'belia'
+              ? 'bg-[#10B981]/10 dark:bg-[#10B981]/14'
+              : 'hover:bg-black/[0.02] dark:hover:bg-white/[0.02]'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-slate-800 dark:text-[#F5F2EC]">Usahawan Belia</span>
+            <Store className="w-4 h-4 text-[#10B981] shrink-0" />
+          </div>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-bold font-mono text-slate-900 dark:text-[#F5F2EC] tabular-nums leading-none">
+              {animatedBeliaCount}
+            </span>
+            <span className="text-xs font-mono font-semibold text-[#0B6E52] dark:text-[#34D399] tabular-nums">
+              {animatedBeliaPct}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-stone-400 leading-snug">
+            {businesses.length} perniagaan · {bookings.length} tempahan · {grantApplications.length} sokongan
+          </p>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setSelectedType(selectedType === 'mentor' ? 'all' : 'mentor')}
+          className={`px-5 py-4 text-left transition-colors cursor-pointer flex flex-col justify-between gap-2 ${
+            selectedType === 'mentor'
+              ? 'bg-[#2563EB]/10 dark:bg-[#22D3EE]/12'
+              : 'hover:bg-black/[0.02] dark:hover:bg-white/[0.02]'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-slate-800 dark:text-[#F5F2EC]">Panel Mentor</span>
+            <GraduationCap className="w-4 h-4 text-[#2563EB] dark:text-[#38BDF8] shrink-0" />
+          </div>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-bold font-mono text-slate-900 dark:text-[#F5F2EC] tabular-nums leading-none">
+              {animatedMentorCount}
+            </span>
+            <span className="text-xs font-mono font-semibold text-[#1D4ED8] dark:text-[#38BDF8] tabular-nums">
+              {animatedMentorPct}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-stone-400 leading-snug">
+            {mentors.length} mentor · {mentorshipRegistrations.length} sesi bimbingan
+          </p>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setSelectedType(selectedType === 'admin' ? 'all' : 'admin')}
+          className={`px-5 py-4 text-left transition-colors cursor-pointer flex flex-col justify-between gap-2 ${
+            selectedType === 'admin'
+              ? 'bg-[#D98A4E]/12 dark:bg-[#D98A4E]/15'
+              : 'hover:bg-black/[0.02] dark:hover:bg-white/[0.02]'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-slate-800 dark:text-[#F5F2EC]">Penyelaras Rangkaian</span>
+            <ShieldCheck className="w-4 h-4 text-[#9A5628] dark:text-[#D98A4E] shrink-0" />
+          </div>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-bold font-mono text-slate-900 dark:text-[#F5F2EC] tabular-nums leading-none">
+              {animatedAdminCount}
+            </span>
+            <span className="text-xs font-mono font-semibold text-[#9A5628] dark:text-[#D98A4E] tabular-nums">
+              {animatedAdminPct}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-stone-400 leading-snug">
+            Urusetia &amp; seliaan · {programs.length} inisiatif · {newsItems.length} siaran
+          </p>
+        </button>
+      </div>
+
+      {/* Unified User-Type Data Table */}
+      <div className="overflow-visible">
+        <ReferenceTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Cari nama, perniagaan atau daerah..."
+          filterCount={(selectedType !== 'all' ? 1 : 0) + (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0)}
+          onResetFilters={() => {
+            setSelectedType('all');
+            setSortBy(DEFAULT_SORT_VALUE);
+          }}
+          sortOptions={reportSortOptions}
+          sortValue={sortBy}
+          onSortChange={setSortBy}
+          filterContent={
+            <div>
+              <label className="block text-[0.8125rem] font-semibold text-slate-700 dark:text-stone-300 mb-1.5">
+                Peranan Komuniti
+              </label>
+              <div className="grid grid-cols-1 gap-1.5">
+                {(
+                  [
+                    { id: 'all', label: `Semua (${consolidatedRecords.length})` },
+                    { id: 'belia', label: `Usahawan Belia (${countsByType.belia})` },
+                    { id: 'mentor', label: `Panel Mentor (${countsByType.mentor})` },
+                    { id: 'admin', label: `Penyelaras (${countsByType.admin})` }
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setSelectedType(tab.id)}
+                    className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold border text-left transition-colors cursor-pointer ${
+                      selectedType === tab.id
+                        ? `${adminTheme.primaryButtonClass} border-transparent`
+                        : `${adminTheme.secondaryButtonClass}`
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          }
+        />
+
+        {filteredRecords.length === 0 ? (
+          <div className="p-10 text-center space-y-2">
+            <Users className="w-8 h-8 text-slate-400 dark:text-stone-500 mx-auto" />
+            <p className="text-sm font-bold text-slate-900 dark:text-[#F5F2EC]">Tiada Rekod Dijumpai</p>
+            <p className="text-sm text-slate-600 dark:text-stone-400">
+              Cuba pilih peranan lain atau tukar kata kunci carian anda.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left border-collapse">
+                <thead>
+                  <tr className={`${adminTheme.surfaceMutedClass} border-b ${adminTheme.dividerClass} text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-400`}>
+                    <th className="py-3 pl-4 pr-2 w-12 text-center">Bil</th>
+                    <th className="py-3 px-3">Nama &amp; Entiti</th>
+                    <th className="py-3 px-3">Peranan</th>
+                    <th className="py-3 px-3">Lokasi / Agensi</th>
+                    <th className="py-3 px-3">Ringkasan Aktiviti</th>
+                    <th className="py-3 px-3 text-right">Catatan</th>
+                    <th className="py-3 px-3 text-center">Keadaan</th>
+                    <th className="py-3 pl-2 pr-4 w-12 text-right">
+                      <span className="sr-only">Tindakan</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${adminTheme.dividerClass} text-slate-900 dark:text-[#F5F2EC]`}>
+                  {pagination.paginatedItems.map((rec, idx) => {
+                    const rowNumber = (pagination.currentPage - 1) * 6 + idx + 1;
+                    const isExpanded = expandedRowId === rec.id;
+                    const typeTextTone = USER_TYPE_COLORS[rec.userType].textTone;
+                    const statusTextTone =
+                      rec.statusTone === 'emerald'
+                        ? 'text-emerald-700 dark:text-emerald-400'
+                        : rec.statusTone === 'amber'
+                        ? 'text-amber-700 dark:text-amber-400'
+                        : rec.statusTone === 'blue'
+                        ? 'text-sky-700 dark:text-sky-400'
+                        : 'text-[#9A5628] dark:text-[#D98A4E]';
+
+                    return (
+                      <React.Fragment key={rec.id}>
+                        <tr className="kbelia-table-row">
+                          <td className="py-3.5 pl-4 pr-2 text-center font-mono text-slate-500 dark:text-stone-400 tabular-nums">
+                            {rowNumber}
+                          </td>
+                          <td className="py-3.5 px-3">
+                            <div className="font-semibold text-slate-900 dark:text-[#F5F2EC] leading-snug">
+                              {rec.displayName}
+                            </div>
+                            <div className="text-[0.8125rem] text-slate-500 dark:text-stone-400 truncate max-w-[220px]">
+                              {rec.secondaryEntity}
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-3 whitespace-nowrap">
+                            <span className={`text-[0.8125rem] font-semibold ${typeTextTone}`}>
+                              {rec.userTypeLabel}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-3 text-slate-600 dark:text-stone-300 whitespace-nowrap">
+                            {rec.locationOrAgency}
+                          </td>
+                          <td className="py-3.5 px-3 text-slate-700 dark:text-stone-300 max-w-[240px]">
+                            <span className="line-clamp-2">{rec.activitySummary}</span>
+                          </td>
+                          <td className="py-3.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-[#F5F2EC] tabular-nums whitespace-nowrap">
+                            {rec.metricDisplay}
+                          </td>
+                          <td className="py-3.5 px-3 text-center whitespace-nowrap">
+                            <span className={`text-[0.8125rem] font-semibold ${statusTextTone}`}>
+                              {rec.statusLabel}
+                            </span>
+                          </td>
+                          <td className="py-3.5 pl-2 pr-4 text-right whitespace-nowrap">
+                            <RowActionMenu
+                              ariaLabel={`Tindakan untuk ${rec.displayName}`}
+                              items={[
+                                {
+                                  label: isExpanded ? 'Tutup Maklumat' : 'Lihat Maklumat Tambahan',
+                                  onClick: () => setExpandedRowId(isExpanded ? null : rec.id)
+                                }
+                              ]}
+                            />
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr className={adminTheme.surfaceMutedClass}>
+                            <td colSpan={8} className={`px-6 py-3.5 text-sm text-slate-700 dark:text-stone-200 border-t ${adminTheme.dividerClass}`}>
+                              <span className="font-semibold mr-2">Butiran Ringkas:</span>
+                              <span>{rec.detailLine}</span>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <PaginationBar
+              currentPage={pagination.currentPage}
+              totalItems={pagination.totalItems}
+              itemsPerPage={6}
+              onPageChange={pagination.setCurrentPage}
+              itemLabel="rekod"
+            />
+          </>
+        )}
       </div>
     </section>
   );

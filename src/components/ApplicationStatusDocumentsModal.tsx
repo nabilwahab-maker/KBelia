@@ -30,6 +30,8 @@ import {
 } from '../utils/printUtils';
 import { downloadOfferLetterPdf, downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import { loadLocalPortalSettings } from '../services/dataService';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface ApplicationStatusDocumentsModalProps {
   isOpen: boolean;
@@ -56,6 +58,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
   onOpenVerification,
   onCancelMentorship
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [activeTab, setActiveTab] = useState<'status' | 'offerLetter' | 'tenancy' | 'verify'>('status');
   const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
 
@@ -119,13 +123,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
       >
         
         {/* Header */}
-        <div className="kbelia-important-header dark:bg-slate-800 px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-slate-300 dark:border-slate-600">
+        <div className={`${roleTheme.surfaceMutedClass} px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b ${roleTheme.dividerClass}`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 flex items-center justify-center border border-rose-200 dark:border-rose-800/70">
-              <ShieldCheck className="w-6 h-6 text-black dark:text-white/75" />
+            <div className={`w-10 h-10 rounded-2xl ${roleTheme.activeMiniBtnClass} flex items-center justify-center border`}>
+              <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <div className="text-[0.8125rem] font-extrabold uppercase tracking-widest text-black dark:text-white/75">
+              <div className={`text-[0.8125rem] font-extrabold uppercase tracking-widest ${roleTheme.accentTextClass}`}>
                 Pusat Urusan Rasmi KBelia
               </div>
               <h3 className="font-black text-base sm:text-lg text-black dark:text-white">
@@ -136,59 +140,60 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            aria-label="Tutup"
+            className={roleTheme.iconButtonClass}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Sub-Tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-7 pt-4 border-b border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 shrink-0 overflow-x-auto">
+        <div className={`flex items-center gap-2 px-5 sm:px-7 pt-4 border-b ${roleTheme.dividerClass} ${roleTheme.surfaceMutedClass} shrink-0 overflow-x-auto`}>
           <button
             onClick={() => setActiveTab('status')}
             className={`pb-3 px-3 text-sm font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'status'
-                ? 'border-indigo-600 text-black dark:border-amber-400 dark:text-white/75'
-                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
+                ? roleTheme.tabActiveUnderlineClass
+                : roleTheme.tabIdleUnderlineClass
             }`}
           >
-            Status Permohonan Semasa
+            Status Permohonan
           </button>
 
           <button
             onClick={() => setActiveTab('offerLetter')}
             className={`pb-3 px-3 text-sm font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'offerLetter'
-                ? 'border-indigo-600 text-black dark:border-amber-400 dark:text-white/75'
-                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
+                ? roleTheme.tabActiveUnderlineClass
+                : roleTheme.tabIdleUnderlineClass
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Surat Tawaran Kiosk</span>
+            <span>Surat Tawaran</span>
           </button>
 
           <button
             onClick={() => setActiveTab('tenancy')}
             className={`pb-3 px-3 text-sm font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'tenancy'
-                ? 'border-blue-600 text-black dark:border-amber-400 dark:text-white/75'
-                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
+                ? roleTheme.tabActiveUnderlineClass
+                : roleTheme.tabIdleUnderlineClass
             }`}
           >
             <Award className="w-3.5 h-3.5" />
-            <span>Perjanjian Sewaan (Tenancy)</span>
+            <span>Perjanjian Sewa</span>
           </button>
 
           <button
             onClick={() => setActiveTab('verify')}
             className={`pb-3 px-3 text-sm font-bold transition-all border-b-2 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
               activeTab === 'verify'
-                ? 'border-indigo-600 text-black dark:border-amber-400 dark:text-white/75'
-                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
+                ? roleTheme.tabActiveUnderlineClass
+                : roleTheme.tabIdleUnderlineClass
             }`}
           >
             <QrCode className="w-3.5 h-3.5" />
-            <span>Pengesahan Kod Digital</span>
+            <span>Sahkan Kod</span>
           </button>
         </div>
 
@@ -204,7 +209,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 shadow-xs">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-blue-600 text-black dark:text-white/75 border border-blue-200 dark:border-blue-800/70 flex items-center justify-center shrink-0">
+                      <div className={`w-10 h-10 rounded-xl ${roleTheme.activeMiniBtnClass} border flex items-center justify-center shrink-0`}>
                         <Building2 className="w-5 h-5" />
                       </div>
                       <div>
@@ -220,14 +225,14 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                       </div>
                     </div>
 
-                    <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-[0.8125rem] font-bold border flex items-center gap-1.5 ${
+                    <span className={`self-start sm:self-auto text-[0.8125rem] font-bold flex items-center gap-1.5 ${
                       userBooking.status === 'approved'
-                        ? 'bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white border-emerald-300 dark:border-emerald-800'
+                        ? 'text-emerald-700 dark:text-emerald-400'
                         : userBooking.status === 'rejected' || userBooking.status === 'cancelled'
-                          ? 'bg-rose-100 dark:bg-rose-950 text-black dark:text-white border-rose-300 dark:border-rose-800'
-                          : 'bg-amber-100 dark:bg-amber-950 text-black dark:text-white border-amber-300 dark:border-amber-800'
+                          ? 'text-rose-700 dark:text-rose-400'
+                          : 'text-amber-700 dark:text-amber-300'
                     }`}>
-                      {userBooking.status === 'approved' ? <CheckCircle2 className="w-4 h-4 text-black dark:text-white" /> : <Clock className="w-4 h-4 text-black dark:text-white" />}
+                      {userBooking.status === 'approved' ? <CheckCircle2 className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
                       <span>
                         {userBooking.status === 'approved'
                           ? 'Permohonan Diluluskan'
@@ -249,7 +254,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                         <button
                           type="button"
                           onClick={() => setActiveTab('offerLetter')}
-                          className="px-3.5 py-1.5 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer dark:bg-indigo-600"
+                          className={roleTheme.compactPrimaryButtonClass}
                         >
                           <FileText className="w-3.5 h-3.5" />
                           <span>Surat Tawaran</span>
@@ -257,9 +262,9 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                         <button
                           type="button"
                           onClick={() => setActiveTab('tenancy')}
-                          className="px-3 py-1.5 rounded-xl font-semibold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
+                          className={roleTheme.compactSecondaryButtonClass}
                         >
-                          Perjanjian Sewa
+                          Perjanjian
                         </button>
                       </div>
                     )}
@@ -279,7 +284,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <button
                     type="button"
                     onClick={() => { onClose(); onOpenBooking(); }}
-                    className="px-4 py-2 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer shrink-0 dark:bg-blue-600"
+                    className={roleTheme.compactPrimaryButtonClass}
                   >
                     Mohon Kiosk
                   </button>
@@ -307,12 +312,12 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                       </div>
                     </div>
 
-                    <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-[0.8125rem] font-bold border flex items-center gap-1.5 ${
+                    <span className={`self-start sm:self-auto text-[0.8125rem] font-bold flex items-center gap-1.5 ${
                       userGrant.status === 'approved'
-                        ? 'bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white border-emerald-300 dark:border-emerald-800'
+                        ? 'text-emerald-700 dark:text-emerald-400'
                         : userGrant.status === 'rejected' || userGrant.status === 'cancelled'
-                          ? 'bg-rose-100 dark:bg-rose-950 text-black dark:text-white border-rose-300 dark:border-rose-800'
-                          : 'bg-amber-100 dark:bg-amber-950 text-black dark:text-white border-amber-300 dark:border-amber-800'
+                          ? 'text-rose-700 dark:text-rose-400'
+                          : 'text-amber-700 dark:text-amber-300'
                     }`}>
                       <Clock className="w-4 h-4" />
                       <span>
@@ -346,7 +351,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <button
                     type="button"
                     onClick={() => { onClose(); onOpenGrantModal(); }}
-                    className="px-4 py-2 rounded-xl text-sm font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                    className={roleTheme.compactSecondaryButtonClass}
                   >
                     Mohon Geran
                   </button>
@@ -358,7 +363,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <div className="p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow-xs">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-indigo-600 text-black dark:text-white/75 border border-indigo-200 dark:border-indigo-800/70 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-[#0B6E52]/10 dark:bg-[#10B981]/20 text-[#0B6E52] dark:text-[#34D399] border border-[#0B6E52]/25 dark:border-[#34D399]/35 flex items-center justify-center shrink-0">
                         <GraduationCap className="w-5 h-5" />
                       </div>
                       <div>
@@ -374,14 +379,14 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                       </div>
                     </div>
 
-                    <span className={`self-start sm:self-auto px-3 py-1 rounded-full text-[0.8125rem] font-bold border flex items-center gap-1.5 ${
+                    <span className={`self-start sm:self-auto text-[0.8125rem] font-bold flex items-center gap-1.5 ${
                       userMentorship.status === 'confirmed'
-                        ? 'bg-amber-100 dark:bg-teal-600 text-black dark:text-white border-amber-400'
+                        ? 'text-sky-700 dark:text-sky-300'
                         : userMentorship.status === 'completed'
-                        ? 'bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white border-emerald-300'
+                        ? 'text-emerald-700 dark:text-emerald-400'
                         : userMentorship.status === 'cancelled'
-                        ? 'bg-rose-100 dark:bg-rose-950 text-black dark:text-white border-rose-300'
-                        : 'bg-amber-100 dark:bg-amber-950 text-black dark:text-white border-amber-300'
+                        ? 'text-rose-700 dark:text-rose-400'
+                        : 'text-amber-700 dark:text-amber-300'
                     }`}>
                       {userMentorship.status === 'confirmed'
                         ? 'Temujanji Disahkan'
@@ -405,17 +410,17 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                         <button
                           type="button"
                           onClick={() => setIsCancelConfirmOpen(true)}
-                          className="px-3 py-1 rounded-lg text-sm font-bold text-black hover:text-black dark:text-white/75 dark:hover:text-white bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 transition-colors flex items-center gap-1 cursor-pointer"
+                          className={`px-3 py-1.5 text-[0.8125rem] ${roleTheme.dangerOutlineButtonClass}`}
                         >
                           <XCircle className="w-3.5 h-3.5" />
-                          <span>Batal Pendaftaran</span>
+                          <span>Batal</span>
                         </button>
                       )}
 
                       <button
                         type="button"
                         onClick={() => { onClose(); onOpenMentorship(); }}
-                        className="font-bold text-black dark:text-white/75 hover:underline cursor-pointer"
+                        className={roleTheme.compactSecondaryButtonClass}
                       >
                         Pilih Mentor
                       </button>
@@ -436,9 +441,9 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <button
                     type="button"
                     onClick={() => { onClose(); onOpenMentorship(); }}
-                    className="px-4 py-2 rounded-xl text-sm font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+                    className={roleTheme.compactSecondaryButtonClass}
                   >
-                    Tempah Klinik Mentor
+                    Tempah
                   </button>
                 </div>
               )}
@@ -471,16 +476,16 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                                 message: `Pendaftaran sesi bimbingan bersama ${userMentorship?.mentorName || 'Mentor'} telah berjaya dibatalkan.`
                               });
                             }}
-                            className="px-3.5 py-1.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-bold text-sm shadow-xs transition-colors cursor-pointer"
+                            className={`px-3.5 py-1.5 text-sm shadow-xs ${roleTheme.dangerButtonClass}`}
                           >
-                            Ya, Batalkan Pendaftaran
+                            Ya, Batal
                           </button>
                           <button
                             type="button"
                             onClick={() => setIsCancelConfirmOpen(false)}
-                            className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-black dark:text-white font-bold text-sm border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
+                            className={roleTheme.compactSecondaryButtonClass}
                           >
-                            Kekalkan Pendaftaran
+                            Kekalkan
                           </button>
                         </div>
                       </div>
@@ -512,7 +517,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <button
                     type="button"
                     onClick={() => handleDownloadPdf('offerLetter')}
-                    className="px-3 py-1.5 rounded-xl text-sm font-bold bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                    className={roleTheme.compactSecondaryButtonClass}
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Muat Turun PDF</span>
@@ -520,10 +525,10 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                   <button
                     type="button"
                     onClick={() => handlePrint('offerLetter')}
-                    className="px-3.5 py-1.5 rounded-xl text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer dark:bg-indigo-600"
+                    className={roleTheme.compactPrimaryButtonClass}
                   >
                     <Printer className="w-3.5 h-3.5" />
-                    <span>Cetak Dokumen</span>
+                    <span>Cetak</span>
                   </button>
                 </div>
               </div>
@@ -646,7 +651,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </h4>
                     <span className="text-[0.8125rem] text-black/70">Antara KBelia/PBT dan Penyewa Kiosk {applicantName}</span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-emerald-100 dark:bg-emerald-950 text-black dark:text-white">
+                  <span className={`text-[0.8125rem] font-bold ${userBooking.tenancySigned ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-300'}`}>
                     {userBooking.tenancySigned ? 'Dimeterai' : 'Menunggu Tandatangan'}
                   </span>
                 </div>
@@ -710,7 +715,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           {/* TAB 4: PENGESAHAN KOD DIGITAL (VERIFICATION) */}
           {activeTab === 'verify' && (
             <div className="space-y-4 animate-in fade-in duration-200 text-center py-4">
-              <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto border border-indigo-200 dark:border-indigo-800/70">
+              <div className="w-16 h-16 rounded-3xl bg-[#0B6E52]/10 dark:bg-[#10B981]/20 text-[#0B6E52] dark:text-[#34D399] flex items-center justify-center mx-auto border border-[#0B6E52]/25 dark:border-[#34D399]/35">
                 <QrCode className="w-8 h-8" />
               </div>
               <h4 className="font-bold text-base text-black dark:text-white">
@@ -735,9 +740,9 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     onClose();
                     onOpenVerification(bookingRef || `REG-${currentYear}-BELIA`);
                   }}
-                  className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors cursor-pointer dark:bg-indigo-600"
+                  className={`px-5 py-2 text-sm shadow-sm ${roleTheme.primaryButtonClass}`}
                 >
-                  Portal Pengesahan PBT
+                  Sahkan QR
                 </button>
               )}
             </div>
@@ -753,7 +758,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-sm font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className={`px-5 py-2 text-sm ${roleTheme.secondaryButtonClass}`}
           >
             Tutup
           </button>

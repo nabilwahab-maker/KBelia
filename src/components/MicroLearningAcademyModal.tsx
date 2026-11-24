@@ -7,6 +7,7 @@ import {
   Clock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { showToast } from './ToastNotification';
 
 interface MicroLearningAcademyModalProps {
@@ -74,7 +75,8 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
   isOpen,
   onClose
 }) => {
-  const { user } = useAuth();
+  const { user, isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const storageKey = `kbelia_academy_completed_${user?.uid || 'guest'}`;
 
   const [completedIds, setCompletedIds] = useState<string[]>(() => {
@@ -145,7 +147,8 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Tutup"
+            className={roleTheme.iconButtonClass}
           >
             <X className="w-4 h-4" />
           </button>
@@ -203,7 +206,7 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
           <div className="md:col-span-7 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold bg-amber-200/80 dark:bg-amber-900/60 text-black dark:text-white">
+                <span className={`px-2.5 py-0.5 rounded-lg text-[0.8125rem] font-bold border ${roleTheme.activeMiniBtnClass}`}>
                   {activeCourse.category}
                 </span>
                 <span className="text-sm text-black/70 dark:text-white/75 flex items-center gap-1">
@@ -241,9 +244,9 @@ export const MicroLearningAcademyModal: React.FC<MicroLearningAcademyModalProps>
                 <button
                   type="button"
                   onClick={() => handleCompleteCourse(activeCourse.id)}
-                  className="py-1.5 px-4 rounded-xl text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors shadow-sm"
+                  className={roleTheme.compactPrimaryButtonClass}
                 >
-                  Tebus Lencana
+                  Tebus
                 </button>
               ) : (
                 <span className="text-sm font-bold text-black dark:text-white/75 flex items-center gap-1">

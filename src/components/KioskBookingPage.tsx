@@ -82,6 +82,7 @@ import {
   loadFormDraft,
   clearFormDraft
 } from '../utils/securityUtils';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 export type KioskPageView = 'browse' | 'book' | 'manage';
 
@@ -135,7 +136,8 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
   onOpenVerification,
   onOpenMaintenanceModal
 }) => {
-  const { user, userProfile, openLoginModal } = useAuth();
+  const { user, userProfile, openLoginModal, isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
 
   const safeAllSlots = useMemo(() => slots || [], [slots]);
   const availableSlots = useMemo(
@@ -782,7 +784,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
           {/* Bar Atas Ringkas Tanpa Teks Penerangan Berlebihan */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+              <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${roleTheme.activeMiniBtnClass}`}>
                 <Store className="w-5 h-5" />
               </div>
               <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
@@ -797,7 +799,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   setIsConfirmingCancel(false);
                   onChangeView('manage');
                 }}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer whitespace-nowrap"
+                className={`px-3.5 py-2 text-sm inline-flex items-center gap-2 ${roleTheme.secondaryButtonClass}`}
               >
                 <ClipboardList className="w-4 h-4" />
                 <span>Urus Tempahan</span>
@@ -805,7 +807,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
               <button
                 type="button"
                 onClick={() => onChangeView('browse')}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer whitespace-nowrap"
+                className={`px-4 py-2 text-sm inline-flex items-center gap-2 ${roleTheme.secondaryButtonClass}`}
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Peta Kiosk</span>
@@ -833,14 +835,14 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     setIsConfirmingCancel(false);
                     onChangeView('manage');
                   }}
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer"
+                  className={`px-5 py-2.5 text-sm ${roleTheme.primaryButtonClass}`}
                 >
                   Urus Tempahan
                 </button>
                 <button
                   type="button"
                   onClick={() => onChangeView('browse')}
-                  className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-sm font-bold text-black dark:text-white transition-colors cursor-pointer"
+                  className={`px-5 py-2.5 text-sm ${roleTheme.secondaryButtonClass}`}
                 >
                   Peta Kiosk
                 </button>
@@ -855,7 +857,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
               <button
                 type="button"
                 onClick={() => openLoginModal()}
-                className="py-2.5 px-6 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer"
+                className={`py-2.5 px-6 text-sm ${roleTheme.primaryButtonClass}`}
               >
                 Log Masuk
               </button>
@@ -889,7 +891,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     setIsConfirmingCancel(false);
                     onChangeView('manage');
                   }}
-                  className="py-2.5 px-6 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer"
+                  className={`py-2.5 px-6 text-sm ${roleTheme.primaryButtonClass}`}
                 >
                   Urus Tempahan
                 </button>
@@ -899,7 +901,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     setSubmitted(false);
                     onChangeView('browse');
                   }}
-                  className="py-2.5 px-5 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+                  className={`py-2.5 px-5 text-sm ${roleTheme.secondaryButtonClass}`}
                 >
                   Peta Kiosk
                 </button>
@@ -914,7 +916,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
               <button
                 type="button"
                 onClick={() => onChangeView('browse')}
-                className="py-2.5 px-6 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer"
+                className={`py-2.5 px-6 text-sm ${roleTheme.primaryButtonClass}`}
               >
                 Peta Kiosk
               </button>
@@ -948,11 +950,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                           }`}
                         >
                           <div
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all shrink-0 tabular-nums ${
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold transition-all shrink-0 tabular-nums ${
                               isCompleted
                                 ? 'bg-emerald-600 text-white'
                                 : isActive
-                                ? 'bg-blue-600 text-white ring-4 ring-blue-500/20'
+                                ? roleTheme.badgeClass
                                 : 'bg-slate-100 dark:bg-zinc-800 text-black/60 dark:text-white/65 border border-slate-200 dark:border-zinc-700'
                             }`}
                           >
@@ -1081,7 +1083,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                             <button
                               type="button"
                               onClick={() => setIsGoodToKnowExpanded((prev) => !prev)}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-950 hover:bg-slate-100 dark:hover:bg-zinc-800 text-xs font-bold text-black dark:text-white transition-colors cursor-pointer"
+                              className={roleTheme.compactSecondaryButtonClass}
                             >
                               <span>{isGoodToKnowExpanded ? 'Tutup' : 'Baca lagi'}</span>
                               {isGoodToKnowExpanded ? (
@@ -1129,15 +1131,15 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                   onClick={() => setDurationMonths(pkg.months)}
                                   className={`w-full p-3.5 sm:px-4 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
                                     isSelected
-                                      ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 ring-1 ring-blue-500/25'
-                                      : 'border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 hover:border-blue-400/70'
+                                      ? `${roleTheme.activeMiniBtnClass} ring-1 ring-current/20`
+                                      : 'border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 hover:border-slate-400'
                                   }`}
                                 >
                                   <div className="flex items-center gap-3 min-w-0">
                                     <div
                                       className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
                                         isSelected
-                                          ? 'bg-blue-600 border-blue-600 text-white'
+                                          ? roleTheme.badgeClass + ' border-transparent'
                                           : 'border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900'
                                       }`}
                                     >
@@ -1154,7 +1156,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                   </div>
 
                                   <div className="text-right shrink-0 tabular-nums">
-                                    <div className="text-sm font-black text-blue-700 dark:text-blue-400">
+                                    <div className={`text-sm font-black ${roleTheme.accentTextClass}`}>
                                       RM {pkgTotal.toLocaleString('ms-MY')}
                                     </div>
                                     <div className="text-xs text-black/60 dark:text-white/65">
@@ -1465,7 +1467,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                           type="button"
                           disabled={step === 1 && !isCurrentSlotAvailable}
                           onClick={handleNextStep}
-                          className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                          className={`w-full py-3 px-4 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${roleTheme.primaryButtonClass}`}
                         >
                           <span>Seterusnya</span>
                           <ArrowRight className="w-4 h-4" />
@@ -1475,10 +1477,10 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                           type="button"
                           disabled={loading || !pdpaConsent || !isCurrentSlotAvailable}
                           onClick={handleSubmit}
-                          className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                          className={`w-full py-3 px-4 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${roleTheme.primaryButtonClass}`}
                         >
                           <CheckCircle2 className="w-4 h-4" />
-                          <span>{loading ? 'Menghantar...' : 'Hantar Permohonan'}</span>
+                          <span>{loading ? 'Menghantar...' : 'Hantar'}</span>
                         </button>
                       )}
 
@@ -1489,7 +1491,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                             setError(null);
                             setStep(step === 3 ? 2 : 1);
                           }}
-                          className="w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                          className={`w-full py-2.5 px-4 text-sm flex items-center justify-center gap-1.5 ${roleTheme.secondaryButtonClass}`}
                         >
                           <ArrowLeft className="w-4 h-4" />
                           <span>Kembali</span>
@@ -1575,20 +1577,20 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsQuickActionsOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer shadow-2xs"
+                    className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                   >
                     <Edit3 className="w-4 h-4" />
-                    <span>Kemaskini Info</span>
+                    <span>Kemaskini</span>
                   </button>
                 ) : (
                   <button
                     type="button"
                     disabled={availableSlots.length === 0 || isMaintenanceMode}
                     onClick={() => onChangeView('book')}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold transition-colors cursor-pointer shadow-2xs"
+                    className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${roleTheme.primaryButtonClass}`}
                   >
                     <Store className="w-4 h-4" />
-                    <span>Mohon Kiosk</span>
+                    <span>Mohon</span>
                   </button>
                 )}
 
@@ -1598,7 +1600,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     aria-label="Menu tindakan kiosk"
                     aria-expanded={isHeaderMenuOpen}
                     onClick={() => setIsHeaderMenuOpen((prev) => !prev)}
-                    className="w-10 h-10 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-black dark:text-white inline-flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+                    className={roleTheme.iconButtonClass}
                   >
                     <MoreHorizontal className="w-4 h-4" />
                   </button>
@@ -2092,7 +2094,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                       }}
                       className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
                         activeFilterCount > 0
-                          ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300'
+                          ? roleTheme.activeMiniBtnClass
                           : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
                       }`}
                     >
@@ -2118,7 +2120,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                 onClick={() => setRecordTypeFilter(opt.key as 'all' | 'aduan' | 'permohonan')}
                                 className={`px-2 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
                                   recordTypeFilter === opt.key
-                                    ? 'bg-blue-600 border-blue-600 text-white'
+                                    ? roleTheme.segmentedActiveClass + ' border-transparent'
                                     : 'bg-slate-50 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white'
                                 }`}
                               >
@@ -2139,7 +2141,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                 e.target.value as 'all' | 'active' | 'processing' | 'closed'
                               )
                             }
-                            className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                            className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${roleTheme.inputClass}`}
                           >
                             <option value="all">Semua Status</option>
                             <option value="active">Aktif</option>
@@ -2162,7 +2164,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                           <button
                             type="button"
                             onClick={() => setIsFilterPopoverOpen(false)}
-                            className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+                            className={roleTheme.compactPrimaryButtonClass}
                           >
                             Tutup
                           </button>
@@ -2180,7 +2182,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                         setIsFilterPopoverOpen(false);
                         setIsSortPopoverOpen((prev) => !prev);
                       }}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-800 text-black dark:text-white text-sm font-semibold transition-colors cursor-pointer"
+                      className={roleTheme.compactSecondaryButtonClass}
                     >
                       <ArrowUpDown className="w-4 h-4" />
                       <span>Susun</span>
@@ -2202,7 +2204,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                             }}
                             className={`w-full px-3.5 py-2 text-sm text-left flex items-center justify-between cursor-pointer ${
                               recordSortBy === opt.key
-                                ? 'font-bold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40'
+                                ? `font-bold ${roleTheme.accentTextClass} ${roleTheme.surfaceMutedClass}`
                                 : 'font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
                             }`}
                           >
@@ -2246,9 +2248,9 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                     setRecordTypeFilter('all');
                                     setRecordStatusFilter('all');
                                   }}
-                                  className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs font-bold text-black dark:text-white cursor-pointer"
+                                  className={roleTheme.compactSecondaryButtonClass}
                                 >
-                                  Set Semula Tapis
+                                  Set Semula
                                 </button>
                               )}
                               <button
@@ -2256,9 +2258,9 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                 onClick={() =>
                                   activeBooking ? openComplaintDialog(activeBooking) : onChangeView('book')
                                 }
-                                className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+                                className={roleTheme.compactPrimaryButtonClass}
                               >
-                                {activeBooking ? 'Buat Aduan' : 'Mohon Kiosk'}
+                                {activeBooking ? 'Buat Aduan' : 'Mohon'}
                               </button>
                             </div>
                           </div>
@@ -2334,7 +2336,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                 {item.location}
                               </td>
                               <td className="py-3.5 px-4 whitespace-nowrap">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs font-semibold text-black/80 dark:text-white/85">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-xs font-semibold text-black/80 dark:text-white/85">
                                   {item.type}
                                 </span>
                               </td>
@@ -2343,7 +2345,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                               </td>
                               <td className="py-3.5 px-4 whitespace-nowrap">
                                 <span
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-bold ${statusPillClass}`}
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-lg border text-xs font-bold ${statusPillClass}`}
                                 >
                                   {item.statusLabel}
                                 </span>
@@ -2385,7 +2387,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                       <button
                                         type="button"
                                         onClick={() => setSelectedReceiptBooking(item.rawBooking!)}
-                                        className="self-start sm:self-auto px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-bold text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer shrink-0"
+                                        className={roleTheme.compactSecondaryButtonClass}
                                       >
                                         Buka Resit
                                       </button>
@@ -2407,7 +2409,6 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                 totalItems={totalRecordsCount}
                 itemsPerPage={6}
                 onPageChange={setRecordsPage}
-                accent="blue"
                 variant="compact"
               />
             </div>
@@ -2422,7 +2423,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
           <div className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden text-black dark:text-white">
             {/* Receipt Header */}
-            <div className="p-5 kbelia-important-header border-b border-slate-300 dark:border-zinc-600 flex items-center justify-between">
+            <div className="p-5 bg-[#FAF8F3] dark:bg-[#101815] border-b border-[#E2DCCB] dark:border-[#24342D] flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center">
                   <KBeliaLogo size="sm" showWordmark={false} />
@@ -2439,7 +2440,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedReceiptBooking(null)}
-                className="p-1.5 text-black/70 hover:text-black dark:text-white/75 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                className={roleTheme.iconButtonClass}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2524,9 +2525,9 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                           <td className="p-3">Subsidi Kerajaan Negeri Kelantan (Kadar Khas)</td>
                           <td className="p-3 text-right font-mono tabular-nums">-50.00</td>
                         </tr>
-                        <tr className="bg-blue-600 text-white font-extrabold text-sm">
+                        <tr className={`font-extrabold text-sm ${roleTheme.badgeClass}`}>
                           <td className="p-3">JUMLAH DIBAYAR</td>
-                          <td className="p-3 text-right font-mono tabular-nums text-white">RM {rate.toFixed(2)}</td>
+                          <td className="p-3 text-right font-mono tabular-nums">RM {rate.toFixed(2)}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -2549,10 +2550,10 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     const html = generateOfficialReceiptHtml(selectedReceiptBooking, receiptRef, rateVal);
                     void openAndPrintDocument(html, `Resit_Rasmi_${selectedReceiptBooking.slotCode}`);
                   }}
-                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl flex items-center gap-2 shadow-xs cursor-pointer"
+                  className={`px-4 py-2.5 text-sm flex items-center gap-2 ${roleTheme.secondaryButtonClass}`}
                 >
-                  <Printer className="w-4 h-4 text-white" />
-                  <span>Cetak Salinan Resit</span>
+                  <Printer className="w-4 h-4" />
+                  <span>Cetak Resit</span>
                 </button>
                 <button
                   type="button"
@@ -2567,15 +2568,15 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                       showToast('Gagal menjana fail PDF resit. Sila gunakan butang Cetak.', 'error');
                     }
                   }}
-                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl flex items-center gap-2 shadow-xs cursor-pointer"
+                  className={`px-4 py-2.5 text-sm flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
-                  <Download className="w-4 h-4 text-white" />
+                  <Download className="w-4 h-4" />
                   <span>Muat Turun PDF</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedReceiptBooking(null)}
-                  className="px-4 py-2.5 bg-slate-50 dark:bg-zinc-800 hover:bg-amber-50 dark:hover:bg-zinc-700 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-bold text-sm rounded-xl cursor-pointer"
+                  className={`px-4 py-2.5 text-sm ${roleTheme.secondaryButtonClass}`}
                 >
                   Tutup
                 </button>
@@ -2591,7 +2592,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       {maintenanceComplaintBooking && user && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
           <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-slate-300 dark:border-zinc-600 overflow-hidden text-black dark:text-white">
-            <div className="p-5 kbelia-important-header dark:bg-zinc-800 flex items-center justify-between border-b border-slate-300 dark:border-zinc-600">
+            <div className="p-5 bg-[#FAF8F3] dark:bg-[#101815] flex items-center justify-between border-b border-[#E2DCCB] dark:border-[#24342D]">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-black dark:text-white flex items-center justify-center font-bold">
                   <Wrench className="w-4 h-4" />
@@ -2606,7 +2607,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
               <button
                 type="button"
                 onClick={() => setMaintenanceComplaintBooking(null)}
-                className="p-1.5 text-black/70 hover:text-black dark:text-white/75 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-700 cursor-pointer"
+                className={roleTheme.iconButtonClass}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2625,9 +2626,9 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   <button
                     type="button"
                     onClick={() => setMaintenanceComplaintBooking(null)}
-                    className="w-full mt-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold cursor-pointer"
+                    className={`w-full mt-2 py-2 ${roleTheme.primaryButtonClass}`}
                   >
-                    Selesai &amp; Tutup
+                    Tutup
                   </button>
                 </div>
               ) : (
@@ -2715,17 +2716,17 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     <button
                       type="button"
                       onClick={() => setMaintenanceComplaintBooking(null)}
-                      className="px-4 py-2 bg-slate-50 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-600 text-black dark:text-white rounded-xl font-bold cursor-pointer"
+                      className={`px-4 py-2 ${roleTheme.secondaryButtonClass}`}
                     >
                       Batal
                     </button>
                     <button
                       type="submit"
                       disabled={submittingComplaint}
-                      className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+                      className={`px-5 py-2 ${roleTheme.dangerButtonClass}`}
                     >
                       <Wrench className="w-3.5 h-3.5" />
-                      <span>{submittingComplaint ? 'Menghantar...' : 'Hantar Aduan Sekarang'}</span>
+                      <span>{submittingComplaint ? 'Menghantar...' : 'Hantar Aduan'}</span>
                     </button>
                   </div>
                 </form>
@@ -2754,7 +2755,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                 type="button"
                 aria-label="Tutup"
                 onClick={() => setIsQuickActionsOpen(false)}
-                className="p-1.5 text-black/65 hover:text-black dark:text-white/70 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                className={roleTheme.iconButtonClass}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2768,11 +2769,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     setIsQuickActionsOpen(false);
                     onViewOfferLetter(activeBooking);
                   }}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-blue-500 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-slate-400 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
-                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span>Surat Tawaran Rasmi</span>
+                    <FileText className={`w-4 h-4 ${roleTheme.accentTextClass}`} />
+                    <span>Surat Tawaran</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-black/45 dark:text-white/50" />
                 </button>
@@ -2785,11 +2786,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     setIsQuickActionsOpen(false);
                     onOpenTenancyAgreement(activeBooking);
                   }}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-blue-500 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-slate-400 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
-                    <PenTool className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span>Perjanjian Sewa Kiosk</span>
+                    <PenTool className={`w-4 h-4 ${roleTheme.accentTextClass}`} />
+                    <span>Perjanjian Sewa</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-black/45 dark:text-white/50" />
                 </button>
@@ -2801,11 +2802,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   setIsQuickActionsOpen(false);
                   setSelectedReceiptBooking(activeBooking);
                 }}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-blue-500 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-slate-400 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
               >
                 <span className="flex items-center gap-2.5">
-                  <Receipt className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Resit Rasmi Bayaran</span>
+                  <Receipt className={`w-4 h-4 ${roleTheme.accentTextClass}`} />
+                  <span>Resit Bayaran</span>
                 </span>
                 <ChevronRight className="w-4 h-4 text-black/45 dark:text-white/50" />
               </button>
@@ -2817,11 +2818,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     setIsQuickActionsOpen(false);
                     onOpenVerification(`KBN-${activeBooking.slotCode}`);
                   }}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-blue-500 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-slate-400 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
-                    <QrCode className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span>Sahkan Lesen QR</span>
+                    <QrCode className={`w-4 h-4 ${roleTheme.accentTextClass}`} />
+                    <span>Sahkan QR</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-black/45 dark:text-white/50" />
                 </button>
@@ -2833,11 +2834,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   setIsQuickActionsOpen(false);
                   openComplaintDialog(activeBooking);
                 }}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-blue-500 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-slate-400 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
               >
                 <span className="flex items-center gap-2.5">
-                  <Wrench className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Buat Aduan Fasiliti</span>
+                  <Wrench className={`w-4 h-4 ${roleTheme.accentTextClass}`} />
+                  <span>Buat Aduan</span>
                 </span>
                 <ChevronRight className="w-4 h-4 text-black/45 dark:text-white/50" />
               </button>
@@ -2848,11 +2849,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   setIsQuickActionsOpen(false);
                   onChangeView('browse');
                 }}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-blue-500 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950 hover:border-slate-400 flex items-center justify-between font-semibold text-black dark:text-white transition-colors cursor-pointer"
               >
                 <span className="flex items-center gap-2.5">
-                  <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Tukar Unit di Peta Kiosk</span>
+                  <MapPin className={`w-4 h-4 ${roleTheme.accentTextClass}`} />
+                  <span>Peta Kiosk</span>
                 </span>
                 <ChevronRight className="w-4 h-4 text-black/45 dark:text-white/50" />
               </button>
@@ -2864,14 +2865,14 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     setIsQuickActionsOpen(false);
                     setIsConfirmingCancel(true);
                   }}
-                  className="px-3.5 py-2 rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs font-bold cursor-pointer"
+                  className={`${roleTheme.dangerOutlineButtonClass} px-3.5 py-2 text-xs`}
                 >
-                  Batalkan Tempahan
+                  Batal Tempahan
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsQuickActionsOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 text-black dark:text-white text-sm font-bold cursor-pointer"
+                  className={`px-4 py-2 text-sm ${roleTheme.secondaryButtonClass}`}
                 >
                   Tutup
                 </button>

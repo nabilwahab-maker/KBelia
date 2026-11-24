@@ -19,6 +19,7 @@ import { KelantanDistrictsMap } from './KelantanDistrictsMap';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface CapsuleGridProps {
   slots: CapsuleSlot[];
@@ -72,7 +73,8 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   onGoToManageBooking
 }) => {
   const subsidyRate = portalSettings?.portalSubsidyRate ?? 50;
-  const { user } = useAuth();
+  const { user, isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const { language } = useLanguage();
   const isEn = language === 'en';
   const [internalHub, setInternalHub] = useState<string>('Semua');
@@ -185,10 +187,10 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           <button
             type="button"
             onClick={onGoToManageBooking}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+            className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
           >
             <Building2 className="w-4 h-4" />
-            <span>{hasActiveBooking ? 'Urus Kiosk Saya' : 'Kiosk Saya'}</span>
+            <span>{hasActiveBooking ? 'Urus Kiosk' : 'Kiosk Saya'}</span>
           </button>
         )}
       </div>
@@ -233,10 +235,10 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               <button
                 type="button"
                 onClick={onAddSlot}
-                className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer"
+                className={`min-h-[38px] ${roleTheme.compactPrimaryButtonClass}`}
               >
                 <Building2 className="w-4 h-4" />
-                <span>Daftar Kiosk</span>
+                <span>Tambah Kiosk</span>
               </button>
             ) : undefined
           }
@@ -250,7 +252,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                 <select
                   value={selectedHub}
                   onChange={(e) => handleSelectHubWithMapSync(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${roleTheme.inputClass}`}
                 >
                   {hubs.map((hub) => (
                     <option key={hub} value={hub}>
@@ -283,7 +285,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                         onClick={() => setSelectedStatus(st.id)}
                         className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                           isActive
-                            ? 'bg-blue-600 border-blue-600 text-white'
+                            ? roleTheme.segmentedActiveClass + ' border-transparent'
                             : 'bg-slate-50 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800'
                         }`}
                       >
@@ -340,9 +342,9 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               <button
                 type="button"
                 onClick={handleResetAll}
-                className="mt-3 px-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-bold text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className={`mt-3 ${roleTheme.compactSecondaryButtonClass}`}
               >
-                {isEn ? 'Reset Search & Filters' : 'Set Semula Carian & Penapis'}
+                {isEn ? 'Reset' : 'Set Semula'}
               </button>
             )}
           </div>
@@ -443,7 +445,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 px-2.5 py-2 rounded-lg border border-slate-300 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800 text-[0.8125rem] font-bold text-black dark:text-white hover:bg-amber-50 dark:hover:bg-zinc-700 transition-colors shrink-0"
+                        className={roleTheme.compactSecondaryButtonClass}
                         title={isEn ? 'Open in Google Maps' : 'Buka lokasi di Google Maps'}
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -457,10 +459,10 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                             e.stopPropagation();
                             if (onViewTenantDetail) onViewTenantDetail(slot);
                           }}
-                          className="py-2 px-3.5 rounded-lg text-sm font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs shrink-0"
+                          className={roleTheme.compactPrimaryButtonClass}
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Permohonan Anda</span>
+                          <span>Permohonan</span>
                         </button>
                       ) : isRegistered ? (
                         <button
@@ -469,25 +471,25 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                             e.stopPropagation();
                             if (onViewTenantDetail) onViewTenantDetail(slot);
                           }}
-                          className="py-2 px-3.5 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer bg-slate-50 hover:bg-slate-100 text-black dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white border border-slate-300 dark:border-zinc-600 shrink-0"
+                          className={roleTheme.compactSecondaryButtonClass}
                         >
                           <Eye className="w-3.5 h-3.5" />
-                          <span>Lihat Penyewa</span>
+                          <span>Lihat</span>
                         </button>
                       ) : isReadOnly ? (
-                        <span className="py-2 px-3.5 rounded-lg text-sm font-semibold bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-600 inline-flex items-center gap-1.5 shrink-0">
+                        <span className="py-2 px-3.5 rounded-xl text-[0.8125rem] font-semibold bg-slate-50 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-600 inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap">
                           <Eye className="w-3.5 h-3.5" />
-                          <span>Status Tersedia</span>
+                          <span>Tersedia</span>
                         </span>
                       ) : hasActiveBooking ? (
                         <button
                           type="button"
                           disabled
                           onClick={(e) => e.stopPropagation()}
-                          className="py-2 px-3.5 rounded-lg text-sm font-bold inline-flex items-center gap-1.5 bg-slate-100 dark:bg-zinc-800 text-black/55 dark:text-white/55 border border-slate-300 dark:border-zinc-600 cursor-not-allowed shrink-0"
+                          className={roleTheme.compactSecondaryButtonClass}
                         >
                           <Lock className="w-3.5 h-3.5 shrink-0" />
-                          <span>Sudah Ditempah</span>
+                          <span>Ditempah</span>
                         </button>
                       ) : (
                         <button
@@ -496,9 +498,9 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                             e.stopPropagation();
                             onSelectSlot(slot);
                           }}
-                          className="py-2 px-3.5 rounded-lg text-sm font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm shrink-0"
+                          className={roleTheme.compactPrimaryButtonClass}
                         >
-                          <span>Mohon Kiosk</span>
+                          <span>Mohon</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       )}
@@ -515,7 +517,6 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
               itemsPerPage={7}
               onPageChange={pagination.setCurrentPage}
               itemLabel={isEn ? 'kiosks' : 'kiosk'}
-              accent="blue"
             />
           </>
         )}

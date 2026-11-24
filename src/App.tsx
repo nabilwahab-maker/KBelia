@@ -89,6 +89,7 @@ import { LoginPage } from './components/LoginPage';
 import { RegisterPage } from './components/RegisterPage';
 import { LandingPage } from './components/LandingPage';
 import { KioskBookingPage, KioskPageView } from './components/KioskBookingPage';
+import { getRoleTheme } from './utils/roleTheme';
 import { CapsuleTenantDetailModal } from './components/CapsuleTenantDetailModal';
 import { BusinessDetailModal } from './components/BusinessDetailModal';
 import { GrantModal } from './components/GrantModal';
@@ -1734,6 +1735,10 @@ function MainApp() {
           setMerchantSubTab(sub);
           navigateWithSkeleton('merchant', sub);
         }}
+        onSelectAdminSubTab={(sub) => {
+          setAdminSubTab(sub);
+          navigateWithSkeleton('admin', sub);
+        }}
         onSelectMentorSubTab={(sub) => {
           setMentorSubTab(sub);
           navigateWithSkeleton('mentor', sub);
@@ -1801,7 +1806,9 @@ function MainApp() {
         {/* Center/Right Dynamic Body */}
         <main
           ref={mainScrollRef}
-          className="flex-1 h-full overflow-y-auto overflow-x-hidden p-2 sm:p-3 w-full max-w-none min-w-0 scroll-smooth bg-slate-50 dark:bg-zinc-950 bg-grid-pattern"
+          className={`flex-1 h-full overflow-y-auto overflow-x-hidden p-3 sm:p-5 w-full max-w-none min-w-0 scroll-smooth transition-colors ${
+            getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia').canvasClass
+          }`}
         >
           <div className="w-full">
           {/* Portal Maintenance / Announcement Bar from Admin Settings */}
@@ -1831,7 +1838,7 @@ function MainApp() {
             <>
               {/* 1. ADMIN DASHBOARD VIEW */}
               {isAdmin && (
-                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
+                <div className="pt-0.5">
                   <AdminDashboard
                     slots={enrichedSlots}
                     businesses={businesses}
@@ -1858,7 +1865,7 @@ function MainApp() {
 
               {/* 2. MENTOR DASHBOARD VIEW */}
               {isMentor && (
-                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
+                <div className="pt-0.5">
                   <MentorPortal
                     mentors={mentors}
                     registrations={scopedMentorRegistrations}
@@ -1876,7 +1883,7 @@ function MainApp() {
 
               {/* 3. YOUTH ENTREPRENEUR DASHBOARD VIEW */}
               {isYouth && (
-                <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
+                <div className="pt-0.5">
                   <MerchantPortal
                     myBusiness={myBusiness}
                     myProducts={myProducts}
@@ -1916,30 +1923,31 @@ function MainApp() {
             </>
           )}
 
-          {/* KAPSUL NIAGA VIEW (Strictly Belia / Admin Monitoring Only - Blocked for Mentor) */}
-          {activeTab === 'academic' && (
-            isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <Lock className="w-7 h-7" />
+          {/* KAPSUL NIAGA VIEW */}
+          {activeTab === 'academic' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return isMentor ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Kiosk Belia Disekat</h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
-                    Akaun Mentor dihadkan kepada portal bimbingan, surat sokongan geran, dan rekod sesi usahawan sahaja tanpa capaian modul sewaan kiosk.
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Ruang Ini Khusus untuk Usahawan</h3>
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
+                    Akaun Mentor tertumpu kepada sesi bimbingan, jadual pertemuan, dan sokongan usahawan di Ruang Bimbingan.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Portal Mentor</span>
+                  <span>Kembali ke Ruang Bimbingan</span>
                 </button>
               </div>
             ) : isAdmin ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <CapsuleGrid
                   slots={enrichedSlots}
                   bookings={bookings}
@@ -1956,92 +1964,96 @@ function MainApp() {
                 />
               </div>
             ) : (
-              <KioskBookingPage
-                slots={enrichedSlots}
-                bookings={bookings}
-                maintenanceTickets={maintenanceTickets}
-                portalSettings={portalSettings}
-                view={kioskPageView}
-                onChangeView={setKioskPageView}
-                preselectedSlot={selectedSlotForBooking}
-                onSelectSlotForBooking={(slot) => setSelectedSlotForBooking(slot)}
-                onViewTenantDetail={handleOpenTenantDetail}
-                selectedHub={selectedHubFilter}
-                onSelectHub={setSelectedHubFilter}
-                maxBudget={maxBudgetFilter}
-                onBudgetChange={setMaxBudgetFilter}
-                onRefresh={triggerRefresh}
-                onViewOfferLetter={handleViewOfferLetter}
-                onOpenTenancyAgreement={(booking) => {
-                  setSelectedBookingForTenancy(booking);
-                  setIsTenancyModalOpen(true);
-                }}
-                onOpenVerification={(refCode) => {
-                  setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');
-                  setIsVerificationModalOpen(true);
-                }}
-                onOpenMaintenanceModal={() => { if (isYouth) setIsMaintenanceModalOpen(true); }}
-              />
-            )
-          )}
+              <div className="pt-0.5">
+                <KioskBookingPage
+                  slots={enrichedSlots}
+                  bookings={bookings}
+                  maintenanceTickets={maintenanceTickets}
+                  portalSettings={portalSettings}
+                  view={kioskPageView}
+                  onChangeView={setKioskPageView}
+                  preselectedSlot={selectedSlotForBooking}
+                  onSelectSlotForBooking={(slot) => setSelectedSlotForBooking(slot)}
+                  onViewTenantDetail={handleOpenTenantDetail}
+                  selectedHub={selectedHubFilter}
+                  onSelectHub={setSelectedHubFilter}
+                  maxBudget={maxBudgetFilter}
+                  onBudgetChange={setMaxBudgetFilter}
+                  onRefresh={triggerRefresh}
+                  onViewOfferLetter={handleViewOfferLetter}
+                  onOpenTenancyAgreement={(booking) => {
+                    setSelectedBookingForTenancy(booking);
+                    setIsTenancyModalOpen(true);
+                  }}
+                  onOpenVerification={(refCode) => {
+                    setVerificationRefCode(refCode || myBookings[0]?.id || 'KBN-KB-2026-8819');
+                    setIsVerificationModalOpen(true);
+                  }}
+                  onOpenMaintenanceModal={() => { if (isYouth) setIsMaintenanceModalOpen(true); }}
+                />
+              </div>
+            );
+          })()}
 
-          {/* DIREKTORI USAHAWAN KELANTAN (Belia / Admin Audit Only - Blocked for Mentor) */}
-          {activeTab === 'hepa' && (
-            isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <Lock className="w-7 h-7" />
+          {/* DIREKTORI USAHAWAN KELANTAN */}
+          {activeTab === 'hepa' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return isMentor ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Direktori Usahawan Disekat</h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
-                    Untuk keselamatan dan batas peranan, Mentor hanya melihat usahawan mentee di bawah seliaan sendiri di Portal Mentor.
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Senarai Usahawan Anda di Ruang Bimbingan</h3>
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
+                    Untuk menjaga privasi komuniti, Mentor melihat senarai usahawan di bawah bimbingan sendiri terus dari Ruang Bimbingan.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Portal Mentor</span>
+                  <span>Kembali ke Ruang Bimbingan</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <DirectorySection
                   businesses={businesses}
                   onSelectBusiness={handleOpenBusinessDetail}
                   onRegisterBusiness={isYouth ? () => navigateWithSkeleton('merchant') : undefined}
                 />
               </div>
-            )
-          )}
+            );
+          })()}
 
-          {/* GERAN & DANA BELIA (Belia / Admin Monitoring Only - Blocked for Mentor) */}
-          {activeTab === 'ceed' && (
-            isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <Lock className="w-7 h-7" />
+          {/* SOKONGAN MODAL & INISIATIF */}
+          {activeTab === 'ceed' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return isMentor ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Permohonan Geran Disekat</h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
-                    Mentor hanya mengurus surat perakuan rasmi melalui tab Perakuan Geran di Portal Mentor.
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Urusan Sokongan Melalui Ruang Bimbingan</h3>
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
+                    Mentor mengurus pengesahan sokongan usahawan melalui tab Sokongan Usahawan di Ruang Bimbingan.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Portal Mentor</span>
+                  <span>Kembali ke Ruang Bimbingan</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <ProgramsSection 
                   programs={programs} 
                   grantApplications={isAdmin ? grantApplications : myYouthGrants}
@@ -2052,124 +2064,128 @@ function MainApp() {
                   isReadOnly={isAdmin}
                 />
               </div>
-            )
-          )}
+            );
+          })()}
 
-          {/* JADUAL ACARA & KARNIVAL BELIA (Strictly Youth Portal Only) */}
-          {activeTab === 'events' && (
-            !isYouth ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <Lock className="w-7 h-7" />
+          {/* ACARA & EKSPO KOMUNITI */}
+          {activeTab === 'events' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return !isYouth ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Modul Acara Belia Sahaja</h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
-                    Halaman penyertaan acara & karnival ini dikhaskan untuk Usahawan Belia.
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Penyertaan Acara Khusus untuk Usahawan</h3>
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
+                    Halaman penyertaan acara dan ekspo komuniti ini disediakan khusus untuk akaun Usahawan Belia.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
-                  <span>{isAdmin ? 'Panel Pentadbir' : 'Portal Mentor'}</span>
+                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Ke Ruang Bimbingan'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <EventsSection />
               </div>
-            )
-          )}
+            );
+          })()}
 
-          {/* RUANG IKLAN & PELUANG NIAGA BELIA (Strictly Youth Portal Only) */}
-          {activeTab === 'b2b' && (
-            !isYouth ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <Lock className="w-7 h-7" />
+          {/* JARINGAN PEMBEKAL & NIAGA */}
+          {activeTab === 'b2b' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return !isYouth ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Ruang Niaga Usahawan Sahaja</h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
-                    Ruang Niaga dikhaskan untuk rantaian bekalan dan kerjasama antara usahawan belia.
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Jaringan Niaga Khusus untuk Usahawan</h3>
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
+                    Jaringan pembekal dan kerjasama niaga ini dikhaskan untuk komuniti usahawan belia Kelantan.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
-                  <span>{isAdmin ? 'Panel Pentadbir' : 'Portal Mentor'}</span>
+                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Ke Ruang Bimbingan'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <B2BMarketSection />
               </div>
-            )
-          )}
+            );
+          })()}
 
-          {/* KALKULATOR KELAYAKAN GERAN & PEMBIAYAAN (Strictly Youth Portal Only) */}
-          {activeTab === 'calculator' && (
-            !isYouth ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <Lock className="w-7 h-7" />
+          {/* ANGGARAN KELAYAKAN SOKONGAN */}
+          {activeTab === 'calculator' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return !isYouth ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">Akses Kalkulator Geran Usahawan Sahaja</h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
-                    Simulasi kelayakan geran ini dikhaskan kepada pemohon Usahawan Belia.
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Anggaran Sokongan Khusus untuk Usahawan</h3>
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
+                    Alat semakan anggaran kelayakan ini dikhaskan untuk pemohon Usahawan Belia.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
-                  <span>{isAdmin ? 'Panel Pentadbir' : 'Portal Mentor'}</span>
+                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Ke Ruang Bimbingan'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <GrantCalculatorSection 
                   onOpenGrantModal={handleOpenGrantModal}
                   onOpenMentorship={handleOpenMentorshipClinicGuarded}
                 />
               </div>
-            )
-          )}
+            );
+          })()}
 
-          {/* PENTADBIRAN (ADMIN - STRICTLY ADMIN ROLE ONLY) */}
-          {activeTab === 'admin' && (
-            !isAdmin ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <ShieldCheck className="w-8 h-8" />
+          {/* PUSAT PENYELARASAN (ADMIN ONLY) */}
+          {activeTab === 'admin' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return !isAdmin ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">
-                    {language === 'en' ? 'Administrator Access Only' : 'Akses Khusus Pentadbir Sistem Sahaja'}
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">
+                    {language === 'en' ? 'Coordinator Access Only' : 'Khusus untuk Penyelaras Ekosistem'}
                   </h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
                     {isMentor 
-                      ? 'Akaun anda adalah akaun Mentor. Modul kawalan pentadbir sistem hanya dikhaskan kepada pihak pentadbir KBelia.'
-                      : 'Halaman ini dikhaskan kepada Pentadbir Sistem Portal KBelia.'}
+                      ? 'Akaun anda ialah akaun Mentor. Ruangan penyelarasan ekosistem ini dikhaskan untuk pihak pentadbir.'
+                      : 'Ruangan ini dikhaskan kepada Penyelaras Ekosistem Portal KBelia.'}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isMentor ? 'mentor' : 'home')}
-                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  <span>{isMentor ? 'Portal Mentor' : 'Laman Utama'}</span>
+                  <span>{isMentor ? 'Kembali ke Ruang Bimbingan' : 'Laman Utama'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <AdminDashboard
                   slots={enrichedSlots}
                   businesses={businesses}
@@ -2192,37 +2208,38 @@ function MainApp() {
                   }}
                 />
               </div>
-            )
-          )}
+            );
+          })()}
 
-          {/* PORTAL MENTOR: HAB BIMBINGAN (STRICT ROLE GUARD - MENTOR ONLY) */}
-          {activeTab === 'mentor' && (
-            !isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <GraduationCap className="w-8 h-8" />
+          {/* RUANG BIMBINGAN (MENTOR ONLY) */}
+          {activeTab === 'mentor' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return !isMentor ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <GraduationCap className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">
-                    {language === 'en' ? 'Mentor Access Only' : 'Akses Khusus Mentor Sahaja'}
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">
+                    {language === 'en' ? 'Mentor Access Only' : 'Khusus untuk Panel Mentor'}
                   </h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
                     {isAdmin
-                      ? 'Akaun Pentadbir menggunakan modul Panel Mentor di Pusat Kawalan Pentadbir untuk melantik serta memantau mentor, manakala ruang bimbingan ini dikhaskan kepada Mentor sahaja.'
-                      : 'Hab Bimbingan Mentor dikhaskan kepada panel mentor dalaman & pakar industri KBelia.'}
+                      ? 'Penyelaras boleh mengurus senarai mentor melalui tab Mentor di Pusat Penyelarasan, manakala ruang bimbingan ini dikhaskan untuk Mentor.'
+                      : 'Ruang Bimbingan ini dikhaskan untuk panel mentor dan pembimbing keusahawanan KBelia.'}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'home')}
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-blue-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{isAdmin ? 'Panel Pentadbir' : 'Laman Utama'}</span>
+                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Laman Utama'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <MentorPortal
                   mentors={mentors}
                   registrations={scopedMentorRegistrations}
@@ -2236,61 +2253,62 @@ function MainApp() {
                   }}
                 />
               </div>
-            )
-          )}
+            );
+          })()}
 
-          {/* MERCHANT PORTAL: BISNES SAYA (KHUSUS BELIA) */}
-          {activeTab === 'merchant' && (
-            isAdmin ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <ShieldCheck className="w-8 h-8" />
+          {/* RUANG USAHA ANDA (KHUSUS BELIA) */}
+          {activeTab === 'merchant' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return isAdmin ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">
-                    {language === 'en' ? 'Youth Entrepreneur Portal Only' : 'Akses Khusus Usahawan Belia Sahaja'}
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">
+                    {language === 'en' ? 'Youth Entrepreneur Space Only' : 'Khusus untuk Usahawan Belia'}
                   </h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
                     {language === 'en'
-                      ? 'You are logged in with an Administrator account. Merchant business operations and kiosk management are reserved for registered youth.'
-                      : 'Akaun anda adalah Pentadbir Sistem (Admin). Modul pengurusan bisnes usahawan dikhaskan kepada usahawan belia Kelantan.'}
+                      ? 'You are logged in as Coordinator. Business and product workspaces are reserved for youth entrepreneurs.'
+                      : 'Akaun anda ialah Penyelaras Ekosistem. Ruang pengurusan perniagaan ini dikhaskan untuk usahawan belia Kelantan.'}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('admin')}
-                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-rose-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  <span>{language === 'en' ? 'Admin Panel' : 'Panel Pentadbir'}</span>
+                  <span>{language === 'en' ? 'Ecosystem Hub' : 'Ke Pusat Penyelarasan'}</span>
                 </button>
               </div>
             ) : isMentor ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <GraduationCap className="w-8 h-8" />
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <GraduationCap className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">
-                    {language === 'en' ? 'Youth Entrepreneur Portal Only' : 'Akses Khusus Usahawan Belia Sahaja'}
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">
+                    {language === 'en' ? 'Youth Entrepreneur Space Only' : 'Khusus untuk Usahawan Belia'}
                   </h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
                     {language === 'en'
-                      ? 'You are logged in with an Academic Mentor account. Business management is reserved for youth mentees. Please use the Mentor Coaching Hub.'
-                      : 'Akaun anda adalah Mentor Bimbingan KBelia. Modul pengurusan bisnes dikhaskan kepada usahawan belia. Sila gunakan Hab Mentor untuk menyemak dan membimbing usahawan.'}
+                      ? 'You are logged in with a Mentor account. Please use your Mentorship Space to review sessions and support requests.'
+                      : 'Akaun anda ialah Mentor KBelia. Sila gunakan Ruang Bimbingan untuk menyemak sesi dan memberi panduan kepada usahawan.'}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton('mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs dark:bg-teal-600"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{language === 'en' ? 'Mentor Hub' : 'Portal Mentor'}</span>
+                  <span>{language === 'en' ? 'Mentorship Space' : 'Ke Ruang Bimbingan'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-3.5 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <MerchantPortal
                   myBusiness={myBusiness}
                   myProducts={myProducts}
@@ -2326,37 +2344,38 @@ function MainApp() {
                   }}
                 />
               </div>
-            )
-          )}
+            );
+          })()}
 
-          {/* HALAMAN BIMBINGAN BEBAS (STRICTLY YOUTH ROLE ONLY) */}
-          {activeTab === 'mentorship' && (
-            !isYouth ? (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-8 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800/70 rounded-2xl flex items-center justify-center mx-auto">
-                  <GraduationCap className="w-8 h-8" />
+          {/* SESI & SENARAI MENTOR (YOUTH ONLY) */}
+          {activeTab === 'mentorship' && (() => {
+            const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
+            return !isYouth ? (
+              <div className={`rounded-2xl border p-8 sm:p-10 text-center space-y-4 ${roleTheme.surfaceClass}`}>
+                <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mx-auto ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass} ${roleTheme.accentTextClass}`}>
+                  <GraduationCap className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-black dark:text-white">
-                    {language === 'en' ? 'Youth Entrepreneur Access Only' : 'Akses Khusus Usahawan Belia Sahaja'}
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">
+                    {language === 'en' ? 'Youth Entrepreneur Access Only' : 'Khusus untuk Usahawan Belia'}
                   </h3>
-                  <p className="text-[0.9375rem] text-black dark:text-white max-w-md mx-auto mt-1 leading-relaxed">
+                  <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
                     {language === 'en'
-                      ? 'Mentor appointment booking is reserved for Youth Entrepreneur accounts.'
-                      : 'Halaman tempahan dan pengurusan temu janji mentor dikhaskan kepada akaun Usahawan Belia.'}
+                      ? 'Mentor session booking is reserved for Youth Entrepreneur accounts.'
+                      : 'Halaman tempahan sesi bimbingan dikhaskan kepada akaun Usahawan Belia.'}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
-                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 shadow-xs"
+                  className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{isAdmin ? 'Panel Pentadbir' : 'Portal Mentor'}</span>
+                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Ke Ruang Bimbingan'}</span>
                 </button>
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+              <div className="pt-0.5">
                 <MentorshipPage
                   mentors={mentors}
                   registrations={scopedMentorRegistrations}
@@ -2369,12 +2388,12 @@ function MainApp() {
                   defaultDistrict={(userProfile?.district as KelantanDistrict) || 'Kota Bharu'}
                 />
               </div>
-            )
-          )}
+            );
+          })()}
 
-          {/* DEDICATED NEWS PAGE (Accessible to All Logged-In Roles, Controlled by Admin) */}
+          {/* BERITA & PERKONGSIAN */}
           {activeTab === 'news' && (
-            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+            <div className="pt-0.5">
               <NewsPage
                 newsItems={newsItems}
                 onRefresh={triggerRefresh}
@@ -2390,9 +2409,9 @@ function MainApp() {
             </div>
           )}
 
-          {/* DEDICATED KOMUNITI PAGE (Forum & Entrepreneur Q&A for All Logged-In Roles) */}
+          {/* FORUM & PERBINCANGAN KOMUNITI */}
           {activeTab === 'community' && (
-            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+            <div className="pt-0.5">
               <CommunityPage
                 posts={communityPosts}
                 replies={communityReplies}
@@ -2404,7 +2423,7 @@ function MainApp() {
 
           {/* TETAPAN AKAUN & PROFIL */}
           {activeTab === 'settings' && (
-            <div className="bg-white dark:bg-zinc-900 rounded-b-2xl rounded-t-none border border-t-0 border-slate-300 dark:border-zinc-700 p-3 sm:p-4 shadow-sm transition-colors">
+            <div className="pt-0.5">
               <SettingsPage
                 myBusiness={myBusiness}
                 onRefresh={triggerRefresh}

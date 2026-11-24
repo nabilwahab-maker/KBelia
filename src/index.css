@@ -132,19 +132,72 @@ html.dark {
   color: #16221D;
 }
 
-/* IMPORTANT HEADERS ONLY: Modern Cobalt Blue & Indigo/Emerald soft radial wash */
-.kbelia-important-header,
-.kbelia-corner-glow-tl {
-  background-color: #FFFFFF;
-  background-image: radial-gradient(circle at 10% 0%, rgba(37, 99, 235, 0.10) 0%, rgba(79, 70, 229, 0.05) 36%, transparent 66%),
-                    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 48%);
+/* Role-Differentiated Dashboard Canvases: Soft Warm/Cool Gradients + Light Mode Equivalents */
+.kbelia-canvas-belia {
+  background-color: #F7F5F0;
+  background-image:
+    radial-gradient(ellipse 68% 48% at 14% 0%, rgba(11, 110, 82, 0.08) 0%, transparent 68%),
+    radial-gradient(ellipse 56% 42% at 92% 6%, rgba(217, 164, 65, 0.11) 0%, transparent 66%),
+    linear-gradient(180deg, #F7F5F0 0%, #F2EFE6 100%);
+  color: #16221D;
 }
 
-html.dark .kbelia-important-header,
+html.dark .kbelia-canvas-belia {
+  background-color: #101614;
+  background-image:
+    radial-gradient(ellipse 65% 48% at 14% 0%, rgba(16, 185, 129, 0.14) 0%, transparent 68%),
+    radial-gradient(ellipse 58% 45% at 92% 8%, rgba(229, 184, 92, 0.11) 0%, transparent 66%),
+    linear-gradient(180deg, #101614 0%, #151F1B 52%, #111815 100%);
+  color: #F4F1EA;
+}
+
+.kbelia-canvas-mentor {
+  background-color: #F4F7FA;
+  background-image:
+    radial-gradient(ellipse 68% 48% at 14% 0%, rgba(29, 78, 216, 0.07) 0%, transparent 68%),
+    radial-gradient(ellipse 56% 42% at 92% 6%, rgba(14, 165, 233, 0.09) 0%, transparent 66%),
+    linear-gradient(180deg, #F4F7FA 0%, #EDF2F7 100%);
+  color: #0F1E2E;
+}
+
+html.dark .kbelia-canvas-mentor {
+  background-color: #0E151C;
+  background-image:
+    radial-gradient(ellipse 65% 48% at 14% 0%, rgba(37, 99, 235, 0.16) 0%, transparent 68%),
+    radial-gradient(ellipse 58% 45% at 92% 8%, rgba(34, 211, 238, 0.12) 0%, transparent 66%),
+    linear-gradient(180deg, #0E151C 0%, #131E29 52%, #0F1720 100%);
+  color: #F1F6FA;
+}
+
+.kbelia-canvas-admin {
+  background-color: #F8F6F2;
+  background-image:
+    radial-gradient(ellipse 68% 48% at 14% 0%, rgba(154, 86, 40, 0.08) 0%, transparent 68%),
+    radial-gradient(ellipse 56% 42% at 92% 6%, rgba(120, 144, 124, 0.08) 0%, transparent 66%),
+    linear-gradient(180deg, #F8F6F2 0%, #F2EFE9 100%);
+  color: #231F1C;
+}
+
+html.dark .kbelia-canvas-admin {
+  background-color: #141312;
+  background-image:
+    radial-gradient(ellipse 65% 48% at 14% 0%, rgba(217, 138, 78, 0.14) 0%, transparent 68%),
+    radial-gradient(ellipse 58% 45% at 92% 8%, rgba(168, 162, 158, 0.09) 0%, transparent 66%),
+    linear-gradient(180deg, #141312 0%, #1D1A18 52%, #151412 100%);
+  color: #F5F2EC;
+}
+
+/* Calm editorial surface wash */
+.kbelia-corner-glow-tl {
+  background-color: #FFFFFF;
+  background-image: radial-gradient(circle at 10% 0%, rgba(16, 185, 129, 0.07) 0%, transparent 55%),
+                    radial-gradient(circle at 90% 10%, rgba(229, 184, 92, 0.07) 0%, transparent 48%);
+}
+
 html.dark .kbelia-corner-glow-tl {
-  background-color: #09090B;
-  background-image: radial-gradient(circle at 12% 0%, rgba(59, 130, 246, 0.18) 0%, transparent 52%),
-                    radial-gradient(circle at 88% 10%, rgba(99, 102, 241, 0.22) 0%, transparent 52%);
+  background-color: #121715;
+  background-image: radial-gradient(circle at 12% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 52%),
+                    radial-gradient(circle at 88% 10%, rgba(229, 184, 92, 0.10) 0%, transparent 52%);
 }
 
 /* Modern Subtle SVG Grid & Dot Patterns */

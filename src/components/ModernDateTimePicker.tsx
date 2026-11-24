@@ -9,6 +9,7 @@ import {
   Check,
   X
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const MALAY_MONTHS = [
   'Januari',
@@ -281,7 +282,7 @@ export interface ModernDatePickerProps {
   placeholder?: string;
   disabled?: boolean;
   isEn?: boolean;
-  accentColor?: 'blue' | 'teal' | 'indigo';
+  accentColor?: 'blue' | 'teal' | 'emerald' | 'amber' | 'indigo';
   className?: string;
   clearable?: boolean;
 }
@@ -362,10 +363,12 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
   placeholder,
   disabled = false,
   isEn = false,
-  accentColor = 'blue',
+  accentColor,
   className = '',
   clearable = false
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const resolvedAccentColor = accentColor || (isAdmin ? 'amber' : isMentor ? 'blue' : 'emerald');
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -418,28 +421,31 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
   const coords = usePortalPopoverPosition(isOpen, triggerRef, panelRef, 336, 405);
 
   const accentClasses =
-    accentColor === 'teal'
+    resolvedAccentColor === 'teal' || resolvedAccentColor === 'emerald'
       ? {
-          ring: 'focus:ring-teal-500/30 focus:border-teal-600 dark:focus:border-teal-500',
-          selected: 'bg-teal-600 text-white font-bold shadow-xs',
-          inRange: 'bg-teal-50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-200',
-          todayRing: 'ring-1 ring-teal-500 text-teal-700 dark:text-teal-300 font-bold',
-          activeChip: 'bg-teal-600 text-white border-teal-600'
+          ring: 'focus:ring-[#10B981]/25 focus:border-[#0B6E52] dark:focus:border-[#34D399]',
+          openBorder: 'border-[#0B6E52] dark:border-[#34D399] ring-2 ring-[#10B981]/25 bg-white dark:bg-[#0F1714]',
+          selected: 'bg-[#0B6E52] dark:bg-[#10B981] text-white dark:text-[#08120E] font-bold shadow-xs',
+          inRange: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200',
+          todayRing: 'ring-1 ring-[#0B6E52] dark:ring-[#34D399] text-[#0B6E52] dark:text-[#34D399] font-bold',
+          activeChip: 'bg-[#0B6E52] dark:bg-[#10B981] text-white dark:text-[#08120E] border-[#0B6E52] dark:border-[#10B981]'
         }
-      : accentColor === 'indigo'
+      : resolvedAccentColor === 'amber' || resolvedAccentColor === 'indigo'
       ? {
-          ring: 'focus:ring-indigo-500/30 focus:border-indigo-600 dark:focus:border-indigo-500',
-          selected: 'bg-indigo-600 text-white font-bold shadow-xs',
-          inRange: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-900 dark:text-indigo-200',
-          todayRing: 'ring-1 ring-indigo-500 text-indigo-700 dark:text-indigo-300 font-bold',
-          activeChip: 'bg-indigo-600 text-white border-indigo-600'
+          ring: 'focus:ring-[#D98A4E]/25 focus:border-[#9A5628] dark:focus:border-[#D98A4E]',
+          openBorder: 'border-[#9A5628] dark:border-[#D98A4E] ring-2 ring-[#D98A4E]/25 bg-white dark:bg-[#141210]',
+          selected: 'bg-[#9A5628] dark:bg-[#D98A4E] text-white dark:text-[#141312] font-bold shadow-xs',
+          inRange: 'bg-[#F5EDE4] dark:bg-[#2A221B] text-[#7D451F] dark:text-[#E8B184]',
+          todayRing: 'ring-1 ring-[#9A5628] dark:ring-[#D98A4E] text-[#9A5628] dark:text-[#D98A4E] font-bold',
+          activeChip: 'bg-[#9A5628] dark:bg-[#D98A4E] text-white dark:text-[#141312] border-[#9A5628] dark:border-[#D98A4E]'
         }
       : {
-          ring: 'focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500',
-          selected: 'bg-blue-600 text-white font-bold shadow-xs',
-          inRange: 'bg-blue-50 dark:bg-blue-950/60 text-blue-900 dark:text-blue-200',
-          todayRing: 'ring-1 ring-blue-500 text-blue-700 dark:text-blue-300 font-bold',
-          activeChip: 'bg-blue-600 text-white border-blue-600'
+          ring: 'focus:ring-[#38BDF8]/25 focus:border-[#1D4ED8] dark:focus:border-[#38BDF8]',
+          openBorder: 'border-[#1D4ED8] dark:border-[#38BDF8] ring-2 ring-[#38BDF8]/25 bg-white dark:bg-[#0D141C]',
+          selected: 'bg-[#1D4ED8] dark:bg-[#0EA5E9] text-white dark:text-[#07111A] font-bold shadow-xs',
+          inRange: 'bg-sky-50 dark:bg-sky-950/60 text-sky-900 dark:text-sky-200',
+          todayRing: 'ring-1 ring-[#1D4ED8] dark:ring-[#38BDF8] text-[#1D4ED8] dark:text-[#38BDF8] font-bold',
+          activeChip: 'bg-[#1D4ED8] dark:bg-[#0EA5E9] text-white dark:text-[#07111A] border-[#1D4ED8] dark:border-[#0EA5E9]'
         };
 
   const formatOutputSingle = (iso: string): string => {
@@ -571,10 +577,10 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setIsOpen((prev) => !prev)}
-        className={`w-full flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border ${
+        className={`w-full flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-white/85 dark:bg-stone-900/85 border ${
           isOpen
-            ? 'border-blue-600 ring-2 ring-blue-500/25 bg-white dark:bg-slate-900'
-            : 'border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500'
+            ? accentClasses.openBorder
+            : 'border-stone-300 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500'
         } text-left transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none ${accentClasses.ring} ${className}`}
       >
         <div className="flex items-center gap-2.5 min-w-0">
@@ -602,7 +608,7 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
           <div
             ref={panelRef}
             style={{ top: coords.top, left: coords.left, width: coords.width }}
-            className="fixed z-[9999] bg-white dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150"
+            className="fixed z-[9999] bg-white/95 dark:bg-[#171615]/95 backdrop-blur-md rounded-2xl border border-stone-200 dark:border-stone-700/80 shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150"
             role="dialog"
             aria-label={isEn ? 'Date picker' : 'Pemilih Tarikh'}
           >
@@ -839,7 +845,7 @@ export const ModernDatePicker: React.FC<ModernDatePickerProps> = ({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-black dark:text-white cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-black dark:text-white cursor-pointer"
               >
                 {isEn ? 'Done' : 'Tutup'}
               </button>
@@ -871,7 +877,7 @@ export interface ModernTimePickerProps {
   placeholder?: string;
   disabled?: boolean;
   isEn?: boolean;
-  accentColor?: 'blue' | 'teal' | 'indigo';
+  accentColor?: 'blue' | 'teal' | 'emerald' | 'amber' | 'indigo';
   className?: string;
 }
 
@@ -969,9 +975,11 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
   placeholder,
   disabled = false,
   isEn = false,
-  accentColor = 'blue',
+  accentColor,
   className = ''
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const resolvedAccentColor = accentColor || (isAdmin ? 'amber' : isMentor ? 'blue' : 'emerald');
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -1018,19 +1026,25 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
   const coords = usePortalPopoverPosition(isOpen, triggerRef, panelRef, 344, 410);
 
   const accentClasses =
-    accentColor === 'teal'
+    resolvedAccentColor === 'teal' || resolvedAccentColor === 'emerald'
       ? {
-          ring: 'focus:ring-teal-500/30 focus:border-teal-600 dark:focus:border-teal-500',
-          selected: 'bg-teal-600 text-white border-teal-600 font-bold'
+          ring: 'focus:ring-[#10B981]/25 focus:border-[#0B6E52] dark:focus:border-[#34D399]',
+          openBorder: 'border-[#0B6E52] dark:border-[#34D399] ring-2 ring-[#10B981]/25 bg-white dark:bg-[#0F1714]',
+          selected: 'bg-[#0B6E52] dark:bg-[#10B981] text-white dark:text-[#08120E] border-[#0B6E52] dark:border-[#10B981] font-bold',
+          activeRangeBox: 'bg-emerald-50/90 dark:bg-emerald-950/45 border-[#0B6E52]/50 dark:border-[#34D399]/50'
         }
-      : accentColor === 'indigo'
+      : resolvedAccentColor === 'amber' || resolvedAccentColor === 'indigo'
       ? {
-          ring: 'focus:ring-indigo-500/30 focus:border-indigo-600 dark:focus:border-indigo-500',
-          selected: 'bg-indigo-600 text-white border-indigo-600 font-bold'
+          ring: 'focus:ring-[#D98A4E]/25 focus:border-[#9A5628] dark:focus:border-[#D98A4E]',
+          openBorder: 'border-[#9A5628] dark:border-[#D98A4E] ring-2 ring-[#D98A4E]/25 bg-white dark:bg-[#141210]',
+          selected: 'bg-[#9A5628] dark:bg-[#D98A4E] text-white dark:text-[#141312] border-[#9A5628] dark:border-[#D98A4E] font-bold',
+          activeRangeBox: 'bg-[#F5EDE4] dark:bg-[#2A221B] border-[#9A5628]/50 dark:border-[#D98A4E]/50'
         }
       : {
-          ring: 'focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500',
-          selected: 'bg-blue-600 text-white border-blue-600 font-bold'
+          ring: 'focus:ring-[#38BDF8]/25 focus:border-[#1D4ED8] dark:focus:border-[#38BDF8]',
+          openBorder: 'border-[#1D4ED8] dark:border-[#38BDF8] ring-2 ring-[#38BDF8]/25 bg-white dark:bg-[#0D141C]',
+          selected: 'bg-[#1D4ED8] dark:bg-[#0EA5E9] text-white dark:text-[#07111A] border-[#1D4ED8] dark:border-[#0EA5E9] font-bold',
+          activeRangeBox: 'bg-sky-50/90 dark:bg-sky-950/45 border-[#1D4ED8]/50 dark:border-[#38BDF8]/50'
         };
 
   const commitTime = (nextStart: Parsed12hTime, nextEnd: Parsed12hTime, rangeFlag: boolean) => {
@@ -1108,10 +1122,10 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setIsOpen((prev) => !prev)}
-        className={`w-full flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border ${
+        className={`w-full flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-white/85 dark:bg-stone-900/85 border ${
           isOpen
-            ? 'border-blue-600 ring-2 ring-blue-500/25 bg-white dark:bg-slate-900'
-            : 'border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500'
+            ? accentClasses.openBorder
+            : 'border-stone-300 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500'
         } text-left transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none ${accentClasses.ring} ${className}`}
       >
         <div className="flex items-center gap-2.5 min-w-0">
@@ -1139,7 +1153,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
           <div
             ref={panelRef}
             style={{ top: coords.top, left: coords.left, width: coords.width }}
-            className="fixed z-[9999] bg-white dark:bg-slate-900 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150"
+            className="fixed z-[9999] bg-white/95 dark:bg-[#171615]/95 backdrop-blur-md rounded-2xl border border-stone-200 dark:border-stone-700/80 shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150"
             role="dialog"
             aria-label={isEn ? 'Time picker' : 'Pemilih Masa'}
           >
@@ -1209,14 +1223,14 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
 
             {/* Range Start / End Switcher */}
             {isRange && (
-              <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-200 dark:border-slate-700">
+              <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-stone-200 dark:border-stone-700">
                 <button
                   type="button"
                   onClick={() => setActiveTarget('start')}
                   className={`p-2 rounded-xl border text-left transition-colors cursor-pointer ${
                     activeTarget === 'start'
-                      ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-400 dark:border-blue-600'
-                      : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
+                      ? accentClasses.activeRangeBox
+                      : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <div className="text-[0.8125rem] font-bold text-black/60 dark:text-white/65 uppercase">
@@ -1231,8 +1245,8 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                   onClick={() => setActiveTarget('end')}
                   className={`p-2 rounded-xl border text-left transition-colors cursor-pointer ${
                     activeTarget === 'end'
-                      ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-400 dark:border-blue-600'
-                      : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
+                      ? accentClasses.activeRangeBox
+                      : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700'
                   }`}
                 >
                   <div className="text-[0.8125rem] font-bold text-black/60 dark:text-white/65 uppercase">
@@ -1371,7 +1385,7 @@ export const ModernTimePicker: React.FC<ModernTimePickerProps> = ({
                   commitTime(startTime, endTime, isRange);
                   setIsOpen(false);
                 }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer shrink-0"
+                className={`inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-bold cursor-pointer shrink-0 ${accentClasses.selected}`}
               >
                 <Check className="w-3.5 h-3.5" />
                 <span>{isEn ? 'Done' : 'Selesai'}</span>

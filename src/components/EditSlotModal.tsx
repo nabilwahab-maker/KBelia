@@ -3,6 +3,9 @@ import { X, Save, Loader2, Edit3, AlertCircle } from 'lucide-react';
 import { CapsuleSlot, KelantanDistrict, SlotStatus } from '../types';
 import { ImageDropzone } from './ImageDropzone';
 import { saveCapsuleSlot } from '../services/dataService';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const adminTheme = getRoleTheme('admin');
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -126,7 +129,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-labelledby="edit-slot-modal-title"
@@ -135,12 +138,12 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+        className={`relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`sticky top-0 z-10 border-b px-6 py-4 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
               <Edit3 className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -158,7 +161,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
             disabled={isSaving}
             onClick={onClose}
             aria-label="Tutup tetingkap edit"
-            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -184,7 +187,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Masukkan kod kiosk"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -199,7 +202,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Contoh: Kapsul Niaga Belia Bachok 02"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -211,7 +214,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 value={hubLocation}
                 onChange={(e) => setHubLocation(e.target.value)}
                 placeholder="Masukkan lokasi tapak"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -220,7 +223,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
               <select
                 value={district}
                 onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
               >
                 {DISTRICTS.map((d) => (
                   <option key={d} value={d}>{d}</option>
@@ -240,7 +243,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 value={monthlyRate}
                 onChange={(e) => setMonthlyRate(e.target.value)}
                 placeholder="Masukkan kadar sewa bulanan"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -252,7 +255,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 value={size}
                 onChange={(e) => setSize(e.target.value)}
                 placeholder="Masukkan saiz unit kiosk"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -261,7 +264,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as SlotStatus)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
               >
                 <option value="available">Kosong (Boleh Mohon)</option>
                 <option value="occupied">Sedang Beroperasi</option>
@@ -279,7 +282,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 value={status === 'available' ? '' : currentTenantBusinessName}
                 onChange={(e) => setCurrentTenantBusinessName(e.target.value)}
                 placeholder={status === 'available' ? 'Tiada penyewa' : 'Masukkan nama penyewa'}
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 disabled:opacity-50"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] disabled:opacity-50 focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -292,7 +295,7 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
                 value={amenities}
                 onChange={(e) => setAmenities(e.target.value)}
                 placeholder="Masukkan senarai kemudahan"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -306,19 +309,19 @@ export const EditSlotModal: React.FC<EditSlotModalProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
+          <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>
             <button
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer disabled:opacity-50"
+              className={`w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold transition-colors cursor-pointer disabled:opacity-50 ${adminTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60"
+              className={`w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60 ${adminTheme.primaryButtonClass}`}
             >
               {isSaving ? (
                 <>

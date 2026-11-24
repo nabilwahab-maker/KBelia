@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { MentorProfile, MentorshipRegistration, KelantanDistrict } from '../types';
 import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { ModernDatePicker, ModernTimePicker, toLocalIsoDate } from './ModernDateTimePicker';
 
 interface MentorshipClinicModalProps {
@@ -40,6 +42,8 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
   defaultPhone = '',
   defaultDistrict = 'Pasir Puteh'
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [selectedMentor, setSelectedMentor] = useState<MentorProfile | null>(null);
   
   // Booking Form States
@@ -109,9 +113,9 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
         aria-modal="true"
       >
         {/* Header */}
-        <div className="border-b border-slate-300 dark:border-slate-600 py-4.5 px-6 sm:px-7 flex items-center justify-between kbelia-important-header shrink-0">
+        <div className={`border-b ${roleTheme.dividerClass} py-4.5 px-6 sm:px-7 flex items-center justify-between ${roleTheme.surfaceMutedClass} shrink-0`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+            <div className={`w-10 h-10 rounded-xl ${roleTheme.activeMiniBtnClass} border flex items-center justify-center shrink-0`}>
               <Users className="w-5 h-5" />
             </div>
             <div>
@@ -126,7 +130,8 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            aria-label="Tutup"
+            className={roleTheme.iconButtonClass}
           >
             <X className="w-5 h-5" />
           </button>
@@ -176,16 +181,16 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     setSelectedMentor(null);
                     setIsSubmitted(false);
                   }}
-                  className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  className={`py-2.5 px-5 text-sm sm:text-[0.9375rem] ${roleTheme.secondaryButtonClass}`}
                 >
-                  Pilih Mentor Lain
+                  Tukar Mentor
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all cursor-pointer dark:bg-teal-600"
+                  className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] shadow-sm ${roleTheme.primaryButtonClass}`}
                 >
-                  Selesai & Tutup
+                  Tutup
                 </button>
               </div>
             </div>
@@ -194,7 +199,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
             <div className="space-y-5 animate-in fade-in duration-200">
               <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+                  <div className={`w-10 h-10 rounded-xl ${roleTheme.activeMiniBtnClass} border flex items-center justify-center shrink-0`}>
                     <GraduationCap className="w-5 h-5" />
                   </div>
                   <div>
@@ -205,14 +210,14 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedMentor(null)}
-                  className="text-sm font-semibold text-black dark:text-white/75 hover:underline cursor-pointer"
+                  className={roleTheme.compactSecondaryButtonClass}
                 >
                   Tukar Mentor
                 </button>
               </div>
 
               {validationError && (
-                <div className="p-3.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-sm text-black dark:text-white flex items-center gap-2">
+                <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-sm text-black dark:text-white flex items-center gap-2">
                   <span>{validationError}</span>
                 </div>
               )}
@@ -230,7 +235,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       value={entrepreneurName}
                       onChange={(e) => setEntrepreneurName(e.target.value)}
                       placeholder="Masukkan nama penuh"
-                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-medium focus:outline-none ${roleTheme.inputClass}`}
                     />
                   </div>
 
@@ -244,7 +249,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       value={entrepreneurPhone}
                       onChange={(e) => setEntrepreneurPhone(e.target.value)}
                       placeholder="Masukkan nombor telefon"
-                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono focus:outline-none ${roleTheme.inputClass}`}
                     />
                   </div>
                 </div>
@@ -261,7 +266,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
                       placeholder="Masukkan nama perniagaan"
-                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-medium focus:outline-none ${roleTheme.inputClass}`}
                     />
                   </div>
 
@@ -272,7 +277,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     <select
                       value={district}
                       onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-medium focus:outline-none cursor-pointer ${roleTheme.inputClass}`}
                     >
                       <option value="Kota Bharu" className="dark:bg-slate-900">Kota Bharu</option>
                       <option value="Bachok" className="dark:bg-slate-900">Bachok</option>
@@ -296,7 +301,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                   <select
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                    className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-medium focus:outline-none cursor-pointer ${roleTheme.inputClass}`}
                   >
                     <option value="Strategi Pemasaran Digital & Jualan Langsung" className="dark:bg-slate-900">Strategi Pemasaran Digital &amp; Jualan Langsung</option>
                     <option value="Pengurusan Aliran Tunai & Penyata Kewangan Kiosk" className="dark:bg-slate-900">Pengurusan Aliran Tunai &amp; Penyata Kewangan Kiosk</option>
@@ -317,7 +322,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     value={challenges}
                     onChange={(e) => setChallenges(e.target.value)}
                     placeholder="Masukkan keterangan permohonan"
-                    className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                    className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${roleTheme.inputClass}`}
                   />
                 </div>
 
@@ -332,7 +337,6 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       onChange={setPreferredDate}
                       valueFormat="malay-day"
                       minDate={toLocalIsoDate(new Date())}
-                      accentColor="teal"
                       placeholder="Pilih tarikh sesi"
                     />
                   </div>
@@ -348,7 +352,6 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       allowRangeToggle
                       formatStyle="12h-am"
                       defaultDurationMinutes={60}
-                      accentColor="teal"
                       placeholder="Pilih masa sesi"
                     />
                   </div>
@@ -360,7 +363,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                     <select
                       value={mode}
                       onChange={(e) => setMode(e.target.value as any)}
-                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all cursor-pointer dark:focus:border-blue-500"
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-medium focus:outline-none cursor-pointer ${roleTheme.inputClass}`}
                     >
                       <option value="Bersemuka di Kampus" className="dark:bg-slate-900">Bersemuka di Hab Usahawan</option>
                       <option value="Google Meet" className="dark:bg-slate-900">Google Meet</option>
@@ -373,16 +376,16 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setSelectedMentor(null)}
-                    className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                    className={`py-2.5 px-5 text-sm sm:text-[0.9375rem] ${roleTheme.secondaryButtonClass}`}
                   >
                     Kembali
                   </button>
                   <button
                     type="submit"
-                    className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-teal-600 hover:bg-teal-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer dark:bg-teal-600"
+                    className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] shadow-sm inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                   >
                     <Send className="w-4 h-4" />
-                    <span>Hantar Permohonan Bimbingan</span>
+                    <span>Hantar</span>
                   </button>
                 </div>
               </form>
@@ -398,12 +401,12 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 {mentors.map((mentor) => (
                   <div
                     key={mentor.id}
-                    className="p-4 sm:p-5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-teal-600 transition-all shadow-xs"
+                    className={`p-4 sm:p-5 rounded-xl border ${roleTheme.surfaceClass} transition-all shadow-xs`}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-[0.8125rem] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70">
+                          <span className={`text-[0.8125rem] font-bold px-2.5 py-0.5 rounded-lg border ${roleTheme.activeMiniBtnClass}`}>
                             {mentor.agency}
                           </span>
                           <span className="text-[0.8125rem] text-black/70 dark:text-white/75">&bull; {mentor.availableDays}</span>
@@ -420,9 +423,9 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleStartBooking(mentor)}
-                        className="py-2 px-4 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors shadow-xs shrink-0 cursor-pointer self-start sm:self-auto flex items-center gap-1.5 dark:bg-teal-600"
+                        className={`${roleTheme.compactPrimaryButtonClass} self-start sm:self-auto`}
                       >
-                        <span>Pilih Mentor</span>
+                        <span>Pilih</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>

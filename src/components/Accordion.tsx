@@ -72,7 +72,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                       {item.title}
                     </span>
                     {item.badge && (
-                      <span className="text-[0.8125rem] px-2.5 py-0.5 rounded-full font-bold bg-amber-50 text-black border border-amber-200 dark:bg-amber-950/60 dark:text-white dark:border-amber-800/70">
+                      <span className="text-[0.8125rem] px-2.5 py-0.5 rounded-lg font-bold bg-amber-50 text-black border border-amber-200 dark:bg-amber-950/60 dark:text-white dark:border-amber-800/70">
                         {item.badge}
                       </span>
                     )}

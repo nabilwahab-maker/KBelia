@@ -1189,6 +1189,108 @@ export const generateMentorEndorsementOfficialHtml = (endorsement: GrantEndorsem
   });
 };
 
+export const generateMentorSummaryReportHtml = (params: {
+  mentorName: string;
+  mentorAgency: string;
+  mentorDesignation?: string;
+  totalMentees: number;
+  completedSessions: number;
+  totalLogs: number;
+  totalEndorsements: number;
+  districtRows: { district: string; mentees: number; sessions: number; endorsements: number }[];
+  sectorRows: { sector: string; count: number }[];
+  generatedDate: string;
+  refCode: string;
+}): string => {
+  const districtTableRows = params.districtRows.length > 0
+    ? params.districtRows
+        .map(
+          (r) => `
+            <tr>
+              <td><strong>${escapeHtml(r.district)}</strong></td>
+              <td style="text-align:right;">${r.mentees}</td>
+              <td style="text-align:right;">${r.sessions}</td>
+              <td style="text-align:right;">${r.endorsements}</td>
+            </tr>
+          `
+        )
+        .join('')
+    : `<tr><td colspan="4" style="text-align:center;color:#64748b;">Tiada rekod daerah lagi.</td></tr>`;
+
+  const sectorTableRows = params.sectorRows.length > 0
+    ? params.sectorRows
+        .map(
+          (r) => `
+            <tr>
+              <td>${escapeHtml(r.sector)}</td>
+              <td style="text-align:right;"><strong>${r.count}</strong></td>
+            </tr>
+          `
+        )
+        .join('')
+    : `<tr><td colspan="2" style="text-align:center;color:#64748b;">Tiada rekod sektor lagi.</td></tr>`;
+
+  const bodyHtml = `
+    <div class="doc-banner">
+      <div class="doc-banner-title">LAPORAN RINGKAS BIMBINGAN MENTOR USAHAWAN BELIA</div>
+      <div class="doc-banner-status">TARIKH JANAAN: ${escapeHtml(params.generatedDate)}</div>
+    </div>
+    <p style="margin-bottom:12px;">
+      Ringkasan aktiviti bimbingan bagi <strong>${escapeHtml(params.mentorName)}</strong> (${escapeHtml(params.mentorAgency)}) di bawah Portal Pembangunan Usahawan Belia Kelantan (KBelia).
+    </p>
+    <div class="section-title">1. Ringkasan Angka Utama</div>
+    <table class="info-table">
+      <tr><th>Jumlah Mentee Diselia</th><td><strong>${params.totalMentees} Usahawan</strong></td></tr>
+      <tr><th>Sesi Bimbingan Selesai</th><td><strong>${params.completedSessions} Sesi</strong></td></tr>
+      <tr><th>Rekod Nota Sesi</th><td><strong>${params.totalLogs} Catatan</strong></td></tr>
+      <tr><th>Surat Sokongan Geran</th><td><strong>${params.totalEndorsements} Perakuan</strong></td></tr>
+    </table>
+    <div class="section-title">2. Pecahan Mengikut Daerah</div>
+    <table class="info-table">
+      <thead>
+        <tr>
+          <th>Daerah</th>
+          <th style="text-align:right;">Mentee</th>
+          <th style="text-align:right;">Sesi</th>
+          <th style="text-align:right;">Sokongan</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${districtTableRows}
+      </tbody>
+    </table>
+    <div class="section-title">3. Pecahan Mengikut Sektor Perniagaan</div>
+    <table class="info-table">
+      <thead>
+        <tr>
+          <th>Sektor</th>
+          <th style="text-align:right;">Bilangan Mentee</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sectorTableRows}
+      </tbody>
+    </table>
+  `;
+
+  return buildOfficialLetterheadShell({
+    title: `Laporan Ringkas Mentor - ${params.mentorName} - ${params.refCode}`,
+    toolbarLabel: 'Laporan Ringkas Bimbingan Mentor KBelia',
+    badgeText: 'Laporan Rasmi',
+    agencyKicker: 'HAB USAHAWAN BELIA KELANTAN · PANEL MENTOR',
+    agencyHeading: 'PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)',
+    agencySubheading: 'Laporan Kemajuan & Rekod Bimbingan Usahawan Belia Kelantan',
+    refNumber: params.refCode,
+    issueDate: params.generatedDate,
+    statusText: 'DISAHKAN',
+    bodyHtml,
+    auditCode: params.refCode,
+    signatoryTitle: params.mentorName.toUpperCase(),
+    signatorySub: `${params.mentorDesignation || 'Mentor Keusahawanan'} · ${params.mentorAgency}`,
+    sealText: '★ LAPORAN MENTOR KBELIA ★'
+  });
+};
+
 export const generateYouthCertificateOfficialHtml = (params: {
   fullName: string;
   email?: string;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   LayoutDashboard,
-  ShieldCheck,
   Store,
   Building2,
   Award,
@@ -11,23 +10,25 @@ import {
   CalendarDays,
   Network,
   Coins,
-  ChevronDown,
   FileCheck,
   ShoppingBag,
   MessageCircle,
   BarChart3,
-  CheckCircle2,
   Clock,
   Sliders,
   FileText,
   Users,
   X,
   Newspaper,
-  Megaphone
+  Megaphone,
+  ClipboardCheck,
+  MapPin,
+  Compass
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { DashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { MerchantSubTab, AdminSubTab, MentorSubTab } from '../types';
 import { subscribeCrossTabSync } from '../services/realtimeSync';
 import {
@@ -56,13 +57,26 @@ interface UMKSidebarProps {
   notificationData?: Omit<SidebarNotificationContextData, 'isAdmin' | 'isMentor' | 'isYouth'>;
 }
 
+interface SidebarNavItem {
+  key: string;
+  label: string;
+  keywords: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+interface SidebarCategoryGroup {
+  title: string;
+  items: SidebarNavItem[];
+}
+
 export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   activeTab,
   setActiveTab,
   isCollapsed,
   isMobileOpen = false,
   onCloseMobile,
-  onOpenMentorshipClinic,
   merchantSubTab = 'overview',
   onSelectMerchantSubTab,
   adminSubTab = 'queue',
@@ -79,6 +93,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const isMs = language === 'ms';
   const isMentor = userProfile?.role === 'mentor';
   const isYouth = !isAdmin && !isMentor;
+  const currentRole: DashboardRole = isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia';
+  const roleTheme = getRoleTheme(currentRole);
 
   const sidebarUserKey = getSidebarUserKey(
     notificationData?.userId || user?.uid || userProfile?.userId,
@@ -124,19 +140,12 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     setSeenByMenu((prev) => markSidebarMenusSeen(sidebarUserKey, menuKeys, itemIdsByMenu, prev));
   };
 
-  const renderCountBadge = (count: number, onActiveSolidBg = false) => {
+  const renderCountBadge = (count: number) => {
     if (count <= 0) return null;
-    const colorClass = onActiveSolidBg
-      ? 'bg-white text-blue-700 dark:bg-white dark:text-blue-700'
-      : isAdmin
-        ? 'bg-indigo-600 text-white dark:bg-indigo-400 dark:text-slate-950'
-        : isMentor
-          ? 'bg-teal-600 text-white dark:bg-teal-400 dark:text-slate-950'
-          : 'bg-blue-600 text-white dark:bg-sky-400 dark:text-slate-950';
     return (
       <span
         aria-label={`${count} ${isMs ? 'perkara baharu' : 'pending items'}`}
-        className={`min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold tabular-nums inline-flex items-center justify-center shrink-0 leading-none ${colorClass}`}
+        className={`min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold tabular-nums inline-flex items-center justify-center shrink-0 leading-none ${roleTheme.badgeClass}`}
       >
         {count > 99 ? '99+' : count}
       </span>
@@ -145,57 +154,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
 
   const renderMiniBadge = (count: number) => {
     if (count <= 0) return null;
-    const colorClass = isAdmin
-      ? 'bg-indigo-600 text-white dark:bg-indigo-400 dark:text-slate-950'
-      : isMentor
-        ? 'bg-teal-600 text-white dark:bg-teal-400 dark:text-slate-950'
-        : 'bg-blue-600 text-white dark:bg-sky-400 dark:text-slate-950';
     return (
       <span
         aria-label={`${count} ${isMs ? 'perkara baharu' : 'pending items'}`}
-        className={`absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full text-[10px] font-bold tabular-nums inline-flex items-center justify-center leading-none ring-2 ring-white dark:ring-zinc-950 ${colorClass}`}
+        className={`absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full text-[10px] font-bold tabular-nums inline-flex items-center justify-center leading-none ring-2 ring-white dark:ring-[#101412] ${roleTheme.badgeClass}`}
       >
         {count > 9 ? '9+' : count}
       </span>
     );
   };
-
-  // Determine whether the active route belongs inside Category 1's accordion for each role
-  const isYouthAccordionRoute =
-    (activeTab === 'home' && isYouth) ||
-    (activeTab === 'merchant' && merchantSubTab !== 'cashflow');
-
-  const isAdminAccordionRoute =
-    (activeTab === 'home' && isAdmin) ||
-    (activeTab === 'admin' && adminSubTab !== 'programs' && adminSubTab !== 'mentors');
-
-  const isMentorAccordionRoute =
-    (activeTab === 'home' && isMentor) ||
-    (activeTab === 'mentor' &&
-      (mentorSubTab === 'overview' || mentorSubTab === 'sessions' || mentorSubTab === 'logbook'));
-
-  const [isDashboardAccordionOpen, setIsDashboardAccordionOpen] = useState(isYouthAccordionRoute);
-  const [isAdminDashboardAccordionOpen, setIsAdminDashboardAccordionOpen] = useState(isAdminAccordionRoute);
-  const [isMentorDashboardAccordionOpen, setIsMentorDashboardAccordionOpen] = useState(isMentorAccordionRoute);
-
-  // Sync accordions cleanly when activeTab / subTab changes externally
-  useEffect(() => {
-    if (isYouth) {
-      setIsDashboardAccordionOpen(isYouthAccordionRoute);
-    }
-  }, [isYouth, isYouthAccordionRoute]);
-
-  useEffect(() => {
-    if (isAdmin) {
-      setIsAdminDashboardAccordionOpen(isAdminAccordionRoute);
-    }
-  }, [isAdmin, isAdminAccordionRoute]);
-
-  useEffect(() => {
-    if (isMentor) {
-      setIsMentorDashboardAccordionOpen(isMentorAccordionRoute);
-    }
-  }, [isMentor, isMentorAccordionRoute]);
 
   const query = sidebarSearch.trim().toLowerCase();
   const matchesSearch = (keywords: string) => {
@@ -208,646 +175,459 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     if (onCloseMobile) onCloseMobile();
   };
 
-  // Shared design tokens for uniform 3-category navigation across all 3 roles
   const navBtnBase =
-    'w-full flex items-center justify-between gap-2 px-3 py-2.25 text-[0.9375rem] font-semibold rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
-  const navBtnActive =
-    'bg-amber-50/90 dark:bg-[#1E4B85]/15 text-black dark:text-white border-blue-200 dark:border-blue-800/70 shadow-xs ring-1 ring-blue-500/30 font-bold';
+    'w-full flex items-center justify-between gap-2 px-3 py-2.25 text-[0.9375rem] font-medium rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30';
+  const navBtnActive = roleTheme.activeNavClass;
   const navBtnIdle =
-    'border-transparent text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
-
-  const subNavBtnBase =
-    'w-full flex items-center justify-between gap-2 px-2.5 py-2 text-sm rounded-lg transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
-  const subNavBtnActive = 'bg-blue-600 text-white font-bold shadow-xs dark:bg-blue-600';
-  const subNavBtnIdle =
-    'text-black dark:text-white/80 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
+    'border-transparent text-slate-700 dark:text-stone-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.05] hover:text-slate-950 dark:hover:text-white';
 
   const categoryHeaderClass =
-    'text-[0.8125rem] font-black tracking-wider text-black/80 dark:text-white/80 uppercase px-2 pb-1 whitespace-nowrap truncate';
-  const categoryDividerClass = 'pt-3 border-t border-slate-300 dark:border-zinc-600 space-y-1';
+    'text-[0.78rem] font-semibold tracking-tight text-slate-500 dark:text-stone-400 px-2 pb-1 whitespace-nowrap truncate';
+  const categoryDividerClass = `pt-3 border-t space-y-1 ${roleTheme.dividerClass}`;
 
   const miniBtnBase =
-    'relative p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40';
-  const miniBtnActive =
-    'bg-amber-50 dark:bg-[#1E4B85]/15 text-black dark:text-white border-blue-200 dark:border-blue-800/70 shadow-xs ring-1 ring-blue-500/30 font-bold';
+    'relative p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30';
+  const miniBtnActive = roleTheme.activeMiniBtnClass;
   const miniBtnIdle =
-    'border-transparent text-black/70 dark:text-white/75 hover:bg-amber-50/70 dark:hover:bg-zinc-800 hover:text-black dark:hover:text-white';
-  const miniDivider = <div className="w-8 h-px bg-slate-300 dark:bg-zinc-600 my-0.5" />;
-
-  const adminAccordionTotal =
-    getCount('admin:queue') +
-    getCount('admin:bookings') +
-    getCount('admin:businesses') +
-    getCount('admin:slots') +
-    getCount('admin:news') +
-    getCount('admin:b2b') +
-    getCount('admin:events') +
-    getCount('admin:users') +
-    getCount('admin:settings');
-
-  const mentorAccordionTotal =
-    getCount('mentor:overview') +
-    getCount('mentor:sessions') +
-    getCount('mentor:logbook');
-
-  const youthAccordionTotal =
-    getCount('youth:overview') +
-    getCount('youth:profile') +
-    getCount('youth:products') +
-    getCount('youth:vault') +
-    getCount('youth:card');
+    'border-transparent text-slate-600 dark:text-stone-400 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-slate-950 dark:hover:text-white';
+  const miniDivider = <div className={`w-8 h-px my-0.5 border-t ${roleTheme.dividerClass}`} />;
 
   // =========================================================================
-  // 1. COLLAPSED SIDEBAR VIEW (Desktop Mini Icon Rail - 3 Aligned Groups)
+  // FLAT 3-CATEGORY NAVIGATION CONFIGS PER ROLE (ZERO SUB-BUTTONS)
+  // =========================================================================
+  const goAdmin = (sub: AdminSubTab, menuKey: string) => {
+    markSeen([menuKey]);
+    navigateAndClose(() => {
+      setActiveTab('admin');
+      if (onSelectAdminSubTab) onSelectAdminSubTab(sub);
+    });
+  };
+
+  const goMentor = (sub: MentorSubTab, menuKey: string) => {
+    markSeen([menuKey]);
+    navigateAndClose(() => {
+      setActiveTab('mentor');
+      if (onSelectMentorSubTab) onSelectMentorSubTab(sub);
+    });
+  };
+
+  const goMerchant = (sub: MerchantSubTab, menuKey: string) => {
+    markSeen([menuKey]);
+    navigateAndClose(() => {
+      setActiveTab('merchant');
+      if (onSelectMerchantSubTab) onSelectMerchantSubTab(sub);
+    });
+  };
+
+  const goTab = (tab: UMKTab, menuKey: string) => {
+    markSeen([menuKey]);
+    navigateAndClose(() => setActiveTab(tab));
+  };
+
+  const roleCategories: SidebarCategoryGroup[] = isAdmin
+    ? [
+        {
+          title: isMs ? 'Ruang Utama' : 'Main Workspace',
+          items: [
+            {
+              key: 'admin:queue',
+              label: 'Dashboard',
+              keywords: 'dashboard ringkasan utama kelulusan giliran semakan permohonan overview queue',
+              icon: LayoutDashboard,
+              isActive:
+                (activeTab === 'home' && isAdmin) ||
+                (activeTab === 'admin' && adminSubTab === 'queue'),
+              onClick: () => goAdmin('queue', 'admin:queue')
+            },
+            {
+              key: 'admin:bookings',
+              label: isMs ? 'Tempahan Kiosk' : 'Kiosk Bookings',
+              keywords: 'tempahan kiosk kapsul sewa bookings',
+              icon: Clock,
+              isActive: activeTab === 'admin' && adminSubTab === 'bookings',
+              onClick: () => goAdmin('bookings', 'admin:bookings')
+            },
+            {
+              key: 'admin:slots',
+              label: isMs ? 'Slot Kiosk' : 'Kiosk Slots',
+              keywords: 'slot kiosk tapak lokasi kapsul slots',
+              icon: Building2,
+              isActive: activeTab === 'admin' && adminSubTab === 'slots',
+              onClick: () => goAdmin('slots', 'admin:slots')
+            },
+            {
+              key: 'admin:academic',
+              label: isMs ? 'Senarai Kiosk' : 'Kiosk List',
+              keywords: 'senarai kiosk pemantauan jajahan semakan status kekosongan monitoring',
+              icon: MapPin,
+              isActive: activeTab === 'academic',
+              onClick: () => goTab('academic', 'admin:academic')
+            }
+          ]
+        },
+        {
+          title: isMs ? 'Dana & Bimbingan' : 'Grants & Mentoring',
+          items: [
+            {
+              key: 'admin:ceed',
+              label: isMs ? 'Geran Belia' : 'Youth Grants',
+              keywords: 'geran belia pemantauan status peruntukan dana bantuan grant',
+              icon: Award,
+              isActive: activeTab === 'ceed',
+              onClick: () => goTab('ceed', 'admin:ceed')
+            },
+            {
+              key: 'admin:programs',
+              label: isMs ? 'Program Geran' : 'Grant Programs',
+              keywords: 'program geran inisiatif dana kelantan programs',
+              icon: Network,
+              isActive: activeTab === 'admin' && adminSubTab === 'programs',
+              onClick: () => goAdmin('programs', 'admin:programs')
+            },
+            {
+              key: 'admin:mentors',
+              label: isMs ? 'Panel Mentor' : 'Mentor Panel',
+              keywords: 'panel mentor bimbingan dalaman rakan industri kbelia mentors',
+              icon: GraduationCap,
+              isActive: activeTab === 'admin' && adminSubTab === 'mentors',
+              onClick: () => goAdmin('mentors', 'admin:mentors')
+            },
+            {
+              key: 'admin:events',
+              label: isMs ? 'Acara & Karnival' : 'Events & Expo',
+              keywords: 'acara karnival ekspo bengkel tempahan peserta events',
+              icon: Calendar,
+              isActive: activeTab === 'admin' && adminSubTab === 'events',
+              onClick: () => goAdmin('events', 'admin:events')
+            }
+          ]
+        },
+        {
+          title: isMs ? 'Direktori & Sistem' : 'Directory & System',
+          items: [
+            {
+              key: 'admin:businesses',
+              label: isMs ? 'Senarai Usahawan' : 'Entrepreneurs',
+              keywords: 'senarai usahawan direktori perniagaan ssm businesses',
+              icon: Store,
+              isActive: activeTab === 'admin' && adminSubTab === 'businesses',
+              onClick: () => goAdmin('businesses', 'admin:businesses')
+            },
+            {
+              key: 'admin:hepa',
+              label: isMs ? 'Semak Usahawan' : 'SSM Audit',
+              keywords: 'semak usahawan audit direktori semakan ssm audit',
+              icon: ClipboardCheck,
+              isActive: activeTab === 'hepa',
+              onClick: () => goTab('hepa', 'admin:hepa')
+            },
+            {
+              key: 'admin:b2b',
+              label: isMs ? 'Ruang Niaga' : 'Trade Space',
+              keywords: 'ruang niaga iklan pembekal gambar b2b ads admin',
+              icon: Megaphone,
+              isActive: activeTab === 'admin' && adminSubTab === 'b2b',
+              onClick: () => goAdmin('b2b', 'admin:b2b')
+            },
+            {
+              key: 'admin:news',
+              label: isMs ? 'Berita Portal' : 'Portal News',
+              keywords: 'berita portal pengumuman warta news manager admin',
+              icon: Newspaper,
+              isActive: activeTab === 'admin' && adminSubTab === 'news',
+              onClick: () => goAdmin('news', 'admin:news')
+            },
+            {
+              key: 'admin:users',
+              label: isMs ? 'Urus Pengguna' : 'Users',
+              keywords: 'urus pengguna akaun profil ahli peranan user management users',
+              icon: Users,
+              isActive: activeTab === 'admin' && adminSubTab === 'users',
+              onClick: () => goAdmin('users', 'admin:users')
+            },
+            {
+              key: 'admin:settings',
+              label: isMs ? 'Tetapan' : 'Settings',
+              keywords: 'tetapan operasi kawalan parameter system settings operations',
+              icon: Sliders,
+              isActive: activeTab === 'admin' && adminSubTab === 'settings',
+              onClick: () => goAdmin('settings', 'admin:settings')
+            }
+          ]
+        }
+      ]
+    : isMentor
+    ? [
+        {
+          title: isMs ? 'Ruang Bimbingan' : 'Coaching Space',
+          items: [
+            {
+              key: 'mentor:overview',
+              label: 'Dashboard',
+              keywords: 'dashboard ringkasan papan pemuka mentor overview',
+              icon: LayoutDashboard,
+              isActive:
+                (activeTab === 'home' && isMentor) ||
+                (activeTab === 'mentor' && mentorSubTab === 'overview'),
+              onClick: () => goMentor('overview', 'mentor:overview')
+            },
+            {
+              key: 'mentor:sessions',
+              label: isMs ? 'Sesi Bimbingan' : 'Sessions',
+              keywords: 'sesi bimbingan kalendar temujanji mentee google meet sessions',
+              icon: Calendar,
+              isActive: activeTab === 'mentor' && mentorSubTab === 'sessions',
+              onClick: () => goMentor('sessions', 'mentor:sessions')
+            },
+            {
+              key: 'mentor:mentees',
+              label: isMs ? 'Senarai Mentee' : 'Mentee List',
+              keywords: 'senarai mentee usahawan bimbingan kedai ssm mentees',
+              icon: Users,
+              isActive: activeTab === 'mentor' && mentorSubTab === 'mentees',
+              onClick: () => goMentor('mentees', 'mentor:mentees')
+            },
+            {
+              key: 'mentor:logbook',
+              label: isMs ? 'Rekod Sesi' : 'Session Log',
+              keywords: 'rekod sesi log jurnal nota bimbingan kpi kemajuan tugasan logbook',
+              icon: FileText,
+              isActive: activeTab === 'mentor' && mentorSubTab === 'logbook',
+              onClick: () => goMentor('logbook', 'mentor:logbook')
+            },
+            {
+              key: 'mentor:schedule',
+              label: isMs ? 'Jadual' : 'Schedule',
+              keywords: 'jadual kalendar temu janji slot bimbingan schedule calendar',
+              icon: CalendarDays,
+              isActive: activeTab === 'mentor' && mentorSubTab === 'schedule',
+              onClick: () => goMentor('schedule', 'mentor:schedule')
+            }
+          ]
+        },
+        {
+          title: isMs ? 'Sokongan Usahawan' : 'Entrepreneur Support',
+          items: [
+            {
+              key: 'mentor:readiness',
+              label: isMs ? 'Semak Geran' : 'Grant Check',
+              keywords: 'semak geran kelayakan ssm jualan readiness',
+              icon: ClipboardCheck,
+              isActive: activeTab === 'mentor' && mentorSubTab === 'readiness',
+              onClick: () => goMentor('readiness', 'mentor:readiness')
+            },
+            {
+              key: 'mentor:endorsements',
+              label: isMs ? 'Sokongan Geran' : 'Endorsements',
+              keywords: 'sokongan geran perakuan dana surat kelulusan benih pemangkin endorsements',
+              icon: Award,
+              isActive: activeTab === 'mentor' && mentorSubTab === 'endorsements',
+              onClick: () => goMentor('endorsements', 'mentor:endorsements')
+            }
+          ]
+        },
+        {
+          title: isMs ? 'Laporan & Profil' : 'Reports & Profile',
+          items: [
+            {
+              key: 'mentor:impact',
+              label: isMs ? 'Laporan Ringkas' : 'Summary Report',
+              keywords: 'laporan ringkas statistik daerah sektor cetak impact report',
+              icon: BarChart3,
+              isActive: activeTab === 'mentor' && mentorSubTab === 'impact',
+              onClick: () => goMentor('impact', 'mentor:impact')
+            },
+            {
+              key: 'mentor:profile',
+              label: isMs ? 'Profil Mentor' : 'Mentor Profile',
+              keywords: 'profil mentor kepakaran maklumat mentor profile',
+              icon: Sliders,
+              isActive: activeTab === 'mentor' && mentorSubTab === 'profile',
+              onClick: () => goMentor('profile', 'mentor:profile')
+            }
+          ]
+        }
+      ]
+    : [
+        {
+          title: isMs ? 'Ruang Usaha' : 'Business Space',
+          items: [
+            {
+              key: 'youth:overview',
+              label: 'Dashboard',
+              keywords: 'dashboard ringkasan papan pemuka usahawan belia overview',
+              icon: LayoutDashboard,
+              isActive:
+                (activeTab === 'home' && isYouth) ||
+                (activeTab === 'merchant' && merchantSubTab === 'overview'),
+              onClick: () => goMerchant('overview', 'youth:overview')
+            },
+            {
+              key: 'youth:academic',
+              label: isMs ? 'Kiosk Saya' : 'My Kiosk',
+              keywords: 'kiosk saya tempahan kapsul modular sewa tapak premis booking my kiosk',
+              icon: Building2,
+              isActive: activeTab === 'academic',
+              onClick: () => goTab('academic', 'youth:academic')
+            },
+            {
+              key: 'youth:cashflow',
+              label: isMs ? 'Rekod Jualan' : 'Sales Log',
+              keywords: 'rekod jualan aliran tunai pos harian untung sales cashflow',
+              icon: Coins,
+              isActive: activeTab === 'merchant' && merchantSubTab === 'cashflow',
+              onClick: () => goMerchant('cashflow', 'youth:cashflow')
+            },
+            {
+              key: 'youth:profile',
+              label: isMs ? 'Profil Kedai' : 'Shop Profile',
+              keywords: 'profil kedai perniagaan bisnes ssm business profile',
+              icon: Store,
+              isActive: activeTab === 'merchant' && merchantSubTab === 'profile',
+              onClick: () => goMerchant('profile', 'youth:profile')
+            },
+            {
+              key: 'youth:products',
+              label: isMs ? 'Produk Saya' : 'My Products',
+              keywords: 'produk saya katalog barangan servis my products catalog',
+              icon: ShoppingBag,
+              isActive: activeTab === 'merchant' && merchantSubTab === 'products',
+              onClick: () => goMerchant('products', 'youth:products')
+            },
+            {
+              key: 'youth:vault',
+              label: isMs ? 'Dokumen Saya' : 'My Documents',
+              keywords: 'dokumen saya surat tawaran perjanjian vault documents',
+              icon: FileCheck,
+              isActive: activeTab === 'merchant' && merchantSubTab === 'vault',
+              onClick: () => goMerchant('vault', 'youth:vault')
+            },
+            {
+              key: 'youth:card',
+              label: isMs ? 'Kad Digital' : 'Digital Card',
+              keywords: 'kad digital whatsapp pautan qr card',
+              icon: MessageCircle,
+              isActive: activeTab === 'merchant' && merchantSubTab === 'card',
+              onClick: () => goMerchant('card', 'youth:card')
+            }
+          ]
+        },
+        {
+          title: isMs ? 'Dana & Peluang' : 'Grants & Growth',
+          items: [
+            {
+              key: 'youth:ceed',
+              label: isMs ? 'Geran Belia' : 'Youth Grants',
+              keywords: 'geran belia permohonan benih pembiayaan modal grant',
+              icon: Award,
+              isActive: activeTab === 'ceed',
+              onClick: () => goTab('ceed', 'youth:ceed')
+            },
+            {
+              key: 'youth:mentorship',
+              label: isMs ? 'Bimbingan' : 'Mentoring',
+              keywords: 'bimbingan sesi mentor konsultasi mentoring clinic',
+              icon: GraduationCap,
+              isActive: activeTab === 'mentorship',
+              onClick: () => goTab('mentorship', 'youth:mentorship')
+            },
+            {
+              key: 'youth:b2b',
+              label: isMs ? 'Ruang Niaga' : 'Trade Space',
+              keywords: 'ruang niaga iklan peluang pembekal market trade',
+              icon: Network,
+              isActive: activeTab === 'b2b',
+              onClick: () => goTab('b2b', 'youth:b2b')
+            },
+            {
+              key: 'youth:events',
+              label: isMs ? 'Acara & Karnival' : 'Events & Expo',
+              keywords: 'acara karnival ekspo bengkel jadual events',
+              icon: Calendar,
+              isActive: activeTab === 'events',
+              onClick: () => goTab('events', 'youth:events')
+            }
+          ]
+        },
+        {
+          title: isMs ? 'Direktori' : 'Directory',
+          items: [
+            {
+              key: 'youth:hepa',
+              label: isMs ? 'Direktori Kedai' : 'Shop Directory',
+              keywords: 'direktori kedai usahawan kelantan bisnes produk servis ssm directory',
+              icon: Compass,
+              isActive: activeTab === 'hepa',
+              onClick: () => goTab('hepa', 'youth:hepa')
+            }
+          ]
+        }
+      ];
+
+  // =========================================================================
+  // 1. COLLAPSED SIDEBAR VIEW (Desktop Mini Icon Rail - Aligned 3 Categories)
   // =========================================================================
   if (isCollapsed && !isMobileOpen) {
     return (
       <aside
         id="kbelia-left-sidebar"
-        className="hidden md:flex w-18 h-full bg-white dark:bg-zinc-950 border-r border-slate-300 dark:border-zinc-600 py-4 flex-col shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0"
+        className={`hidden md:flex w-18 h-full border-r py-4 flex-col shrink-0 select-none overflow-y-auto z-30 transition-all sticky top-0 ${roleTheme.sidebarBgClass}`}
       >
         <div className="flex flex-col items-center gap-2 w-full px-2 pt-1">
-          {/* ROLE A MINI: PENTADBIR URUSETIA */}
-          {isAdmin && (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:queue']);
-                  setActiveTab('admin');
-                  if (onSelectAdminSubTab) onSelectAdminSubTab('queue');
-                }}
-                title={t('nav_admin_control')}
-                className={`${miniBtnBase} ${isAdminAccordionRoute ? miniBtnActive : miniBtnIdle}`}
-              >
-                <ShieldCheck className="w-5 h-5" />
-                {renderMiniBadge(adminAccordionTotal)}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:academic']);
-                  setActiveTab('academic');
-                }}
-                title={t('nav_kiosk_monitoring')}
-                className={`${miniBtnBase} ${activeTab === 'academic' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Building2 className="w-5 h-5" />
-                {renderMiniBadge(getCount('admin:academic'))}
-              </button>
-
-              {miniDivider}
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:ceed']);
-                  setActiveTab('ceed');
-                }}
-                title={t('nav_grant_monitoring')}
-                className={`${miniBtnBase} ${activeTab === 'ceed' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Award className="w-5 h-5" />
-                {renderMiniBadge(getCount('admin:ceed'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:programs']);
-                  setActiveTab('admin');
-                  if (onSelectAdminSubTab) onSelectAdminSubTab('programs');
-                }}
-                title={isMs ? 'Inisiatif Geran' : 'Grant Initiatives'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'admin' && adminSubTab === 'programs' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <Network className="w-5 h-5" />
-                {renderMiniBadge(getCount('admin:programs'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:mentors']);
-                  setActiveTab('admin');
-                  if (onSelectAdminSubTab) onSelectAdminSubTab('mentors');
-                }}
-                title={isMs ? 'Panel Mentor' : 'Mentor Panel'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'admin' && adminSubTab === 'mentors' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <GraduationCap className="w-5 h-5" />
-                {renderMiniBadge(getCount('admin:mentors'))}
-              </button>
-
-              {miniDivider}
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:hepa']);
-                  setActiveTab('hepa');
-                }}
-                title={t('nav_audit_ssm')}
-                className={`${miniBtnBase} ${activeTab === 'hepa' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Store className="w-5 h-5" />
-                {renderMiniBadge(getCount('admin:hepa'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:news']);
-                  setActiveTab('admin');
-                  if (onSelectAdminSubTab) onSelectAdminSubTab('news');
-                }}
-                title={isMs ? 'Pengurusan Berita' : 'News Manager'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'admin' && adminSubTab === 'news' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <Newspaper className="w-5 h-5" />
-                {renderMiniBadge(getCount('admin:news'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:b2b']);
-                  setActiveTab('admin');
-                  if (onSelectAdminSubTab) onSelectAdminSubTab('b2b');
-                }}
-                title={isMs ? 'Ruang Niaga' : 'Ruang Niaga Ads'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'admin' && adminSubTab === 'b2b' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <Megaphone className="w-5 h-5" />
-                {renderMiniBadge(getCount('admin:b2b'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:events']);
-                  setActiveTab('admin');
-                  if (onSelectAdminSubTab) onSelectAdminSubTab('events');
-                }}
-                title={isMs ? 'Acara & Tempahan' : 'Events & Bookings'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'admin' && adminSubTab === 'events' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <Calendar className="w-5 h-5" />
-                {renderMiniBadge(getCount('admin:events'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['admin:users']);
-                  setActiveTab('admin');
-                  if (onSelectAdminSubTab) onSelectAdminSubTab('users');
-                }}
-                title={isMs ? 'Urus Pengguna' : 'User Management'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'admin' && adminSubTab === 'users' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <Users className="w-5 h-5" />
-                {renderMiniBadge(getCount('admin:users'))}
-              </button>
-            </>
-          )}
-
-          {/* ROLE B MINI: MENTOR */}
-          {isMentor && (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['mentor:overview']);
-                  setActiveTab('mentor');
-                  if (onSelectMentorSubTab) onSelectMentorSubTab('overview');
-                }}
-                title={t('nav_mentorship_hub')}
-                className={`${miniBtnBase} ${
-                  (activeTab === 'home' && isMentor) ||
-                  (activeTab === 'mentor' && mentorSubTab === 'overview')
-                    ? miniBtnActive
-                    : miniBtnIdle
-                }`}
-              >
-                <LayoutDashboard className="w-5 h-5" />
-                {renderMiniBadge(getCount('mentor:overview'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['mentor:sessions']);
-                  setActiveTab('mentor');
-                  if (onSelectMentorSubTab) onSelectMentorSubTab('sessions');
-                }}
-                title={isMs ? 'Sesi Bimbingan' : 'Sessions'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'mentor' && mentorSubTab === 'sessions' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <Calendar className="w-5 h-5" />
-                {renderMiniBadge(getCount('mentor:sessions'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['mentor:logbook']);
-                  setActiveTab('mentor');
-                  if (onSelectMentorSubTab) onSelectMentorSubTab('logbook');
-                }}
-                title={isMs ? 'Rekod Sesi' : 'Logbook'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'mentor' && mentorSubTab === 'logbook' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <FileText className="w-5 h-5" />
-                {renderMiniBadge(getCount('mentor:logbook'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['mentor:schedule']);
-                  setActiveTab('mentor');
-                  if (onSelectMentorSubTab) onSelectMentorSubTab('schedule');
-                }}
-                title={isMs ? 'Jadual' : 'Schedule'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'mentor' && mentorSubTab === 'schedule' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <CalendarDays className="w-5 h-5" />
-                {renderMiniBadge(getCount('mentor:schedule'))}
-              </button>
-
-              {miniDivider}
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['mentor:endorsements']);
-                  setActiveTab('mentor');
-                  if (onSelectMentorSubTab) onSelectMentorSubTab('endorsements');
-                }}
-                title={isMs ? 'Perakuan Geran' : 'Grant Endorsements'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'mentor' && mentorSubTab === 'endorsements' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <Award className="w-5 h-5" />
-                {renderMiniBadge(getCount('mentor:endorsements'))}
-              </button>
-
-              {miniDivider}
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['mentor:profile']);
-                  setActiveTab('mentor');
-                  if (onSelectMentorSubTab) onSelectMentorSubTab('profile');
-                }}
-                title={isMs ? 'Profil Mentor' : 'Mentor Profile'}
-                className={`${miniBtnBase} ${
-                  activeTab === 'mentor' && mentorSubTab === 'profile' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <Sliders className="w-5 h-5" />
-                {renderMiniBadge(getCount('mentor:profile'))}
-              </button>
-            </>
-          )}
-
-          {/* ROLE C MINI: USAHAWAN BELIA */}
-          {isYouth && (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['youth:overview']);
-                  setActiveTab('merchant');
-                  if (onSelectMerchantSubTab) onSelectMerchantSubTab('overview');
-                }}
-                title={t('dashboard')}
-                className={`${miniBtnBase} ${isYouthAccordionRoute ? miniBtnActive : miniBtnIdle}`}
-              >
-                <LayoutDashboard className="w-5 h-5" />
-                {renderMiniBadge(youthAccordionTotal)}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['youth:academic']);
-                  setActiveTab('academic');
-                }}
-                title={t('nav_my_kiosk')}
-                className={`${miniBtnBase} ${activeTab === 'academic' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Building2 className="w-5 h-5" />
-                {renderMiniBadge(getCount('youth:academic'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['youth:cashflow']);
-                  setActiveTab('merchant');
-                  if (onSelectMerchantSubTab) onSelectMerchantSubTab('cashflow');
-                }}
-                title={t('nav_sales_pos')}
-                className={`${miniBtnBase} ${
-                  activeTab === 'merchant' && merchantSubTab === 'cashflow' ? miniBtnActive : miniBtnIdle
-                }`}
-              >
-                <Coins className="w-5 h-5" />
-                {renderMiniBadge(getCount('youth:cashflow'))}
-              </button>
-
-              {miniDivider}
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['youth:ceed']);
-                  setActiveTab('ceed');
-                }}
-                title={t('nav_grant_application')}
-                className={`${miniBtnBase} ${activeTab === 'ceed' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Award className="w-5 h-5" />
-                {renderMiniBadge(getCount('youth:ceed'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['youth:mentorship']);
-                  setActiveTab('mentorship');
-                }}
-                title={t('nav_mentor_clinic')}
-                className={`${miniBtnBase} ${activeTab === 'mentorship' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <GraduationCap className="w-5 h-5" />
-                {renderMiniBadge(getCount('youth:mentorship'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['youth:b2b']);
-                  setActiveTab('b2b');
-                }}
-                title={isMs ? 'Ruang Niaga' : 'Ruang Niaga Marketplace'}
-                className={`${miniBtnBase} ${activeTab === 'b2b' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Network className="w-5 h-5" />
-                {renderMiniBadge(getCount('youth:b2b'))}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['youth:events']);
-                  setActiveTab('events');
-                }}
-                title={isMs ? 'Acara & Karnival' : 'Events & Expo'}
-                className={`${miniBtnBase} ${activeTab === 'events' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Calendar className="w-5 h-5" />
-                {renderMiniBadge(getCount('youth:events'))}
-              </button>
-
-              {miniDivider}
-
-              <button
-                type="button"
-                onClick={() => {
-                  markSeen(['youth:hepa']);
-                  setActiveTab('hepa');
-                }}
-                title={t('directory')}
-                className={`${miniBtnBase} ${activeTab === 'hepa' ? miniBtnActive : miniBtnIdle}`}
-              >
-                <Store className="w-5 h-5" />
-                {renderMiniBadge(getCount('youth:hepa'))}
-              </button>
-            </>
-          )}
+          {roleCategories.map((cat, idx) => (
+            <React.Fragment key={cat.title}>
+              {idx > 0 && miniDivider}
+              {cat.items.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={item.onClick}
+                    title={item.label}
+                    aria-label={item.label}
+                    className={`${miniBtnBase} ${item.isActive ? miniBtnActive : miniBtnIdle}`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {renderMiniBadge(getCount(item.key))}
+                  </button>
+                );
+              })}
+            </React.Fragment>
+          ))}
         </div>
       </aside>
     );
   }
 
   // =========================================================================
-  // 2. EXPANDED SIDEBAR VIEW (Uniform 3-Category + Zero-Duplicate Layout)
+  // 2. EXPANDED SIDEBAR VIEW (Desktop Full + Mobile Drawer - Zero Sub-Buttons)
   // =========================================================================
+  const filteredCategories = roleCategories
+    .map((cat) => ({
+      ...cat,
+      items: cat.items.filter((item) => matchesSearch(`${item.label} ${item.keywords}`))
+    }))
+    .filter((cat) => cat.items.length > 0);
 
-  // Role A sub-tab items inside Category 1 accordion (unique only)
-  const adminAccordionItems: {
-    id: AdminSubTab;
-    label: string;
-    keywords: string;
-    icon: React.ComponentType<{ className?: string }>;
-  }[] = [
-    {
-      id: 'queue',
-      label: isMs ? 'Kelulusan' : 'Approvals',
-      keywords: 'kelulusan giliran semakan permohonan approvals queue',
-      icon: CheckCircle2
-    },
-    {
-      id: 'bookings',
-      label: isMs ? 'Tempahan Kiosk' : 'Bookings',
-      keywords: 'kapsul kiosk tempahan sewa bookings',
-      icon: Clock
-    },
-    {
-      id: 'businesses',
-      label: isMs ? 'Senarai Usahawan' : 'Businesses',
-      keywords: 'direktori usahawan perniagaan ssm businesses',
-      icon: Store
-    },
-    {
-      id: 'slots',
-      label: isMs ? 'Slot Kiosk' : 'Kiosk Slots',
-      keywords: 'kiosk slot tapak lokasi slots',
-      icon: Building2
-    },
-    {
-      id: 'news',
-      label: isMs ? 'Pengurusan Berita' : 'News Manager',
-      keywords: 'berita pengumuman warta news manager admin',
-      icon: Newspaper
-    },
-    {
-      id: 'b2b',
-      label: isMs ? 'Ruang Niaga' : 'Ruang Niaga',
-      keywords: 'ruang niaga iklan pembekal gambar b2b ads admin',
-      icon: Megaphone
-    },
-    {
-      id: 'events',
-      label: isMs ? 'Acara & Tempahan' : 'Events & Bookings',
-      keywords: 'acara karnival ekspo bengkel tempahan peserta events',
-      icon: Calendar
-    },
-    {
-      id: 'users',
-      label: isMs ? 'Urus Pengguna' : 'User Management',
-      keywords: 'pengguna akaun profil ahli peranan user management users',
-      icon: Users
-    },
-    {
-      id: 'settings',
-      label: isMs ? 'Tetapan Operasi' : 'Operations',
-      keywords: 'tetapan operasi kawalan parameter system operations',
-      icon: Sliders
-    }
-  ];
-
-  // Role B sub-tab items inside Category 1 accordion (unique only)
-  const mentorAccordionItems: {
-    id: MentorSubTab;
-    label: string;
-    keywords: string;
-    icon: React.ComponentType<{ className?: string }>;
-  }[] = [
-    {
-      id: 'overview',
-      label: isMs ? 'Ringkasan' : 'Overview',
-      keywords: 'ringkasan papan pemuka mentor overview dashboard',
-      icon: LayoutDashboard
-    },
-    {
-      id: 'sessions',
-      label: isMs ? 'Sesi Bimbingan' : 'Sessions',
-      keywords: 'sesi bimbingan kalendar temujanji mentee google meet sessions',
-      icon: Calendar
-    },
-    {
-      id: 'logbook',
-      label: isMs ? 'Rekod Sesi' : 'Logbook',
-      keywords: 'rekod sesi log jurnal nota bimbingan kpi kemajuan tugasan logbook',
-      icon: FileText
-    }
-  ];
-
-  // Role C sub-tab items inside Category 1 accordion (unique only - cashflow excluded since it is a Category 1 direct link)
-  const youthAccordionItems: {
-    id: MerchantSubTab;
-    label: string;
-    keywords: string;
-    icon: React.ComponentType<{ className?: string }>;
-  }[] = [
-    {
-      id: 'overview',
-      label: isMs ? 'Ringkasan' : 'Overview',
-      keywords: 'ringkasan dashboard overview',
-      icon: BarChart3
-    },
-    {
-      id: 'profile',
-      label: isMs ? 'Profil Kedai' : 'Business Profile',
-      keywords: 'profil perniagaan bisnes kedai ssm business profile',
-      icon: Store
-    },
-    {
-      id: 'products',
-      label: isMs ? 'Produk Saya' : 'My Products',
-      keywords: 'produk saya katalog barangan servis my products catalog',
-      icon: ShoppingBag
-    },
-    {
-      id: 'vault',
-      label: isMs ? 'Dokumen Saya' : 'Legal Docs',
-      keywords: 'dokumen saya surat tawaran perjanjian vault documents',
-      icon: FileCheck
-    },
-    {
-      id: 'card',
-      label: isMs ? 'Kad Digital' : 'Digital Card',
-      keywords: 'kad digital whatsapp pautan qr card',
-      icon: MessageCircle
-    }
-  ];
-
-  // Filtered accordion subsets during search
-  const filteredAdminAccordion = adminAccordionItems.filter((item) => matchesSearch(item.keywords));
-  const filteredMentorAccordion = mentorAccordionItems.filter((item) => matchesSearch(item.keywords));
-  const filteredYouthAccordion = youthAccordionItems.filter((item) => matchesSearch(item.keywords));
-
-  // Visibility checks per category so empty search sections hide cleanly
-  const adminCat1HasMatches =
-    matchesSearch('pusat kawalan pentadbir admin control') ||
-    filteredAdminAccordion.length > 0 ||
-    matchesSearch('pemantauan kiosk jajahan semakan status kekosongan monitoring');
-  const adminCat2HasMatches =
-    matchesSearch('pemantauan status geran peruntukan dana bantuan belia grant') ||
-    matchesSearch('inisiatif geran program dana kelantan programs') ||
-    matchesSearch('panel mentor bimbingan dalaman rakan industri kbelia mentors');
-  const adminCat3HasMatches =
-    matchesSearch('audit usahawan direktori semakan ssm audit');
-
-  const mentorCat1HasMatches =
-    matchesSearch('portal mentor hab bimbingan mentor hub') ||
-    filteredMentorAccordion.length > 0 ||
-    matchesSearch('jadual kalendar temu janji slot bimbingan schedule calendar');
-  const mentorCat2HasMatches =
-    matchesSearch('perakuan geran dana sokongan surat kelulusan benih pemangkin endorsements');
-  const mentorCat3HasMatches =
-    matchesSearch('profil mentor kepakaran maklumat mentor profile');
-
-  const youthCat1HasMatches =
-    matchesSearch('papan pemuka usahawan belia dashboard') ||
-    filteredYouthAccordion.length > 0 ||
-    matchesSearch('tempahan kiosk kapsul modular sewa tapak premis booking my kiosk') ||
-    matchesSearch('jualan aliran tunai pos rekod harian untung sales cashflow');
-  const youthCat2HasMatches =
-    matchesSearch('permohonan geran benih pembiayaan modal grant') ||
-    matchesSearch('sesi bimbingan mentor konsultasi mentoring clinic') ||
-    matchesSearch('ruang niaga iklan peluang pembekal market trade') ||
-    matchesSearch('acara karnival ekspo bengkel jadual events');
-  const youthCat3HasMatches =
-    matchesSearch('direktori usahawan kelantan bisnes produk kedai servis ssm directory');
-
-  const hasAnySearchMatch = isAdmin
-    ? adminCat1HasMatches || adminCat2HasMatches || adminCat3HasMatches
-    : isMentor
-    ? mentorCat1HasMatches || mentorCat2HasMatches || mentorCat3HasMatches
-    : youthCat1HasMatches || youthCat2HasMatches || youthCat3HasMatches;
+  const hasAnySearchMatch = filteredCategories.length > 0;
 
   const sidebarBody = (
     <aside
       id="kbelia-left-sidebar"
-      className="w-64 h-full bg-white dark:bg-zinc-950 border-r border-slate-300 dark:border-zinc-600 p-4 flex flex-col shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30"
+      className={`w-64 h-full border-r p-4 flex flex-col shrink-0 transition-colors duration-200 select-none overflow-y-auto z-30 ${roleTheme.sidebarBgClass}`}
     >
       <div className="space-y-4">
         {isMobileOpen && onCloseMobile && (
-          <div className="md:hidden flex items-center justify-between pb-2 border-b border-slate-300 dark:border-zinc-600">
-            <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black dark:text-white">
+          <div className={`md:hidden flex items-center justify-between pb-2 border-b ${roleTheme.dividerClass}`}>
+            <span className="text-[0.875rem] font-bold text-slate-900 dark:text-[#F5F3EE]">
               {isMs ? 'Navigasi KBelia' : 'KBelia Navigation'}
             </span>
             <button
               type="button"
               onClick={onCloseMobile}
               aria-label={isMs ? 'Tutup menu' : 'Close menu'}
-              className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-600 dark:text-stone-300 hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -861,7 +641,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             placeholder={t('search_sidebar')}
             value={sidebarSearch}
             onChange={(e) => setSidebarSearch(e.target.value)}
-            className="w-full pl-3.5 pr-8 py-2 text-[0.9375rem] bg-slate-50 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 rounded-xl text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 transition-all duration-150 dark:focus:border-blue-500"
+            className="w-full pl-3.5 pr-8 py-2 text-[0.875rem] bg-black/[0.03] dark:bg-white/[0.04] border border-slate-300/80 dark:border-white/10 rounded-xl text-slate-900 dark:text-[#F5F3EE] placeholder:text-slate-500 dark:placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-current/25 transition-all duration-150"
           />
           {sidebarSearch ? (
             <button
@@ -892,748 +672,38 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
           </div>
         )}
 
-        {/* =============================================================== */}
-        {/* ROLE A: PENTADBIR URUSETIA                                      */}
-        {/* =============================================================== */}
-        {isAdmin && hasAnySearchMatch && (
+        {hasAnySearchMatch && (
           <div className="space-y-4">
-            {/* KATEGORI 1: PENGURUSAN */}
-            {adminCat1HasMatches && (
-              <div className="space-y-1">
-                <div className={`${categoryHeaderClass} pt-1`}>
-                  {isMs ? 'PENGURUSAN' : 'MANAGEMENT'}
+            {filteredCategories.map((cat, idx) => (
+              <div key={cat.title} className={idx > 0 ? categoryDividerClass : 'space-y-1'}>
+                <div className={idx === 0 ? `${categoryHeaderClass} pt-1` : categoryHeaderClass}>
+                  {cat.title}
                 </div>
-
-                {(matchesSearch('pusat kawalan pentadbir admin control') ||
-                  filteredAdminAccordion.length > 0) && (
-                  <div className="space-y-1">
+                {cat.items.map((item) => {
+                  const Icon = item.icon;
+                  return (
                     <button
+                      key={item.key}
                       type="button"
-                      onClick={() => {
-                        if (isAdminAccordionRoute) {
-                          setIsAdminDashboardAccordionOpen(!isAdminDashboardAccordionOpen);
-                        } else {
-                          markSeen(['admin:queue']);
-                          navigateAndClose(() => {
-                            setActiveTab('admin');
-                            if (onSelectAdminSubTab) onSelectAdminSubTab('queue');
-                          });
-                          setIsAdminDashboardAccordionOpen(true);
-                        }
-                      }}
-                      className={`${navBtnBase} ${isAdminAccordionRoute ? navBtnActive : navBtnIdle}`}
+                      onClick={item.onClick}
+                      className={`${navBtnBase} ${item.isActive ? navBtnActive : navBtnIdle}`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <ShieldCheck
+                        <Icon
                           className={`w-4 h-4 shrink-0 ${
-                            isAdminAccordionRoute
+                            item.isActive
                               ? 'text-black dark:text-white/75'
                               : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                           }`}
                         />
-                        <span className="truncate whitespace-nowrap">{t('nav_admin_control')}</span>
+                        <span className="truncate whitespace-nowrap">{item.label}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {!isAdminDashboardAccordionOpen && !query && renderCountBadge(adminAccordionTotal)}
-                        <ChevronDown
-                          className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                            isAdminDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
-                          } ${
-                            isAdminAccordionRoute
-                              ? 'text-black dark:text-white/75'
-                              : 'text-black/70 dark:text-white/75'
-                          }`}
-                        />
-                      </div>
+                      {renderCountBadge(getCount(item.key))}
                     </button>
-
-                    {(isAdminDashboardAccordionOpen || (Boolean(query) && filteredAdminAccordion.length > 0)) && (
-                      <div className="ml-3 pl-2.5 border-l border-slate-300 dark:border-zinc-600 space-y-1 pt-0.5 pb-1">
-                        {(query ? filteredAdminAccordion : adminAccordionItems).map((item) => {
-                          const Icon = item.icon;
-                          const isSubActive =
-                            (activeTab === 'home' && isAdmin && adminSubTab === item.id) ||
-                            (activeTab === 'admin' && adminSubTab === item.id);
-                          const itemCount = getCount(`admin:${item.id}`);
-                          return (
-                            <button
-                              key={item.id}
-                              type="button"
-                              onClick={() => {
-                                markSeen([`admin:${item.id}`]);
-                                navigateAndClose(() => {
-                                  setActiveTab('admin');
-                                  if (onSelectAdminSubTab) onSelectAdminSubTab(item.id);
-                                });
-                              }}
-                              className={`${subNavBtnBase} ${isSubActive ? subNavBtnActive : subNavBtnIdle}`}
-                            >
-                              <span className="flex items-center gap-2 min-w-0">
-                                <Icon
-                                  className={`w-3.5 h-3.5 shrink-0 ${
-                                    isSubActive
-                                      ? 'text-white'
-                                      : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                                  }`}
-                                />
-                                <span className="truncate whitespace-nowrap">{item.label}</span>
-                              </span>
-                              {renderCountBadge(itemCount, isSubActive)}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {matchesSearch('pemantauan kiosk jajahan semakan status kekosongan monitoring') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['admin:academic']);
-                      navigateAndClose(() => setActiveTab('academic'));
-                    }}
-                    className={`${navBtnBase} ${activeTab === 'academic' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Building2
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'academic'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">{t('nav_kiosk_monitoring')}</span>
-                    </div>
-                    {renderCountBadge(getCount('admin:academic'))}
-                  </button>
-                )}
+                  );
+                })}
               </div>
-            )}
-
-            {/* KATEGORI 2: DANA DAN BIMBINGAN */}
-            {adminCat2HasMatches && (
-              <div className={adminCat1HasMatches ? categoryDividerClass : 'space-y-1'}>
-                <div className={categoryHeaderClass}>
-                  {isMs ? 'DANA DAN BIMBINGAN' : 'GRANTS & COACHING'}
-                </div>
-
-                {matchesSearch('pemantauan status geran peruntukan dana bantuan belia grant') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['admin:ceed']);
-                      navigateAndClose(() => setActiveTab('ceed'));
-                    }}
-                    className={`${navBtnBase} ${activeTab === 'ceed' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Award
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'ceed'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">{t('nav_grant_monitoring')}</span>
-                    </div>
-                    {renderCountBadge(getCount('admin:ceed'))}
-                  </button>
-                )}
-
-                {matchesSearch('inisiatif geran program dana kelantan programs') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['admin:programs']);
-                      navigateAndClose(() => {
-                        setActiveTab('admin');
-                        if (onSelectAdminSubTab) onSelectAdminSubTab('programs');
-                      });
-                    }}
-                    className={`${navBtnBase} ${
-                      activeTab === 'admin' && adminSubTab === 'programs' ? navBtnActive : navBtnIdle
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Network
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'admin' && adminSubTab === 'programs'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Inisiatif Geran' : 'Grant Initiatives'}
-                      </span>
-                    </div>
-                    {renderCountBadge(getCount('admin:programs'))}
-                  </button>
-                )}
-
-                {matchesSearch('panel mentor bimbingan dalaman rakan industri kbelia mentors') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['admin:mentors']);
-                      navigateAndClose(() => {
-                        setActiveTab('admin');
-                        if (onSelectAdminSubTab) onSelectAdminSubTab('mentors');
-                      });
-                    }}
-                    className={`${navBtnBase} ${
-                      activeTab === 'admin' && adminSubTab === 'mentors' ? navBtnActive : navBtnIdle
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <GraduationCap
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'admin' && adminSubTab === 'mentors'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Panel Mentor' : 'Mentor Panel'}
-                      </span>
-                    </div>
-                    {renderCountBadge(getCount('admin:mentors'))}
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* KATEGORI 3: DIREKTORI & PROFIL */}
-            {adminCat3HasMatches && (
-              <div className={adminCat1HasMatches || adminCat2HasMatches ? categoryDividerClass : 'space-y-1'}>
-                <div className={categoryHeaderClass}>
-                  {isMs ? 'DIREKTORI & PROFIL' : 'DIRECTORY & PROFILE'}
-                </div>
-
-                {matchesSearch('audit usahawan direktori semakan ssm audit') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['admin:hepa']);
-                      navigateAndClose(() => setActiveTab('hepa'));
-                    }}
-                    className={`${navBtnBase} ${activeTab === 'hepa' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Users
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'hepa'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">{t('nav_audit_ssm')}</span>
-                    </div>
-                    {renderCountBadge(getCount('admin:hepa'))}
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* =============================================================== */}
-        {/* ROLE B: MENTOR                                                 */}
-        {/* =============================================================== */}
-        {isMentor && hasAnySearchMatch && (
-          <div className="space-y-4">
-            {/* KATEGORI 1: PENGURUSAN */}
-            {mentorCat1HasMatches && (
-              <div className="space-y-1">
-                <div className={`${categoryHeaderClass} pt-1`}>
-                  {isMs ? 'PENGURUSAN' : 'MANAGEMENT'}
-                </div>
-
-                {(matchesSearch('portal mentor hab bimbingan mentor hub') ||
-                  filteredMentorAccordion.length > 0) && (
-                  <div className="space-y-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (isMentorAccordionRoute) {
-                          setIsMentorDashboardAccordionOpen(!isMentorDashboardAccordionOpen);
-                        } else {
-                          markSeen(['mentor:overview']);
-                          navigateAndClose(() => {
-                            setActiveTab('mentor');
-                            if (onSelectMentorSubTab) onSelectMentorSubTab('overview');
-                          });
-                          setIsMentorDashboardAccordionOpen(true);
-                        }
-                      }}
-                      className={`${navBtnBase} ${isMentorAccordionRoute ? navBtnActive : navBtnIdle}`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <GraduationCap
-                          className={`w-4 h-4 shrink-0 ${
-                            isMentorAccordionRoute
-                              ? 'text-black dark:text-white/75'
-                              : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                          }`}
-                        />
-                        <span className="truncate whitespace-nowrap">{t('nav_mentorship_hub')}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {!isMentorDashboardAccordionOpen && !query && renderCountBadge(mentorAccordionTotal)}
-                        <ChevronDown
-                          className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                            isMentorDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
-                          } ${
-                            isMentorAccordionRoute
-                              ? 'text-black dark:text-white/75'
-                              : 'text-black/70 dark:text-white/75'
-                          }`}
-                        />
-                      </div>
-                    </button>
-
-                    {(isMentorDashboardAccordionOpen || (Boolean(query) && filteredMentorAccordion.length > 0)) && (
-                      <div className="ml-3 pl-2.5 border-l border-slate-300 dark:border-zinc-600 space-y-1 pt-0.5 pb-1">
-                        {(query ? filteredMentorAccordion : mentorAccordionItems).map((item) => {
-                          const Icon = item.icon;
-                          const isSubActive =
-                            (activeTab === 'home' && isMentor && mentorSubTab === item.id) ||
-                            (activeTab === 'mentor' && mentorSubTab === item.id);
-                          const itemCount = getCount(`mentor:${item.id}`);
-                          return (
-                            <button
-                              key={item.id}
-                              type="button"
-                              onClick={() => {
-                                markSeen([`mentor:${item.id}`]);
-                                navigateAndClose(() => {
-                                  setActiveTab('mentor');
-                                  if (onSelectMentorSubTab) onSelectMentorSubTab(item.id);
-                                });
-                              }}
-                              className={`${subNavBtnBase} ${isSubActive ? subNavBtnActive : subNavBtnIdle}`}
-                            >
-                              <span className="flex items-center gap-2 min-w-0">
-                                <Icon
-                                  className={`w-3.5 h-3.5 shrink-0 ${
-                                    isSubActive
-                                      ? 'text-white'
-                                      : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                                  }`}
-                                />
-                                <span className="truncate whitespace-nowrap">{item.label}</span>
-                              </span>
-                              {renderCountBadge(itemCount, isSubActive)}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {matchesSearch('jadual kalendar temu janji slot bimbingan schedule calendar') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['mentor:schedule']);
-                      navigateAndClose(() => {
-                        setActiveTab('mentor');
-                        if (onSelectMentorSubTab) onSelectMentorSubTab('schedule');
-                      });
-                    }}
-                    className={`${navBtnBase} ${
-                      activeTab === 'mentor' && mentorSubTab === 'schedule' ? navBtnActive : navBtnIdle
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <CalendarDays
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'mentor' && mentorSubTab === 'schedule'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Jadual' : 'Schedule'}
-                      </span>
-                    </div>
-                    {renderCountBadge(getCount('mentor:schedule'))}
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* KATEGORI 2: DANA DAN BIMBINGAN */}
-            {mentorCat2HasMatches && (
-              <div className={mentorCat1HasMatches ? categoryDividerClass : 'space-y-1'}>
-                <div className={categoryHeaderClass}>
-                  {isMs ? 'DANA DAN BIMBINGAN' : 'GRANTS & COACHING'}
-                </div>
-
-                {matchesSearch('perakuan geran dana sokongan surat kelulusan benih pemangkin endorsements') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['mentor:endorsements']);
-                      navigateAndClose(() => {
-                        setActiveTab('mentor');
-                        if (onSelectMentorSubTab) onSelectMentorSubTab('endorsements');
-                      });
-                    }}
-                    className={`${navBtnBase} ${
-                      activeTab === 'mentor' && mentorSubTab === 'endorsements'
-                        ? navBtnActive
-                        : navBtnIdle
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Award
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'mentor' && mentorSubTab === 'endorsements'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Sokongan Geran' : 'Grant Endorsements'}
-                      </span>
-                    </div>
-                    {renderCountBadge(getCount('mentor:endorsements'))}
-                  </button>
-                )}
-
-              </div>
-            )}
-
-            {/* KATEGORI 3: PROFIL MENTOR */}
-            {mentorCat3HasMatches && (
-              <div className={mentorCat1HasMatches || mentorCat2HasMatches ? categoryDividerClass : 'space-y-1'}>
-                <div className={categoryHeaderClass}>
-                  {isMs ? 'PROFIL MENTOR' : 'MENTOR PROFILE'}
-                </div>
-
-                {matchesSearch('profil mentor kepakaran maklumat mentor profile') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['mentor:profile']);
-                      navigateAndClose(() => {
-                        setActiveTab('mentor');
-                        if (onSelectMentorSubTab) onSelectMentorSubTab('profile');
-                      });
-                    }}
-                    className={`${navBtnBase} ${
-                      activeTab === 'mentor' && mentorSubTab === 'profile' ? navBtnActive : navBtnIdle
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Sliders
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'mentor' && mentorSubTab === 'profile'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Profil Mentor' : 'Mentor Profile'}
-                      </span>
-                    </div>
-                    {renderCountBadge(getCount('mentor:profile'))}
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* =============================================================== */}
-        {/* ROLE C: USAHAWAN BELIA                                          */}
-        {/* =============================================================== */}
-        {isYouth && hasAnySearchMatch && (
-          <div className="space-y-4">
-            {/* KATEGORI 1: PENGURUSAN */}
-            {youthCat1HasMatches && (
-              <div className="space-y-1">
-                <div className={`${categoryHeaderClass} pt-1`}>
-                  {isMs ? 'PENGURUSAN' : 'MANAGEMENT'}
-                </div>
-
-                {(matchesSearch('papan pemuka usahawan belia dashboard') ||
-                  filteredYouthAccordion.length > 0) && (
-                  <div className="space-y-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (isYouthAccordionRoute) {
-                          setIsDashboardAccordionOpen(!isDashboardAccordionOpen);
-                        } else {
-                          markSeen(['youth:overview']);
-                          navigateAndClose(() => {
-                            setActiveTab('merchant');
-                            if (onSelectMerchantSubTab) onSelectMerchantSubTab('overview');
-                          });
-                          setIsDashboardAccordionOpen(true);
-                        }
-                      }}
-                      className={`${navBtnBase} ${isYouthAccordionRoute ? navBtnActive : navBtnIdle}`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <LayoutDashboard
-                          className={`w-4 h-4 shrink-0 ${
-                            isYouthAccordionRoute
-                              ? 'text-black dark:text-white/75'
-                              : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                          }`}
-                        />
-                        <span className="truncate whitespace-nowrap">{t('dashboard')}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {!isDashboardAccordionOpen && !query && renderCountBadge(youthAccordionTotal)}
-                        <ChevronDown
-                          className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                            isDashboardAccordionOpen || Boolean(query) ? 'rotate-0' : '-rotate-90'
-                          } ${
-                            isYouthAccordionRoute
-                              ? 'text-black dark:text-white/75'
-                              : 'text-black/70 dark:text-white/75'
-                          }`}
-                        />
-                      </div>
-                    </button>
-
-                    {(isDashboardAccordionOpen || (Boolean(query) && filteredYouthAccordion.length > 0)) && (
-                      <div className="ml-3 pl-2.5 border-l border-slate-300 dark:border-zinc-600 space-y-1 pt-0.5 pb-1">
-                        {(query ? filteredYouthAccordion : youthAccordionItems).map((item) => {
-                          const Icon = item.icon;
-                          const isSubActive =
-                            (activeTab === 'home' && isYouth && merchantSubTab === item.id) ||
-                            (activeTab === 'merchant' && merchantSubTab === item.id);
-                          const itemCount = getCount(`youth:${item.id}`);
-                          return (
-                            <button
-                              key={item.id}
-                              type="button"
-                              onClick={() => {
-                                markSeen([`youth:${item.id}`]);
-                                navigateAndClose(() => {
-                                  setActiveTab('merchant');
-                                  if (onSelectMerchantSubTab) onSelectMerchantSubTab(item.id);
-                                });
-                              }}
-                              className={`${subNavBtnBase} ${isSubActive ? subNavBtnActive : subNavBtnIdle}`}
-                            >
-                              <span className="flex items-center gap-2 min-w-0">
-                                <Icon
-                                  className={`w-3.5 h-3.5 shrink-0 ${
-                                    isSubActive
-                                      ? 'text-white'
-                                      : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                                  }`}
-                                />
-                                <span className="truncate whitespace-nowrap">{item.label}</span>
-                              </span>
-                              {renderCountBadge(itemCount, isSubActive)}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {matchesSearch('tempahan kiosk kapsul modular sewa tapak premis booking my kiosk') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['youth:academic']);
-                      navigateAndClose(() => setActiveTab('academic'));
-                    }}
-                    className={`${navBtnBase} ${activeTab === 'academic' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Building2
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'academic'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">{t('nav_my_kiosk')}</span>
-                    </div>
-                    {renderCountBadge(getCount('youth:academic'))}
-                  </button>
-                )}
-
-                {matchesSearch('jualan aliran tunai pos rekod harian untung sales cashflow') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['youth:cashflow']);
-                      navigateAndClose(() => {
-                        setActiveTab('merchant');
-                        if (onSelectMerchantSubTab) onSelectMerchantSubTab('cashflow');
-                      });
-                    }}
-                    className={`${navBtnBase} ${
-                      activeTab === 'merchant' && merchantSubTab === 'cashflow'
-                        ? navBtnActive
-                        : navBtnIdle
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Coins
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'merchant' && merchantSubTab === 'cashflow'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">{t('nav_sales_pos')}</span>
-                    </div>
-                    {renderCountBadge(getCount('youth:cashflow'))}
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* KATEGORI 2: DANA DAN BIMBINGAN */}
-            {youthCat2HasMatches && (
-              <div className={youthCat1HasMatches ? categoryDividerClass : 'space-y-1'}>
-                <div className={categoryHeaderClass}>
-                  {isMs ? 'DANA DAN BIMBINGAN' : 'GRANTS & COACHING'}
-                </div>
-
-                {matchesSearch('permohonan geran benih pembiayaan modal grant') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['youth:ceed']);
-                      navigateAndClose(() => setActiveTab('ceed'));
-                    }}
-                    className={`${navBtnBase} ${activeTab === 'ceed' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Award
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'ceed'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">{t('nav_grant_application')}</span>
-                    </div>
-                    {renderCountBadge(getCount('youth:ceed'))}
-                  </button>
-                )}
-
-                {matchesSearch('sesi bimbingan mentor konsultasi mentoring clinic') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['youth:mentorship']);
-                      navigateAndClose(() => setActiveTab('mentorship'));
-                    }}
-                    className={`${navBtnBase} ${activeTab === 'mentorship' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <GraduationCap
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'mentorship'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">{t('nav_mentor_clinic')}</span>
-                    </div>
-                    {renderCountBadge(getCount('youth:mentorship'))}
-                  </button>
-                )}
-
-                {matchesSearch('ruang niaga iklan peluang pembekal market trade') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['youth:b2b']);
-                      navigateAndClose(() => setActiveTab('b2b'));
-                    }}
-                    className={`${navBtnBase} ${activeTab === 'b2b' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Network
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'b2b'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Ruang Niaga' : 'Ruang Niaga Marketplace'}
-                      </span>
-                    </div>
-                    {renderCountBadge(getCount('youth:b2b'))}
-                  </button>
-                )}
-
-                {matchesSearch('acara karnival ekspo bengkel jadual events') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['youth:events']);
-                      navigateAndClose(() => setActiveTab('events'));
-                    }}
-                    className={`${navBtnBase} ${activeTab === 'events' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Calendar
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'events'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">
-                        {isMs ? 'Acara & Karnival' : 'Events & Expo'}
-                      </span>
-                    </div>
-                    {renderCountBadge(getCount('youth:events'))}
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* KATEGORI 3: DIREKTORI & PROFIL */}
-            {youthCat3HasMatches && (
-              <div className={youthCat1HasMatches || youthCat2HasMatches ? categoryDividerClass : 'space-y-1'}>
-                <div className={categoryHeaderClass}>
-                  {isMs ? 'DIREKTORI & PROFIL' : 'DIRECTORY & PROFILE'}
-                </div>
-
-                {matchesSearch('direktori usahawan kelantan bisnes produk kedai servis ssm directory') && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      markSeen(['youth:hepa']);
-                      navigateAndClose(() => setActiveTab('hepa'));
-                    }}
-                    className={`${navBtnBase} ${activeTab === 'hepa' ? navBtnActive : navBtnIdle}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <Store
-                        className={`w-4 h-4 shrink-0 ${
-                          activeTab === 'hepa'
-                            ? 'text-black dark:text-white/75'
-                            : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
-                        }`}
-                      />
-                      <span className="truncate whitespace-nowrap">{t('directory')}</span>
-                    </div>
-                    {renderCountBadge(getCount('youth:hepa'))}
-                  </button>
-                )}
-              </div>
-            )}
+            ))}
           </div>
         )}
       </div>

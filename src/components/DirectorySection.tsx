@@ -7,10 +7,12 @@ import {
 } from 'lucide-react';
 import { BusinessListing, KelantanDistrict, formatBusinessCategory } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { showToast } from './ToastNotification';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface DirectorySectionProps {
   businesses?: BusinessListing[];
@@ -48,6 +50,8 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
   onSelectBusiness
 }) => {
   const { t, language } = useLanguage();
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua Kategori');
   const [selectedDistrict, setSelectedDistrict] = useState<KelantanDistrict>('Semua Jajahan');
@@ -140,9 +144,9 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                       onClick={() =>
                         setSelectedCategory((prev) => (prev === cat ? 'Semua Kategori' : cat))
                       }
-                      className={`px-2.5 py-1 rounded-lg text-[0.8125rem] font-semibold transition-colors cursor-pointer text-left border ${
+                      className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-semibold transition-colors cursor-pointer text-left border ${
                         selectedCategory === cat
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? `${roleTheme.segmentedActiveClass} border-transparent`
                           : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
                       }`}
                     >
@@ -251,9 +255,9 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                           e.stopPropagation();
                           onSelectBusiness(biz);
                         }}
-                        className="py-2 px-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs shrink-0"
+                        className={`py-2 px-3.5 text-sm inline-flex items-center gap-1.5 shadow-xs ${roleTheme.primaryButtonClass}`}
                       >
-                        <span>{language === 'en' ? 'View Profile & Catalog' : 'Katalog & Profil'}</span>
+                        <span>{language === 'en' ? 'Catalog' : 'Katalog'}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
 
@@ -274,7 +278,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                           }
                         }}
                         title={language === 'en' ? 'Direct WhatsApp' : 'WhatsApp Terus'}
-                        className="p-2 bg-indigo-50 hover:bg-amber-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/60 dark:hover:bg-indigo-600 dark:text-indigo-400 dark:border-indigo-800/70 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center shrink-0"
+                        className={roleTheme.iconButtonClass}
                       >
                         <MessageCircle className="w-4 h-4" />
                       </a>
@@ -290,7 +294,6 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
               itemsPerPage={7}
               onPageChange={pagination.setCurrentPage}
               itemLabel={language === 'en' ? 'businesses' : 'perniagaan'}
-              accent="blue"
             />
           </>
         )}

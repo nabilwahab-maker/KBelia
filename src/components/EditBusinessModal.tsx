@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { X, Save, Loader2, Edit3, AlertCircle, CheckCircle2, Star } from 'lucide-react';
 import { BusinessCategory, BusinessListing, KelantanDistrict, formatBusinessCategory } from '../types';
 import { saveBusinessListing } from '../services/dataService';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const adminTheme = getRoleTheme('admin');
 
 const CATEGORIES: BusinessCategory[] = [
   'Makanan & Minuman (F&B)',
@@ -144,7 +147,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-labelledby="edit-business-modal-title"
@@ -153,19 +156,19 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+        className={`relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`sticky top-0 z-10 border-b px-6 py-4 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
               <Edit3 className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <h3 id="edit-business-modal-title" className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+              <h3 id="edit-business-modal-title" className="text-sm sm:text-base font-bold text-stone-900 dark:text-[#F5F2EC] truncate">
                 {business ? 'Edit Maklumat Perniagaan' : 'Tambah Perniagaan Baharu'}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 truncate">
+              <p className="text-[0.875rem] text-stone-600 dark:text-stone-300 truncate">
                 Ubah suai nama kedai, kategori, lokasi, nombor telefon dan status paparan.
               </p>
             </div>
@@ -176,7 +179,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
             disabled={isSaving}
             onClick={onClose}
             aria-label="Tutup tetingkap edit"
-            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+            className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:bg-stone-200/70 dark:hover:bg-stone-800 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -202,7 +205,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 placeholder="Masukkan nama perniagaan"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -214,7 +217,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
                 value={ownerName}
                 onChange={(e) => setOwnerName(e.target.value)}
                 placeholder="Masukkan nama pemilik"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -229,7 +232,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
                   setOwnerPhone(e.target.value);
                 }}
                 placeholder="Masukkan nombor telefon"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -238,7 +241,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as BusinessCategory)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none cursor-pointer ${adminTheme.inputClass}`}
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>{formatBusinessCategory(c)}</option>
@@ -251,7 +254,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
               <select
                 value={district}
                 onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none cursor-pointer ${adminTheme.inputClass}`}
               >
                 {DISTRICTS.map((d) => (
                   <option key={d} value={d}>{d}</option>
@@ -267,7 +270,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
                 value={ssmNumber}
                 onChange={(e) => setSsmNumber(e.target.value)}
                 placeholder="Masukkan nombor pendaftaran SSM"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -279,7 +282,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
                 value={businessHours}
                 onChange={(e) => setBusinessHours(e.target.value)}
                 placeholder="Masukkan waktu operasi"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -291,7 +294,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
                 value={businessAddress}
                 onChange={(e) => setBusinessAddress(e.target.value)}
                 placeholder="Masukkan alamat premis"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -303,7 +306,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
                 placeholder="Masukkan slogan perniagaan"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -315,7 +318,7 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Masukkan keterangan ringkas mengenai perniagaan"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
           </div>
@@ -326,8 +329,8 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
               onClick={() => setIsApproved(!isApproved)}
               className={`min-h-[42px] px-4 py-2 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                 isApproved
-                  ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500 text-black dark:text-white'
-                  : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black dark:text-white'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500/70 text-emerald-800 dark:text-emerald-300'
+                  : adminTheme.secondaryButtonClass
               }`}
             >
               <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -339,8 +342,8 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
               onClick={() => setIsFeatured(!isFeatured)}
               className={`min-h-[42px] px-4 py-2 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                 isFeatured
-                  ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-400 text-black dark:text-white'
-                  : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black dark:text-white'
+                  ? adminTheme.activeNavClass
+                  : adminTheme.secondaryButtonClass
               }`}
             >
               <Star className="w-4 h-4 shrink-0" />
@@ -348,19 +351,19 @@ export const EditBusinessModal: React.FC<EditBusinessModalProps> = ({
             </button>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
+          <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>
             <button
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer disabled:opacity-50"
+              className={`w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold transition-colors cursor-pointer disabled:opacity-50 ${adminTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60"
+              className={`w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60 ${adminTheme.primaryButtonClass}`}
             >
               {isSaving ? (
                 <>

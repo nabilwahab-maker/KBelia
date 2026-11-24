@@ -19,6 +19,8 @@ import {
   calculateOperationEndDate
 } from '../utils/printUtils';
 import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 
 interface DigitalTenancyAgreementModalProps {
@@ -36,6 +38,8 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
   slots = [],
   onAgreementSigned
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const agreementRef = useRef<HTMLDivElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -147,9 +151,9 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
         role="dialog"
         aria-modal="true"
       >
-        <div className="kbelia-important-header px-6 sm:px-8 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-slate-300 dark:border-slate-600 shrink-0">
+        <div className="bg-[#FAF8F3] dark:bg-[#101815] px-6 sm:px-8 pt-6 pb-4 flex items-start justify-between gap-4 border-b border-[#E2DCCB] dark:border-[#24342D] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-200 dark:border-indigo-800/70 shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-[#0B6E52]/10 dark:bg-[#10B981]/15 text-[#0B6E52] dark:text-[#34D399] flex items-center justify-center border border-[#0B6E52]/25 dark:border-[#34D399]/35 shrink-0">
               <FileText className="w-5 h-5" />
             </div>
             <div>
@@ -164,7 +168,8 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label="Tutup"
+            className={roleTheme.iconButtonClass}
           >
             <X className="w-4 h-4" />
           </button>
@@ -245,9 +250,9 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                   type="button"
                   disabled={!hasSignature || isSaving}
                   onClick={handleConfirmSignature}
-                  className="py-2 px-5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-40 transition-all shadow-sm cursor-pointer dark:bg-blue-600"
+                  className={`py-2 px-5 text-sm shadow-sm ${roleTheme.primaryButtonClass}`}
                 >
-                  {isSaving ? 'Menyimpan...' : 'Meterai Perjanjian'}
+                  {isSaving ? 'Menyimpan...' : 'Meterai'}
                 </button>
               </div>
             </div>
@@ -277,11 +282,11 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                       setIsDownloadingPdf(false);
                     }
                   }}
-                  className="py-2 px-3.5 rounded-xl text-sm font-semibold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-60"
+                  className={roleTheme.compactSecondaryButtonClass}
                   title="Muat turun salinan PDF rasmi ber-letterhead"
                 >
-                  <Download className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                  <span>{isDownloadingPdf ? 'Menjana PDF...' : isDownloaded ? 'PDF Tersimpan!' : 'Muat Turun PDF'}</span>
+                  <Download className="w-3.5 h-3.5" />
+                  <span>{isDownloadingPdf ? 'Menjana...' : isDownloaded ? 'Tersimpan' : 'Muat Turun PDF'}</span>
                 </button>
 
                 <button
@@ -305,19 +310,19 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                     }
                   }}
                   disabled={isPrinting}
-                  className="py-2 px-4 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm dark:bg-rose-600"
+                  className={roleTheme.compactPrimaryButtonClass}
                   title="Cetak Salinan Rasmi"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  <span>{isPrinting ? 'Mencetak...' : 'Cetak Salinan Rasmi'}</span>
+                  <span>{isPrinting ? 'Mencetak...' : 'Cetak'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2 px-4 rounded-xl text-sm font-bold text-black dark:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  className={roleTheme.compactSecondaryButtonClass}
                 >
-                  Selesai
+                  Tutup
                 </button>
               </div>
             </div>

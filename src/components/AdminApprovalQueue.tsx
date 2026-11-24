@@ -57,6 +57,9 @@ import {
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { EditSlotModal } from './EditSlotModal';
 import { EditBookingModal, EditGrantModal, EditMaintenanceTicketModal } from './AdminEditModals';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const adminTheme = getRoleTheme('admin');
 
 interface AdminApprovalQueueProps {
   bookings: CapsuleBooking[];
@@ -647,11 +650,10 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   });
 
   return (
-    <div className="rounded-3xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 p-5 md:p-6 shadow-xs overflow-visible animate-dashboard-tab">
+    <div className={`rounded-3xl border p-5 md:p-6 shadow-xs overflow-visible animate-dashboard-tab ${adminTheme.surfaceClass}`}>
       {/* Top Header */}
-      <div className="-mx-5 -mt-5 md:-mx-6 md:-mt-6 px-5 pt-5 md:px-6 md:pt-6 pb-4 mb-4 kbelia-important-header border-b border-slate-300 dark:border-slate-600 rounded-t-3xl relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
-        <h2 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+      <div className={`-mx-5 -mt-5 md:-mx-6 md:-mt-6 px-5 pt-5 md:px-6 md:pt-6 pb-4 mb-4 border-b rounded-t-3xl ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+        <h2 className="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
           Pusat Semakan Permohonan &amp; Pengurusan Kiosk
         </h2>
       </div>
@@ -664,8 +666,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             onClick={() => setActiveTab('overview')}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'overview'
-                ? 'bg-indigo-600 text-white shadow-sm dark:bg-indigo-600'
-                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+                ? adminTheme.segmentedActiveClass
+                : adminTheme.secondaryButtonClass
             }`}
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
@@ -677,8 +679,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             onClick={() => setActiveTab('kiosks')}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'kiosks'
-                ? 'bg-blue-600 text-white shadow-sm dark:bg-blue-600'
-                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+                ? adminTheme.segmentedActiveClass
+                : adminTheme.secondaryButtonClass
             }`}
           >
             <Store className="w-3.5 h-3.5" />
@@ -690,8 +692,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             onClick={() => setActiveTab('grants')}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'grants'
-                ? 'bg-emerald-600 text-white shadow-sm dark:bg-emerald-600'
-                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+                ? adminTheme.segmentedActiveClass
+                : adminTheme.secondaryButtonClass
             }`}
           >
             <Coins className="w-3.5 h-3.5" />
@@ -703,8 +705,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             onClick={() => setActiveTab('facility')}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'facility'
-                ? 'bg-rose-600 text-white shadow-sm dark:bg-rose-600'
-                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+                ? adminTheme.segmentedActiveClass
+                : adminTheme.secondaryButtonClass
             }`}
           >
             <Wrench className="w-3.5 h-3.5" />
@@ -716,8 +718,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             onClick={() => setActiveTab('audit')}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'audit'
-                ? 'bg-indigo-600 text-white shadow-sm dark:bg-indigo-600'
-                : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white/75 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-800 hover:text-black dark:hover:text-white'
+                ? adminTheme.segmentedActiveClass
+                : adminTheme.secondaryButtonClass
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5" />
@@ -729,7 +731,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           <button
             type="button"
             onClick={() => setShowAddSlotModal(true)}
-            className="px-3.5 py-2 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+            className={`px-3.5 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${adminTheme.primaryButtonClass}`}
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>Daftar Kiosk Niaga</span>
@@ -738,19 +740,19 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           <button
             type="button"
             onClick={() => setShowAddProgramModal(true)}
-            className="px-3.5 py-2 rounded-xl text-sm font-bold text-black bg-amber-50 hover:bg-amber-100 border border-amber-300 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+            className={`px-3.5 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${adminTheme.secondaryButtonClass}`}
           >
-            <Award className="w-3.5 h-3.5 text-black dark:text-white" />
+            <Award className={`w-3.5 h-3.5 ${adminTheme.accentTextClass}`} />
             <span>Terbit Program</span>
           </button>
 
           <button
             type="button"
             onClick={() => setShowOfficialReport(true)}
-            className="px-3.5 py-2 rounded-xl text-sm font-bold text-black dark:text-white bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+            className={`px-3.5 py-2 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${adminTheme.secondaryButtonClass}`}
             title="Muat turun ringkasan rasmi kelulusan"
           >
-            <Printer className="w-3.5 h-3.5 text-black dark:text-white/75" />
+            <Printer className="w-3.5 h-3.5 opacity-80" />
             <span>Laporan PDF</span>
           </button>
         </div>
@@ -763,47 +765,46 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           {/* Kolum 1: Permohonan Sewa Kiosk */}
           <div
             style={{ '--stagger': 0 } as React.CSSProperties}
-            className="animate-dashboard-card relative overflow-hidden min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-4 sm:p-5 shadow-2xs flex flex-col justify-start h-full"
+            className={`animate-dashboard-card relative overflow-hidden min-w-0 rounded-2xl border p-4 sm:p-5 shadow-2xs flex flex-col justify-start h-full ${adminTheme.surfaceClass}`}
           >
-            <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
             <div>
-              <div className="flex items-center gap-2.5 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <Store className="w-4.5 h-4.5 text-blue-600 dark:text-blue-400 shrink-0" />
-                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+              <div className={`flex items-center gap-2.5 pb-3 mb-2 border-b ${adminTheme.dividerClass}`}>
+                <Store className={`w-4.5 h-4.5 shrink-0 ${adminTheme.accentTextClass}`} />
+                <h4 className="text-base sm:text-lg font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
                   Permohonan Sewa Kiosk
                 </h4>
               </div>
 
               {/* Booking items list */}
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+              <div className={`divide-y max-h-[500px] overflow-y-auto pr-1 ${adminTheme.dividerClass}`}>
                 {bookings.filter(b => b.status === 'pending').length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-slate-300 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-900">
-                    <CheckCircle2 className="w-8 h-8 text-black/70 dark:text-white/75 mx-auto mb-1 opacity-70" />
-                    <p className="text-sm font-bold text-black dark:text-white">Semua Permohonan Selesai Disemak</p>
-                    <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">Tiada permohonan baru menunggu kelulusan.</p>
+                  <div className={`text-center py-10 border border-dashed rounded-xl mt-2 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <CheckCircle2 className="w-8 h-8 text-stone-400 dark:text-stone-500 mx-auto mb-1" />
+                    <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">Semua Permohonan Selesai Disemak</p>
+                    <p className="text-[0.9375rem] text-stone-600 dark:text-stone-300 mt-0.5">Tiada permohonan baru menunggu kelulusan.</p>
                   </div>
                 ) : (
                   bookings.filter(b => b.status === 'pending').slice(0, 5).map(b => (
-                    <div key={b.id} className="p-3.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 space-y-2">
+                    <div key={b.id} className="py-3.5 space-y-2 first:pt-2 last:pb-1">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white">{b.slotCode}</span>
-                            <span className="text-sm text-black/70 dark:text-white/75">· {b.hubLocation.split(' ')[0]}</span>
+                            <span className="font-mono text-[0.8125rem] font-bold text-stone-900 dark:text-[#F5F2EC]">{b.slotCode}</span>
+                            <span className="text-sm text-stone-600 dark:text-stone-300">· {b.hubLocation.split(' ')[0]}</span>
                           </div>
-                          <h5 className="text-sm font-bold text-black dark:text-white">{b.businessName}</h5>
-                          <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{b.applicantName} · {b.businessCategory}</p>
+                          <h5 className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">{b.businessName}</h5>
+                          <p className="text-[0.9375rem] text-stone-600 dark:text-stone-300">{b.applicantName} · {b.businessCategory}</p>
                         </div>
-                        <span className="px-2 py-0.5 rounded text-[0.8125rem] font-bold bg-amber-100 text-black dark:bg-amber-950/80 dark:text-white">Menunggu</span>
+                        <span className="text-[0.8125rem] font-semibold text-amber-700 dark:text-amber-300 shrink-0">Menunggu</span>
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-300 dark:border-slate-600">
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                         <div className="flex items-center gap-1">
                           <button
                             type="button"
                             onClick={() => setEditingBooking(b)}
-                            className="p-1.5 rounded-lg border border-blue-200 dark:border-blue-800/70 bg-blue-50 dark:bg-blue-950/40 text-black dark:text-white hover:bg-blue-100 cursor-pointer"
-                            title="Edit Permohonan"
+                            className={`p-1.5 rounded-xl border cursor-pointer transition-colors ${adminTheme.activeMiniBtnClass}`}
+                            title="Sunting"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
@@ -816,8 +817,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                 onConfirm: () => handleDeleteBookingRecord(b)
                               })
                             }
-                            className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-800/70 bg-rose-50 dark:bg-rose-950/40 text-black dark:text-white hover:bg-rose-100 cursor-pointer"
-                            title="Padam Permohonan"
+                            className={`p-1.5 rounded-xl ${adminTheme.dangerOutlineButtonClass}`}
+                            title="Padam"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -827,17 +828,17 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           <button
                             type="button"
                             onClick={() => setRejectModalData({ type: 'kiosk', id: b.id, name: b.applicantName, business: b.businessName, slotOrProgram: b.slotCode })}
-                            className="px-2.5 py-1 rounded text-[0.8125rem] font-semibold text-black dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
+                            className={`px-3 py-1 rounded-xl text-[0.8125rem] font-semibold ${adminTheme.dangerOutlineButtonClass}`}
                           >
                             Tolak
                           </button>
                           <button
                             type="button"
                             onClick={() => handleApproveBooking(b.id)}
-                            className="px-3 py-1 rounded text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-1"
+                            className={`px-3 py-1 rounded-xl text-sm font-bold flex items-center gap-1 ${adminTheme.primaryButtonClass}`}
                           >
                             <Check className="w-3.5 h-3.5" />
-                            <span>Luluskan</span>
+                            <span>Lulus</span>
                           </button>
                         </div>
                       </div>
@@ -851,47 +852,46 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           {/* Kolum 2: Permohonan Dana & Geran Belia */}
           <div
             style={{ '--stagger': 1 } as React.CSSProperties}
-            className="animate-dashboard-card relative overflow-hidden min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-4 sm:p-5 shadow-2xs flex flex-col justify-start h-full"
+            className={`animate-dashboard-card relative overflow-hidden min-w-0 rounded-2xl border p-4 sm:p-5 shadow-2xs flex flex-col justify-start h-full ${adminTheme.surfaceClass}`}
           >
-            <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
             <div>
-              <div className="flex items-center gap-2.5 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <Coins className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+              <div className={`flex items-center gap-2.5 pb-3 mb-2 border-b ${adminTheme.dividerClass}`}>
+                <Coins className={`w-4.5 h-4.5 shrink-0 ${adminTheme.accentStrongTextClass}`} />
+                <h4 className="text-base sm:text-lg font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
                   Permohonan Geran &amp; Pembiayaan
                 </h4>
               </div>
 
               {/* Grant items list */}
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+              <div className={`divide-y max-h-[500px] overflow-y-auto pr-1 ${adminTheme.dividerClass}`}>
                 {grantApplications.filter(g => g.status === 'pending').length === 0 ? (
-                  <div className="text-center py-10 border border-dashed border-slate-300 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-900">
-                    <Award className="w-8 h-8 text-black/70 dark:text-white/75 mx-auto mb-1 opacity-70" />
-                    <p className="text-sm font-bold text-black dark:text-white">Tiada Permohonan Geran Tertangguh</p>
-                    <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">Semua semakan kelayakan pembiayaan telah diproses.</p>
+                  <div className={`text-center py-10 border border-dashed rounded-xl mt-2 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <Award className="w-8 h-8 text-stone-400 dark:text-stone-500 mx-auto mb-1" />
+                    <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">Tiada Permohonan Geran Tertangguh</p>
+                    <p className="text-[0.9375rem] text-stone-600 dark:text-stone-300 mt-0.5">Semua semakan kelayakan pembiayaan telah diproses.</p>
                   </div>
                 ) : (
                   grantApplications.filter(g => g.status === 'pending').slice(0, 5).map(g => (
-                    <div key={g.id} className="p-3.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 space-y-2">
+                    <div key={g.id} className="py-3.5 space-y-2 first:pt-2 last:pb-1">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white">{g.grantAmount || 'RM 3,000'}</span>
-                            <span className="text-sm text-black/70 dark:text-white/75">· {g.district || g.businessCategory || 'Kelantan'}</span>
+                            <span className="font-mono text-[0.8125rem] font-bold text-stone-900 dark:text-[#F5F2EC]">{g.grantAmount || 'RM 3,000'}</span>
+                            <span className="text-sm text-stone-600 dark:text-stone-300">· {g.district || g.businessCategory || 'Kelantan'}</span>
                           </div>
-                          <h5 className="text-sm font-bold text-black dark:text-white">{g.programTitle}</h5>
-                          <p className="text-[0.9375rem] text-black/70 dark:text-white/75">{g.applicantName} ({g.businessName})</p>
+                          <h5 className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">{g.programTitle}</h5>
+                          <p className="text-[0.9375rem] text-stone-600 dark:text-stone-300">{g.applicantName} ({g.businessName})</p>
                         </div>
-                        <span className="px-2 py-0.5 rounded text-[0.8125rem] font-bold bg-amber-100 text-black dark:bg-amber-950/80 dark:text-white">Menunggu</span>
+                        <span className="text-[0.8125rem] font-semibold text-amber-700 dark:text-amber-300 shrink-0">Menunggu</span>
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-300 dark:border-slate-600">
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                         <div className="flex items-center gap-1">
                           <button
                             type="button"
                             onClick={() => setEditingGrant(g)}
-                            className="p-1.5 rounded-lg border border-blue-200 dark:border-blue-800/70 bg-blue-50 dark:bg-blue-950/40 text-black dark:text-white hover:bg-blue-100 cursor-pointer"
-                            title="Edit Permohonan Geran"
+                            className={`p-1.5 rounded-xl border cursor-pointer transition-colors ${adminTheme.activeMiniBtnClass}`}
+                            title="Sunting"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
@@ -904,8 +904,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                 onConfirm: () => handleDeleteGrantRecord(g)
                               })
                             }
-                            className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-800/70 bg-rose-50 dark:bg-rose-950/40 text-black dark:text-white hover:bg-rose-100 cursor-pointer"
-                            title="Padam Permohonan Geran"
+                            className={`p-1.5 rounded-xl ${adminTheme.dangerOutlineButtonClass}`}
+                            title="Padam"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -915,17 +915,17 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           <button
                             type="button"
                             onClick={() => setRejectModalData({ type: 'grant', id: g.id, name: g.applicantName, business: g.businessName, slotOrProgram: g.programTitle })}
-                            className="px-2.5 py-1 rounded text-[0.8125rem] font-semibold text-black dark:text-white hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer"
+                            className={`px-3 py-1 rounded-xl text-[0.8125rem] font-semibold ${adminTheme.dangerOutlineButtonClass}`}
                           >
                             Tolak
                           </button>
                           <button
                             type="button"
                             onClick={() => handleApproveGrant(g.id)}
-                            className="px-3 py-1 rounded text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer flex items-center gap-1"
+                            className={`px-3 py-1 rounded-xl text-sm font-bold flex items-center gap-1 ${adminTheme.primaryButtonClass}`}
                           >
                             <Check className="w-3.5 h-3.5" />
-                            <span>Luluskan</span>
+                            <span>Lulus</span>
                           </button>
                         </div>
                       </div>
@@ -939,13 +939,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           {/* Kolum 3: Kawalan Fasiliti Kiosk & Tindakan Pantas */}
           <div
             style={{ '--stagger': 2 } as React.CSSProperties}
-            className="animate-dashboard-card relative overflow-hidden min-w-0 rounded-2xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-4 sm:p-5 shadow-2xs flex flex-col justify-start h-full"
+            className={`animate-dashboard-card relative overflow-hidden min-w-0 rounded-2xl border p-4 sm:p-5 shadow-2xs flex flex-col justify-start h-full ${adminTheme.surfaceClass}`}
           >
-            <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
             <div>
-              <div className="flex items-center gap-2.5 pb-3 mb-3 border-b border-slate-300 dark:border-slate-600">
-                <Wrench className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
+              <div className={`flex items-center gap-2.5 pb-3 mb-3 border-b ${adminTheme.dividerClass}`}>
+                <Wrench className={`w-4.5 h-4.5 shrink-0 ${adminTheme.accentTextClass}`} />
+                <h4 className="text-base sm:text-lg font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
                   Fasiliti &amp; Tindakan Pantas
                 </h4>
               </div>
@@ -955,7 +954,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAddSlotModal(true)}
-                  className="w-full py-2 px-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer dark:bg-blue-600"
+                  className={`w-full py-2 px-3 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer ${adminTheme.primaryButtonClass}`}
                 >
                   <Building2 className="w-3.5 h-3.5" />
                   <span>Daftar Kiosk</span>
@@ -964,29 +963,29 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAddProgramModal(true)}
-                  className="w-full py-2 px-3 rounded-xl text-sm font-bold text-black bg-amber-50 hover:bg-amber-100 border border-amber-300 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                  className={`w-full py-2 px-3 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer ${adminTheme.secondaryButtonClass}`}
                 >
-                  <Award className="w-3.5 h-3.5 text-black" />
+                  <Award className={`w-3.5 h-3.5 ${adminTheme.accentTextClass}`} />
                   <span>Terbit Program</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setShowOfficialReport(true)}
-                  className="w-full py-2 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-600 flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                  className={`w-full py-2 px-3 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer ${adminTheme.secondaryButtonClass}`}
                 >
-                  <Printer className="w-3.5 h-3.5 text-black dark:text-white" />
+                  <Printer className="w-3.5 h-3.5 opacity-80" />
                   <span>Laporan PDF</span>
                 </button>
               </div>
 
               {/* Recent Slots snippet */}
-              <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
-                <span className="text-[0.8125rem] font-bold text-black/75 dark:text-white/75 uppercase tracking-wider block">Kiosk Diurus:</span>
+              <div className={`divide-y max-h-[180px] overflow-y-auto pr-1 ${adminTheme.dividerClass}`}>
+                <span className="text-[0.8125rem] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block pb-1.5">Kiosk Diurus:</span>
                 {slots.slice(0, 4).map(slot => (
-                  <div key={slot.id} className="flex items-center justify-between text-sm p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600">
-                    <span className="font-bold text-black dark:text-white">{slot.name} ({slot.code})</span>
-                    <span className={`text-[0.8125rem] font-bold px-2 py-0.5 rounded ${slot.status === 'available' ? 'bg-emerald-100 text-black' : 'bg-amber-100 text-black'}`}>
+                  <div key={slot.id} className="flex items-center justify-between text-sm py-2">
+                    <span className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate pr-2">{slot.name} ({slot.code})</span>
+                    <span className={`text-[0.8125rem] font-semibold shrink-0 ${slot.status === 'available' ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-300'}`}>
                       {slot.status === 'available' ? 'Kosong' : 'Disewa'}
                     </span>
                   </div>
@@ -1003,7 +1002,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
         <div key="kiosks" className="space-y-4 animate-dashboard-tab">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h4 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+              <h4 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
                 Senarai Permohonan Sewaan Kiosk
               </h4>
             </div>
@@ -1013,16 +1012,16 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 setEditingBooking(null);
                 setShowCreateBooking(true);
               }}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+              className={`px-4 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto transition-colors ${adminTheme.primaryButtonClass}`}
             >
               <Plus className="w-4 h-4" />
-              <span>Tambah Permohonan</span>
+              <span>Tambah</span>
             </button>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+          <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
             <ReferenceTableToolbar
-              accent="indigo"
+              accent="amber"
               searchValue={searchQuery}
               onSearchChange={setSearchQuery}
               searchPlaceholder="Cari pemohon, syarikat atau kod..."
@@ -1042,7 +1041,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               }}
               filterContent={
                 <div>
-                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
                     Status Permohonan
                   </label>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -1056,10 +1055,10 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         key={opt.id}
                         type="button"
                         onClick={() => setStatusFilter(opt.id)}
-                        className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
+                        className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                           statusFilter === opt.id
-                            ? 'bg-indigo-600 border-indigo-600 text-white'
-                            : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
+                            ? adminTheme.segmentedActiveClass
+                            : adminTheme.secondaryButtonClass
                         }`}
                       >
                         {opt.label}
@@ -1084,9 +1083,9 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                       setStatusFilter('all');
                       setBookingSortPreset(DEFAULT_SORT_VALUE);
                     }}
-                    className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                    className={`mt-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
                   >
-                    Set Semula Carian &amp; Penapis
+                    Set Semula
                   </button>
                 )}
               </div>
@@ -1095,12 +1094,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                      <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                         <th className="py-3 pl-5 pr-3">
                           <button
                             type="button"
                             onClick={() => toggleBookingSort('businessName')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Kiosk &amp; Perniagaan</span>
                             <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1110,7 +1109,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           <button
                             type="button"
                             onClick={() => toggleBookingSort('category')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Kategori</span>
                             <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1120,7 +1119,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           <button
                             type="button"
                             onClick={() => toggleBookingSort('hubLocation')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Lokasi &amp; Tempoh</span>
                             <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1130,7 +1129,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           <button
                             type="button"
                             onClick={() => toggleBookingSort('status')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Status</span>
                             <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1141,16 +1140,16 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                    <tbody className={`divide-y ${adminTheme.dividerClass}`}>
                       {bookingsPagination.paginatedItems.map((booking) => {
                         const isActioning = actionLoading === booking.id;
                         const isExpanded = expandedKioskIds.includes(booking.id);
                         return (
                           <React.Fragment key={booking.id}>
-                            <tr className="kbelia-table-row">
+                            <tr className={`kbelia-table-row transition-colors ${adminTheme.rowHoverClass}`}>
                               <td className="py-3.5 pl-5 pr-3">
                                 <div className="flex items-center gap-3 min-w-[210px]">
-                                  <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-950 shrink-0">
+                                  <div className={`w-14 h-14 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                                     <PortalImage
                                       src={resolveBookingKioskImage(booking, slots)}
                                       alt={`Reka bentuk kiosk ${booking.slotName}`}
@@ -1160,34 +1159,34 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                     />
                                   </div>
                                   <div className="min-w-0">
-                                    <p className="font-semibold text-black dark:text-white truncate max-w-[240px]">
+                                    <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
                                       {booking.slotCode} · {booking.businessName}
                                     </p>
-                                    <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[240px]">
+                                    <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[240px]">
                                       {booking.applicantName}
                                     </p>
                                   </div>
                                 </div>
                               </td>
-                              <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
+                              <td className="py-3.5 px-3 text-stone-700 dark:text-stone-300 whitespace-nowrap">
                                 {booking.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : booking.businessCategory}
                               </td>
                               <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
-                                <p className="font-medium text-black dark:text-white">{booking.hubLocation}</p>
-                                <p className="text-[0.8125rem] text-black/60 dark:text-white/65">
+                                <p className="font-medium text-stone-900 dark:text-[#F5F2EC]">{booking.hubLocation}</p>
+                                <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400">
                                   {booking.durationMonths} bulan · Mula {formatDisplayDate(booking.startDate)}
                                 </p>
                               </td>
                               <td className="py-3.5 px-3 whitespace-nowrap">
                                 <span
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
+                                  className={`text-[0.8125rem] font-semibold ${
                                     booking.status === 'approved'
-                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
+                                      ? 'text-emerald-700 dark:text-emerald-400'
                                       : booking.status === 'rejected'
-                                      ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/70'
+                                      ? 'text-rose-700 dark:text-rose-400'
                                       : booking.status === 'cancelled'
-                                      ? 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700'
-                                      : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
+                                      ? 'text-stone-500 dark:text-stone-400'
+                                      : 'text-amber-700 dark:text-amber-300'
                                   }`}
                                 >
                                   {booking.status === 'approved'
@@ -1204,17 +1203,17 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                   ariaLabel={`Tindakan untuk ${booking.businessName}`}
                                   items={[
                                     {
-                                      label: isExpanded ? 'Tutup Butiran' : 'Lihat Butiran & Catatan',
+                                      label: isExpanded ? 'Tutup' : 'Lihat Butiran',
                                       onClick: () => toggleExpandedId(setExpandedKioskIds, booking.id)
                                     },
                                     {
-                                      label: 'Luluskan Permohonan',
+                                      label: 'Lulus',
                                       tone: 'accent',
                                       disabled: isActioning || booking.status === 'approved',
                                       onClick: () => handleApproveBooking(booking.id)
                                     },
                                     {
-                                      label: 'Tolak Permohonan',
+                                      label: 'Tolak',
                                       disabled: isActioning || booking.status === 'rejected',
                                       onClick: () =>
                                         setRejectModalData({
@@ -1228,19 +1227,19 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                     ...(booking.status !== 'pending'
                                       ? [
                                           {
-                                            label: 'Set Menunggu Semakan',
+                                            label: 'Set Menunggu',
                                             disabled: isActioning,
                                             onClick: () => handleDirectBookingStatus(booking, 'pending')
                                           }
                                         ]
                                       : []),
                                     {
-                                      label: 'Edit Permohonan',
+                                      label: 'Sunting',
                                       dividerBefore: true,
                                       onClick: () => setEditingBooking(booking)
                                     },
                                     {
-                                      label: 'Padam Permohonan',
+                                      label: 'Padam',
                                       tone: 'danger',
                                       onClick: () =>
                                         confirmDelete({
@@ -1255,14 +1254,14 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             </tr>
 
                             {isExpanded && (
-                              <tr className="bg-slate-50/70 dark:bg-zinc-950/60">
+                              <tr className={adminTheme.surfaceMutedClass}>
                                 <td colSpan={5} className="px-5 py-4 space-y-3">
-                                  <div className="text-sm text-black/75 dark:text-white/80 tabular-nums">
-                                    Tempoh Operasi: <strong className="text-black dark:text-white">{booking.durationMonths} Bulan</strong> · Mula: <strong className="text-black dark:text-white">{formatDisplayDate(booking.startDate)}</strong> · Akhir: <strong className="text-black dark:text-white">{calculateOperationEndDate(booking.startDate, booking.durationMonths)}</strong>
+                                  <div className="text-sm text-stone-700 dark:text-stone-300 tabular-nums">
+                                    Tempoh Operasi: <strong className="text-stone-900 dark:text-[#F5F2EC]">{booking.durationMonths} Bulan</strong> · Mula: <strong className="text-stone-900 dark:text-[#F5F2EC]">{formatDisplayDate(booking.startDate)}</strong> · Akhir: <strong className="text-stone-900 dark:text-[#F5F2EC]">{calculateOperationEndDate(booking.startDate, booking.durationMonths)}</strong>
                                   </div>
 
                                   {booking.pitchNotes && (
-                                    <div className="p-3 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-sm text-black dark:text-white">
+                                    <div className={`p-3 rounded-xl border text-sm text-stone-900 dark:text-[#F5F2EC] ${adminTheme.surfaceClass}`}>
                                       <span className="font-semibold block mb-0.5">
                                         Penerangan Perniagaan &amp; Cadangan Jualan:
                                       </span>
@@ -1276,17 +1275,17 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                       placeholder="Masukkan catatan pegawai"
                                       value={adminNoteInput[booking.id] ?? (booking.adminNotes || '')}
                                       onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [booking.id]: e.target.value })}
-                                      className="flex-1 px-3 py-1.5 rounded-xl text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                                      className={`flex-1 px-3 py-1.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                                     />
                                     <div className="flex items-center gap-2">
                                       <button
                                         type="button"
                                         disabled={isActioning}
                                         onClick={() => handleApproveBooking(booking.id)}
-                                        className="py-1.5 px-3 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center gap-1 cursor-pointer"
+                                        className={`py-1.5 px-3 rounded-xl text-sm font-bold flex items-center gap-1 ${adminTheme.primaryButtonClass}`}
                                       >
                                         <CheckCircle2 className="w-3.5 h-3.5" />
-                                        <span>Luluskan</span>
+                                        <span>Lulus</span>
                                       </button>
                                       <button
                                         type="button"
@@ -1300,7 +1299,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                             slotOrProgram: `${booking.slotCode} (${booking.hubLocation})`
                                           })
                                         }
-                                        className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 border border-rose-200 dark:border-rose-900 transition-colors cursor-pointer"
+                                        className={`py-1.5 px-3 rounded-xl text-sm font-bold ${adminTheme.dangerOutlineButtonClass}`}
                                       >
                                         Tolak
                                       </button>
@@ -1322,7 +1321,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   itemsPerPage={7}
                   onPageChange={bookingsPagination.setCurrentPage}
                   itemLabel="permohonan kiosk"
-                  accent="rose"
+                  accent="amber"
                 />
               </>
             )}
@@ -1335,7 +1334,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
         <div key="grants" className="space-y-4 animate-dashboard-tab">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h4 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+              <h4 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
                 Senarai Permohonan Geran &amp; Pembiayaan Belia
               </h4>
             </div>
@@ -1345,16 +1344,16 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 setEditingGrant(null);
                 setShowCreateGrant(true);
               }}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+              className={`px-4 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto transition-colors ${adminTheme.primaryButtonClass}`}
             >
               <Plus className="w-4 h-4" />
-              <span>Tambah Geran</span>
+              <span>Tambah</span>
             </button>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+          <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
             <ReferenceTableToolbar
-              accent="indigo"
+              accent="amber"
               searchValue={searchQuery}
               onSearchChange={setSearchQuery}
               searchPlaceholder="Cari pemohon, syarikat atau geran..."
@@ -1374,7 +1373,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               }}
               filterContent={
                 <div>
-                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
                     Status Permohonan Geran
                   </label>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -1388,10 +1387,10 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         key={opt.id}
                         type="button"
                         onClick={() => setStatusFilter(opt.id)}
-                        className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
+                        className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                           statusFilter === opt.id
-                            ? 'bg-indigo-600 border-indigo-600 text-white'
-                            : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
+                            ? adminTheme.segmentedActiveClass
+                            : adminTheme.secondaryButtonClass
                         }`}
                       >
                         {opt.label}
@@ -1404,8 +1403,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
             {sortedGrants.length === 0 ? (
               <div className="py-12 px-6 text-center space-y-2">
-                <Coins className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
-                <p className="text-sm font-bold text-black dark:text-white">
+                <Coins className="w-9 h-9 text-stone-400 dark:text-stone-500 mx-auto" />
+                <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
                   Tiada rekod permohonan dana geran sepadan dengan tapisan semasa.
                 </p>
                 {(searchQuery || statusFilter !== 'all') && (
@@ -1416,9 +1415,9 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                       setStatusFilter('all');
                       setGrantSortPreset(DEFAULT_SORT_VALUE);
                     }}
-                    className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                    className={`mt-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
                   >
-                    Set Semula Carian &amp; Penapis
+                    Set Semula
                   </button>
                 )}
               </div>
@@ -1427,12 +1426,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                      <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                         <th className="py-3 pl-5 pr-3">
                           <button
                             type="button"
                             onClick={() => toggleGrantSort('businessName')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Perniagaan &amp; Pemohon</span>
                             <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1442,7 +1441,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           <button
                             type="button"
                             onClick={() => toggleGrantSort('programTitle')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Program &amp; SSM</span>
                             <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1452,7 +1451,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           <button
                             type="button"
                             onClick={() => toggleGrantSort('grantAmount')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Nilai Geran</span>
                             <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1462,7 +1461,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           <button
                             type="button"
                             onClick={() => toggleGrantSort('status')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Status</span>
                             <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1473,49 +1472,49 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                    <tbody className={`divide-y ${adminTheme.dividerClass}`}>
                       {grantsPagination.paginatedItems.map((grant) => {
                         const isActioning = actionLoading === grant.id;
                         const isExpanded = expandedGrantIds.includes(grant.id);
                         return (
                           <React.Fragment key={grant.id}>
-                            <tr className="kbelia-table-row">
+                            <tr className={`kbelia-table-row transition-colors ${adminTheme.rowHoverClass}`}>
                               <td className="py-3.5 pl-5 pr-3">
                                 <div className="flex items-center gap-3 min-w-[200px]">
-                                  <div className="w-10 h-10 rounded-xl shrink-0 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
+                                  <div className={`w-10 h-10 rounded-xl shrink-0 border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
                                     <FileText className="w-4 h-4" />
                                   </div>
                                   <div className="min-w-0">
-                                    <p className="font-semibold text-black dark:text-white truncate max-w-[240px]">
+                                    <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
                                       {grant.businessName}
                                     </p>
-                                    <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[240px]">
+                                    <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[240px]">
                                       {grant.applicantName}
                                     </p>
                                   </div>
                                 </div>
                               </td>
                               <td className="py-3.5 px-3">
-                                <p className="font-medium text-black dark:text-white truncate max-w-[240px]">
+                                <p className="font-medium text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
                                   {grant.programTitle}
                                 </p>
-                                <p className="text-[0.8125rem] text-black/60 dark:text-white/65 whitespace-nowrap">
+                                <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 whitespace-nowrap">
                                   {grant.businessCategory} · SSM: {grant.ssmNumber || 'Dikecualikan'}
                                 </p>
                               </td>
-                              <td className="py-3.5 px-3 font-mono font-bold text-black dark:text-white tabular-nums whitespace-nowrap">
+                              <td className="py-3.5 px-3 font-mono font-bold text-stone-900 dark:text-[#F5F2EC] tabular-nums whitespace-nowrap">
                                 {grant.grantAmount}
                               </td>
                               <td className="py-3.5 px-3 whitespace-nowrap">
                                 <span
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
+                                  className={`text-[0.8125rem] font-semibold ${
                                     grant.status === 'approved'
-                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
+                                      ? 'text-emerald-700 dark:text-emerald-400'
                                       : grant.status === 'rejected'
-                                      ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/70'
+                                      ? 'text-rose-700 dark:text-rose-400'
                                       : grant.status === 'cancelled'
-                                      ? 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700'
-                                      : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
+                                      ? 'text-stone-500 dark:text-stone-400'
+                                      : 'text-amber-700 dark:text-amber-300'
                                   }`}
                                 >
                                   {grant.status === 'approved'
@@ -1532,17 +1531,17 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                   ariaLabel={`Tindakan untuk ${grant.businessName}`}
                                   items={[
                                     {
-                                      label: isExpanded ? 'Tutup Butiran' : 'Lihat Butiran & Catatan',
+                                      label: isExpanded ? 'Tutup' : 'Lihat Butiran',
                                       onClick: () => toggleExpandedId(setExpandedGrantIds, grant.id)
                                     },
                                     {
-                                      label: 'Luluskan Dana Geran',
+                                      label: 'Lulus',
                                       tone: 'accent',
                                       disabled: isActioning || grant.status === 'approved',
                                       onClick: () => handleApproveGrant(grant.id)
                                     },
                                     {
-                                      label: 'Tolak Permohonan',
+                                      label: 'Tolak',
                                       disabled: isActioning || grant.status === 'rejected',
                                       onClick: () =>
                                         setRejectModalData({
@@ -1556,19 +1555,19 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                     ...(grant.status !== 'pending'
                                       ? [
                                           {
-                                            label: 'Set Menunggu Semakan',
+                                            label: 'Set Menunggu',
                                             disabled: isActioning,
                                             onClick: () => handleDirectGrantStatus(grant, 'pending')
                                           }
                                         ]
                                       : []),
                                     {
-                                      label: 'Edit Permohonan',
+                                      label: 'Sunting',
                                       dividerBefore: true,
                                       onClick: () => setEditingGrant(grant)
                                     },
                                     {
-                                      label: 'Padam Permohonan',
+                                      label: 'Padam',
                                       tone: 'danger',
                                       onClick: () =>
                                         confirmDelete({
@@ -1583,14 +1582,14 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             </tr>
 
                             {isExpanded && (
-                              <tr className="bg-slate-50/70 dark:bg-zinc-950/60">
+                              <tr className={adminTheme.surfaceMutedClass}>
                                 <td colSpan={5} className="px-5 py-4 space-y-3">
-                                  <div className="text-sm text-black/75 dark:text-white/80">
-                                    Akaun Bank: <strong className="text-black dark:text-white">{grant.bankName}</strong> ({grant.bankAccountNumber})
+                                  <div className="text-sm text-stone-700 dark:text-stone-300">
+                                    Akaun Bank: <strong className="text-stone-900 dark:text-[#F5F2EC]">{grant.bankName}</strong> ({grant.bankAccountNumber})
                                   </div>
 
                                   {grant.fundPurpose && (
-                                    <div className="p-3 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-sm text-black dark:text-white">
+                                    <div className={`p-3 rounded-xl border text-sm text-stone-900 dark:text-[#F5F2EC] ${adminTheme.surfaceClass} ${adminTheme.dividerClass}`}>
                                       <span className="font-semibold block mb-0.5">
                                         Cadangan Penggunaan Dana:
                                       </span>
@@ -1604,17 +1603,17 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                       placeholder="Masukkan catatan pegawai"
                                       value={adminNoteInput[grant.id] ?? (grant.adminNotes || '')}
                                       onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [grant.id]: e.target.value })}
-                                      className="flex-1 px-3 py-1.5 rounded-xl text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                                      className={`flex-1 px-3 py-1.5 rounded-xl text-sm border focus:outline-none ${adminTheme.inputClass}`}
                                     />
                                     <div className="flex items-center gap-2">
                                       <button
                                         type="button"
                                         disabled={isActioning}
                                         onClick={() => handleApproveGrant(grant.id)}
-                                        className="py-1.5 px-3 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center gap-1 cursor-pointer"
+                                        className={`py-1.5 px-3 rounded-xl text-sm font-bold flex items-center gap-1 ${adminTheme.primaryButtonClass}`}
                                       >
                                         <CheckCircle2 className="w-3.5 h-3.5" />
-                                        <span>Luluskan Dana Geran</span>
+                                        <span>Lulus</span>
                                       </button>
                                       <button
                                         type="button"
@@ -1628,7 +1627,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                             slotOrProgram: `${grant.programTitle} (${grant.grantAmount})`
                                           })
                                         }
-                                        className="py-1.5 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 border border-rose-200 dark:border-rose-900 transition-colors cursor-pointer"
+                                        className={`py-1.5 px-3 rounded-xl text-sm font-bold ${adminTheme.dangerOutlineButtonClass}`}
                                       >
                                         Tolak
                                       </button>
@@ -1650,7 +1649,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   itemsPerPage={7}
                   onPageChange={grantsPagination.setCurrentPage}
                   itemLabel="permohonan geran"
-                  accent="rose"
+                  accent="amber"
                 />
               </>
             )}
@@ -1664,23 +1663,23 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h4 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
+                <h4 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
                   Kawalan Fasiliti &amp; Status Unit Kiosk ({slots.length})
                 </h4>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAddSlotModal(true)}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+                className={`px-4 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto ${adminTheme.primaryButtonClass}`}
               >
                 <Plus className="w-4 h-4" />
-                <span>Tambah Unit Kiosk</span>
+                <span>Tambah Unit</span>
               </button>
             </div>
 
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+            <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
               <ReferenceTableToolbar
-                accent="indigo"
+                accent="amber"
                 searchValue={slotSearch}
                 onSearchChange={setSlotSearch}
                 searchPlaceholder="Cari kod kiosk, nama atau daerah..."
@@ -1700,7 +1699,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 }}
                 filterContent={
                   <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
                       Status Unit Kiosk
                     </label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -1714,10 +1713,10 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           key={opt.id}
                           type="button"
                           onClick={() => setSlotStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
+                          className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                             slotStatusFilter === opt.id
-                              ? 'bg-indigo-600 border-indigo-600 text-white'
-                              : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
+                              ? adminTheme.segmentedActiveClass
+                              : adminTheme.secondaryButtonClass
                           }`}
                         >
                           {opt.label}
@@ -1730,8 +1729,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
               {filteredFacilitySlots.length === 0 ? (
                 <div className="py-10 px-6 text-center space-y-2">
-                  <Building2 className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
-                  <p className="text-sm font-bold text-black dark:text-white">
+                  <Building2 className="w-9 h-9 text-stone-400 dark:text-stone-500 mx-auto" />
+                  <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
                     Tiada unit kiosk sepadan dengan carian atau penapis.
                   </p>
                   <button
@@ -1741,9 +1740,9 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                       setSlotStatusFilter('all');
                       setSlotSortPreset(DEFAULT_SORT_VALUE);
                     }}
-                    className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                    className={`mt-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
                   >
-                    Set Semula Carian &amp; Penapis
+                    Set Semula
                   </button>
                 </div>
               ) : (
@@ -1751,12 +1750,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                        <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                           <th className="py-3 pl-5 pr-3">
                             <button
                               type="button"
                               onClick={() => toggleSlotSort('name')}
-                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
                             >
                               <span>Unit Kiosk</span>
                               <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1766,7 +1765,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             <button
                               type="button"
                               onClick={() => toggleSlotSort('district')}
-                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
                             >
                               <span>Hab &amp; Daerah</span>
                               <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1776,7 +1775,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             <button
                               type="button"
                               onClick={() => toggleSlotSort('monthlyRate')}
-                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
                             >
                               <span>Kadar Sewa</span>
                               <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1786,7 +1785,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             <button
                               type="button"
                               onClick={() => toggleSlotSort('status')}
-                              className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
                             >
                               <span>Status</span>
                               <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -1797,15 +1796,15 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                      <tbody className={`divide-y ${adminTheme.dividerClass}`}>
                         {facilitySlotsPagination.paginatedItems.map((slot) => (
                           <tr
                             key={slot.id}
-                            className="kbelia-table-row"
+                            className={`transition-colors ${adminTheme.rowHoverClass}`}
                           >
                             <td className="py-3.5 pl-5 pr-3">
                               <div className="flex items-center gap-3 min-w-[200px]">
-                                <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 shrink-0">
+                                <div className={`w-14 h-14 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                                   <PortalImage
                                     src={resolveSlotImage(slot)}
                                     alt={slot.name}
@@ -1815,34 +1814,34 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                   />
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="font-semibold text-black dark:text-white truncate max-w-[240px]">
+                                  <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
                                     {slot.code} · {slot.name}
                                   </p>
-                                  <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[240px]">
+                                  <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[240px]">
                                     {slot.size}
                                   </p>
                                 </div>
                               </div>
                             </td>
                             <td className="py-3.5 px-3">
-                              <p className="font-medium text-black dark:text-white whitespace-nowrap">
+                              <p className="font-medium text-stone-900 dark:text-[#F5F2EC] whitespace-nowrap">
                                 {slot.hubLocation}
                               </p>
-                              <p className="text-[0.8125rem] text-black/60 dark:text-white/65 whitespace-nowrap">
+                              <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 whitespace-nowrap">
                                 {slot.district}
                               </p>
                             </td>
-                            <td className="py-3.5 px-3 font-mono font-bold text-black dark:text-white tabular-nums whitespace-nowrap">
+                            <td className="py-3.5 px-3 font-mono font-bold text-stone-900 dark:text-[#F5F2EC] tabular-nums whitespace-nowrap">
                               RM{slot.monthlyRate}/bulan
                             </td>
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
+                                className={`text-[0.8125rem] font-semibold ${
                                   slot.status === 'available'
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
+                                    ? 'text-emerald-700 dark:text-emerald-400'
                                     : slot.status === 'maintenance'
-                                    ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
-                                    : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700'
+                                    ? 'text-amber-700 dark:text-amber-300'
+                                    : 'text-stone-500 dark:text-stone-400'
                                 }`}
                               >
                                 {slot.status === 'available'
@@ -1859,12 +1858,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                   ...(onUpdateSlotStatus
                                     ? [
                                         {
-                                          label: 'Set Tersedia (Buka)',
+                                          label: 'Set Tersedia',
                                           disabled: slot.status === 'available',
                                           onClick: () => onUpdateSlotStatus(slot.id, 'available')
                                         },
                                         {
-                                          label: 'Set Dalam Pembaikan',
+                                          label: 'Set Pembaikan',
                                           disabled: slot.status === 'maintenance',
                                           onClick: () => onUpdateSlotStatus(slot.id, 'maintenance')
                                         },
@@ -1876,12 +1875,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                       ]
                                     : []),
                                   {
-                                    label: 'Edit Unit Kiosk',
+                                    label: 'Sunting',
                                     dividerBefore: Boolean(onUpdateSlotStatus),
                                     onClick: () => setEditingSlot(slot)
                                   },
                                   {
-                                    label: 'Padam Unit Kiosk',
+                                    label: 'Padam',
                                     tone: 'danger',
                                     onClick: () =>
                                       confirmDelete({
@@ -1905,7 +1904,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                     itemsPerPage={7}
                     onPageChange={facilitySlotsPagination.setCurrentPage}
                     itemLabel="unit kiosk"
-                    accent="rose"
+                    accent="amber"
                   />
                 </>
               )}
@@ -1916,8 +1915,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
           <div className="space-y-3 pt-2">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2">
-                  <Wrench className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
+                <h4 className="text-base sm:text-lg font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight flex items-center gap-2">
+                  <Wrench className={`w-4.5 h-4.5 shrink-0 ${adminTheme.accentTextClass}`} />
                   <span>Tiket Aduan Penyelenggaraan Penyewa ({maintenanceTickets.length})</span>
                 </h4>
               </div>
@@ -1927,21 +1926,21 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   setEditingTicket(null);
                   setShowCreateTicket(true);
                 }}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shrink-0"
+                className={`px-4 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shrink-0 ${adminTheme.primaryButtonClass}`}
               >
                 <Plus className="w-4 h-4" />
-                <span>Tambah Tiket Aduan</span>
+                <span>Tambah Tiket</span>
               </button>
             </div>
 
             {maintenanceTickets.length === 0 ? (
-              <div className="p-8 text-center rounded-2xl border border-dashed border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-black/70 dark:text-white/75">
+              <div className={`p-8 text-center rounded-2xl border border-dashed text-sm text-stone-600 dark:text-stone-300 ${adminTheme.surfaceClass}`}>
                 Tiada aduan kerosakan aktif diterima daripada penyewa buat masa ini.
               </div>
             ) : (
-              <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+              <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
                 <ReferenceTableToolbar
-                  accent="indigo"
+                  accent="amber"
                   searchValue={ticketSearch}
                   onSearchChange={setTicketSearch}
                   searchPlaceholder="Cari kiosk, pelapor atau aduan..."
@@ -1961,7 +1960,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   }}
                   filterContent={
                     <div>
-                      <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/60 dark:text-white/65 mb-1.5">
+                      <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
                         Status Tiket Aduan
                       </label>
                       <div className="grid grid-cols-2 gap-1.5">
@@ -1975,10 +1974,10 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             key={opt.id}
                             type="button"
                             onClick={() => setTicketStatusFilter(opt.id)}
-                            className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
+                            className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                               ticketStatusFilter === opt.id
-                                ? 'bg-indigo-600 border-indigo-600 text-white'
-                                : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
+                                ? adminTheme.segmentedActiveClass
+                                : adminTheme.secondaryButtonClass
                             }`}
                           >
                             {opt.label}
@@ -1991,8 +1990,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
                 {sortedTickets.length === 0 ? (
                   <div className="py-10 px-6 text-center space-y-2">
-                    <Wrench className="w-8 h-8 text-black/30 dark:text-white/30 mx-auto" />
-                    <p className="text-sm font-bold text-black dark:text-white">
+                    <Wrench className="w-8 h-8 text-stone-400 dark:text-stone-500 mx-auto" />
+                    <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
                       Tiada tiket aduan sepadan dengan carian atau penapis.
                     </p>
                     <button
@@ -2002,9 +2001,9 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         setTicketStatusFilter('all');
                         setTicketSortPreset(DEFAULT_SORT_VALUE);
                       }}
-                      className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                      className={`mt-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
                     >
-                      Set Semula Carian &amp; Penapis
+                      Set Semula
                     </button>
                   </div>
                 ) : (
@@ -2012,12 +2011,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm text-left border-collapse">
                         <thead>
-                          <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                          <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                             <th className="py-3 pl-5 pr-3">
                               <button
                                 type="button"
                                 onClick={() => toggleTicketSort('slotCode')}
-                                className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                                className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
                               >
                                 <span>Kiosk &amp; Pelapor</span>
                                 <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -2027,7 +2026,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                               <button
                                 type="button"
                                 onClick={() => toggleTicketSort('issueCategory')}
-                                className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                                className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
                               >
                                 <span>Kategori &amp; Aduan</span>
                                 <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -2037,7 +2036,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                               <button
                                 type="button"
                                 onClick={() => toggleTicketSort('status')}
-                                className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                                className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
                               >
                                 <span>Status</span>
                                 <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
@@ -2048,44 +2047,44 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                        <tbody className={`divide-y ${adminTheme.dividerClass}`}>
                           {ticketsPagination.paginatedItems.map((ticket) => {
                             const isExpanded = expandedTicketIds.includes(ticket.id);
                             const isBusy = actionLoading === ticket.id;
                             return (
                               <React.Fragment key={ticket.id}>
-                                <tr className="kbelia-table-row">
+                                <tr className={`transition-colors ${adminTheme.rowHoverClass}`}>
                                   <td className="py-3.5 pl-5 pr-3">
                                     <div className="flex items-center gap-3 min-w-[200px]">
-                                      <div className="w-10 h-10 rounded-xl shrink-0 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 flex items-center justify-center text-amber-700 dark:text-amber-300">
+                                      <div className={`w-10 h-10 rounded-xl shrink-0 border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
                                         <Wrench className="w-4 h-4" />
                                       </div>
                                       <div className="min-w-0">
-                                        <p className="font-semibold text-black dark:text-white truncate max-w-[220px]">
+                                        <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[220px]">
                                           {ticket.slotCode} · {ticket.kioskName}
                                         </p>
-                                        <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[220px]">
+                                        <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[220px]">
                                           {ticket.reporterName}
                                         </p>
                                       </div>
                                     </div>
                                   </td>
                                   <td className="py-3.5 px-3">
-                                    <p className="font-medium text-black dark:text-white truncate max-w-[240px]">
+                                    <p className="font-medium text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
                                       {ticket.issueCategory}
                                     </p>
-                                    <p className="text-[0.8125rem] text-black/60 dark:text-white/65 truncate max-w-[280px]">
+                                    <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[280px]">
                                       {ticket.description}
                                     </p>
                                   </td>
                                   <td className="py-3.5 px-3 whitespace-nowrap">
                                     <span
-                                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
+                                      className={`text-[0.8125rem] font-semibold ${
                                         ticket.status === 'resolved'
-                                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
+                                          ? 'text-emerald-700 dark:text-emerald-400'
                                           : ticket.status === 'in_progress'
-                                          ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/70'
-                                          : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
+                                          ? adminTheme.accentTextClass
+                                          : 'text-amber-700 dark:text-amber-300'
                                       }`}
                                     >
                                       {ticket.status === 'resolved'
@@ -2100,16 +2099,16 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                       ariaLabel={`Tindakan untuk tiket ${ticket.slotCode}`}
                                       items={[
                                         {
-                                          label: isExpanded ? 'Tutup Butiran' : 'Lihat Butiran Aduan',
+                                          label: isExpanded ? 'Tutup' : 'Lihat Butiran',
                                           onClick: () => toggleExpandedId(setExpandedTicketIds, ticket.id)
                                         },
                                         {
-                                          label: 'Set Sedang Dibaiki',
+                                          label: 'Set Dibaiki',
                                           disabled: isBusy || ticket.status === 'in_progress',
                                           onClick: () => handleDirectTicketStatus(ticket, 'in_progress')
                                         },
                                         {
-                                          label: 'Tandakan Selesai',
+                                          label: 'Selesai',
                                           tone: 'accent',
                                           disabled: isBusy || ticket.status === 'resolved',
                                           onClick: () => handleDirectTicketStatus(ticket, 'resolved')
@@ -2124,12 +2123,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                             ]
                                           : []),
                                         {
-                                          label: 'Edit Tiket Aduan',
+                                          label: 'Sunting',
                                           dividerBefore: true,
                                           onClick: () => setEditingTicket(ticket)
                                         },
                                         {
-                                          label: 'Padam Tiket Aduan',
+                                          label: 'Padam',
                                           tone: 'danger',
                                           onClick: () =>
                                             confirmDelete({
@@ -2144,11 +2143,11 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                 </tr>
 
                                 {isExpanded && (
-                                  <tr className="bg-slate-50/70 dark:bg-zinc-950/60">
+                                  <tr className={adminTheme.surfaceMutedClass}>
                                     <td colSpan={4} className="px-5 py-3.5 space-y-2.5">
-                                      <p className="text-sm text-black dark:text-white leading-relaxed">{ticket.description}</p>
-                                      <p className="text-[0.8125rem] text-black/70 dark:text-white/75">
-                                        Pelapor: <strong className="text-black dark:text-white">{ticket.reporterName}</strong> ({ticket.reporterPhone})
+                                      <p className="text-sm text-stone-900 dark:text-[#F5F2EC] leading-relaxed">{ticket.description}</p>
+                                      <p className="text-[0.8125rem] text-stone-600 dark:text-stone-300">
+                                        Pelapor: <strong className="text-stone-900 dark:text-[#F5F2EC]">{ticket.reporterName}</strong> ({ticket.reporterPhone})
                                       </p>
                                       {onUpdateTicketStatus && ticket.status !== 'resolved' && (
                                         <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -2156,17 +2155,17 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                                             <button
                                               type="button"
                                               onClick={() => onUpdateTicketStatus(ticket.id, 'in_progress', 'Juruteknik telah ditugaskan untuk pemeriksaan.')}
-                                              className="px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+                                              className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
                                             >
-                                              Tugaskan Juruteknik
+                                              Tugaskan
                                             </button>
                                           )}
                                           <button
                                             type="button"
                                             onClick={() => onUpdateTicketStatus(ticket.id, 'resolved', 'Kerja baik pulih selesai dan disahkan.')}
-                                            className="px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+                                            className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${adminTheme.primaryButtonClass}`}
                                           >
-                                            Tandakan Selesai
+                                            Selesai
                                           </button>
                                         </div>
                                       )}
@@ -2186,7 +2185,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                       itemsPerPage={7}
                       onPageChange={ticketsPagination.setCurrentPage}
                       itemLabel="tiket aduan"
-                      accent="rose"
+                      accent="amber"
                     />
                   </>
                 )}
@@ -2201,21 +2200,20 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
         <div key="audit" className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-stretch animate-dashboard-tab">
           <div
             style={{ '--stagger': 0 } as React.CSSProperties}
-            className="animate-dashboard-card relative overflow-hidden p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex flex-col justify-between"
+            className={`animate-dashboard-card p-5 rounded-2xl border flex flex-col justify-between ${adminTheme.surfaceClass}`}
           >
-            <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
             <div>
-              <span className="text-sm font-bold text-black dark:text-white block mb-3 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                Peta Haba Permintaan Lokasi Kiosk (Berdasarkan Carian & Permohonan Belia)
+              <span className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] mb-3 flex items-center gap-1.5">
+                <MapPin className={`w-3.5 h-3.5 ${adminTheme.accentTextClass}`} />
+                Peta Haba Permintaan Lokasi Kiosk (Berdasarkan Carian &amp; Permohonan Belia)
               </span>
-              <div className="flex flex-col gap-2">
+              <div className={`divide-y border-t ${adminTheme.dividerClass}`}>
                 {Object.entries(districtDemandCount).map(([location, count]) => (
-                  <div key={location} className="flex items-center justify-between text-sm p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 transition-colors hover:border-indigo-300 dark:hover:border-indigo-500/60">
-                    <span className="font-medium text-black dark:text-white">
+                  <div key={location} className="flex items-center justify-between text-sm py-2.5">
+                    <span className="font-medium text-stone-900 dark:text-[#F5F2EC]">
                       {location}
                     </span>
-                    <span className="font-bold text-indigo-700 dark:text-indigo-300 tabular-nums">
+                    <span className={`font-bold tabular-nums ${adminTheme.accentTextClass}`}>
                       {count} Permohonan
                     </span>
                   </div>
@@ -2226,19 +2224,18 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
           <div
             style={{ '--stagger': 1 } as React.CSSProperties}
-            className="animate-dashboard-card relative overflow-hidden p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 flex flex-col justify-between"
+            className={`animate-dashboard-card p-5 rounded-2xl border flex flex-col justify-between ${adminTheme.surfaceClass}`}
           >
-            <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500/80 dark:bg-emerald-400/80" />
             <div>
-              <span className="text-sm font-bold text-black dark:text-white block mb-3 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                Integriti & Garis Panduan Tatakelola Negeri
+              <span className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] mb-3 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
+                Integriti &amp; Garis Panduan Tatakelola Negeri
               </span>
-              <p className="text-[0.9375rem] text-black dark:text-white/75 leading-relaxed mb-3">
+              <p className="text-[0.9375rem] text-stone-700 dark:text-stone-300 leading-relaxed mb-4">
                 Setiap kelulusan yang dibuat oleh pegawai direkodkan dengan cap masa antarabangsa, alamat sesi pentadbir, dan terikat dengan Akta Perlindungan Data Peribadi (PDPA 2010).
               </p>
             </div>
-            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-800/50 text-sm text-black dark:text-white">
+            <div className={`p-3.5 rounded-xl border text-sm text-stone-800 dark:text-stone-200 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
               ✓ Semua permohonan yang diluluskan secara automatik menjana Surat Tawaran Digital rasmi berkod QR untuk semakan pihak berkuasa tempatan (PBT).
             </div>
           </div>
@@ -2255,22 +2252,22 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* MODAL 2: TAMBAH KAPSUL NIAGA OLEH PENTADBIR */}
       {showAddSlotModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 max-h-[90vh] overflow-y-auto overflow-hidden">
-            <div className="kbelia-important-header px-6 py-5 sm:px-7 flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className={`w-full max-w-lg rounded-3xl shadow-2xl border max-h-[90vh] overflow-y-auto overflow-hidden ${adminTheme.surfaceClass}`}>
+            <div className={`px-6 py-5 sm:px-7 flex items-center justify-between border-b ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-blue-600 text-black dark:text-white/75 flex items-center justify-center font-bold">
+                <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-bold ${adminTheme.activeMiniBtnClass}`}>
                   <Store className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-black dark:text-white">Tambah Kiosk Baharu</h3>
-                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Daftarkan kiosk untuk permohonan belia Kelantan</p>
+                  <h3 className="text-base font-bold text-stone-900 dark:text-[#F5F2EC]">Tambah Kiosk Baharu</h3>
+                  <p className="text-[0.9375rem] text-stone-600 dark:text-stone-300">Daftarkan kiosk untuk permohonan belia Kelantan</p>
                 </div>
               </div>
               <button 
                 type="button" 
                 onClick={() => setShowAddSlotModal(false)}
-                className="text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white p-1 cursor-pointer"
+                className="text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-[#F5F2EC] p-1 cursor-pointer"
               >
                 <XCircle className="w-5 h-5" />
               </button>
@@ -2279,22 +2276,22 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
             <form onSubmit={handleCreateSlot} className="p-6 sm:p-7 space-y-4 text-sm">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-black dark:text-white mb-1">Kod Kiosk <span className="text-black dark:text-white">*</span></label>
+                  <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Kod Kiosk <span className="text-rose-600 dark:text-rose-400">*</span></label>
                   <input
                     type="text"
                     required
                     placeholder="Masukkan kod kiosk"
                     value={slotCode}
                     onChange={(e) => setSlotCode(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                    className={`w-full p-2.5 rounded-xl border font-mono focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-black dark:text-white mb-1">Daerah <span className="text-black dark:text-white">*</span></label>
+                  <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Daerah <span className="text-rose-600 dark:text-rose-400">*</span></label>
                   <select
                     value={slotDistrict}
                     onChange={(e) => setSlotDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                    className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                   >
                     {(['Kota Bharu', 'Bachok', 'Pasir Mas', 'Tumpat', 'Tanah Merah', 'Machang', 'Pasir Puteh', 'Kuala Krai', 'Gua Musang', 'Jeli'] as KelantanDistrict[]).map(d => (
                       <option key={d} value={d}>{d}</option>
@@ -2304,31 +2301,31 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               </div>
 
               <div>
-                <label className="block font-bold text-black dark:text-white mb-1">Nama Kiosk <span className="text-black dark:text-white">*</span></label>
+                <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Nama Kiosk <span className="text-rose-600 dark:text-rose-400">*</span></label>
                 <input
                   type="text"
                   required
                   placeholder="Contoh: Kapsul Niaga Belia Bachok 02"
                   value={slotName}
                   onChange={(e) => setSlotName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 dark:focus:border-blue-500"
+                  className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-black dark:text-white mb-1">Lokasi Hab</label>
+                <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Lokasi Hab</label>
                 <input
                   type="text"
                   placeholder="Masukkan lokasi hab"
                   value={slotHub}
                   onChange={(e) => setSlotHub(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-black dark:text-white mb-1">Kadar Sewa Bulanan <span className="text-black dark:text-white">*</span></label>
+                  <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Kadar Sewa Bulanan <span className="text-rose-600 dark:text-rose-400">*</span></label>
                   <input
                     type="number"
                     required
@@ -2336,29 +2333,29 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                     placeholder="Masukkan kadar sewa bulanan"
                     value={slotMonthlyRate}
                     onChange={(e) => setSlotMonthlyRate(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                    className={`w-full p-2.5 rounded-xl border font-mono focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-black dark:text-white mb-1">Saiz Kiosk</label>
+                  <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Saiz Kiosk</label>
                   <input
                     type="text"
                     placeholder="Masukkan saiz kiosk"
                     value={slotSize}
                     onChange={(e) => setSlotSize(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                    className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-black dark:text-white mb-1">Kemudahan Disediakan</label>
+                <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Kemudahan Disediakan</label>
                 <input
                   type="text"
                   placeholder="Masukkan senarai kemudahan"
                   value={slotAmenities}
                   onChange={(e) => setSlotAmenities(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                  className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                 />
               </div>
 
@@ -2375,16 +2372,16 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAddSlotModal(false)}
-                  className="w-1/2 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className={`w-1/2 py-2.5 rounded-xl border font-bold transition-colors cursor-pointer ${adminTheme.secondaryButtonClass}`}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={savingSlot}
-                  className="w-1/2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-colors cursor-pointer shadow-xs disabled:opacity-50 dark:bg-blue-600"
+                  className={`w-1/2 py-2.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs disabled:opacity-50 ${adminTheme.primaryButtonClass}`}
                 >
-                  {savingSlot ? 'Menyimpan...' : 'Terbitkan Kiosk'}
+                  {savingSlot ? 'Menyimpan...' : 'Terbit'}
                 </button>
               </div>
             </form>
@@ -2394,22 +2391,22 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
       {/* MODAL 3: TAMBAH PROGRAM & GERAN OLEH PENTADBIR */}
       {showAddProgramModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 max-h-[90vh] overflow-y-auto overflow-hidden">
-            <div className="kbelia-important-header px-6 py-5 sm:px-7 flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className={`w-full max-w-lg rounded-3xl shadow-2xl border max-h-[90vh] overflow-y-auto overflow-hidden ${adminTheme.surfaceClass}`}>
+            <div className={`px-6 py-5 sm:px-7 flex items-center justify-between border-b ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-emerald-600 text-black dark:text-white/75 flex items-center justify-center font-bold">
+                <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-bold ${adminTheme.activeMiniBtnClass}`}>
                   <Coins className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-black dark:text-white">Tambah Program / Geran Baharu</h3>
-                  <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Buka permohonan dana dan inisiatif latihan belia</p>
+                  <h3 className="text-base font-bold text-stone-900 dark:text-[#F5F2EC]">Tambah Program / Geran Baharu</h3>
+                  <p className="text-[0.9375rem] text-stone-600 dark:text-stone-300">Buka permohonan dana dan inisiatif latihan belia</p>
                 </div>
               </div>
               <button 
                 type="button" 
                 onClick={() => setShowAddProgramModal(false)}
-                className="text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white p-1 cursor-pointer"
+                className="text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-[#F5F2EC] p-1 cursor-pointer"
               >
                 <XCircle className="w-5 h-5" />
               </button>
@@ -2417,86 +2414,87 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
             <form onSubmit={handleCreateProgram} className="p-6 sm:p-7 space-y-4 text-sm">
               <div>
-                <label className="block font-bold text-black dark:text-white mb-1">Tajuk Program <span className="text-black dark:text-white">*</span></label>
+                <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Tajuk Program <span className="text-rose-600 dark:text-rose-400">*</span></label>
                 <input
                   type="text"
                   required
                   placeholder="Masukkan tajuk program"
                   value={progTitle}
                   onChange={(e) => setProgTitle(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                  className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-black dark:text-white mb-1">Kategori Program</label>
+                  <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Kategori Program</label>
                   <select
                     value={progCategory}
                     onChange={(e) => setProgCategory(e.target.value as YouthProgram['category'])}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-emerald-600 dark:focus:border-blue-500"
+                    className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                   >
-                    <option value="Geran & Dana">Geran & Dana</option>
-                    <option value="Bengkel & Latihan">Bengkel & Latihan</option>
+                    <option value="Geran & Dana">Geran &amp; Dana</option>
+                    <option value="Bengkel & Latihan">Bengkel &amp; Latihan</option>
                     <option value="Inkubator Perniagaan">Inkubator Perniagaan</option>
                     <option value="Bimbingan Mentor">Bimbingan Mentor</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-black dark:text-white mb-1">Peruntukan Dana</label>
+                  <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Peruntukan Dana</label>
                   <input
                     type="text"
                     placeholder="Masukkan peruntukan dana"
                     value={progAmount}
                     onChange={(e) => setProgAmount(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                    className={`w-full p-2.5 rounded-xl border font-mono focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-black dark:text-white mb-1">Tarikh Pelaksanaan</label>
+                  <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Tarikh Pelaksanaan</label>
                   <ModernDatePicker
                     value={progDate}
                     onChange={setProgDate}
                     valueFormat="program-date"
                     allowRange
                     allowOngoingPreset
+                    accentColor="amber"
                     placeholder="Pilih tarikh atau tempoh"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-black dark:text-white mb-1">Penganjur</label>
+                  <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Penganjur</label>
                   <input
                     type="text"
                     placeholder="Masukkan nama penganjur"
                     value={progOrganizer}
                     onChange={(e) => setProgOrganizer(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-indigo-600 dark:focus:border-blue-500"
+                    className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-black dark:text-white mb-1">Lokasi</label>
+                <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Lokasi</label>
                 <input
                   type="text"
                   placeholder="Masukkan lokasi"
                   value={progLocation}
                   onChange={(e) => setProgLocation(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-black dark:text-white mb-1">Keterangan Program</label>
+                <label className="block font-bold text-stone-900 dark:text-[#F5F2EC] mb-1">Keterangan Program</label>
                 <textarea
                   rows={3}
                   placeholder="Masukkan keterangan program"
                   value={progDesc}
                   onChange={(e) => setProgDesc(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
+                  className={`w-full p-2.5 rounded-xl border focus:outline-none ${adminTheme.inputClass}`}
                 />
               </div>
 
@@ -2504,16 +2502,16 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAddProgramModal(false)}
-                  className="w-1/2 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className={`w-1/2 py-2.5 rounded-xl border font-bold transition-colors cursor-pointer ${adminTheme.secondaryButtonClass}`}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={savingProgram}
-                  className="w-1/2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-colors cursor-pointer shadow-xs disabled:opacity-50 dark:bg-blue-600"
+                  className={`w-1/2 py-2.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs disabled:opacity-50 ${adminTheme.primaryButtonClass}`}
                 >
-                  {savingProgram ? 'Menyimpan...' : 'Terbitkan Program'}
+                  {savingProgram ? 'Menyimpan...' : 'Terbit'}
                 </button>
               </div>
             </form>
@@ -2526,22 +2524,22 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
       {/* ========================================================================= */}
       {rejectModalData && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-rose-200 dark:border-rose-900/60 transition-all scale-100 overflow-hidden">
+          <div className={`w-full max-w-md rounded-3xl shadow-2xl border transition-all scale-100 overflow-hidden ${adminTheme.surfaceClass}`}>
             {/* Header with warning icon */}
-            <div className="kbelia-important-header px-6 pt-6 sm:px-7 sm:pt-7 pb-4 border-b border-slate-300 dark:border-slate-600 flex items-start justify-between gap-3">
+            <div className={`px-6 pt-6 sm:px-7 sm:pt-7 pb-4 border-b flex items-start justify-between gap-3 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-rose-100 text-black dark:bg-rose-950/60 dark:text-white/75 flex items-center justify-center shrink-0 shadow-inner">
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70 flex items-center justify-center shrink-0">
                   <AlertCircle className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-black dark:text-white leading-tight">
+                  <h3 className="text-base sm:text-lg font-black text-stone-900 dark:text-[#F5F2EC] leading-tight">
                     Adakah anda ingin tolak?
                   </h3>
-                  <p className="text-[0.875rem] text-black/70 dark:text-white/75 mt-0.5">
+                  <p className="text-[0.875rem] text-stone-600 dark:text-stone-300 mt-0.5">
                     Pengesahan Pengurusan Kiosk Pentadbiran Niaga Belia
                   </p>
                 </div>
@@ -2549,7 +2547,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
               <button
                 type="button"
                 onClick={handleCancelReject}
-                className="p-1 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1 rounded-xl text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-[#F5F2EC] hover:bg-stone-200/70 dark:hover:bg-stone-800 transition-colors cursor-pointer"
                 title="Tutup & Kembali"
               >
                 <XCircle className="w-5 h-5" />
@@ -2558,24 +2556,24 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
 
             <div className="p-6 sm:p-7">
               {/* Target Application Summary Box */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-2 mb-4 text-sm">
+              <div className={`p-3.5 rounded-2xl border space-y-2 mb-4 text-sm ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                 <div className="flex justify-between items-center">
-                  <span className="text-black/70 dark:text-white/75">Nama Pemohon:</span>
-                  <span className="font-bold text-black dark:text-white">{rejectModalData.name}</span>
+                  <span className="text-stone-600 dark:text-stone-300">Nama Pemohon:</span>
+                  <span className="font-bold text-stone-900 dark:text-[#F5F2EC]">{rejectModalData.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-black/70 dark:text-white/75">Perniagaan:</span>
-                  <span className="font-semibold text-black dark:text-white">{rejectModalData.business}</span>
+                  <span className="text-stone-600 dark:text-stone-300">Perniagaan:</span>
+                  <span className="font-semibold text-stone-900 dark:text-[#F5F2EC]">{rejectModalData.business}</span>
                 </div>
                 {rejectModalData.slotOrProgram && (
                   <div className="flex justify-between items-center">
-                    <span className="text-black/70 dark:text-white/75">Kiosk / Lokasi:</span>
-                    <span className="font-mono text-black dark:text-white/75 font-bold">{rejectModalData.slotOrProgram}</span>
+                    <span className="text-stone-600 dark:text-stone-300">Kiosk / Lokasi:</span>
+                    <span className="font-mono text-stone-900 dark:text-[#F5F2EC] font-bold">{rejectModalData.slotOrProgram}</span>
                   </div>
                 )}
               </div>
 
-              <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed mb-6">
+              <p className="text-[0.9375rem] text-stone-700 dark:text-stone-200 leading-relaxed mb-6">
                 Adakah anda pasti ingin menolak permohonan ini? Jika anda memilih <strong>Ya</strong>, permohonan ini akan ditolak dan dikeluarkan serta-merta daripada senarai permohonan ini.
               </p>
 
@@ -2584,7 +2582,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <button
                   type="button"
                   onClick={handleCancelReject}
-                  className="w-full py-2.5 px-4 rounded-xl text-sm sm:text-[0.9375rem] font-bold bg-slate-50 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-600 text-black dark:text-white border border-slate-300 dark:border-slate-600 transition-colors flex items-center justify-center cursor-pointer"
+                  className={`w-full py-2.5 px-4 rounded-xl text-sm sm:text-[0.9375rem] font-bold border transition-colors flex items-center justify-center cursor-pointer ${adminTheme.secondaryButtonClass}`}
                 >
                   Tidak
                 </button>

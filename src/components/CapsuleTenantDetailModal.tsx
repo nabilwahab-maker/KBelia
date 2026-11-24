@@ -23,6 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { loadLocalPortalSettings } from '../services/dataService';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { resolveSlotImage } from '../utils/visualAssets';
 
 interface CapsuleTenantDetailModalProps {
@@ -42,7 +43,8 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
   products = [],
   onSelectBusiness
 }) => {
-  const { user } = useAuth();
+  const { user, isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const alertStorageKey = `kbelia_slot_interest_alerts_${user?.uid || 'guest'}`;
   const [interestSaved, setInterestSaved] = useState(false);
   const subsidyRate = loadLocalPortalSettings().portalSubsidyRate ?? 50;
@@ -114,19 +116,18 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
       <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden my-6 max-h-[92vh] flex flex-col">
         
         {/* Top Header Bar */}
-        <div className="px-6 py-4 border-b border-slate-300 dark:border-slate-600 kbelia-important-header dark:bg-slate-800 flex items-center justify-between shrink-0">
+        <div className={`px-6 py-4 border-b ${roleTheme.dividerClass} ${roleTheme.surfaceMutedClass} flex items-center justify-between shrink-0`}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-blue-600 text-black dark:text-white/75 flex items-center justify-center font-bold">
+            <div className={`w-8 h-8 rounded-xl ${roleTheme.activeMiniBtnClass} border flex items-center justify-center font-bold`}>
               <Store className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-[0.8125rem] font-bold text-black dark:text-white bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800/70">
+                <span className={`font-mono text-[0.8125rem] font-bold px-2 py-0.5 rounded-lg border ${roleTheme.activeMiniBtnClass}`}>
                   {slot.code}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[0.8125rem] font-bold text-black dark:text-white bg-emerald-100/80 dark:bg-emerald-900/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  Berpenyewa & Aktif Beroperasi
+                <span className="inline-flex items-center gap-1 text-[0.8125rem] font-bold text-black dark:text-white bg-emerald-100/80 dark:bg-emerald-900/40 px-2.5 py-0.5 rounded-lg border border-emerald-200 dark:border-emerald-700">
+                  Berpenyewa &amp; Aktif
                 </span>
               </div>
               <h2 className="text-base font-bold text-black dark:text-white mt-0.5">
@@ -139,16 +140,18 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
             <button
               type="button"
               onClick={handleShare}
-              className="p-2 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
+              className={roleTheme.iconButtonClass}
               title="Kongsi Maklumat Premis"
+              aria-label="Kongsi"
             >
               <Share2 className="w-4 h-4" />
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="p-2 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
+              className={roleTheme.iconButtonClass}
               title="Tutup"
+              aria-label="Tutup"
             >
               <X className="w-5 h-5" />
             </button>
@@ -207,7 +210,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
           <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-4">
             <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-300 dark:border-slate-600">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm dark:bg-blue-600">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm ${roleTheme.badgeClass}`}>
                   {businessName.charAt(0)}
                 </div>
                 <div>
@@ -285,10 +288,10 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
                     });
                   }
                 }}
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
+                className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 shadow-xs ${roleTheme.primaryButtonClass}`}
               >
                 <MessageCircle className="w-4 h-4" />
-                <span>Hubungi Usahawan / WhatsApp</span>
+                <span>Hubungi WhatsApp</span>
               </a>
 
               {tenantBusiness && onSelectBusiness && (
@@ -298,10 +301,10 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
                     onClose();
                     onSelectBusiness(tenantBusiness);
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 font-bold text-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className={`px-4 py-2.5 text-sm inline-flex items-center gap-1.5 ${roleTheme.secondaryButtonClass}`}
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-black dark:text-white" />
-                  <span>Profil Direktori</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Direktori</span>
                 </button>
               )}
             </div>
@@ -347,20 +350,20 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
             type="button"
             onClick={handleSaveInterest}
             disabled={interestSaved}
-            className={`px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 ${
               interestSaved
-                ? 'bg-emerald-100 text-black border border-emerald-300 dark:bg-emerald-950/60 dark:text-white dark:border-emerald-800'
-                : 'bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
+                ? `${roleTheme.compactSecondaryButtonClass} opacity-80`
+                : roleTheme.secondaryButtonClass
             }`}
           >
-            <BellRing className="w-3.5 h-3.5 text-black/70 dark:text-white/75" />
-            <span>{interestSaved ? 'Minat Direkodkan' : 'Beritahu Saya'}</span>
+            <BellRing className="w-3.5 h-3.5" />
+            <span>{interestSaved ? 'Direkodkan' : 'Beritahu Saya'}</span>
           </button>
 
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer shadow-xs dark:bg-blue-600"
+            className={`px-5 py-2.5 text-sm shadow-xs ${roleTheme.primaryButtonClass}`}
           >
             Tutup
           </button>

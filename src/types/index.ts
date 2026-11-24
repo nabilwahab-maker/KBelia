@@ -379,10 +379,28 @@ export type AdminSubTab =
 export type MentorSubTab = 
   | 'overview'       // Ringkasan Dashboard Eksekutif Mentor
   | 'sessions'       // Sesi Bimbingan Mentee
+  | 'mentees'        // Senarai Mentee
   | 'schedule'       // Kalendar Jadual & Slot Bimbingan Mentor
+  | 'readiness'      // Semak Geran
   | 'endorsements'   // Perakuan Rasmi Geran Belia
   | 'logbook'        // Log Jurnal Minit & Pelan Tindakan
+  | 'impact'         // Laporan Ringkas
   | 'profile';       // Profil Mentor
+
+export interface MenteeGrantCheck {
+  id: string;
+  mentorId: string;
+  menteeKey: string;
+  menteeName: string;
+  businessName: string;
+  district: KelantanDistrict | string;
+  hasSsm: boolean;
+  hasSalesRecord: boolean;
+  attendedSession: boolean;
+  productReady: boolean;
+  notes?: string;
+  updatedAt: string;
+}
 
 export type NewsCategory =
   | 'Pengumuman'

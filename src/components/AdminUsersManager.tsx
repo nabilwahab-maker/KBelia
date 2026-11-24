@@ -20,6 +20,9 @@ import { showToast } from './ToastNotification';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const adminTheme = getRoleTheme('admin');
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -266,8 +269,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
   return (
     <div className="space-y-4 animate-dashboard-tab">
       {/* Header */}
-      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs">
-        <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
+      <div className={`p-4 sm:p-5 rounded-2xl border backdrop-blur-xs transition-colors ${adminTheme.surfaceClass}`}>
         <div className="space-y-1">
           <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Pengurusan Akaun &amp; Profil Pengguna Portal
@@ -276,9 +278,9 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       </div>
 
       {/* Reference-Style Users Table Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+      <div className={`rounded-2xl border backdrop-blur-xs overflow-visible transition-colors ${adminTheme.surfaceClass}`}>
         <ReferenceTableToolbar
-          accent="indigo"
+          accent="amber"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder="Cari nama, emel atau perniagaan..."
@@ -301,10 +303,10 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
             <button
               type="button"
               onClick={openCreateModal}
-              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap shrink-0"
+              className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap shrink-0 transition-colors ${adminTheme.primaryButtonClass}`}
             >
               <Plus className="w-4 h-4" />
-              <span>Tambah Pengguna Baharu</span>
+              <span>Tambah</span>
             </button>
           }
           filterContent={
@@ -323,10 +325,10 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                       key={tab.id}
                       type="button"
                       onClick={() => setRoleFilter(tab.id)}
-                      className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold border text-left transition-colors cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold border text-left transition-colors cursor-pointer ${
                         roleFilter === tab.id
-                          ? 'bg-indigo-600 text-white border-indigo-600'
-                          : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                          ? `${adminTheme.segmentedActiveClass} border-transparent`
+                          : `${adminTheme.secondaryButtonClass}`
                       }`}
                     >
                       {tab.label}
@@ -342,7 +344,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                 <select
                   value={districtFilter}
                   onChange={(e) => setDistrictFilter(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer"
+                  className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
                 >
                   <option value="Semua">Semua Daerah</option>
                   {DISTRICTS.map((d) => (
@@ -360,7 +362,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
             <p className="text-sm font-bold text-black dark:text-white">
               Tiada rekod akaun pengguna sepadan dengan tapisan semasa.
             </p>
-            {(searchQuery || activeFilterCount > 0) && (
+              {(searchQuery || activeFilterCount > 0) && (
               <button
                 type="button"
                 onClick={() => {
@@ -368,7 +370,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                   setRoleFilter('all');
                   setDistrictFilter('Semua');
                 }}
-                className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                className={`text-sm font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
               >
                 Set Semula Carian &amp; Penapis
               </button>
@@ -379,7 +381,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                  <tr className={`${adminTheme.surfaceMutedClass} border-b ${adminTheme.dividerClass} text-[0.8125rem] font-semibold text-black/65 dark:text-white/70`}>
                     <th className="py-3 pl-4 pr-3">
                       <button
                         type="button"
@@ -417,7 +419,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-black dark:text-white">
+                <tbody className={`divide-y ${adminTheme.dividerClass} text-black dark:text-white`}>
                   {pagination.paginatedItems.map((u) => {
                     const isSelf = isCurrentActiveUser(u);
                     const orgLabel =
@@ -428,13 +430,13 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         : u.designation || 'Pentadbir Portal KBelia';
 
                     return (
-                      <tr key={u.userId} className="kbelia-table-row">
+                      <tr key={u.userId} className={`transition-colors ${adminTheme.rowHoverClass}`}>
                         <td className="py-3.5 pl-4 pr-3">
                           <div className="flex items-center gap-3 min-w-[200px]">
                             <img
                               src={u.avatarUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg'}
                               alt={u.fullName}
-                              className="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-zinc-700 shrink-0"
+                              className={`w-14 h-14 rounded-xl object-cover border shrink-0 ${adminTheme.dividerClass}`}
                             />
                             <div className="min-w-0">
                               <div className="font-semibold text-black dark:text-white truncate max-w-[220px]">
@@ -449,10 +451,10 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         </td>
                         <td className="py-3.5 px-3 whitespace-nowrap">
                           <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
+                            className={`text-[0.8125rem] font-semibold ${
                               u.role === 'mentor'
-                                ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800/70 text-teal-800 dark:text-teal-200'
-                                : 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/70 text-blue-800 dark:text-blue-200'
+                                ? 'text-[#0E7490] dark:text-[#22D3EE]'
+                                : 'text-[#0B6E52] dark:text-[#34D399]'
                             }`}
                           >
                             {ROLE_LABELS[u.role] || 'Usahawan Belia'}
@@ -504,7 +506,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
               itemsPerPage={7}
               onPageChange={pagination.setCurrentPage}
               itemLabel="akaun pengguna"
-              accent="blue"
+              accent="amber"
             />
           </>
         )}
@@ -513,18 +515,18 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       {/* Add / Edit User Modal */}
       {showUserModal && (
         <div
-          className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
+          className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
           onClick={() => !isSaving && setShowUserModal(false)}
         >
           <div
-            className="animate-popover-enter relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+            className={`animate-popover-enter relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-5 py-3.5 flex items-center justify-between">
+            <div className={`sticky top-0 z-10 border-b px-5 py-3.5 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
                   <Users className="w-4 h-4" />
                 </div>
                 <div>
@@ -539,7 +541,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
               <button
                 type="button"
                 onClick={() => !isSaving && setShowUserModal(false)}
-                className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -562,7 +564,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Masukkan nama penuh"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -574,7 +576,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nama@contoh.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -585,7 +587,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+601XXXXXXXX"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-mono focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -594,7 +596,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                   <select
                     value={district}
                     onChange={(e) => setDistrict(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
                   >
                     {DISTRICTS.map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -605,14 +607,14 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                 <div>
                   <label className="block text-sm font-semibold text-black dark:text-white mb-1.5">Peranan Akaun</label>
                   {editingUser ? (
-                    <div className="w-full px-3.5 py-2.5 rounded-xl text-sm font-bold bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white">
+                    <div className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-bold border text-black dark:text-white ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                       {ROLE_LABELS[editingUser.role] || 'Usahawan Belia'}
                     </div>
                   ) : (
                     <select
                       value={role === 'mentor' ? 'mentor' : 'user'}
                       onChange={(e) => setRole(e.target.value as UserRole)}
-                      className="w-full px-3.5 py-2.5 rounded-xl text-sm font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
+                      className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-bold cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
                     >
                       <option value="user">Usahawan Belia</option>
                       <option value="mentor">Mentor</option>
@@ -629,7 +631,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         value={businessName}
                         onChange={(e) => setBusinessName(e.target.value)}
                         placeholder="Nama syarikat / kedai"
-                        className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                        className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                       />
                     </div>
                     <div className="sm:col-span-2">
@@ -639,7 +641,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         value={ssmNumber}
                         onChange={(e) => setSsmNumber(e.target.value)}
                         placeholder="Contoh: 202403123456 (KT0123456-X)"
-                        className="w-full px-3.5 py-2.5 rounded-xl text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                        className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-mono focus:outline-none ${adminTheme.inputClass}`}
                       />
                     </div>
                   </>
@@ -654,7 +656,7 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         value={institution}
                         onChange={(e) => setInstitution(e.target.value)}
                         placeholder="Hab Usahawan / Rakan Industri"
-                        className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                        className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                       />
                     </div>
                     <div className="sm:col-span-2">
@@ -664,26 +666,26 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         value={mentorId}
                         onChange={(e) => setMentorId(e.target.value)}
                         placeholder="mentor-1"
-                        className="w-full px-3.5 py-2.5 rounded-xl text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                        className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-mono focus:outline-none ${adminTheme.inputClass}`}
                       />
                     </div>
                   </>
                 )}
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
+              <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>
                 <button
                   type="button"
                   disabled={isSaving}
                   onClick={() => setShowUserModal(false)}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer"
+                  className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 ${adminTheme.primaryButtonClass}`}
                 >
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   <span>{isSaving ? 'Menyimpan...' : editingUser ? 'Simpan Perubahan' : 'Daftar Pengguna'}</span>

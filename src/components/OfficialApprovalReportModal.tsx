@@ -22,6 +22,7 @@ import {
 } from '../utils/pdfGenerator';
 import { openAndPrintDocument } from '../utils/printUtils';
 import { showToast } from './ToastNotification';
+import { getRoleTheme } from '../utils/roleTheme';
 
 interface OfficialApprovalReportModalProps {
   isOpen: boolean;
@@ -40,6 +41,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const adminTheme = getRoleTheme('admin');
 
   if (!isOpen) return null;
 
@@ -137,47 +139,46 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-5 overflow-y-auto">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-4xl w-full border border-slate-300 dark:border-slate-600 shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
+    <div className="fixed inset-0 z-[9999] bg-stone-950/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-5 overflow-y-auto">
+      <div className={`rounded-2xl max-w-4xl w-full border shadow-2xl overflow-hidden flex flex-col max-h-[94vh] ${adminTheme.surfaceClass}`}>
         {/* Modal Header */}
-        <div className="kbelia-important-header px-5 py-4 border-b border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div className={`px-5 py-4 border-b flex flex-wrap items-center justify-between gap-3 shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0">
+            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-bold shrink-0 ${adminTheme.surfaceClass} ${adminTheme.dividerClass} ${adminTheme.accentTextClass}`}>
               <FileText className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <h3 className="text-sm sm:text-base font-bold text-black dark:text-white">
-                Dokumen Ringkasan Kelulusan Rasmi
+                Ringkasan Kelulusan Rasmi
               </h3>
-              <p className="text-[0.8125rem] sm:text-sm text-black/70 dark:text-white/75">
-                Penyata semakan audit kelulusan permohonan kiosk dan geran belia
+              <p className="text-[0.8125rem] sm:text-sm text-black/65 dark:text-white/70">
+                Penyata semakan dan cetakan dokumen kelulusan portal
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {/* Unified and Fixed "Cetak / Simpan PDF" Action with Royal Border */}
             <div className="relative inline-flex items-center shadow-xs rounded-xl">
               <button
                 type="button"
                 onClick={handleSaveAndPrint}
                 disabled={isProcessing}
-                className="px-3.5 py-2 rounded-l-xl text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 transition-all cursor-pointer disabled:opacity-75 dark:bg-indigo-600"
-                title="Cetak atau simpan sebagai dokumen PDF rasmi dengan bingkai keselamatan"
+                className={`px-3.5 py-2 rounded-l-xl text-sm font-bold flex items-center gap-2 transition-all cursor-pointer disabled:opacity-75 ${adminTheme.primaryButtonClass}`}
+                title="Cetak atau simpan sebagai dokumen PDF rasmi"
               >
                 {isProcessing ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     <span>Menjana PDF...</span>
                   </>
                 ) : isSaved ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-white" />
+                    <CheckCircle2 className="w-4 h-4" />
                     <span>PDF Disimpan</span>
                   </>
                 ) : (
                   <>
-                    <Printer className="w-4 h-4 text-white" />
+                    <Printer className="w-4 h-4" />
                     <span>Simpan PDF</span>
                   </>
                 )}
@@ -187,7 +188,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
                 type="button"
                 onClick={() => setShowMenu(!showMenu)}
                 disabled={isProcessing}
-                className="px-2 py-2 rounded-r-xl border-l border-blue-600 bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer"
+                className={`px-2 py-2 rounded-r-xl border-l border-white/20 dark:border-black/20 transition-colors cursor-pointer ${adminTheme.primaryButtonClass}`}
                 title="Pilihan Format Cetak & Simpan"
               >
                 <ChevronDown className="w-3.5 h-3.5" />
@@ -195,27 +196,27 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
 
               {/* Sub-menu Dropdown */}
               {showMenu && (
-                <div className="absolute right-0 top-full mt-2 w-60 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-300 dark:border-slate-600 py-1.5 z-50 animate-in fade-in">
+                <div className={`absolute right-0 top-full mt-2 w-60 max-w-[calc(100vw-2rem)] rounded-xl shadow-xl border py-1.5 z-50 animate-in fade-in backdrop-blur-md ${adminTheme.surfaceClass}`}>
                   <button
                     type="button"
                     onClick={handleSavePdf}
-                    className="w-full text-left px-3.5 py-2.5 text-sm font-medium text-black dark:text-white hover:bg-amber-50 dark:hover:bg-indigo-600 hover:text-black dark:hover:text-white flex items-center gap-2 transition-colors cursor-pointer"
+                    className={`w-full text-left px-3.5 py-2.5 text-sm font-medium text-black dark:text-white flex items-center gap-2 transition-colors cursor-pointer ${adminTheme.rowHoverClass}`}
                   >
-                    <Download className="w-4 h-4 text-black dark:text-white/75" />
+                    <Download className={`w-4 h-4 shrink-0 ${adminTheme.accentTextClass}`} />
                     <div>
                       <div className="font-bold">Muat Turun PDF</div>
-                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75">Bingkai keselamatan A4</div>
+                      <div className="text-[0.8125rem] text-black/65 dark:text-white/70">Bingkai keselamatan A4</div>
                     </div>
                   </button>
                   <button
                     type="button"
                     onClick={handlePrint}
-                    className="w-full text-left px-3.5 py-2.5 text-sm font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 border-t border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
+                    className={`w-full text-left px-3.5 py-2.5 text-sm font-medium text-black dark:text-white flex items-center gap-2 border-t transition-colors cursor-pointer ${adminTheme.dividerClass} ${adminTheme.rowHoverClass}`}
                   >
-                    <Printer className="w-4 h-4 text-black dark:text-white" />
+                    <Printer className={`w-4 h-4 shrink-0 ${adminTheme.accentTextClass}`} />
                     <div>
                       <div className="font-bold">Cetak A4</div>
-                      <div className="text-[0.8125rem] text-black/70 dark:text-white/75">Dialog cetakan</div>
+                      <div className="text-[0.8125rem] text-black/65 dark:text-white/70">Dialog cetakan</div>
                     </div>
                   </button>
                 </div>
@@ -224,7 +225,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
 
             <button
               onClick={onClose}
-              className="p-1.5 text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white rounded-lg transition-colors cursor-pointer ml-1"
+              className={`ml-1 ${adminTheme.iconButtonClass}`}
               aria-label="Tutup"
             >
               <X className="w-5 h-5" />
@@ -233,7 +234,7 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
         </div>
 
         {/* Modal Printable Document Body with Professional Royal Border */}
-        <div className="p-3 sm:p-6 overflow-y-auto flex-1 bg-slate-100 dark:bg-slate-900 flex justify-center">
+        <div className="p-3 sm:p-6 overflow-y-auto flex-1 bg-stone-100 dark:bg-[#121110] flex justify-center">
           {/* Framed Official Document Sheet with Royal Kelantan Double Border & Gold Inset */}
           <div 
             ref={printAreaRef}

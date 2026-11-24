@@ -168,7 +168,7 @@ export const PublicVerificationModal: React.FC<PublicVerificationModalProps> = (
         refCode: q,
         status: 'valid',
         recipient: 'Ahli Berdaftar Portal KBelia Kelantan',
-        kioskLocation: 'Seluruh Jajahan Negeri Kelantan',
+        kioskLocation: 'Rangkaian Seluruh Negeri Kelantan',
         district: 'Negeri Kelantan',
         rate: 'Sijil Keahlian Usahawan Belia Rasmi',
         issueDate: `Januari ${yr}`,

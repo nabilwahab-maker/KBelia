@@ -10,6 +10,8 @@ import {
   Landmark
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface BusinessSubsidyCalculatorProps {
   onOpenBooking?: () => void;
@@ -21,6 +23,8 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
   onOpenGrantModal
 }) => {
   const { t, language } = useLanguage();
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [dailySales, setDailySales] = useState<number>(250);
   const [marginPct, setMarginPct] = useState<number>(45);
   const [operatingDays, setOperatingDays] = useState<number>(26);
@@ -102,10 +106,10 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                   key={sales}
                   type="button"
                   onClick={() => setDailySales(sales)}
-                  className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 ${
+                  className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 ${
                     dailySales === sales
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                      : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                      ? `${roleTheme.segmentedActiveClass} border-transparent shadow-2xs`
+                      : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
                   RM {sales}
@@ -145,10 +149,10 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                     key={pct}
                     type="button"
                     onClick={() => setMarginPct(pct)}
-                    className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-bold border transition-colors cursor-pointer ${
                       marginPct === pct
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        ? `${roleTheme.segmentedActiveClass} border-transparent shadow-2xs`
+                        : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700'
                     }`}
                   >
                     {pct}%
@@ -186,10 +190,10 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                     key={d}
                     type="button"
                     onClick={() => setOperatingDays(d)}
-                    className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-bold border transition-colors cursor-pointer ${
                       operatingDays === d
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        ? `${roleTheme.segmentedActiveClass} border-transparent shadow-2xs`
+                        : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700'
                     }`}
                   >
                     {d} {language === 'en' ? 'Days' : 'Hari'}
@@ -291,7 +295,7 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                 <button
                   type="button"
                   onClick={() => onOpenGrantModal(recommendedGrant.title, recommendedGrant.amount)}
-                  className="flex-1 py-2 px-3 rounded-xl text-sm font-bold text-black dark:text-white bg-emerald-50 hover:bg-amber-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-emerald-800/70 transition-colors text-center cursor-pointer"
+                  className={`flex-1 py-2.5 px-3 text-sm inline-flex items-center justify-center ${roleTheme.secondaryButtonClass}`}
                 >
                   {t('apply_this_grant_btn')}
                 </button>
@@ -300,9 +304,9 @@ export const BusinessSubsidyCalculator: React.FC<BusinessSubsidyCalculatorProps>
                 <button
                   type="button"
                   onClick={onOpenBooking}
-                  className="flex-1 py-2 px-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors text-center flex items-center justify-center gap-1 cursor-pointer shadow-xs dark:bg-blue-600"
+                  className={`flex-1 py-2.5 px-3 text-sm inline-flex items-center justify-center gap-1.5 shadow-xs ${roleTheme.primaryButtonClass}`}
                 >
-                  {t('book_kiosk_btn')} <ArrowRight className="w-3 h-3" />
+                  {t('book_kiosk_btn')} <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>

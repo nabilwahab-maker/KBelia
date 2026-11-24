@@ -27,6 +27,8 @@ import {
 import { BusinessListing, CapsuleSlot, GrantApplication, YouthProgram } from '../types';
 import { usePrefersReducedMotion } from '../hooks/useMotion';
 import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface SectorData {
   name: string;
@@ -49,7 +51,7 @@ const SECTOR_BREAKDOWN: SectorData[] = [
   { name: 'Fesyen, Batik & Kraf Kelantan', shortName: 'Batik & Kraf', percentage: 24, entrepreneurs: 31, color: '#E11D48', darkColor: '#FB7185' },
   { name: 'Teknologi & Servis Digital', shortName: 'Teknologi Digital', percentage: 18, entrepreneurs: 23, color: '#2563EB', darkColor: '#60A5FA' },
   { name: 'Pertanian & Agrotek Belia', shortName: 'Pertanian & Agrotek', percentage: 12, entrepreneurs: 15, color: '#059669', darkColor: '#34D399' },
-  { name: 'Runcit & Gaya Hidup', shortName: 'Runcit & Gaya Hidup', percentage: 8, entrepreneurs: 11, color: '#4F46E5', darkColor: '#818CF8' }
+  { name: 'Runcit & Gaya Hidup', shortName: 'Runcit & Gaya Hidup', percentage: 8, entrepreneurs: 11, color: '#0D9488', darkColor: '#2DD4BF' }
 ];
 
 const BASE_QUARTERLY_DATA = [
@@ -65,6 +67,8 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
   grantApplications = []
 }) => {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [activeSector, setActiveSector] = useState<SectorData>(SECTOR_BREAKDOWN[0]);
   const [chartTab, setChartTab] = useState<'sectors' | 'growth'>('growth');
 
@@ -112,9 +116,9 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
           <button
             type="button"
             onClick={() => setChartTab('growth')}
-            className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap ${
               chartTab === 'growth'
-                ? 'bg-indigo-600 text-white shadow-xs dark:bg-indigo-600'
+                ? `${roleTheme.segmentedActiveClass} shadow-xs`
                 : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
             }`}
           >
@@ -124,9 +128,9 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
           <button
             type="button"
             onClick={() => setChartTab('sectors')}
-            className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap ${
               chartTab === 'sectors'
-                ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
+                ? `${roleTheme.segmentedActiveClass} shadow-xs`
                 : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
             }`}
           >
@@ -368,10 +372,10 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
                     key={sec.name}
                     type="button"
                     onClick={() => setActiveSector(sec)}
-                    className={`flex items-center justify-between gap-2 text-left text-[0.8125rem] font-medium px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                    className={`flex items-center justify-between gap-2 text-left text-[0.8125rem] font-medium px-2.5 py-1.5 rounded-xl border transition-colors cursor-pointer ${
                       activeSector.name === sec.name
-                        ? 'bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-bold text-black dark:text-white'
-                        : 'text-black/80 dark:text-white/80 hover:text-black dark:hover:text-white'
+                        ? `${roleTheme.activeMiniBtnClass} font-bold`
+                        : 'border-transparent text-black/80 dark:text-white/80 hover:text-black dark:hover:text-white'
                     }`}
                   >
                     <span className="flex items-center gap-1.5 min-w-0">
@@ -391,8 +395,8 @@ export const CommunityAnalyticsWidget: React.FC<CommunityAnalyticsWidgetProps> =
           {/* Active Sector Highlight Spotlight (Preserved & Tidied Full-Width Card) */}
           <div className="rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5 w-full min-w-0">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/70 mb-2.5">
-                <PieChartIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[0.8125rem] font-bold uppercase tracking-wider text-black dark:text-white bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 mb-2.5">
+                <PieChartIcon className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                 Sorotan Sektor Terpilih
               </div>
 

@@ -30,6 +30,8 @@ import {
 } from '../utils/printUtils';
 import { downloadOfferLetterPdf } from '../utils/pdfGenerator';
 import { loadLocalPortalSettings } from '../services/dataService';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { showToast } from './ToastNotification';
 
 interface OfferLetterModalProps {
@@ -47,6 +49,8 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
   onClose,
   onOpenVerification
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [isCopied, setIsCopied] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
@@ -123,7 +127,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
       <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden transition-all duration-300 flex flex-col max-h-[94vh]">
         
         {/* Top Header */}
-        <div className="kbelia-important-header text-black dark:text-white px-5 sm:px-6 py-4 flex items-center justify-between border-b border-slate-300 dark:border-slate-600 shrink-0">
+        <div className="bg-[#FAF8F3] dark:bg-[#101815] text-black dark:text-white px-5 sm:px-6 py-4 flex items-center justify-between border-b border-[#E2DCCB] dark:border-[#24342D] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 flex items-center justify-center border border-rose-200 dark:border-rose-800/70 shrink-0">
               <ShieldCheck className="w-6 h-6 text-black dark:text-white/75" />
@@ -136,7 +140,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-black/70 hover:text-black dark:text-white/75 dark:hover:text-white bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer"
+            className={roleTheme.iconButtonClass}
             title="Tutup tetingkap"
             aria-label="Tutup"
           >
@@ -279,52 +283,52 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
 
         {/* Footer Actions */}
         <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-900 border-t border-slate-300 dark:border-slate-600 flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleCopyRef}
-              className="py-2 px-3 rounded-xl text-sm font-semibold text-black dark:text-white bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+              className={roleTheme.compactSecondaryButtonClass}
               title="Salin Nombor Rujukan Rasmi"
             >
-              {isCopied ? <Check className="w-3.5 h-3.5 text-black" /> : <Copy className="w-3.5 h-3.5 text-black/70" />}
-              <span>{isCopied ? 'Disalin!' : 'Salin Nombor Rujukan'}</span>
+              {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{isCopied ? 'Disalin' : 'Salin Rujukan'}</span>
             </button>
 
             <button
               type="button"
               onClick={handleDownload}
               disabled={isDownloadingPdf}
-              className="py-2 px-3 rounded-xl text-sm font-semibold text-black dark:text-white bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-70"
+              className={roleTheme.compactSecondaryButtonClass}
               title="Muat turun dokumen PDF rasmi (.pdf) 1 muka surat A4"
             >
               {isDownloadingPdf ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 text-black animate-spin" />
-                  <span>Menjana PDF...</span>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Menjana...</span>
                 </>
               ) : isDownloaded ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-black" />
-                  <span>PDF Tersimpan!</span>
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Tersimpan</span>
                 </>
               ) : (
                 <>
-                  <Download className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                  <span>Muat Turun Fail</span>
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Muat Turun PDF</span>
                 </>
               )}
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {onOpenVerification && (
               <button
                 type="button"
                 onClick={() => onOpenVerification(refNumber)}
-                className="py-2 px-3.5 rounded-xl text-sm font-bold text-black dark:text-white bg-rose-50 hover:bg-amber-100 border border-rose-200 dark:bg-rose-950/60 dark:border-rose-800/70 dark:hover:bg-rose-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+                className={roleTheme.compactSecondaryButtonClass}
                 title="Buka tetingkap semakan ketulenan dokumen secara terus"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white" />
+                <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Sahkan QR</span>
               </button>
             )}
@@ -333,7 +337,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
               type="button"
               onClick={handlePrint}
               disabled={isPrinting}
-              className="py-2 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 dark:bg-blue-600"
+              className={roleTheme.compactPrimaryButtonClass}
               title="Buka halaman cetakan dan cetak salinan rasmi"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -343,7 +347,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="py-2 px-3.5 rounded-xl text-sm font-semibold text-black hover:text-black dark:text-white dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              className={roleTheme.compactSecondaryButtonClass}
             >
               Tutup
             </button>

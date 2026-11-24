@@ -34,6 +34,7 @@ import {
   clearFormDraft,
   maskMyKad 
 } from '../utils/securityUtils';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface BookingModalProps {
   slot?: CapsuleSlot | null;
@@ -67,7 +68,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 }) => {
   const activeSlot = selectedSlot !== undefined ? selectedSlot : slot;
   const handleSuccess = onBookingSuccess || onSuccess;
-  const { user, userProfile, openLoginModal } = useAuth();
+  const { user, userProfile, openLoginModal, isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const safeAllSlots = allSlots || [];
   const subsidyRate = portalSettings?.portalSubsidyRate ?? 50;
   const maxLeaseDuration = portalSettings?.maxLeaseDurationMonths ?? 12;
@@ -287,9 +289,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       >
         
         {/* Header - STICKY & SHRINK-0 */}
-        <div className="border-b border-slate-300 dark:border-slate-600 py-4 px-6 sm:px-7 flex items-center justify-between kbelia-important-header dark:bg-slate-800 shrink-0 sticky top-0 z-10">
+        <div className="border-b border-[#E2DCCB] dark:border-[#24342D] py-4 px-6 sm:px-7 flex items-center justify-between bg-[#FAF8F3] dark:bg-[#101815] shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${roleTheme.activeMiniBtnClass}`}>
               <Store className="w-5 h-5" />
             </div>
             <div>
@@ -304,7 +306,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           <button
             type="button"
             onClick={handleResetAndClose}
-            className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer interactive-press hover:rotate-90 duration-200"
+            className={roleTheme.iconButtonClass}
             title="Tutup"
           >
             <X className="w-5 h-5" />
@@ -320,17 +322,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               <div className="flex flex-col items-center gap-1.5 flex-1">
                 <div className="flex items-center w-full">
                   <div className="w-full h-0.5 opacity-0" />
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8125rem] font-bold transition-all shrink-0 ${
-                    step > 1 
-                      ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600' 
-                      : step === 1 
-                        ? 'bg-blue-600 text-white ring-4 ring-blue-500/30 dark:ring-blue-500/30 shadow-xs dark:bg-blue-600' 
-                        : 'bg-slate-200 dark:bg-slate-800 text-black/70 dark:text-white/75'
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[0.8125rem] font-bold transition-all shrink-0 ${
+                    step >= 1
+                      ? roleTheme.badgeClass
+                      : 'bg-slate-200 dark:bg-slate-800 text-black/70 dark:text-white/75'
                   }`}>
                     {step > 1 ? <Check className="w-4 h-4 stroke-[3]" /> : '1'}
                   </div>
                   <div className={`w-full h-0.5 transition-colors ${
-                    step > 1 ? 'bg-blue-600 dark:bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'
+                    step > 1 ? roleTheme.progressFillClass : 'bg-slate-200 dark:bg-slate-700'
                   }`} />
                 </div>
                 <span className={`text-[0.8125rem] font-bold text-center leading-tight ${
@@ -344,19 +344,17 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               <div className="flex flex-col items-center gap-1.5 flex-1">
                 <div className="flex items-center w-full">
                   <div className={`w-full h-0.5 transition-colors ${
-                    step > 1 ? 'bg-blue-600 dark:bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'
+                    step > 1 ? roleTheme.progressFillClass : 'bg-slate-200 dark:bg-slate-700'
                   }`} />
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8125rem] font-bold transition-all shrink-0 ${
-                    step > 2 
-                      ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600' 
-                      : step === 2 
-                        ? 'bg-blue-600 text-white ring-4 ring-blue-500/30 dark:ring-blue-500/30 shadow-xs dark:bg-blue-600' 
-                        : 'bg-slate-200 dark:bg-slate-800 text-black/70 dark:text-white/75'
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[0.8125rem] font-bold transition-all shrink-0 ${
+                    step >= 2
+                      ? roleTheme.badgeClass
+                      : 'bg-slate-200 dark:bg-slate-800 text-black/70 dark:text-white/75'
                   }`}>
                     {step > 2 ? <Check className="w-4 h-4 stroke-[3]" /> : '2'}
                   </div>
                   <div className={`w-full h-0.5 transition-colors ${
-                    step > 2 ? 'bg-blue-600 dark:bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'
+                    step > 2 ? roleTheme.progressFillClass : 'bg-slate-200 dark:bg-slate-700'
                   }`} />
                 </div>
                 <span className={`text-[0.8125rem] font-bold text-center leading-tight ${
@@ -370,11 +368,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               <div className="flex flex-col items-center gap-1.5 flex-1">
                 <div className="flex items-center w-full">
                   <div className={`w-full h-0.5 transition-colors ${
-                    step > 2 ? 'bg-blue-600 dark:bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'
+                    step > 2 ? roleTheme.progressFillClass : 'bg-slate-200 dark:bg-slate-700'
                   }`} />
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[0.8125rem] font-bold transition-all shrink-0 ${
-                    step === 3 
-                      ? 'bg-blue-600 text-white ring-4 ring-blue-500/30 dark:ring-blue-500/30 shadow-xs dark:bg-blue-600' 
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[0.8125rem] font-bold transition-all shrink-0 ${
+                    step === 3
+                      ? roleTheme.badgeClass
                       : 'bg-slate-200 dark:bg-slate-800 text-black/70 dark:text-white/75'
                   }`}>
                     3
@@ -416,7 +414,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   onClose();
                   openLoginModal();
                 }}
-                className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm cursor-pointer dark:bg-rose-600"
+                className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] ${roleTheme.primaryButtonClass}`}
               >
                 Log Masuk
               </button>
@@ -433,7 +431,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetAndClose}
-                className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] ${roleTheme.secondaryButtonClass}`}
               >
                 Tutup
               </button>
@@ -447,15 +445,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               <p className="text-[0.9375rem] text-black dark:text-white/75 max-w-md mx-auto leading-relaxed mb-4">
                 Pegawai kami sedang menyemak permohonan anda. Sila semak status terkini di Dashboard anda. Sebaik diluluskan, Surat Tawaran Rasmi berkod QR akan terus tersedia.
               </p>
-              <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-sm text-black dark:text-white mb-6 max-w-sm mx-auto">
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-sm text-black dark:text-white mb-6 max-w-sm mx-auto">
                 Nombor Rujukan Anda: <strong>KBN-{currentSlot?.code}-{new Date().getFullYear()}</strong>
               </div>
               <button
                 type="button"
                 onClick={handleResetAndClose}
-                className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer dark:bg-blue-600"
+                className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] ${roleTheme.primaryButtonClass}`}
               >
-                Kembali ke Dashboard
+                Tutup
               </button>
             </div>
           ) : (
@@ -470,7 +468,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <select
                       value={selectedSlotId}
                       onChange={(e) => setSelectedSlotId(e.target.value)}
-                      className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 focus:outline-none transition-all cursor-pointer dark:focus:border-blue-500"
+                      className={`w-full px-4.5 py-3 rounded-xl text-sm sm:text-[0.9375rem] font-medium focus:outline-none transition-all cursor-pointer ${roleTheme.inputClass}`}
                     >
                       {safeAllSlots.map((s) => {
                         const isFree = s.status === 'available' && !s.currentTenantBusinessName;
@@ -517,12 +515,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                             </p>
                           </div>
                           {isCurrentSlotAvailable ? (
-                            <span className="px-3 py-1 rounded-full text-[0.8125rem] font-bold bg-emerald-100 text-black dark:bg-emerald-950 dark:text-white border border-emerald-200 dark:border-emerald-800 shrink-0">
-                              Tersedia untuk Belia
+                            <span className="px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-emerald-100 text-black dark:bg-emerald-950 dark:text-white border border-emerald-200 dark:border-emerald-800 shrink-0">
+                              Tersedia
                             </span>
                           ) : (
-                            <span className="px-3 py-1 rounded-full text-[0.8125rem] font-bold bg-rose-100 text-black dark:bg-rose-950 dark:text-white border border-rose-200 dark:border-rose-800 shrink-0">
-                              Unit Telah Berdaftar / Penuh
+                            <span className="px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-rose-100 text-black dark:bg-rose-950 dark:text-white border border-rose-200 dark:border-rose-800 shrink-0">
+                              Penuh
                             </span>
                           )}
                         </div>
@@ -587,17 +585,17 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                             onClick={() => setDurationMonths(pkg.months)}
                             className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer relative flex flex-col justify-between ${
                               isSelected
-                                ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/60 ring-1 ring-blue-500/30 shadow-xs'
-                                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-500'
+                                ? `${roleTheme.activeMiniBtnClass} ring-1 ring-current/20 shadow-xs`
+                                : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500'
                             }`}
                           >
                             <div className="flex items-center justify-between gap-1 mb-2">
-                              <span className={`text-[0.8125rem] px-2 py-0.5 rounded-full ${pkg.badgeColor}`}>
+                              <span className="text-xs font-semibold text-black/70 dark:text-white/75">
                                 {pkg.badge}
                               </span>
-                              <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                                isSelected 
-                                  ? 'border-blue-600 bg-blue-600 text-white dark:bg-blue-600' 
+                              <div className={`w-4 h-4 rounded-md border flex items-center justify-center ${
+                                isSelected
+                                  ? roleTheme.badgeClass + ' border-transparent'
                                   : 'border-slate-300 dark:border-slate-600'
                               }`}>
                                 {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -640,7 +638,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <button
                       type="button"
                       onClick={handleResetAndClose}
-                      className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                      className={`py-2.5 px-5 text-sm sm:text-[0.9375rem] ${roleTheme.secondaryButtonClass}`}
                     >
                       Batal
                     </button>
@@ -648,7 +646,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       type="button"
                       disabled={!isCurrentSlotAvailable}
                       onClick={handleNextStep}
-                      className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center gap-2 cursor-pointer dark:bg-blue-600"
+                      className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${roleTheme.primaryButtonClass}`}
                     >
                       <span>Seterusnya</span>
                       <ArrowRight className="w-4 h-4" />
@@ -781,7 +779,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2"
+                      className={`py-2.5 px-5 text-sm sm:text-[0.9375rem] flex items-center gap-2 ${roleTheme.secondaryButtonClass}`}
                     >
                       <ArrowLeft className="w-4 h-4" />
                       <span>Kembali</span>
@@ -789,7 +787,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <button
                       type="button"
                       onClick={handleNextStep}
-                      className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer dark:bg-blue-600"
+                      className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                     >
                       <span>Seterusnya</span>
                       <ArrowRight className="w-4 h-4" />
@@ -809,7 +807,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         </h4>
                         <p className="text-[0.875rem] text-black/70 dark:text-white/75">Sila semak maklumat sebelum pengesahan akhir</p>
                       </div>
-                      <span className="px-2.5 py-1 rounded-full text-[0.8125rem] font-bold bg-amber-100 text-black border border-amber-300 dark:bg-blue-600 dark:text-white">
+                      <span className={`text-[0.8125rem] font-bold ${roleTheme.accentTextClass}`}>
                         Pakej {durationMonths} Bulan
                       </span>
                     </div>
@@ -863,7 +861,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer flex items-center gap-2"
+                      className={`py-2.5 px-5 text-sm sm:text-[0.9375rem] flex items-center gap-2 ${roleTheme.secondaryButtonClass}`}
                     >
                       <ArrowLeft className="w-4 h-4" />
                       <span>Kembali</span>
@@ -872,10 +870,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       type="button"
                       disabled={loading || !pdpaConsent}
                       onClick={handleSubmit}
-                      className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all shadow-sm flex items-center gap-2 cursor-pointer dark:bg-blue-600"
+                      className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] disabled:opacity-50 flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                     >
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{loading ? 'Menghantar...' : 'Hantar Permohonan'}</span>
+                      <span>{loading ? 'Menghantar...' : 'Hantar'}</span>
                     </button>
                   </div>
                 </div>

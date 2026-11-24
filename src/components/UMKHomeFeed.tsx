@@ -41,6 +41,7 @@ import { CommunityAnalyticsWidget } from './CommunityAnalyticsWidget';
 import { BusinessSubsidyCalculator } from './BusinessSubsidyCalculator';
 import { PortalImage } from './PortalImage';
 import { resolveSlotImage } from '../utils/visualAssets';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface UMKHomeFeedProps {
   setActiveTab: (tab: UMKTab) => void;
@@ -101,8 +102,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
   onSelectSlot,
   onSelectBusiness
 }) => {
-  const { user, userProfile, isAdmin } = useAuth();
+  const { user, userProfile, isAdmin, isMentor } = useAuth();
   const { t, language } = useLanguage();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [selectedDistrict, setSelectedDistrict] = useState<KelantanDistrict>('Semua Jajahan');
   const [dailySalesEstimate, setDailySalesEstimate] = useState<number>(150);
 
@@ -153,13 +155,13 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
   return (
     <div className="space-y-6 w-full min-w-0">
       
-      {/* 1. WELCOME HEADER (TOP-LEFT SOFT SKY BLUE GRADIENT FOR IMPORTANT HEADER ONLY) */}
-      <div className="kbelia-important-header rounded-3xl p-6 sm:p-7 border border-slate-300 dark:border-slate-600 shadow-xs relative overflow-hidden transition-all duration-300">
+      {/* 1. WELCOME HEADER */}
+      <div className="bg-white/90 dark:bg-[#141D1A]/85 rounded-3xl p-6 sm:p-7 border border-[#E2DCCB] dark:border-[#24342D] relative overflow-hidden transition-all duration-300">
         <div className="relative z-10">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-black dark:text-white leading-snug">
-            {t('welcome_greeting')} <span className="text-black dark:text-white/75">{displayName}</span>
+            {t('welcome_greeting')} <span className={roleTheme.accentTextClass}>{displayName}</span>
           </h1>
-          <p className="text-[0.9375rem] text-black dark:text-white mt-1 max-w-2xl leading-relaxed">
+          <p className="text-[0.9375rem] text-black/80 dark:text-white/85 mt-1 max-w-2xl leading-relaxed">
             {t('home_subtitle')}
           </p>
         </div>
@@ -169,7 +171,6 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
           <div className="text-base sm:text-lg font-extrabold tracking-tight text-black dark:text-white flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-600"></span>
             <span>{t('quick_desk_title')}</span>
           </div>
         </div>
@@ -335,12 +336,12 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   <span className="text-sm font-bold text-black dark:text-white truncate max-w-[200px] sm:max-w-[280px]">
                     {userBooking.slotName}
                   </span>
-                  <span className={`text-[0.8125rem] font-bold px-2.5 py-0.5 rounded-full ${
+                  <span className={`text-[0.8125rem] font-bold ${
                     userBooking.status === 'approved'
-                      ? 'bg-emerald-100 text-black dark:bg-emerald-950/80 dark:text-white'
+                      ? 'text-emerald-700 dark:text-emerald-400'
                       : userBooking.status === 'rejected'
-                      ? 'bg-rose-100 text-black dark:bg-rose-950/80 dark:text-white'
-                      : 'bg-amber-100 text-black dark:bg-amber-950/80 dark:text-white'
+                      ? 'text-rose-700 dark:text-rose-400'
+                      : 'text-amber-700 dark:text-amber-300'
                   }`}>
                     {userBooking.status === 'approved' ? (language === 'en' ? '✓ Approved' : '✓ Diluluskan') : userBooking.status === 'rejected' ? (language === 'en' ? 'Rejected' : 'Ditolak') : (language === 'en' ? '⏳ Under Review' : '⏳ Dalam Semakan')}
                   </span>
@@ -361,7 +362,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   <button
                     type="button"
                     onClick={() => onViewOfferLetter && onViewOfferLetter(userBooking)}
-                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs dark:bg-indigo-600"
+                    className={`${roleTheme.compactPrimaryButtonClass} text-xs sm:text-sm`}
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>{language === 'en' ? 'Offer Letter' : 'Surat Tawaran'}</span>
@@ -371,9 +372,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                     <button
                       type="button"
                       onClick={() => onOpenTenancyAgreement(userBooking)}
-                      className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className={`${roleTheme.compactSecondaryButtonClass} text-xs sm:text-sm`}
                     >
-                      <PenTool className="w-3.5 h-3.5 text-black dark:text-white" />
+                      <PenTool className="w-3.5 h-3.5" />
                       <span>{language === 'en' ? 'Agreement' : 'Perjanjian'}</span>
                     </button>
                   )}
@@ -382,7 +383,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                     <button
                       type="button"
                       onClick={() => onOpenVerification(`KBN-${userBooking.slotCode}`)}
-                      className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white border border-slate-300 rounded-lg text-sm transition-colors cursor-pointer"
+                      className={roleTheme.iconButtonClass}
                       title={language === 'en' ? 'Verify QR License' : 'Sahkan Lesen QR'}
                     >
                       <QrCode className="w-4 h-4" />
@@ -395,19 +396,19 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 href={`https://wa.me/601120508890?text=${encodeURIComponent(language === 'en' ? `Hello KBelia Admin, I would like to inquire about kiosk status ${userBooking.slotCode}.` : `Salam Admin KBelia Kelantan, saya ingin bertanya tentang status kiosk ${userBooking.slotCode}.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-200 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-colors"
+                className={`${roleTheme.compactSecondaryButtonClass} text-xs sm:text-sm`}
               >
-                <MessageCircle className="w-3.5 h-3.5 text-black dark:text-white" />
-                <span>{language === 'en' ? 'Hub WhatsApp' : 'WhatsApp Hab'}</span>
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>WhatsApp</span>
               </a>
 
               <button
                 type="button"
                 onClick={() => onOpenMaintenance && onOpenMaintenance()}
-                className="p-1.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800 text-black dark:text-white border border-slate-300 rounded-lg text-sm transition-colors cursor-pointer"
+                className={roleTheme.iconButtonClass}
                 title={language === 'en' ? 'Facility Maintenance Report' : 'Aduan Kerosakan Fasiliti'}
               >
-                <Wrench className="w-4 h-4 text-black dark:text-white" />
+                <Wrench className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -463,7 +464,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
         <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-300 dark:border-slate-600 p-6 shadow-xs transition-all duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-300 dark:border-slate-600">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs dark:bg-blue-600">
+              <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-xs ${roleTheme.activeSubNavClass}`}>
                 <Award className="w-6 h-6" />
               </div>
               <div>
@@ -549,7 +550,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       {!userBooking && !userGrant && (
         <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-300 dark:border-slate-600 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 flex items-center justify-center shrink-0">
+            <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center shrink-0 ${roleTheme.activeMiniBtnClass}`}>
               <Building2 className="w-5 h-5" />
             </div>
             <div>
@@ -565,9 +566,9 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
             <button
               type="button"
               onClick={onOpenBooking}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white rounded-xl text-sm font-bold transition-all shadow-xs shrink-0 cursor-pointer dark:bg-blue-600"
+              className={`px-4 py-2 text-sm shadow-xs ${roleTheme.primaryButtonClass}`}
             >
-              <span>{language === 'en' ? 'Apply Kiosk' : 'Mohon Kiosk'}</span>
+              <span>{language === 'en' ? 'Apply' : 'Mohon Kiosk'}</span>
             </button>
             <button
               type="button"
@@ -575,15 +576,15 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 if (onOpenGrantModal) onOpenGrantModal();
                 else setActiveTab('ceed');
               }}
-              className="px-4 py-2 bg-amber-50 hover:bg-amber-100 active:scale-[0.98] text-black border border-amber-300 rounded-xl text-sm font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+              className={`px-4 py-2 text-sm shadow-xs ${roleTheme.secondaryButtonClass}`}
             >
-              <span>{language === 'en' ? 'Apply Grant' : 'Mohon Geran'}</span>
+              <span>{language === 'en' ? 'Grants' : 'Mohon Geran'}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* 4. PETA INTERAKTIF 10 JAJAHAN KELANTAN */}
+      {/* 4. PETA RANGKAIAN SELURUH NEGERI KELANTAN */}
       <KelantanDistrictsMap
         slots={safeSlots}
         selectedDistrict={selectedDistrict}
@@ -685,13 +686,13 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                       <button
                         type="button"
                         onClick={() => onSelectSlot(slot)}
-                        className={`px-3 py-1.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                        className={
                           isAvail
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-2xs dark:bg-blue-600'
-                            : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-white border border-slate-300'
-                        }`}
+                            ? roleTheme.compactPrimaryButtonClass
+                            : roleTheme.compactSecondaryButtonClass
+                        }
                       >
-                        {isAvail ? (language === 'en' ? 'Apply Kiosk' : 'Mohon Kiosk') : (language === 'en' ? 'View Details' : 'Lihat Maklumat')}
+                        {isAvail ? (language === 'en' ? 'Apply' : 'Mohon') : (language === 'en' ? 'Details' : 'Butiran')}
                       </button>
                     </td>
                   </tr>
@@ -756,17 +757,17 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   <button
                     type="button"
                     onClick={() => onSelectBusiness(biz)}
-                    className="text-sm font-bold text-black dark:text-white hover:text-black dark:hover:text-white cursor-pointer"
+                    className={`text-sm font-bold hover:underline cursor-pointer ${roleTheme.accentTextClass}`}
                   >
-                    {language === 'en' ? 'View Profile' : 'Lihat Profil'}
+                    {language === 'en' ? 'Profile' : 'Profil'}
                   </button>
                   <a
                     href={waUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold flex items-center gap-1 shadow-2xs cursor-pointer"
+                    className={roleTheme.compactPrimaryButtonClass}
                   >
-                    <MessageCircle className="w-3 h-3" />
+                    <MessageCircle className="w-3.5 h-3.5" />
                     <span>WhatsApp</span>
                   </a>
                 </div>

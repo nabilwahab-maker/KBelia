@@ -28,6 +28,7 @@ import {
   parseNumericAmount,
   sortRecords
 } from '../utils/sortUtils';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface ProgramsSectionProps {
   programs: YouthProgram[];
@@ -51,10 +52,11 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
   isReadOnly = false
 }) => {
   const { language } = useLanguage();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isMentor } = useAuth();
   const { confirmDelete } = useConfirmDelete();
   const isEn = language === 'en';
   const isAdminView = isAdmin || isReadOnly;
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
 
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all');
@@ -344,9 +346,9 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
               setDetailProgram(null);
               setEditingProgram(prog);
             }}
-            className="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold inline-flex items-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
+            className={`py-2 px-4 text-sm inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
           >
-            <span>{isEn ? 'Edit Program' : 'Edit Program'}</span>
+            <span>{isEn ? 'Edit' : 'Sunting'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         );
@@ -395,12 +397,12 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
               type="button"
               disabled={cancellingGrantId === matchingPendingGrant.id}
               onClick={() => handleCancelGrantClick(matchingPendingGrant)}
-              className="py-1.5 px-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+              className={`px-2.5 py-1.5 text-xs ${roleTheme.dangerOutlineButtonClass}`}
             >
-              <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+              <XCircle className="w-3.5 h-3.5" />
               <span>
                 {cancellingGrantId === matchingPendingGrant.id
-                  ? (isEn ? 'Cancelling...' : 'Membatalkan...')
+                  ? (isEn ? 'Cancelling...' : 'Batal...')
                   : (isEn ? 'Cancel' : 'Batal')}
               </span>
             </button>
@@ -412,16 +414,16 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
     if (isRegistered) {
       return (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="py-1.5 px-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 whitespace-nowrap">
+          <span className="py-1.5 px-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 whitespace-nowrap">
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
             <span>{isEn ? 'Registered' : 'Didaftarkan'}</span>
           </span>
           <button
             type="button"
             onClick={() => handleCancelProgramRegistration(prog)}
-            className="py-1.5 px-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+            className={`px-2.5 py-1.5 text-xs ${roleTheme.dangerOutlineButtonClass}`}
           >
-            <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+            <XCircle className="w-3.5 h-3.5" />
             <span>{isEn ? 'Cancel' : 'Batal'}</span>
           </button>
         </div>
@@ -437,14 +439,16 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           }
           handleProgramAction(prog);
         }}
-        className={`${
-          variant === 'card' ? 'py-1.5 px-3 text-xs' : 'py-2.5 px-4 text-sm'
-        } bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0`}
+        className={
+          variant === 'card'
+            ? roleTheme.compactPrimaryButtonClass
+            : `py-2.5 px-4 text-sm inline-flex items-center gap-1.5 ${roleTheme.primaryButtonClass}`
+        }
       >
         <span>
           {isGrant
-            ? (isEn ? 'Apply Grant' : 'Mohon Geran')
-            : (isEn ? 'Join Program' : 'Daftar Program')}
+            ? (isEn ? 'Apply' : 'Mohon')
+            : (isEn ? 'Join' : 'Daftar')}
         </span>
         <ArrowRight className="w-3.5 h-3.5" />
       </button>
@@ -463,7 +467,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
           <button
             type="button"
             onClick={() => setActiveNotice(null)}
-            className="text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white p-1 cursor-pointer"
+            className="text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white p-1.5 rounded-xl cursor-pointer"
             aria-label={isEn ? 'Close notice' : 'Tutup notis'}
           >
             <X className="w-4 h-4" />
@@ -541,13 +545,13 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                       type="button"
                       disabled={isCancelling}
                       onClick={() => handleCancelGrantClick(grant)}
-                      className="px-3 py-2 rounded-lg text-[0.8125rem] font-bold text-black dark:text-white bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 border border-rose-300 dark:border-rose-700 transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50 self-end sm:self-center"
+                      className={`px-3 py-2 text-[0.8125rem] self-end sm:self-center ${roleTheme.dangerOutlineButtonClass}`}
                     >
-                      <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                      <XCircle className="w-3.5 h-3.5" />
                       <span>
                         {isCancelling
-                          ? (isEn ? 'Cancelling...' : 'Membatalkan...')
-                          : (isEn ? 'Cancel Request' : 'Batal Permohonan')}
+                          ? (isEn ? 'Cancelling...' : 'Batal...')
+                          : (isEn ? 'Cancel' : 'Batal')}
                       </span>
                     </button>
                   )}
@@ -581,7 +585,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             <div className="lg:col-span-7 p-5 sm:p-6 lg:p-7 flex flex-col justify-between gap-5">
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                  <div className={`flex flex-wrap items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${roleTheme.accentTextClass}`}>
                     <Star className="w-3.5 h-3.5 fill-current shrink-0" />
                     <span>{isEn ? 'Featured Spotlight' : 'Sorotan Pilihan Utama'}</span>
                     <span className="text-black/30 dark:text-white/30">·</span>
@@ -593,7 +597,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
 
                 <h2
                   onClick={() => setDetailProgram(spotlightProgram)}
-                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight leading-snug text-balance cursor-pointer hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight leading-snug text-balance cursor-pointer hover:opacity-85 transition-opacity"
                 >
                   {spotlightProgram.title}
                 </h2>
@@ -631,9 +635,9 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                   <button
                     type="button"
                     onClick={() => setDetailProgram(spotlightProgram)}
-                    className="py-2 px-3 rounded-xl text-sm font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                    className={`py-2 px-3.5 text-sm inline-flex items-center gap-1.5 ${roleTheme.secondaryButtonClass}`}
                   >
-                    <span>{isEn ? 'View Details' : 'Lihat Butiran'}</span>
+                    <span>{isEn ? 'Details' : 'Butiran'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -663,10 +667,10 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
               <button
                 type="button"
                 onClick={onAddProgram}
-                className="min-h-[38px] inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-xs transition-colors shrink-0 cursor-pointer whitespace-nowrap"
+                className={`min-h-[38px] ${roleTheme.compactPrimaryButtonClass}`}
               >
                 <Award className="w-4 h-4" />
-                <span>{isEn ? 'Add Program' : 'Terbit Program'}</span>
+                <span>{isEn ? 'Add' : 'Tambah'}</span>
               </button>
             ) : undefined
           }
@@ -682,9 +686,9 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                       key={cat.key}
                       type="button"
                       onClick={() => setSelectedCategory(cat.key)}
-                      className={`px-3 py-1.5 rounded-lg text-[0.8125rem] font-semibold border text-left transition-colors cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold border text-left transition-colors cursor-pointer ${
                         selectedCategory === cat.key
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? `${roleTheme.segmentedActiveClass} border-transparent`
                           : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
                       }`}
                     >
@@ -707,9 +711,9 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                       key={opt.id}
                       type="button"
                       onClick={() => setFeaturedFilter(opt.id as 'all' | 'featured')}
-                      className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border transition-colors cursor-pointer ${
+                      className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border transition-colors cursor-pointer ${
                         featuredFilter === opt.id
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? `${roleTheme.segmentedActiveClass} border-transparent`
                           : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
                       }`}
                     >
@@ -737,9 +741,9 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                   setSearchQuery('');
                   handleResetFilters();
                 }}
-                className="px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className={roleTheme.compactSecondaryButtonClass}
               >
-                {isEn ? 'Reset Search & Filters' : 'Set Semula Carian & Penapis'}
+                {isEn ? 'Reset' : 'Set Semula'}
               </button>
             )}
           </div>
@@ -767,7 +771,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
 
                     <div className="p-4 sm:p-5 pb-3">
                       <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
-                        <span className="text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                        <span className={`uppercase tracking-wider ${roleTheme.accentTextClass}`}>
                           {prog.category}
                         </span>
                         {prog.isFeatured && (
@@ -781,7 +785,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                         )}
                       </div>
 
-                      <h3 className="font-bold text-black dark:text-white text-base sm:text-lg leading-snug line-clamp-2 mt-1.5 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                      <h3 className="font-bold text-black dark:text-white text-base sm:text-lg leading-snug line-clamp-2 mt-1.5 group-hover:opacity-85 transition-opacity">
                         {prog.title}
                       </h3>
 
@@ -806,8 +810,8 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                           {prog.grantAmount}
                         </span>
                       ) : (
-                        <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 inline-flex items-center gap-1 group-hover:underline">
-                          <span>{isEn ? 'View Details' : 'Lihat Butiran'}</span>
+                        <span className={`text-xs font-semibold inline-flex items-center gap-1 group-hover:underline ${roleTheme.accentTextClass}`}>
+                          <span>{isEn ? 'Details' : 'Butiran'}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </span>
                       )}
@@ -821,7 +825,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                         <button
                           type="button"
                           onClick={() => setDetailProgram(prog)}
-                          className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline px-1.5 py-1 cursor-pointer whitespace-nowrap"
+                          className={`text-xs font-semibold hover:underline px-1.5 py-1 cursor-pointer whitespace-nowrap ${roleTheme.accentTextClass}`}
                         >
                           {isEn ? 'Details' : 'Butiran'}
                         </button>
@@ -839,7 +843,6 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
               itemsPerPage={ITEMS_PER_PAGE}
               onPageChange={pagination.setCurrentPage}
               itemLabel={isEn ? 'programs' : 'program'}
-              accent="blue"
             />
           </>
         )}
@@ -870,7 +873,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
                 type="button"
                 onClick={() => setDetailProgram(null)}
                 aria-label={isEn ? 'Close details' : 'Tutup butiran'}
-                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 dark:bg-zinc-900/95 text-black dark:text-white border border-slate-200 dark:border-zinc-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                className={`absolute top-3 right-3 ${roleTheme.iconButtonClass}`}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -879,7 +882,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
             <div className="p-5 sm:p-6 space-y-5">
               <div>
                 <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold uppercase tracking-wider">
-                  <span className="text-blue-600 dark:text-blue-400">
+                  <span className={roleTheme.accentTextClass}>
                     {detailProgram.category}
                   </span>
                   {detailProgram.isFeatured && (
@@ -970,7 +973,7 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
               <button
                 type="button"
                 onClick={() => setDetailProgram(null)}
-                className="py-2 px-4 rounded-xl text-sm font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer whitespace-nowrap"
+                className={`py-2 px-4 text-sm ${roleTheme.secondaryButtonClass}`}
               >
                 {isEn ? 'Close' : 'Tutup'}
               </button>

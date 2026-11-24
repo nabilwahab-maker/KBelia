@@ -27,6 +27,7 @@ import { EditCashflowModal } from './EditCashflowModal';
 import { showToast } from './ToastNotification';
 import { openAndPrintDocument, generateCashflowStatementOfficialHtml } from '../utils/printUtils';
 import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { ModernDatePicker, addDaysIso, toLocalIsoDate } from './ModernDateTimePicker';
 
 interface KioskCashflowModalProps {
@@ -42,7 +43,8 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
   kioskName = 'Kiosk Modular KBelia',
   businessName = 'Perniagaan Anda'
 }) => {
-  const { user, isDemoSession } = useAuth();
+  const { user, isDemoSession, isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const { confirmDelete } = useConfirmDelete();
   const ownerId = user?.uid || 'guest';
   const storageKey = `kbelia_cashflow_records_${ownerId}`;
@@ -231,7 +233,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
       >
 
         {/* Header */}
-        <div className="kbelia-important-header text-black dark:text-white px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-slate-300 dark:border-slate-600 print:hidden">
+        <div className="bg-[#FAF8F3] dark:bg-[#101815] text-black dark:text-white px-5 sm:px-7 py-4.5 flex items-center justify-between shrink-0 border-b border-[#E2DCCB] dark:border-[#24342D] print:hidden">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center border border-emerald-200 dark:border-emerald-800/70">
               <Coins className="w-6 h-6 text-black dark:text-white" />
@@ -248,21 +250,22 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            aria-label="Tutup"
+            className={roleTheme.iconButtonClass}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Sub-tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-7 pt-4 border-b border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 shrink-0 print:hidden">
+        <div className={`flex items-center gap-2 px-5 sm:px-7 pt-4 border-b ${roleTheme.dividerClass} ${roleTheme.surfaceMutedClass} shrink-0 print:hidden`}>
           <button
             type="button"
             onClick={() => setActiveTab('sales')}
             className={`pb-3 px-3 text-sm font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'sales'
-                ? 'border-emerald-600 text-black dark:border-amber-400 dark:text-white/75'
-                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
+                ? roleTheme.tabActiveUnderlineClass
+                : roleTheme.tabIdleUnderlineClass
             }`}
           >
             <Coins className="w-3.5 h-3.5" />
@@ -274,8 +277,8 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
             onClick={() => setActiveTab('qr')}
             className={`pb-3 px-3 text-sm font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'qr'
-                ? 'border-blue-600 text-black dark:border-amber-400 dark:text-white/75'
-                : 'border-transparent text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
+                ? roleTheme.tabActiveUnderlineClass
+                : roleTheme.tabIdleUnderlineClass
             }`}
           >
             <QrCode className="w-3.5 h-3.5" />
@@ -410,9 +413,9 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                     <button
                       type="submit"
                       disabled={saving}
-                      className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 shadow-sm transition-colors cursor-pointer shrink-0 dark:bg-emerald-600"
+                      className={`px-5 py-2 text-sm disabled:opacity-50 shadow-sm ${roleTheme.primaryButtonClass}`}
                     >
-                      {saving ? 'Menyimpan...' : '+ Simpan Jualan'}
+                      {saving ? 'Menyimpan...' : '+ Simpan'}
                     </button>
                   </div>
                 </form>
@@ -424,18 +427,18 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                   <h4 className="text-sm font-bold text-black dark:text-white">
                     Sejarah Transaksi Jualan ({salesRecords.length} Hari Direkod)
                   </h4>
-                  <div className="flex items-center gap-3 print:hidden">
+                  <div className="flex items-center gap-2 print:hidden">
                     <button
                       type="button"
                       onClick={handlePrint}
-                      className="text-sm text-black dark:text-white/75 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                      className={roleTheme.compactSecondaryButtonClass}
                     >
-                      <Printer className="w-3.5 h-3.5" /> Cetak Rekod
+                      <Printer className="w-3.5 h-3.5" /> Cetak
                     </button>
                     <button
                       type="button"
                       onClick={() => void handleDownloadPdf()}
-                      className="text-sm text-emerald-700 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                      className={roleTheme.compactSecondaryButtonClass}
                     >
                       <Download className="w-3.5 h-3.5" /> Muat Turun PDF
                     </button>
@@ -476,11 +479,11 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                                   <button
                                     type="button"
                                     onClick={() => setEditingRecord(r)}
-                                    className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-black dark:text-white border border-blue-200 dark:border-blue-800/70 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 text-[0.8125rem] font-semibold whitespace-nowrap shrink-0"
-                                    title="Edit rekod"
+                                    className={roleTheme.compactSecondaryButtonClass}
+                                    title="Sunting rekod"
                                   >
                                     <Edit3 className="w-3.5 h-3.5 shrink-0" />
-                                    <span>Edit</span>
+                                    <span>Sunting</span>
                                   </button>
                                   <button
                                     type="button"
@@ -491,7 +494,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                                         onConfirm: () => handleDelete(r.id)
                                       })
                                     }
-                                    className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-black dark:text-white border border-rose-200 dark:border-rose-800/70 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 text-[0.8125rem] font-semibold whitespace-nowrap shrink-0"
+                                    className={`px-2.5 py-1.5 text-[0.8125rem] ${roleTheme.dangerOutlineButtonClass}`}
                                     title="Padam rekod"
                                   >
                                     <Trash2 className="w-3.5 h-3.5 shrink-0" />
@@ -528,13 +531,45 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                 <div>
                   <div className="font-extrabold text-sm text-black uppercase">{businessName}</div>
                   <div className="text-[0.8125rem] font-mono text-black font-semibold">{kioskName}</div>
-                  <div className="text-[0.8125rem] text-black/70 mt-1">Imbas menggunakan mana-mana aplikasi perbankan atau e-dompet (Touch &apos;n Go, GrabPay, MAE, CIMB).</div> </div> </div> <div className="flex flex-wrap items-center justify-center gap-3 print:hidden"> <button type="button" onClick={handlePrint} className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer dark:bg-blue-600" > <Printer className="w-4 h-4" /> <span>Cetak QR</span> </button> <button type="button" onClick={() => void handleDownloadPdf()} className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer" > <Download className="w-4 h-4" /> <span>Muat Turun PDF</span> </button> </div> </div> )} </div> {/* Footer */} <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0 print:hidden"> <div className="text-[0.8125rem] text-black/70 dark:text-white/75"> {isDemoSession ? 'Mod Demo: Rekod diasingkan daripada pangkalan data pengeluaran.'
+                  <div className="text-[0.8125rem] text-black/70 mt-1">
+                    Imbas menggunakan mana-mana aplikasi perbankan atau e-dompet (Touch &apos;n Go, GrabPay, MAE, CIMB).
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3 print:hidden">
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className={`px-5 py-2.5 text-sm inline-flex items-center gap-2 shadow-sm ${roleTheme.primaryButtonClass}`}
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Cetak QR</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleDownloadPdf()}
+                  className={`px-5 py-2.5 text-sm inline-flex items-center gap-2 shadow-sm ${roleTheme.secondaryButtonClass}`}
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Muat Turun PDF</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 sm:px-7 border-t border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0 print:hidden">
+          <div className="text-[0.8125rem] text-black/70 dark:text-white/75">
+            {isDemoSession
+              ? 'Mod Demo: Rekod diasingkan daripada pangkalan data pengeluaran.'
               : 'Rekod disegerakkan dengan akaun usahawan anda.'}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-xl text-sm font-bold text-black dark:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className={`px-5 py-2 text-sm ${roleTheme.secondaryButtonClass}`}
           >
             Tutup
           </button>

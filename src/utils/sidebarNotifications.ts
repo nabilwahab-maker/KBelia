@@ -7,6 +7,7 @@ import {
   GrantEndorsement,
   KioskDailySale,
   MaintenanceTicket,
+  MenteeGrantCheck,
   MentorProfile,
   MentoringLogEntry,
   MentorshipRegistration,
@@ -236,6 +237,26 @@ export function computeSidebarActionableIds(
         )
     );
     map['mentor:endorsements'] = completedWithoutEndorsement.map((r) => `mendorse_${r.id}`);
+
+    const savedChecks = readLocalJsonArray<MenteeGrantCheck>('kbelia_mentor_grant_checks_v1', []);
+    const mentorChecks = savedChecks.filter((c) => !mentorId || c.mentorId === mentorId);
+    const activeMenteesPendingLog = registrations.filter(
+      (r) =>
+        r.status !== 'cancelled' &&
+        !mentorLogs.some(
+          (l) => l.businessName?.toLowerCase() === r.businessName?.toLowerCase()
+        )
+    );
+    map['mentor:mentees'] = activeMenteesPendingLog.map((r) => `mmentee_${r.id}`);
+
+    const needingReadinessCheck = completedWithoutEndorsement.filter(
+      (r) =>
+        !mentorChecks.some(
+          (c) => c.businessName?.toLowerCase() === r.businessName?.toLowerCase()
+        )
+    );
+    map['mentor:readiness'] = needingReadinessCheck.map((r) => `mready_${r.id}`);
+    map['mentor:impact'] = [];
 
     const hasPublishedSlots =
       Boolean(data.currentMentor?.publishedSlots && data.currentMentor.publishedSlots.length > 0);

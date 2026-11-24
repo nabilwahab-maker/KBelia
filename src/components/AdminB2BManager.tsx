@@ -32,6 +32,9 @@ import { showToast } from './ToastNotification';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const adminTheme = getRoleTheme('admin');
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -336,8 +339,7 @@ export const AdminB2BManager: React.FC = () => {
   return (
     <div className="space-y-4 animate-dashboard-tab">
       {/* Header Banner */}
-      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-zinc-600">
-        <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
+      <div className={`p-4 sm:p-5 rounded-2xl border backdrop-blur-xs transition-colors ${adminTheme.surfaceClass}`}>
         <div className="space-y-1">
           <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Pengurusan Ruang Niaga &amp; Iklan Bekalan
@@ -349,12 +351,11 @@ export const AdminB2BManager: React.FC = () => {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="relative bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 shadow-xs overflow-hidden animate-dashboard-tab"
+          className={`rounded-2xl border backdrop-blur-xs overflow-hidden animate-dashboard-tab ${adminTheme.surfaceClass}`}
         >
-          <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
-          <div className="px-4 sm:px-5 py-3.5 border-b border-slate-300 dark:border-zinc-600 flex flex-wrap items-center justify-between gap-2 bg-slate-50 dark:bg-zinc-950">
+          <div className={`px-4 sm:px-5 py-3.5 border-b flex flex-wrap items-center justify-between gap-2 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
             <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2">
-              <Megaphone className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+              <Megaphone className={`w-4 h-4 ${adminTheme.accentTextClass}`} />
               <span>{editingId ? 'Edit Iklan Ruang Niaga' : 'Cipta Iklan Ruang Niaga Bergambar'}</span>
             </h4>
 
@@ -363,10 +364,10 @@ export const AdminB2BManager: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleApplySampleTemplate}
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 hover:bg-slate-100 dark:hover:bg-zinc-800 text-black dark:text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                  className={`px-3 py-1.5 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
-                  <span>Isi Contoh Iklan</span>
+                  <Sparkles className={`w-3.5 h-3.5 ${adminTheme.accentTextClass}`} />
+                  <span>Contoh</span>
                 </button>
               )}
               <button
@@ -375,7 +376,7 @@ export const AdminB2BManager: React.FC = () => {
                   setShowForm(false);
                   resetForm();
                 }}
-                className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
+                className="p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white cursor-pointer"
                 aria-label="Tutup borang"
               >
                 <X className="w-4 h-4" />
@@ -396,8 +397,8 @@ export const AdminB2BManager: React.FC = () => {
                     onClick={() => setType('supply')}
                     className={`py-2 px-3 text-sm font-bold rounded-xl border text-center transition-colors cursor-pointer ${
                       type === 'supply'
-                        ? 'bg-teal-600 text-white border-teal-600'
-                        : 'bg-slate-50 text-black border-slate-300 dark:bg-zinc-950 dark:text-white/75 dark:border-zinc-600'
+                        ? `${adminTheme.segmentedActiveClass} border-transparent`
+                        : adminTheme.secondaryButtonClass
                     }`}
                   >
                     Membekal (Tawaran)
@@ -407,8 +408,8 @@ export const AdminB2BManager: React.FC = () => {
                     onClick={() => setType('demand')}
                     className={`py-2 px-3 text-sm font-bold rounded-xl border text-center transition-colors cursor-pointer ${
                       type === 'demand'
-                        ? 'bg-amber-500 text-white border-amber-600'
-                        : 'bg-slate-50 text-black border-slate-300 dark:bg-zinc-950 dark:text-white/75 dark:border-zinc-600'
+                        ? `${adminTheme.segmentedActiveClass} border-transparent`
+                        : adminTheme.secondaryButtonClass
                     }`}
                   >
                     Mencari Bekalan
@@ -427,7 +428,7 @@ export const AdminB2BManager: React.FC = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Masukkan tajuk iklan"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 font-semibold"
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold focus:outline-none ${adminTheme.inputClass}`}
                 />
               </div>
 
@@ -443,7 +444,7 @@ export const AdminB2BManager: React.FC = () => {
                     value={authorBusiness}
                     onChange={(e) => setAuthorBusiness(e.target.value)}
                     placeholder="Masukkan nama perniagaan"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -454,7 +455,7 @@ export const AdminB2BManager: React.FC = () => {
                   <select
                     value={district}
                     onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-semibold focus:outline-none ${adminTheme.inputClass}`}
                   >
                     {DISTRICTS.map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -474,7 +475,7 @@ export const AdminB2BManager: React.FC = () => {
                     value={authorName}
                     onChange={(e) => setAuthorName(e.target.value)}
                     placeholder="Masukkan nama wakil"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -489,7 +490,7 @@ export const AdminB2BManager: React.FC = () => {
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
                     placeholder="Masukkan nombor telefon"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-mono focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
               </div>
@@ -504,7 +505,7 @@ export const AdminB2BManager: React.FC = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Masukkan keterangan iklan"
-                  className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-600 text-black dark:text-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600"
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-sm resize-none focus:outline-none ${adminTheme.inputClass}`}
                 />
               </div>
 
@@ -522,22 +523,22 @@ export const AdminB2BManager: React.FC = () => {
                     setShowForm(false);
                     resetForm();
                   }}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-zinc-600 text-sm font-semibold text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className={`px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+                  className={`px-5 py-2.5 rounded-xl text-sm font-bold inline-flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer ${adminTheme.primaryButtonClass}`}
                 >
                   <Save className="w-4 h-4" />
                   <span>
                     {saving
                       ? 'Menyimpan...'
                       : editingId
-                        ? 'Simpan Perubahan'
-                        : 'Siar Iklan'}
+                        ? 'Simpan'
+                        : 'Siar'}
                   </span>
                 </button>
               </div>
@@ -560,9 +561,9 @@ export const AdminB2BManager: React.FC = () => {
       )}
 
       {/* Unified Reference Table Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-xs overflow-visible">
+      <div className={`rounded-2xl border backdrop-blur-xs overflow-visible transition-colors ${adminTheme.surfaceClass}`}>
         <ReferenceTableToolbar
-          accent="indigo"
+          accent="amber"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder="Cari iklan, syarikat atau daerah..."
@@ -586,10 +587,10 @@ export const AdminB2BManager: React.FC = () => {
               id="btn-admin-add-b2b"
               type="button"
               onClick={showForm ? () => setShowForm(false) : handleOpenCreate}
-              className="px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold inline-flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
+              className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
             >
               {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-              <span>{showForm ? 'Tutup Borang' : 'Tambah Iklan Bergambar'}</span>
+              <span>{showForm ? 'Tutup' : 'Tambah'}</span>
             </button>
           }
           filterContent={
@@ -608,10 +609,10 @@ export const AdminB2BManager: React.FC = () => {
                       key={opt.id}
                       type="button"
                       onClick={() => setFilterType(opt.id)}
-                      className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
+                      className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
                         filterType === opt.id
-                          ? 'bg-indigo-600 border-indigo-600 text-white'
-                          : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-700'
+                          ? `${adminTheme.segmentedActiveClass} border-transparent`
+                          : adminTheme.secondaryButtonClass
                       }`}
                     >
                       {opt.label}
@@ -626,7 +627,7 @@ export const AdminB2BManager: React.FC = () => {
                 <select
                   value={districtFilter}
                   onChange={(e) => setDistrictFilter(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  className={`w-full px-3 py-2 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                 >
                   <option value="Semua">Semua Daerah</option>
                   {DISTRICTS.map((d) => (
@@ -652,9 +653,9 @@ export const AdminB2BManager: React.FC = () => {
                   setFilterType('all');
                   setDistrictFilter('Semua');
                 }}
-                className="mt-1 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className={`mt-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
               >
-                Set Semula Carian &amp; Penapis
+                Set Semula
               </button>
             )}
           </div>
@@ -663,7 +664,7 @@ export const AdminB2BManager: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
+                  <tr className={`${adminTheme.surfaceMutedClass} border-b ${adminTheme.dividerClass} text-[0.8125rem] font-semibold text-black/65 dark:text-white/70`}>
                     <th className="py-3 pl-5 pr-3">
                       <button
                         type="button"
@@ -709,15 +710,15 @@ export const AdminB2BManager: React.FC = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                <tbody className={`divide-y ${adminTheme.dividerClass}`}>
                   {b2bPagination.paginatedItems.map((item) => (
                     <tr
                       key={item.id}
-                      className="kbelia-table-row"
+                      className={`transition-colors ${adminTheme.rowHoverClass}`}
                     >
                       <td className="py-3.5 pl-5 pr-3">
                         <div className="flex items-center gap-3 min-w-[210px]">
-                          <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-zinc-950 overflow-hidden shrink-0 border border-slate-200 dark:border-zinc-700">
+                          <div className={`w-14 h-14 rounded-xl overflow-hidden shrink-0 border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                             <PortalImage
                               src={resolveB2BImage(item)}
                               alt={item.title}
@@ -738,10 +739,10 @@ export const AdminB2BManager: React.FC = () => {
                       </td>
                       <td className="py-3.5 px-3 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold border ${
+                          className={`text-[0.8125rem] font-semibold ${
                             item.type === 'supply'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70'
-                              : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
+                              ? 'text-emerald-700 dark:text-emerald-400'
+                              : adminTheme.accentTextClass
                           }`}
                         >
                           {item.type === 'supply' ? 'Membekal' : 'Mencari'}
@@ -788,7 +789,7 @@ export const AdminB2BManager: React.FC = () => {
               itemsPerPage={7}
               onPageChange={b2bPagination.setCurrentPage}
               itemLabel="iklan"
-              accent="blue"
+              accent="amber"
             />
           </>
         )}

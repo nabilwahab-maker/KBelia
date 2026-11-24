@@ -27,6 +27,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { UMKTab } from './UMKHeader';
 import { KBeliaLogo } from './KBeliaLogo';
 import { KelantanDistrict } from '../types';
+import { getRoleTheme } from '../utils/roleTheme';
 
 interface RegisterPageProps {
   setActiveTab: (tab: UMKTab) => void;
@@ -437,10 +438,10 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-600 active:scale-[0.99] text-white rounded-xl font-bold text-sm sm:text-[0.9375rem] flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
+                className={`w-full mt-2 py-3.5 px-4 text-sm sm:text-[0.9375rem] flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-60 ${getRoleTheme('belia').primaryButtonClass}`}
               >
-                <UserPlus className="w-4 h-4 text-white" />
-                <span>{isSubmitting ? (isEn ? 'Processing...' : 'Memproses...') : (isEn ? 'Sign Up' : 'Daftar Sekarang')}</span>
+                <UserPlus className="w-4 h-4" />
+                <span>{isSubmitting ? (isEn ? 'Processing...' : 'Memproses...') : (isEn ? 'Sign Up' : 'Daftar')}</span>
               </button>
 
               {/* BOTTOM TOGGLE TO SIGN IN */}
@@ -476,10 +477,10 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
                   setActiveTab('login');
                 }}
-                className="inline-flex items-center gap-1.5 font-bold text-blue-700 dark:text-blue-300 hover:underline cursor-pointer shrink-0"
+                className={`inline-flex items-center gap-1.5 font-bold hover:underline cursor-pointer shrink-0 ${getRoleTheme('belia').accentTextClass}`}
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>{isEn ? 'Sign In at Main Portal →' : 'Log Masuk di Portal Utama →'}</span>
+                <span>{isEn ? 'Sign In →' : 'Log Masuk →'}</span>
               </button>
             </div>
 
@@ -493,7 +494,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
         {/* ======================================================== */}
         {/* LEFT COLUMN (DESKTOP): CRISP WHITE + TOP-LEFT SKY GLOW   */}
         {/* ======================================================== */}
-        <div className="hidden lg:flex flex-col items-center justify-center p-8 xl:p-12 relative overflow-hidden kbelia-important-header dark:bg-slate-800 select-none lg:col-span-5 xl:col-span-4 order-2 lg:order-1 border-r border-slate-300 dark:border-slate-600">
+        <div className="hidden lg:flex flex-col items-center justify-center p-8 xl:p-12 relative overflow-hidden kbelia-canvas-belia select-none lg:col-span-5 xl:col-span-4 order-2 lg:order-1 border-r border-[#E2DCCB] dark:border-[#24342D]">
           
           {/* SOFT GEOMETRIC ACCENT PATTERN */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -532,7 +533,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
             </p>
 
             {/* WELCOME BADGE */}
-            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[0.8125rem] font-semibold bg-amber-50 border border-amber-300 text-black shadow-xs">
+            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[0.8125rem] font-semibold bg-amber-50 border border-amber-300 text-black shadow-xs">
               <Sparkles className="w-3.5 h-3.5 text-black" />
               <span>Selamat Datang ke KBelia</span>
             </div>
@@ -562,7 +563,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
       {showTermsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-xs p-4 animate-fade-slide-up">
           <div className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl max-h-[85vh] overflow-y-auto">
-            <div className="kbelia-important-header px-6 pt-5 pb-3.5 flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
+            <div className="bg-[#FAF8F3] dark:bg-[#101815] px-6 pt-5 pb-3.5 flex items-center justify-between border-b border-[#E2DCCB] dark:border-[#24342D]">
               <div className="flex items-center gap-2 text-black dark:text-white/75 font-bold text-sm">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Terma & Syarat Pendaftaran KBelia</span>
@@ -570,7 +571,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={() => setShowTermsModal(false)}
-                className="text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white p-1 rounded-lg cursor-pointer"
+                aria-label="Tutup"
+                className={getRoleTheme('belia').iconButtonClass}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -595,9 +597,9 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                   setAgreeTerms(true);
                   setShowTermsModal(false);
                 }}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-colors cursor-pointer dark:bg-blue-600"
+                className={`w-full py-2.5 text-sm shadow-xs ${getRoleTheme('belia').primaryButtonClass}`}
               >
-                Saya Bersetuju & Tutup
+                Setuju &amp; Tutup
               </button>
             </div>
           </div>

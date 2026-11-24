@@ -42,12 +42,12 @@ const COLOR_MAP = {
     ropeGlow: 'stroke-amber-400/25 dark:stroke-amber-400/20'
   },
   violet: {
-    topBar: 'bg-indigo-600/80 dark:bg-indigo-500/80',
-    iconBg: 'bg-indigo-600 dark:bg-indigo-600 border-indigo-500 text-white',
-    hoverBorder: 'hover:border-indigo-400/70 dark:hover:border-indigo-400/70',
+    topBar: 'bg-teal-600/80 dark:bg-teal-500/80',
+    iconBg: 'bg-teal-600 dark:bg-teal-600 border-teal-500 text-white',
+    hoverBorder: 'hover:border-teal-400/70 dark:hover:border-teal-400/70',
     valueText: 'text-black dark:text-white',
-    ropeStroke: 'stroke-indigo-600/80 dark:stroke-indigo-400/85',
-    ropeGlow: 'stroke-indigo-500/20 dark:stroke-indigo-400/20'
+    ropeStroke: 'stroke-teal-600/80 dark:stroke-teal-400/85',
+    ropeGlow: 'stroke-teal-500/20 dark:stroke-teal-400/20'
   }
 };
 
@@ -87,9 +87,6 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
         onClick ? 'cursor-pointer' : ''
       }`}
     >
-      {/* Subtle Top Accent Line */}
-      <div className={`absolute top-0 left-0 right-0 h-0.5 opacity-60 group-hover:opacity-100 transition-opacity duration-200 ${theme.topBar}`} aria-hidden="true" />
-
       {/* Top Header: Title, Metric Value & Icon Badge */}
       <div className="flex items-start justify-between gap-2.5">
         <div className="min-w-0 flex-1">

@@ -15,6 +15,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { createMaintenanceTicket } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { showToast } from './ToastNotification';
 
 interface KioskMaintenanceModalProps {
@@ -31,7 +32,8 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
   defaultKioskName = 'Hab Belia Kota Bharu Sentral'
 }) => {
   const { language } = useLanguage();
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [category, setCategory] = useState<MaintenanceTicket['issueCategory']>('Elektrik & Suis');
   const [description, setDescription] = useState('');
   const [reporterName, setReporterName] = useState('');
@@ -114,7 +116,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
         aria-modal="true"
       >
         {/* Header */}
-        <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-4.5 px-6 sm:px-7 flex items-center justify-between shrink-0">
+        <div className="bg-[#FAF8F3] dark:bg-[#101815] border-b border-[#E2DCCB] dark:border-[#24342D] py-4.5 px-6 sm:px-7 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
               <Wrench className="w-5 h-5" />
@@ -131,7 +133,8 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            aria-label={language === 'en' ? 'Close' : 'Tutup'}
+            className={roleTheme.iconButtonClass}
           >
             <X className="w-5 h-5" />
           </button>
@@ -140,7 +143,7 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto">
           {errorMsg && (
-            <div className="mb-4 p-3.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-black dark:text-white text-sm sm:text-[0.9375rem] font-medium border border-rose-200 dark:border-rose-900 flex items-center gap-2">
+            <div className="mb-4 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-black dark:text-white text-sm sm:text-[0.9375rem] font-medium border border-rose-200 dark:border-rose-900 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
@@ -180,11 +183,11 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                         onClick={() => setCategory(cat as MaintenanceTicket['issueCategory'])}
                         className={`p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-600 ring-1 ring-blue-500/30 text-black dark:text-white font-bold'
-                            : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black dark:text-white hover:border-blue-400/70'
+                            ? `${roleTheme.activeMiniBtnClass} font-bold`
+                            : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black dark:text-white hover:border-slate-400 dark:hover:border-slate-500'
                         }`}
                       >
-                        <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-black dark:text-white/75' : 'text-black/70'}`} />
+                        <Icon className={`w-4 h-4 shrink-0 ${isSelected ? roleTheme.accentTextClass : 'text-black/70 dark:text-white/70'}`} />
                         <span className="text-sm font-semibold">{language === 'en' ? labelEn : cat}</span>
                       </button>
                     );
@@ -241,23 +244,23 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  className={`py-2.5 px-5 text-sm sm:text-[0.9375rem] ${roleTheme.secondaryButtonClass}`}
                 >
                   {language === 'en' ? 'Cancel' : 'Batal'}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 shadow-sm transition-all flex items-center gap-2 cursor-pointer dark:bg-blue-600"
+                  className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] disabled:opacity-50 shadow-sm inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <Send className="w-4 h-4" />
-                  <span>{submitting ? (language === 'en' ? 'Submitting...' : 'Menghantar...') : (language === 'en' ? 'Submit Issue Ticket' : 'Hantar Tiket Aduan')}</span>
+                  <span>{submitting ? (language === 'en' ? 'Submitting...' : 'Menghantar...') : (language === 'en' ? 'Submit' : 'Hantar')}</span>
                 </button>
               </div>
             </form>
           ) : (
             <div className="text-center py-6">
-              <CheckCircle2 className="w-12 h-12 text-black dark:text-white/75 mx-auto mb-3" />
+              <CheckCircle2 className={`w-12 h-12 mx-auto mb-3 ${roleTheme.accentTextClass}`} />
               <h4 className="text-base sm:text-lg font-bold text-black dark:text-white mb-1">
                 {language === 'en' ? `Maintenance Ticket #${ticketId} Submitted` : `Tiket Aduan #${ticketId} Berjaya Dihantar`}
               </h4>
@@ -269,9 +272,9 @@ export const KioskMaintenanceModal: React.FC<KioskMaintenanceModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer dark:bg-rose-600"
+                className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] ${roleTheme.primaryButtonClass}`}
               >
-                {language === 'en' ? 'Return to Dashboard' : 'Kembali ke Dashboard'}
+                {language === 'en' ? 'Close' : 'Tutup'}
               </button>
             </div>
           )}

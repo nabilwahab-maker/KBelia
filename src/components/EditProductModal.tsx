@@ -3,6 +3,8 @@ import { X, Save, CheckCircle2, XCircle, Loader2, Edit3, AlertCircle } from 'luc
 import { ProductItem } from '../types';
 import { ImageDropzone } from './ImageDropzone';
 import { saveProduct } from '../services/dataService';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 const DEFAULT_PRODUCT_IMAGE = '/assets/generated/product_kelantan_delights_1793924253401.jpg';
 
@@ -19,6 +21,8 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   onClose,
   onSaved
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
@@ -128,9 +132,9 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`${roleTheme.surfaceMutedClass} sticky top-0 z-10 border-b ${roleTheme.dividerClass} px-6 py-4 flex items-center justify-between`}>
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div className={`w-9 h-9 rounded-xl ${roleTheme.activeMiniBtnClass} border flex items-center justify-center shrink-0`}>
               <Edit3 className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -151,7 +155,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
             disabled={isSaving}
             onClick={onClose}
             aria-label="Tutup tetingkap edit"
-            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+            className={`${roleTheme.iconButtonClass} disabled:opacity-40`}
           >
             <X className="w-4 h-4" />
           </button>
@@ -178,7 +182,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Masukkan nama produk"
-                className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium"
+                className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none transition-all font-medium ${roleTheme.inputClass}`}
               />
             </div>
 
@@ -194,7 +198,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="Masukkan harga jualan"
-                className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums focus:outline-none transition-all ${roleTheme.inputClass}`}
               />
             </div>
 
@@ -208,7 +212,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="Masukkan kategori produk"
-                className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none transition-all ${roleTheme.inputClass}`}
               />
             </div>
           </div>
@@ -259,7 +263,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Masukkan penerangan produk"
-                className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none transition-all ${roleTheme.inputClass}`}
               />
               <div className="mt-1 text-[0.8125rem] text-black/60 dark:text-white/60 text-right tabular-nums">
                 {description.length}/1000 aksara
@@ -282,14 +286,14 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-50"
+              className={`w-full sm:w-auto min-h-[42px] px-5 py-2.5 text-sm sm:text-[0.9375rem] disabled:opacity-50 ${roleTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap transition-colors cursor-pointer disabled:opacity-60"
+              className={`w-full sm:w-auto min-h-[42px] px-6 py-2.5 text-sm sm:text-[0.9375rem] shadow-sm inline-flex items-center justify-center gap-2 disabled:opacity-60 ${roleTheme.primaryButtonClass}`}
             >
               {isSaving ? (
                 <>
@@ -299,7 +303,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
               ) : (
                 <>
                   <Save className="w-4 h-4 shrink-0" />
-                  <span>Simpan Perubahan</span>
+                  <span>Simpan</span>
                 </>
               )}
             </button>

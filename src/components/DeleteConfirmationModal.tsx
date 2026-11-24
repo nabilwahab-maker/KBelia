@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { Trash2, X, Loader2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 export interface DeleteConfirmationModalProps {
   isOpen: boolean;
@@ -28,6 +30,8 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
   onCancel
 }) => {
   const { language } = useLanguage();
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const isEn = language === 'en';
 
   useEffect(() => {
@@ -72,7 +76,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
           disabled={isDeleting}
           onClick={onCancel}
           aria-label={isEn ? 'Close' : 'Tutup'}
-          className="absolute top-3.5 right-3.5 p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-amber-100/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer disabled:opacity-40"
+          className={`absolute top-3.5 right-3.5 disabled:opacity-40 ${roleTheme.iconButtonClass}`}
         >
           <X className="w-4 h-4" />
         </button>
@@ -113,7 +117,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
             type="button"
             disabled={isDeleting}
             onClick={onCancel}
-            className="w-full sm:w-1/2 min-h-[42px] px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-300 dark:bg-zinc-600 dark:hover:bg-zinc-700 text-black dark:text-white text-sm font-bold border border-slate-300 dark:border-zinc-600 transition-colors cursor-pointer disabled:opacity-50"
+            className={`w-full sm:w-1/2 min-h-[42px] px-5 py-2.5 text-sm disabled:opacity-50 ${roleTheme.secondaryButtonClass}`}
           >
             {resolvedCancel}
           </button>
@@ -121,7 +125,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
             type="button"
             disabled={isDeleting}
             onClick={onConfirm}
-            className="w-full sm:w-1/2 min-h-[42px] px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold shadow-sm transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+            className={`w-full sm:w-1/2 min-h-[42px] px-5 py-2.5 text-sm shadow-sm inline-flex items-center justify-center gap-2 disabled:opacity-60 ${roleTheme.dangerButtonClass}`}
           >
             {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>{isDeleting ? (isEn ? 'Deleting...' : 'Memadam...') : resolvedConfirm}</span>

@@ -16,6 +16,7 @@ import {
   subscribeNotifications
 } from '../services/notificationStore';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface NotificationDropdownProps {
   onNavigateTab?: (tab: string) => void;
@@ -26,6 +27,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 }) => {
   const { user, userProfile, isAdmin, isDemoSession } = useAuth();
   const isMentor = userProfile?.role === 'mentor';
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
 
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<YouthNotification[]>(getStoredNotifications);
@@ -132,16 +134,10 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 <span className="text-[0.9375rem] font-bold text-black dark:text-white">
                   Pemberitahuan
                 </span>
-                <span className={`text-[0.8125rem] px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 border ${
-                  isAdmin 
-                    ? 'bg-amber-100 text-black dark:bg-amber-950/80 dark:text-white border-amber-300 dark:border-amber-800'
-                    : isMentor 
-                      ? 'bg-amber-100 text-black dark:bg-rose-600 dark:text-white border-rose-200 dark:border-rose-800/70'
-                      : 'bg-amber-100 text-black dark:bg-rose-600 dark:text-white border-amber-400 dark:border-amber-400/40'
-                }`}>
-                  {isAdmin && <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/80" />}
-                  {isMentor && <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/80" />}
-                  {!isAdmin && !isMentor && <User className="w-3.5 h-3.5 text-black dark:text-white/80" />}
+                <span className={`text-[0.8125rem] px-2.5 py-0.5 rounded-lg font-bold inline-flex items-center gap-1 border ${roleTheme.activeMiniBtnClass}`}>
+                  {isAdmin && <ShieldCheck className="w-3.5 h-3.5" />}
+                  {isMentor && <GraduationCap className="w-3.5 h-3.5" />}
+                  {!isAdmin && !isMentor && <User className="w-3.5 h-3.5" />}
                   <span>{accountRoleLabel}</span>
                 </span>
               </div>

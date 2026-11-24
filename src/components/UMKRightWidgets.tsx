@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
 import { CapsuleSlot, BusinessListing, YouthProgram } from '../types';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface UMKRightWidgetsProps {
   setActiveTab: (tab: UMKTab) => void;
@@ -18,6 +20,8 @@ interface UMKRightWidgetsProps {
 export const UMKRightWidgets: React.FC<UMKRightWidgetsProps> = ({
   onOpenBooking,
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   return (
     <div className="space-y-4 w-full min-w-0">
       {/* 1. PENGUMUMAN RASMI (ALERT BOX) */}
@@ -29,7 +33,7 @@ export const UMKRightWidgets: React.FC<UMKRightWidgetsProps> = ({
           </div>
         </div>
 
-        <div className="p-3.5 bg-blue-50 dark:bg-blue-950/60 rounded-xl border border-blue-200 dark:border-blue-800/70 text-left">
+        <div className={`p-3.5 rounded-xl border text-left ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass}`}>
           <div className="text-sm font-bold text-black dark:text-white">Pengambilan Kiosk Modular</div>
           <p className="text-[0.875rem] text-black dark:text-white mt-1 leading-relaxed">
             Permohonan dibuka untuk lokasi tumpuan Kota Bharu, Bachok, Kubang Kerian & Jeli.
@@ -58,10 +62,10 @@ export const UMKRightWidgets: React.FC<UMKRightWidgetsProps> = ({
             href="https://wa.me/601155552026?text=Salam%20Admin%20KBelia,%20saya%20ingin%20bertanya%20berkaitan%20sewaan%20kiosk%20niaga"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors shadow-2xs"
+            className={`w-full py-2.5 px-3 text-sm inline-flex items-center justify-center gap-2 shadow-2xs ${roleTheme.primaryButtonClass}`}
           >
             <MessageSquare className="w-4 h-4" />
-            <span>Bantuan WhatsApp Rasmi</span>
+            <span>WhatsApp Urusetia</span>
           </a>
 
           <div className="pt-2.5 border-t border-slate-300 dark:border-slate-600 flex items-center justify-between text-[0.8125rem] text-black dark:text-white">

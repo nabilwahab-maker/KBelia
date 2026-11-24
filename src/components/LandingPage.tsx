@@ -393,7 +393,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               id="landing-darkmode-toggle"
               type="button"
               onClick={toggleEditorialTone}
-              className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+              className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
                 isEditorialDark
                   ? 'bg-[#18221F] border-[#E5B85C]/20 text-[#E5B85C] hover:bg-[#1F2C28]'
                   : 'bg-white border-[#0B6E52]/20 text-[#0B6E52] hover:bg-[#EDF5F1]'
@@ -413,7 +413,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
 
             <div
-              className={`flex items-center p-0.5 rounded-lg border text-xs font-semibold shrink-0 ${
+              className={`flex items-center p-0.5 rounded-xl border text-xs font-semibold shrink-0 ${
                 isEditorialDark
                   ? 'bg-[#18221F] border-[#E5B85C]/20'
                   : 'bg-white border-[#0B6E52]/20'
@@ -422,7 +422,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={() => setLanguage('ms')}
-                className={`px-2.5 py-1.5 rounded-md transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   isBM
                     ? 'bg-emerald-700 text-white'
                     : `${surfaceTextMuted} ${isEditorialDark ? 'hover:text-white' : 'hover:text-slate-900'}`
@@ -433,7 +433,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`px-2.5 py-1.5 rounded-md transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   !isBM
                     ? 'bg-emerald-700 text-white'
                     : `${surfaceTextMuted} ${isEditorialDark ? 'hover:text-white' : 'hover:text-slate-900'}`
@@ -447,7 +447,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               type="button"
               id="landing-login-btn"
               onClick={() => navigateToPage('login')}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
                 isEditorialDark
                   ? 'bg-emerald-700 hover:bg-emerald-600 text-[#F4F1EA]'
                   : 'bg-[#0B6E52] hover:bg-[#085640] text-white'
@@ -494,13 +494,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   type="button"
                   id="landing-register-nav-btn"
                   onClick={() => navigateToPage('register')}
-                  className={`inline-flex items-center gap-2.5 px-6 py-3 rounded-lg text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 interactive-press ${
+                  className={`inline-flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 interactive-press ${
                     isEditorialDark
                       ? 'bg-[#E5B85C] hover:bg-[#EDC878] text-[#111916]'
                       : 'bg-[#0B6E52] hover:bg-[#085640] text-white'
                   }`}
                 >
-                  <span>{isBM ? 'Mulakan Langkah' : 'Get Started'}</span>
+                  <span>{isBM ? 'Daftar Sekarang' : 'Get Started'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
@@ -1045,19 +1045,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   type="button"
                   id="landing-cta-register-btn"
                   onClick={() => navigateToPage('register')}
-                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 interactive-press ${
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 interactive-press ${
                     isEditorialDark
                       ? 'bg-[#E5B85C] hover:bg-[#EDC878] text-[#111916]'
                       : 'bg-[#0B6E52] hover:bg-[#085640] text-white'
                   }`}
                 >
-                  <span>{isBM ? 'Daftar Akaun Belia' : 'Create Youth Account'}</span>
+                  <span>{isBM ? 'Daftar Akaun' : 'Sign Up'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
                   type="button"
                   onClick={() => navigateToPage('login')}
-                  className={`inline-flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-semibold border transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold border transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                     isEditorialDark
                       ? 'border-[#E5B85C]/30 text-[#F4F1EA] hover:bg-white/5'
                       : 'border-[#0B6E52]/30 text-[#16221D] hover:bg-white/70'
@@ -1220,7 +1220,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Laman Komuniti"
-                className={`w-8 h-8 rounded-lg border ${hairlineBorder} flex items-center justify-center ${surfaceTextMuted} hover:text-emerald-400 transition-colors`}
+                className={`w-9 h-9 rounded-xl border ${hairlineBorder} flex items-center justify-center ${surfaceTextMuted} hover:text-emerald-400 transition-colors`}
               >
                 <Globe className="w-4 h-4" />
               </a>
@@ -1229,7 +1229,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Saluran Video Komuniti"
-                className={`w-8 h-8 rounded-lg border ${hairlineBorder} flex items-center justify-center ${surfaceTextMuted} hover:text-emerald-400 transition-colors`}
+                className={`w-9 h-9 rounded-xl border ${hairlineBorder} flex items-center justify-center ${surfaceTextMuted} hover:text-emerald-400 transition-colors`}
               >
                 <Video className="w-4 h-4" />
               </a>
@@ -1238,7 +1238,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Talian Bantuan"
-                className={`w-8 h-8 rounded-lg border ${hairlineBorder} flex items-center justify-center ${surfaceTextMuted} hover:text-emerald-400 transition-colors`}
+                className={`w-9 h-9 rounded-xl border ${hairlineBorder} flex items-center justify-center ${surfaceTextMuted} hover:text-emerald-400 transition-colors`}
               >
                 <Compass className="w-4 h-4" />
               </a>
@@ -1291,10 +1291,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}
-                className={`p-1.5 rounded-lg border ${hairlineBorder} cursor-pointer`}
+                className={`w-9 h-9 rounded-xl border ${hairlineBorder} inline-flex items-center justify-center cursor-pointer`}
                 aria-label={isBM ? 'Tutup' : 'Close'}
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -1328,9 +1328,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={() => setLegalModalType(null)}
-                className="px-5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-sm rounded-lg transition-colors cursor-pointer"
+                className="px-5 py-2.5 bg-[#0B6E52] hover:bg-[#085640] text-white font-semibold text-sm rounded-xl transition-colors cursor-pointer"
               >
-                {isBM ? 'Saya Faham & Tutup' : 'I Understand & Close'}
+                {isBM ? 'Tutup' : 'Close'}
               </button>
             </div>
           </div>

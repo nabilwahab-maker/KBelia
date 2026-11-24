@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth, ADMIN_EMAIL } from '../context/AuthContext';
 import { KelantanDistrict } from '../types';
+import { getRoleTheme } from '../utils/roleTheme';
 
 const DISTRICT_LIST: KelantanDistrict[] = [
   'Kota Bharu', 'Bachok', 'Pasir Mas', 'Tumpat', 'Pasir Puteh',
@@ -38,6 +39,9 @@ export const LoginModal: React.FC = () => {
 
   // Role: 'user' | 'mentor' | 'admin'
   const [activeRoleTab, setActiveRoleTab] = useState<'user' | 'admin' | 'mentor'>('user');
+  const modalRoleTheme = getRoleTheme(
+    activeRoleTab === 'admin' ? 'admin' : activeRoleTab === 'mentor' ? 'mentor' : 'belia'
+  );
   
   // Mode: 'login' | 'register'
   const [userMode, setUserMode] = useState<'login' | 'register'>('login');
@@ -134,9 +138,9 @@ export const LoginModal: React.FC = () => {
         className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-300 dark:border-slate-600 overflow-hidden flex flex-col transition-colors"
       >
         {/* Header */}
-        <div className="p-4 kbelia-important-header dark:bg-slate-800 text-black dark:text-white flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
+        <div className={`p-4 ${modalRoleTheme.surfaceMutedClass} text-black dark:text-white flex items-center justify-between border-b ${modalRoleTheme.dividerClass}`}>
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/70 text-rose-600 dark:text-rose-400 flex items-center justify-center font-black">
+            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-black ${modalRoleTheme.activeMiniBtnClass}`}>
               {activeRoleTab === 'admin' ? <ShieldCheck className="w-4 h-4" /> : activeRoleTab === 'mentor' ? <GraduationCap className="w-4 h-4" /> : <Store className="w-4 h-4" />}
             </div>
             <div>
@@ -149,7 +153,8 @@ export const LoginModal: React.FC = () => {
           <button
             type="button"
             onClick={closeLoginModal}
-            className="p-1.5 text-black/70 hover:text-black dark:text-white dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+            aria-label="Tutup"
+            className={modalRoleTheme.iconButtonClass}
           >
             <X className="w-4 h-4" />
           </button>
@@ -163,8 +168,8 @@ export const LoginModal: React.FC = () => {
               setActiveRoleTab('user');
               clearAuthError();
             }}
-            className={`py-1.5 px-2 rounded-xl font-bold transition-all cursor-pointer ${
-              activeRoleTab === 'user' ? 'bg-rose-600 text-white shadow-xs dark:bg-rose-600' : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
+            className={`py-1.5 px-2 rounded-xl font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeRoleTab === 'user' ? `${getRoleTheme('belia').segmentedActiveClass} shadow-xs` : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             Usahawan
@@ -176,8 +181,8 @@ export const LoginModal: React.FC = () => {
               setUserMode('login');
               clearAuthError();
             }}
-            className={`py-1.5 px-2 rounded-xl font-bold transition-all cursor-pointer ${
-              activeRoleTab === 'mentor' ? 'bg-rose-600 text-white shadow-xs dark:bg-rose-600' : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
+            className={`py-1.5 px-2 rounded-xl font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeRoleTab === 'mentor' ? `${getRoleTheme('mentor').segmentedActiveClass} shadow-xs` : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             Mentor
@@ -189,8 +194,8 @@ export const LoginModal: React.FC = () => {
               setUserMode('login');
               clearAuthError();
             }}
-            className={`py-1.5 px-2 rounded-xl font-bold transition-all cursor-pointer ${
-              activeRoleTab === 'admin' ? 'bg-rose-600 text-white shadow-xs dark:bg-rose-600' : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
+            className={`py-1.5 px-2 rounded-xl font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeRoleTab === 'admin' ? `${getRoleTheme('admin').segmentedActiveClass} shadow-xs` : 'text-black dark:text-white/75 hover:text-black dark:hover:text-white'
             }`}
           >
             Pentadbir
@@ -209,8 +214,8 @@ export const LoginModal: React.FC = () => {
                 }}
                 className={`pb-1 cursor-pointer transition-colors border-b-2 ${
                   userMode === 'login'
-                    ? 'border-blue-600 text-black dark:text-white/75'
-                    : 'border-transparent text-black/70 dark:text-white/75'
+                    ? modalRoleTheme.tabActiveUnderlineClass
+                    : modalRoleTheme.tabIdleUnderlineClass
                 }`}
               >
                 Log Masuk
@@ -223,11 +228,11 @@ export const LoginModal: React.FC = () => {
                 }}
                 className={`pb-1 cursor-pointer transition-colors border-b-2 ${
                   userMode === 'register'
-                    ? 'border-blue-600 text-black dark:text-white/75'
-                    : 'border-transparent text-black/70 dark:text-white/75'
+                    ? modalRoleTheme.tabActiveUnderlineClass
+                    : modalRoleTheme.tabIdleUnderlineClass
                 }`}
               >
-                Daftar Baharu
+                Daftar
               </button>
             </div>
           )}
@@ -294,10 +299,10 @@ export const LoginModal: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
+                className={`w-full py-2.5 text-sm flex items-center justify-center gap-2 shadow-xs disabled:opacity-60 ${modalRoleTheme.primaryButtonClass}`}
               >
                 <LogIn className="w-4 h-4" />
-                <span>{isSubmitting ? 'Memproses...' : 'Log Masuk Sekarang'}</span>
+                <span>{isSubmitting ? 'Memproses...' : 'Log Masuk'}</span>
               </button>
 
               {activeRoleTab === 'user' && (
@@ -396,10 +401,10 @@ export const LoginModal: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-60 dark:bg-blue-600"
+                className={`w-full py-2.5 text-sm flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-60 ${modalRoleTheme.primaryButtonClass}`}
               >
                 <UserPlus className="w-4 h-4" />
-                <span>{isSubmitting ? 'Mendaftar...' : 'Daftar Akaun'}</span>
+                <span>{isSubmitting ? 'Mendaftar...' : 'Daftar'}</span>
               </button>
             </form>
           )}
@@ -417,10 +422,10 @@ export const LoginModal: React.FC = () => {
                   setSuccessNotice('Log masuk Mod Demo Belia berjaya!');
                   setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-300 dark:border-slate-600 rounded-xl text-left cursor-pointer transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-[#0B6E52]/10 dark:hover:bg-[#10B981]/15 border border-slate-300 dark:border-slate-600 rounded-xl text-left cursor-pointer transition-colors"
               >
                 <div className="text-[0.8125rem] font-bold text-black dark:text-white flex items-center gap-1">
-                  <Store className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                  <Store className="w-3.5 h-3.5 text-[#0B6E52] dark:text-[#34D399] shrink-0" />
                   <span>Belia</span>
                 </div>
                 <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate">Ahmad Faizul</div>
@@ -433,10 +438,10 @@ export const LoginModal: React.FC = () => {
                   setSuccessNotice('Log masuk Mod Demo Mentor berjaya!');
                   setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-300 dark:border-slate-600 rounded-xl text-left cursor-pointer transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-[#1D4ED8]/10 dark:hover:bg-[#0EA5E9]/15 border border-slate-300 dark:border-slate-600 rounded-xl text-left cursor-pointer transition-colors"
               >
                 <div className="text-[0.8125rem] font-bold text-black dark:text-white flex items-center gap-1">
-                  <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                  <GraduationCap className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#38BDF8] shrink-0" />
                   <span>Mentor</span>
                 </div>
                 <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate">Dr. Wan Azhar</div>
@@ -449,10 +454,10 @@ export const LoginModal: React.FC = () => {
                   setSuccessNotice('Log masuk Mod Demo Admin berjaya!');
                   setTimeout(() => closeLoginModal(), 400);
                 }}
-                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-amber-50 dark:hover:bg-rose-600 border border-slate-300 dark:border-slate-600 rounded-xl text-left cursor-pointer transition-colors"
+                className="p-2 bg-slate-50 dark:bg-slate-900 hover:bg-[#9A5628]/10 dark:hover:bg-[#D98A4E]/15 border border-slate-300 dark:border-slate-600 rounded-xl text-left cursor-pointer transition-colors"
               >
                 <div className="text-[0.8125rem] font-bold text-black dark:text-white flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#9A5628] dark:text-[#D98A4E] shrink-0" />
                   <span>Admin</span>
                 </div>
                 <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate">Admin KBelia</div>

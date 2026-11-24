@@ -25,6 +25,7 @@ import { resolveEventImage } from '../utils/visualAssets';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 const MONTH_MAP: Record<string, number> = {
   januari: 0, january: 0, jan: 0,
@@ -88,8 +89,9 @@ const getEventCategoryLabel = (category: string, isEn: boolean): string => {
 
 export const EventsSection: React.FC = () => {
   const { language } = useLanguage();
-  const { user, userProfile, isAdmin, openLoginModal } = useAuth();
+  const { user, userProfile, isAdmin, isMentor, openLoginModal } = useAuth();
   const isEn = language === 'en';
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
 
   const [events, setEvents] = useState<YouthEvent[]>(INITIAL_YOUTH_EVENTS);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -313,7 +315,6 @@ export const EventsSection: React.FC = () => {
               style={{ '--stagger': 0 } as React.CSSProperties}
               className="animate-dashboard-card group relative rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-blue-400/80 dark:hover:border-blue-500/70 shadow-xs overflow-hidden transition-colors duration-200"
             >
-              <div className="h-0.5 w-full bg-blue-600 dark:bg-blue-500" />
               <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
                 {/* Poster Besar Acara Utama */}
                 <div className="lg:col-span-6 relative min-h-[240px] sm:min-h-[290px] lg:min-h-[320px] lg:h-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
@@ -338,7 +339,7 @@ export const EventsSection: React.FC = () => {
                 {/* Butiran Lengkap & Tindakan Pantas Acara Utama */}
                 <div className="lg:col-span-6 p-5 sm:p-6 flex flex-col justify-between gap-4">
                   <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] font-semibold text-blue-700 dark:text-blue-400">
+                    <div className={`flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] font-semibold ${roleTheme.accentTextClass}`}>
                       <span>{getEventCategoryLabel(featuredEvent.category, isEn)}</span>
                       <span aria-hidden="true">·</span>
                       <span className="tabular-nums">{featuredEvent.date}</span>
@@ -372,7 +373,7 @@ export const EventsSection: React.FC = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2.5 pt-3 border-t border-slate-200 dark:border-zinc-700 text-sm">
                       <div className="flex items-start gap-2 min-w-0">
-                        <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                        <Calendar className={`w-4 h-4 shrink-0 mt-0.5 ${roleTheme.accentTextClass}`} />
                         <div className="min-w-0">
                           <span className="block text-[0.8125rem] font-medium text-black/60 dark:text-white/65">
                             {isEn ? 'Date & Time' : 'Tarikh & Masa'}
@@ -384,7 +385,7 @@ export const EventsSection: React.FC = () => {
                       </div>
 
                       <div className="flex items-start gap-2 min-w-0">
-                        <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                        <MapPin className={`w-4 h-4 shrink-0 mt-0.5 ${roleTheme.accentTextClass}`} />
                         <div className="min-w-0">
                           <span className="block text-[0.8125rem] font-medium text-black/60 dark:text-white/65">
                             {isEn ? 'Venue' : 'Lokasi Acara'}
@@ -412,7 +413,7 @@ export const EventsSection: React.FC = () => {
                         <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-zinc-800 overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-[width] duration-500 ${
-                              featuredFull ? 'bg-rose-500' : 'bg-blue-600 dark:bg-blue-500'
+                              featuredFull ? 'bg-rose-500' : roleTheme.progressFillClass
                             }`}
                             style={{ width: `${occupancyPercent}%` }}
                           />
@@ -433,28 +434,28 @@ export const EventsSection: React.FC = () => {
                           ? 'bg-slate-100 text-black/60 border border-slate-200 dark:bg-zinc-800 dark:text-white/60 dark:border-zinc-700 cursor-not-allowed'
                           : featuredFull
                           ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 cursor-not-allowed'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
+                          : `${roleTheme.primaryButtonClass} shadow-xs`
                       }`}
                     >
                       {isFeaturedBooked ? (
                         <>
                           <Check className="w-4 h-4" />
-                          <span>{isEn ? 'Stall Booked' : 'Slot Ditempah'}</span>
+                          <span>{isEn ? 'Booked' : 'Ditempah'}</span>
                         </>
                       ) : featuredEnded ? (
                         <>
                           <Clock className="w-4 h-4" />
-                          <span>{isEn ? 'Event Ended' : 'Telah Selesai'}</span>
+                          <span>{isEn ? 'Ended' : 'Selesai'}</span>
                         </>
                       ) : featuredFull ? (
                         <>
                           <XCircle className="w-4 h-4" />
-                          <span>{isEn ? 'Slots Full' : 'Slot Penuh'}</span>
+                          <span>{isEn ? 'Full' : 'Penuh'}</span>
                         </>
                       ) : (
                         <>
                           <Store className="w-4 h-4" />
-                          <span>{isEn ? 'Book Stall Slot' : 'Tempah Slot Gerai'}</span>
+                          <span>{isEn ? 'Book Stall' : 'Tempah Slot'}</span>
                         </>
                       )}
                     </button>
@@ -463,7 +464,7 @@ export const EventsSection: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setEventToCancel(featuredEvent)}
-                        className="py-2.5 px-4 text-sm font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-black border border-rose-200 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-white dark:border-rose-800 transition-colors inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                        className={`py-2.5 px-4 text-sm ${roleTheme.dangerOutlineButtonClass}`}
                       >
                         <XCircle className="w-4 h-4" />
                         <span>{isEn ? 'Cancel' : 'Batal'}</span>
@@ -474,10 +475,10 @@ export const EventsSection: React.FC = () => {
                       href={`https://wa.me/${featuredEvent.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(featuredEvent.title)}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="py-2.5 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 text-sm font-semibold inline-flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+                      className={`py-2.5 px-4 text-sm inline-flex items-center gap-1.5 ${roleTheme.secondaryButtonClass}`}
                     >
                       <MessageCircle className="w-4 h-4" />
-                      <span>{isEn ? 'Organizer' : 'Hubungi Penganjur'}</span>
+                      <span>{isEn ? 'Contact' : 'Hubungi'}</span>
                     </a>
                   </div>
                 </div>
@@ -507,8 +508,6 @@ export const EventsSection: React.FC = () => {
                         style={{ '--stagger': idx + 1 } as React.CSSProperties}
                         className="animate-dashboard-card group relative flex flex-col justify-between rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 hover:border-blue-400/80 dark:hover:border-blue-500/70 shadow-2xs overflow-hidden transition-colors duration-200"
                       >
-                        <div className={`h-0.5 w-full ${isBooked ? 'bg-emerald-500' : 'bg-blue-500/80 dark:bg-blue-400/80'}`} />
-
                         <div className="relative aspect-[16/9] overflow-hidden bg-slate-100 dark:bg-zinc-800">
                           <PortalImage
                             src={resolveEventImage(evt.category, evt.imageUrl)}
@@ -522,7 +521,7 @@ export const EventsSection: React.FC = () => {
                         <div className="p-4 flex-1 flex flex-col justify-between gap-3.5">
                           <div className="space-y-2">
                             <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70 tabular-nums">
-                              <span className="text-blue-700 dark:text-blue-400">
+                              <span className={roleTheme.accentTextClass}>
                                 {getEventCategoryLabel(evt.category, isEn)}
                               </span>
                               <span aria-hidden="true">·</span>
@@ -574,7 +573,7 @@ export const EventsSection: React.FC = () => {
                                   ? 'bg-slate-100 text-black/60 border border-slate-200 dark:bg-zinc-800 dark:text-white/60 dark:border-zinc-700 cursor-not-allowed'
                                   : full
                                   ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 cursor-not-allowed'
-                                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
+                                  : `${roleTheme.primaryButtonClass} shadow-xs`
                               }`}
                             >
                               {isBooked ? (
@@ -595,7 +594,7 @@ export const EventsSection: React.FC = () => {
                               ) : (
                                 <>
                                   <Store className="w-3.5 h-3.5" />
-                                  <span>{isEn ? 'Book Stall' : 'Tempah Slot'}</span>
+                                  <span>{isEn ? 'Book' : 'Tempah'}</span>
                                 </>
                               )}
                             </button>
@@ -604,7 +603,7 @@ export const EventsSection: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => setEventToCancel(evt)}
-                                className="py-2 px-3 text-sm font-bold rounded-xl bg-rose-50 hover:bg-rose-100 text-black border border-rose-200 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-white dark:border-rose-800 transition-colors inline-flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
+                                className={`py-2 px-3 text-sm ${roleTheme.dangerOutlineButtonClass}`}
                                 title={isEn ? 'Cancel registration' : 'Batal pendaftaran'}
                               >
                                 <XCircle className="w-3.5 h-3.5" />
@@ -616,7 +615,7 @@ export const EventsSection: React.FC = () => {
                               href={`https://wa.me/${evt.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(evt.title)}`}
                               target="_blank"
                               rel="noreferrer"
-                              className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 transition-colors shrink-0"
+                              className={roleTheme.iconButtonClass}
                               title="WhatsApp Penganjur"
                             >
                               <MessageCircle className="w-4 h-4" />
@@ -636,7 +635,6 @@ export const EventsSection: React.FC = () => {
       {/* Acara & Karnival: Carian, Penapis Bersepadu, Senarai Baris & Halaman Bernombor */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
         <ReferenceTableToolbar
-          accent="blue"
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder={isEn ? 'Search event title or location...' : 'Cari tajuk acara atau lokasi...'}
@@ -781,14 +779,14 @@ export const EventsSection: React.FC = () => {
                         type="button"
                         onClick={() => !bookingBlocked && handleBookBooth(evt)}
                         disabled={bookingBlocked}
-                        className={`py-2 px-3.5 text-sm font-bold rounded-lg transition-colors inline-flex items-center gap-1.5 shrink-0 ${
+                        className={`py-2 px-3.5 text-sm font-bold rounded-xl transition-colors inline-flex items-center gap-1.5 shrink-0 ${
                           isBooked
                             ? 'bg-emerald-50 text-black border border-emerald-300 dark:bg-emerald-950/40 dark:text-white dark:border-emerald-800 cursor-default'
                             : ended
                             ? 'bg-slate-100 text-black/60 border border-slate-200 dark:bg-zinc-800 dark:text-white/60 dark:border-zinc-700 cursor-not-allowed'
                             : full
                             ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
+                            : `${roleTheme.primaryButtonClass} shadow-xs`
                         }`}
                       >
                         {isBooked ? (
@@ -799,17 +797,17 @@ export const EventsSection: React.FC = () => {
                         ) : ended ? (
                           <>
                             <Clock className="w-3.5 h-3.5" />
-                            <span>{isEn ? 'Event Ended' : 'Telah Selesai'}</span>
+                            <span>{isEn ? 'Ended' : 'Selesai'}</span>
                           </>
                         ) : full ? (
                           <>
                             <XCircle className="w-3.5 h-3.5" />
-                            <span>{isEn ? 'Slots Full' : 'Slot Penuh'}</span>
+                            <span>{isEn ? 'Full' : 'Penuh'}</span>
                           </>
                         ) : (
                           <>
                             <Store className="w-3.5 h-3.5" />
-                            <span>{isEn ? 'Book Stall' : 'Tempah Slot Gerai'}</span>
+                            <span>{isEn ? 'Book' : 'Tempah'}</span>
                           </>
                         )}
                       </button>
@@ -818,7 +816,7 @@ export const EventsSection: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setEventToCancel(evt)}
-                          className="py-2 px-3 text-sm font-bold rounded-lg bg-rose-50 hover:bg-rose-100 text-black border border-rose-200 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-white dark:border-rose-800 transition-colors inline-flex items-center gap-1.5 cursor-pointer shrink-0"
+                          className={`py-2 px-3 text-sm ${roleTheme.dangerOutlineButtonClass}`}
                           title={isEn ? 'Cancel event registration' : 'Batal pendaftaran acara ini'}
                         >
                           <XCircle className="w-3.5 h-3.5" />
@@ -830,7 +828,7 @@ export const EventsSection: React.FC = () => {
                         href={`https://wa.me/${evt.whatsappContact}?text=Salam%20Penganjur,%20saya%20berminat%20dengan%20${encodeURIComponent(evt.title)}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 transition-colors shrink-0"
+                        className={roleTheme.iconButtonClass}
                         title="WhatsApp Penganjur"
                       >
                         <MessageCircle className="w-4 h-4" />
@@ -847,7 +845,6 @@ export const EventsSection: React.FC = () => {
               itemsPerPage={7}
               onPageChange={pagination.setCurrentPage}
               itemLabel={isEn ? 'events' : 'acara'}
-              accent="blue"
             />
           </>
         )}
@@ -896,17 +893,17 @@ export const EventsSection: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setEventToCancel(null)}
-                className="px-4 py-2 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
+                className={`px-4 py-2 text-sm ${roleTheme.secondaryButtonClass}`}
               >
-                {isEn ? 'Keep Registration' : 'Kekalkan Pendaftaran'}
+                {isEn ? 'Keep' : 'Tutup'}
               </button>
               <button
                 type="button"
                 onClick={() => handleCancelBooking(eventToCancel.id, eventToCancel.title)}
-                className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className={`px-4 py-2 text-sm shadow-xs ${roleTheme.dangerButtonClass}`}
               >
                 <XCircle className="w-3.5 h-3.5" />
-                <span>{isEn ? 'Yes, Cancel Registration' : 'Ya, Batalkan Pendaftaran'}</span>
+                <span>{isEn ? 'Yes, Cancel' : 'Ya, Batal'}</span>
               </button>
             </div>
           </div>

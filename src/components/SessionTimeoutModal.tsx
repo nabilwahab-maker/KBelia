@@ -2,6 +2,7 @@ import React from 'react';
 import { X, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 export const SessionTimeoutModal: React.FC = () => {
   const {
@@ -15,6 +16,7 @@ export const SessionTimeoutModal: React.FC = () => {
     terminateSessionNow
   } = useAuth();
   const { language } = useLanguage();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const isEn = language === 'en';
 
   if (!user || !isSessionWarningOpen) return null;
@@ -49,7 +51,7 @@ export const SessionTimeoutModal: React.FC = () => {
           type="button"
           onClick={keepSessionActive}
           aria-label={isEn ? 'Close and keep session active' : 'Tutup dan kekal aktifkan sesi'}
-          className="absolute top-3.5 right-3.5 p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-amber-100/70 dark:hover:bg-rose-600 transition-colors cursor-pointer"
+          className={`absolute top-3.5 right-3.5 ${roleTheme.iconButtonClass}`}
         >
           <X className="w-4 h-4" />
         </button>
@@ -105,18 +107,18 @@ export const SessionTimeoutModal: React.FC = () => {
           <button
             type="button"
             onClick={keepSessionActive}
-            className="w-full sm:w-auto min-w-[210px] min-h-[44px] px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-bold shadow-sm transition-colors cursor-pointer"
+            className={`w-full sm:w-auto min-w-[200px] min-h-[44px] px-6 py-2.5 text-sm shadow-sm ${roleTheme.primaryButtonClass}`}
           >
-            {isEn ? 'Keep session active' : 'Kekal Aktifkan Sesi'}
+            {isEn ? 'Keep Session' : 'Kekalkan Sesi'}
           </button>
 
           <button
             type="button"
             onClick={terminateSessionNow}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-black/75 dark:text-white/75 hover:bg-rose-100 dark:hover:bg-rose-950/60 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+            className={`px-3.5 py-2 text-sm ${roleTheme.dangerOutlineButtonClass}`}
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>{isEn ? 'Sign out now' : 'Log keluar sekarang'}</span>
+            <span>{isEn ? 'Sign Out' : 'Log Keluar'}</span>
           </button>
         </div>
       </div>

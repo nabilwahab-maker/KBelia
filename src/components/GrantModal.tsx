@@ -18,6 +18,7 @@ import { createGrantApplication } from '../services/dataService';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import confetti from 'canvas-confetti';
 import { showToast } from './ToastNotification';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface GrantModalProps {
   isOpen: boolean;
@@ -56,7 +57,8 @@ export const GrantModal: React.FC<GrantModalProps> = ({
   initialGrantAmount = 'RM3,000',
   portalSettings
 }) => {
-  const { user, userProfile, openLoginModal } = useAuth();
+  const { user, userProfile, openLoginModal, isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const isMaintenanceMode = portalSettings?.systemStatus === 'maintenance';
 
   const [programTitle, setProgramTitle] = useState(initialProgramTitle);
@@ -207,7 +209,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
       >
         
         {/* Header - STICKY and SHRINK-0 */}
-        <div className="border-b border-slate-300 dark:border-slate-600 py-4 px-6 sm:px-7 flex items-center justify-between kbelia-important-header shrink-0 sticky top-0 z-10">
+        <div className="border-b border-[#E2DCCB] dark:border-[#24342D] py-4 px-6 sm:px-7 flex items-center justify-between bg-[#FAF8F3] dark:bg-[#101815] shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/70 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <Award className="w-5 h-5" />
@@ -224,7 +226,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
           <button
             type="button"
             onClick={handleResetAndClose}
-            className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer interactive-press hover:rotate-90 duration-200"
+            className={roleTheme.iconButtonClass}
             title="Tutup"
           >
             <X className="w-5 h-5" />
@@ -235,7 +237,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
         <div className="p-6 overflow-y-auto flex-1">
           {submitted ? (
             <div className="text-center py-6 space-y-4">
-              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white/75 rounded-full flex items-center justify-center mx-auto ring-8 ring-emerald-50 dark:ring-emerald-950/40">
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border ${roleTheme.activeMiniBtnClass}`}>
                 <CheckCircle2 className="w-10 h-10" />
               </div>
               <h4 className="text-xl font-bold text-black dark:text-white">Permohonan Geran Diterima!</h4>
@@ -246,7 +248,7 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer dark:bg-emerald-600"
+                  className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] ${roleTheme.primaryButtonClass}`}
                 >
                   Selesai
                 </button>
@@ -256,14 +258,14 @@ export const GrantModal: React.FC<GrantModalProps> = ({
             <form onSubmit={handleSubmit} className="space-y-5">
               
               {!user && (
-                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/70 rounded-xl flex items-center justify-between gap-3 text-sm sm:text-[0.9375rem]">
+                <div className={`p-4 rounded-xl border flex items-center justify-between gap-3 text-sm sm:text-[0.9375rem] ${roleTheme.surfaceMutedClass} ${roleTheme.dividerClass}`}>
                   <span className="text-black dark:text-white font-medium">
                     Sila log masuk untuk menghantar permohonan geran rasmi.
                   </span>
                   <button
                     type="button"
                     onClick={() => openLoginModal()}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg cursor-pointer transition-colors shrink-0 dark:bg-blue-600"
+                    className={`px-4 py-2 text-sm shrink-0 ${roleTheme.primaryButtonClass}`}
                   >
                     Log Masuk
                   </button>
@@ -298,8 +300,8 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                         }}
                         className={`p-4 rounded-xl text-left border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                           isSelected
-                            ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 ring-1 ring-blue-500/30 shadow-xs'
-                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-400/70 dark:hover:border-slate-500'
+                            ? `${roleTheme.activeMiniBtnClass} ring-1 ring-current/20 shadow-xs`
+                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500'
                         }`}
                       >
                         <div className="space-y-1">
@@ -307,8 +309,8 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                             <span className="font-bold text-sm sm:text-[0.9375rem] text-black dark:text-white">
                               {pkg.title}
                             </span>
-                            <span className={`text-[0.8125rem] px-2 py-0.5 rounded-full font-medium ${pkg.badgeColor}`}>
-                              {pkg.badge}
+                            <span className="text-xs font-semibold text-black/65 dark:text-white/70">
+                              · {pkg.badge}
                             </span>
                           </div>
                           <p className="text-[0.9375rem] text-black dark:text-white/75 leading-snug">
@@ -320,9 +322,9 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                           <span className="text-base sm:text-lg font-black text-black dark:text-white/75 tabular-nums">
                             {pkg.amount}
                           </span>
-                          <div className={`mt-1 w-4 h-4 rounded-full border flex items-center justify-center ${
-                            isSelected 
-                              ? 'border-emerald-600 bg-emerald-600 text-white dark:bg-emerald-600' 
+                          <div className={`mt-1 w-4 h-4 rounded-md border flex items-center justify-center ${
+                            isSelected
+                              ? roleTheme.badgeClass + ' border-transparent'
                               : 'border-slate-300 dark:border-slate-600'
                           }`}>
                             {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -496,17 +498,17 @@ export const GrantModal: React.FC<GrantModalProps> = ({
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                  className={`py-2.5 px-5 text-sm sm:text-[0.9375rem] ${roleTheme.secondaryButtonClass}`}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 dark:bg-emerald-600"
+                  className={`py-2.5 px-6 text-sm sm:text-[0.9375rem] flex items-center gap-2 disabled:opacity-50 ${roleTheme.primaryButtonClass}`}
                 >
                   <Send className="w-4 h-4" />
-                  <span>{loading ? 'Menghantar...' : 'Hantar Permohonan'}</span>
+                  <span>{loading ? 'Menghantar...' : 'Hantar'}</span>
                 </button>
               </div>
 

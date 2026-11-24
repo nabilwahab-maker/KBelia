@@ -32,7 +32,16 @@ import {
   Check,
   Newspaper,
   MessagesSquare,
-  MapPin
+  MapPin,
+  ClipboardCheck,
+  BarChart3,
+  Sliders,
+  FileText,
+  ShoppingBag,
+  MessageCircle,
+  Compass,
+  Megaphone,
+  CalendarDays
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -40,7 +49,8 @@ import { useLanguage } from '../context/LanguageContext';
 import { NotificationDropdown } from './NotificationDropdown';
 import { KBeliaLogo } from './KBeliaLogo';
 import { showToast } from './ToastNotification';
-import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab, MentorSubTab, formatBusinessCategory } from '../types';
+import { DashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab, AdminSubTab, MentorSubTab, formatBusinessCategory } from '../types';
 
 export type UMKTab = 
   | 'home' 
@@ -68,6 +78,7 @@ interface UMKHeaderProps {
   setIsSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
   onToggleMobileSidebar?: () => void;
   onSelectMerchantSubTab?: (sub: MerchantSubTab) => void;
+  onSelectAdminSubTab?: (sub: AdminSubTab) => void;
   onSelectMentorSubTab?: (sub: MentorSubTab) => void;
   onOpenBooking?: () => void;
   slots?: CapsuleSlot[];
@@ -85,6 +96,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   setIsSidebarCollapsed,
   onToggleMobileSidebar,
   onSelectMerchantSubTab,
+  onSelectAdminSubTab,
   onSelectMentorSubTab,
   slots = [],
   businesses = [],
@@ -94,6 +106,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   onOpenGrantModal
 }) => {
   const { user, userProfile, isAdmin, isMentor, isYouth, isDemoSession, logout, loginAsDemoUser } = useAuth();
+  const currentRole: DashboardRole = isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia';
+  const roleTheme = getRoleTheme(currentRole);
   const { isDark, setTheme } = useTheme();
   const { t, language } = useLanguage();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -139,11 +153,14 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
     // Mentors are strictly isolated from Youth Kiosk/Directory/Grant-Application search results
     if (isMentor) {
       const mentorQuickLinks = [
-        { id: 'overview' as MentorSubTab, label: 'Ringkasan Dashboard Mentor', desc: 'KPI, carta daerah & temujanji terdekat' },
-        { id: 'sessions' as MentorSubTab, label: 'Sesi Bimbingan & Mentee', desc: 'Senarai permohonan, jadual & pelan bimbingan' },
-        { id: 'schedule' as MentorSubTab, label: 'Jadual & Kalendar Mentor', desc: 'Paparan kalendar temu janji & slot bimbingan' },
-        { id: 'endorsements' as MentorSubTab, label: 'Surat Sokongan Geran', desc: 'Keluarkan & semak sokongan geran rasmi' },
-        { id: 'logbook' as MentorSubTab, label: 'Rekod Sesi Bimbingan', desc: 'Nota bimbingan & senarai semak tugasan' },
+        { id: 'overview' as MentorSubTab, label: 'Dashboard', desc: 'KPI, carta daerah & temujanji terdekat' },
+        { id: 'sessions' as MentorSubTab, label: 'Sesi Bimbingan', desc: 'Senarai permohonan, jadual & pelan bimbingan' },
+        { id: 'mentees' as MentorSubTab, label: 'Senarai Mentee', desc: 'Senarai usahawan bimbingan, bisnes & nombor WhatsApp' },
+        { id: 'logbook' as MentorSubTab, label: 'Rekod Sesi', desc: 'Nota bimbingan & senarai semak tugasan' },
+        { id: 'schedule' as MentorSubTab, label: 'Jadual', desc: 'Paparan kalendar temu janji & slot bimbingan' },
+        { id: 'readiness' as MentorSubTab, label: 'Semak Geran', desc: 'Senarai semak 4 perkara asas sebelum sokongan geran' },
+        { id: 'endorsements' as MentorSubTab, label: 'Sokongan Geran', desc: 'Keluarkan & semak sokongan geran rasmi' },
+        { id: 'impact' as MentorSubTab, label: 'Laporan Ringkas', desc: 'Ringkasan angka, pecahan daerah & cetak laporan' },
         { id: 'profile' as MentorSubTab, label: 'Profil Mentor', desc: 'Kemas kini profil & maklumat mentor' }
       ].filter(item => item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q));
       return { matchedSlots: [], matchedBiz: [], matchedProg: [], mentorQuickLinks, totalCount: mentorQuickLinks.length };
@@ -268,12 +285,12 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
   }, [isAdmin, userProfile, myBusiness, language]);
 
   return (
-    <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-300 dark:border-slate-600 sticky top-0 z-40 transition-colors duration-200 shadow-2xs w-full shrink-0">
+    <header className={`backdrop-blur-md border-b sticky top-0 z-40 transition-colors duration-200 shadow-2xs w-full shrink-0 ${roleTheme.topbarBgClass}`}>
       {/* Top Main Navigation Row */}
       <div className="w-full flex items-stretch h-15 sm:h-16">
         
         {/* Left Column: Aligned with Sidebar below */}
-        <div className={`${isSidebarCollapsed ? 'md:w-18 px-3 md:px-2 md:justify-center gap-1.5' : 'md:w-64 px-3 sm:px-4 justify-between'} shrink-0 h-full md:border-r border-slate-300 dark:border-slate-600 flex items-center transition-all duration-200 kbelia-important-header`}>
+        <div className={`${isSidebarCollapsed ? 'md:w-18 px-3 md:px-2 md:justify-center gap-1.5' : 'md:w-64 px-3 sm:px-4 justify-between'} shrink-0 h-full md:border-r flex items-center transition-all duration-200 ${roleTheme.sidebarBgClass}`}>
           
           {/* Mobile Drawer Hamburger */}
           {onToggleMobileSidebar && (
@@ -318,7 +335,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
             type="button"
             onClick={() => setIsSidebarCollapsed(prev => !prev)}
             title={isSidebarCollapsed ? t('nav_expand_sidebar') : t('nav_collapse_sidebar')}
-            className="hidden md:flex p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-amber-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
+            className="hidden md:flex p-1.5 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-amber-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
           >
             {isSidebarCollapsed ? (
               <ChevronsRight className="w-4 h-4" />
@@ -340,14 +357,14 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 type="button"
                 onClick={() => setActiveTab('news')}
                 aria-current={activeTab === 'news' ? 'page' : undefined}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold border transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 shadow-2xs ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
                   activeTab === 'news'
-                    ? 'bg-blue-600 text-white border-blue-700 dark:bg-blue-600 dark:border-blue-500'
-                    : 'bg-slate-50 hover:bg-slate-100 text-black border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:border-slate-600'
+                    ? roleTheme.primaryButtonClass
+                    : roleTheme.secondaryButtonClass
                 }`}
                 title="Berita & Pengumuman Rasmi"
               >
-                <Newspaper className={`w-4 h-4 shrink-0 ${activeTab === 'news' ? 'text-white' : 'text-black/75 dark:text-white/75'}`} />
+                <Newspaper className="w-4 h-4 shrink-0 opacity-85" />
                 <span>News</span>
               </button>
 
@@ -356,14 +373,14 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 type="button"
                 onClick={() => setActiveTab('community')}
                 aria-current={activeTab === 'community' ? 'page' : undefined}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold border transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 shadow-2xs ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
                   activeTab === 'community'
-                    ? 'bg-blue-600 text-white border-blue-700 dark:bg-blue-600 dark:border-blue-500'
-                    : 'bg-slate-50 hover:bg-slate-100 text-black border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white dark:border-slate-600'
+                    ? roleTheme.primaryButtonClass
+                    : roleTheme.secondaryButtonClass
                 }`}
                 title="Komuniti: Forum & Soal Jawab Usahawan"
               >
-                <MessagesSquare className={`w-4 h-4 shrink-0 ${activeTab === 'community' ? 'text-white' : 'text-black/75 dark:text-white/75'}`} />
+                <MessagesSquare className="w-4 h-4 shrink-0 opacity-85" />
                 <span>Komuniti</span>
               </button>
             </nav>
@@ -725,19 +742,35 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       <>
                         <button
                           type="button"
-                          onClick={() => { setActiveTab('admin'); setMobileMenuOpen(false); }}
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('queue'); setMobileMenuOpen(false); }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <ShieldCheck className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{t('nav_admin_control')}</span>
+                          <LayoutDashboard className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>Dashboard</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('bookings'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Clock className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Kiosk Bookings' : 'Tempahan Kiosk'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('slots'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Building2 className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Kiosk Slots' : 'Slot Kiosk'}</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => { setActiveTab('academic'); setMobileMenuOpen(false); }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <Building2 className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{t('nav_kiosk_approval')}</span>
+                          <MapPin className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Kiosk List' : 'Senarai Kiosk'}</span>
                         </button>
                         <button
                           type="button"
@@ -745,7 +778,79 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Award className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{t('nav_grant_approval')}</span>
+                          <span>{language === 'en' ? 'Youth Grants' : 'Geran Belia'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('programs'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Network className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Grant Programs' : 'Program Geran'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('mentors'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <GraduationCap className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Mentor Panel' : 'Panel Mentor'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('events'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Calendar className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Events & Expo' : 'Acara & Karnival'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('businesses'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Store className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Entrepreneurs' : 'Senarai Usahawan'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('hepa'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <ClipboardCheck className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'SSM Audit' : 'Semak Usahawan'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('b2b'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Megaphone className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Trade Space' : 'Ruang Niaga'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('news'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Newspaper className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Portal News' : 'Berita Portal'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('users'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Users className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Users' : 'Urus Pengguna'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('admin'); onSelectAdminSubTab?.('settings'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Sliders className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Settings' : 'Tetapan'}</span>
                         </button>
                       </>
                     )}
@@ -758,7 +863,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <LayoutDashboard className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>Ringkasan Mentor</span>
+                          <span>Dashboard</span>
                         </button>
                         <button
                           type="button"
@@ -766,15 +871,39 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Calendar className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>Sesi Bimbingan</span>
+                          <span>{language === 'en' ? 'Sessions' : 'Sesi Bimbingan'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('mentees'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Users className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Mentee List' : 'Senarai Mentee'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('logbook'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <FileText className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Session Log' : 'Rekod Sesi'}</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('schedule'); setMobileMenuOpen(false); }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <Calendar className="w-4 h-4 text-teal-700 dark:text-teal-400" />
-                          <span>Jadual</span>
+                          <CalendarDays className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Schedule' : 'Jadual'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('readiness'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <ClipboardCheck className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Grant Check' : 'Semak Geran'}</span>
                         </button>
                         <button
                           type="button"
@@ -782,15 +911,23 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Award className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>Perakuan Geran</span>
+                          <span>{language === 'en' ? 'Endorsements' : 'Sokongan Geran'}</span>
                         </button>
                         <button
                           type="button"
-                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('logbook'); setMobileMenuOpen(false); }}
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('impact'); setMobileMenuOpen(false); }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
-                          <FileCheck className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>Rekod Sesi</span>
+                          <BarChart3 className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Summary Report' : 'Laporan Ringkas'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('mentor'); onSelectMentorSubTab?.('profile'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Sliders className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Mentor Profile' : 'Profil Mentor'}</span>
                         </button>
                       </>
                     )}
@@ -803,7 +940,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <LayoutDashboard className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{t('dashboard')}</span>
+                          <span>Dashboard</span>
                         </button>
                         <button
                           type="button"
@@ -811,7 +948,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Building2 className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{t('nav_my_kiosk')}</span>
+                          <span>{language === 'en' ? 'My Kiosk' : 'Kiosk Saya'}</span>
                         </button>
                         <button
                           type="button"
@@ -819,7 +956,39 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Coins className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{t('nav_sales_pos')}</span>
+                          <span>{language === 'en' ? 'Sales Log' : 'Rekod Jualan'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('merchant'); if (onSelectMerchantSubTab) onSelectMerchantSubTab('profile'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Store className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Shop Profile' : 'Profil Kedai'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('merchant'); if (onSelectMerchantSubTab) onSelectMerchantSubTab('products'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <ShoppingBag className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'My Products' : 'Produk Saya'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('merchant'); if (onSelectMerchantSubTab) onSelectMerchantSubTab('vault'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <FileCheck className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'My Documents' : 'Dokumen Saya'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('merchant'); if (onSelectMerchantSubTab) onSelectMerchantSubTab('card'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <MessageCircle className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Digital Card' : 'Kad Digital'}</span>
                         </button>
                         <button
                           type="button"
@@ -827,7 +996,39 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Award className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{t('grants')}</span>
+                          <span>{language === 'en' ? 'Youth Grants' : 'Geran Belia'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('mentorship'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <GraduationCap className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Mentoring' : 'Bimbingan'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('b2b'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Network className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Trade Space' : 'Ruang Niaga'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('events'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Calendar className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Events & Expo' : 'Acara & Karnival'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setActiveTab('hepa'); setMobileMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        >
+                          <Compass className="w-4 h-4 text-black dark:text-white/75" />
+                          <span>{language === 'en' ? 'Shop Directory' : 'Direktori Kedai'}</span>
                         </button>
                       </>
                     )}
@@ -922,12 +1123,12 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       onClick={() => { setActiveTab('settings'); setProfileDropdownOpen(false); }}
                       className={`w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl text-left transition-colors cursor-pointer ${
                         activeTab === 'settings'
-                          ? 'bg-indigo-50 dark:bg-indigo-950/60 text-black dark:text-white font-bold border border-indigo-200 dark:border-indigo-800/70'
+                          ? `${roleTheme.activeNavClass} border`
                           : 'text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <Settings className={`w-4 h-4 ${activeTab === 'settings' ? 'text-black dark:text-white/75' : 'text-black/70 dark:text-white/75'}`} />
+                        <Settings className={`w-4 h-4 ${activeTab === 'settings' ? roleTheme.accentTextClass : 'text-black/70 dark:text-white/75'}`} />
                         <span>{language === 'en' ? 'Account Settings' : 'Tetapan Akaun'}</span>
                       </div>
                     </button>
@@ -949,8 +1150,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                             }}
                             className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer border ${
                               !isAdmin && userProfile?.role !== 'mentor'
-                                ? 'bg-teal-600 text-white border-teal-700 dark:bg-teal-600 dark:border-teal-500'
-                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
+                                ? 'bg-[#0B6E52] text-white border-[#0B6E52] dark:bg-[#10B981] dark:text-[#08120E] dark:border-[#10B981]'
+                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700'
                             }`}
                           >
                             {t('role_youth')}
@@ -964,8 +1165,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                             }}
                             className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer border ${
                               userProfile?.role === 'mentor'
-                                ? 'bg-teal-600 text-white border-teal-700 dark:bg-teal-600 dark:border-teal-500'
-                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
+                                ? 'bg-[#1D4ED8] text-white border-[#1D4ED8] dark:bg-[#0EA5E9] dark:text-[#07111A] dark:border-[#0EA5E9]'
+                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700'
                             }`}
                           >
                             {t('role_mentor')}
@@ -979,8 +1180,8 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                             }}
                             className={`px-1.5 py-1.5 rounded text-[0.8125rem] font-bold text-center transition-colors cursor-pointer border ${
                               isAdmin
-                                ? 'bg-blue-600 text-white font-black border-blue-700 dark:bg-blue-600 dark:border-blue-500'
-                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-amber-50 dark:hover:bg-slate-700'
+                                ? 'bg-[#9A5628] text-white font-black border-[#9A5628] dark:bg-[#D98A4E] dark:text-[#141312] dark:border-[#D98A4E]'
+                                : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700'
                             }`}
                           >
                             {t('role_admin')}
@@ -1012,9 +1213,9 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               id="kbelia-header-login-btn"
               type="button"
               onClick={() => setActiveTab('login')}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-2xs transition-colors cursor-pointer dark:bg-blue-600 whitespace-nowrap shrink-0"
+              className={`flex items-center gap-1.5 px-4 py-2 text-sm shadow-2xs ${roleTheme.primaryButtonClass}`}
             >
-              <LogIn className="w-4 h-4 text-white" />
+              <LogIn className="w-4 h-4" />
               <span>{t('login')}</span>
             </button>
           )}
@@ -1051,7 +1252,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
               type="button"
               id="btn-logout-confirm-no"
               onClick={() => setShowLogoutConfirm(false)}
-              className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-black dark:text-white bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer"
+              className={`flex-1 py-2.5 px-4 text-sm ${roleTheme.secondaryButtonClass}`}
             >
               {t('cancel')}
             </button>
@@ -1063,7 +1264,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 setShowLogoutConfirm(false);
                 setActiveTab('login');
               }}
-              className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs transition-colors cursor-pointer dark:bg-rose-600"
+              className={`flex-1 py-2.5 px-4 text-sm shadow-xs ${roleTheme.dangerButtonClass}`}
             >
               {t('confirm_logout')}
             </button>

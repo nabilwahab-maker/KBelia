@@ -27,6 +27,9 @@ import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 import { ModernDatePicker, ModernTimePicker } from './ModernDateTimePicker';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const adminTheme = getRoleTheme('admin');
 
 const DISTRICTS: KelantanDistrict[] = [
   'Kota Bharu',
@@ -342,8 +345,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
 
   return (
     <div className="space-y-4 animate-dashboard-tab">
-      <div className="kbelia-important-header relative overflow-hidden p-4 sm:p-5 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs">
-        <div className="absolute inset-x-0 top-0 h-0.5 bg-indigo-500/80 dark:bg-indigo-400/80" />
+      <div className={`p-4 sm:p-5 rounded-2xl border backdrop-blur-xs transition-colors ${adminTheme.surfaceClass}`}>
         <div className="space-y-1">
           <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
             Acara Usahawan Belia &amp; Tempahan Tapak
@@ -359,8 +361,8 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             onClick={() => setSubView('catalog')}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer inline-flex items-center gap-2 ${
               subView === 'catalog'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600'
+                ? adminTheme.segmentedActiveClass
+                : adminTheme.secondaryButtonClass
             }`}
           >
             <Calendar className="w-4 h-4" />
@@ -371,8 +373,8 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             onClick={() => setSubView('bookings')}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer inline-flex items-center gap-2 ${
               subView === 'bookings'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-white dark:bg-slate-800 text-black dark:text-white border border-slate-300 dark:border-slate-600'
+                ? adminTheme.segmentedActiveClass
+                : adminTheme.secondaryButtonClass
             }`}
           >
             <Users className="w-4 h-4" />
@@ -383,17 +385,16 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
         <button
           type="button"
           onClick={openCreateEvent}
-          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold inline-flex items-center gap-2 shadow-xs cursor-pointer shrink-0"
+          className={`px-4 py-2 text-sm inline-flex items-center gap-2 shadow-xs ${adminTheme.primaryButtonClass}`}
         >
           <Plus className="w-4 h-4" />
-          <span>Tambah Acara Baharu</span>
+          <span>Tambah</span>
         </button>
       </div>
 
       {subView === 'catalog' ? (
-        <div key="catalog" className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs animate-dashboard-tab">
+        <div key="catalog" className={`rounded-2xl border backdrop-blur-xs overflow-visible animate-dashboard-tab ${adminTheme.surfaceClass}`}>
           <ReferenceTableToolbar
-            accent="indigo"
             searchValue={catalogSearch}
             onSearchChange={setCatalogSearch}
             searchPlaceholder="Cari tajuk acara atau daerah..."
@@ -425,7 +426,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                   <select
                     value={catalogCategoryFilter}
                     onChange={(e) => setCatalogCategoryFilter(e.target.value as 'all' | YouthEvent['category'])}
-                    className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                    className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
                   >
                     <option value="all">Semua Kategori</option>
                     <option value="karnival">Karnival Jualan</option>
@@ -441,7 +442,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                   <select
                     value={catalogDistrictFilter}
                     onChange={(e) => setCatalogDistrictFilter(e.target.value as 'all' | KelantanDistrict)}
-                    className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                    className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
                   >
                     <option value="all">Semua Daerah</option>
                     {DISTRICTS.map((d) => (
@@ -461,7 +462,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                  <tr className={`${adminTheme.surfaceMutedClass} border-b ${adminTheme.dividerClass}`}>
                     <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <button
                         type="button"
@@ -510,15 +511,15 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                <tbody className={`divide-y ${adminTheme.dividerClass} text-sm`}>
                   {catalogPagination.paginatedItems.map((evt) => (
                     <tr
                       key={evt.id}
-                      className="kbelia-table-row"
+                      className={`transition-colors ${adminTheme.rowHoverClass}`}
                     >
                       <td className="py-3.5 px-4 max-w-sm">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-14 h-14 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 overflow-hidden shrink-0">
+                          <div className={`w-14 h-14 rounded-lg border overflow-hidden shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                             <PortalImage
                               src={resolveEventImage(evt.category, evt.imageUrl)}
                               alt={evt.title}
@@ -538,7 +539,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                         </div>
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold uppercase bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200">
+                        <span className={`text-[0.8125rem] font-bold uppercase ${adminTheme.accentTextClass}`}>
                           {evt.category}
                         </span>
                       </td>
@@ -559,11 +560,11 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                           ariaLabel={`Tindakan untuk ${evt.title}`}
                           items={[
                             {
-                              label: 'Edit Acara',
+                              label: 'Sunting',
                               onClick: () => openEditEvent(evt)
                             },
                             {
-                              label: 'Padam Acara',
+                              label: 'Padam',
                               onClick: () =>
                                 confirmDelete({
                                   itemName: evt.title,
@@ -590,14 +591,12 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
               itemsPerPage={7}
               onPageChange={catalogPagination.setCurrentPage}
               itemLabel="acara belia"
-              accent="blue"
             />
           )}
         </div>
       ) : (
-        <div key="bookings" className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs animate-dashboard-tab">
+        <div key="bookings" className={`rounded-2xl border backdrop-blur-xs overflow-visible animate-dashboard-tab ${adminTheme.surfaceClass}`}>
           <ReferenceTableToolbar
-            accent="indigo"
             searchValue={bookingSearch}
             onSearchChange={setBookingSearch}
             searchPlaceholder="Cari peserta, acara atau ID..."
@@ -626,7 +625,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                 <select
                   value={bookingStatusFilter}
                   onChange={(e) => setBookingStatusFilter(e.target.value as 'all' | 'booked' | 'cancelled')}
-                  className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white cursor-pointer"
+                  className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
                 >
                   <option value="all">Semua Status</option>
                   <option value="booked">Ditempah (Aktif)</option>
@@ -644,7 +643,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/70 dark:bg-zinc-950/60 border-b border-slate-200 dark:border-zinc-700">
+                  <tr className={`${adminTheme.surfaceMutedClass} border-b ${adminTheme.dividerClass}`}>
                     <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
                       <button
                         type="button"
@@ -680,15 +679,15 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-sm">
+                <tbody className={`divide-y ${adminTheme.dividerClass} text-sm`}>
                   {bookingsPagination.paginatedItems.map((b) => (
                     <tr
                       key={b.id}
-                      className="kbelia-table-row"
+                      className={`transition-colors ${adminTheme.rowHoverClass}`}
                     >
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-700 dark:text-indigo-300 shrink-0">
+                          <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
                             <Users className="w-4 h-4" />
                           </div>
                           <div className="min-w-0">
@@ -706,10 +705,10 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-bold border ${
+                          className={`text-[0.8125rem] font-bold ${
                             b.status === 'booked'
-                              ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
-                              : 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                              ? 'text-emerald-700 dark:text-emerald-400'
+                              : 'text-rose-700 dark:text-rose-400'
                           }`}
                         >
                           {b.status === 'booked' ? 'Ditempah' : 'Dibatalkan'}
@@ -720,13 +719,13 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                           ariaLabel={`Tindakan untuk tempahan ${b.userName || b.eventTitle}`}
                           items={[
                             {
-                              label: b.status === 'booked' ? 'Tandakan Dibatalkan' : 'Aktifkan Semula (Ditempah)',
+                              label: b.status === 'booked' ? 'Batal' : 'Aktifkan',
                               onClick: () =>
                                 handleBookingStatusChange(b, b.status === 'booked' ? 'cancelled' : 'booked'),
                               tone: 'accent'
                             },
                             {
-                              label: 'Padam Tempahan',
+                              label: 'Padam',
                               onClick: () =>
                                 confirmDelete({
                                   itemName: `${b.userName || 'Peserta'} - ${b.eventTitle}`,
@@ -753,7 +752,6 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
               itemsPerPage={7}
               onPageChange={bookingsPagination.setCurrentPage}
               itemLabel="tempahan peserta"
-              accent="blue"
             />
           )}
         </div>
@@ -762,18 +760,18 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
       {/* Add / Edit Youth Event Modal */}
       {showEventModal && (
         <div
-          className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
+          className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
           onClick={() => !isSaving && setShowEventModal(false)}
         >
           <div
-            className="animate-popover-enter relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+            className={`animate-popover-enter relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-5 py-3.5 flex items-center justify-between">
+            <div className={`sticky top-0 z-10 border-b px-5 py-3.5 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
                   <Calendar className="w-4 h-4" />
                 </div>
                 <div>
@@ -788,7 +786,8 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
               <button
                 type="button"
                 onClick={() => !isSaving && setShowEventModal(false)}
-                className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                aria-label="Tutup"
+                className={adminTheme.iconButtonClass}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -804,7 +803,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Contoh: Karnival Usahawan Belia Kelantan"
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -813,7 +812,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as YouthEvent['category'])}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
                   >
                     <option value="karnival">Karnival Jualan</option>
                     <option value="bengkel">Bengkel Pensijilan</option>
@@ -827,7 +826,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                   <select
                     value={district}
                     onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
                   >
                     {DISTRICTS.map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -865,7 +864,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -875,7 +874,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     type="text"
                     value={organizer}
                     onChange={(e) => setOrganizer(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -885,7 +884,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     type="text"
                     value={fee}
                     onChange={(e) => setFee(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -896,7 +895,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     min="0"
                     value={boothsAvailable}
                     onChange={(e) => setBoothsAvailable(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-mono focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -907,7 +906,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     min="1"
                     value={totalBooths}
                     onChange={(e) => setTotalBooths(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-mono focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -917,7 +916,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     type="text"
                     value={whatsappContact}
                     onChange={(e) => setWhatsappContact(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-mono focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -927,7 +926,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                     rows={3}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white"
+                    className={`w-full px-3.5 py-2.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
                   />
                 </div>
 
@@ -941,22 +940,22 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
                 </div>
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
+              <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>
                 <button
                   type="button"
                   disabled={isSaving}
                   onClick={() => setShowEventModal(false)}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer"
+                  className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 ${adminTheme.primaryButtonClass}`}
                 >
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  <span>{isSaving ? 'Menyimpan...' : editingEvent ? 'Simpan Perubahan' : 'Terbitkan Acara'}</span>
+                  <span>{isSaving ? 'Menyimpan...' : editingEvent ? 'Simpan' : 'Terbit'}</span>
                 </button>
               </div>
             </form>

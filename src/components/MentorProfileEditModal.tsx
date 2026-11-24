@@ -19,6 +19,8 @@ import {
 import { MentorProfile } from '../types';
 import { ImageDropzone } from './ImageDropzone';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
+import { useRoleTheme } from '../hooks/useRoleTheme';
+import { getRoleTheme } from '../utils/roleTheme';
 
 interface MentorProfileEditModalProps {
   isOpen: boolean;
@@ -49,6 +51,9 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const { confirmDelete } = useConfirmDelete();
+  const { theme } = useRoleTheme();
+  const modalTheme = isAdminEditing ? getRoleTheme('admin') : theme;
+  const fieldClass = `w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none transition-all ${modalTheme.inputClass}`;
 
   useEffect(() => {
     if (isOpen) {
@@ -111,28 +116,29 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-300 dark:border-slate-600 overflow-hidden flex flex-col max-h-[92vh] transition-colors my-6">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+      <div className={`relative w-full max-w-2xl rounded-2xl shadow-xl border overflow-hidden flex flex-col max-h-[92vh] transition-colors my-6 backdrop-blur-md ${modalTheme.surfaceClass}`}>
         
         {/* Header */}
-        <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-4.5 px-6 sm:px-7 flex items-center justify-between shrink-0">
+        <div className={`border-b py-4 px-6 sm:px-7 flex items-center justify-between shrink-0 ${modalTheme.surfaceMutedClass} ${modalTheme.dividerClass}`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/70 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+            <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${modalTheme.surfaceClass} ${modalTheme.dividerClass} ${modalTheme.accentTextClass}`}>
               <GraduationCap className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-black dark:text-white tracking-tight">
-                {isCreating ? 'Tambah Mentor Baharu' : isAdminEditing ? 'Edit Profil Mentor' : 'Edit Profil Saya (Mentor)'}
+                {isCreating ? 'Tambah Mentor Baharu' : isAdminEditing ? 'Edit Profil Mentor' : 'Edit Profil Saya'}
               </h3>
-              <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-                Info bimbingan, waktu temu janji dan maklumat perhubungan rasmi KBelia
+              <p className="text-sm text-black/65 dark:text-white/70">
+                Maklumat bimbingan, jadual temu janji dan perhubungan
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label="Tutup"
+            className={modalTheme.iconButtonClass}
           >
             <X className="w-5 h-5" />
           </button>
@@ -142,8 +148,8 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 sm:p-7 overflow-y-auto space-y-5">
           
           {successToast && (
-            <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-lg text-black dark:text-white text-sm sm:text-[0.9375rem] flex items-center gap-2">
-              <Check className="w-4 h-4 text-black dark:text-white shrink-0" />
+            <div className={`p-3.5 border rounded-xl text-black dark:text-white text-sm sm:text-[0.9375rem] flex items-center gap-2 ${modalTheme.surfaceMutedClass} ${modalTheme.dividerClass}`}>
+              <Check className={`w-4 h-4 shrink-0 ${modalTheme.accentTextClass}`} />
               <span className="font-semibold">{successToast}</span>
             </div>
           )}
@@ -159,10 +165,10 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
           </div>
 
           {/* 2-Column Row 1: Nama Penuh + Jawatan */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
-                Nama Penuh <span className="text-black dark:text-white">*</span>
+              <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
+                Nama Penuh <span className={modalTheme.accentTextClass}>*</span>
               </label>
               <input
                 type="text"
@@ -170,13 +176,13 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Masukkan nama penuh"
-                className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className={`${fieldClass} font-medium`}
               />
             </div>
 
             <div>
-              <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
-                Jawatan <span className="text-black dark:text-white">*</span>
+              <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
+                Jawatan <span className={modalTheme.accentTextClass}>*</span>
               </label>
               <input
                 type="text"
@@ -184,16 +190,16 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Masukkan jawatan"
-                className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className={`${fieldClass} font-medium`}
               />
             </div>
           </div>
 
           {/* 2-Column Row 2: Agensi + Telefon */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
-                Agensi <span className="text-black dark:text-white">*</span>
+              <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
+                Agensi <span className={modalTheme.accentTextClass}>*</span>
               </label>
               <input
                 type="text"
@@ -201,13 +207,13 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 value={agency}
                 onChange={(e) => setAgency(e.target.value)}
                 placeholder="Masukkan agensi"
-                className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className={`${fieldClass} font-medium`}
               />
             </div>
 
             <div>
-              <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
-                Nombor Telefon <span className="text-black dark:text-white">*</span>
+              <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
+                Nombor Telefon <span className={modalTheme.accentTextClass}>*</span>
               </label>
               <input
                 type="tel"
@@ -215,15 +221,15 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Masukkan nombor telefon"
-                className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className={`${fieldClass} font-mono`}
               />
             </div>
           </div>
 
           {/* Row 3: Emel Rasmi */}
           <div>
-            <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
-              Alamat Emel <span className="text-black dark:text-white">*</span>
+            <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
+              Alamat Emel <span className={modalTheme.accentTextClass}>*</span>
             </label>
             <input
               type="email"
@@ -231,13 +237,13 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Masukkan alamat emel"
-              className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+              className={fieldClass}
             />
           </div>
 
           <div>
-            <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
-              Jadual Bimbingan <span className="text-black dark:text-white">*</span>
+            <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
+              Jadual Bimbingan <span className={modalTheme.accentTextClass}>*</span>
             </label>
             <input
               type="text"
@@ -245,22 +251,22 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
               value={availableDays}
               onChange={(e) => setAvailableDays(e.target.value)}
               placeholder="Masukkan jadual bimbingan"
-              className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+              className={fieldClass}
             />
           </div>
 
           {/* Section: Bidang Pengkhususan */}
           <div>
-            <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+            <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
               Bidang Kepakaran
             </label>
             <div className="flex flex-wrap gap-2 mb-3">
               {expertise.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800/70 rounded-lg text-sm font-medium"
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 border rounded-lg text-sm font-medium text-black dark:text-white ${modalTheme.surfaceMutedClass} ${modalTheme.dividerClass}`}
                 >
-                  <Award className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                  <Award className={`w-3.5 h-3.5 shrink-0 ${modalTheme.accentTextClass}`} />
                   <span>{tag}</span>
                   <button
                     type="button"
@@ -271,7 +277,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                         onConfirm: () => handleRemoveExpertise(tag)
                       })
                     }
-                    className="hover:text-black cursor-pointer ml-1 text-black/70 dark:text-white/75 dark:hover:text-white"
+                    className="hover:text-black cursor-pointer ml-1 text-black/65 dark:text-white/70 dark:hover:text-white"
                     title="Padam tag"
                     aria-label={`Padam ${tag}`}
                   >
@@ -287,22 +293,22 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 value={newExpertiseInput}
                 onChange={(e) => setNewExpertiseInput(e.target.value)}
                 placeholder="Masukkan bidang kepakaran"
-                className="flex-1 px-4.5 py-2.5 text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+                className={`flex-1 px-4 py-2.5 text-sm sm:text-[0.9375rem] rounded-xl focus:outline-none transition-all ${modalTheme.inputClass}`}
               />
               <button
                 type="button"
                 onClick={handleAddExpertise}
-                className="py-2.5 px-5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm sm:text-[0.9375rem] font-semibold flex items-center gap-1.5 cursor-pointer transition-all shrink-0 dark:bg-teal-600"
+                className={`py-2.5 px-4 text-sm inline-flex items-center gap-1.5 ${modalTheme.secondaryButtonClass}`}
               >
-                <Tag className="w-4 h-4" />
-                <span>Tambah Bidang</span>
+                <Tag className={`w-4 h-4 ${modalTheme.accentTextClass}`} />
+                <span>Tambah</span>
               </button>
             </div>
           </div>
 
           {/* Section: Bio / Latar Belakang */}
           <div>
-            <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+            <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
               Ringkasan Profil
             </label>
             <textarea
@@ -310,26 +316,26 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Masukkan ringkasan profil"
-              className="w-full px-4.5 py-3 rounded-lg text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-teal-600 transition-all dark:focus:border-blue-500"
+              className={fieldClass}
             />
           </div>
 
           {/* Action Buttons Footer */}
-          <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
+          <div className={`flex justify-end items-center gap-3 pt-5 border-t ${modalTheme.dividerClass}`}>
             <button
               type="button"
               onClick={onClose}
-              className="py-2.5 px-5 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              className={`py-2.5 px-5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${modalTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 dark:bg-blue-600"
+              className={`py-2.5 px-6 rounded-xl text-sm font-semibold shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${modalTheme.primaryButtonClass}`}
             >
               <Save className="w-4 h-4" />
-              <span>{isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}</span>
+              <span>{isSaving ? 'Menyimpan...' : 'Simpan'}</span>
             </button>
           </div>
 

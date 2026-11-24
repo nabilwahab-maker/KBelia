@@ -27,6 +27,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { UMKTab } from './UMKHeader';
 import { KBeliaLogo } from './KBeliaLogo';
 import { KelantanDistrict } from '../types';
+import { getRoleTheme } from '../utils/roleTheme';
 
 interface LoginPageProps {
   setActiveTab: (tab: UMKTab) => void;
@@ -85,6 +86,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
 
   // Role: 'user' | 'mentor' | 'admin'
   const [activeRole, setActiveRole] = useState<'user' | 'admin' | 'mentor'>('user');
+  const activeRoleTheme = getRoleTheme(
+    activeRole === 'admin' ? 'admin' : activeRole === 'mentor' ? 'mentor' : 'belia'
+  );
 
   // Login Form
   const [email, setEmail] = useState('');
@@ -258,14 +262,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 <button
                   type="button"
                   onClick={() => setActiveTab(isAdmin ? 'admin' : isMentor ? 'mentor' : 'merchant')}
-                  className="px-3 py-1.5 bg-emerald-700 text-white rounded-lg font-bold text-sm hover:bg-emerald-800 transition-colors cursor-pointer"
+                  className={`px-3.5 py-2 text-sm ${getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia').primaryButtonClass}`}
                 >
-                  Dashboard &rarr;
+                  Portal &rarr;
                 </button>
                 <button
                   type="button"
                   onClick={() => logout()}
-                  className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-black dark:text-white rounded-lg font-semibold text-[0.8125rem] hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer transition-colors"
+                  className={`px-3 py-2 text-[0.8125rem] ${getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia').secondaryButtonClass}`}
                 >
                   {isEn ? 'Logout' : 'Log Keluar'}
                 </button>
@@ -323,9 +327,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       setActiveRole('user');
                       clearAuthError();
                     }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-[0.8125rem] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                    className={`flex-1 py-2 px-2 rounded-xl text-[0.8125rem] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
                       activeRole === 'user'
-                        ? 'bg-blue-600 text-white shadow-xs dark:bg-blue-600'
+                        ? `${getRoleTheme('belia').segmentedActiveClass} shadow-xs`
                         : 'text-black dark:text-white hover:text-black dark:hover:text-white'
                     }`}
                   >
@@ -339,9 +343,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       setActiveRole('mentor');
                       clearAuthError();
                     }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-[0.8125rem] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                    className={`flex-1 py-2 px-2 rounded-xl text-[0.8125rem] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
                       activeRole === 'mentor'
-                        ? 'bg-teal-600 text-white shadow-xs dark:bg-teal-600'
+                        ? `${getRoleTheme('mentor').segmentedActiveClass} shadow-xs`
                         : 'text-black dark:text-white hover:text-black dark:hover:text-white'
                     }`}
                   >
@@ -355,9 +359,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       setActiveRole('admin');
                       clearAuthError();
                     }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg text-[0.8125rem] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                    className={`flex-1 py-2 px-2 rounded-xl text-[0.8125rem] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
                       activeRole === 'admin'
-                        ? 'bg-rose-600 text-white shadow-xs dark:bg-rose-600'
+                        ? `${getRoleTheme('admin').segmentedActiveClass} shadow-xs`
                         : 'text-black dark:text-white hover:text-black dark:hover:text-white'
                     }`}
                   >
@@ -433,9 +437,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full mt-2.5 py-3.5 px-6 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
+                  className={`w-full mt-2.5 py-3.5 px-6 text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-60 ${activeRoleTheme.primaryButtonClass}`}
                 >
-                  <LogIn className="w-4 h-4 text-white" />
+                  <LogIn className="w-4 h-4" />
                   <span>{isSubmitting ? (isEn ? 'Processing...' : 'Memproses...') : (isEn ? 'Sign In' : 'Log Masuk')}</span>
                 </button>
 
@@ -648,13 +652,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full mt-2 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white rounded-xl font-bold text-sm sm:text-[0.9375rem] flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 dark:bg-blue-600"
+                  className={`w-full mt-2 py-3.5 px-4 text-sm sm:text-[0.9375rem] flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-60 ${getRoleTheme('belia').primaryButtonClass}`}
                 >
-                  <UserPlus className="w-4 h-4 text-white" />
+                  <UserPlus className="w-4 h-4" />
                   <span>
                     {isSubmitting 
                       ? (isEn ? 'Processing...' : 'Memproses...') 
-                      : (isEn ? 'Sign Up' : 'Daftar Sekarang')}
+                      : (isEn ? 'Sign Up' : 'Daftar')}
                   </span>
                 </button>
 
@@ -689,10 +693,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={handleDemoBelia}
-                className="p-2.5 bg-blue-50 hover:bg-amber-100/80 dark:bg-blue-950/60 dark:hover:bg-blue-600 border border-blue-200 dark:border-blue-800/70 rounded-xl text-left transition-colors cursor-pointer group"
+                className="p-2.5 bg-slate-50 hover:bg-[#0B6E52]/10 dark:bg-slate-800 dark:hover:bg-[#10B981]/15 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
               >
                 <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
-                  <Store className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                  <Store className="w-3.5 h-3.5 text-[#0B6E52] dark:text-[#34D399] shrink-0" />
                   <span>Demo Belia</span>
                 </div>
                 <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
@@ -703,10 +707,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={handleDemoMentor}
-                className="p-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
+                className="p-2.5 bg-slate-50 hover:bg-[#1D4ED8]/10 dark:bg-slate-800 dark:hover:bg-[#0EA5E9]/15 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
               >
                 <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
-                  <GraduationCap className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                  <GraduationCap className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#38BDF8] shrink-0" />
                   <span>Demo Mentor</span>
                 </div>
                 <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
@@ -717,10 +721,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={handleDemoAdmin}
-                className="p-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
+                className="p-2.5 bg-slate-50 hover:bg-[#9A5628]/10 dark:bg-slate-800 dark:hover:bg-[#D98A4E]/15 border border-slate-300 dark:border-slate-600 rounded-xl text-left transition-colors cursor-pointer group"
               >
                 <div className="flex items-center gap-1.5 font-bold text-sm text-black dark:text-white">
-                  <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75 shrink-0" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#9A5628] dark:text-[#D98A4E] shrink-0" />
                   <span>Demo Admin</span>
                 </div>
                 <div className="text-[0.8125rem] text-black/70 dark:text-white/75 truncate mt-0.5">
@@ -859,7 +863,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
       {showForgotModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-xs p-4 animate-fade-slide-up">
           <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl overflow-hidden">
-            <div className="kbelia-important-header px-6 pt-5 pb-3.5 flex items-center justify-between border-b border-slate-300 dark:border-slate-600">
+            <div className="bg-[#FAF8F3] dark:bg-[#101815] px-6 pt-5 pb-3.5 flex items-center justify-between border-b border-[#E2DCCB] dark:border-[#24342D]">
               <div className="flex items-center gap-2 text-black dark:text-white/75 font-bold text-sm">
                 <HelpCircle className="w-4 h-4" />
                 <span>Tetapan Semula Kata Laluan</span>
@@ -867,7 +871,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={() => setShowForgotModal(false)}
-                className="text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white p-1 rounded-lg cursor-pointer"
+                aria-label="Tutup"
+                className={activeRoleTheme.iconButtonClass}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -887,9 +892,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
               <button
                 type="button"
                 onClick={() => setShowForgotModal(false)}
-                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-colors cursor-pointer dark:bg-blue-600"
+                className={`w-full py-2.5 text-sm ${activeRoleTheme.primaryButtonClass}`}
               >
-                Faham & Tutup
+                Tutup
               </button>
             </div>
           </div>

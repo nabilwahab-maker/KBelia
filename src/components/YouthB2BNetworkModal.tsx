@@ -14,6 +14,7 @@ import { getDeletedIds, saveB2BListingRecord } from '../services/dataService';
 import { mergeUniqueById, subscribeCrossTabSync, subscribeDemoSyncCollection } from '../services/realtimeSync';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { showToast } from './ToastNotification';
 
 interface YouthB2BNetworkModalProps {
@@ -26,7 +27,8 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
   onClose
 }) => {
   const { language } = useLanguage();
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [listings, setListings] = useState<B2BListing[]>(INITIAL_B2B_LISTINGS);
   const [filterType, setFilterType] = useState<'all' | 'supply' | 'demand'>('all');
   const [isAdding, setIsAdding] = useState(false);
@@ -164,20 +166,21 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label={language === 'en' ? 'Close' : 'Tutup'}
+            className={roleTheme.iconButtonClass}
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Top Controls */}
-        <div className="flex items-center justify-between gap-3 mb-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-[#242D3B] rounded-xl text-sm">
             <button
               type="button"
               onClick={() => setFilterType('all')}
-              className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
-                filterType === 'all' ? 'bg-white dark:bg-[#1E2530] text-black dark:text-white shadow-xs' : 'text-black/70'
+              className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                filterType === 'all' ? `${roleTheme.segmentedActiveClass} shadow-xs` : 'text-black/70 dark:text-white/75'
               }`}
             >
               {language === 'en' ? `All (${listings.length})` : `Semua (${listings.length})`}
@@ -185,30 +188,30 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
             <button
               type="button"
               onClick={() => setFilterType('demand')}
-              className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
-                filterType === 'demand' ? 'bg-white dark:bg-[#1E2530] text-black dark:text-white/75 shadow-xs' : 'text-black/70'
+              className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                filterType === 'demand' ? `${roleTheme.segmentedActiveClass} shadow-xs` : 'text-black/70 dark:text-white/75'
               }`}
             >
-              {language === 'en' ? 'Seeking Supplies' : 'Mencari Bekalan'}
+              {language === 'en' ? 'Seeking' : 'Mencari'}
             </button>
             <button
               type="button"
               onClick={() => setFilterType('supply')}
-              className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
-                filterType === 'supply' ? 'bg-white dark:bg-[#1E2530] text-black dark:text-white/75 shadow-xs' : 'text-black/70'
+              className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                filterType === 'supply' ? `${roleTheme.segmentedActiveClass} shadow-xs` : 'text-black/70 dark:text-white/75'
               }`}
             >
-              {language === 'en' ? 'Supplying Goods' : 'Membekal Stok'}
+              {language === 'en' ? 'Supplying' : 'Membekal'}
             </button>
           </div>
 
           <button
             type="button"
             onClick={() => setIsAdding(!isAdding)}
-            className="py-1.5 px-3.5 rounded-xl text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+            className={roleTheme.compactPrimaryButtonClass}
           >
             <Megaphone className="w-3.5 h-3.5" />
-            <span>{isAdding ? (language === 'en' ? 'Close' : 'Tutup') : (language === 'en' ? 'Post Listing' : 'Siar Padanan')}</span>
+            <span>{isAdding ? (language === 'en' ? 'Close' : 'Tutup') : (language === 'en' ? 'Post' : 'Siar')}</span>
           </button>
         </div>
 
@@ -284,16 +287,16 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
               <button
                 type="button"
                 onClick={() => setIsAdding(false)}
-                className="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-black dark:text-white font-semibold cursor-pointer"
+                className={roleTheme.compactSecondaryButtonClass}
               >
                 {language === 'en' ? 'Cancel' : 'Batal'}
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold cursor-pointer transition-colors"
+                className={roleTheme.compactPrimaryButtonClass}
               >
-                {saving ? (language === 'en' ? 'Publishing...' : 'Menghantar...') : (language === 'en' ? 'Publish Listing' : 'Hantar Siaran')}
+                {saving ? (language === 'en' ? 'Publishing...' : 'Menghantar...') : (language === 'en' ? 'Publish' : 'Siar')}
               </button>
             </div>
           </form>
@@ -354,10 +357,10 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
                       );
                     }
                   }}
-                  className="py-1.5 px-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                  className={roleTheme.compactPrimaryButtonClass}
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
-                  <span>{language === 'en' ? 'Discuss on WhatsApp' : 'Bincang di WhatsApp'}</span>
+                  <span>WhatsApp</span>
                 </a>
               </div>
             </div>

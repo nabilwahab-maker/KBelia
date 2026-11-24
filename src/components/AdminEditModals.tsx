@@ -40,6 +40,9 @@ import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { showToast } from './ToastNotification';
 import { ImageDropzone } from './ImageDropzone';
 import { ModernDatePicker, ModernTimePicker } from './ModernDateTimePicker';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const adminTheme = getRoleTheme('admin');
 
 const CATEGORIES: BusinessCategory[] = [
   'Makanan & Minuman (F&B)',
@@ -63,8 +66,7 @@ const DISTRICTS: KelantanDistrict[] = [
   'Jeli'
 ];
 
-const inputClass =
-  'w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600';
+const inputClass = `w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`;
 
 // =========================================================================
 // 1. EDIT / CREATE CAPSULE BOOKING MODAL
@@ -188,7 +190,7 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       onClick={() => {
@@ -196,12 +198,12 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+        className={`relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`sticky top-0 z-10 border-b px-6 py-4 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
               <Building2 className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -217,7 +219,7 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
             type="button"
             disabled={isSaving}
             onClick={onClose}
-            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/70 dark:hover:bg-stone-800 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -344,6 +346,7 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
                 value={startDate}
                 onChange={setStartDate}
                 valueFormat="iso"
+                accentColor="amber"
                 placeholder="Pilih tarikh mula"
               />
             </div>
@@ -371,19 +374,19 @@ export const EditBookingModal: React.FC<EditBookingModalProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
+          <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>
             <button
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer"
+              className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-colors ${adminTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60 ${adminTheme.primaryButtonClass}`}
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               <span>{isSaving ? 'Menyimpan...' : isEditing ? 'Simpan Perubahan' : 'Simpan Permohonan'}</span>
@@ -517,7 +520,7 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       onClick={() => {
@@ -525,12 +528,12 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+        className={`relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`sticky top-0 z-10 border-b px-6 py-4 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
               <Coins className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -546,7 +549,7 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
             type="button"
             disabled={isSaving}
             onClick={onClose}
-            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/70 dark:hover:bg-stone-800 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -722,19 +725,19 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
+          <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>
             <button
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer"
+              className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-colors ${adminTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60 ${adminTheme.primaryButtonClass}`}
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               <span>{isSaving ? 'Menyimpan...' : isEditing ? 'Simpan Perubahan' : 'Simpan Geran'}</span>
@@ -853,7 +856,7 @@ export const EditMaintenanceTicketModal: React.FC<EditMaintenanceTicketModalProp
 
   return (
     <div
-      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       onClick={() => {
@@ -861,10 +864,10 @@ export const EditMaintenanceTicketModal: React.FC<EditMaintenanceTicketModalProp
       }}
     >
       <div
-        className="relative w-full max-w-xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+        className={`relative w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`sticky top-0 z-10 border-b px-6 py-4 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
               <Wrench className="w-4 h-4" />
@@ -882,7 +885,7 @@ export const EditMaintenanceTicketModal: React.FC<EditMaintenanceTicketModalProp
             type="button"
             disabled={isSaving}
             onClick={onClose}
-            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/70 dark:hover:bg-stone-800 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -987,19 +990,19 @@ export const EditMaintenanceTicketModal: React.FC<EditMaintenanceTicketModalProp
             </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
+          <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>
             <button
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer"
+              className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-colors ${adminTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60 ${adminTheme.primaryButtonClass}`}
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               <span>{isSaving ? 'Menyimpan...' : isEditing ? 'Simpan Perubahan' : 'Simpan Tiket'}</span>
@@ -1142,7 +1145,7 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       onClick={() => {
@@ -1150,12 +1153,12 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+        className={`relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`sticky top-0 z-10 border-b px-6 py-4 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
               <GraduationCap className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -1171,7 +1174,7 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
             type="button"
             disabled={isSaving}
             onClick={onClose}
-            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/70 dark:hover:bg-stone-800 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -1276,6 +1279,7 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
                 value={preferredDate}
                 onChange={setPreferredDate}
                 valueFormat="iso"
+                accentColor="amber"
                 placeholder="Pilih tarikh sesi"
               />
             </div>
@@ -1289,6 +1293,7 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
                 allowRangeToggle
                 formatStyle="12h-pg"
                 defaultDurationMinutes={60}
+                accentColor="amber"
                 placeholder="Pilih masa sesi"
               />
             </div>
@@ -1341,19 +1346,19 @@ export const EditMentorshipModal: React.FC<EditMentorshipModalProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
+          <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>
             <button
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer"
+              className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-colors ${adminTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              className={`w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60 ${adminTheme.primaryButtonClass}`}
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               <span>{isSaving ? 'Menyimpan...' : isEditing ? 'Simpan Perubahan' : 'Simpan Sesi'}</span>
@@ -1467,25 +1472,25 @@ export const ManageBusinessProductsModal: React.FC<ManageBusinessProductsModalPr
 
   return (
     <div
-      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+        className={`relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`sticky top-0 z-10 border-b px-6 py-4 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
               <ShoppingBag className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
+              <h3 className="text-sm sm:text-base font-bold text-stone-900 dark:text-[#F5F2EC] truncate">
                 Katalog Produk: {business.businessName}
               </h3>
-              <p className="text-[0.875rem] text-black/70 dark:text-white/75 truncate">
+              <p className="text-[0.875rem] text-stone-600 dark:text-stone-300 truncate">
                 Tambah, sunting atau padam produk jualan usahawan ini.
               </p>
             </div>
@@ -1495,16 +1500,16 @@ export const ManageBusinessProductsModal: React.FC<ManageBusinessProductsModalPr
               <button
                 type="button"
                 onClick={openAdd}
-                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                className={`px-3 py-1.5 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Tambah Produk</span>
+                <span>Tambah</span>
               </button>
             )}
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+              className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/70 dark:hover:bg-stone-800 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1513,7 +1518,7 @@ export const ManageBusinessProductsModal: React.FC<ManageBusinessProductsModalPr
 
         <div className="p-6 space-y-4">
           {showForm ? (
-            <form onSubmit={handleSaveProduct} className="space-y-4 bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-300 dark:border-slate-600">
+            <form onSubmit={handleSaveProduct} className={`space-y-4 p-4 rounded-2xl border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
               <div className="flex items-center justify-between">
                 <h4 className="font-bold text-sm text-black dark:text-white">
                   {editingProd ? 'Sunting Produk' : 'Tambah Produk Baharu'}
@@ -1593,36 +1598,36 @@ export const ManageBusinessProductsModal: React.FC<ManageBusinessProductsModalPr
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-300 dark:border-slate-600 text-black dark:text-white cursor-pointer"
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition-colors ${adminTheme.secondaryButtonClass}`}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer disabled:opacity-50"
+                  className={`px-5 py-2 rounded-xl text-sm font-bold cursor-pointer transition-colors disabled:opacity-50 ${adminTheme.primaryButtonClass}`}
                 >
-                  {isSaving ? 'Menyimpan...' : 'Simpan Produk'}
+                  {isSaving ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>
             </form>
           ) : businessProducts.length === 0 ? (
-            <div className="p-8 text-center rounded-2xl border border-dashed border-slate-300 dark:border-slate-600 text-sm text-black/70 dark:text-white/75">
+            <div className={`p-8 text-center rounded-2xl border border-dashed text-sm text-stone-600 dark:text-stone-300 ${adminTheme.dividerClass}`}>
               Tiada produk didaftarkan bagi perniagaan ini. Klik &quot;Tambah Produk&quot; untuk memulakan katalog.
             </div>
           ) : (
-            <div className="divide-y divide-slate-200 dark:divide-slate-700 rounded-2xl border border-slate-300 dark:border-slate-600 overflow-hidden">
+            <div className={`divide-y rounded-2xl border overflow-hidden ${adminTheme.dividerClass} ${adminTheme.surfaceClass}`}>
               {businessProducts.map((prod) => (
-                <div key={prod.id} className="p-3.5 flex items-center justify-between gap-3 bg-white dark:bg-slate-800">
+                <div key={prod.id} className={`p-3.5 flex items-center justify-between gap-3 transition-colors ${adminTheme.rowHoverClass}`}>
                   <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={prod.imageUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                       alt={prod.name}
-                      className="w-14 h-14 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0"
+                      className={`w-14 h-14 rounded-xl object-cover border shrink-0 ${adminTheme.dividerClass}`}
                     />
                     <div className="min-w-0">
-                      <div className="font-bold text-sm text-black dark:text-white truncate">{prod.name}</div>
-                      <div className="text-sm text-black/70 dark:text-white/75 tabular-nums">
+                      <div className="font-bold text-sm text-stone-900 dark:text-[#F5F2EC] truncate">{prod.name}</div>
+                      <div className="text-sm text-stone-600 dark:text-stone-300 tabular-nums">
                         RM{Number(prod.price).toFixed(2)} · {prod.inStock ? 'Ada Stok' : 'Habis'}
                       </div>
                     </div>
@@ -1631,10 +1636,10 @@ export const ManageBusinessProductsModal: React.FC<ManageBusinessProductsModalPr
                     <button
                       type="button"
                       onClick={() => openEdit(prod)}
-                      className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                      className={`px-2.5 py-1.5 rounded-xl border text-[0.8125rem] font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap transition-colors ${adminTheme.activeMiniBtnClass}`}
                     >
                       <Edit3 className="w-3.5 h-3.5" />
-                      <span>Edit</span>
+                      <span>Sunting</span>
                     </button>
                     <button
                       type="button"
@@ -1645,7 +1650,7 @@ export const ManageBusinessProductsModal: React.FC<ManageBusinessProductsModalPr
                           onConfirm: () => handleDeleteProd(prod.id)
                         })
                       }
-                      className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/70 text-black dark:text-white text-[0.8125rem] font-semibold inline-flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                      className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold inline-flex items-center gap-1 whitespace-nowrap ${adminTheme.dangerOutlineButtonClass}`}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       <span>Padam</span>

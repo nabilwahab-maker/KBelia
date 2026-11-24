@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 import { KelantanDistrict, CapsuleSlot } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import {
   DEFAULT_SORT_VALUE,
@@ -203,6 +205,8 @@ const HubAdvancedMarker: React.FC<HubMarkerProps> = ({
   onCloseInfo,
   onBookHub
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [markerRef, marker] = useAdvancedMarkerRef();
   const firstAvailable = stats.districtSlots.find((s) => s.status === 'available');
 
@@ -261,7 +265,7 @@ const HubAdvancedMarker: React.FC<HubMarkerProps> = ({
             <button
               type="button"
               onClick={() => onBookHub(geo.district, firstAvailable)}
-              className="w-full py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold transition-colors cursor-pointer"
+              className={`w-full py-2 px-3 text-[0.8125rem] ${roleTheme.primaryButtonClass}`}
             >
               {stats.available > 0 ? 'Mohon Kiosk' : 'Lihat Hab'}
             </button>
@@ -350,6 +354,8 @@ const LiveMapCanvas: React.FC<LiveMapCanvasProps> = ({
   onResetView,
   onSwitchToGrid
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const apiStatus = useApiLoadingStatus();
 
   const sortedDistricts = useMemo(
@@ -374,7 +380,7 @@ const LiveMapCanvas: React.FC<LiveMapCanvasProps> = ({
         <button
           type="button"
           onClick={onSwitchToGrid}
-          className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer"
+          className={`px-4 py-2 text-sm ${roleTheme.primaryButtonClass}`}
         >
           Mod Senarai
         </button>
@@ -483,6 +489,8 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
   onSelectSlot
 }) => {
   const { language } = useLanguage();
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const isEn = language === 'en';
   const [viewMode, setViewMode] = useState<'map' | 'grid'>('map');
   const [mapTypeId, setMapTypeId] = useState<'roadmap' | 'terrain' | 'hybrid'>('roadmap');
@@ -941,7 +949,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                 </APIProvider>
               ) : (
                 <div className="w-full h-[460px] sm:h-[520px] flex flex-col items-center justify-center p-6 text-center bg-slate-50 dark:bg-zinc-950 gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center ${roleTheme.activeMiniBtnClass}`}>
                     <MapPin className="w-6 h-6" />
                   </div>
                   <div className="max-w-md space-y-1">
@@ -955,7 +963,7 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                   <button
                     type="button"
                     onClick={() => setViewMode('grid')}
-                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer"
+                    className={`px-4 py-2 text-sm ${roleTheme.primaryButtonClass}`}
                   >
                     Senarai Jajahan
                   </button>
@@ -1135,16 +1143,16 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                   activeSelectedSlot &&
                   handleBookHub(activeDistrictData.district, activeSelectedSlot)
                 }
-                className={`w-full py-2.5 px-4 rounded-xl text-sm font-bold shadow-2xs transition-colors flex items-center justify-center gap-2 whitespace-nowrap ${
+                className={`w-full py-2.5 px-4 text-sm shadow-2xs flex items-center justify-center gap-2 whitespace-nowrap ${
                   activeSelectedSlot
-                    ? 'text-white bg-blue-600 hover:bg-blue-700 cursor-pointer'
-                    : 'text-black/45 dark:text-white/45 bg-slate-200 dark:bg-zinc-800 cursor-not-allowed'
+                    ? roleTheme.primaryButtonClass
+                    : 'rounded-xl font-semibold text-black/45 dark:text-white/45 bg-slate-200 dark:bg-zinc-800 cursor-not-allowed'
                 }`}
               >
                 <span>
                   {activeSelectedSlot
-                    ? `Mohon Unit ${activeSelectedSlot.code}`
-                    : 'Tiada Unit Tersedia'}
+                    ? `Mohon ${activeSelectedSlot.code}`
+                    : 'Tiada Unit'}
                 </span>
                 {activeSelectedSlot && <ArrowRight className="w-4 h-4" />}
               </button>
@@ -1227,9 +1235,9 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
             <button
               type="button"
               onClick={handleResetMapFilters}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors cursor-pointer"
+              className={`px-4 py-2 text-sm ${roleTheme.primaryButtonClass}`}
             >
-              Set Semula Penapis
+              Set Semula
             </button>
           </div>
         )

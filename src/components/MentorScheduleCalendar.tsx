@@ -30,6 +30,9 @@ import { toLocalIsoDate } from './ModernDateTimePicker';
 import { PortalImage } from './PortalImage';
 import { resolveMenteeVisuals } from '../utils/visualAssets';
 import { showToast as triggerToast } from './ToastNotification';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const mentorTheme = getRoleTheme('mentor');
 
 interface MentorScheduleCalendarProps {
   currentMentor: MentorProfile;
@@ -556,14 +559,14 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
   const getEventCardClasses = (kind: CalendarEventKind) => {
     switch (kind) {
       case 'confirmed':
-        return 'bg-sky-50/95 hover:bg-sky-100/95 border-sky-200 text-sky-950 dark:bg-sky-950/75 dark:hover:bg-sky-900/80 dark:border-sky-800/80 dark:text-sky-100';
+        return 'bg-blue-50/95 hover:bg-blue-100/95 border-blue-200 text-blue-950 dark:bg-blue-950/75 dark:hover:bg-blue-900/80 dark:border-blue-800/80 dark:text-blue-100';
       case 'pending':
         return 'bg-amber-50/95 hover:bg-amber-100/95 border-amber-200 text-amber-950 dark:bg-amber-950/70 dark:hover:bg-amber-900/75 dark:border-amber-800/80 dark:text-amber-100';
       case 'open_slot':
-        return 'bg-teal-50/95 hover:bg-teal-100/95 border-teal-200 text-teal-950 dark:bg-teal-950/75 dark:hover:bg-teal-900/80 dark:border-teal-800/80 dark:text-teal-100';
+        return 'bg-cyan-50/95 hover:bg-cyan-100/95 border-cyan-200 text-cyan-950 dark:bg-cyan-950/75 dark:hover:bg-cyan-900/80 dark:border-cyan-800/80 dark:text-cyan-100';
       case 'completed':
       default:
-        return 'bg-indigo-50/95 hover:bg-indigo-100/95 border-indigo-200 text-indigo-950 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/75 dark:border-indigo-800/80 dark:text-indigo-100';
+        return 'bg-slate-100/95 hover:bg-slate-200/90 border-slate-300 text-slate-900 dark:bg-slate-800/75 dark:hover:bg-slate-800 dark:border-slate-700 dark:text-slate-100';
     }
   };
 
@@ -608,9 +611,9 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
         {/* =================================================================== */}
         <aside className="w-full lg:w-[276px] xl:w-[292px] shrink-0 space-y-3.5">
           {/* 1. MINI MONTHLY CALENDAR */}
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-4 shadow-2xs">
+          <div className={`rounded-2xl border backdrop-blur-xs p-4 ${mentorTheme.surfaceClass}`}>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-[#F1F6FA] tracking-tight">
                 {(isEn ? EN_MONTHS_FULL : MALAY_MONTHS_FULL)[miniMonthDate.getMonth()]}{' '}
                 {miniMonthDate.getFullYear()}
               </h3>
@@ -621,7 +624,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     setMiniMonthDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
                   }
                   aria-label={isEn ? 'Previous month' : 'Bulan sebelumnya'}
-                  className="p-1.5 rounded-lg text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                  className={`p-1.5 rounded-xl text-slate-600 dark:text-slate-300 transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -631,7 +634,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     setMiniMonthDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
                   }
                   aria-label={isEn ? 'Next month' : 'Bulan seterusnya'}
-                  className="p-1.5 rounded-lg text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                  className={`p-1.5 rounded-xl text-slate-600 dark:text-slate-300 transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -642,7 +645,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
               {(isEn ? EN_WEEKDAYS_INITIALS : MALAY_WEEKDAYS_INITIALS).map((dayChar, idx) => (
                 <div
                   key={idx}
-                  className="text-[11px] font-semibold text-slate-400 dark:text-zinc-500 py-1"
+                  className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 py-1"
                 >
                   {dayChar}
                 </div>
@@ -656,21 +659,21 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     key={cell.iso}
                     type="button"
                     onClick={() => handleJumpToDate(cell.date)}
-                    className={`relative mx-auto w-8 h-8 rounded-full text-xs font-semibold tabular-nums flex flex-col items-center justify-center transition-colors cursor-pointer ${
+                    className={`relative mx-auto w-8 h-8 rounded-lg text-xs font-semibold tabular-nums flex flex-col items-center justify-center transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-teal-700 text-white dark:bg-teal-500 dark:text-slate-950 font-bold'
+                        ? 'bg-[#1D4ED8] text-white dark:bg-[#38BDF8] dark:text-[#07111A] font-bold'
                         : isToday
-                        ? 'ring-1 ring-teal-600/70 dark:ring-teal-400/70 text-teal-800 dark:text-teal-300 bg-teal-50/70 dark:bg-teal-950/40'
+                        ? 'ring-1 ring-[#1D4ED8]/70 dark:ring-[#38BDF8]/70 text-[#1D4ED8] dark:text-[#38BDF8] bg-[#2563EB]/10 dark:bg-[#38BDF8]/15'
                         : cell.inCurrentMonth
-                        ? 'text-slate-800 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800'
-                        : 'text-slate-300 dark:text-zinc-600 hover:bg-slate-50 dark:hover:bg-zinc-800/50'
+                        ? `text-slate-800 dark:text-slate-200 ${mentorTheme.rowHoverClass}`
+                        : 'text-slate-300 dark:text-slate-600 hover:bg-slate-100/40 dark:hover:bg-slate-800/40'
                     }`}
                   >
                     <span>{cell.date.getDate()}</span>
                     {hasEvents && !isSelected && (
                       <span
                         aria-hidden="true"
-                        className="absolute bottom-1 w-2.5 h-0.5 rounded-full bg-teal-600 dark:bg-teal-400"
+                        className="absolute bottom-1 w-2.5 h-0.5 rounded-full bg-[#1D4ED8] dark:bg-[#22D3EE]"
                       />
                     )}
                   </button>
@@ -679,14 +682,14 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
             </div>
           </div>
 
-          {/* 2. FEATURED TEAL REMINDER CARD (Peringatan Temu Janji) */}
-          <div className="bg-teal-800 dark:bg-teal-900/95 text-white rounded-2xl border border-teal-700/80 dark:border-teal-700/60 p-4 shadow-xs space-y-3">
+          {/* 2. FEATURED NILAM-SIAN REMINDER CARD */}
+          <div className="bg-gradient-to-br from-[#1D4ED8] via-[#1E40AF] to-[#0E7490] dark:from-[#0F2847] dark:via-[#15365E] dark:to-[#0C4A6E] text-white rounded-2xl border border-[#2563EB]/40 dark:border-[#38BDF8]/30 p-4 space-y-3">
             {activeReminder ? (
               <>
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-xs font-medium text-teal-100/85">
-                      {isEn ? 'Appointment Reminder' : 'Peringatan Temu Janji'}
+                    <p className="text-xs font-medium text-sky-100/85">
+                      {isEn ? 'Session Reminder' : 'Peringatan Sesi'}
                     </p>
                     <h4 className="text-base font-bold text-white leading-snug mt-0.5 truncate">
                       {activeReminder.title}
@@ -695,14 +698,14 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                   <button
                     type="button"
                     onClick={() => handleJumpToDate(activeReminder.dateObj)}
-                    className="text-[11px] font-semibold text-teal-100 hover:text-white underline underline-offset-2 shrink-0 cursor-pointer"
+                    className="text-[11px] font-semibold text-sky-100 hover:text-white underline underline-offset-2 shrink-0 cursor-pointer"
                   >
-                    {isEn ? 'Go' : 'Lihat'}
+                    {isEn ? 'View' : 'Lihat'}
                   </button>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-xs text-teal-50/95 tabular-nums">
-                  <Clock className="w-3.5 h-3.5 shrink-0 text-teal-200" />
+                <div className="flex items-center gap-1.5 text-xs text-sky-50/95 tabular-nums">
+                  <Clock className="w-3.5 h-3.5 shrink-0 text-cyan-200" />
                   <span className="truncate">
                     {activeReminder.dateObj.getDate()}{' '}
                     {(isEn ? EN_MONTHS_SHORT : MALAY_MONTHS_SHORT)[activeReminder.dateObj.getMonth()]}{' '}
@@ -714,7 +717,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                   <div className="flex items-center gap-2 min-w-0">
                     {reminderVisuals && (
                       <div className="flex -space-x-2 shrink-0">
-                        <div className="w-7 h-7 rounded-full overflow-hidden ring-2 ring-teal-800 bg-teal-700">
+                        <div className="w-7 h-7 rounded-full overflow-hidden ring-2 ring-[#1E40AF] bg-blue-900">
                           <PortalImage
                             src={reminderVisuals.businessUrl}
                             alt={activeReminder.title}
@@ -727,12 +730,12 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                             src={currentMentor.avatarUrl}
                             alt={currentMentor.name}
                             referrerPolicy="no-referrer"
-                            className="w-7 h-7 rounded-full object-cover ring-2 ring-teal-800 bg-teal-700"
+                            className="w-7 h-7 rounded-full object-cover ring-2 ring-[#1E40AF] bg-blue-900"
                           />
                         )}
                       </div>
                     )}
-                    <span className="text-xs text-teal-100/90 truncate">
+                    <span className="text-xs text-sky-100/90 truncate">
                       {activeReminder.registration?.entrepreneurName || activeReminder.subtitle}
                     </span>
                   </div>
@@ -743,7 +746,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                       onClick={() => setDismissedReminderIds((prev) => [...prev, activeReminder.id])}
                       title={isEn ? 'Dismiss reminder' : 'Tutup peringatan ini'}
                       aria-label={isEn ? 'Dismiss reminder' : 'Tutup peringatan'}
-                      className="w-8 h-8 rounded-full bg-amber-300 hover:bg-amber-200 text-slate-950 flex items-center justify-center transition-colors cursor-pointer"
+                      className="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -767,7 +770,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                           : 'Buka butiran sesi'
                       }
                       aria-label={isEn ? 'Confirm or open reminder' : 'Sahkan atau buka butiran'}
-                      className="w-8 h-8 rounded-full bg-teal-950/90 hover:bg-slate-950 text-white border border-teal-600/60 flex items-center justify-center transition-colors cursor-pointer"
+                      className="w-8 h-8 rounded-xl bg-cyan-300 hover:bg-cyan-200 text-[#07111A] flex items-center justify-center transition-colors cursor-pointer"
                     >
                       <Check className="w-4 h-4" />
                     </button>
@@ -776,17 +779,17 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
               </>
             ) : (
               <div className="space-y-1.5">
-                <p className="text-xs font-medium text-teal-100/85">
-                  {isEn ? 'Appointment Reminder' : 'Peringatan Temu Janji'}
+                <p className="text-xs font-medium text-sky-100/85">
+                  {isEn ? 'Session Reminder' : 'Peringatan Sesi'}
                 </p>
                 <p className="text-sm font-bold text-white">
-                  {isEn ? 'All caught up on reminders' : 'Tiada peringatan temu janji tertunda'}
+                  {isEn ? 'All caught up on reminders' : 'Tiada peringatan sesi tertunda'}
                 </p>
                 {dismissedReminderIds.length > 0 && (
                   <button
                     type="button"
                     onClick={() => setDismissedReminderIds([])}
-                    className="text-xs font-semibold text-amber-200 hover:text-amber-100 underline underline-offset-2 cursor-pointer"
+                    className="text-xs font-semibold text-cyan-200 hover:text-cyan-100 underline underline-offset-2 cursor-pointer"
                   >
                     {isEn ? 'Restore reminders' : 'Papar semula peringatan'}
                   </button>
@@ -796,15 +799,15 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
           </div>
 
           {/* 3. COLLAPSIBLE FILTERS CARD (Penapis) */}
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-4 shadow-2xs">
+          <div className={`rounded-2xl border backdrop-blur-xs p-4 ${mentorTheme.surfaceClass}`}>
             <button
               type="button"
               onClick={() => setIsFiltersOpen((prev) => !prev)}
-              className="w-full flex items-center justify-between text-sm font-bold text-slate-900 dark:text-white cursor-pointer"
+              className="w-full flex items-center justify-between text-sm font-bold text-slate-900 dark:text-[#F1F6FA] cursor-pointer"
             >
               <span>{isEn ? 'Filters' : 'Penapis'}</span>
               <ChevronDown
-                className={`w-4 h-4 text-slate-500 dark:text-zinc-400 transition-transform duration-150 ${
+                className={`w-4 h-4 text-slate-500 dark:text-slate-400 transition-transform duration-150 ${
                   isFiltersOpen ? 'rotate-0' : '-rotate-90'
                 }`}
               />
@@ -817,28 +820,28 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     {
                       key: 'confirmed' as CalendarEventKind,
                       label: isEn ? 'Confirmed Sessions' : 'Disahkan',
-                      accent: 'accent-sky-600'
+                      accent: 'accent-[#1D4ED8] dark:accent-[#38BDF8]'
                     },
                     {
                       key: 'pending' as CalendarEventKind,
-                      label: isEn ? 'Pending Approval' : 'Menunggu Kelulusan',
+                      label: isEn ? 'Pending Approval' : 'Menunggu Pengesahan',
                       accent: 'accent-amber-600'
                     },
                     {
                       key: 'open_slot' as CalendarEventKind,
                       label: isEn ? 'Published Open Slots' : 'Slot Terbuka Mentor',
-                      accent: 'accent-teal-700'
+                      accent: 'accent-cyan-600'
                     },
                     {
                       key: 'completed' as CalendarEventKind,
                       label: isEn ? 'Completed' : 'Selesai',
-                      accent: 'accent-indigo-600'
+                      accent: 'accent-slate-600'
                     }
                   ] as const
                 ).map((item) => (
                   <label
                     key={item.key}
-                    className="flex items-center gap-2.5 text-slate-700 dark:text-zinc-200 cursor-pointer select-none"
+                    className="flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer select-none"
                   >
                     <input
                       type="checkbox"
@@ -846,7 +849,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                       onChange={() =>
                         setStatusFilters((prev) => ({ ...prev, [item.key]: !prev[item.key] }))
                       }
-                      className={`w-4 h-4 rounded border-slate-300 dark:border-zinc-600 ${item.accent} cursor-pointer`}
+                      className={`w-4 h-4 rounded border-slate-300 dark:border-slate-600 ${item.accent} cursor-pointer`}
                     />
                     <span>{item.label}</span>
                   </label>
@@ -855,16 +858,16 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
             )}
           </div>
 
-          {/* 4. COLLAPSIBLE OTHER CALENDARS / CHANNELS CARD (Kalendar Lain) */}
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-4 shadow-2xs">
+          {/* 4. COLLAPSIBLE OTHER CALENDARS / CHANNELS CARD (Saluran Sesi) */}
+          <div className={`rounded-2xl border backdrop-blur-xs p-4 ${mentorTheme.surfaceClass}`}>
             <button
               type="button"
               onClick={() => setIsOtherCalendarsOpen((prev) => !prev)}
-              className="w-full flex items-center justify-between text-sm font-bold text-slate-900 dark:text-white cursor-pointer"
+              className="w-full flex items-center justify-between text-sm font-bold text-slate-900 dark:text-[#F1F6FA] cursor-pointer"
             >
-              <span>{isEn ? 'Session Channels' : 'Kalendar Lain'}</span>
+              <span>{isEn ? 'Session Channels' : 'Saluran Sesi'}</span>
               <ChevronDown
-                className={`w-4 h-4 text-slate-500 dark:text-zinc-400 transition-transform duration-150 ${
+                className={`w-4 h-4 text-slate-500 dark:text-slate-400 transition-transform duration-150 ${
                   isOtherCalendarsOpen ? 'rotate-0' : '-rotate-90'
                 }`}
               />
@@ -872,26 +875,26 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
 
             {isOtherCalendarsOpen && (
               <div className="mt-3 space-y-2.5 text-sm">
-                <label className="flex items-center gap-2.5 text-slate-700 dark:text-zinc-200 cursor-pointer select-none">
+                <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={modeFilters.googleMeet}
                     onChange={() =>
                       setModeFilters((prev) => ({ ...prev, googleMeet: !prev.googleMeet }))
                     }
-                    className="w-4 h-4 rounded border-slate-300 dark:border-zinc-600 accent-teal-700 cursor-pointer"
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 accent-[#1D4ED8] dark:accent-[#38BDF8] cursor-pointer"
                   />
                   <span>Google Meet</span>
                 </label>
 
-                <label className="flex items-center gap-2.5 text-slate-700 dark:text-zinc-200 cursor-pointer select-none">
+                <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-200 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={modeFilters.inPerson}
                     onChange={() =>
                       setModeFilters((prev) => ({ ...prev, inPerson: !prev.inPerson }))
                     }
-                    className="w-4 h-4 rounded border-slate-300 dark:border-zinc-600 accent-teal-700 cursor-pointer"
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 accent-[#1D4ED8] dark:accent-[#38BDF8] cursor-pointer"
                   />
                   <span>{isEn ? 'In-Person (Hab Usahawan)' : 'Bersemuka di Hab Usahawan'}</span>
                 </label>
@@ -903,16 +906,16 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
         {/* =================================================================== */}
         {/* RIGHT MAIN CALENDAR WORKSPACE                                       */}
         {/* =================================================================== */}
-        <section className="flex-1 min-w-0 w-full bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-hidden">
+        <section className={`flex-1 min-w-0 w-full rounded-2xl border backdrop-blur-xs overflow-hidden ${mentorTheme.surfaceClass}`}>
           {/* Calendar Top Toolbar */}
-          <div className="px-4 sm:px-5 py-3.5 border-b border-slate-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-3">
+          <div className={`px-4 sm:px-5 py-3.5 border-b flex flex-wrap items-center justify-between gap-3 ${mentorTheme.dividerClass}`}>
             <div className="flex items-center gap-2 flex-wrap">
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => navigatePeriod(-1)}
                   aria-label={isEn ? 'Previous period' : 'Tempoh sebelumnya'}
-                  className="p-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                  className={`p-1.5 rounded-xl text-slate-700 dark:text-slate-200 transition-colors cursor-pointer ${mentorTheme.secondaryButtonClass}`}
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -920,20 +923,20 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                   type="button"
                   onClick={() => navigatePeriod(1)}
                   aria-label={isEn ? 'Next period' : 'Tempoh seterusnya'}
-                  className="p-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                  className={`p-1.5 rounded-xl text-slate-700 dark:text-slate-200 transition-colors cursor-pointer ${mentorTheme.secondaryButtonClass}`}
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
 
-              <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight tabular-nums px-1">
+              <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-[#F1F6FA] tracking-tight tabular-nums px-1">
                 {toolbarRangeTitle}
               </h3>
 
               <button
                 type="button"
                 onClick={handleJumpToday}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs font-bold text-slate-800 dark:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-700 transition-colors whitespace-nowrap cursor-pointer"
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap cursor-pointer ${mentorTheme.secondaryButtonClass}`}
               >
                 {isEn ? 'Today' : 'Hari Ini'}
               </button>
@@ -941,7 +944,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
 
             <div className="flex items-center gap-2.5 flex-wrap">
               {/* Daily / Weekly / Monthly Switcher */}
-              <div className="inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700">
+              <div className={`inline-flex items-center p-1 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                 {(
                   [
                     { id: 'daily' as CalendarViewMode, label: isEn ? 'Daily' : 'Harian' },
@@ -957,8 +960,8 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                       onClick={() => setViewMode(modeTab.id)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap cursor-pointer ${
                         active
-                          ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-2xs'
-                          : 'text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white'
+                          ? mentorTheme.segmentedActiveClass
+                          : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
                       {modeTab.label}
@@ -972,7 +975,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                 onClick={() =>
                   onOpenCreateSlotModal(formatDateToMalayDay(selectedDate), '10:00 AM - 11:00 AM')
                 }
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500 text-white shadow-xs transition-colors whitespace-nowrap cursor-pointer"
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-2xs transition-colors whitespace-nowrap cursor-pointer ${mentorTheme.primaryButtonClass}`}
               >
                 <Plus className="w-4 h-4" />
                 <span>{isEn ? 'Create Slot' : 'Cipta Slot'}</span>
@@ -987,8 +990,8 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
             <div className="overflow-x-auto">
               <div className="min-w-[760px]">
                 {/* Day Header Row */}
-                <div className="grid grid-cols-[68px_repeat(7,minmax(0,1fr))] border-b border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950/50">
-                  <div className="py-3 px-2 text-[11px] font-bold text-slate-500 dark:text-zinc-400 flex items-end justify-center tabular-nums">
+                <div className={`grid grid-cols-[68px_repeat(7,minmax(0,1fr))] border-b ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
+                  <div className="py-3 px-2 text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-end justify-center tabular-nums">
                     GMT+08
                   </div>
                   {weekDays.map((dayDt) => {
@@ -1001,17 +1004,17 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                         key={dayIso}
                         type="button"
                         onClick={() => setSelectedDate(dayDt)}
-                        className={`py-2.5 px-2 border-l border-slate-200 dark:border-zinc-700 text-center transition-colors cursor-pointer ${
+                        className={`py-2.5 px-2 border-l text-center transition-colors cursor-pointer ${mentorTheme.dividerClass} ${
                           isSelectedDay
-                            ? 'bg-teal-50/90 dark:bg-teal-950/45'
-                            : 'hover:bg-slate-100/70 dark:hover:bg-zinc-800/50'
+                            ? 'bg-[#2563EB]/8 dark:bg-[#38BDF8]/12'
+                            : mentorTheme.rowHoverClass
                         }`}
                       >
                         <div
                           className={`text-[11px] font-semibold ${
                             isSelectedDay || isTodayDay
-                              ? 'text-teal-700 dark:text-teal-300'
-                              : 'text-slate-500 dark:text-zinc-400'
+                              ? mentorTheme.accentTextClass
+                              : 'text-slate-500 dark:text-slate-400'
                           }`}
                         >
                           {dayName}
@@ -1019,10 +1022,10 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                         <div
                           className={`mt-0.5 text-lg font-extrabold tabular-nums leading-tight ${
                             isTodayDay
-                              ? 'inline-flex items-center justify-center w-8 h-8 rounded-full bg-teal-700 text-white dark:bg-teal-500 dark:text-slate-950'
+                              ? 'inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#1D4ED8] text-white dark:bg-[#38BDF8] dark:text-[#07111A]'
                               : isSelectedDay
-                              ? 'text-teal-900 dark:text-teal-200'
-                              : 'text-slate-900 dark:text-white'
+                              ? mentorTheme.accentTextClass
+                              : 'text-slate-900 dark:text-[#F1F6FA]'
                           }`}
                         >
                           {dayDt.getDate()}
@@ -1035,12 +1038,12 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                 {/* Scrollable Hourly Body */}
                 <div className="relative grid grid-cols-[68px_repeat(7,minmax(0,1fr))]">
                   {/* Time Axis */}
-                  <div className="bg-white dark:bg-zinc-900">
+                  <div className="bg-transparent">
                     {hoursList.map((hour) => (
                       <div
                         key={hour}
                         style={{ height: HOUR_ROW_HEIGHT }}
-                        className="pr-2.5 pt-1 text-right text-[11px] font-semibold text-slate-400 dark:text-zinc-500 tabular-nums border-b border-slate-100 dark:border-zinc-800/80"
+                        className={`pr-2.5 pt-1 text-right text-[11px] font-semibold text-slate-400 dark:text-slate-500 tabular-nums border-b ${mentorTheme.dividerClass}`}
                       >
                         {formatHourLabel24h(hour)}
                       </div>
@@ -1057,8 +1060,8 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     return (
                       <div
                         key={dayIso}
-                        className={`relative border-l border-slate-200 dark:border-zinc-700 ${
-                          isSelectedDay ? 'bg-teal-50/35 dark:bg-teal-950/15' : ''
+                        className={`relative border-l ${mentorTheme.dividerClass} ${
+                          isSelectedDay ? 'bg-[#2563EB]/[0.03] dark:bg-[#38BDF8]/[0.05]' : ''
                         }`}
                       >
                         {hoursList.map((hour) => (
@@ -1076,9 +1079,9 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                             aria-label={`${
                               isEn ? 'Create slot on' : 'Cipta slot pada'
                             } ${formatDateToMalayDay(dayDt)} ${formatHourLabel24h(hour)}`}
-                            className="group w-full block border-b border-slate-100 dark:border-zinc-800/80 hover:bg-teal-50/50 dark:hover:bg-teal-950/30 transition-colors text-left cursor-pointer relative"
+                            className={`group w-full block border-b ${mentorTheme.dividerClass} hover:bg-[#2563EB]/8 dark:hover:bg-[#38BDF8]/10 transition-colors text-left cursor-pointer relative`}
                           >
-                            <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-1.5 top-1 text-[10px] font-bold text-teal-700 dark:text-teal-300 bg-white/90 dark:bg-zinc-900/90 px-1.5 py-0.5 rounded-md border border-teal-200 dark:border-teal-800">
+                            <span className={`opacity-0 group-hover:opacity-100 transition-opacity absolute right-1.5 top-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${mentorTheme.surfaceClass} ${mentorTheme.accentTextClass}`}>
                               + Slot
                             </span>
                           </button>
@@ -1153,40 +1156,40 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
 
             return (
               <div>
-                <div className="grid grid-cols-[72px_1fr] border-b border-slate-200 dark:border-zinc-700 bg-teal-50/60 dark:bg-teal-950/30">
-                  <div className="py-3 px-2 text-[11px] font-bold text-slate-500 dark:text-zinc-400 flex items-end justify-center tabular-nums">
+                <div className={`grid grid-cols-[72px_1fr] border-b ${mentorTheme.dividerClass} bg-[#2563EB]/8 dark:bg-[#38BDF8]/10`}>
+                  <div className="py-3 px-2 text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-end justify-center tabular-nums">
                     GMT+08
                   </div>
-                  <div className="py-3 px-4 border-l border-slate-200 dark:border-zinc-700 flex items-center justify-between gap-2">
+                  <div className={`py-3 px-4 border-l flex items-center justify-between gap-2 ${mentorTheme.dividerClass}`}>
                     <div>
-                      <div className="text-xs font-semibold text-teal-700 dark:text-teal-300">
+                      <div className={`text-xs font-semibold ${mentorTheme.accentTextClass}`}>
                         {dayName}
                       </div>
-                      <div className="text-xl font-extrabold text-slate-900 dark:text-white tabular-nums">
+                      <div className="text-xl font-extrabold text-slate-900 dark:text-[#F1F6FA] tabular-nums">
                         {selectedDate.getDate()}{' '}
                         {(isEn ? EN_MONTHS_FULL : MALAY_MONTHS_FULL)[selectedDate.getMonth()]}
                       </div>
                     </div>
-                    <span className="text-xs font-semibold text-slate-600 dark:text-zinc-300 tabular-nums">
+                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 tabular-nums">
                       {dayEvents.length} {isEn ? 'scheduled items' : 'jadual sesi'}
                     </span>
                   </div>
                 </div>
 
                 <div className="relative grid grid-cols-[72px_1fr]">
-                  <div className="bg-white dark:bg-zinc-900">
+                  <div className="bg-transparent">
                     {hoursList.map((hour) => (
                       <div
                         key={hour}
                         style={{ height: HOUR_ROW_HEIGHT }}
-                        className="pr-3 pt-1.5 text-right text-xs font-semibold text-slate-400 dark:text-zinc-500 tabular-nums border-b border-slate-100 dark:border-zinc-800/80"
+                        className={`pr-3 pt-1.5 text-right text-xs font-semibold text-slate-400 dark:text-slate-500 tabular-nums border-b ${mentorTheme.dividerClass}`}
                       >
                         {formatHourLabel24h(hour)}
                       </div>
                     ))}
                   </div>
 
-                  <div className="relative border-l border-slate-200 dark:border-zinc-700">
+                  <div className={`relative border-l ${mentorTheme.dividerClass}`}>
                     {hoursList.map((hour) => (
                       <button
                         key={hour}
@@ -1198,9 +1201,9 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                           )
                         }
                         style={{ height: HOUR_ROW_HEIGHT }}
-                        className="group w-full block border-b border-slate-100 dark:border-zinc-800/80 hover:bg-teal-50/45 dark:hover:bg-teal-950/25 transition-colors text-left relative cursor-pointer"
+                        className={`group w-full block border-b ${mentorTheme.dividerClass} hover:bg-[#2563EB]/8 dark:hover:bg-[#38BDF8]/10 transition-colors text-left relative cursor-pointer`}
                       >
-                        <span className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-3 top-2 text-xs font-bold text-teal-700 dark:text-teal-300">
+                        <span className={`opacity-0 group-hover:opacity-100 transition-opacity absolute right-3 top-2 text-xs font-bold ${mentorTheme.accentTextClass}`}>
                           + {isEn ? 'Add slot at this hour' : 'Cipta slot pada jam ini'}
                         </span>
                       </button>
@@ -1266,11 +1269,11 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
           {/* ================================================================= */}
           {viewMode === 'monthly' && (
             <div>
-              <div className="grid grid-cols-7 border-b border-slate-200 dark:border-zinc-700 bg-slate-50/70 dark:bg-zinc-950/50">
+              <div className={`grid grid-cols-7 border-b ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                 {(isEn ? EN_WEEKDAYS_FULL : MALAY_WEEKDAYS_FULL).map((dayName) => (
                   <div
                     key={dayName}
-                    className="py-2.5 px-2 text-center text-xs font-bold text-slate-600 dark:text-zinc-300 border-l first:border-l-0 border-slate-200 dark:border-zinc-700"
+                    className={`py-2.5 px-2 text-center text-xs font-bold text-slate-600 dark:text-slate-300 border-l first:border-l-0 ${mentorTheme.dividerClass}`}
                   >
                     {dayName}
                   </div>
@@ -1289,30 +1292,30 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                         setSelectedDate(cell.date);
                         onOpenCreateSlotModal(formatDateToMalayDay(cell.date), '10:00 AM - 11:00 AM');
                       }}
-                      className={`min-h-[108px] p-2 border-b border-l first:border-l-0 border-slate-200 dark:border-zinc-700 transition-colors cursor-pointer flex flex-col gap-1 ${
+                      className={`min-h-[108px] p-2 border-b border-l first:border-l-0 ${mentorTheme.dividerClass} transition-colors cursor-pointer flex flex-col gap-1 ${
                         isSelected
-                          ? 'bg-teal-50/50 dark:bg-teal-950/25'
+                          ? 'bg-[#2563EB]/8 dark:bg-[#38BDF8]/12'
                           : cell.inCurrentMonth
-                          ? 'bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800/60'
-                          : 'bg-slate-50/60 dark:bg-zinc-950/50 text-slate-400 dark:text-zinc-500'
+                          ? `bg-transparent ${mentorTheme.rowHoverClass}`
+                          : `${mentorTheme.surfaceMutedClass} text-slate-400 dark:text-slate-500`
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <span
                           className={`text-xs font-bold tabular-nums w-6 h-6 rounded-full inline-flex items-center justify-center ${
                             isToday
-                              ? 'bg-teal-700 text-white dark:bg-teal-500 dark:text-slate-950'
+                              ? 'bg-[#1D4ED8] text-white dark:bg-[#38BDF8] dark:text-[#07111A]'
                               : isSelected
-                              ? 'bg-teal-100 text-teal-900 dark:bg-teal-900/60 dark:text-teal-200'
+                              ? 'bg-[#2563EB]/15 text-[#1D4ED8] dark:bg-[#38BDF8]/20 dark:text-[#38BDF8]'
                               : cell.inCurrentMonth
-                              ? 'text-slate-800 dark:text-zinc-200'
-                              : 'text-slate-400 dark:text-zinc-600'
+                              ? 'text-slate-800 dark:text-slate-200'
+                              : 'text-slate-400 dark:text-slate-600'
                           }`}
                         >
                           {cell.date.getDate()}
                         </span>
                         {cellEvents.length > 0 && (
-                          <span className="text-[10px] font-semibold text-slate-500 dark:text-zinc-400 tabular-nums">
+                          <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 tabular-nums">
                             {cellEvents.length}
                           </span>
                         )}
@@ -1336,7 +1339,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                           </button>
                         ))}
                         {cellEvents.length > 3 && (
-                          <div className="text-[10px] font-bold text-teal-700 dark:text-teal-300 px-1">
+                          <div className={`text-[10px] font-bold px-1 ${mentorTheme.accentTextClass}`}>
                             +{cellEvents.length - 3} {isEn ? 'more' : 'lagi'}
                           </div>
                         )}
@@ -1355,7 +1358,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
       {/* ===================================================================== */}
       {selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-zinc-700 overflow-hidden max-h-[90vh] overflow-y-auto">
+          <div className={`w-full max-w-lg rounded-2xl shadow-2xl border backdrop-blur-md overflow-hidden max-h-[90vh] overflow-y-auto ${mentorTheme.surfaceClass}`}>
             {selectedEvent.registration ? (
               (() => {
                 const reg = selectedEvent.registration;
@@ -1373,9 +1376,9 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
 
                 return (
                   <>
-                    <div className="px-6 py-4 border-b border-slate-200 dark:border-zinc-700 flex items-start justify-between gap-4 bg-slate-50/70 dark:bg-zinc-950/60">
+                    <div className={`px-6 py-4 border-b flex items-start justify-between gap-4 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                        <div className={`w-12 h-12 rounded-xl overflow-hidden border bg-slate-100 dark:bg-slate-800 shrink-0 ${mentorTheme.dividerClass}`}>
                           <PortalImage
                             src={visuals.businessUrl}
                             alt={reg.businessName}
@@ -1384,13 +1387,13 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                           />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-xs font-bold text-teal-700 dark:text-teal-400">
+                          <div className={`text-xs font-bold ${mentorTheme.accentTextClass}`}>
                             {getKindLabel(selectedEvent.kind)} &middot; {reg.district || 'Kelantan'}
                           </div>
-                          <h3 className="text-base font-extrabold text-slate-900 dark:text-white truncate">
+                          <h3 className="text-base font-extrabold text-slate-900 dark:text-[#F1F6FA] truncate">
                             {reg.businessName}
                           </h3>
-                          <p className="text-xs text-slate-600 dark:text-zinc-300 truncate">
+                          <p className="text-xs text-slate-600 dark:text-slate-300 truncate">
                             {reg.entrepreneurName}
                           </p>
                         </div>
@@ -1400,29 +1403,29 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                         type="button"
                         onClick={() => setSelectedEvent(null)}
                         aria-label={isEn ? 'Close modal' : 'Tutup'}
-                        className="p-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:bg-slate-200/70 dark:hover:bg-zinc-800 cursor-pointer"
+                        className={`p-1.5 rounded-xl text-slate-500 dark:text-slate-400 cursor-pointer ${mentorTheme.rowHoverClass}`}
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
 
                     <div className="p-6 space-y-4 text-sm">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-950/70 border border-slate-200 dark:border-zinc-800">
-                        <div className="flex items-center gap-2 text-slate-800 dark:text-zinc-200">
-                          <Calendar className="w-4 h-4 text-teal-700 dark:text-teal-400 shrink-0" />
+                      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b ${mentorTheme.dividerClass}`}>
+                        <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                          <Calendar className={`w-4 h-4 shrink-0 ${mentorTheme.accentTextClass}`} />
                           <span className="font-semibold tabular-nums">
                             {reg.preferredDate || selectedEvent.dateIso}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-800 dark:text-zinc-200">
-                          <Clock className="w-4 h-4 text-teal-700 dark:text-teal-400 shrink-0" />
+                        <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                          <Clock className={`w-4 h-4 shrink-0 ${mentorTheme.accentTextClass}`} />
                           <span className="font-semibold tabular-nums">{selectedEvent.timeLabel}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-800 dark:text-zinc-200 sm:col-span-2">
+                        <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 sm:col-span-2">
                           {selectedEvent.mode === 'Google Meet' ? (
-                            <Video className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+                            <Video className={`w-4 h-4 shrink-0 ${mentorTheme.accentStrongTextClass}`} />
                           ) : (
-                            <MapPin className="w-4 h-4 text-teal-700 dark:text-teal-400 shrink-0" />
+                            <MapPin className={`w-4 h-4 shrink-0 ${mentorTheme.accentTextClass}`} />
                           )}
                           <span className="font-semibold">
                             {selectedEvent.mode === 'Google Meet'
@@ -1435,30 +1438,30 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                       </div>
 
                       <div>
-                        <div className="text-xs font-bold text-slate-500 dark:text-zinc-400 mb-1">
+                        <div className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
                           {isEn ? 'Session Topic' : 'Topik Perbincangan'}
                         </div>
-                        <p className="font-bold text-slate-900 dark:text-white">{reg.topic}</p>
+                        <p className="font-bold text-slate-900 dark:text-[#F1F6FA]">{reg.topic}</p>
                       </div>
 
                       {reg.challenges && (
-                        <div>
-                          <div className="text-xs font-bold text-slate-500 dark:text-zinc-400 mb-1">
+                        <div className={`pt-3 border-t ${mentorTheme.dividerClass}`}>
+                          <div className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">
                             {isEn ? 'Entrepreneur Notes' : 'Cabaran & Mesej Usahawan'}
                           </div>
-                          <p className="text-slate-700 dark:text-zinc-300 leading-relaxed bg-slate-50 dark:bg-zinc-950/60 p-3 rounded-xl border border-slate-200 dark:border-zinc-800">
+                          <p className="text-slate-700 dark:text-slate-300 leading-relaxed italic">
                             &ldquo;{reg.challenges}&rdquo;
                           </p>
                         </div>
                       )}
 
                       {reg.meetingLink && (
-                        <div className="flex items-center justify-between gap-2 p-3 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/70">
+                        <div className={`flex items-center justify-between gap-2 p-3 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                           <a
                             href={reg.meetingLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs font-bold text-sky-800 dark:text-sky-300 hover:underline flex items-center gap-1.5 truncate"
+                            className={`text-xs font-bold hover:underline flex items-center gap-1.5 truncate ${mentorTheme.accentTextClass}`}
                           >
                             <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate">{reg.meetingLink}</span>
@@ -1472,7 +1475,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                                 'success'
                               );
                             }}
-                            className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white dark:bg-zinc-900 border border-sky-200 dark:border-sky-700 text-slate-800 dark:text-zinc-200 flex items-center gap-1 shrink-0 cursor-pointer"
+                            className={`px-2.5 py-1 rounded-xl text-xs font-bold flex items-center gap-1 shrink-0 cursor-pointer ${mentorTheme.secondaryButtonClass}`}
                           >
                             <Copy className="w-3 h-3" />
                             <span>{isEn ? 'Copy' : 'Salin'}</span>
@@ -1480,7 +1483,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                         </div>
                       )}
 
-                      <div className="pt-3 border-t border-slate-200 dark:border-zinc-700 flex flex-wrap items-center justify-between gap-2">
+                      <div className={`pt-3 border-t flex flex-wrap items-center justify-between gap-2 ${mentorTheme.dividerClass}`}>
                         <div className="flex flex-wrap items-center gap-2">
                           {cleanPhone && (
                             <a
@@ -1489,9 +1492,9 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                               )}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 flex items-center gap-1.5 cursor-pointer"
+                              className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer ${mentorTheme.secondaryButtonClass}`}
                             >
-                              <Phone className="w-3.5 h-3.5" />
+                              <Phone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                               <span>WhatsApp</span>
                             </a>
                           )}
@@ -1502,10 +1505,10 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                               setSelectedEvent(null);
                               onOpenNotesModal(reg);
                             }}
-                            className="px-3 py-2 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 text-slate-900 dark:text-white border border-slate-300 dark:border-zinc-600 hover:bg-slate-50 dark:hover:bg-zinc-700 flex items-center gap-1.5 cursor-pointer"
+                            className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer ${mentorTheme.secondaryButtonClass}`}
                           >
                             <FileText className="w-3.5 h-3.5" />
-                            <span>{isEn ? 'Notes & Meet Link' : 'Nota & Pautan Meet'}</span>
+                            <span>{isEn ? 'Notes' : 'Nota'}</span>
                           </button>
                         </div>
 
@@ -1518,7 +1521,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                                   onStatusChange(reg, 'cancelled');
                                   setSelectedEvent(null);
                                 }}
-                                className="px-3 py-2 rounded-xl text-xs font-bold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-900/60 flex items-center gap-1 cursor-pointer"
+                                className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer ${mentorTheme.dangerOutlineButtonClass}`}
                               >
                                 <XCircle className="w-3.5 h-3.5" />
                                 <span>{isEn ? 'Decline' : 'Tolak'}</span>
@@ -1529,10 +1532,10 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                                   onStatusChange(reg, 'confirmed');
                                   setSelectedEvent(null);
                                 }}
-                                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500 flex items-center gap-1.5 cursor-pointer"
+                                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer ${mentorTheme.primaryButtonClass}`}
                               >
                                 <Check className="w-3.5 h-3.5" />
-                                <span>{isEn ? 'Confirm Session' : 'Sahkan Sesi'}</span>
+                                <span>{isEn ? 'Confirm' : 'Sahkan'}</span>
                               </button>
                             </>
                           )}
@@ -1544,10 +1547,10 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                                 onStatusChange(reg, 'completed');
                                 setSelectedEvent(null);
                               }}
-                              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 flex items-center gap-1.5 cursor-pointer"
+                              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer ${mentorTheme.primaryButtonClass}`}
                             >
                               <CheckCircle2 className="w-3.5 h-3.5" />
-                              <span>{isEn ? 'Mark Completed' : 'Tandakan Selesai'}</span>
+                              <span>{isEn ? 'Done' : 'Selesai'}</span>
                             </button>
                           )}
                         </div>
@@ -1558,16 +1561,16 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
               })()
             ) : selectedEvent.slot ? (
               <>
-                <div className="px-6 py-4 border-b border-slate-200 dark:border-zinc-700 flex items-center justify-between bg-teal-50/70 dark:bg-teal-950/40">
+                <div className={`px-6 py-4 border-b flex items-center justify-between ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-teal-700 text-white flex items-center justify-center">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${mentorTheme.primaryButtonClass}`}>
                       <Users className="w-4 h-4" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-[#F1F6FA]">
                         {isEn ? 'Published Open Slot' : 'Slot Jadual Terbuka Mentor'}
                       </h3>
-                      <p className="text-xs text-slate-600 dark:text-zinc-300">
+                      <p className="text-xs text-slate-600 dark:text-slate-300">
                         {isEn
                           ? 'Visible to youth entrepreneurs for booking.'
                           : 'Sedia ditempah oleh usahawan belia di portal.'}
@@ -1578,27 +1581,27 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     type="button"
                     onClick={() => setSelectedEvent(null)}
                     aria-label={isEn ? 'Close modal' : 'Tutup'}
-                    className="p-1.5 rounded-lg text-slate-500 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-800 cursor-pointer"
+                    className={`p-1.5 rounded-xl text-slate-500 dark:text-slate-400 cursor-pointer ${mentorTheme.rowHoverClass}`}
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
                 <div className="p-6 space-y-4 text-sm">
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-zinc-950/70 border border-slate-200 dark:border-zinc-800 space-y-2">
-                    <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                      <Calendar className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+                  <div className={`space-y-2 pb-3 border-b ${mentorTheme.dividerClass}`}>
+                    <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-[#F1F6FA]">
+                      <Calendar className={`w-4 h-4 ${mentorTheme.accentTextClass}`} />
                       <span>{selectedEvent.slot.date}</span>
                     </div>
-                    <div className="flex items-center gap-2 font-semibold text-slate-700 dark:text-zinc-200 tabular-nums">
-                      <Clock className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+                    <div className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-200 tabular-nums">
+                      <Clock className={`w-4 h-4 ${mentorTheme.accentTextClass}`} />
                       <span>{selectedEvent.slot.time}</span>
                     </div>
-                    <div className="flex items-center gap-2 font-medium text-slate-700 dark:text-zinc-200">
+                    <div className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200">
                       {selectedEvent.mode === 'Google Meet' ? (
-                        <Video className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                        <Video className={`w-4 h-4 ${mentorTheme.accentStrongTextClass}`} />
                       ) : (
-                        <MapPin className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+                        <MapPin className={`w-4 h-4 ${mentorTheme.accentTextClass}`} />
                       )}
                       <span>
                         {selectedEvent.mode === 'Google Meet'
@@ -1610,11 +1613,11 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-zinc-700">
+                  <div className="flex items-center justify-end gap-2 pt-1">
                     <button
                       type="button"
                       onClick={() => setSelectedEvent(null)}
-                      className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                      className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer ${mentorTheme.secondaryButtonClass}`}
                     >
                       {isEn ? 'Close' : 'Tutup'}
                     </button>

@@ -14,7 +14,9 @@ import {
 } from 'lucide-react';
 import { KelantanDistrict, BusinessCategory } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import confetti from 'canvas-confetti';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 interface GrantCalculatorProps {
   onOpenGrantModal: (title: string, amount: string) => void;
@@ -26,7 +28,9 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
   onOpenMentorship
 }) => {
   const { language } = useLanguage();
+  const { isAdmin, isMentor } = useAuth();
   const isEn = language === 'en';
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
 
   const [age, setAge] = useState<number>(24);
   const [district, setDistrict] = useState<KelantanDistrict>('Kota Bharu');
@@ -130,10 +134,10 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     key={presetAge}
                     type="button"
                     onClick={() => setAge(presetAge)}
-                    className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 ${
+                    className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 ${
                       age === presetAge
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        ? `${roleTheme.segmentedActiveClass} border-transparent`
+                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     {presetAge} {isEn ? 'years' : 'tahun'}
@@ -254,10 +258,10 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     key={m}
                     type="button"
                     onClick={() => setExperienceMonths(m)}
-                    className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 ${
+                    className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 ${
                       experienceMonths === m
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        ? `${roleTheme.segmentedActiveClass} border-transparent`
+                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     {m} {isEn ? 'months' : 'bulan'}
@@ -294,10 +298,10 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     key={sales}
                     type="button"
                     onClick={() => setMonthlySales(sales)}
-                    className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                    className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
                       monthlySales === sales
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        ? `${roleTheme.segmentedActiveClass} border-transparent`
+                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     RM {sales >= 1000 ? `${sales / 1000}k` : sales}
@@ -334,10 +338,10 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     key={need}
                     type="button"
                     onClick={() => setFundingNeed(need)}
-                    className={`px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                    className={`px-2.5 py-1 rounded-xl text-[0.8125rem] font-bold border transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
                       fundingNeed === need
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs dark:bg-emerald-600'
-                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-800'
+                        ? `${roleTheme.segmentedActiveClass} border-transparent`
+                        : 'bg-slate-50 dark:bg-slate-900 text-black dark:text-white border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     RM {need >= 1000 ? `${need / 1000}k` : need}
@@ -351,9 +355,9 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
             <button
               type="button"
               onClick={handleRecalculate}
-              className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer dark:bg-blue-600"
+              className={`w-full py-2.5 px-4 text-sm shadow-xs flex items-center justify-center gap-2 ${roleTheme.primaryButtonClass}`}
             >
-              <Sparkles className="w-4 h-4 text-white" />
+              <Sparkles className="w-4 h-4" />
               <span>{isEn ? 'Recalculate' : 'Kira Semula'}</span>
             </button>
           </div>
@@ -412,7 +416,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     Geran Percuma RM3,000
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full text-[0.8125rem] font-bold bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white">
+                <span className="px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold bg-emerald-100 text-black dark:bg-emerald-950/60 dark:text-white">
                   {starterMatch}% {isEn ? 'Match' : 'Padan'}
                 </span>
               </div>
@@ -425,9 +429,9 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                   'Geran Permulaan Hab Usahawan Belia',
                   `RM ${Math.min(Math.max(fundingNeed, 1000), 3000).toLocaleString('ms-MY')}`
                 )}
-                className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer dark:bg-emerald-600"
+                className={`w-full py-2 px-3 text-sm flex items-center justify-center gap-1.5 ${roleTheme.primaryButtonClass}`}
               >
-                <span>{isEn ? 'Apply Grant Now' : 'Mohon Geran Ini'}</span>
+                <span>{isEn ? 'Apply Grant' : 'Mohon Geran'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -443,7 +447,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
                     Mikro Pembiayaan RM5,000 - RM20,000
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded-full text-[0.8125rem] font-bold bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white">
+                <span className="px-2 py-0.5 rounded-lg text-[0.8125rem] font-bold bg-amber-100 text-black dark:bg-amber-950/60 dark:text-white">
                   {tekunMatch}% {isEn ? 'Match' : 'Padan'}
                 </span>
               </div>
@@ -453,9 +457,9 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
               <button
                 type="button"
                 onClick={onOpenMentorship}
-                className="w-full py-2 px-3 bg-white hover:bg-amber-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-black dark:text-white border border-slate-300 dark:border-slate-600 font-bold text-sm rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className={`w-full py-2 px-3 text-sm flex items-center justify-center gap-1.5 ${roleTheme.secondaryButtonClass}`}
               >
-                <span>{isEn ? 'Book Mentor Consultation' : 'Minta Panduan Mentor'}</span>
+                <span>{isEn ? 'Ask Mentor' : 'Tanya Mentor'}</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>

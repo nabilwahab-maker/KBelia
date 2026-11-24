@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { X, Save, Loader2, Edit3, AlertCircle } from 'lucide-react';
 import { KioskDailySale } from '../types';
 import { saveCashflowRecord } from '../services/dataService';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { ModernDatePicker, addDaysIso, toLocalIsoDate } from './ModernDateTimePicker';
 
 interface EditCashflowModalProps {
@@ -21,6 +23,9 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
   onClose,
   onSaved
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
+
   const [date, setDate] = useState('');
   const [cashSales, setCashSales] = useState('');
   const [qrSales, setQrSales] = useState('');
@@ -110,9 +115,9 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
         className="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`${roleTheme.surfaceMutedClass} border-b ${roleTheme.dividerClass} px-6 py-4 flex items-center justify-between`}>
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div className={`w-9 h-9 rounded-xl ${roleTheme.activeMiniBtnClass} border flex items-center justify-center shrink-0`}>
               <Edit3 className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -130,7 +135,7 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
             disabled={isSaving}
             onClick={onClose}
             aria-label="Tutup tetingkap edit"
-            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+            className={`${roleTheme.iconButtonClass} disabled:opacity-40`}
           >
             <X className="w-4 h-4" />
           </button>
@@ -168,7 +173,7 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
                 value={cashSales}
                 onChange={(e) => setCashSales(e.target.value)}
                 placeholder="Masukkan jumlah"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums focus:outline-none ${roleTheme.inputClass}`}
               />
             </div>
 
@@ -181,7 +186,7 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
                 value={qrSales}
                 onChange={(e) => setQrSales(e.target.value)}
                 placeholder="Masukkan jumlah"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums focus:outline-none ${roleTheme.inputClass}`}
               />
             </div>
 
@@ -194,7 +199,7 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
                 value={expenses}
                 onChange={(e) => setExpenses(e.target.value)}
                 placeholder="Masukkan jumlah"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums focus:outline-none ${roleTheme.inputClass}`}
               />
             </div>
           </div>
@@ -207,7 +212,7 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Masukkan catatan"
-              className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+              className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${roleTheme.inputClass}`}
             />
           </div>
 
@@ -223,14 +228,14 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer disabled:opacity-50"
+              className={`w-full sm:w-auto min-h-[42px] px-5 py-2.5 text-sm sm:text-[0.9375rem] disabled:opacity-50 ${roleTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60"
+              className={`w-full sm:w-auto min-h-[42px] px-6 py-2.5 text-sm sm:text-[0.9375rem] shadow-sm inline-flex items-center justify-center gap-2 disabled:opacity-60 ${roleTheme.primaryButtonClass}`}
             >
               {isSaving ? (
                 <>
@@ -240,7 +245,7 @@ export const EditCashflowModal: React.FC<EditCashflowModalProps> = ({
               ) : (
                 <>
                   <Save className="w-4 h-4 shrink-0" />
-                  <span>Simpan Perubahan</span>
+                  <span>Simpan</span>
                 </>
               )}
             </button>

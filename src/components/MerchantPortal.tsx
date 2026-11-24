@@ -70,8 +70,9 @@ import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar, RowActionMenu, getSearchInputWidth } from './ReferenceTableKit';
-import { SaaSKpiCard } from './SaaSKpiCard';
+import { EditorialMetricStrip } from './EditorialMetricStrip';
 import { RoleDonutCard } from './RoleDonutCard';
+import { getRoleTheme } from '../utils/roleTheme';
 import { AnimatedShimmerBar, AnimatedShimmerBarProps } from './AnimatedShimmerBar';
 import {
   AreaChart,
@@ -194,6 +195,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   onSelectSubTab
 }) => {
   const { user, userProfile, updateProfileData, openLoginModal } = useAuth();
+  const beliaTheme = getRoleTheme('belia');
   const { language } = useLanguage();
   const isMs = language === 'ms';
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -400,20 +402,20 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   if (!user) {
     return (
       <div className="w-full px-4 py-16 text-center">
-        <div className="p-8 bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-sm max-w-md mx-auto space-y-4">
-          <div className="w-14 h-14 bg-blue-50 border border-blue-200 text-blue-600 dark:bg-blue-950/60 dark:border-blue-800/70 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto">
-            <Store className="w-8 h-8" />
+        <div className={`p-8 rounded-2xl border max-w-md mx-auto space-y-4 ${beliaTheme.surfaceClass}`}>
+          <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center mx-auto ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass} ${beliaTheme.accentTextClass}`}>
+            <Store className="w-7 h-7" />
           </div>
-          <h3 className="text-xl font-bold text-black dark:text-white">Portal Usahawan Belia</h3>
-          <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed">
-            Sila log masuk untuk daftar perniagaan anda, urus katalog produk, dan semak status sewaan Kiosk Belia Kelantan.
+          <h3 className="text-xl font-bold text-slate-900 dark:text-[#F4F1EA]">Portal Usahawan Belia</h3>
+          <p className="text-[0.9375rem] text-slate-600 dark:text-stone-300 leading-relaxed">
+            Sila log masuk untuk mengurus profil perniagaan, katalog produk, dan ruang niaga anda.
           </p>
           <button
             type="button"
             onClick={() => openLoginModal()}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer dark:bg-blue-600"
+            className={`w-full py-2.5 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 ${beliaTheme.primaryButtonClass}`}
           >
-            <LogIn className="w-4 h-4 text-white" />
+            <LogIn className="w-4 h-4" />
             <span>Log Masuk</span>
           </button>
         </div>
@@ -600,42 +602,42 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   };
 
   return (
-    <div className="w-full space-y-3.5">
+    <div className="w-full space-y-5">
       
-      {/* Clean Single-Elevation Hero: Biru-Zamrud (Horizontal Business Focus Split) */}
+      {/* Editorial Hero: Zamrud & Emas Songket */}
       <div
         id="merchant-portal-header"
-        className="relative overflow-hidden kbelia-ambient-sheen-soft rounded-2xl bg-gradient-to-br from-sky-50/90 via-white to-emerald-50/75 dark:from-slate-900/95 dark:via-zinc-950 dark:to-emerald-950/35 border border-sky-200/80 dark:border-sky-800/55 p-4 sm:p-5 transition-colors"
+        className={`relative overflow-hidden rounded-2xl border backdrop-blur-xs p-5 sm:p-6 transition-colors ${beliaTheme.surfaceClass}`}
       >
-        {/* Softened Ambient Orbs */}
-        <div className="pointer-events-none absolute -top-14 -left-10 w-52 h-52 rounded-full bg-sky-400/7 dark:bg-sky-500/9 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-16 right-8 w-48 h-48 rounded-full bg-emerald-400/7 dark:bg-emerald-500/8 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
+        {/* Subtle Warm Emerald & Songket Gold Glow */}
+        <div className="pointer-events-none absolute -top-16 -left-10 w-56 h-56 rounded-full bg-emerald-500/12 dark:bg-emerald-500/16 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-16 right-6 w-52 h-52 rounded-full bg-amber-400/14 dark:bg-[#E5B85C]/12 blur-3xl" aria-hidden="true" />
 
         {(() => {
           const merchantDisplayName = userProfile?.fullName || user.displayName || (isMs ? 'Usahawan Belia' : 'Youth Entrepreneur');
-          const bizLabel = myBusiness?.businessName || (isMs ? 'Profil Perniagaan Belia' : 'Youth Business Profile');
-          const districtLabel = myBusiness?.district || 'Kota Bharu';
+          const bizLabel = myBusiness?.businessName || userProfile?.businessName || (isMs ? 'Usaha Niaga Belia' : 'Youth Business');
+          const districtLabel = myBusiness?.district || userProfile?.district || 'Kelantan';
 
           const headerMap: Record<MerchantSubTab, { prefix: string; accent: string }> = {
             overview: {
-              prefix: isMs ? 'Ringkasan & ' : 'Business Overview & ',
-              accent: isMs ? 'Prestasi Bisnes' : 'Performance'
+              prefix: isMs ? 'Gambaran Usaha Niaga ' : 'Your Business ',
+              accent: isMs ? 'Anda' : 'Overview'
             },
             profile: {
-              prefix: isMs ? 'Pengurusan ' : 'Manage ',
-              accent: isMs ? 'Profil Kedai' : 'Business Profile'
+              prefix: isMs ? 'Identiti ' : 'Manage ',
+              accent: isMs ? 'Perniagaan' : 'Business Identity'
             },
             products: {
-              prefix: isMs ? 'Pengurusan ' : 'Manage ',
-              accent: isMs ? 'Produk Saya' : 'My Products'
+              prefix: isMs ? 'Koleksi ' : 'Your ',
+              accent: isMs ? 'Produk & Tawaran' : 'Products & Offers'
             },
             cashflow: {
-              prefix: isMs ? 'Rekod Jualan & ' : 'Sales & ',
-              accent: isMs ? 'Aliran Tunai' : 'Cashflow Tracker'
+              prefix: isMs ? 'Aliran Hasil & ' : 'Sales & ',
+              accent: isMs ? 'Perkembangan' : 'Cashflow'
             },
             vault: {
-              prefix: isMs ? 'Peti Dokumen & ' : 'Document Vault & ',
-              accent: isMs ? 'Rekod Rasmi' : 'Official Records'
+              prefix: isMs ? 'Dokumen & ' : 'Records & ',
+              accent: isMs ? 'Rekod Simpanan' : 'Documents'
             },
             card: {
               prefix: isMs ? 'Perkongsian ' : 'Share ',
@@ -644,30 +646,44 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           };
           const currentHeader = headerMap[activeTab] || headerMap.overview;
 
+          const targetBeliaTab: MerchantSubTab = activeTab === 'overview' ? 'cashflow' : 'overview';
+          const beliaActionLabel =
+            activeTab === 'overview'
+              ? (isMs ? 'Catat Jualan' : 'Log Sales')
+              : 'Dashboard';
+
           return (
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 mb-1">
-                  <span className="truncate font-medium">{bizLabel}</span>
+                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-stone-400 mb-1.5">
+                  <span className="truncate">{bizLabel}</span>
                   <span aria-hidden="true">·</span>
                   <span className="shrink-0">{districtLabel}</span>
                 </div>
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                <h1 className="font-display text-2xl sm:text-[1.85rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight leading-tight">
                   {currentHeader.prefix}
-                  <span className="text-blue-700 dark:text-sky-400">{currentHeader.accent}</span>
+                  <span className={beliaTheme.accentTextClass}>{currentHeader.accent}</span>
                 </h1>
-                <p className="text-[0.9375rem] text-slate-600 dark:text-slate-300 mt-1">
+                <p className="text-[0.9375rem] text-slate-600 dark:text-stone-300 mt-1.5">
                   {isMs ? (
                     <>
-                      Selamat kembali, <span className="font-semibold text-slate-900 dark:text-white">{merchantDisplayName}</span>
+                      Selamat kembali, <span className="font-semibold text-slate-900 dark:text-[#F4F1EA]">{merchantDisplayName}</span>
                     </>
                   ) : (
                     <>
-                      Welcome back, <span className="font-semibold text-slate-900 dark:text-white">{merchantDisplayName}</span>
+                      Welcome back, <span className="font-semibold text-slate-900 dark:text-[#F4F1EA]">{merchantDisplayName}</span>
                     </>
                   )}
                 </p>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab(targetBeliaTab)}
+                className={`self-start lg:self-auto px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold ${beliaTheme.primaryButtonClass}`}
+              >
+                {beliaActionLabel}
+              </button>
             </div>
           );
         })()}
@@ -874,13 +890,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         const periodProfitMargin = periodTotal > 0 ? Math.round((periodNetProfit / periodTotal) * 100) : 0;
 
         const paymentMixSegments = [
-          { name: 'Pembayaran QR', value: periodQrTotal, color: '#2563EB' },
-          { name: 'Jualan Tunai', value: periodCashTotal, color: '#10B981' }
+          { name: 'Bayaran Tanpa Tunai', value: periodQrTotal, color: beliaTheme.chartSecondary },
+          { name: 'Jualan Tunai', value: periodCashTotal, color: beliaTheme.chartPrimary }
         ];
         const periodShortBadge =
           salesPeriod === 'weekly' ? 'Mingguan' : salesPeriod === 'monthly' ? 'Bulanan' : 'Suku';
 
-        // Dynamic Application Stepper based on user's actual state
+        // Dynamic journey steps expressed in warm general language
         const hasBusiness = Boolean(myBusiness || userProfile?.businessName);
         const hasSsm = Boolean(myBusiness?.ssmNumber || userProfile?.ssmNumber);
         const hasBooking = Boolean(primaryBooking);
@@ -890,93 +906,90 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         const stepperItems = [
           {
             step: 1,
-            title: 'Profil Bisnes & Usahawan',
-            date: myBusiness?.createdAt ? formatDisplayDate(myBusiness.createdAt.split('T')[0]) : 'Langkah 1',
-            officer: 'KBelia Online',
+            title: 'Kenalkan Perniagaan Anda',
+            date: myBusiness?.createdAt ? formatDisplayDate(myBusiness.createdAt.split('T')[0]) : 'Langkah Awal',
+            officer: 'Ruang Usaha',
             status: hasBusiness ? 'completed' : 'current',
             desc: hasBusiness
-              ? `Profil "${myBusiness?.businessName || userProfile?.businessName}" telah didaftarkan.`
-              : 'Lengkapkan profil perniagaan anda di tab Profil Bisnes.'
+              ? `Perniagaan "${myBusiness?.businessName || userProfile?.businessName}" sudah tersenarai dalam rangkaian.`
+              : 'Kongsikan nama dan latar ringkas perniagaan anda.'
           },
           {
             step: 2,
-            title: 'Pengesahan SSM & Hubungi',
-            date: hasSsm ? 'Disahkan' : 'Menunggu',
-            officer: 'Pegawai Pengesah',
+            title: 'Lengkapkan Butiran Asas',
+            date: hasSsm ? 'Sudah Lengkap' : 'Dalam Proses',
+            officer: 'Maklumat Asas',
             status: hasSsm ? 'completed' : hasBusiness ? 'current' : 'upcoming',
             desc: hasSsm
-              ? `Nombor SSM (${myBusiness?.ssmNumber || userProfile?.ssmNumber}) telah direkodkan.`
-              : 'Masukkan nombor SSM (jika ada) di Tetapan Akaun atau Profil Kedai.'
+              ? 'Maklumat pendaftaran perniagaan anda telah dikemas kini.'
+              : 'Tambahkan nombor pendaftaran perniagaan apabila sedia.'
           },
           {
             step: 3,
-            title: 'Permohonan Slot Kiosk Belia',
-            date: primaryBooking ? formatDisplayDate(primaryBooking.createdAt?.split('T')[0]) : 'Belum Mohon',
-            officer: 'Pengurus Hub',
+            title: 'Pilih Ruang Niaga',
+            date: primaryBooking ? formatDisplayDate(primaryBooking.createdAt?.split('T')[0]) : 'Pilihan Terbuka',
+            officer: 'Lokasi Pilihan',
             status: isBookingApproved ? 'completed' : hasBooking ? 'current' : 'upcoming',
             desc: primaryBooking
-              ? `Permohonan ${primaryBooking.slotCode} (${primaryBooking.hubLocation}) berstatus: ${primaryBooking.status === 'approved' ? 'Diluluskan' : primaryBooking.status === 'rejected' ? 'Ditolak' : 'Dalam Semakan'}.`
-              : 'Pilih lokasi kiosk di menu Kiosk Saya untuk mula beroperasi.'
+              ? `Penyertaan di ${primaryBooking.hubLocation} kini berstatus: ${primaryBooking.status === 'approved' ? 'Diluluskan' : primaryBooking.status === 'rejected' ? 'Perlu Semakan Semula' : 'Dalam Semakan'}.`
+              : 'Teroka ruang niaga yang sesuai dengan keperluan perniagaan anda.'
           },
           {
             step: 4,
-            title: 'Surat Tawaran & Perjanjian Digital',
-            date: isBookingApproved ? (isTenancySigned ? 'Dimeterai' : 'Sedia Ditandatangani') : 'Menunggu Kelulusan',
-            officer: 'Penyelaras KBelia',
+            title: 'Sahkan Penyertaan',
+            date: isBookingApproved ? (isTenancySigned ? 'Disahkan' : 'Menunggu Pengesahan') : 'Fasa Seterusnya',
+            officer: 'Pengesahan',
             status: isTenancySigned ? 'completed' : isBookingApproved ? 'current' : 'upcoming',
             desc: isTenancySigned
-              ? 'Perjanjian sewaan digital telah ditandatangani.'
+              ? 'Pengesahan penyertaan ruang niaga anda telah lengkap.'
               : isBookingApproved
-              ? 'Surat tawaran sedia dimuat turun. Sila sahkan perjanjian digital.'
-              : 'Surat tawaran disediakan sebaik permohonan kiosk diluluskan.'
+              ? 'Dokumen penyertaan sedia untuk disemak dan disahkan.'
+              : 'Langkah pengesahan akan dibuka selepas lokasi dipilih.'
           },
           {
             step: 5,
-            title: 'Operasi Kiosk & Rekod Jualan',
-            date: isTenancySigned ? 'Aktif Beroperasi' : 'Peringkat Akhir',
-            officer: 'Penyelia Tapak',
+            title: 'Mula Berniaga & Catat Hasil',
+            date: isTenancySigned ? 'Sedang Berjalan' : 'Sedia Bermula',
+            officer: 'Perkembangan',
             status: isTenancySigned && safeCashflow.length > 0 ? 'completed' : isTenancySigned ? 'current' : 'upcoming',
             desc: safeCashflow.length > 0
-              ? `${safeCashflow.length} rekod jualan tunai/QR telah dicatatkan.`
-              : 'Catat jualan harian anda melalui Buku Tunai Kiosk selepas beroperasi.'
+              ? `${safeCashflow.length} catatan hasil jualan telah direkodkan.`
+              : 'Mula catat hasil harian anda bagi memantau perkembangan semasa.'
           }
         ];
 
-        // Dynamic live notifications / alerts from real user records
-        const liveAlerts: { tag: string; tagColor: string; time: string; title: string; body: string; action?: () => void }[] = [];
+        // Dynamic updates in general friendly prose
+        const liveAlerts: { tag: string; time: string; title: string; body: string; action?: () => void }[] = [];
         if (upcomingMentor) {
           liveAlerts.push({
-            tag: 'Jadual Mentor',
-            tagColor: 'text-black dark:text-white/75',
+            tag: 'Bimbingan',
             time: upcomingMentor.preferredDate || 'Dijadualkan',
-            title: `Sesi Bimbingan: ${upcomingMentor.topic}`,
-            body: `${upcomingMentor.mentorName} · ${upcomingMentor.preferredTime} (${normalizeMentorshipMode(upcomingMentor.mode)}).`,
+            title: `Perbincangan: ${upcomingMentor.topic}`,
+            body: `${upcomingMentor.mentorName} · ${upcomingMentor.preferredTime} (${normalizeMentorshipMode(upcomingMentor.mode)})`,
             action: onOpenMentorshipClinic
           });
         }
         if (safeTickets.length > 0) {
           const latestTicket = safeTickets[0];
           liveAlerts.push({
-            tag: 'Tiket Fasiliti',
-            tagColor: 'text-black dark:text-white/75',
-            time: latestTicket.status === 'resolved' ? 'Selesai' : latestTicket.status === 'in_progress' ? 'Diproses' : 'Diterima',
-            title: `Aduan ${latestTicket.slotCode}: ${latestTicket.issueCategory}`,
+            tag: 'Penjagaan Ruang',
+            time: latestTicket.status === 'resolved' ? 'Selesai' : latestTicket.status === 'in_progress' ? 'Sedang Diurus' : 'Diterima',
+            title: `${latestTicket.issueCategory}`,
             body: latestTicket.description,
             action: () => onOpenBookingTab?.('manage')
           });
         }
         if (latestGrant) {
           liveAlerts.push({
-            tag: 'Permohonan Geran',
-            tagColor: 'text-black dark:text-white/75',
-            time: latestGrant.status === 'approved' ? 'Diluluskan' : latestGrant.status === 'rejected' ? 'Ditolak' : 'Dalam Semakan',
+            tag: 'Sokongan Modal',
+            time: latestGrant.status === 'approved' ? 'Diluluskan' : latestGrant.status === 'rejected' ? 'Tidak Berjaya' : 'Dalam Semakan',
             title: latestGrant.programTitle,
-            body: `Jumlah dipohon: ${latestGrant.grantAmount} (${latestGrant.businessName}).`,
+            body: `Anggaran sokongan: ${latestGrant.grantAmount} (${latestGrant.businessName})`,
             action: () => setActiveTab('vault')
           });
         }
 
-        // Aggregate real pending approval requests across Kiosk, Grant, Mentorship & Maintenance
+        // Aggregate open pending items calmly
         const pendingApprovalItems: {
           id: string;
           category: string;
@@ -992,52 +1005,52 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             .filter((b) => b.status === 'pending')
             .map((b) => ({
               id: `booking-${b.id}`,
-              category: 'Sewaan Kiosk',
-              title: `${b.slotCode} · ${b.hubLocation}`,
+              category: 'Ruang Niaga',
+              title: `${b.hubLocation}`,
               subtitle: `${b.businessName} · Tempoh ${b.durationMonths} bulan`,
-              statusLabel: 'Menunggu Kelulusan',
+              statusLabel: 'Menunggu Semakan',
               dateLabel: b.createdAt ? formatDisplayDate(b.createdAt.split('T')[0]) : 'Baharu',
               createdAt: b.createdAt || '',
-              actionLabel: 'Lihat Kiosk',
+              actionLabel: 'Lihat',
               onAction: () => onOpenBookingTab?.('manage')
             })),
           ...grantApplications
             .filter((g) => g.status === 'pending')
             .map((g) => ({
               id: `grant-${g.id}`,
-              category: 'Geran Belia',
+              category: 'Sokongan Modal',
               title: g.programTitle,
               subtitle: `${g.businessName} · ${g.grantAmount || g.amount || 'Dalam Semakan'}`,
               statusLabel: 'Dalam Semakan',
               dateLabel: g.createdAt ? formatDisplayDate(g.createdAt.split('T')[0]) : 'Baharu',
               createdAt: g.createdAt || '',
-              actionLabel: 'Lihat Geran',
+              actionLabel: 'Lihat',
               onAction: () => setActiveTab('vault')
             })),
           ...safeMentorships
             .filter((m) => m.status === 'pending')
             .map((m) => ({
               id: `mentor-${m.id}`,
-              category: 'Klinik Mentor',
+              category: 'Sesi Bimbingan',
               title: m.topic,
               subtitle: `${m.mentorName} · ${m.preferredDate} (${m.preferredTime})`,
-              statusLabel: 'Menunggu Sesi',
+              statusLabel: 'Menunggu Pengesahan',
               dateLabel: m.createdAt ? formatDisplayDate(m.createdAt.split('T')[0]) : m.preferredDate || 'Dijadualkan',
               createdAt: m.createdAt || '',
-              actionLabel: 'Buka Klinik',
+              actionLabel: 'Buka',
               onAction: onOpenMentorshipClinic
             })),
           ...safeTickets
             .filter((t) => t.status === 'received' || t.status === 'in_progress')
             .map((t) => ({
               id: `ticket-${t.id}`,
-              category: 'Tiket Fasiliti',
-              title: `${t.slotCode}: ${t.issueCategory}`,
+              category: 'Penjagaan Ruang',
+              title: `${t.issueCategory}`,
               subtitle: `${t.kioskName} · ${t.description}`,
-              statusLabel: t.status === 'in_progress' ? 'Sedang Diproses' : 'Diterima',
+              statusLabel: t.status === 'in_progress' ? 'Sedang Diurus' : 'Diterima',
               dateLabel: t.createdAt ? formatDisplayDate(t.createdAt.split('T')[0]) : 'Baharu',
               createdAt: t.createdAt || '',
-              actionLabel: 'Semak Tiket',
+              actionLabel: 'Semak',
               onAction: () => onOpenBookingTab?.('manage')
             }))
         ].sort((a, b) => {
@@ -1049,491 +1062,458 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         const topPendingApprovals = pendingApprovalItems.slice(0, 3);
 
         return (
-        <div className="space-y-4">
+        <div className="space-y-5">
           
-          {/* Compact Business Identity Summary Strip */}
-          <div className="animate-dashboard-card rounded-xl bg-white dark:bg-zinc-900 px-4 py-2.5 border border-slate-200 dark:border-zinc-700 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm transition-colors hover:border-slate-300 dark:hover:border-zinc-600">
-            <span className="font-extrabold text-black dark:text-white text-sm">
-              {myBusiness?.businessName || userProfile?.businessName || 'Perniagaan Usahawan Belia'}
-            </span>
-            <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-            <span className="text-black/75 dark:text-white/75">
-              {myBusiness?.district || userProfile?.district || 'Kota Bharu'}
-            </span>
-            <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-            <span className="font-mono text-[0.8125rem] font-semibold text-black/80 dark:text-white/80">
-              SSM: {myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Belum Didaftarkan'}
-            </span>
-          </div>
-
-          {/* 4 Compact Summary KPI Metric Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <SaaSKpiCard
-              title="Hasil Jualan Direkodkan"
-              value={`RM ${totalSalesAll.toLocaleString('ms-MY', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
-              subtitle={
-                safeCashflow.length > 0
-                  ? `Purata RM ${avgDailySales.toLocaleString()} · ${qrPercentAll}% QR`
-                  : 'Mula catat di Buku Tunai'
-              }
-              icon={TrendingUp}
-              accentColor="emerald"
-              isLive
-              staggerIndex={0}
-              onClick={() => setActiveTab('cashflow')}
-            />
-
-            <SaaSKpiCard
-              title="Status Tapak Kiosk"
-              value={primaryBooking ? primaryBooking.slotCode : 'Belum Mohon'}
-              subtitle={
-                primaryBooking
+          {/* Open-Editorial 4-Column Metric Strip */}
+          <EditorialMetricStrip
+            role="belia"
+            items={[
+              {
+                id: 'sales',
+                label: 'Perkembangan Jualan',
+                value: `RM ${totalSalesAll.toLocaleString('ms-MY', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+                summary:
+                  safeCashflow.length > 0
+                    ? `Ringkasan hasil terkini (Purata RM ${avgDailySales.toLocaleString()})`
+                    : 'Mula catat jualan harian anda',
+                highlightTone: 'primary',
+                onClick: () => setActiveTab('cashflow')
+              },
+              {
+                id: 'space',
+                label: 'Ruang Niaga',
+                value: primaryBooking ? primaryBooking.slotCode : 'Terbuka',
+                summary: primaryBooking
                   ? `${primaryBooking.hubLocation} · ${primaryBooking.durationMonths} bulan`
-                  : 'Mohon slot kapsul niaga belia'
-              }
-              icon={Building2}
-              accentColor="amber"
-              isLive
-              staggerIndex={1}
-              onClick={() =>
-                onOpenBookingTab?.(primaryBooking || safeTickets.length > 0 ? 'manage' : 'browse')
-              }
-            />
-
-            <SaaSKpiCard
-              title="Permohonan Geran Belia"
-              value={`RM ${totalGrantValue.toLocaleString('ms-MY')}`}
-              subtitle={
-                latestGrant
-                  ? `${latestGrant.programTitle}`
-                  : 'Tiada permohonan geran lagi'
-              }
-              icon={FileCheck}
-              accentColor="blue"
-              staggerIndex={2}
-              onClick={() => setActiveTab('vault')}
-            />
-
-            <SaaSKpiCard
-              title="Klinik Mentoring Seterusnya"
-              value={upcomingMentor ? upcomingMentor.preferredDate : 'Tiada Sesi'}
-              subtitle={
-                upcomingMentor
+                  : 'Teroka pilihan tapak niaga',
+                highlightTone: 'secondary',
+                onClick: () =>
+                  onOpenBookingTab?.(primaryBooking || safeTickets.length > 0 ? 'manage' : 'browse')
+              },
+              {
+                id: 'support',
+                label: 'Sokongan Modal',
+                value: `RM ${totalGrantValue.toLocaleString('ms-MY')}`,
+                summary: latestGrant ? latestGrant.programTitle : 'Lihat peluang sokongan modal',
+                highlightTone: 'neutral',
+                onClick: () => setActiveTab('vault')
+              },
+              {
+                id: 'mentoring',
+                label: 'Sesi Bimbingan',
+                value: upcomingMentor ? upcomingMentor.preferredDate : 'Sedia Diatur',
+                summary: upcomingMentor
                   ? `${upcomingMentor.mentorName} · ${upcomingMentor.preferredTime}`
-                  : 'Tempah sesi bimbingan mentor'
+                  : 'Atur sesi bersama mentor',
+                highlightTone: 'neutral',
+                onClick: onOpenMentorshipClinic
               }
-              icon={Calendar}
-              accentColor="violet"
-              staggerIndex={3}
-              onClick={onOpenMentorshipClinic}
-            />
-          </div>
+            ]}
+          />
 
-          {/* [2] Seksyen Analitik 2:1 — Graf Aliran Jualan (2 Bahagian) + Donat Kategori & Stok (1 Bahagian) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 items-stretch">
+          {/* [2] Seksyen Analitik 2:1 — Aliran Perkembangan Jualan + Ringkasan Hasil */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
             <div
               style={{ '--stagger': 4 } as React.CSSProperties}
-              className="animate-dashboard-card lg:col-span-2 h-full w-full rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col justify-between min-w-0"
+              className={`animate-dashboard-card lg:col-span-2 h-full w-full rounded-2xl border backdrop-blur-xs overflow-hidden transition-all duration-200 flex flex-col justify-between min-w-0 ${beliaTheme.surfaceClass}`}
             >
-            {/* Card Header */}
-            <div className="border-b border-slate-300 dark:border-zinc-600 py-3 px-4 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <BarChart3 className="w-5 h-5 text-black dark:text-white/80 shrink-0" />
-                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
-                  Analitik Aliran Jualan Kiosk
-                </h4>
-              </div>
-
-              {/* Chart Mode + Period Selector Tabs */}
-              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-                <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
-                  <button
-                    type="button"
-                    onClick={() => setChartMode('bar')}
-                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
-                      chartMode === 'bar'
-                        ? 'bg-slate-800 dark:bg-zinc-700 text-white'
-                        : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
-                    }`}
-                  >
-                    Bar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setChartMode('area')}
-                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-bold transition-all cursor-pointer ${
-                      chartMode === 'area'
-                        ? 'bg-slate-800 dark:bg-zinc-700 text-white'
-                        : 'text-black/75 dark:text-white/80 hover:text-black dark:hover:text-white'
-                    }`}
-                  >
-                    Grafik
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-1 p-1 bg-slate-50 dark:bg-zinc-950 rounded-lg border border-slate-300 dark:border-zinc-600">
-                  <button
-                    type="button"
-                    onClick={() => setSalesPeriod('weekly')}
-                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                      salesPeriod === 'weekly'
-                        ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                        : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                    }`}
-                  >
-                    Mingguan
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSalesPeriod('monthly')}
-                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                      salesPeriod === 'monthly'
-                        ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                        : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                    }`}
-                  >
-                    Bulanan
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSalesPeriod('quarterly')}
-                    className={`px-2.5 py-1.5 rounded-md text-[0.8125rem] font-semibold transition-all cursor-pointer ${
-                      salesPeriod === 'quarterly'
-                        ? 'bg-blue-600 text-white shadow-2xs dark:bg-blue-600'
-                        : 'text-black dark:text-white/80 hover:text-black dark:hover:text-white'
-                    }`}
-                  >
-                    Suku
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Compact Chart Content Area */}
-            <div className="p-3.5 sm:p-4 flex flex-col gap-2.5 min-w-0">
-              {/* Metric Strip */}
-              <div className="grid grid-cols-3 gap-2 pb-2.5 border-b border-slate-300 dark:border-zinc-600 text-center">
-                <div>
-                  <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Terkumpul</span>
-                  <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
-                    RM {periodTotal.toLocaleString()}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Purata/Tempoh</span>
-                  <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white">
-                    RM {periodAvg.toLocaleString()}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-sm text-black/75 dark:text-white/80 block font-semibold">Puncak</span>
-                  <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-black dark:text-white/85">
-                    RM {periodMax.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
-              {/* Interactive Full-Width Recharts Chart */}
-              <div className="relative h-[215px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-700 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-200">
-                <div className="absolute inset-0">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 640, height: 215 }}>
-                    {chartMode === 'area' ? (
-                      <AreaChart data={chartBars} margin={{ top: 18, right: 12, left: 0, bottom: 2 }}>
-                        <defs>
-                          <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#10B981" stopOpacity={0.38} />
-                            <stop offset="100%" stopColor="#2563EB" stopOpacity={0.04} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                        <XAxis
-                          dataKey="label"
-                          height={24}
-                          tickMargin={4}
-                          tick={{ fontSize: 12, fontWeight: 600 }}
-                          interval={0}
-                          axisLine={false}
-                          tickLine={false}
-                        />
-                        <YAxis
-                          width={48}
-                          tickMargin={2}
-                          domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
-                          allowDecimals={false}
-                          tick={{ fontSize: 12, fontWeight: 500 }}
-                          axisLine={false}
-                          tickLine={false}
-                          tickFormatter={(val) => `RM${val}`}
-                        />
-                        <Tooltip
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
-                              return (
-                                <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                  <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
-                                  <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                  <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% Pembayaran QR</div>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="value"
-                          stroke="#10B981"
-                          strokeWidth={2.5}
-                          fill="url(#beliaSalesGradient)"
-                          isAnimationActive={!prefersReducedMotion}
-                          animationDuration={650}
-                          animationEasing="ease-out"
-                          dot={{ r: 4, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
-                          activeDot={{ r: 6, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2 }}
-                        />
-                      </AreaChart>
-                    ) : (
-                      <BarChart
-                        data={chartBars}
-                        barCategoryGap="18%"
-                        margin={{ top: 18, right: 12, left: 0, bottom: 2 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.24)" />
-                        <XAxis
-                          dataKey="label"
-                          height={24}
-                          tickMargin={4}
-                          tick={{ fontSize: 12, fontWeight: 600 }}
-                          interval={0}
-                          axisLine={false}
-                          tickLine={false}
-                        />
-                        <YAxis
-                          width={48}
-                          tickMargin={2}
-                          domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
-                          allowDecimals={false}
-                          tick={{ fontSize: 12, fontWeight: 500 }}
-                          axisLine={false}
-                          tickLine={false}
-                          tickFormatter={(val) => `RM${val}`}
-                        />
-                        <Tooltip
-                          cursor={{ fill: 'rgba(37, 99, 235, 0.12)' }}
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
-                              return (
-                                <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-mono shadow-xl border border-slate-700">
-                                  <div className="text-white/80 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
-                                  <div className="font-bold text-white">RM {d.value.toLocaleString()}</div>
-                                  <div className="text-[0.8125rem] text-white/85 mt-0.5">{d.tx} rekod · {d.qr}% Pembayaran QR</div>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Bar
-                          dataKey="value"
-                          fill="#2563EB"
-                          radius={[6, 6, 0, 0]}
-                          maxBarSize={56}
-                          minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
-                          isAnimationActive={!prefersReducedMotion}
-                          animationDuration={650}
-                          animationEasing="ease-out"
-                          shape={(barProps: unknown) => (
-                            <AnimatedShimmerBar
-                              {...(barProps as AnimatedShimmerBarProps)}
-                              radius={6}
-                              reducedMotion={prefersReducedMotion}
-                            />
-                          )}
-                        >
-                          <LabelList
-                            dataKey="value"
-                            position="top"
-                            formatter={(val: unknown) => {
-                              const num = Number(val);
-                              return num > 0 ? `RM${num.toLocaleString()}` : '';
-                            }}
-                            className="fill-slate-900 dark:fill-slate-100 font-mono"
-                            style={{ fontSize: 11.5, fontWeight: 700 }}
-                          />
-                        </Bar>
-                      </BarChart>
+              {/* Card Header */}
+              <div className={`border-b py-3.5 px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${beliaTheme.dividerClass}`}>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <BarChart3 className={`w-5 h-5 shrink-0 ${beliaTheme.accentTextClass}`} />
+                  <div>
+                    <h4 className="font-display text-base sm:text-[1.0625rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
+                      Aliran Perkembangan Jualan
+                    </h4>
+                    {chartRangeLabel && (
+                      <p className="text-xs text-slate-500 dark:text-stone-400">
+                        {chartRangeLabel}
+                      </p>
                     )}
-                  </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Chart Mode + Period Selector Tabs */}
+                <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                  <div className={`flex items-center gap-1 p-1 rounded-xl border ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
+                    <button
+                      type="button"
+                      onClick={() => setChartMode('bar')}
+                      className={`px-2.5 py-1 rounded-lg text-[0.8125rem] transition-all cursor-pointer ${
+                        chartMode === 'bar'
+                          ? beliaTheme.segmentedActiveClass
+                          : 'text-slate-600 dark:text-stone-300 hover:text-slate-950 dark:hover:text-white'
+                      }`}
+                    >
+                      Lajur
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setChartMode('area')}
+                      className={`px-2.5 py-1 rounded-lg text-[0.8125rem] transition-all cursor-pointer ${
+                        chartMode === 'area'
+                          ? beliaTheme.segmentedActiveClass
+                          : 'text-slate-600 dark:text-stone-300 hover:text-slate-950 dark:hover:text-white'
+                      }`}
+                    >
+                      Lengkung
+                    </button>
+                  </div>
+
+                  <div className={`flex items-center gap-1 p-1 rounded-xl border ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
+                    <button
+                      type="button"
+                      onClick={() => setSalesPeriod('weekly')}
+                      className={`px-2.5 py-1 rounded-lg text-[0.8125rem] transition-all cursor-pointer ${
+                        salesPeriod === 'weekly'
+                          ? beliaTheme.segmentedActiveClass
+                          : 'text-slate-600 dark:text-stone-300 hover:text-slate-950 dark:hover:text-white'
+                      }`}
+                    >
+                      Mingguan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSalesPeriod('monthly')}
+                      className={`px-2.5 py-1 rounded-lg text-[0.8125rem] transition-all cursor-pointer ${
+                        salesPeriod === 'monthly'
+                          ? beliaTheme.segmentedActiveClass
+                          : 'text-slate-600 dark:text-stone-300 hover:text-slate-950 dark:hover:text-white'
+                      }`}
+                    >
+                      Bulanan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSalesPeriod('quarterly')}
+                      className={`px-2.5 py-1 rounded-lg text-[0.8125rem] transition-all cursor-pointer ${
+                        salesPeriod === 'quarterly'
+                          ? beliaTheme.segmentedActiveClass
+                          : 'text-slate-600 dark:text-stone-300 hover:text-slate-950 dark:hover:text-white'
+                      }`}
+                    >
+                      Suku
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              {/* Chart Content Area */}
+              <div className="p-4 sm:p-5 flex flex-col gap-3 min-w-0">
+                {/* Calm Hairline-Divided Metric Strip */}
+                <div className={`grid grid-cols-3 divide-x pb-3 border-b text-center ${beliaTheme.dividerClass}`}>
+                  <div className="px-2">
+                    <span className="text-xs text-slate-500 dark:text-stone-400 block font-medium">Jumlah Tempoh</span>
+                    <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-slate-900 dark:text-[#F4F1EA]">
+                      RM {periodTotal.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="px-2">
+                    <span className="text-xs text-slate-500 dark:text-stone-400 block font-medium">Purata</span>
+                    <span className="font-mono tabular-nums text-base sm:text-lg font-bold text-slate-900 dark:text-[#F4F1EA]">
+                      RM {periodAvg.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="px-2">
+                    <span className="text-xs text-slate-500 dark:text-stone-400 block font-medium">Tertinggi</span>
+                    <span className={`font-mono tabular-nums text-base sm:text-lg font-bold ${beliaTheme.accentStrongTextClass}`}>
+                      RM {periodMax.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Interactive Full-Width Recharts Chart in Zamrud & Emas */}
+                <div className="relative h-[220px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-600 dark:[&_.recharts-cartesian-axis-tick_text]:fill-stone-300">
+                  <div className="absolute inset-0">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 640, height: 220 }}>
+                      {chartMode === 'area' ? (
+                        <AreaChart data={chartBars} margin={{ top: 18, right: 12, left: 0, bottom: 2 }}>
+                          <defs>
+                            <linearGradient id="beliaSalesGradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor={beliaTheme.chartPrimary} stopOpacity={0.38} />
+                              <stop offset="100%" stopColor={beliaTheme.chartSecondary} stopOpacity={0.05} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.16)" />
+                          <XAxis
+                            dataKey="label"
+                            height={24}
+                            tickMargin={4}
+                            tick={{ fontSize: 12, fontWeight: 500 }}
+                            interval={0}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <YAxis
+                            width={48}
+                            tickMargin={2}
+                            domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
+                            allowDecimals={false}
+                            tick={{ fontSize: 12, fontWeight: 500 }}
+                            axisLine={false}
+                            tickLine={false}
+                            tickFormatter={(val) => `RM${val}`}
+                          />
+                          <Tooltip
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
+                                return (
+                                  <div className={`px-3.5 py-2.5 rounded-xl text-sm font-mono shadow-xl border ${beliaTheme.tooltipBgClass}`}>
+                                    <div className="opacity-75 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
+                                    <div className="font-bold">RM {d.value.toLocaleString()}</div>
+                                    <div className="text-[0.8125rem] opacity-80 mt-0.5">{d.tx} catatan · {d.qr}% tanpa tunai</div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="value"
+                            stroke={beliaTheme.chartPrimary}
+                            strokeWidth={2.5}
+                            fill="url(#beliaSalesGradient)"
+                            isAnimationActive={!prefersReducedMotion}
+                            animationDuration={650}
+                            animationEasing="ease-out"
+                            dot={{ r: 4, fill: beliaTheme.chartSecondary, stroke: '#101614', strokeWidth: 2 }}
+                            activeDot={{ r: 6, fill: beliaTheme.chartPrimary, stroke: '#FFFFFF', strokeWidth: 2 }}
+                          />
+                        </AreaChart>
+                      ) : (
+                        <BarChart
+                          data={chartBars}
+                          barCategoryGap="20%"
+                          margin={{ top: 18, right: 12, left: 0, bottom: 2 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.16)" />
+                          <XAxis
+                            dataKey="label"
+                            height={24}
+                            tickMargin={4}
+                            tick={{ fontSize: 12, fontWeight: 500 }}
+                            interval={0}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <YAxis
+                            width={48}
+                            tickMargin={2}
+                            domain={[0, (dataMax: number) => Math.max(dataMax, 100)]}
+                            allowDecimals={false}
+                            tick={{ fontSize: 12, fontWeight: 500 }}
+                            axisLine={false}
+                            tickLine={false}
+                            tickFormatter={(val) => `RM${val}`}
+                          />
+                          <Tooltip
+                            cursor={{ fill: 'rgba(16, 185, 129, 0.10)' }}
+                            content={({ active, payload }) => {
+                              if (active && payload && payload.length) {
+                                const d = payload[0].payload as { label: string; fullDate?: string; value: number; tx: number; qr: number };
+                                return (
+                                  <div className={`px-3.5 py-2.5 rounded-xl text-sm font-mono shadow-xl border ${beliaTheme.tooltipBgClass}`}>
+                                    <div className="opacity-75 text-[0.8125rem] mb-0.5">{d.fullDate || d.label}</div>
+                                    <div className="font-bold">RM {d.value.toLocaleString()}</div>
+                                    <div className="text-[0.8125rem] opacity-80 mt-0.5">{d.tx} catatan · {d.qr}% tanpa tunai</div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar
+                            dataKey="value"
+                            fill={beliaTheme.chartPrimary}
+                            radius={[6, 6, 0, 0]}
+                            maxBarSize={52}
+                            minPointSize={(val) => (Number(val) > 0 ? 6 : 0)}
+                            isAnimationActive={!prefersReducedMotion}
+                            animationDuration={650}
+                            animationEasing="ease-out"
+                            shape={(barProps: unknown) => (
+                              <AnimatedShimmerBar
+                                {...(barProps as AnimatedShimmerBarProps)}
+                                radius={6}
+                                reducedMotion={prefersReducedMotion}
+                              />
+                            )}
+                          >
+                            <LabelList
+                              dataKey="value"
+                              position="top"
+                              formatter={(val: unknown) => {
+                                const num = Number(val);
+                                return num > 0 ? `RM${num.toLocaleString()}` : '';
+                              }}
+                              className="fill-slate-800 dark:fill-stone-200 font-mono"
+                              style={{ fontSize: 11.5, fontWeight: 700 }}
+                            />
+                          </Bar>
+                        </BarChart>
+                      )}
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <RoleDonutCard
+              role="belia"
               className="lg:col-span-1 h-full"
-              title="Saluran Bayaran & Untung"
+              title="Ringkasan Hasil & Perbelanjaan"
               icon={Wallet}
-              accentBarClass="bg-emerald-600/80 dark:bg-emerald-500/80"
               headerRight={
-                <span className="text-[0.8125rem] font-mono font-semibold text-black/70 dark:text-white/75 tabular-nums">
+                <span className="text-[0.8125rem] font-medium text-slate-500 dark:text-stone-400">
                   {periodShortBadge}
                 </span>
               }
               segments={paymentMixSegments}
               centerValue={`${periodProfitMargin}%`}
-              centerLabel="Margin Untung"
+              centerLabel="Baki Positif"
               valueUnit="RM"
               summaryPairs={[
                 {
-                  label: 'Untung Bersih',
+                  label: 'Aliran Masuk',
                   value: `${periodNetProfit < 0 ? '-' : ''}RM ${Math.abs(periodNetProfit).toLocaleString('ms-MY')}`,
-                  dotColor: periodNetProfit >= 0 ? '#10B981' : '#F43F5E'
+                  dotColor: periodNetProfit >= 0 ? beliaTheme.chartPrimary : '#F43F5E'
                 },
                 {
-                  label: 'Kos / Belanja',
+                  label: 'Perbelanjaan',
                   value: `RM ${periodExpensesTotal.toLocaleString('ms-MY')}`,
-                  dotColor: '#F59E0B'
+                  dotColor: beliaTheme.chartSecondary
                 }
               ]}
               emptyState={{
-                title: 'Tiada Rekod Jualan Tempoh Ini',
-                description: 'Catat jualan tunai, pembayaran QR, dan kos di Buku Tunai untuk melihat pecahan saluran bayaran serta margin untung.',
-                actionLabel: 'Rekod Jualan',
+                title: 'Belum Ada Catatan Tempoh Ini',
+                description: 'Catat jualan harian dan perbelanjaan anda bagi melihat ringkasan perkembangan semasa.',
+                actionLabel: 'Catat Jualan',
                 onAction: () => setActiveTab('cashflow')
               }}
               staggerIndex={5}
             />
           </div>
 
-          {/* [3] Dua Lajur Ringkasan Seimbang Kiri & Kanan */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 items-start">
-            {/* Lajur Kiri: Permohonan Menunggu Kelulusan */}
+          {/* [3] Dua Lajur Ringkasan Editorial Terbuka (Tanpa Kotak Bertindih) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+            {/* Lajur Kiri: Perkara Terkini Untuk Anda */}
             <div
               style={{ '--stagger': 5 } as React.CSSProperties}
-              className="animate-dashboard-card min-w-0 rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
+              className={`animate-dashboard-card min-w-0 rounded-2xl border backdrop-blur-xs overflow-hidden transition-all duration-200 flex flex-col ${beliaTheme.surfaceClass}`}
             >
-              <div className="border-b border-slate-300 dark:border-zinc-600 py-3.5 px-4 sm:px-5">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <Clock className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400 shrink-0" />
-                  <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
-                    Permohonan Menunggu Kelulusan
-                  </h4>
-                </div>
+              <div className={`border-b py-3.5 px-5 flex items-center gap-2.5 ${beliaTheme.dividerClass}`}>
+                <Clock className={`w-4.5 h-4.5 shrink-0 ${beliaTheme.accentStrongTextClass}`} />
+                <h4 className="font-display text-base sm:text-[1.0625rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
+                  Perkara Terkini Untuk Anda
+                </h4>
               </div>
 
-              <div className="p-3.5 sm:p-4 flex flex-col justify-start gap-3">
-                <div className="flex flex-col justify-start">
-                  {topPendingApprovals.length === 0 ? (
-                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 flex flex-col items-center justify-center text-center gap-2">
-                      <CheckCircle2 className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
-                      <div>
-                        <p className="text-sm sm:text-base font-bold text-black dark:text-white">
-                          Tiada Permohonan Menunggu Kelulusan
-                        </p>
-                        <p className="text-sm text-black/70 dark:text-white/75 mt-1 max-w-md leading-relaxed">
-                          Semua permohonan sewaan kiosk, geran belia, dan sesi klinik mentor anda telah selesai diproses atau sedia untuk permohonan baharu.
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => (onOpenBookingTab ? onOpenBookingTab('browse') : onOpenBookingModal?.())}
-                          className="px-3 py-1.5 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer"
-                        >
-                          Mohon Kiosk
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab('vault')}
-                          className="px-3 py-1.5 rounded-lg text-sm font-semibold text-black dark:text-white bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                        >
-                          Mohon Geran
-                        </button>
-                      </div>
+              <div className="flex flex-col">
+                {topPendingApprovals.length === 0 ? (
+                  <div className="p-6 text-center flex flex-col items-center justify-center gap-3">
+                    <CheckCircle2 className={`w-7 h-7 ${beliaTheme.accentTextClass}`} />
+                    <div>
+                      <p className="text-sm sm:text-base font-semibold text-slate-900 dark:text-[#F4F1EA]">
+                        Semua Urusan Berjalan Lancar
+                      </p>
+                      <p className="text-sm text-slate-600 dark:text-stone-400 mt-1 max-w-md leading-relaxed">
+                        Semua urusan semasa anda berada dalam keadaan teratur. Teroka peluang baharu apabila anda bersedia.
+                      </p>
                     </div>
-                  ) : (
-                    <div className="space-y-2.5">
-                      {topPendingApprovals.map((item) => (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={item.onAction}
-                          disabled={!item.onAction}
-                          className={`w-full text-left p-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-700 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
-                            item.onAction
-                              ? 'cursor-pointer hover:-translate-y-0.5 hover:border-blue-500/70 dark:hover:border-blue-400/70'
-                              : 'cursor-default'
-                          }`}
-                        >
-                          <div className="min-w-0 flex-1 space-y-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-[0.8125rem] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
-                                {item.category}
-                              </span>
-                              <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-                              <span className="font-mono text-[0.8125rem] text-black/65 dark:text-white/70 tabular-nums">
-                                {item.dateLabel}
-                              </span>
-                              <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-800/70 text-[0.8125rem] font-bold text-black dark:text-amber-200">
-                                {item.statusLabel}
-                              </span>
-                            </div>
-                            <h5 className="text-sm font-bold text-black dark:text-white leading-snug truncate">
-                              {item.title}
-                            </h5>
-                            <p className="text-[0.8125rem] text-black/75 dark:text-white/75 truncate">
-                              {item.subtitle}
-                            </p>
-                          </div>
-
-                          {item.onAction && (
-                            <span className="inline-flex items-center gap-1 text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 shrink-0 self-start sm:self-center">
-                              <span>{item.actionLabel}</span>
-                              <ChevronRight className="w-3.5 h-3.5" />
+                    <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => (onOpenBookingTab ? onOpenBookingTab('browse') : onOpenBookingModal?.())}
+                        className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${beliaTheme.primaryButtonClass}`}
+                      >
+                        Teroka Ruang Niaga
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('vault')}
+                        className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${beliaTheme.secondaryButtonClass}`}
+                      >
+                        Lihat Sokongan
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`divide-y ${beliaTheme.dividerClass}`}>
+                    {topPendingApprovals.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={item.onAction}
+                        disabled={!item.onAction}
+                        className={`w-full text-left px-5 py-4 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+                          item.onAction
+                            ? 'cursor-pointer hover:bg-black/[0.025] dark:hover:bg-white/[0.03]'
+                            : 'cursor-default'
+                        }`}
+                      >
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-stone-400">
+                            <span className={`font-semibold ${beliaTheme.accentTextClass}`}>
+                              {item.category}
                             </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                            <span aria-hidden="true">·</span>
+                            <span className="font-mono tabular-nums">{item.dateLabel}</span>
+                            <span aria-hidden="true">·</span>
+                            <span className={`font-medium ${beliaTheme.accentStrongTextClass}`}>
+                              {item.statusLabel}
+                            </span>
+                          </div>
+                          <h5 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA] leading-snug truncate">
+                            {item.title}
+                          </h5>
+                          <p className="text-[0.8125rem] text-slate-600 dark:text-stone-400 truncate">
+                            {item.subtitle}
+                          </p>
+                        </div>
+
+                        {item.onAction && (
+                          <span className={`inline-flex items-center gap-1 text-[0.8125rem] font-semibold shrink-0 self-start sm:self-center ${beliaTheme.accentTextClass}`}>
+                            <span>{item.actionLabel}</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Lajur Kanan: Penjejak Permohonan Berperingkat */}
+            {/* Lajur Kanan: Perjalanan Usaha Niaga */}
             <div
               style={{ '--stagger': 6 } as React.CSSProperties}
-              className="animate-dashboard-card min-w-0 rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
+              className={`animate-dashboard-card min-w-0 rounded-2xl border backdrop-blur-xs overflow-hidden transition-all duration-200 flex flex-col ${beliaTheme.surfaceClass}`}
             >
-              {/* Card Header */}
-              <div className="border-b border-slate-300 dark:border-slate-600 py-3.5 px-4 sm:px-5">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <FileCheck className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
-                  <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
-                    Penjejak Permohonan
-                  </h4>
-                </div>
+              <div className={`border-b py-3.5 px-5 flex items-center gap-2.5 ${beliaTheme.dividerClass}`}>
+                <FileCheck className={`w-4.5 h-4.5 shrink-0 ${beliaTheme.accentTextClass}`} />
+                <h4 className="font-display text-base sm:text-[1.0625rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
+                  Perjalanan Usaha Niaga
+                </h4>
               </div>
 
-              {/* Stepper Timeline Body */}
-              <div className="p-3.5 sm:p-4 flex flex-col justify-start gap-2.5">
+              <div className="p-4 sm:p-5 flex flex-col justify-start gap-3">
                 <div className="grid grid-cols-5 gap-1.5" aria-hidden="true">
                   {stepperItems.map((stepItem) => (
                     <div
                       key={stepItem.step}
                       className={`h-1.5 rounded-full transition-colors duration-300 ${
                         stepItem.status === 'completed'
-                          ? 'bg-emerald-500'
+                          ? 'bg-[#10B981]'
                           : stepItem.status === 'current'
-                          ? 'bg-amber-500'
-                          : 'bg-slate-200 dark:bg-zinc-700'
+                          ? 'bg-[#E5B85C]'
+                          : 'bg-slate-200 dark:bg-white/10'
                       }`}
                     />
                   ))}
                 </div>
-                <div className="space-y-2">
+                <div className={`divide-y ${beliaTheme.dividerClass}`}>
                   {stepperItems.map((stepItem, idx) => {
                     const isCompleted = stepItem.status === 'completed';
                     const isCurrent = stepItem.status === 'current';
@@ -1543,49 +1523,43 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       <div
                         key={stepItem.step}
                         onClick={() => setSelectedStepperIndex(idx)}
-                        className={`p-2 rounded-xl border transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-slate-50 dark:bg-slate-900 border-amber-400 dark:border-amber-400/40 shadow-xs'
-                            : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-900'
-                        }`}
+                        className="py-3 first:pt-1 last:pb-1 transition-colors cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] rounded-lg px-2 -mx-2"
                       >
-                        <div className="flex items-start gap-2.5">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[0.8125rem] font-bold ${
+                        <div className="flex items-start gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[0.78rem] font-bold ${
                             isCompleted
-                              ? 'bg-emerald-600 text-white'
+                              ? 'bg-[#0B6E52] dark:bg-[#10B981] text-white dark:text-[#07130F]'
                               : isCurrent
-                              ? 'bg-amber-500 text-white ring-2 ring-amber-100 dark:ring-amber-950/60'
-                              : 'bg-slate-200 dark:bg-slate-700 text-black/70 dark:text-white/75'
+                              ? 'bg-[#E5B85C] text-[#101614]'
+                              : 'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-stone-400'
                           }`}>
                             {isCompleted ? <Check className="w-3.5 h-3.5" /> : stepItem.step}
                           </div>
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
-                              <h5 className={`text-sm font-bold leading-snug break-words ${
-                                isCurrent ? 'text-black dark:text-white/75' : 'text-black dark:text-white'
-                              }`}>
+                              <h5 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA] leading-snug break-words">
                                 {stepItem.title}
                               </h5>
-                              <span className={`text-[0.8125rem] font-semibold px-1.5 py-0.5 rounded shrink-0 ${
+                              <span className={`text-xs font-medium shrink-0 ${
                                 isCompleted
-                                  ? 'bg-emerald-100 dark:bg-emerald-950/70 text-black dark:text-white'
+                                  ? beliaTheme.accentTextClass
                                   : isCurrent
-                                  ? 'bg-amber-100 dark:bg-amber-950/70 text-black dark:text-white'
-                                  : 'bg-slate-100 dark:bg-slate-900 text-black/70 dark:text-white/75'
+                                  ? beliaTheme.accentStrongTextClass
+                                  : 'text-slate-500 dark:text-stone-400'
                               }`}>
-                                {isCompleted ? 'Selesai' : isCurrent ? 'Diproses' : 'Menunggu'}
+                                {isCompleted ? 'Selesai' : isCurrent ? 'Sedang Diurus' : 'Menunggu'}
                               </span>
                             </div>
 
-                            <div className="text-[0.8125rem] text-black/70 dark:text-white/75 mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 leading-relaxed">
+                            <div className="text-xs text-slate-500 dark:text-stone-400 mt-0.5 flex flex-wrap items-center gap-x-1.5">
                               <span className="font-mono">{stepItem.date}</span>
                               <span>·</span>
-                              <span className="break-words">{stepItem.officer}</span>
+                              <span>{stepItem.officer}</span>
                             </div>
 
                             {isSelected && (
-                              <p className="mt-1.5 text-[0.875rem] text-black dark:text-white bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-300 dark:border-slate-600 leading-relaxed animate-in fade-in duration-150">
+                              <p className="mt-2 text-[0.8125rem] text-slate-700 dark:text-stone-300 leading-relaxed animate-in fade-in duration-150">
                                 {stepItem.desc}
                               </p>
                             )}
@@ -1599,74 +1573,72 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           </div>
 
-          {/* [4] Senarai Ringkasan Aktiviti & Laporan Pantas Usahawan (Lebar Penuh Padat) */}
+          {/* [4] Catatan & Kemas Kini Semasa (Aliran Terbuka) */}
           <div
             style={{ '--stagger': 7 } as React.CSSProperties}
-            className="animate-dashboard-card w-full rounded-2xl border border-slate-300 dark:border-zinc-700 hover:border-slate-400/80 dark:hover:border-zinc-500 bg-white dark:bg-zinc-900 shadow-sm overflow-hidden transition-all duration-200 flex flex-col"
+            className={`animate-dashboard-card w-full rounded-2xl border backdrop-blur-xs overflow-hidden transition-all duration-200 flex flex-col ${beliaTheme.surfaceClass}`}
           >
-            <div className="border-b border-slate-300 dark:border-slate-600 py-3.5 px-4 sm:px-5">
-              <div className="flex items-center gap-2.5">
-                <Bell className="w-4.5 h-4.5 text-black dark:text-white/80 shrink-0" />
-                <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight">
-                  Ringkasan Aktiviti &amp; Laporan Semasa
-                </h4>
-              </div>
+            <div className={`border-b py-3.5 px-5 flex items-center gap-2.5 ${beliaTheme.dividerClass}`}>
+              <Bell className={`w-4.5 h-4.5 shrink-0 ${beliaTheme.accentTextClass}`} />
+              <h4 className="font-display text-base sm:text-[1.0625rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
+                Catatan &amp; Kemas Kini Semasa
+              </h4>
             </div>
 
             {liveAlerts.length === 0 ? (
-              <div className="p-5 text-center space-y-2">
-                <p className="text-[0.9375rem] font-bold text-black dark:text-white">
-                  Mulakan Langkah Usahawan Anda
+              <div className="p-6 text-center space-y-2.5">
+                <p className="text-[0.9375rem] font-semibold text-slate-900 dark:text-[#F4F1EA]">
+                  Kongsikan Perkembangan Usaha Anda
                 </p>
-                <p className="text-[0.875rem] text-black dark:text-white/75 leading-relaxed max-w-xl mx-auto">
-                  Lengkapkan profil perniagaan, tempah klinik bimbingan mentor, atau laporkan sebarang aduan fasiliti kiosk anda.
+                <p className="text-[0.875rem] text-slate-600 dark:text-stone-400 leading-relaxed max-w-xl mx-auto">
+                  Anda boleh mengatur sesi bimbingan bersama mentor atau mengemas kini keperluan ruang niaga anda pada bila-bila masa.
                 </p>
-                <div className="flex flex-wrap justify-center gap-2 pt-1">
+                <div className="flex flex-wrap justify-center gap-2.5 pt-1">
                   {onOpenMentorshipClinic && (
                     <button
                       type="button"
                       onClick={onOpenMentorshipClinic}
-                      className="px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-black dark:text-white border border-teal-200 dark:border-teal-800/70 text-[0.8125rem] font-semibold cursor-pointer"
+                      className={`px-4 py-2 rounded-xl text-[0.8125rem] font-semibold ${beliaTheme.primaryButtonClass}`}
                     >
-                      Klinik Mentor
+                      Atur Sesi
                     </button>
                   )}
                   {onOpenMaintenanceModal && (
                     <button
                       type="button"
                       onClick={onOpenMaintenanceModal}
-                      className="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-200 dark:border-amber-800 text-[0.8125rem] font-semibold cursor-pointer"
+                      className={`px-4 py-2 rounded-xl text-[0.8125rem] font-semibold ${beliaTheme.secondaryButtonClass}`}
                     >
-                      Aduan Fasiliti
+                      Lapor Ruang
                     </button>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col divide-y divide-slate-200 dark:divide-zinc-700">
+              <div className={`flex flex-col divide-y ${beliaTheme.dividerClass}`}>
                 {liveAlerts.slice(0, 5).map((item, idx) => (
                   <div
                     key={idx}
                     onClick={item.action}
-                    className={`px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
-                      item.action ? 'cursor-pointer hover:bg-slate-50/80 dark:hover:bg-zinc-800/40 transition-colors' : ''
+                    className={`px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+                      item.action ? 'cursor-pointer hover:bg-black/[0.025] dark:hover:bg-white/[0.03] transition-colors' : ''
                     }`}
                   >
                     <div className="min-w-0 flex-1 space-y-0.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className={`text-[0.8125rem] font-bold uppercase tracking-wider ${item.tagColor}`}>{item.tag}</span>
-                        <span className="text-black/30 dark:text-white/30" aria-hidden="true">·</span>
-                        <span className="text-[0.8125rem] text-black/65 dark:text-white/70 font-mono tabular-nums">{item.time}</span>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-stone-400">
+                        <span className={`font-semibold ${beliaTheme.accentTextClass}`}>{item.tag}</span>
+                        <span aria-hidden="true">·</span>
+                        <span className="font-mono tabular-nums">{item.time}</span>
                       </div>
-                      <h5 className="text-sm font-bold text-black dark:text-white leading-snug truncate">
+                      <h5 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA] leading-snug truncate">
                         {item.title}
                       </h5>
-                      <p className="text-[0.8125rem] sm:text-[0.875rem] text-black/75 dark:text-white/75 truncate">
+                      <p className="text-[0.8125rem] text-slate-600 dark:text-stone-400 truncate">
                         {item.body}
                       </p>
                     </div>
                     {item.action && (
-                      <span className="inline-flex items-center gap-1 text-[0.8125rem] sm:text-[0.8125rem] font-bold text-blue-600 dark:text-blue-400 shrink-0 self-start sm:self-center">
+                      <span className={`inline-flex items-center gap-1 text-[0.8125rem] font-semibold shrink-0 self-start sm:self-center ${beliaTheme.accentTextClass}`}>
                         <span>Buka</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </span>
@@ -1683,17 +1655,20 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
       {/* Tab 1: Profile Form */}
       {activeTab === 'profile' && (
-        <div key="profile" className="mt-4 relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden w-full transition-colors animate-dashboard-tab">
-          <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
-          {/* Card Header */}
-          <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-3.5 px-5 flex items-center justify-between">
+        <div key="profile" className={`mt-4 relative rounded-2xl border overflow-hidden w-full transition-colors animate-dashboard-tab ${beliaTheme.surfaceClass}`}>
+          <div className={`border-b py-4 px-5 flex items-center justify-between ${beliaTheme.dividerClass}`}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                <Store className="w-5 h-5" />
+              <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass} ${beliaTheme.accentTextClass}`}>
+                <Store className="w-4.5 h-4.5" />
               </div>
-              <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
-                Maklumat Asas &amp; Jenama Perniagaan
-              </h3>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
+                  Maklumat Perniagaan Anda
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-stone-400">
+                  Butiran asas dan saluran hebahan untuk paparan komuniti.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -1701,7 +1676,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             {/* 2-Column Row 1: Nama Perniagaan + Slogan */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                   Nama Perniagaan *
                 </label>
                 <input
@@ -1710,61 +1685,61 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   placeholder="Masukkan nama perniagaan"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium"
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all font-medium ${beliaTheme.inputClass}`}
                 />
               </div>
 
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                   Slogan Perniagaan
                 </label>
                 <input
                   type="text"
-                  placeholder="Masukkan slogan perniagaan"
+                  placeholder="Masukkan slogan ringkas"
                   value={tagline}
                   onChange={(e) => setTagline(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
               </div>
             </div>
 
-            {/* 2-Column Row 2: Kategori + Jajahan */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* 2-Column Row 2: Kategori + Lokasi */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                   Kategori Perniagaan *
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as BusinessCategory)}
-                  className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer"
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium focus:outline-none transition-all cursor-pointer ${beliaTheme.inputClass}`}
                 >
                   {CATEGORIES.map((c) => (
-                    <option key={c} value={c} className="dark:bg-slate-900">{formatBusinessCategory(c)}</option>
+                    <option key={c} value={c} className="dark:bg-[#141D1A]">{formatBusinessCategory(c)}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
-                  Jajahan Operasi *
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
+                  Lokasi Operasi *
                 </label>
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value as KelantanDistrict)}
-                  className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white font-medium focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all cursor-pointer"
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium focus:outline-none transition-all cursor-pointer ${beliaTheme.inputClass}`}
                 >
                   {DISTRICTS.map((d) => (
-                    <option key={d} value={d} className="dark:bg-slate-900">{d}</option>
+                    <option key={d} value={d} className="dark:bg-[#141D1A]">{d}</option>
                   ))}
                 </select>
               </div>
             </div>
 
             {/* 2-Column Row 3: Nombor Pendaftaran SSM + Nombor WhatsApp */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                   Nombor Pendaftaran SSM
                 </label>
                 <input
@@ -1772,12 +1747,12 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   placeholder="Masukkan nombor pendaftaran SSM"
                   value={ssmNumber}
                   onChange={(e) => setSsmNumber(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm font-mono focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
               </div>
 
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                   Nombor WhatsApp *
                 </label>
                 <input
@@ -1786,58 +1761,58 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   placeholder="Masukkan nombor telefon"
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm font-mono focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
               </div>
             </div>
 
             {/* Penerangan Perniagaan */}
             <div>
-              <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+              <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                 Penerangan Perniagaan
               </label>
               <textarea
                 rows={3}
-                placeholder="Masukkan penerangan perniagaan"
+                placeholder="Ceritakan sedikit tentang produk atau perkhidmatan anda"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                className={`w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
               />
             </div>
 
             {/* 2-Column Row 4: Instagram + TikTok */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                   Instagram
                 </label>
                 <input
                   type="text"
-                  placeholder="Masukkan nama pengguna Instagram"
+                  placeholder="Nama pengguna Instagram"
                   value={instagram}
                   onChange={(e) => setInstagram(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
               </div>
 
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                   TikTok
                 </label>
                 <input
                   type="text"
-                  placeholder="Masukkan nama pengguna TikTok"
+                  placeholder="Nama pengguna TikTok"
                   value={tiktok}
                   onChange={(e) => setTiktok(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                  className={`w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
               </div>
             </div>
 
             {/* 2-Column Row 5: Media Uploads */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                   Logo Perniagaan
                 </label>
                 <ImageDropzone
@@ -1849,7 +1824,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                   Banner Premis
                 </label>
                 <ImageDropzone
@@ -1862,14 +1837,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {/* Action Buttons Footer */}
-            <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
+            <div className={`flex justify-end items-center gap-3 pt-5 border-t ${beliaTheme.dividerClass}`}>
               <button
                 type="submit"
                 disabled={loading}
-                className="py-2.5 px-6 rounded-lg text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 dark:bg-blue-600"
+                className={`py-2.5 px-6 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${beliaTheme.primaryButtonClass}`}
               >
                 <Save className="w-4 h-4" />
-                <span>{loading ? 'Menyimpan...' : 'Simpan Profil Perniagaan'}</span>
+                <span>{loading ? 'Menyimpan...' : 'Simpan'}</span>
               </button>
             </div>
           </form>
@@ -1902,26 +1877,28 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
         return (
         <div key="products" className="mt-4 space-y-4 animate-dashboard-tab">
-          <div>
-            <h3 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
-              Katalog Menu &amp; Produk Anda
+          <div className="px-1">
+            <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
+              Senarai Produk &amp; Perkhidmatan
             </h3>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-stone-400 mt-0.5">
+              Urus pilihan tawaran, harga, dan ketersediaan stok perniagaan anda.
+            </p>
           </div>
 
-          {/* Add Product Form Box */}
+          {/* Add Product Form */}
           {showAddProduct && (
-            <div className="relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden animate-dashboard-tab transition-colors">
-              <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
-              <div className="kbelia-important-header border-b border-slate-300 dark:border-slate-600 py-3.5 px-5 flex items-center justify-between">
-                <h4 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight flex items-center gap-2">
-                  <ShoppingBag className="w-4.5 h-4.5 text-blue-600 dark:text-blue-400" />
-                  <span>Borang Tambah Produk Baharu</span>
+            <div className={`relative rounded-2xl border overflow-hidden animate-dashboard-tab transition-colors ${beliaTheme.surfaceClass}`}>
+              <div className={`border-b py-3.5 px-5 flex items-center justify-between ${beliaTheme.dividerClass}`}>
+                <h4 className="font-semibold text-base text-slate-900 dark:text-[#F4F1EA] tracking-tight flex items-center gap-2">
+                  <ShoppingBag className={`w-4.5 h-4.5 ${beliaTheme.accentTextClass}`} />
+                  <span>Tambah Produk Baharu</span>
                 </h4>
                 <button
                   type="button"
                   onClick={() => setShowAddProduct(false)}
                   aria-label="Tutup borang tambah produk"
-                  className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+                  className="p-1.5 rounded-xl text-slate-500 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1930,7 +1907,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <form onSubmit={handleAddProduct} className="p-4 sm:p-5 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                    <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                       Nama Produk *
                     </label>
                     <input
@@ -1940,11 +1917,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       placeholder="Masukkan nama produk"
                       value={prodName}
                       onChange={(e) => setProdName(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all font-medium"
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all font-medium ${beliaTheme.inputClass}`}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                    <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                       Harga Jualan *
                     </label>
                     <input
@@ -1952,29 +1929,29 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       min="0"
                       step="0.10"
                       required
-                      placeholder="Masukkan harga jualan"
+                      placeholder="0.00"
                       value={prodPrice}
                       onChange={(e) => setProdPrice(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-mono tabular-nums bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm font-mono tabular-nums focus:outline-none transition-all ${beliaTheme.inputClass}`}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                    <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                       Kategori Produk
                     </label>
                     <input
                       type="text"
                       maxLength={60}
-                      placeholder="Masukkan kategori produk"
+                      placeholder="Contoh: Makanan, Kraf"
                       value={prodCategory}
                       onChange={(e) => setProdCategory(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                  <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                     Status Stok
                   </label>
                   <div className="grid grid-cols-2 gap-3 sm:max-w-md">
@@ -1982,23 +1959,23 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       type="button"
                       aria-pressed={prodInStock}
                       onClick={() => setProdInStock(true)}
-                      className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-sm sm:text-[0.9375rem] font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+                      className={`min-h-[42px] px-4 py-2 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
                         prodInStock
-                          ? 'bg-emerald-100 dark:bg-emerald-900/70 border-emerald-500 dark:border-emerald-500 text-black dark:text-white shadow-2xs'
-                          : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          ? `${beliaTheme.activeMiniBtnClass}`
+                          : `${beliaTheme.secondaryButtonClass}`
                       }`}
                     >
                       <CheckCircle2 className="w-4 h-4 shrink-0" />
-                      <span>Stok Tersedia</span>
+                      <span>Tersedia</span>
                     </button>
                     <button
                       type="button"
                       aria-pressed={!prodInStock}
                       onClick={() => setProdInStock(false)}
-                      className={`min-h-[42px] px-4 py-2.5 rounded-xl border text-sm sm:text-[0.9375rem] font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+                      className={`min-h-[42px] px-4 py-2 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
                         !prodInStock
-                          ? 'bg-rose-100 dark:bg-rose-900/70 border-rose-500 dark:border-rose-500 text-black dark:text-white shadow-2xs'
-                          : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black/70 dark:text-white/70 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          ? 'bg-rose-50 dark:bg-rose-950/50 border-rose-400/60 dark:border-rose-700/60 text-rose-700 dark:text-rose-300'
+                          : `${beliaTheme.secondaryButtonClass}`
                       }`}
                     >
                       <XCircle className="w-4 h-4 shrink-0" />
@@ -2007,22 +1984,22 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                    <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                       Penerangan Produk
                     </label>
                     <textarea
                       rows={4}
                       maxLength={1000}
-                      placeholder="Masukkan penerangan produk"
+                      placeholder="Masukkan penerangan ringkas produk"
                       value={prodDesc}
                       onChange={(e) => setProdDesc(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                      className={`w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm sm:text-[0.9375rem] font-medium text-black dark:text-white mb-2">
+                    <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
                       Gambar Produk
                     </label>
                     <ImageDropzone
@@ -2034,50 +2011,49 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   </div>
                 </div>
 
-                {/* Action Buttons Footer */}
-                <div className="flex justify-end items-center gap-3 pt-5 border-t border-slate-300 dark:border-slate-600">
+                <div className={`flex justify-end items-center gap-3 pt-4 border-t ${beliaTheme.dividerClass}`}>
                   <button
                     type="button"
                     onClick={() => setShowAddProduct(false)}
-                    className="min-h-[40px] py-2.5 px-5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 whitespace-nowrap transition-all cursor-pointer"
+                    className={`min-h-[40px] py-2 px-5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${beliaTheme.secondaryButtonClass}`}
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="min-h-[40px] py-2.5 px-6 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer active:scale-[0.98] disabled:opacity-50"
+                    className={`min-h-[40px] py-2 px-6 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer disabled:opacity-50 ${beliaTheme.primaryButtonClass}`}
                   >
                     <Save className="w-4 h-4 shrink-0" />
-                    <span>{loading ? 'Menyimpan...' : 'Simpan Produk'}</span>
+                    <span>{loading ? 'Menyimpan...' : 'Simpan'}</span>
                   </button>
                 </div>
               </form>
             </div>
           )}
 
-          {/* Reference-Style Product Table Card: Search + Filter Toolbar -> Sortable Table -> Compact Pagination */}
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
+          {/* Single-Elevation Hairline Product Table */}
+          <div className={`rounded-2xl border overflow-visible transition-colors ${beliaTheme.surfaceClass}`}>
             {/* Search & Filter Toolbar */}
-            <div className="p-3.5 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-700">
+            <div className={`p-3.5 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b ${beliaTheme.dividerClass}`}>
               <div
                 style={{ ['--search-fit-w' as string]: getSearchInputWidth('Cari produk atau kategori...') }}
                 className="relative w-full sm:w-[var(--search-fit-w)] sm:max-w-full min-w-0"
               >
-                <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Search className="w-4 h-4 text-slate-400 dark:text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   value={prodSearch}
                   onChange={(e) => setProdSearch(e.target.value)}
                   placeholder="Cari produk atau kategori..."
-                  className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                  className={`w-full pl-9 pr-8 py-2 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
                 {prodSearch && (
                   <button
                     type="button"
                     onClick={() => setProdSearch('')}
                     aria-label="Kosongkan carian"
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -2086,27 +2062,27 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
               <div className="flex flex-wrap items-center justify-end gap-2">
                 {selectedProductIds.length > 0 && (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white">
+                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[0.8125rem] font-semibold ${beliaTheme.activeMiniBtnClass}`}>
                     <span className="tabular-nums">{selectedProductIds.length} dipilih</span>
                     <button
                       type="button"
                       onClick={() => setSelectedProductIds([])}
-                      className="text-blue-700 dark:text-blue-300 hover:underline cursor-pointer font-bold"
+                      className="underline cursor-pointer font-semibold"
                     >
                       Kosongkan
                     </button>
                   </div>
                 )}
 
-                <div className="relative" data-prod-filter>
+                <div className="relative flex flex-wrap items-center gap-2" data-prod-filter>
                   <button
                     type="button"
                     onClick={() => setIsProdFilterOpen((prev) => !prev)}
                     aria-expanded={isProdFilterOpen}
                     className={`min-h-[38px] px-3.5 py-2 rounded-xl border text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${
                       activeFilterCount > 0
-                        ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-black dark:text-white'
-                        : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
+                        ? beliaTheme.activeMiniBtnClass
+                        : beliaTheme.secondaryButtonClass
                     }`}
                   >
                     <SlidersHorizontal className="w-4 h-4 shrink-0" />
@@ -2118,7 +2094,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <button
                     type="button"
                     onClick={handleExportProducts}
-                    className="min-h-[38px] px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-black dark:text-white text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors"
+                    className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${beliaTheme.secondaryButtonClass}`}
                   >
                     <Download className="w-4 h-4 shrink-0" />
                     <span>
@@ -2131,17 +2107,17 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowAddProduct(!showAddProduct)}
-                    className="min-h-[38px] px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 shadow-xs cursor-pointer transition-all"
+                    className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 ${beliaTheme.primaryButtonClass}`}
                   >
                     <Plus className="w-4 h-4 shrink-0" />
-                    <span>{showAddProduct ? 'Tutup Borang' : 'Daftar Produk'}</span>
+                    <span>{showAddProduct ? 'Tutup' : 'Tambah'}</span>
                   </button>
 
                   {isProdFilterOpen && (
-                    <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
-                      <div className="pb-3 border-b border-slate-200 dark:border-zinc-700">
-                        <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
-                          <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                    <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#141D1A] border border-slate-200 dark:border-[#24342D] shadow-xl p-4 z-30 space-y-3.5">
+                      <div className={`pb-3 border-b ${beliaTheme.dividerClass}`}>
+                        <label className="block text-[0.8125rem] font-semibold text-slate-700 dark:text-stone-300 mb-1.5 flex items-center gap-1.5">
+                          <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${beliaTheme.accentTextClass}`} />
                           <span>Susun Mengikut</span>
                         </label>
                         <select
@@ -2149,7 +2125,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           onChange={(e) => {
                             if (e.target.value) setProdSortBy(e.target.value);
                           }}
-                          className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer"
+                          className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
                         >
                           {prodSortBy === 'table_column' && (
                             <option value="">Ikut Lajur Jadual</option>
@@ -2163,13 +2139,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                        <label className="block text-xs font-semibold text-slate-600 dark:text-stone-400 mb-1.5">
                           Kategori
                         </label>
                         <select
                           value={prodCategoryFilter}
                           onChange={(e) => setProdCategoryFilter(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer"
+                          className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
                         >
                           {productCategories.map((cat) => (
                             <option key={cat} value={cat}>
@@ -2180,7 +2156,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                        <label className="block text-xs font-semibold text-slate-600 dark:text-stone-400 mb-1.5">
                           Status Stok
                         </label>
                         <div className="grid grid-cols-3 gap-1.5">
@@ -2195,10 +2171,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                               key={opt.id}
                               type="button"
                               onClick={() => setProdStockFilter(opt.id)}
-                              className={`px-2 py-1.5 rounded-lg text-[0.8125rem] font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
+                              className={`px-2 py-1.5 rounded-xl text-[0.8125rem] font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
                                 prodStockFilter === opt.id
-                                  ? 'bg-blue-600 text-white border-blue-600'
-                                  : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                                  ? beliaTheme.segmentedActiveClass
+                                  : beliaTheme.secondaryButtonClass
                               }`}
                             >
                               {opt.label}
@@ -2207,7 +2183,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         </div>
                       </div>
 
-                      <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+                      <div className={`pt-2 border-t flex items-center justify-between ${beliaTheme.dividerClass}`}>
                         <button
                           type="button"
                           onClick={() => {
@@ -2215,14 +2191,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             setProdStockFilter('all');
                             setProdSortBy(DEFAULT_SORT_VALUE);
                           }}
-                          className="text-[0.8125rem] font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
+                          className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300 hover:underline cursor-pointer"
                         >
                           Set Semula
                         </button>
                         <button
                           type="button"
                           onClick={() => setIsProdFilterOpen(false)}
-                          className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold cursor-pointer"
+                          className={`px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${beliaTheme.primaryButtonClass}`}
                         >
                           Tutup
                         </button>
@@ -2234,20 +2210,20 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
 
             {safeProducts.length === 0 ? (
-              <div className="p-10 text-center">
-                <ShoppingBag className="w-10 h-10 text-black/30 dark:text-white/30 mx-auto mb-2" />
-                <h4 className="text-sm font-bold text-black dark:text-white">
+              <div className="p-10 text-center space-y-1.5">
+                <ShoppingBag className="w-9 h-9 text-slate-400 dark:text-stone-500 mx-auto mb-1" />
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA]">
                   Belum Ada Produk Disenaraikan
                 </h4>
-                <p className="text-[0.9375rem] text-black/70 dark:text-white/75 mt-0.5">
-                  Tekan butang Daftar Produk di atas untuk memasukkan item pertama anda.
+                <p className="text-sm text-slate-600 dark:text-stone-400">
+                  Klik butang Tambah Produk di atas untuk mula menyenaraikan produk anda.
                 </p>
               </div>
             ) : filteredSortedProducts.length === 0 ? (
               <div className="p-10 text-center space-y-2">
-                <Search className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
-                <h4 className="text-sm font-bold text-black dark:text-white">
-                  Tiada Produk Padan Dengan Carian / Penapis
+                <Search className="w-8 h-8 text-slate-400 dark:text-stone-500 mx-auto" />
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA]">
+                  Tiada Produk Padan Dengan Carian
                 </h4>
                 <button
                   type="button"
@@ -2256,9 +2232,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     setProdCategoryFilter('Semua');
                     setProdStockFilter('all');
                   }}
-                  className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                  className={`text-sm font-semibold hover:underline cursor-pointer ${beliaTheme.accentTextClass}`}
                 >
-                  Set Semula Carian &amp; Penapis
+                  Set Semula
                 </button>
               </div>
             ) : (
@@ -2266,72 +2242,72 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
-                        <th className="py-3 pl-4 pr-2 w-10">
+                      <tr className={`border-b text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-400 ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
+                        <th className="py-3 pl-5 pr-2 w-10">
                           <input
                             type="checkbox"
                             checked={allPageSelected}
                             onChange={toggleSelectAllOnPage}
                             aria-label="Pilih semua produk pada halaman ini"
-                            className="w-4 h-4 rounded border-slate-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                            className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
                           />
                         </th>
                         <th className="py-3 px-3">
                           <button
                             type="button"
                             onClick={() => toggleProductSort('name')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Produk</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                           </button>
                         </th>
                         <th className="py-3 px-3">
                           <button
                             type="button"
                             onClick={() => toggleProductSort('category')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Kategori</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                           </button>
                         </th>
                         <th className="py-3 px-3">
                           <button
                             type="button"
                             onClick={() => toggleProductSort('price')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Harga</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                           </button>
                         </th>
                         <th className="py-3 px-3">
                           <button
                             type="button"
                             onClick={() => toggleProductSort('inStock')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
-                            <span>Stok</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                            <span>Status</span>
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                           </button>
                         </th>
                         <th className="py-3 px-3">
                           <button
                             type="button"
                             onClick={() => toggleProductSort('createdAt')}
-                            className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                           >
                             <span>Tarikh</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                           </button>
                         </th>
-                        <th className="py-3 pl-2 pr-4 w-12 text-right">
+                        <th className="py-3 pl-2 pr-5 w-12 text-right">
                           <span className="sr-only">Tindakan</span>
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-zinc-700">
+                    <tbody className={`divide-y ${beliaTheme.dividerClass}`}>
                       {productsPagination.paginatedItems.map((prod) => {
                         const isAvailable = prod.inStock !== false;
                         const isChecked = selectedProductIds.includes(prod.id);
@@ -2343,50 +2319,50 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         return (
                           <tr
                             key={prod.id}
-                            className={`kbelia-table-row ${
+                            className={`transition-colors ${
                               isChecked
-                                ? 'bg-blue-50/40 dark:bg-blue-950/20'
-                                : ''
+                                ? 'bg-[#0B6E52]/6 dark:bg-[#10B981]/10'
+                                : beliaTheme.rowHoverClass
                             }`}
                           >
-                            <td className="py-3.5 pl-4 pr-2">
+                            <td className="py-3.5 pl-5 pr-2">
                               <input
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => toggleSelectRow(prod.id)}
                                 aria-label={`Pilih ${prod.name}`}
-                                className="w-4 h-4 rounded border-slate-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                                className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
                               />
                             </td>
                             <td className="py-3.5 px-3">
                               <div className="flex items-center gap-3 min-w-[200px]">
                                 <ProductRowThumbnail src={prod.imageUrl} alt={prod.name} compact />
-                                <span className="font-semibold text-black dark:text-white truncate max-w-[260px]">
+                                <span className="font-semibold text-slate-900 dark:text-[#F4F1EA] truncate max-w-[260px]">
                                   {prod.name}
                                 </span>
                               </div>
                             </td>
-                            <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
+                            <td className="py-3.5 px-3 text-slate-600 dark:text-stone-400 whitespace-nowrap">
                               {prod.category || 'Umum'}
                             </td>
-                            <td className="py-3.5 px-3 font-mono font-bold text-black dark:text-white tabular-nums whitespace-nowrap">
+                            <td className="py-3.5 px-3 font-mono font-semibold text-slate-900 dark:text-[#F4F1EA] tabular-nums whitespace-nowrap">
                               {formattedPrice}
                             </td>
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.8125rem] font-semibold ${
+                                className={`text-[0.8125rem] font-semibold ${
                                   isAvailable
-                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/70'
-                                    : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70'
+                                    ? 'text-[#0B6E52] dark:text-[#34D399]'
+                                    : 'text-rose-600 dark:text-rose-400'
                                 }`}
                               >
-                                {isAvailable ? 'Stok Tersedia' : 'Habis Stok'}
+                                {isAvailable ? 'Tersedia' : 'Habis Stok'}
                               </span>
                             </td>
-                            <td className="py-3.5 px-3 text-black/70 dark:text-white/75 tabular-nums whitespace-nowrap">
+                            <td className="py-3.5 px-3 text-slate-600 dark:text-stone-400 tabular-nums whitespace-nowrap">
                               {dateStr || '-'}
                             </td>
-                            <td className="py-3.5 pl-2 pr-4 text-right whitespace-nowrap">
+                            <td className="py-3.5 pl-2 pr-5 text-right whitespace-nowrap">
                               <RowActionMenu
                                 ariaLabel={`Tindakan untuk ${prod.name}`}
                                 items={[
@@ -2400,7 +2376,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                     onClick: () => handleDuplicateProduct(prod)
                                   },
                                   {
-                                    label: isAvailable ? 'Tanda Habis Stok' : 'Tanda Stok Tersedia',
+                                    label: isAvailable ? 'Habis Stok' : 'Stok Ada',
                                     disabled: togglingStockId === prod.id,
                                     onClick: () => handleToggleProductStock(prod)
                                   },
@@ -2432,7 +2408,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   itemsPerPage={7}
                   onPageChange={productsPagination.setCurrentPage}
                   itemLabel="produk"
-                  accent="blue"
                 />
               </>
             )}
@@ -2471,20 +2446,16 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       {/* Tab 4: Digital Card & QR Promo */}
       {activeTab === 'card' && (
         <div key="card" className="mt-4 animate-dashboard-tab">
-          <div className="relative overflow-hidden bg-white dark:bg-slate-800 text-black dark:text-white p-5 sm:p-6 rounded-2xl shadow-2xs border border-slate-300 dark:border-slate-600">
-            <div className="absolute inset-x-0 top-0 h-0.5 bg-blue-500/80 dark:bg-blue-400/80" />
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-              <div
-                style={{ '--stagger': 0 } as React.CSSProperties}
-                className="animate-dashboard-card lg:col-span-5 flex flex-col justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-center space-y-4"
-              >
-                <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-950/60 dark:border-blue-800/70 dark:text-blue-200 text-[0.8125rem] font-bold uppercase tracking-wider mx-auto">
+          <div className={`relative overflow-hidden rounded-2xl border transition-colors ${beliaTheme.surfaceClass}`}>
+            <div className={`grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x ${beliaTheme.dividerClass}`}>
+              <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between text-center space-y-5">
+                <div className={`inline-flex items-center justify-center gap-1.5 text-xs font-semibold mx-auto ${beliaTheme.accentTextClass}`}>
                   <QrCode className="w-3.5 h-3.5" />
-                  <span>Kad Profil Usahawan Belia</span>
+                  <span>Kad Profil Perniagaan</span>
                 </div>
 
-                <div className="space-y-2.5">
-                  <div className="w-20 h-20 rounded-2xl mx-auto border-2 border-slate-300 dark:border-slate-600 overflow-hidden bg-white dark:bg-slate-800">
+                <div className="space-y-3">
+                  <div className={`w-20 h-20 rounded-2xl mx-auto border overflow-hidden ${beliaTheme.dividerClass} ${beliaTheme.surfaceMutedClass}`}>
                     <PortalImage
                       src={myBusiness?.logoUrl || user.photoURL || ''}
                       alt={myBusiness?.businessName || 'Logo Perniagaan'}
@@ -2493,11 +2464,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
-                    {myBusiness?.businessName || 'Nama Bisnes Belia'}
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
+                    {myBusiness?.businessName || 'Usaha Niaga Belia'}
                   </h3>
-                  <p className="text-sm text-black/75 dark:text-white/75 font-medium">
-                    {myBusiness?.tagline || 'Inisiatif Usahawan Muda Kelantan'}
+                  <p className="text-sm text-slate-600 dark:text-stone-400 font-medium">
+                    {myBusiness?.tagline || 'Komuniti Usahawan Belia Kelantan'}
                   </p>
                 </div>
 
@@ -2505,53 +2476,50 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   href={`https://wa.me/?text=${encodeURIComponent(`Sokong perniagaan ${myBusiness?.businessName || 'Usahawan Belia'} di Portal KBelia Kelantan: ${window.location.origin}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold inline-flex items-center justify-center gap-2 shadow-xs transition-colors"
+                  className={`w-full py-2.5 px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors ${beliaTheme.primaryButtonClass}`}
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>Kongsi Kad ke WhatsApp</span>
+                  <span>Kongsi WhatsApp</span>
                 </a>
               </div>
 
-              <div
-                style={{ '--stagger': 1 } as React.CSSProperties}
-                className="animate-dashboard-card lg:col-span-7 flex flex-col justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-4"
-              >
+              <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-5">
                 <div>
-                  <h4 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight mb-3">
-                    Butiran Pendaftaran &amp; Saluran Hebahan
+                  <h4 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-[#F4F1EA] tracking-tight mb-3">
+                    Butiran Ringkas Perniagaan
                   </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                    <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65 block">Jajahan Operasi</span>
-                      <span className="font-bold text-black dark:text-white mt-0.5 block">{myBusiness?.district || 'Kota Bharu'}</span>
+                  <div className={`divide-y border-y text-sm ${beliaTheme.dividerClass}`}>
+                    <div className="py-3 flex items-center justify-between gap-4">
+                      <span className="text-slate-600 dark:text-stone-400">Lokasi Operasi</span>
+                      <span className="font-semibold text-slate-900 dark:text-[#F4F1EA]">{myBusiness?.district || 'Kota Bharu'}</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65 block">Kategori Sektor</span>
-                      <span className="font-bold text-black dark:text-white mt-0.5 block">
+                    <div className="py-3 flex items-center justify-between gap-4">
+                      <span className="text-slate-600 dark:text-stone-400">Kategori</span>
+                      <span className="font-semibold text-slate-900 dark:text-[#F4F1EA]">
                         {myBusiness?.category === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : (myBusiness?.category || 'Makanan & Minuman')}
                       </span>
                     </div>
-                    <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65 block">Nombor WhatsApp Rasmi</span>
-                      <span className="font-mono font-bold text-black dark:text-white mt-0.5 block tabular-nums">{myBusiness?.whatsapp || userProfile?.phone || '-'}</span>
+                    <div className="py-3 flex items-center justify-between gap-4">
+                      <span className="text-slate-600 dark:text-stone-400">Nombor WhatsApp</span>
+                      <span className="font-mono font-semibold text-slate-900 dark:text-[#F4F1EA] tabular-nums">{myBusiness?.whatsapp || userProfile?.phone || '-'}</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      <span className="text-[0.8125rem] font-medium text-black/60 dark:text-white/65 block">Pendaftaran SSM</span>
-                      <span className="font-mono font-bold text-black dark:text-white mt-0.5 block tabular-nums">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Dalam Proses'}</span>
+                    <div className="py-3 flex items-center justify-between gap-4">
+                      <span className="text-slate-600 dark:text-stone-400">Status Pendaftaran</span>
+                      <span className="font-mono font-semibold text-slate-900 dark:text-[#F4F1EA] tabular-nums">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Sedang Dikemas Kini'}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/35 border border-blue-200 dark:border-blue-800/60 text-[0.8125rem] sm:text-sm text-black/80 dark:text-white/85 flex items-center justify-between gap-3">
+                <div className={`pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-slate-600 dark:text-stone-400`}>
                   <span>
-                    Paparan kad digital ini disegerakkan daripada Profil Perniagaan anda untuk rujukan rakan niaga belia, mentor, dan semakan portal.
+                    Maklumat pada kad ini diselaraskan terus daripada profil perniagaan anda.
                   </span>
                   <button
                     type="button"
                     onClick={() => setActiveTab('profile')}
-                    className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold whitespace-nowrap cursor-pointer shrink-0"
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap cursor-pointer shrink-0 ${beliaTheme.secondaryButtonClass}`}
                   >
-                    Kemaskini Profil
+                    Ubah Profil
                   </button>
                 </div>
               </div>

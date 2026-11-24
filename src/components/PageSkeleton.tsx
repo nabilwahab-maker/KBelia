@@ -380,7 +380,7 @@ export const PageSkeleton: React.FC<PageSkeletonProps> = ({
           aria-live="polite"
           aria-label="Memuatkan halaman..."
           style={snapshot.height > 0 ? { minHeight: `${snapshot.height}px` } : undefined}
-          className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-b-2xl rounded-t-none bg-white dark:bg-zinc-900 border border-t-0 border-slate-300 dark:border-zinc-700 shadow-sm"
+          className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-2xl bg-transparent"
         >
           {snapshot.boxes.map((box) => (
             <div

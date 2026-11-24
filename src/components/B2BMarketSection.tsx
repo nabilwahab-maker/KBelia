@@ -30,14 +30,16 @@ import { resolveB2BImage } from '../utils/visualAssets';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 
 const ITEMS_PER_PAGE = 6;
 const SPOTLIGHT_ROTATE_MS = 6000;
 
 export const B2BMarketSection: React.FC = () => {
   const { language } = useLanguage();
-  const { user, isDemoSession } = useAuth();
+  const { user, isDemoSession, isAdmin, isMentor } = useAuth();
   const isEn = language === 'en';
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
 
   const [listings, setListings] = useState<B2BListing[]>(() => {
     try {
@@ -252,7 +254,7 @@ export const B2BMarketSection: React.FC = () => {
             <div className="lg:col-span-7 p-5 sm:p-6 lg:p-7 flex flex-col justify-between gap-5">
               <div className="space-y-3" aria-live="polite">
                 <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold uppercase tracking-wider">
-                  <span className="inline-flex items-center gap-1 text-teal-700 dark:text-teal-400">
+                  <span className={`inline-flex items-center gap-1 ${roleTheme.accentTextClass}`}>
                     <Sparkles className="w-3.5 h-3.5 shrink-0" />
                     <span>{isEn ? 'Featured Spotlight' : 'Sorotan Pilihan Utama'}</span>
                   </span>
@@ -272,7 +274,7 @@ export const B2BMarketSection: React.FC = () => {
 
                 <h2
                   onClick={() => setDetailListing(spotlightListing)}
-                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight leading-snug text-balance cursor-pointer hover:text-teal-700 dark:hover:text-teal-400 transition-colors"
+                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight leading-snug text-balance cursor-pointer hover:opacity-85 transition-opacity"
                 >
                   {spotlightListing.title}
                 </h2>
@@ -288,18 +290,18 @@ export const B2BMarketSection: React.FC = () => {
                     href={buildWhatsAppHref(spotlightListing)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-2xs transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                    className={`py-2.5 px-4 text-sm inline-flex items-center justify-center gap-2 ${roleTheme.primaryButtonClass}`}
                   >
                     <MessageCircle className="w-4 h-4" />
-                    <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi Rakan Niaga'}</span>
+                    <span>WhatsApp</span>
                   </a>
 
                   <button
                     type="button"
                     onClick={() => setDetailListing(spotlightListing)}
-                    className="py-2 px-3 rounded-xl text-sm font-bold text-teal-700 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/40 transition-colors inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                    className={`py-2 px-3.5 text-sm inline-flex items-center gap-1.5 ${roleTheme.secondaryButtonClass}`}
                   >
-                    <span>{isEn ? 'View Details' : 'Lihat Butiran'}</span>
+                    <span>{isEn ? 'Details' : 'Butiran'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -322,7 +324,7 @@ export const B2BMarketSection: React.FC = () => {
                           onClick={() => setSpotlightIndex(idx)}
                           className={`h-1.5 rounded-full transition-all cursor-pointer ${
                             isActiveSlide
-                              ? 'w-6 bg-teal-600 dark:bg-teal-400'
+                              ? `w-6 ${roleTheme.progressFillClass}`
                               : 'w-2.5 bg-slate-200 dark:bg-zinc-700 hover:bg-slate-300 dark:hover:bg-zinc-600'
                           }`}
                         />
@@ -362,9 +364,9 @@ export const B2BMarketSection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFilterType('all')}
-                    className={`px-2 py-1.5 text-[0.8125rem] font-bold rounded-lg transition-colors cursor-pointer ${
+                    className={`px-2 py-1.5 text-[0.8125rem] font-bold rounded-xl transition-colors cursor-pointer ${
                       filterType === 'all'
-                        ? 'bg-white dark:bg-zinc-800 text-black dark:text-white shadow-2xs border border-slate-200 dark:border-zinc-600'
+                        ? roleTheme.segmentedActiveClass
                         : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
                     }`}
                   >
@@ -373,9 +375,9 @@ export const B2BMarketSection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFilterType('demand')}
-                    className={`px-2 py-1.5 text-[0.8125rem] font-bold rounded-lg transition-colors cursor-pointer ${
+                    className={`px-2 py-1.5 text-[0.8125rem] font-bold rounded-xl transition-colors cursor-pointer ${
                       filterType === 'demand'
-                        ? 'bg-teal-600 text-white shadow-2xs dark:bg-teal-600'
+                        ? roleTheme.segmentedActiveClass
                         : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
                     }`}
                   >
@@ -384,9 +386,9 @@ export const B2BMarketSection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFilterType('supply')}
-                    className={`px-2 py-1.5 text-[0.8125rem] font-bold rounded-lg transition-colors cursor-pointer ${
+                    className={`px-2 py-1.5 text-[0.8125rem] font-bold rounded-xl transition-colors cursor-pointer ${
                       filterType === 'supply'
-                        ? 'bg-teal-600 text-white shadow-2xs dark:bg-teal-600'
+                        ? roleTheme.segmentedActiveClass
                         : 'text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white'
                     }`}
                   >
@@ -437,9 +439,9 @@ export const B2BMarketSection: React.FC = () => {
                   setFilterDistrict('all');
                   setSortBy(DEFAULT_SORT_VALUE);
                 }}
-                className="mt-3 px-3.5 py-1.5 rounded-lg text-[0.8125rem] font-bold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-black dark:text-white transition-colors cursor-pointer"
+                className={`mt-3 ${roleTheme.compactSecondaryButtonClass}`}
               >
-                {isEn ? 'Reset Filters' : 'Set Semula Penapis'}
+                {isEn ? 'Reset' : 'Set Semula'}
               </button>
             )}
           </div>
@@ -482,7 +484,7 @@ export const B2BMarketSection: React.FC = () => {
                         </span>
                       </div>
 
-                      <h3 className="text-base sm:text-lg font-bold text-black dark:text-white leading-snug line-clamp-2 mt-1.5 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors">
+                      <h3 className="text-base sm:text-lg font-bold text-black dark:text-white leading-snug line-clamp-2 mt-1.5 group-hover:opacity-85 transition-opacity">
                         {item.title}
                       </h3>
 
@@ -498,7 +500,7 @@ export const B2BMarketSection: React.FC = () => {
 
                   {/* Card Footer: View Details + Direct WhatsApp CTA */}
                   <div className="px-4 sm:px-5 py-3.5 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between gap-2.5">
-                    <span className="text-xs font-semibold text-teal-700 dark:text-teal-400 inline-flex items-center gap-1 group-hover:underline whitespace-nowrap">
+                    <span className={`text-xs font-semibold inline-flex items-center gap-1 group-hover:underline whitespace-nowrap ${roleTheme.accentTextClass}`}>
                       <span>{isEn ? 'Details' : 'Butiran'}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </span>
@@ -508,7 +510,7 @@ export const B2BMarketSection: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="py-1.5 px-3 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
+                      className={roleTheme.compactPrimaryButtonClass}
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
                       <span>{isEn ? 'Contact' : 'Hubungi'}</span>
@@ -524,7 +526,6 @@ export const B2BMarketSection: React.FC = () => {
               itemsPerPage={ITEMS_PER_PAGE}
               onPageChange={pagination.setCurrentPage}
               itemLabel={isEn ? 'listings' : 'iklan ruang niaga'}
-              accent="teal"
             />
           </>
         )}
@@ -555,7 +556,7 @@ export const B2BMarketSection: React.FC = () => {
                 type="button"
                 onClick={() => setDetailListing(null)}
                 aria-label={isEn ? 'Close details' : 'Tutup butiran'}
-                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/95 dark:bg-zinc-900/95 text-black dark:text-white border border-slate-200 dark:border-zinc-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                className={`absolute top-3 right-3 ${roleTheme.iconButtonClass}`}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -653,7 +654,7 @@ export const B2BMarketSection: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setDetailListing(null)}
-                className="py-2 px-4 rounded-xl text-sm font-semibold border border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer whitespace-nowrap"
+                className={`py-2 px-4 text-sm ${roleTheme.secondaryButtonClass}`}
               >
                 {isEn ? 'Close' : 'Tutup'}
               </button>
@@ -662,10 +663,10 @@ export const B2BMarketSection: React.FC = () => {
                 href={buildWhatsAppHref(detailListing)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                className={`py-2.5 px-4 text-sm inline-flex items-center justify-center gap-2 ${roleTheme.primaryButtonClass}`}
               >
                 <MessageCircle className="w-4 h-4" />
-                <span>{isEn ? 'Connect via WhatsApp' : 'Hubungi via WhatsApp'}</span>
+                <span>WhatsApp</span>
               </a>
             </div>
           </div>

@@ -14,6 +14,8 @@ import {
   ShoppingBag
 } from 'lucide-react';
 import { BusinessListing, ProductItem, formatBusinessCategory } from '../types';
+import { useAuth } from '../context/AuthContext';
+import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { showToast } from './ToastNotification';
 
 interface BusinessDetailModalProps {
@@ -29,6 +31,9 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
   isOpen,
   onClose
 }) => {
+  const { isAdmin, isMentor } = useAuth();
+  const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
+
   if (!isOpen || !business) return null;
 
   const safeProducts = products || [];
@@ -80,8 +85,9 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
           
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-slate-900/60 hover:bg-slate-900 text-white backdrop-blur-sm transition-colors z-20 cursor-pointer"
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-sm transition-colors z-20 cursor-pointer"
             title="Tutup"
+            aria-label="Tutup"
           >
             <X className="w-5 h-5" />
           </button>
@@ -173,10 +179,10 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
               target={cleanWhatsapp ? '_blank' : undefined}
               rel={cleanWhatsapp ? 'noopener noreferrer' : undefined}
               onClick={handleMissingWhatsappClick}
-              className="flex-1 min-w-[200px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition-colors"
+              className={`flex-1 min-w-[200px] inline-flex items-center justify-center gap-2 py-3 px-4 text-sm shadow-sm ${roleTheme.primaryButtonClass}`}
             >
               <MessageCircle className="w-4 h-4" />
-              <span>Hubungi Rakan Belia via WhatsApp</span>
+              <span>Hubungi WhatsApp</span>
             </a>
 
             {business.instagram && (
@@ -242,10 +248,10 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                           target={cleanWhatsapp ? '_blank' : undefined}
                           rel={cleanWhatsapp ? 'noopener noreferrer' : undefined}
                           onClick={handleMissingWhatsappClick}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 hover:bg-emerald-100 text-black dark:text-white border border-emerald-200 dark:border-emerald-800 font-bold text-[0.8125rem] flex items-center gap-1 transition-colors"
+                          className={roleTheme.compactSecondaryButtonClass}
                         >
-                          <MessageCircle className="w-3 h-3 text-black dark:text-white/75" />
-                          <span>Hubungi Rakan Belia</span>
+                          <MessageCircle className="w-3 h-3 shrink-0" />
+                          <span>WhatsApp</span>
                         </a>
                       </div>
                     </div>

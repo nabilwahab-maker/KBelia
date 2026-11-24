@@ -27,6 +27,7 @@ import { exportSalesToExcel } from '../utils/excelExport';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 import { ModernDatePicker, addDaysIso, toLocalIsoDate } from './ModernDateTimePicker';
 import { useAnimatedMetric } from '../hooks/useMotion';
+import { getRoleTheme } from '../utils/roleTheme';
 
 interface KioskCashflowTrackerProps {
   kioskName?: string;
@@ -389,48 +390,53 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   const animatedNetProfit = useAnimatedMetric(formattedNetProfit);
   const animatedQrPct = useAnimatedMetric(`${qrPercentage}%`);
 
+  const beliaTheme = getRoleTheme('belia');
+
   return (
     <div className="animate-dashboard-tab space-y-4">
-      <div>
-        <h2 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
-          Rekod Aliran Tunai &amp; Untung Bersih
+      <div className="px-1">
+        <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
+          Catatan Aliran Tunai
         </h2>
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-stone-400 mt-0.5">
+          Rekod harian hasil jualan dan perbelanjaan perniagaan anda.
+        </p>
       </div>
 
       {/* Ringkasan Kewangan Mendatar */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 dark:divide-zinc-700 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700">
-        <div className="p-3.5 sm:p-4">
-          <span className="text-sm sm:text-base font-extrabold text-black dark:text-white block mb-1 tracking-tight">
-            Jumlah Jualan Kasar
+      <div className={`grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x rounded-2xl border transition-colors ${beliaTheme.surfaceClass} ${beliaTheme.dividerClass}`}>
+        <div className="p-4">
+          <span className="text-xs font-medium text-slate-600 dark:text-stone-400 block mb-1">
+            Jumlah Jualan
           </span>
-          <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
+          <span className="text-xl sm:text-2xl font-bold font-mono text-slate-900 dark:text-[#F4F1EA] tabular-nums tracking-tight">
             {animatedRevenue}
           </span>
         </div>
 
-        <div className="p-3.5 sm:p-4">
-          <span className="text-sm sm:text-base font-extrabold text-black dark:text-white block mb-1 tracking-tight">
-            Kos &amp; Belanja Stok
+        <div className="p-4">
+          <span className="text-xs font-medium text-slate-600 dark:text-stone-400 block mb-1">
+            Perbelanjaan
           </span>
-          <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white/90 tabular-nums tracking-tight">
+          <span className="text-xl sm:text-2xl font-bold font-mono text-slate-900 dark:text-[#F4F1EA] tabular-nums tracking-tight">
             {animatedExpenses}
           </span>
         </div>
 
-        <div className="p-3.5 sm:p-4">
-          <span className="text-sm sm:text-base font-extrabold text-black dark:text-white block mb-1 tracking-tight">
-            Untung Bersih Terkumpul
+        <div className="p-4">
+          <span className="text-xs font-medium text-slate-600 dark:text-stone-400 block mb-1">
+            Baki Positif
           </span>
-          <span className="text-xl sm:text-2xl font-extrabold font-mono text-emerald-700 dark:text-emerald-300 tabular-nums tracking-tight">
+          <span className={`text-xl sm:text-2xl font-bold font-mono tabular-nums tracking-tight ${beliaTheme.accentTextClass}`}>
             {animatedNetProfit}
           </span>
         </div>
 
-        <div className="p-3.5 sm:p-4">
-          <span className="text-sm sm:text-base font-extrabold text-black dark:text-white block mb-1 tracking-tight">
-            Bayaran DuitNow QR
+        <div className="p-4">
+          <span className="text-xs font-medium text-slate-600 dark:text-stone-400 block mb-1">
+            Bayaran QR
           </span>
-          <span className="text-xl sm:text-2xl font-extrabold font-mono text-black dark:text-white tabular-nums tracking-tight">
+          <span className={`text-xl sm:text-2xl font-bold font-mono tabular-nums tracking-tight ${beliaTheme.accentStrongTextClass}`}>
             {animatedQrPct}
           </span>
         </div>
@@ -438,32 +444,32 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
 
       {/* Collapsible Record Input Form */}
       {showAddForm && (
-        <div className="animate-dashboard-tab bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xs overflow-hidden transition-colors">
-          <div className="kbelia-important-header border-b border-slate-200 dark:border-slate-700 py-3 px-4 flex items-center justify-between">
-            <span className="text-sm sm:text-[0.9375rem] font-bold text-black dark:text-white flex items-center gap-2">
-              <Coins className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>Borang Catatan Jualan &amp; Belanja Harian</span>
+        <div className={`animate-dashboard-tab rounded-2xl border overflow-hidden transition-colors ${beliaTheme.surfaceClass}`}>
+          <div className={`border-b py-3.5 px-5 flex items-center justify-between ${beliaTheme.dividerClass}`}>
+            <span className="text-sm sm:text-base font-semibold text-slate-900 dark:text-[#F4F1EA] flex items-center gap-2">
+              <Coins className={`w-4 h-4 ${beliaTheme.accentTextClass}`} />
+              <span>Tambah Catatan Harian</span>
             </span>
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
               aria-label="Tutup borang catatan jualan"
-              className="p-1.5 rounded-lg text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+              className="p-1.5 rounded-xl text-slate-500 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <form onSubmit={handleAddRecord} className="p-4 space-y-3.5">
+          <form onSubmit={handleAddRecord} className="p-4 sm:p-5 space-y-4">
             {validationError && (
-              <div className="p-2.5 rounded-lg bg-rose-50 dark:bg-rose-950/50 text-black dark:text-white text-sm font-semibold border border-rose-200 dark:border-rose-800">
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-200 text-sm font-medium border border-rose-200 dark:border-rose-800">
                 {validationError}
               </div>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
               <div>
-                <label className="text-sm font-medium text-black dark:text-white block mb-1.5">Tarikh</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-[#F4F1EA] block mb-1.5">Tarikh</label>
                 <ModernDatePicker
                   value={date}
                   onChange={setDate}
@@ -477,7 +483,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-black dark:text-white block mb-1.5">Jualan Tunai (RM)</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-[#F4F1EA] block mb-1.5">Jualan Tunai (RM)</label>
                 <input
                   type="number"
                   min="0"
@@ -485,11 +491,11 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                   placeholder="0.00"
                   value={cash}
                   onChange={(e) => setCash(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                  className={`w-full px-3.5 py-2 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-black dark:text-white block mb-1.5">Jualan DuitNow QR (RM)</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-[#F4F1EA] block mb-1.5">Bayaran QR (RM)</label>
                 <input
                   type="number"
                   min="0"
@@ -497,11 +503,11 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                   placeholder="0.00"
                   value={qr}
                   onChange={(e) => setQr(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                  className={`w-full px-3.5 py-2 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-black dark:text-white block mb-1.5">Belanja Kos (RM)</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-[#F4F1EA] block mb-1.5">Perbelanjaan (RM)</label>
                 <input
                   type="number"
                   min="0"
@@ -509,7 +515,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                   placeholder="0.00"
                   value={expenses}
                   onChange={(e) => setExpenses(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                  className={`w-full px-3.5 py-2 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
               </div>
             </div>
@@ -518,27 +524,27 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               <div className="flex-1">
                 <input
                   type="text"
-                  placeholder="Masukkan catatan jualan harian (cth: Jualan hujung minggu & stok kopi)"
+                  placeholder="Catatan ringkas harian (contoh: Jualan hujung minggu)"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                  className={`w-full px-3.5 py-2 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
                 />
               </div>
               <div className="flex items-center justify-end gap-2.5 shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="min-h-[38px] px-4 py-2 rounded-xl text-sm font-semibold text-black dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+                  className={`min-h-[38px] px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer transition-colors ${beliaTheme.secondaryButtonClass}`}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="min-h-[38px] px-5 py-2 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                  className={`min-h-[38px] px-5 py-2 rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${beliaTheme.primaryButtonClass}`}
                 >
                   <Save className="w-4 h-4 shrink-0" />
-                  <span>{saving ? 'Menyimpan...' : 'Simpan Rekod'}</span>
+                  <span>{saving ? 'Menyimpan...' : 'Simpan'}</span>
                 </button>
               </div>
             </div>
@@ -546,28 +552,27 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
         </div>
       )}
 
-      {/* Reference-Style Sales Log Table Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 shadow-2xs overflow-visible">
-        {/* Search & Filter Toolbar */}
-        <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-700">
+      {/* Single-Elevation Hairline Sales Table */}
+      <div className={`rounded-2xl border overflow-visible transition-colors ${beliaTheme.surfaceClass}`}>
+        <div className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b ${beliaTheme.dividerClass}`}>
           <div
             style={{ ['--search-fit-w' as string]: getSearchInputWidth('Cari tarikh atau catatan...') }}
             className="relative w-full sm:w-[var(--search-fit-w)] sm:max-w-full min-w-0"
           >
-            <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-400 dark:text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={salesSearch}
               onChange={(e) => setSalesSearch(e.target.value)}
               placeholder="Cari tarikh atau catatan..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+              className={`w-full pl-9 pr-8 py-2 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
             />
             {salesSearch && (
               <button
                 type="button"
                 onClick={() => setSalesSearch('')}
                 aria-label="Kosongkan carian"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -576,12 +581,12 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             {selectedIds.length > 0 && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/70 text-[0.8125rem] font-semibold text-black dark:text-white">
+              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[0.8125rem] font-semibold ${beliaTheme.activeMiniBtnClass}`}>
                 <span className="tabular-nums">{selectedIds.length} dipilih</span>
                 <button
                   type="button"
                   onClick={() => setSelectedIds([])}
-                  className="text-blue-700 dark:text-blue-300 hover:underline cursor-pointer font-bold"
+                  className="underline cursor-pointer font-semibold"
                 >
                   Kosongkan
                 </button>
@@ -597,8 +602,8 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                 title={activeFilterCount > 0 ? `Penapis (${activeFilterCount} aktif)` : 'Penapis'}
                 className={`min-h-[38px] w-[38px] rounded-xl border inline-flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
                   activeFilterCount > 0
-                    ? 'bg-blue-50 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-black dark:text-white'
-                    : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
+                    ? beliaTheme.activeMiniBtnClass
+                    : beliaTheme.secondaryButtonClass
                 }`}
               >
                 <SlidersHorizontal className="w-4 h-4 shrink-0" />
@@ -607,7 +612,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               <button
                 type="button"
                 onClick={handleExportSales}
-                className="min-h-[38px] px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-black dark:text-white text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors"
+                className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${beliaTheme.secondaryButtonClass}`}
               >
                 <Download className="w-4 h-4 shrink-0" />
                 <span>
@@ -620,17 +625,17 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAddForm((prev) => !prev)}
-                className="min-h-[38px] px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 shadow-xs cursor-pointer transition-all"
+                className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-all ${beliaTheme.primaryButtonClass}`}
               >
                 <Plus className="w-4 h-4 shrink-0" />
-                <span>{showAddForm ? 'Tutup Borang' : 'Catat Jualan'}</span>
+                <span>{showAddForm ? 'Tutup' : 'Tambah'}</span>
               </button>
 
               {isFilterOpen && (
-                <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-30 space-y-3.5">
-                  <div className="pb-3 border-b border-slate-200 dark:border-zinc-700">
-                    <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5 flex items-center gap-1.5">
-                      <ArrowUpDown className="w-3.5 h-3.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#141D1A] border border-slate-200 dark:border-[#24342D] shadow-xl p-4 z-30 space-y-3.5">
+                  <div className={`pb-3 border-b ${beliaTheme.dividerClass}`}>
+                    <label className="block text-[0.8125rem] font-semibold text-slate-700 dark:text-stone-300 mb-1.5 flex items-center gap-1.5">
+                      <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${beliaTheme.accentTextClass}`} />
                       <span>Susun Mengikut</span>
                     </label>
                     <select
@@ -638,7 +643,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                       onChange={(e) => {
                         if (e.target.value) setSortBy(e.target.value);
                       }}
-                      className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer"
+                      className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
                     >
                       {sortBy === 'table_column' && (
                         <option value="">Ikut Lajur Jadual</option>
@@ -652,13 +657,13 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-600 dark:text-stone-400 mb-1.5">
                       Bulan / Tempoh
                     </label>
                     <select
                       value={monthFilter}
                       onChange={(e) => setMonthFilter(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white font-medium cursor-pointer"
+                      className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
                     >
                       {availableMonths.map((ym) => (
                         <option key={ym} value={ym}>
@@ -669,7 +674,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-600 dark:text-stone-400 mb-1.5">
                       Kategori Rekod
                     </label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -677,18 +682,18 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                         [
                           { id: 'all', label: 'Semua' },
                           { id: 'cash', label: 'Ada Tunai' },
-                          { id: 'qr', label: 'Ada DuitNow QR' },
-                          { id: 'profit', label: 'Untung Positif' }
+                          { id: 'qr', label: 'Ada QR' },
+                          { id: 'profit', label: 'Baki Positif' }
                         ] as const
                       ).map((opt) => (
                         <button
                           key={opt.id}
                           type="button"
                           onClick={() => setCategoryFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-lg text-[0.8125rem] font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
+                          className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
                             categoryFilter === opt.id
-                              ? 'bg-blue-600 text-white border-blue-600'
-                              : 'bg-slate-50 dark:bg-zinc-950 text-black dark:text-white border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                              ? beliaTheme.segmentedActiveClass
+                              : beliaTheme.secondaryButtonClass
                           }`}
                         >
                           {opt.label}
@@ -697,7 +702,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+                  <div className={`pt-2 border-t flex items-center justify-between ${beliaTheme.dividerClass}`}>
                     <button
                       type="button"
                       onClick={() => {
@@ -705,14 +710,14 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                         setCategoryFilter('all');
                         setSortBy(DEFAULT_SORT_VALUE);
                       }}
-                      className="text-[0.8125rem] font-semibold text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:underline cursor-pointer"
+                      className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300 hover:underline cursor-pointer"
                     >
                       Set Semula
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsFilterOpen(false)}
-                      className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[0.8125rem] font-bold cursor-pointer"
+                      className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${beliaTheme.primaryButtonClass}`}
                     >
                       Tutup
                     </button>
@@ -725,20 +730,20 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
 
         {/* Empty States or Table */}
         {salesRecords.length === 0 ? (
-          <div className="p-10 text-center space-y-2">
-            <Coins className="w-10 h-10 text-black/30 dark:text-white/30 mx-auto" />
-            <h4 className="text-sm font-bold text-black dark:text-white">
-              Tiada Rekod Jualan Lagi
+          <div className="p-10 text-center space-y-1.5">
+            <Coins className="w-9 h-9 text-slate-400 dark:text-stone-500 mx-auto" />
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA]">
+              Belum Ada Catatan Jualan
             </h4>
-            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-              Tekan butang Catat Jualan di atas untuk merekodkan jualan harian anda.
+            <p className="text-sm text-slate-600 dark:text-stone-400">
+              Klik Tambah Catatan di atas untuk merekodkan jualan harian anda.
             </p>
           </div>
         ) : filteredSortedSales.length === 0 ? (
           <div className="p-10 text-center space-y-2">
-            <Search className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
-            <h4 className="text-sm font-bold text-black dark:text-white">
-              Tiada Rekod Padan Dengan Carian / Penapis
+            <Search className="w-8 h-8 text-slate-400 dark:text-stone-500 mx-auto" />
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA]">
+              Tiada Rekod Padan Dengan Carian
             </h4>
             <button
               type="button"
@@ -747,9 +752,9 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                 setMonthFilter('Semua');
                 setCategoryFilter('all');
               }}
-              className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+              className={`text-sm font-semibold hover:underline cursor-pointer ${beliaTheme.accentTextClass}`}
             >
-              Set Semula Carian &amp; Penapis
+              Set Semula
             </button>
           </div>
         ) : (
@@ -757,73 +762,73 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-700 text-[0.8125rem] font-semibold text-black/65 dark:text-white/70">
-                    <th className="py-3 pl-4 pr-2 w-10">
+                  <tr className={`border-b text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-400 ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
+                    <th className="py-3 pl-5 pr-2 w-10">
                       <input
                         type="checkbox"
                         checked={allPageSelected}
                         onChange={toggleSelectAllOnPage}
                         aria-label="Pilih semua rekod jualan pada halaman ini"
-                        className="w-4 h-4 rounded border-slate-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                        className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
                       />
                     </th>
                     <th className="py-3 px-3">
                       <button
                         type="button"
                         onClick={() => toggleSort('date')}
-                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                       >
                         <span>Tarikh</span>
-                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                       </button>
                     </th>
                     <th className="py-3 px-3">
                       <button
                         type="button"
                         onClick={() => toggleSort('cashSales')}
-                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                       >
                         <span>Tunai</span>
-                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                       </button>
                     </th>
                     <th className="py-3 px-3">
                       <button
                         type="button"
                         onClick={() => toggleSort('qrSales')}
-                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                       >
-                        <span>DuitNow QR</span>
-                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                        <span>Bayaran QR</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                       </button>
                     </th>
                     <th className="py-3 px-3">
                       <button
                         type="button"
                         onClick={() => toggleSort('expenses')}
-                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                       >
-                        <span>Kos Belanja</span>
-                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                        <span>Perbelanjaan</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                       </button>
                     </th>
                     <th className="py-3 px-3">
                       <button
                         type="button"
                         onClick={() => toggleSort('net')}
-                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
                       >
-                        <span>Untung Bersih</span>
-                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
+                        <span>Baki</span>
+                        <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
                       </button>
                     </th>
                     <th className="py-3 px-3">Catatan</th>
-                    <th className="py-3 pl-2 pr-4 w-12 text-right">
+                    <th className="py-3 pl-2 pr-5 w-12 text-right">
                       <span className="sr-only">Tindakan</span>
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-zinc-700 text-black dark:text-white">
+                <tbody className={`divide-y text-slate-900 dark:text-[#F4F1EA] ${beliaTheme.dividerClass}`}>
                   {salesPagination.paginatedItems.map((r) => {
                     const dailyNet = (r.cashSales + r.qrSales) - r.expenses;
                     const isChecked = selectedIds.includes(r.id);
@@ -831,22 +836,22 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                     return (
                       <tr
                         key={r.id}
-                        className={`kbelia-table-row ${
+                        className={`transition-colors ${
                           isChecked
-                            ? 'bg-blue-50/40 dark:bg-blue-950/20'
-                            : ''
+                            ? 'bg-[#0B6E52]/6 dark:bg-[#10B981]/10'
+                            : beliaTheme.rowHoverClass
                         }`}
                       >
-                        <td className="py-3.5 pl-4 pr-2">
+                        <td className="py-3.5 pl-5 pr-2">
                           <input
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => toggleSelectRow(r.id)}
                             aria-label={`Pilih rekod bertarikh ${r.date}`}
-                            className="w-4 h-4 rounded border-slate-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                            className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
                           />
                         </td>
-                        <td className="py-3.5 px-3 font-semibold text-black dark:text-white tabular-nums whitespace-nowrap">
+                        <td className="py-3.5 px-3 font-semibold tabular-nums whitespace-nowrap">
                           {formatSaleDate(r.date)}
                         </td>
                         <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
@@ -855,29 +860,29 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                         <td className="py-3.5 px-3 tabular-nums font-medium whitespace-nowrap">
                           RM {r.qrSales.toFixed(2)}
                         </td>
-                        <td className="py-3.5 px-3 tabular-nums text-black/80 dark:text-white/80 whitespace-nowrap">
+                        <td className="py-3.5 px-3 tabular-nums text-slate-600 dark:text-stone-400 whitespace-nowrap">
                           RM {r.expenses.toFixed(2)}
                         </td>
                         <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
                           <span
-                            className={`font-bold ${
+                            className={`font-semibold ${
                               dailyNet >= 0
-                                ? 'text-emerald-700 dark:text-emerald-300'
+                                ? beliaTheme.accentTextClass
                                 : 'text-rose-600 dark:text-rose-400'
                             }`}
                           >
                             RM {dailyNet.toFixed(2)}
                           </span>
                         </td>
-                        <td className="py-3.5 px-3 text-black/75 dark:text-white/80 max-w-[240px] truncate">
+                        <td className="py-3.5 px-3 text-slate-600 dark:text-stone-400 max-w-[240px] truncate">
                           {r.notes || '-'}
                         </td>
-                        <td className="py-3.5 pl-2 pr-4 text-right whitespace-nowrap">
+                        <td className="py-3.5 pl-2 pr-5 text-right whitespace-nowrap">
                           <RowActionMenu
                             ariaLabel={`Tindakan untuk rekod ${r.date}`}
                             items={[
                               {
-                                label: 'Edit',
+                                label: 'Sunting',
                                 onClick: () => setEditingRecord(r)
                               },
                               {
@@ -908,7 +913,6 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               itemsPerPage={7}
               onPageChange={salesPagination.setCurrentPage}
               itemLabel="rekod jualan"
-              accent="blue"
             />
           </>
         )}

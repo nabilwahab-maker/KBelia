@@ -4,6 +4,9 @@ import { YouthProgram } from '../types';
 import { saveProgram } from '../services/dataService';
 import { ImageDropzone } from './ImageDropzone';
 import { ModernDatePicker } from './ModernDateTimePicker';
+import { getRoleTheme } from '../utils/roleTheme';
+
+const adminTheme = getRoleTheme('admin');
 
 interface EditProgramModalProps {
   isOpen: boolean;
@@ -97,7 +100,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9990] flex items-center justify-center p-4 bg-stone-950/60 backdrop-blur-xs animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-labelledby="edit-program-modal-title"
@@ -106,12 +109,12 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
       }}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-2xl"
+        className={`relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border shadow-2xl ${adminTheme.surfaceClass}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kbelia-important-header sticky top-0 z-10 border-b border-slate-300 dark:border-slate-600 px-6 py-4 flex items-center justify-between">
+        <div className={`sticky top-0 z-10 border-b px-6 py-4 flex items-center justify-between ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
               <Edit3 className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -129,7 +132,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
             disabled={isSaving}
             onClick={onClose}
             aria-label="Tutup tetingkap edit"
-            className="p-2 rounded-xl text-black/70 dark:text-white/75 hover:text-black dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-40 shrink-0"
+            className={`${adminTheme.iconButtonClass} disabled:opacity-40`}
           >
             <X className="w-4 h-4" />
           </button>
@@ -155,7 +158,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Masukkan tajuk program atau geran"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -164,7 +167,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as YouthProgram['category'])}
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 cursor-pointer"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none cursor-pointer ${adminTheme.inputClass}`}
               >
                 <option value="Geran & Dana">Geran &amp; Dana</option>
                 <option value="Bengkel & Latihan">Bengkel &amp; Latihan</option>
@@ -181,7 +184,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
                 value={grantAmount}
                 onChange={(e) => setGrantAmount(e.target.value)}
                 placeholder="Masukkan nilai bantuan atau yuran"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -205,7 +208,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Masukkan lokasi program"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -217,7 +220,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
                 value={organizer}
                 onChange={(e) => setOrganizer(e.target.value)}
                 placeholder="Masukkan nama penganjur"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -229,7 +232,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
                 value={registrationLink}
                 onChange={(e) => setRegistrationLink(e.target.value)}
                 placeholder="Masukkan pautan pendaftaran"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -241,7 +244,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Masukkan maklumat dan syarat program"
-                className="w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/55 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600"
+                className={`w-full px-3.5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none ${adminTheme.inputClass}`}
               />
             </div>
 
@@ -260,27 +263,27 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
             onClick={() => setIsFeatured(!isFeatured)}
             className={`w-full min-h-[42px] px-4 py-2 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
               isFeatured
-                ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-400 text-black dark:text-white'
-                : 'bg-slate-50 dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-black dark:text-white'
+                ? adminTheme.activeNavClass
+                : adminTheme.secondaryButtonClass
             }`}
           >
             <Star className="w-4 h-4 shrink-0" />
             <span>{isFeatured ? 'Pilihan Utama (Ya)' : 'Program Pilihan'}</span>
           </button>
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-300 dark:border-slate-600">
+          <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>
             <button
               type="button"
               disabled={isSaving}
               onClick={onClose}
-              className="w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-black dark:text-white bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 transition-colors cursor-pointer disabled:opacity-50"
+              className={`w-full sm:w-auto min-h-[42px] px-5 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold transition-colors cursor-pointer disabled:opacity-50 ${adminTheme.secondaryButtonClass}`}
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60"
+              className={`w-full sm:w-auto min-h-[42px] px-6 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] font-semibold shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-60 ${adminTheme.primaryButtonClass}`}
             >
               {isSaving ? (
                 <>
@@ -290,7 +293,7 @@ export const EditProgramModal: React.FC<EditProgramModalProps> = ({
               ) : (
                 <>
                   <Save className="w-4 h-4 shrink-0" />
-                  <span>Simpan Perubahan</span>
+                  <span>Simpan</span>
                 </>
               )}
             </button>
