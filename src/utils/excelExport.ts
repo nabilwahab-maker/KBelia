@@ -88,3 +88,54 @@ export const exportSalesToExcel = (
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Rekod Jualan');
   XLSX.writeFile(workbook, `rekod-jualan-kbelia-${todaySlug()}.xlsx`);
 };
+
+export const exportMentorReportToExcel = (params: {
+  mentorName: string;
+  mentorAgency: string;
+  totalMentees: number;
+  completedSessions: number;
+  totalLogs: number;
+  totalEndorsements: number;
+  districtRows: { district: string; mentees: number; sessions: number; endorsements: number }[];
+  sectorRows: { sector: string; count: number }[];
+}): void => {
+  const workbook = XLSX.utils.book_new();
+
+  const summarySheet = XLSX.utils.json_to_sheet([
+    { Perkara: 'Nama Mentor', Nilai: params.mentorName },
+    { Perkara: 'Agensi / Institusi', Nilai: params.mentorAgency },
+    { Perkara: 'Tarikh Laporan', Nilai: formatSheetDate(new Date().toISOString()) },
+    { Perkara: 'Jumlah Mentee Diselia', Nilai: params.totalMentees },
+    { Perkara: 'Sesi Bimbingan Selesai', Nilai: params.completedSessions },
+    { Perkara: 'Rekod Nota Sesi', Nilai: params.totalLogs },
+    { Perkara: 'Surat Sokongan Geran Aktif', Nilai: params.totalEndorsements }
+  ]);
+  summarySheet['!cols'] = [{ wch: 30 }, { wch: 38 }];
+  XLSX.utils.book_append_sheet(workbook, summarySheet, 'Ringkasan');
+
+  const districtSheet = XLSX.utils.json_to_sheet(
+    params.districtRows.map((row, idx) => ({
+      Bil: idx + 1,
+      Daerah: row.district,
+      'Bilangan Mentee': row.mentees,
+      'Sesi Selesai': row.sessions,
+      'Surat Sokongan': row.endorsements
+    }))
+  );
+  districtSheet['!cols'] = [{ wch: 6 }, { wch: 22 }, { wch: 18 }, { wch: 16 }, { wch: 18 }];
+  XLSX.utils.book_append_sheet(workbook, districtSheet, 'Pecahan Daerah');
+
+  const sectorSheet = XLSX.utils.json_to_sheet(
+    params.sectorRows.map((row, idx) => ({
+      Bil: idx + 1,
+      'Sektor Perniagaan': row.sector,
+      'Bilangan Mentee': row.count
+    }))
+  );
+  sectorSheet['!cols'] = [{ wch: 6 }, { wch: 36 }, { wch: 18 }];
+  XLSX.utils.book_append_sheet(workbook, sectorSheet, 'Pecahan Sektor');
+
+  const safeSlug = params.mentorName.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 24) || 'mentor';
+  XLSX.writeFile(workbook, `laporan-mentor-${safeSlug}-${todaySlug()}.xlsx`);
+};
+

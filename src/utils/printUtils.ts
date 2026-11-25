@@ -1,4 +1,4 @@
-import { CapsuleBooking, GrantApplication, GrantEndorsementLetter, KioskDailySale } from '../types';
+import { CapsuleBooking, GrantApplication, GrantEndorsementLetter, KioskDailySale, MentoringLogEntry } from '../types';
 
 /**
  * Formats a date string into readable formal Malay (e.g., "1 Jun 2026")
@@ -1288,6 +1288,81 @@ export const generateMentorSummaryReportHtml = (params: {
     signatoryTitle: params.mentorName.toUpperCase(),
     signatorySub: `${params.mentorDesignation || 'Mentor Keusahawanan'} · ${params.mentorAgency}`,
     sealText: '★ LAPORAN MENTOR KBELIA ★'
+  });
+};
+
+export const generateMentorLogbookOfficialHtml = (params: {
+  log: MentoringLogEntry;
+  mentorName: string;
+  mentorAgency: string;
+  mentorDesignation?: string;
+}): string => {
+  const { log } = params;
+  const sessionDateFormatted = formatDisplayDate(log.sessionDate);
+  const items = log.actionItems || [];
+  const doneCount = items.filter((i) => i.completed).length;
+
+  const taskRows = items.length > 0
+    ? items
+        .map(
+          (item, idx) => `
+            <tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td>${escapeHtml(item.task)}</td>
+              <td style="font-family:monospace;white-space:nowrap;">${escapeHtml(item.dueDate || '-')}</td>
+              <td style="font-weight:700;color:${item.completed ? '#065f46' : '#b45309'};white-space:nowrap;">
+                ${item.completed ? 'Selesai' : 'Dalam Tindakan'}
+              </td>
+            </tr>
+          `
+        )
+        .join('')
+    : `<tr><td colspan="4" style="text-align:center;color:#64748b;">Tiada tugasan susulan direkodkan.</td></tr>`;
+
+  const bodyHtml = `
+    <div class="doc-banner">
+      <div class="doc-banner-title">MINIT &amp; REKOD SESI BIMBINGAN USAHAWAN BELIA</div>
+      <div class="doc-banner-status">TARIKH SESI: ${escapeHtml(sessionDateFormatted)} · ${doneCount}/${items.length} TUGASAN SELESAI</div>
+    </div>
+    <table class="info-table">
+      <tr><th>Usahawan / Mentee</th><td><strong>${escapeHtml(log.menteeName)}</strong></td></tr>
+      <tr><th>Nama Perniagaan</th><td>${escapeHtml(log.businessName)}</td></tr>
+      <tr><th>Topik Bimbingan</th><td><strong>${escapeHtml(log.topic)}</strong></td></tr>
+      <tr><th>Mentor Pembimbing</th><td>${escapeHtml(params.mentorName)} (${escapeHtml(params.mentorAgency)})</td></tr>
+    </table>
+    <div class="section-title">1. Ringkasan Perbincangan &amp; Nasihat Mentor</div>
+    <div class="highlight-card" style="line-height:1.65;">
+      ${escapeHtml(log.minutes).replace(/\n/g, '<br/>')}
+    </div>
+    <div class="section-title">2. Pelan Tindakan &amp; Tugasan Susulan (${items.length})</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:42px;text-align:center;">Bil</th>
+          <th>Tugasan Usahawan</th>
+          <th style="width:115px;">Tarikh Sasaran</th>
+          <th style="width:120px;">Status</th>
+        </tr>
+      </thead>
+      <tbody>${taskRows}</tbody>
+    </table>
+  `;
+
+  return buildOfficialLetterheadShell({
+    title: `Rekod Sesi Bimbingan - ${log.businessName}`,
+    toolbarLabel: 'Rekod Sesi Bimbingan Mentor KBelia',
+    badgeText: 'Rekod Sesi',
+    agencyKicker: 'HAB USAHAWAN BELIA KELANTAN · PANEL BIMBINGAN MENTOR',
+    agencyHeading: 'PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)',
+    agencySubheading: 'Dokumen Minit Sesi & Pelan Tindakan Susulan Usahawan Belia',
+    refNumber: log.id.toUpperCase(),
+    issueDate: sessionDateFormatted,
+    statusText: 'DISIMPAN RASMI',
+    bodyHtml,
+    auditCode: log.id.toUpperCase(),
+    signatoryTitle: params.mentorName.toUpperCase(),
+    signatorySub: `${params.mentorDesignation || 'Mentor Keusahawanan'} · ${params.mentorAgency}`,
+    sealText: '★ REKOD SESI KBELIA ★'
   });
 };
 

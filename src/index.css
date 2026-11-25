@@ -152,21 +152,21 @@ html.dark .kbelia-canvas-belia {
 }
 
 .kbelia-canvas-mentor {
-  background-color: #F4F7FA;
+  background-color: #F8FAFD;
   background-image:
-    radial-gradient(ellipse 68% 48% at 14% 0%, rgba(29, 78, 216, 0.07) 0%, transparent 68%),
-    radial-gradient(ellipse 56% 42% at 92% 6%, rgba(14, 165, 233, 0.09) 0%, transparent 66%),
-    linear-gradient(180deg, #F4F7FA 0%, #EDF2F7 100%);
-  color: #0F1E2E;
+    radial-gradient(ellipse 68% 44% at 14% 0%, rgba(26, 115, 232, 0.05) 0%, transparent 68%),
+    radial-gradient(ellipse 52% 38% at 92% 4%, rgba(211, 227, 253, 0.35) 0%, transparent 66%),
+    linear-gradient(180deg, #F8FAFD 0%, #F3F6FC 100%);
+  color: #1F1F1F;
 }
 
 html.dark .kbelia-canvas-mentor {
-  background-color: #0E151C;
+  background-color: #131314;
   background-image:
-    radial-gradient(ellipse 65% 48% at 14% 0%, rgba(37, 99, 235, 0.16) 0%, transparent 68%),
-    radial-gradient(ellipse 58% 45% at 92% 8%, rgba(34, 211, 238, 0.12) 0%, transparent 66%),
-    linear-gradient(180deg, #0E151C 0%, #131E29 52%, #0F1720 100%);
-  color: #F1F6FA;
+    radial-gradient(ellipse 65% 44% at 14% 0%, rgba(138, 180, 248, 0.08) 0%, transparent 68%),
+    radial-gradient(ellipse 56% 42% at 92% 6%, rgba(0, 74, 119, 0.14) 0%, transparent 66%),
+    linear-gradient(180deg, #131314 0%, #17181A 52%, #131314 100%);
+  color: #E3E3E3;
 }
 
 .kbelia-canvas-admin {
